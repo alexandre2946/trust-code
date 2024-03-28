@@ -56,7 +56,9 @@
 
 
 #define Implemente_base_sans_constructeur_ni_destructeur(_TYPE_,_NOM_,_BASE_) \
-                                                                        \
+                                                                           \
+  static_assert(std::is_base_of<_BASE_, _TYPE_>::value, "\n\n!!!!! Error in Implemente_base* macro usage: type '" #_TYPE_ "' does not inherit from '" #_BASE_ "' !!!!\n\n"); \
+                                                                           \
   const Type_info* name2(_TYPE_,bases)[1]={                                \
     &(_BASE_::info_obj)};                                                \
   const Type_info _TYPE_::info_obj(_NOM_, 1, name2(_TYPE_,bases));        \
