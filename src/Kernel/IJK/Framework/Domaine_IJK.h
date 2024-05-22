@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -50,7 +50,7 @@ public:
 
   /*! @brief Localisation sub class
    */
-  enum Localisation {ELEM, NODES, FACES_I, FACES_J, FACES_K};
+  enum Localisation {ELEM, NODES, EDGES, EDGES_I, EDGES_J, EDGES_K, FACES, FACES_I, FACES_J, FACES_K};
 
   /*! @brief status sub class to not compute the same structure twitce when not needed
    */
@@ -65,6 +65,13 @@ public:
     Localisation faces[] = {FACES_I, FACES_J, FACES_K};
     assert(direction >= 0 && direction <= 2);
     return faces[direction];
+  }
+
+  static Localisation Edges_Dir_To_Localisation(int direction)
+  {
+    Localisation edges[] = {EDGES_I, EDGES_J, EDGES_K};
+    assert(direction >= 0 && direction <= 2);
+    return edges[direction];
   }
 
   Domaine_IJK();
@@ -232,9 +239,24 @@ public:
     return nb_faces_local_[compo][direction];
   }
 
+  /*! @brief Returns the number, in requested direction, of edges of faces in direction of "compo"
+   *
+   *  The last face of the last element is owned by the next processor.
+   *
+   *  @param compo direction In IJK, horizontal(0), vertical(1) or z-axis depth(2)
+   *  @param direction In IJK, x(0), y(1) or z(2)
+   *  @return nb_faces_local_[compo][direction]
+   */
+  inline int get_nb_edges_local(int compo, int direction) const
+  {
+    assert(compo >= 0 && compo < 3);
+    assert(direction >= 0 && direction < 3);
+    return nb_edges_local_[compo][direction];
+  }
+
   /*! @brief Returns the number of local items (on this processor) for the given localisation in the requested direction
    *
-   *  @param loc In IJK, ELEM, NODES, FACES_I, FACES_J or FACES_K
+   *  @param loc In IJK, ELEM, NODES, EDGES_I, EDGES_J, EDGES_K, FACES_I, FACES_J or FACES_K
    *  @param direction In IJK, x(0), y(1) or z(2)
    *  @return Number of requested items
    */
@@ -268,7 +290,7 @@ public:
    *
    *  If periodic along requested direction, need to add the last item for nodes and faces.
    *
-   *  @param loc In IJK, ELEM, NODES, FACES_I, FACES_J or FACES_K
+   *  @param loc In IJK, ELEM, NODES, EDGES_I, EDGES_J, EDGES_K, FACES_I, FACES_J or FACES_K
    *  @param direction In IJK, x(0), y(1) or z(2)
    *  @return Number of requested items
    */
@@ -414,7 +436,7 @@ public:
    *         for all slices in the requested direction.
    *
    *  @param direction In IJK, x(0), y(1) or z(2).
-   *  @param loc In IJK, ELEM, NODES, FACES_I, FACES_J or FACES_K
+   *  @param loc In IJK, ELEM, NODES, EDGES_I, EDGES_J, EDGES_K, FACES_I, FACES_J or FACES_K
    *  @param tab Array in which we'll store the number of slices in given direction
    */
   void get_slice_size(int direction, Localisation loc, ArrOfInt& tab) const;
@@ -453,7 +475,7 @@ public:
    *  @param i Local index of an element along x axis.
    *  @param j Local index of an element along y axis.
    *  @param k Local index of an element along z axis.
-   *  @param In IJK, ELEM, NODES, FACES_I, FACES_J or FACES_K.
+   *  @param In IJK, ELEM, NODES, EDGES_I, EDGES_J, EDGES_K, FACES_I, FACES_J or FACES_K.
    *
    *  @return A vector with the coordinates of dof
    */
@@ -631,6 +653,8 @@ private:
   FixedVector<int, 3> nb_nodes_local_;
   /*! indexing is nb_faces_local_[for orientation i][number of faces in direction j] */
   FixedVector<FixedVector<int, 3>, 3> nb_faces_local_;
+  /*! same indexing for nb_edges_local_[for orientation i][number of faces in direction j] */
+  FixedVector<FixedVector<int, 3>, 3> nb_edges_local_;
   /*! Index in the global mesh of the first (non ghost) element on this processor, in each direction */
   FixedVector<int, 3> offset_;
   /*! @brief MPI ranks of the processors that hold the neighbour domains.
@@ -653,10 +677,16 @@ inline double Domaine_IJK::get_coord_of_dof_along_dir(int dir, int i, Localisati
   int gi = i + offset_[dir];
   double x = get_node_coordinates(dir)[gi];
 
+  bool loc_edges = (loc == EDGES_I) || (loc == EDGES_J) || (loc == EDGES_K);
   bool loc_equal_dir = (((loc == FACES_I) && (dir == 0)) || ((loc == FACES_J) && (dir == 1)) || ((loc == FACES_K) && (dir == 2)));
-  bool loc_equal_dir_or_nodes = loc_equal_dir || (loc == NODES);
+  bool loc_equal_dir_or_nodes_or_edges = loc_equal_dir || loc_edges || (loc == NODES);
 
-  if (!loc_equal_dir_or_nodes)
+  bool loc_equal_edge_dir = (((loc == EDGES_I) && (dir == 0)) || ((loc == EDGES_J) && (dir == 1)) || ((loc == EDGES_K) && (dir == 2)));
+
+  if (!loc_equal_dir_or_nodes_or_edges)
+    x += get_delta(dir)[gi] * 0.5;
+
+  if (loc_equal_edge_dir)
     x += get_delta(dir)[gi] * 0.5;
 
   return x;

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -47,7 +47,10 @@ Domaine_IJK::Domaine_IJK()
       offset_[i] = 0;
       nproc_per_direction_[i] = 0;
       for(int j = 0; j < 3; ++j)
-        nb_faces_local_[i][j] = 0;
+        {
+          nb_faces_local_[i][j] = 0;
+          nb_edges_local_[i][j] = 0;
+        }
       for(int j = 0; j < 2; ++j)
         neighbour_processors_[j][i] = -1;
     }
@@ -557,7 +560,10 @@ void Domaine_IJK::initialize_mapping(Domaine_IJK& geom, const ArrOfInt& slice_si
           nb_elem_local_[i] = 0;
           nb_nodes_local_[i] = 0;
           for (int j = 0; j < 3; ++j)
-            nb_faces_local_[i][j] = 0;
+            {
+              nb_faces_local_[i][j] = 0;
+              nb_edges_local_[i][j] = 0;
+            }
           offset_[i] = 0;
           neighbour_processors_[0][i] = -1;
           neighbour_processors_[1][i] = -1;
@@ -584,6 +590,10 @@ void Domaine_IJK::initialize_mapping(Domaine_IJK& geom, const ArrOfInt& slice_si
                 nb_faces_local_[j][i] = nb_nodes_local_[i];
               else
                 nb_faces_local_[j][i] = nb_elem_local_[i];
+              if (i == j)
+                nb_edges_local_[j][i] = nb_elem_local_[i];
+              else
+                nb_edges_local_[j][i] = nb_nodes_local_[i];
             }
           offset_[i] = offsets_all_slices_[i][processor_position_[i]];
         }
@@ -898,14 +908,15 @@ Faces* Domaine_IJK::creer_faces()
 /*! @brief Returns the number of local items (on this processor) for the given localisation in the requested direction
  *
  *
- *  @param loc In IJK, ELEM, NODES, FACES_I, FACES_J or FACES_K
+ *  @param loc In IJK, ELEM, NODES, FACES_I, FACES_J, FACES_K, ELEM_I, ELEM_J or ELEM_K
  *  @param direction In IJK, x(0), y(1) or z(2)
  *  @return Number of requested items
  */
 int Domaine_IJK::get_nb_items_local(Localisation loc, int direction) const
 {
-  assert(loc == ELEM || loc == NODES || loc == FACES_I ||
-         loc == FACES_J || loc == FACES_K);
+  assert(loc == ELEM || loc == NODES ||
+         loc == FACES_I || loc == FACES_J || loc == FACES_K ||
+         loc == EDGES_I || loc == EDGES_J || loc == EDGES_K);
   assert(direction >= 0 && direction < 3);
   switch(loc)
     {
@@ -913,12 +924,21 @@ int Domaine_IJK::get_nb_items_local(Localisation loc, int direction) const
       return get_nb_elem_local(direction);
     case NODES:
       return get_nb_nodes_local(direction);
+    case EDGES_I:
+      return get_nb_edges_local(0, direction);
+    case EDGES_J:
+      return get_nb_edges_local(1, direction);
+    case EDGES_K:
+      return get_nb_edges_local(2, direction);
     case FACES_I:
       return get_nb_faces_local(0, direction);
     case FACES_J:
       return get_nb_faces_local(1, direction);
     case FACES_K:
       return get_nb_faces_local(2, direction);
+    case FACES:
+    case EDGES:
+      break;
     }
   return -1;
 }
@@ -992,14 +1012,15 @@ void Domaine_IJK::get_local_mesh_delta(int direction, int ghost_cells,
  *
  *  If periodic along requested direction, need to add the last item for nodes and faces.
  *
- *  @param loc In IJK, ELEM, NODES, FACES_I, FACES_J or FACES_K
+ *  @param loc In IJK, ELEM, NODES, FACES_I, FACES_J, FACES_K, EDGES_I, EDGES_J or EDGES_K
  *  @param direction In IJK, x(0), y(1) or z(2)
  *  @return Number of requested items
  */
 int Domaine_IJK::get_nb_items_global(Localisation loc, int direction) const
 {
-  assert(loc == ELEM || loc == NODES || loc == FACES_I ||
-         loc == FACES_J || loc == FACES_K);
+  assert(loc == ELEM || loc == NODES ||
+         loc == FACES_I || loc == FACES_J || loc == FACES_K ||
+         loc == EDGES_I || loc == EDGES_J || loc == EDGES_K);
   assert(direction >= 0 && direction < 3);
   int n = get_nb_elem_tot(direction);
   int no_perio = 0;
@@ -1009,9 +1030,23 @@ int Domaine_IJK::get_nb_items_global(Localisation loc, int direction) const
   switch(loc)
     {
     case ELEM:
+    case EDGES:
+    case FACES:
       break;
     case NODES:
       n += no_perio;
+      break;
+    case EDGES_I:
+      if (direction != 0)
+        n += no_perio;
+      break;
+    case EDGES_J:
+      if (direction != 1)
+        n += no_perio;
+      break;
+    case EDGES_K:
+      if (direction != 2)
+        n += no_perio;
       break;
     case FACES_I:
       if (direction == 0)
@@ -1033,7 +1068,7 @@ int Domaine_IJK::get_nb_items_global(Localisation loc, int direction) const
  *         for all slices in the requested direction.
  *
  *  @param direction In IJK, x(0), y(1) or z(2).
- *  @param loc In IJK, ELEM, NODES, FACES_I, FACES_J or FACES_K
+ *  @param loc In IJK, ELEM, NODES, EDGES_I, EDGES_J, EDGES_K, FACES_I, FACES_J or FACES_K
  *  @param tab Array in which we'll store the number of slices in given direction
  */
 void Domaine_IJK::get_slice_size(int direction, Localisation loc, ArrOfInt& tab) const
@@ -1051,6 +1086,15 @@ void Domaine_IJK::get_slice_size(int direction, Localisation loc, ArrOfInt& tab)
           break;
         case NODES:
           tab[n]++;
+          break;
+        case EDGES_I:
+          if (direction != 0) tab[n]++;
+          break;
+        case EDGES_J:
+          if (direction != 1) tab[n]++;
+          break;
+        case EDGES_K:
+          if (direction != 2) tab[n]++;
           break;
         case FACES_I:
           if (direction == 0) tab[n]++;
@@ -1074,7 +1118,7 @@ void Domaine_IJK::get_slice_size(int direction, Localisation loc, ArrOfInt& tab)
  *  @param i Local index of an element along x axis.
  *  @param j Local index of an element along y axis.
  *  @param k Local index of an element along z axis.
- *  @param In IJK, ELEM, NODES, FACES_I, FACES_J or FACES_K.
+ *  @param In IJK, ELEM, NODES, EDGES_I, EDGES_J, EDGES_K, FACES_I, FACES_J or FACES_K.
  *
  *  @return A vector with the coordinates of dof
  */
@@ -1089,11 +1133,11 @@ Vecteur3 Domaine_IJK::get_coords_of_dof(int i, int j, int k, Localisation loc) c
   xyz[0] = get_node_coordinates(0)[gi];
   xyz[1] = get_node_coordinates(1)[gj];
   xyz[2] = get_node_coordinates(2)[gk];
-  if (loc == ELEM || loc == FACES_J || loc == FACES_K)
+  if (loc == ELEM || loc == EDGES_I || loc == FACES_J || loc == FACES_K)
     xyz[0] += get_delta(0)[gi] * 0.5;
-  if (loc == ELEM || loc == FACES_I || loc == FACES_K)
+  if (loc == ELEM || loc == EDGES_J || loc == FACES_I || loc == FACES_K)
     xyz[1] += get_delta(1)[gj] * 0.5;
-  if (loc == ELEM || loc == FACES_I || loc == FACES_J)
+  if (loc == ELEM || loc == EDGES_K || loc == FACES_I || loc == FACES_J)
     xyz[2] += get_delta(2)[gk] * 0.5;
   return xyz;
 }
