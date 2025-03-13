@@ -75,6 +75,8 @@ public :
   ///
   virtual IntTab& face_sommets();
   virtual const IntTab& face_sommets() const;
+  virtual IntTab& face_aretes();
+  virtual const IntTab& face_aretes() const;
   virtual IntTab& face_voisins();
   virtual const IntTab& face_voisins() const;
 

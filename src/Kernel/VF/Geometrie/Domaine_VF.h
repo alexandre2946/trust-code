@@ -67,6 +67,7 @@ public :
   inline int nb_faces() const;
   inline int nb_faces_tot() const;
   inline int nb_som_face() const;
+  inline int nb_arete_face() const;
   inline int nb_faces_bord() const;
   inline int nb_faces_bord_tot() const;
   inline int premiere_face_bord() const;
@@ -129,6 +130,8 @@ public :
   inline const ArrOfInt& faces_doubles() const;
   inline IntTab& face_sommets() override;
   inline const IntTab& face_sommets() const override;
+  inline IntTab& face_aretes() override;
+  inline const IntTab& face_aretes() const override;
   void modifier_pour_Cl(const Conds_lim&) override;
 
   int numero_face_local(int face, int elem) const;
@@ -215,6 +218,7 @@ protected:
 
   IntTab elem_faces_;                           // connectivite element/faces
   IntTab face_sommets_;                           // sommets des faces
+  IntTab face_aretes_;                           // aretes des faces
   DoubleTab xa_;                            // centres de gravite des aretes
   IntTab face_numero_bord_;                     // connectivite face/numero_bord
 
@@ -489,6 +493,15 @@ inline int Domaine_VF::nb_som_face() const
   return face_sommets_.dimension(1);
 }
 
+/*! @brief renvoie le nombre d'aretes par face.
+ *
+ *
+ */
+inline int Domaine_VF::nb_arete_face() const
+{
+  return face_aretes_.dimension(1);
+}
+
 /*! @brief renvoie le nombre de faces sur lesquelles sont appliquees les conditions limites :
  *
  *  bords, raccords, plaques.
@@ -583,6 +596,22 @@ inline IntTab& Domaine_VF::face_sommets()
 inline const IntTab& Domaine_VF::face_sommets() const
 {
   return face_sommets_;
+}
+
+/*! @brief renvoie le tableau de connectivite faces/aretes.
+ *
+ */
+inline IntTab& Domaine_VF::face_aretes()
+{
+  return face_aretes_;
+}
+
+/*! @brief cf au dessus.
+ *
+ */
+inline const IntTab& Domaine_VF::face_aretes() const
+{
+  return face_aretes_;
 }
 
 /*! @brief renvoie la ieme frontiere_discrete.

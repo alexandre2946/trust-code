@@ -135,6 +135,22 @@ const IntTab& Domaine_dis_base::face_sommets() const
   throw;
 }
 
+IntTab& Domaine_dis_base::face_aretes()
+{
+  Cerr << que_suis_je() << "does not implement the method face_aretes()"
+       << finl;
+  exit();
+  throw;
+}
+
+const IntTab& Domaine_dis_base::face_aretes() const
+{
+  Cerr << que_suis_je() << "does not implement the method face_aretes()"
+       << finl;
+  exit();
+  throw;
+}
+
 IntTab& Domaine_dis_base::face_voisins()
 {
   Cerr << que_suis_je() << "does not implement the method face_voisins()"

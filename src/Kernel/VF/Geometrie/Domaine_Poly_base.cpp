@@ -447,6 +447,63 @@ void Domaine_Poly_base::discretiser_aretes()
   MD_Vector_composite mdc_fa;
   mdc_fa.add_part(md_vector_faces()), mdc_fa.add_part(dimension < 3 ? domaine().md_vector_sommets() : md_vector_aretes());
   mdv_faces_aretes.copy(mdc_fa);
+
+  //Ajout face_arete connectivite (pour STT a mettre ailleurs ? )
+  if (dimension > 2)
+    {
+      const IntTab& elem_aretes = domaine().elem_aretes();
+      const IntTab& aretes_som = domaine().aretes_som();
+
+      int nb_faces = face_sommets_.dimension(0);
+      int nb_faces_tot = face_sommets_.dimension_tot(0);
+
+      int nb_edges_max = face_sommets_.dimension(1);
+      int nb_edges_elem_max = domaine().elem_aretes().dimension(1);
+
+      face_aretes_.resize(nb_faces,nb_edges_max);
+      creer_tableau_faces(face_aretes_, RESIZE_OPTIONS::NOCOPY_NOINIT);
+      face_aretes_ = -1;
+
+      int arete;
+      int node0, node1;
+
+      for (int f=0; f<nb_faces_tot; f++)
+        {
+          int i = 0;
+          int elem0 = face_voisins_(f,0);
+          int elem1 = face_voisins_(f,1);
+
+          int elem = (elem0 == -1 ? elem1 : elem0);
+
+          int last_index = nb_edges_max-1;
+          while (face_sommets_(f,last_index) == -1) last_index--;
+
+          for (int k=0; k<nb_edges_elem_max; k++)
+            {
+              arete = elem_aretes(elem,k);
+
+              if (arete == -1) break;
+              node0 = aretes_som(arete,0);
+              node1 = aretes_som(arete,1);
+
+              for (int j=0; j<nb_edges_max; j++)
+                {
+                  // find continuous edge in face_nodes_
+                  if (face_sommets_(f,j) == node0)
+                    {
+                      int previous = j > 0 ? j-1 : last_index;
+                      int next = j < last_index ? j+1 : 0;
+
+                      if (face_sommets_(f,previous) == node1 || face_sommets(f,next) == node1)
+                        {
+                          face_aretes_(f,i) = arete;
+                          i++;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 void Domaine_Poly_base::orthocentrer()
