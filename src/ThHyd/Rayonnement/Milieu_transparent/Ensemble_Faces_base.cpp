@@ -81,8 +81,6 @@ int Ensemble_Faces_base::contient(int num_face) const
     }
 }
 
-int is_la_cl_rayo(const Cond_lim_base& la_cl,Cond_Lim_Rayo*& la_cl_rayo);
-
 int Ensemble_Faces_base::is_ok() const
 {
   if (les_cl_base.non_nul()) return 1;
@@ -91,7 +89,7 @@ int Ensemble_Faces_base::is_ok() const
 
 void Ensemble_Faces_base::associer_les_cl(Cond_lim_base& la_cl)
 {
-  is_la_cl_rayo(la_cl,la_cond_lim_rayo_);
+  la_cl.is_la_cl_rayo(la_cond_lim_rayo_);
   les_cl_base=la_cl;
   Frontiere& le_bord = la_cl.frontiere_dis().frontiere();
   nb_faces_bord_ = le_bord.nb_faces();

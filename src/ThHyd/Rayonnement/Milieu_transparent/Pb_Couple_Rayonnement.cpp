@@ -16,14 +16,8 @@
 #include <Pb_Couple_Rayonnement.h>
 #include <Modele_Rayonnement_Milieu_Transparent.h>
 #include <Paroi_Rayo_transp.h>
-#include <Frontiere_Ouverte_temperature_imposee_Rayo_transp.h>
 #include <Probleme_base.h>
-#include <Echange_contact_Rayo_transp_VDF.h>
-#include <Echange_externe_impose_rayo_transp.h>
-#include <Temperature_imposee_paroi_rayo_transp.h>
-#include <Frontiere_Ouverte_Rayo_transp.h>
-#include <verif_cast.h>
-#include <Probleme_base.h>
+#include <Fluide_base.h>
 
 Implemente_instanciable(Pb_Couple_Rayonnement,"Pb_Couple_Rayonnement",Probleme_Couple);
 
@@ -131,44 +125,6 @@ void Pb_Couple_Rayonnement::validateTimeStep()
   le_modele_rayo().mettre_a_jour(presentTime());
 }
 
-
-int is_la_cl_rayo (const Cond_lim_base& la_cl,Cond_Lim_Rayo*& la_cl_rayo)
-{
-  //if  (sub_type(Paroi_Rayo_transp,la_cl)|| sub_type(Frontiere_Ouverte_temperature_imposee_Rayo_transp,la_cl))
-
-  if (sub_type(Paroi_Rayo_transp,la_cl))
-    {
-      la_cl_rayo =&( verif_cast(Cond_Lim_Rayo&, ref_cast(Paroi_Rayo_transp,la_cl)));
-      return 1;
-    }
-  if sub_type(Frontiere_Ouverte_temperature_imposee_Rayo_transp,la_cl)
-    {
-      la_cl_rayo =&( verif_cast(Cond_Lim_Rayo&,  ref_cast(Frontiere_Ouverte_temperature_imposee_Rayo_transp,la_cl)));
-      return 1;
-    }
-  if sub_type( Echange_contact_Rayo_transp_VDF,la_cl)
-    {
-      la_cl_rayo =&( verif_cast(Cond_Lim_Rayo&,  ref_cast( Echange_contact_Rayo_transp_VDF,la_cl)));
-      return 1;
-    }
-  if sub_type( Echange_externe_impose_rayo_transp,la_cl)
-    {
-      la_cl_rayo =&( verif_cast(Cond_Lim_Rayo&,  ref_cast( Echange_externe_impose_rayo_transp,la_cl)));
-      return 1;
-    }
-  if sub_type( Temperature_imposee_paroi_rayo_transp,la_cl)
-    {
-      la_cl_rayo =&( verif_cast(Cond_Lim_Rayo&,  ref_cast( Temperature_imposee_paroi_rayo_transp,la_cl)));
-      return 1;
-    }
-  if sub_type( Frontiere_Ouverte_Rayo_transp,la_cl)
-    {
-      la_cl_rayo =&( verif_cast(Cond_Lim_Rayo&,  ref_cast(Frontiere_Ouverte_Rayo_transp ,la_cl)));
-      return 1;
-    }
-  return 0;
-}
-
 void Pb_Couple_Rayonnement::completer()
 {
   le_modele_de_rayo->discretiser(ref_cast(Probleme_base,probleme(0)).discretisation(), ref_cast(Probleme_base,probleme(0)).domaine());
@@ -230,7 +186,7 @@ void Pb_Couple_Rayonnement::completer()
               Cond_lim_base& la_cl = la_zcl.les_conditions_limites(num_cl).valeur();
 
               Cond_Lim_Rayo* la_cl_rayo;
-              if (is_la_cl_rayo(la_cl,la_cl_rayo))
+              if (la_cl.is_la_cl_rayo(la_cl_rayo))
                 {
                   ((*la_cl_rayo)).associer_modele_rayo(mod_rayo);
 

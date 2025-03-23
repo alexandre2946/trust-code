@@ -40,6 +40,11 @@ public :
   void calculer_Teta_paroi(DoubleTab& tab_p,const DoubleTab& mon_h,const DoubleTab& autre_h,int is_pb_fluide,double temps) override;
   void calculer_Teta_equiv(DoubleTab& Teta_equiv,const DoubleTab& mon_h,const DoubleTab& autre_h,int is_pb_fluide,double temps) override;
   //int verifier_correspondance() const;
+  int is_la_cl_rayo(Cond_Lim_Rayo *& la_cl_rayo) override
+  {
+    la_cl_rayo = &((Cond_Lim_Rayo&) (*this));
+    return 1;
+  }
 protected :
   int num_premiere_face_dans_pb_fluide;
   double alpha_;

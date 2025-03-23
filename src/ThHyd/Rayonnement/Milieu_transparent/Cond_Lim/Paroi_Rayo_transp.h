@@ -31,6 +31,12 @@ public :
   double flux_impose(int i,int j) const override;
   int compatible_avec_eqn(const Equation_base&) const override { return 1; }
 
+  int is_la_cl_rayo(Cond_Lim_Rayo *& la_cl_rayo) override
+  {
+    la_cl_rayo = &((Cond_Lim_Rayo&) (*this));
+    return 1;
+  }
+
 };
 
 #endif

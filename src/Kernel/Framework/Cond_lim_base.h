@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2025, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -23,6 +23,7 @@
 
 class Discretisation_base;
 class Domaine_Cl_dis_base;
+class Cond_Lim_Rayo;
 class Equation_base;
 
 /*! @brief classe Cond_lim_base Classe de base pour la hierarchie des classes qui representent les differentes conditions aux limites (Dirichlet, Neumann ...).
@@ -70,6 +71,12 @@ public:
   virtual int reculer(double temps);
 
 //  virtual void set_app_domains() = 0;
+
+  // methode virtuelle pour les CL rayonnement ! Attention, Cond_Lim_Rayo ne derive pas d'objet_U
+  virtual int is_la_cl_rayo(Cond_Lim_Rayo*& la_cl_rayo)
+  {
+    return 0; /* par defaut pas rayo ! */
+  }
 
 protected:
   std::vector<Motcle> app_domains;

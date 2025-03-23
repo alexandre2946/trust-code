@@ -29,7 +29,11 @@ public :
   void completer() override;
   void mettre_a_jour(double temps) override;
   void calculer_Teta_i(double temps);
-
+  int is_la_cl_rayo(Cond_Lim_Rayo *& la_cl_rayo) override
+  {
+    la_cl_rayo = &((Cond_Lim_Rayo&) (*this));
+    return 1;
+  }
 protected:
 };
 
