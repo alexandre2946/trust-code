@@ -13,26 +13,17 @@
 *
 *****************************************************************************/
 
-#ifndef Modele_Rayonnement_base_included
-#define Modele_Rayonnement_base_included
+#ifndef Paroi_flux_impose_Rayo_transp_VEF_included
+#define Paroi_flux_impose_Rayo_transp_VEF_included
 
-#include <Domaine_forward.h>
-#include <Cond_lim_base.h>
+#include <Paroi_flux_impose_Rayo_transp.h>
 
-class Modele_Rayonnement_base : public Objet_U
+class Paroi_flux_impose_Rayo_transp_VEF: public Paroi_flux_impose_Rayo_transp
 {
-
-  Declare_base(Modele_Rayonnement_base);
-
+  Declare_instanciable(Paroi_flux_impose_Rayo_transp_VEF);
 public:
-
-  virtual void discretiser(const Discretisation_base&, const Domaine& ) = 0;
-  virtual void mettre_a_jour (double temps) =0;
-  virtual void preparer_calcul () =0;
-  virtual void calculer_temperatures()=0;
-  virtual void calculer_radiosites() =0;
-  virtual void calculer_flux_radiatifs() =0;
-  virtual void imprimer_flux_radiatifs(Sortie& ) const =0;
+  void calculer_Teta_i() override;
+  void completer() override;
 };
 
-#endif
+#endif /* Paroi_flux_impose_Rayo_transp_VEF_included */

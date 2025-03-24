@@ -20,23 +20,14 @@
 #include <Champ_front_calc.h>
 #include <TRUST_Ref.h>
 
-class Domaine_Cl_VDF;
-class Domaine_VDF;
-
-class Paroi_flux_impose_Rayo_transp : public Paroi_Rayo_transp
+class Paroi_flux_impose_Rayo_transp: public Paroi_Rayo_transp
 {
+  Declare_base(Paroi_flux_impose_Rayo_transp);
+public:
 
-  Declare_instanciable(Paroi_flux_impose_Rayo_transp);
-
-public :
-
-  void calculer_Teta_i();
+  virtual void calculer_Teta_i() = 0;
   void mettre_a_jour(double temps) override;
   void completer() override;
-protected:
-  void calculer_Teta_i_VDF();
-  void calculer_Teta_i_VEF();
-  OBS_PTR(Domaine_VDF) domaine_VDF;
-  int is_VDF_;
 };
-#endif
+
+#endif /* Paroi_flux_impose_Rayo_transp_included */

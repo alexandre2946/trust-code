@@ -16,31 +16,24 @@
 #ifndef Frontiere_Ouverte_temperature_imposee_Rayo_transp_included
 #define Frontiere_Ouverte_temperature_imposee_Rayo_transp_included
 
-
-#include <Cond_Lim_Rayo.h>
 #include <Dirichlet_entree_fluide_leaves.h>
+#include <Cond_Lim_Rayo.h>
 
-class Frontiere_Ouverte_temperature_imposee_Rayo_transp : public Cond_Lim_Rayo, public Entree_fluide_temperature_imposee
+class Frontiere_Ouverte_temperature_imposee_Rayo_transp: public Cond_Lim_Rayo, public Entree_fluide_temperature_imposee
 {
   Declare_instanciable(Frontiere_Ouverte_temperature_imposee_Rayo_transp);
-
-public :
-  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
+public:
 
   void completer() override;
-  void mettre_a_jour(double ) override;
+  void mettre_a_jour(double) override;
   void calculer_Teta_i();
+  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
 
-  int is_la_cl_rayo(Cond_Lim_Rayo *& la_cl_rayo) override
+  inline int is_la_cl_rayo(Cond_Lim_Rayo *& la_cl_rayo) override
   {
     la_cl_rayo = &((Cond_Lim_Rayo&) (*this));
     return 1;
   }
-
-protected:
-  //double d_rho;
 };
 
-
-
-#endif
+#endif /* Frontiere_Ouverte_temperature_imposee_Rayo_transp_included */

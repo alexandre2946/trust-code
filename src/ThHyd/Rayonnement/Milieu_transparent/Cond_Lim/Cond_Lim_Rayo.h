@@ -21,57 +21,24 @@
 
 class Modele_Rayonnement_Milieu_Transparent;
 
-class Modele_Rayonnement_base;
 class Cond_Lim_Rayo
 {
-
 public:
-  virtual void completer();
-  void preparer_surface(const Frontiere_dis_base& ,const Domaine_Cl_dis_base& );
-  virtual void associer_modele_rayo(Modele_Rayonnement_base& );
-  //virtual const Cond_lim_base& la_cl() const =0;
-  inline virtual double surface(int ) const ;
-  inline virtual double teta_i(int )  ;
-  inline virtual double teta_i(int ) const;
-  virtual inline ~Cond_Lim_Rayo();
-  inline Modele_Rayonnement_Milieu_Transparent& modele_rayo();
-  inline const Modele_Rayonnement_Milieu_Transparent& modele_rayo() const;
+  virtual ~Cond_Lim_Rayo() { }
 
-protected :
-  DoubleVect Surf_i;
-  DoubleVect Teta_i;
+  virtual void completer();
+  void preparer_surface(const Frontiere_dis_base&, const Domaine_Cl_dis_base&);
+  virtual void associer_modele_rayo(Modele_Rayonnement_Milieu_Transparent&);
+
+  inline virtual double surface(int numfa) const { return surf_i_[numfa]; }
+  inline virtual double teta_i(int numfa) const { return teta_i_[numfa]; }
+
+  inline Modele_Rayonnement_Milieu_Transparent& modele_rayo() { return le_modele_rayo.valeur(); }
+  inline const Modele_Rayonnement_Milieu_Transparent& modele_rayo() const { return le_modele_rayo.valeur(); }
+
+protected:
+  DoubleVect surf_i_, teta_i_;
   OBS_PTR(Modele_Rayonnement_Milieu_Transparent) le_modele_rayo;
 };
 
-inline Cond_Lim_Rayo::~Cond_Lim_Rayo()
-{}
-
-inline Modele_Rayonnement_Milieu_Transparent& Cond_Lim_Rayo::modele_rayo()
-{
-  return le_modele_rayo.valeur();
-}
-
-inline const Modele_Rayonnement_Milieu_Transparent& Cond_Lim_Rayo::modele_rayo() const
-{
-  return le_modele_rayo.valeur();
-}
-inline double Cond_Lim_Rayo::surface(int numfa) const
-{
-  return Surf_i[numfa];
-}
-
-
-inline double Cond_Lim_Rayo::teta_i(int numfa)
-{
-  return Teta_i[numfa];
-}
-
-inline double Cond_Lim_Rayo::teta_i(int numfa) const
-{
-  return Teta_i[numfa];
-}
-
-
-
-
-#endif
+#endif /* Cond_Lim_Rayo_included */

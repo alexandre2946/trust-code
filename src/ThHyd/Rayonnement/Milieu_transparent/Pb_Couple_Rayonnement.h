@@ -16,42 +16,33 @@
 #ifndef Pb_Couple_Rayonnement_included
 #define Pb_Couple_Rayonnement_included
 
+#include <Modele_Rayonnement_Milieu_Transparent.h>
 #include <Probleme_Couple.h>
-#include <Modele_Rayonnement_base.h>
 #include <TRUST_Ref.h>
 
 class Cond_lim_base;
-
 class Schema_Temps_base;
 class Discretisation_base;
 
 class Pb_Couple_Rayonnement: public Probleme_Couple
 {
   Declare_instanciable(Pb_Couple_Rayonnement);
-
 public:
-  void le_modele_rayo_associe(const Modele_Rayonnement_base&);
-  void associer_cl_base(const Cond_lim_base& );
   int associer_(Objet_U&) override;
+  int postraiter(int force = 1) override;
+
+  void le_modele_rayo_associe(const Modele_Rayonnement_Milieu_Transparent&);
+  void associer_cl_base(const Cond_lim_base&);
   void completer();
   void validateTimeStep() override;
   void initialize() override;
-  inline Modele_Rayonnement_base& le_modele_rayo();
-  inline Cond_lim_base& cond_l_base();
-  int postraiter(int force=1) override;
+
+  inline Modele_Rayonnement_Milieu_Transparent& le_modele_rayo() { return le_modele_de_rayo_.valeur(); }
+  inline Cond_lim_base& cond_l_base() { return les_cl_.valeur(); }
 
 protected:
-  OBS_PTR(Modele_Rayonnement_base) le_modele_de_rayo;
-  OBS_PTR(Cond_lim_base) les_cl;
+  OBS_PTR(Modele_Rayonnement_Milieu_Transparent) le_modele_de_rayo_;
+  OBS_PTR(Cond_lim_base) les_cl_;
 };
 
-inline Modele_Rayonnement_base& Pb_Couple_Rayonnement::le_modele_rayo()
-{
-  return le_modele_de_rayo.valeur();
-}
-
-inline Cond_lim_base& Pb_Couple_Rayonnement::cond_l_base()
-{
-  return les_cl.valeur();
-}
-#endif
+#endif /* Pb_Couple_Rayonnement_included */

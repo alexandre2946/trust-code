@@ -13,22 +13,17 @@
 *
 *****************************************************************************/
 
-#include <Modele_Rayonnement_base.h>
-Implemente_base(Modele_Rayonnement_base,"Modele_Rayonnement_base",Objet_U);
+#ifndef Paroi_flux_impose_Rayo_transp_VDF_included
+#define Paroi_flux_impose_Rayo_transp_VDF_included
 
+#include <Paroi_flux_impose_Rayo_transp.h>
 
-Entree& Modele_Rayonnement_base :: readOn(Entree& is)
+class Paroi_flux_impose_Rayo_transp_VDF: public Paroi_flux_impose_Rayo_transp
 {
+  Declare_instanciable(Paroi_flux_impose_Rayo_transp_VDF);
+public:
+  void calculer_Teta_i() override;
+  void completer() override;
+};
 
-  return is;
-}
-
-Sortie& Modele_Rayonnement_base :: printOn(Sortie& os) const
-{
-
-  return os;
-}
-
-
-
-
+#endif /* Paroi_flux_impose_Rayo_transp_VDF_included */

@@ -14,66 +14,44 @@
 *****************************************************************************/
 
 #include <Ensemble_Faces_base.h>
-#include <EFichier.h>
 #include <Frontiere_dis_base.h>
-#include <Domaine.h>
 #include <TRUSTList.h>
+#include <EFichier.h>
+#include <Domaine.h>
 
-Implemente_instanciable_sans_constructeur(Ensemble_Faces_base,"Ensemble_Faces_base",Objet_U);
+Implemente_instanciable(Ensemble_Faces_base, "Ensemble_Faces_base", Objet_U);
 
-Ensemble_Faces_base::Ensemble_Faces_base(): la_cond_lim_rayo_(0),nb_faces_bord_(0)
-{
-}
-Entree& Ensemble_Faces_base::readOn(Entree& is)
-{
-  return is;
-}
+Entree& Ensemble_Faces_base::readOn(Entree& is) { return is; }
 
-Sortie& Ensemble_Faces_base::printOn(Sortie& os) const
-{
-  return os;
-}
+Sortie& Ensemble_Faces_base::printOn(Sortie& os) const { return os; }
 
-void Ensemble_Faces_base::lire(const Nom& nom_bord_lu,const Nom& nom_bord, const Domaine& dom)
+void Ensemble_Faces_base::lire(const Nom& nom_bord_lu, const Nom& nom_bord, const Domaine& dom)
 {
   {
-    Nom fic2(dom.le_nom()+"."+nom_bord);
-    fic2+="_xv";
+    Nom fic2(dom.le_nom() + "." + nom_bord);
+    fic2 += "_xv";
     EFichier fichier(fic2);
     Nom motlu;
-    while(motlu!=nom_bord_lu)
+    while (motlu != nom_bord_lu)
       {
-        fichier>>motlu;
+        fichier >> motlu;
       }
-    fichier >>positions_;
+    fichier >> positions_;
     fichier.close();
   }
-}
-double Ensemble_Faces_base::surface(int numfa) const
-{
-  const Cond_Lim_Rayo& la_cl_rayon=cond_lim_rayo();
-  return la_cl_rayon.surface(numfa);
-}
-
-double Ensemble_Faces_base::teta_i(int numfa)
-{
-  Cond_Lim_Rayo& la_cl_rayon=cond_lim_rayo();
-  return la_cl_rayon.teta_i(numfa);
 }
 
 int Ensemble_Faces_base::contient(int num_face) const
 {
   // Dans notre cas une face rayonnantes est exactement une face de bord
-  // num_face_Ensemble.resize(0);
-
-  if (num_face_Ensemble.size()==0)
+  if (num_face_Ensemble_.size() == 0)
     return 1;
   else
     {
-      int nb_faces_rayo=num_face_Ensemble.size();
+      int nb_faces_rayo = num_face_Ensemble_.size();
 
-      for (int i=0; i<nb_faces_rayo; i++)
-        if (num_face==num_face_Ensemble[i])
+      for (int i = 0; i < nb_faces_rayo; i++)
+        if (num_face == num_face_Ensemble_[i])
           {
             return 1;
           }
@@ -83,74 +61,77 @@ int Ensemble_Faces_base::contient(int num_face) const
 
 int Ensemble_Faces_base::is_ok() const
 {
-  if (les_cl_base.non_nul()) return 1;
-  else return 0;
+  if (les_cl_base_.non_nul())
+    return 1;
+  else
+    return 0;
 }
 
 void Ensemble_Faces_base::associer_les_cl(Cond_lim_base& la_cl)
 {
   la_cl.is_la_cl_rayo(la_cond_lim_rayo_);
-  les_cl_base=la_cl;
+  les_cl_base_ = la_cl;
   Frontiere& le_bord = la_cl.frontiere_dis().frontiere();
   nb_faces_bord_ = le_bord.nb_faces();
-  // On construit num_face_Ensemble
-  // On a les positions_ on cherche la liste des faces de ce bord
+  // On construit num_face_Ensemble. On a les positions_ on cherche la liste des faces de ce bord
   IntList numface;
   DoubleTab pos;
 
-  int n1=positions_.dimension(0);
-  if (n1!=0)
+  int n1 = positions_.dimension(0);
+  if (n1 != 0)
     {
-      Faces& faces=le_bord.faces();
+      Faces& faces = le_bord.faces();
       // pos contient les centres de gravite des faces du bord
       if (nb_faces_bord_)
-        Faces::Calculer_centres_gravite(pos,faces.type_face(), le_bord.domaine().coord_sommets(),faces.les_sommets());
-      for (int fac=0; fac<n1; fac++)
+        Faces::Calculer_centres_gravite(pos, faces.type_face(), le_bord.domaine().coord_sommets(), faces.les_sommets());
+      for (int fac = 0; fac < n1; fac++)
         {
-          int marq=0;
-          for (int f2=0; f2<nb_faces_bord_; f2++)
+          int marq = 0;
+          for (int f2 = 0; f2 < nb_faces_bord_; f2++)
             {
-              int ok=1;
-              for (int dir=0; dir<dimension; dir++)
+              int ok = 1;
+              for (int dir = 0; dir < dimension; dir++)
                 {
-                  if (!(est_egal(positions_(fac,dir),pos(f2,dir))))
-                    ok=0;
+                  if (!(est_egal(positions_(fac, dir), pos(f2, dir))))
+                    ok = 0;
                 }
-              if (ok==1)
+              if (ok == 1)
                 {
                   numface.add(f2);
                   marq++;
-                  if (marq!=1)
+                  if (marq != 1)
                     {
                       Cerr << "Error in Ensemble_Faces_base::associer_les_cl" << finl;
                       Cerr << "Contact TRUST support." << finl;
-                      Cerr<<fac<<" face en double "<<finl;
+                      Cerr << fac << " face en double " << finl;
                       Process::exit();
                     }
                 }
             }
-          marq=(int)mp_sum((double)marq);
-          if (marq==0)
+          marq = (int) mp_sum((double) marq);
+          if (marq == 0)
             {
-              Cerr<< "Face " << fac << " du fichier " << la_cl.frontiere_dis().frontiere().le_nom() << "_xv non trouvee !!! positions ";
-              for (int dir=0; dir<dimension; dir++)
-                Cerr <<positions_(fac,dir)<<" ";
-              Cerr<<finl;
-              for (int f2=0; f2<nb_faces_bord_; f2++)
+              Cerr << "Face " << fac << " du fichier " << la_cl.frontiere_dis().frontiere().le_nom() << "_xv non trouvee !!! positions ";
+              for (int dir = 0; dir < dimension; dir++)
+                Cerr << positions_(fac, dir) << " ";
+              Cerr << finl;
+              for (int f2 = 0; f2 < nb_faces_bord_; f2++)
                 {
-                  Cerr<<" face "<<f2<<" du bord ";
-                  for (int dir=0; dir<dimension; dir++)
-                    Cerr <<pos(f2,dir)<<" ";
-                  Cerr<<finl;
+                  Cerr << " face " << f2 << " du bord ";
+                  for (int dir = 0; dir < dimension; dir++)
+                    Cerr << pos(f2, dir) << " ";
+                  Cerr << finl;
                 }
               Process::exit();
             }
 
         }
-      int nf=numface.size();
-      if (nf==0) nb_faces_bord_=0;
-      num_face_Ensemble.resize(nf);
-      for (int f3=0; f3<nf; f3++) num_face_Ensemble[f3]=numface[f3];
+      int nf = numface.size();
+      if (nf == 0)
+        nb_faces_bord_ = 0;
+      num_face_Ensemble_.resize(nf);
+      for (int f3 = 0; f3 < nf; f3++)
+        num_face_Ensemble_[f3] = numface[f3];
       positions_.resize(0);
     }
 }

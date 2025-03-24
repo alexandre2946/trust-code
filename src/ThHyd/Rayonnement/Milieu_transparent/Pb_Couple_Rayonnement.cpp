@@ -13,25 +13,19 @@
 *
 *****************************************************************************/
 
-#include <Pb_Couple_Rayonnement.h>
 #include <Modele_Rayonnement_Milieu_Transparent.h>
+#include <Pb_Couple_Rayonnement.h>
 #include <Paroi_Rayo_transp.h>
 #include <Probleme_base.h>
 #include <Fluide_base.h>
 
-Implemente_instanciable(Pb_Couple_Rayonnement,"Pb_Couple_Rayonnement",Probleme_Couple);
+Implemente_instanciable(Pb_Couple_Rayonnement, "Pb_Couple_Rayonnement", Probleme_Couple);
 
-Entree& Pb_Couple_Rayonnement::readOn(Entree& is)
-{
-  return is;
-}
+Entree& Pb_Couple_Rayonnement::readOn(Entree& is) { return is; }
 
-Sortie& Pb_Couple_Rayonnement::printOn(Sortie& os) const
-{
-  return Probleme_Couple::printOn(os);
-}
+Sortie& Pb_Couple_Rayonnement::printOn(Sortie& os) const { return Probleme_Couple::printOn(os); }
 
-void Pb_Couple_Rayonnement::initialize( )
+void Pb_Couple_Rayonnement::initialize()
 {
   completer();
   Probleme_Couple::initialize();
@@ -40,44 +34,43 @@ void Pb_Couple_Rayonnement::initialize( )
 
 int Pb_Couple_Rayonnement::associer_(Objet_U& ob)
 {
-  int set_type_rayo=0;
+  int set_type_rayo = 0;
   if (Probleme_Couple::associer_(ob))
     {
-      set_type_rayo=1;
-
+      set_type_rayo = 1;
     }
   else
     {
-      if( sub_type(Modele_Rayonnement_base, ob))
+      if (sub_type(Modele_Rayonnement_Milieu_Transparent, ob))
         {
-          set_type_rayo=1;
+          set_type_rayo = 1;
           Cerr << "association du modele au pbc" << finl;
-          le_modele_rayo_associe(ref_cast(Modele_Rayonnement_base, ob));
+          le_modele_rayo_associe(ref_cast(Modele_Rayonnement_Milieu_Transparent, ob));
         }
       else
         return 0;
     }
-  if (set_type_rayo==1)
+  if (set_type_rayo == 1)
     {
-      int nb_pb_fluide=0;
-      for(int l=0; l< nb_problemes(); l++)
+      int nb_pb_fluide = 0;
+      for (int l = 0; l < nb_problemes(); l++)
         {
 
-          Probleme_base& pb = ref_cast(Probleme_base,probleme(l));
+          Probleme_base& pb = ref_cast(Probleme_base, probleme(l));
 
-          if (sub_type(Fluide_base,pb.milieu()))
+          if (sub_type(Fluide_base, pb.milieu()))
             nb_pb_fluide++;
         }
 
-      for(int l=0; l< nb_problemes(); l++)
+      for (int l = 0; l < nb_problemes(); l++)
         {
 
-          Probleme_base& pb = ref_cast(Probleme_base,probleme(l));
+          Probleme_base& pb = ref_cast(Probleme_base, probleme(l));
 
-          if (sub_type(Fluide_base,pb.milieu()))
+          if (sub_type(Fluide_base, pb.milieu()))
             {
-              Fluide_base& fluide=ref_cast(Fluide_base,pb.milieu());
-              if (nb_pb_fluide==1)
+              Fluide_base& fluide = ref_cast(Fluide_base, pb.milieu());
+              if (nb_pb_fluide == 1)
                 fluide.fixer_type_rayo();
               else
                 fluide.reset_type_rayo();
@@ -90,31 +83,30 @@ int Pb_Couple_Rayonnement::associer_(Objet_U& ob)
     return 0;
 }
 
-void Pb_Couple_Rayonnement::le_modele_rayo_associe(const Modele_Rayonnement_base& un_modele_de_rayonnement)
+void Pb_Couple_Rayonnement::le_modele_rayo_associe(const Modele_Rayonnement_Milieu_Transparent& un_modele_de_rayonnement)
 {
-  le_modele_de_rayo = un_modele_de_rayonnement;
+  le_modele_de_rayo_ = un_modele_de_rayonnement;
 }
 
-void Pb_Couple_Rayonnement::associer_cl_base(const Cond_lim_base& les_cl_)
+void Pb_Couple_Rayonnement::associer_cl_base(const Cond_lim_base& les_cl)
 {
-  les_cl = les_cl_;
+  les_cl_ = les_cl;
 }
 
 int Pb_Couple_Rayonnement::postraiter(int force)
 {
-  int ok=Probleme_Couple::postraiter(force);
+  int ok = Probleme_Couple::postraiter(force);
   if (!ok)
     return 0;
 
   // Impression en plus du modele de rayonnement
-  const Modele_Rayonnement_Milieu_Transparent& mod_rayo  =
-    ref_cast(Modele_Rayonnement_Milieu_Transparent,le_modele_de_rayo.valeur());
+  const Modele_Rayonnement_Milieu_Transparent& mod_rayo = le_modele_de_rayo_.valeur();
   if (mod_rayo.processeur_rayonnant() != -1)
     if (schema_temps().limpr())
       {
         Cout << "Impression des flux radiatifs sur les bords de rayonnement" << finl;
-        Cout << "----------------------------------------------------------------"<< finl;
-        le_modele_de_rayo->imprimer_flux_radiatifs(Cout);
+        Cout << "----------------------------------------------------------------" << finl;
+        le_modele_de_rayo_->imprimer_flux_radiatifs(Cout);
       }
   return 1;
 }
@@ -127,65 +119,63 @@ void Pb_Couple_Rayonnement::validateTimeStep()
 
 void Pb_Couple_Rayonnement::completer()
 {
-  le_modele_de_rayo->discretiser(ref_cast(Probleme_base,probleme(0)).discretisation(), ref_cast(Probleme_base,probleme(0)).domaine());
-  int nb_pb_fluide=0;
-  Modele_Rayonnement_Milieu_Transparent& mod_rayo  =
-    ref_cast(Modele_Rayonnement_Milieu_Transparent,le_modele_de_rayo.valeur());
+  le_modele_de_rayo_->discretiser(ref_cast(Probleme_base,probleme(0)).discretisation(), ref_cast(Probleme_base,probleme(0)).domaine());
+  int nb_pb_fluide = 0;
+  Modele_Rayonnement_Milieu_Transparent& mod_rayo = le_modele_de_rayo_.valeur();
 
-  int compte_nb_bords_rayo =0;
+  int compte_nb_bords_rayo = 0;
   int l;
-  int pb_fluide=-1;
-  int is_pb_nom_existe=0;
-  for(l=0; l< nb_problemes(); l++)
+  int pb_fluide = -1;
+  int is_pb_nom_existe = 0;
+  for (l = 0; l < nb_problemes(); l++)
     {
-      Probleme_base& le_pb = ref_cast(Probleme_base,probleme(l));
-      if (sub_type(Fluide_base,le_pb.milieu()))
+      Probleme_base& le_pb = ref_cast(Probleme_base, probleme(l));
+      if (sub_type(Fluide_base, le_pb.milieu()))
         {
           nb_pb_fluide++;
-          pb_fluide=l;
-          if (le_pb.le_nom()==mod_rayo.nom_pb_rayonnant())
-            is_pb_nom_existe=1;
+          pb_fluide = l;
+          if (le_pb.le_nom() == mod_rayo.nom_pb_rayonnant())
+            is_pb_nom_existe = 1;
         }
     }
-  if (nb_pb_fluide>1)
+  if (nb_pb_fluide > 1)
     {
-      if (mod_rayo.nom_pb_rayonnant()=="non_donne")
+      if (mod_rayo.nom_pb_rayonnant() == "non_donne")
         {
-          Cerr<<"On ne sait traiter qu'un seul pb fluide"<<finl;
-          Cerr<<" a moins d'indiquer le nom_pb_rayonnant au modele de rayonnement"<<finl;
-          //  is_pb_fluide=0;
+          Cerr << "On ne sait traiter qu'un seul pb fluide" << finl;
+          Cerr << " a moins d'indiquer le nom_pb_rayonnant au modele de rayonnement" << finl;
           Process::exit();
         }
-      else if (is_pb_nom_existe==0)
+      else if (is_pb_nom_existe == 0)
         {
-          Cerr<<"On a au moins deux problemes fluides, le nom du pb rayonnant indique est "<<mod_rayo.nom_pb_rayonnant()<<" et ne corrrespond pas a un probleme fluide existant"<<finl;
+          Cerr << "On a au moins deux problemes fluides, le nom du pb rayonnant indique est " << mod_rayo.nom_pb_rayonnant() << " et ne corrrespond pas a un probleme fluide existant" << finl;
           Process::exit();
         }
     }
   else
-    mod_rayo.nom_pb_rayonnant()= probleme(pb_fluide).le_nom();
+    mod_rayo.nom_pb_rayonnant() = probleme(pb_fluide).le_nom();
 
-  for(l=0; l< nb_problemes(); l++)
+  for (l = 0; l < nb_problemes(); l++)
     {
-      Probleme_base& le_pb = ref_cast(Probleme_base,probleme(l));
+      Probleme_base& le_pb = ref_cast(Probleme_base, probleme(l));
       //          Probleme_base& le_pb = probleme(l);
-      int is_pb_fluide=( mod_rayo.nom_pb_rayonnant()== le_pb.le_nom());
+      int is_pb_fluide = (mod_rayo.nom_pb_rayonnant() == le_pb.le_nom());
 
-      if (is_pb_fluide==1)
+      if (is_pb_fluide == 1)
         {
           // normalement deja fait
-          assert(le_pb.milieu().is_rayo_transp()==1);
+          assert(le_pb.milieu().is_rayo_transp() == 1);
           //          ref_cast(Fluide_base,le_pb.milieu()).fixer_type_rayo();
           Cerr << "Le probleme rayonnant trouve est : " << le_pb.le_nom() << finl;
         }
-      for (int j=0; j<le_pb.nombre_d_equations(); j++)
+      for (int j = 0; j < le_pb.nombre_d_equations(); j++)
         {
           Domaine_Cl_dis_base& la_zcl = le_pb.equation(j).domaine_Cl_dis();
-          for (int num_cl=0; num_cl<la_zcl.nb_cond_lim(); num_cl++)
+          for (int num_cl = 0; num_cl < la_zcl.nb_cond_lim(); num_cl++)
             {
               Cond_lim_base& la_cl = la_zcl.les_conditions_limites(num_cl).valeur();
 
-              Cond_Lim_Rayo* la_cl_rayo;
+              Cond_Lim_Rayo *la_cl_rayo;
               if (la_cl.is_la_cl_rayo(la_cl_rayo))
                 {
                   ((*la_cl_rayo)).associer_modele_rayo(mod_rayo);
@@ -193,24 +183,24 @@ void Pb_Couple_Rayonnement::completer()
                   // on associe la cl liee au pb fluide
                   if (is_pb_fluide)
                     {
-                      int ok=0;
-                      for (int i =0; i <mod_rayo.nb_faces_totales(); i++)
+                      int ok = 0;
+                      for (int i = 0; i < mod_rayo.nb_faces_totales(); i++)
                         {
 
-
-                          if (mod_rayo.face_rayonnante(i).nom_bord_rayo()==la_zcl.les_conditions_limites(num_cl)->frontiere_dis().le_nom())
+                          if (mod_rayo.face_rayonnante(i).nom_bord_rayo() == la_zcl.les_conditions_limites(num_cl)->frontiere_dis().le_nom())
                             //if (la_cl.frontiere_dis().frontiere().nb_faces()!=0)
                             {
-                              if (mod_rayo.face_rayonnante(i).emissivite()!=-1)
-                                ok=1;
+                              if (mod_rayo.face_rayonnante(i).emissivite() != -1)
+                                ok = 1;
                               //Cerr<< mod_rayo.face_rayonnante(i).nom_bord_rayo()<<" associe a "<<la_zcl.les_conditions_limites(num_cl).frontiere_dis().le_nom()<<finl;
                               mod_rayo.face_rayonnante(i).ensembles_faces_bord(0).associer_les_cl(la_cl);
                               compte_nb_bords_rayo += 1;
                             }
                         }
-                      if (ok==0)
+                      if (ok == 0)
                         {
-                          Cerr<<"La condition limite de nom "<<la_zcl.les_conditions_limites(num_cl)->frontiere_dis().le_nom()<<" est definie comme rayonnante, mais n'est pas dans la liste des faces rayonnantes ou son emissivite vaut -1"<<finl;
+                          Cerr << "La condition limite de nom " << la_zcl.les_conditions_limites(num_cl)->frontiere_dis().le_nom()
+                               << " est definie comme rayonnante, mais n'est pas dans la liste des faces rayonnantes ou son emissivite vaut -1" << finl;
                           Process::exit();
                         }
                     }
@@ -219,21 +209,22 @@ void Pb_Couple_Rayonnement::completer()
         }
       if (is_pb_fluide)
         {
-          for (int i=0; i <mod_rayo.nb_faces_totales(); i++)
+          for (int i = 0; i < mod_rayo.nb_faces_totales(); i++)
             {
-              if (!mod_rayo.face_rayonnante(i).ensembles_faces_bord(0).is_ok()&& (mod_rayo.face_rayonnante(i).emissivite()!=-1) )
+              if (!mod_rayo.face_rayonnante(i).ensembles_faces_bord(0).is_ok() && (mod_rayo.face_rayonnante(i).emissivite() != -1))
                 {
-                  Cerr<<"Le bord " << mod_rayo.face_rayonnante(i).nom_bord_rayo_lu()<<" n'a pas ete asssocie a une condition limite rayonnante."<<finl;
-                  Cerr<<"Soit vous mettez une condition limite rayonnante pour "<<mod_rayo.face_rayonnante(i).nom_bord_rayo()<<finl;
-                  Cerr<<"Soit vous affectez une emissivite de -1 a ce bord." << finl;
-                  Cerr<<finl;
+                  Cerr << "Le bord " << mod_rayo.face_rayonnante(i).nom_bord_rayo_lu() << " n'a pas ete asssocie a une condition limite rayonnante." << finl;
+                  Cerr << "Soit vous mettez une condition limite rayonnante pour " << mod_rayo.face_rayonnante(i).nom_bord_rayo() << finl;
+                  Cerr << "Soit vous affectez une emissivite de -1 a ce bord." << finl;
+                  Cerr << finl;
                 }
             }
         }
     }
-  //assert(nb_pb_fluide==1);
 
-  if (compte_nb_bords_rayo!=mod_rayo.nb_faces_rayonnantes()) abort();
+  if (compte_nb_bords_rayo != mod_rayo.nb_faces_rayonnantes())
+    abort();
+
   if (nproc() == 1)
     {
       mod_rayo.associer_processeur_rayonnant(me());
@@ -247,41 +238,35 @@ void Pb_Couple_Rayonnement::completer()
       //         }
       //       else
       {
-        if (compte_nb_bords_rayo!=0)
+        if (compte_nb_bords_rayo != 0)
           {
-
-            //Cerr<<me() <<nom_rayos<<finl;
             LIST(Nom) collectnoms;
-            for (int i=0; i<mod_rayo.nb_faces_rayonnantes(); i++)
+            for (int i = 0; i < mod_rayo.nb_faces_rayonnantes(); i++)
               {
-                if (mod_rayo.face_rayonnante(i).ensembles_faces_bord(0).nb_faces_bord()!=0) collectnoms.add(mod_rayo.face_rayonnante(i).nom_bord_rayo_lu());
+                if (mod_rayo.face_rayonnante(i).ensembles_faces_bord(0).nb_faces_bord() != 0)
+                  collectnoms.add(mod_rayo.face_rayonnante(i).nom_bord_rayo_lu());
               }
-            Cerr<<me() << collectnoms<<finl;
+            Cerr << me() << collectnoms << finl;
             // on verifie que l'on a bien tous les noms
             // pour verifier a la fin;
             /*
-              for (int n=0;n<nb_proc()-1;n++)
+             for (int n=0;n<nb_proc()-1;n++)
 
-              abort();
-            */
-            if (me()==0) mod_rayo.associer_processeur_rayonnant(me());
+             abort();
+             */
+            if (me() == 0)
+              mod_rayo.associer_processeur_rayonnant(me());
             else
               mod_rayo.associer_processeur_rayonnant(-1);
-
-
-
-
           }
         else
           {
             //tout est ok
-            Cerr<<"On redimenssionne le tableau de faces de bord"<<finl;
-            Cerr<<"compte_nb_bords_rayo = "<<compte_nb_bords_rayo<<finl;
-            Cerr<<"mod_rayo.nb_faces_rayonnantes() = "<<mod_rayo.nb_faces_rayonnantes()<<finl;
+            Cerr << "On redimenssionne le tableau de faces de bord" << finl;
+            Cerr << "compte_nb_bords_rayo = " << compte_nb_bords_rayo << finl;
+            Cerr << "mod_rayo.nb_faces_rayonnantes() = " << mod_rayo.nb_faces_rayonnantes() << finl;
             mod_rayo.associer_processeur_rayonnant(-1);
           }
       }
     }
-
-  //  Cerr << "Pb_Couple_Rayonnement::completer() Fin" << finl;
 }

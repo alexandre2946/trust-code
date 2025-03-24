@@ -23,62 +23,41 @@
 
 class Cond_lim_base;
 
-class Ensemble_Faces_base : public Objet_U
+class Ensemble_Faces_base: public Objet_U
 {
-
   Declare_instanciable(Ensemble_Faces_base);
-
 public:
 
-  inline const Cond_Lim_Rayo& cond_lim_rayo() const;
-  inline Cond_Lim_Rayo& cond_lim_rayo();
-  inline const Cond_lim_base& la_cl_base() const;
-  inline Cond_lim_base& la_cl_base();
-  void associer_les_cl(Cond_lim_base& ) ;
-  double surface(int ) const;
-  double teta_i(int ) ;
+  void associer_les_cl(Cond_lim_base&);
+  void lire(const Nom&, const Nom&, const Domaine&);
   int contient(int) const;
-  inline  const IntVect& Table_faces () const ;
-  void lire(const Nom&,const Nom&, const Domaine& );
-  inline int nb_faces_bord() const;
   int is_ok() const;
-protected:
 
-  IntVect num_face_Ensemble;//contient_;
-  OBS_PTR(Cond_lim_base) les_cl_base;
-  Cond_Lim_Rayo* la_cond_lim_rayo_;
-  int nb_faces_bord_;
+  inline const Cond_Lim_Rayo& cond_lim_rayo() const
+  {
+    assert(la_cond_lim_rayo_ != 0);
+    return *la_cond_lim_rayo_;
+  }
+
+  inline Cond_Lim_Rayo& cond_lim_rayo()
+  {
+    assert(la_cond_lim_rayo_ != 0);
+    return *la_cond_lim_rayo_;
+  }
+
+  inline double surface(int numfa) const { return la_cond_lim_rayo_->surface(numfa); }
+  inline double teta_i(int numfa) { return la_cond_lim_rayo_->teta_i(numfa); }
+  inline const Cond_lim_base& la_cl_base() const { return les_cl_base_; }
+  inline Cond_lim_base& la_cl_base() { return les_cl_base_; }
+  inline const IntVect& Table_faces() const { return num_face_Ensemble_; }
+  inline int nb_faces_bord() const { return nb_faces_bord_; }
+
+protected:
+  int nb_faces_bord_ = 0;
+  OBS_PTR(Cond_lim_base) les_cl_base_;
+  Cond_Lim_Rayo *la_cond_lim_rayo_ = nullptr;
+  IntVect num_face_Ensemble_; //contient_;
   DoubleTab positions_;
 };
 
-inline int Ensemble_Faces_base::nb_faces_bord() const
-{
-  return nb_faces_bord_;
-}
-// les verifs de type cl seront faites dans associer_cl (?)
-inline const Cond_lim_base& Ensemble_Faces_base::la_cl_base() const
-{
-  return les_cl_base;
-}
-inline  Cond_lim_base& Ensemble_Faces_base::la_cl_base()
-{
-  return les_cl_base;
-}
-inline const Cond_Lim_Rayo& Ensemble_Faces_base::cond_lim_rayo() const
-{
-  //return (const Cond_Lim_Rayo&) les_cl_base.valeur();
-  assert(la_cond_lim_rayo_!=0);
-  return *la_cond_lim_rayo_;
-}
-inline Cond_Lim_Rayo& Ensemble_Faces_base::cond_lim_rayo()
-{
-  //return (Cond_Lim_Rayo&) les_cl_base.valeur();
-  assert(la_cond_lim_rayo_!=0);
-  return *la_cond_lim_rayo_;
-
-}
-inline  const IntVect& Ensemble_Faces_base::Table_faces () const
-{
-  return num_face_Ensemble;
-}
-#endif
+#endif /* Ensemble_Faces_base_included */

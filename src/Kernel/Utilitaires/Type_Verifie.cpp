@@ -21,15 +21,13 @@ static Motcles motcle_obsolete;
 // Parcours du jeu de donnees pour verification des mots cles obsoletes
 void verifie(const Nom& type)
 {
-  int n=74;
+  int n=72;
   if( motcle_obsolete.size()!=n)
     {
       int i=0;
       // Definition des anciens mots cles desormais plus reconnus
       motcle_obsolete.dimensionner(n);
       motcle_obsolete[i++] = "Solv_GCP_SSOR";
-      motcle_obsolete[i++] = "Paroi_flux_impose_Rayo_transp_VDF";
-      motcle_obsolete[i++] = "Paroi_flux_impose_Rayo_transp_VEF";
       motcle_obsolete[i++] = "Frontiere_Ouverte_Rayo_transp_VDF";
       motcle_obsolete[i++] = "Frontiere_Ouverte_Rayo_transp_VEF";
       motcle_obsolete[i++] = "EchgItemsComm";
@@ -113,8 +111,6 @@ void verifie(const Nom& type)
       Noms nouvelle_syntaxe(n);
       int i=0;
       nouvelle_syntaxe[i++] = "1.2, le format du jeu de donnees pour le solveur de pression a change:\nsolveur_pression GCP_ssor { omega 1.5 seuil 1.e-8 impr }\nDevient, pour tenir compte du preconditionneur:\nsolveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-8 impr }";
-      nouvelle_syntaxe[i++] = "1.4.9, il devient Paroi_flux_impose_Rayo_transp";
-      nouvelle_syntaxe[i++] = "1.4.9, il devient Paroi_flux_impose_Rayo_transp";
       nouvelle_syntaxe[i++] = "1.4.9, il devient Frontiere_Ouverte_Rayo_transp";
       nouvelle_syntaxe[i++] = "1.4.9, il devient Frontiere_Ouverte_Rayo_transp";
       nouvelle_syntaxe[i++] = "1.5.";

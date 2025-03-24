@@ -16,27 +16,23 @@
 #ifndef Frontiere_Ouverte_Rayo_transp_included
 #define Frontiere_Ouverte_Rayo_transp_included
 
-
 #include <Neumann_sortie_libre.h>
 #include <Cond_Lim_Rayo.h>
 
-class Frontiere_Ouverte_Rayo_transp :   public Cond_Lim_Rayo, public Neumann_sortie_libre
+class Frontiere_Ouverte_Rayo_transp: public Cond_Lim_Rayo, public Neumann_sortie_libre
 {
   Declare_instanciable(Frontiere_Ouverte_Rayo_transp);
-
-public :
+public:
 
   void completer() override;
-  void mettre_a_jour(double ) override;
+  void mettre_a_jour(double) override;
   void calculer_Teta_i();
 
-  int is_la_cl_rayo(Cond_Lim_Rayo *& la_cl_rayo) override
+  inline int is_la_cl_rayo(Cond_Lim_Rayo *& la_cl_rayo) override
   {
     la_cl_rayo = &((Cond_Lim_Rayo&) (*this));
     return 1;
   }
-private :
-
-
 };
-#endif
+
+#endif /* Frontiere_Ouverte_Rayo_transp_included */

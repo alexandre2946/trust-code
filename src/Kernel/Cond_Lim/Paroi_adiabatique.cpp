@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2025, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -34,7 +34,12 @@ void Paroi_adiabatique::complement(Nom& ajout)
         ajout = "paroi_flux_impose_rayo_semi_transp_VEF champ_front_uniforme 1 0";
     }
   else if (rayo == 2)
-    ajout = "paroi_flux_impose_rayo_transp champ_front_uniforme 1 0";
+    {
+      if (mon_equation->discretisation().is_vdf())
+        ajout = "paroi_flux_impose_rayo_transp_VDF champ_front_uniforme 1 0";
+      else
+        ajout = "paroi_flux_impose_rayo_transp_VEF champ_front_uniforme 1 0";
+    }
   else
     ajout = "Neumann_Paroi_adiabatique";
 }

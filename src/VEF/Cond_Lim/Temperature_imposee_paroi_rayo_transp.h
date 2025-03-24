@@ -16,27 +16,25 @@
 #ifndef Temperature_imposee_paroi_rayo_transp_included
 #define Temperature_imposee_paroi_rayo_transp_included
 
-#include <Cond_Lim_Rayo.h>
 #include <Temperature_imposee_paroi.h>
+#include <Cond_Lim_Rayo.h>
 
-class Temperature_imposee_paroi_rayo_transp : public Cond_Lim_Rayo, public Temperature_imposee_paroi
+class Temperature_imposee_paroi_rayo_transp: public Cond_Lim_Rayo, public Temperature_imposee_paroi
 {
   Declare_instanciable(Temperature_imposee_paroi_rayo_transp);
+public:
 
-public :
-  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
-  void associer_modele_rayo(Modele_Rayonnement_base& ) override;
+  void associer_modele_rayo(Modele_Rayonnement_Milieu_Transparent&) override;
   void completer() override;
   void mettre_a_jour(double temps) override;
   void calculer_Teta_i(double temps);
-  int is_la_cl_rayo(Cond_Lim_Rayo *& la_cl_rayo) override
+  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
+
+  inline int is_la_cl_rayo(Cond_Lim_Rayo *& la_cl_rayo) override
   {
     la_cl_rayo = &((Cond_Lim_Rayo&) (*this));
     return 1;
   }
-protected:
 };
 
-
-
-#endif
+#endif /* Temperature_imposee_paroi_rayo_transp_included */

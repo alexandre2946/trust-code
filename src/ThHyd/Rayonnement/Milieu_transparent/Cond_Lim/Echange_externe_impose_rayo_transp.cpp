@@ -14,24 +14,14 @@
 *****************************************************************************/
 
 #include <Echange_externe_impose_rayo_transp.h>
-//providoire
-////#include <Paroi_2couches_scal_VDF.h>
+#include <Front_VF.h>
 
-Implemente_instanciable(Echange_externe_impose_rayo_transp,"Paroi_Echange_externe_impose_rayo_transp",Echange_externe_impose);
+Implemente_instanciable(Echange_externe_impose_rayo_transp, "Paroi_Echange_externe_impose_rayo_transp", Echange_externe_impose);
 
+Sortie& Echange_externe_impose_rayo_transp::printOn(Sortie& is) const { return is; }
 
-// printOn et readOn
-
-Sortie& Echange_externe_impose_rayo_transp::printOn(Sortie& is ) const
+Entree& Echange_externe_impose_rayo_transp::readOn(Entree& is)
 {
-  return is;
-}
-
-
-
-Entree& Echange_externe_impose_rayo_transp::readOn(Entree& is )
-{
-
   Motcle motlu;
   Motcles les_motcles(2);
   {
@@ -59,46 +49,42 @@ Entree& Echange_externe_impose_rayo_transp::readOn(Entree& is )
           }
         default:
           {
-            Cerr << "Erreur a la lecture de la condition aux limites de type "<<finl;
+            Cerr << "Erreur a la lecture de la condition aux limites de type " << finl;
             Cerr << "Echange_externe_impose_rayo_transp " << finl;
-            Cerr << "On attendait " << les_motcles << "a la place de " <<  motlu << finl;
+            Cerr << "On attendait " << les_motcles << "a la place de " << motlu << finl;
             Process::exit();
           }
         }
       ind++;
     }
 
-  if(local_min_vect(h_imp_->valeurs()) < 1.e9)
+  if (local_min_vect(h_imp_->valeurs()) < 1.e9)
     {
-      Cerr<<"Erreur sur l'utilisation de la condition a la limite"<<finl;
-      Cerr<<"Echange_externe_impose_rayo_transp. Celle ci ne peut"<<finl;
-      Cerr<<"etre utilisee pour un probleme de rayonnement que pour "<<finl;
-      Cerr<<"imposer une temperature sur une paroi"<<finl;
+      Cerr << "Erreur sur l'utilisation de la condition a la limite" << finl;
+      Cerr << "Echange_externe_impose_rayo_transp. Celle ci ne peut" << finl;
+      Cerr << "etre utilisee pour un probleme de rayonnement que pour " << finl;
+      Cerr << "imposer une temperature sur une paroi" << finl;
       Process::exit();
     }
 
   return is;
 }
 
-
-
 void Echange_externe_impose_rayo_transp::completer()
 {
   Echange_externe_impose::completer();
-  preparer_surface(frontiere_dis(),domaine_Cl_dis());
+  preparer_surface(frontiere_dis(), domaine_Cl_dis());
 }
 
-
-void  Echange_externe_impose_rayo_transp::calculer_Teta_i()
+void Echange_externe_impose_rayo_transp::calculer_Teta_i()
 {
-  const Front_VF& front_vf = ref_cast(Front_VF,frontiere_dis());
-  int nb_faces_bord = front_vf.nb_faces();
-  for (int numfa=0; numfa<nb_faces_bord; numfa++)
-    Teta_i[numfa]=T_ext(numfa);
+  const Front_VF& front_vf = ref_cast(Front_VF, frontiere_dis());
+  for (int numfa = 0; numfa < front_vf.nb_faces(); numfa++)
+    teta_i_[numfa] = T_ext(numfa);
 }
+
 void Echange_externe_impose_rayo_transp::mettre_a_jour(double temps)
 {
   Echange_externe_impose::mettre_a_jour(temps);
   calculer_Teta_i();
 }
-

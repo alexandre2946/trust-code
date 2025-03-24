@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2025, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -36,7 +36,12 @@ void Paroi_flux_impose::complement(Nom& ajout)
         ajout = "paroi_flux_impose_rayo_semi_transp_VEF";
     }
   else if (rayo == 2)
-    ajout = "paroi_flux_impose_rayo_transp";
+    {
+      if (mon_equation->discretisation().is_vdf())
+        ajout = "paroi_flux_impose_rayo_transp_VDF";
+      else
+        ajout = "paroi_flux_impose_rayo_transp_VEF";
+    }
   else
     ajout = "Neumann_Paroi";
 }

@@ -14,71 +14,53 @@
 *****************************************************************************/
 
 #include <Temperature_imposee_paroi_rayo_transp.h>
+#include <Champ_front_contact_rayo_transp_VEF.h>
 #include <Equation_base.h>
 #include <Domaine_VEF.h>
-#include <Champ_front_contact_rayo_transp_VEF.h>
 
-Implemente_instanciable(Temperature_imposee_paroi_rayo_transp,"Paroi_temperature_imposee_rayo_transp",Temperature_imposee_paroi);
+Implemente_instanciable(Temperature_imposee_paroi_rayo_transp, "Paroi_temperature_imposee_rayo_transp", Temperature_imposee_paroi);
 
+Sortie& Temperature_imposee_paroi_rayo_transp::printOn(Sortie& is) const { return is; }
 
-Sortie& Temperature_imposee_paroi_rayo_transp::printOn(Sortie& is ) const
-{
-  return is;
-}
-
-Entree& Temperature_imposee_paroi_rayo_transp::readOn(Entree& s )
-{
-  return Temperature_imposee_paroi::readOn(s);
-}
-
+Entree& Temperature_imposee_paroi_rayo_transp::readOn(Entree& s) { return Temperature_imposee_paroi::readOn(s); }
 
 void Temperature_imposee_paroi_rayo_transp::completer()
 {
-  //  Cerr<<"Temperature_imposee_paroi_rayo_transp::completer debut"<<finl;
   Temperature_imposee_paroi::completer();
-  preparer_surface(frontiere_dis(),domaine_Cl_dis());
+  preparer_surface(frontiere_dis(), domaine_Cl_dis());
 }
 
 void Temperature_imposee_paroi_rayo_transp::mettre_a_jour(double temps)
 {
-  //  Cerr<<"Temperature_imposee_paroi_rayo_transp::mettre_a_jour"<<finl;
   calculer_Teta_i(temps);
 }
 
-
 void Temperature_imposee_paroi_rayo_transp::calculer_Teta_i(double temps)
 {
-  //  Cerr<<"Temperature_imposee_paroi_rayo_transp::calculer_Teta_i()"<<finl;
-  if (sub_type(Champ_front_contact_rayo_transp_VEF,le_champ_front.valeur()))
+  if (sub_type(Champ_front_contact_rayo_transp_VEF, le_champ_front.valeur()))
     {
-      Champ_front_contact_rayo_transp_VEF& Ch_contact
-        = ref_cast(Champ_front_contact_rayo_transp_VEF,le_champ_front.valeur());
+      Champ_front_contact_rayo_transp_VEF& Ch_contact = ref_cast(Champ_front_contact_rayo_transp_VEF, le_champ_front.valeur());
       Ch_contact.calculer_temperature_bord(temps);
     }
   else
     {
-      // La temperature de paroi etant directement donnee par le champ_front
-      // associe a la condition a la limite, il n'y a rien a calculer ici
-      ;
+      // La temperature de paroi etant directement donnee par le champ_front associe a la condition a la limite, il n'y a rien a calculer ici
     }
 
-  const Front_VF& front_vf = ref_cast(Front_VF,frontiere_dis());
-  int nb_faces_bord = front_vf.nb_faces();
-  for (int numfa=0; numfa<nb_faces_bord; numfa++)
+  const Front_VF& front_vf = ref_cast(Front_VF, frontiere_dis());
+  for (int numfa = 0; numfa < front_vf.nb_faces(); numfa++)
     {
-      Teta_i[numfa]=val_imp(numfa);
+      teta_i_[numfa] = val_imp(numfa);
     }
 }
 
-
-void Temperature_imposee_paroi_rayo_transp::associer_modele_rayo(Modele_Rayonnement_base& mod)
+void Temperature_imposee_paroi_rayo_transp::associer_modele_rayo(Modele_Rayonnement_Milieu_Transparent& mod)
 {
-  le_modele_rayo = ref_cast(Modele_Rayonnement_Milieu_Transparent, mod);
+  le_modele_rayo = mod;
 
-  if (sub_type(Champ_front_contact_rayo_transp_VEF,le_champ_front.valeur()))
+  if (sub_type(Champ_front_contact_rayo_transp_VEF, le_champ_front.valeur()))
     {
-      Champ_front_contact_rayo_transp_VEF& Ch_contact
-        = ref_cast(Champ_front_contact_rayo_transp_VEF,le_champ_front.valeur());
+      Champ_front_contact_rayo_transp_VEF& Ch_contact = ref_cast(Champ_front_contact_rayo_transp_VEF, le_champ_front.valeur());
       Ch_contact.associer_modele_rayo(modele_rayo());
     }
 }

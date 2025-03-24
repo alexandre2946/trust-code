@@ -17,43 +17,33 @@
 #define Echange_contact_Rayo_transp_VDF_included
 
 #include <Echange_contact_VDF.h>
-#include <Convection_Diffusion_Temperature.h>
-#include <Conduction.h>
-#include <Champ_front_calc.h>
-#include <Fluide_Incompressible.h>
-#include <Front_VF.h>
 #include <Cond_Lim_Rayo.h>
-#include <TRUST_Ref.h>
 
-class Domaine_Cl_VDF;
-class Domaine_VDF;
-
-class Echange_contact_Rayo_transp_VDF : public Cond_Lim_Rayo,public Echange_contact_VDF
+class Echange_contact_Rayo_transp_VDF: public Cond_Lim_Rayo, public Echange_contact_VDF
 {
-
   Declare_instanciable(Echange_contact_Rayo_transp_VDF);
+public:
 
-public :
-  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
   void completer() override;
-  void mettre_a_jour(double ) override;
-  void calculer_Teta_paroi(DoubleTab& tab_p,const DoubleTab& mon_h,const DoubleTab& autre_h,int is_pb_fluide,double temps) override;
-  void calculer_Teta_equiv(DoubleTab& Teta_equiv,const DoubleTab& mon_h,const DoubleTab& autre_h,int is_pb_fluide,double temps) override;
-  //int verifier_correspondance() const;
-  int is_la_cl_rayo(Cond_Lim_Rayo *& la_cl_rayo) override
+  void mettre_a_jour(double) override;
+  void calculer_Teta_paroi(DoubleTab& tab_p, const DoubleTab& mon_h, const DoubleTab& autre_h, int is_pb_fluide, double temps) override;
+  void calculer_Teta_equiv(DoubleTab& Teta_equiv, const DoubleTab& mon_h, const DoubleTab& autre_h, int is_pb_fluide, double temps) override;
+
+  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
+  inline int is_la_cl_rayo(Cond_Lim_Rayo *& la_cl_rayo) override
   {
     la_cl_rayo = &((Cond_Lim_Rayo&) (*this));
     return 1;
   }
-protected :
-  int num_premiere_face_dans_pb_fluide;
-  double alpha_;
+
+protected:
+  int num_premiere_face_dans_pb_fluide_ = -1;
+  double alpha_ = 0.5;
 };
 
-class Echange_contact_Rayo_transp_sans_relax_VDF : public Echange_contact_Rayo_transp_VDF
+class Echange_contact_Rayo_transp_sans_relax_VDF: public Echange_contact_Rayo_transp_VDF
 {
   Declare_instanciable(Echange_contact_Rayo_transp_sans_relax_VDF);
 };
 
-
-#endif
+#endif /* Echange_contact_Rayo_transp_VDF_included */

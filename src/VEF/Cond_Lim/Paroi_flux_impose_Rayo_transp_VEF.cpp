@@ -13,30 +13,50 @@
 *
 *****************************************************************************/
 
-#include <Frontiere_Ouverte_Rayo_transp.h>
-#include <Front_VF.h>
+#include <Modele_Rayonnement_Milieu_Transparent.h>
+#include <Paroi_flux_impose_Rayo_transp_VEF.h>
+#include <Schema_Temps_base.h>
+#include <Champ_Uniforme.h>
+#include <Probleme_base.h>
+#include <Equation_base.h>
+#include <Milieu_base.h>
+#include <Domaine_VF.h>
 
-Implemente_instanciable(Frontiere_Ouverte_Rayo_transp, "Frontiere_Ouverte_Rayo_transp", Neumann_sortie_libre);
+Implemente_instanciable(Paroi_flux_impose_Rayo_transp_VEF, "Paroi_flux_impose_Rayo_transp_VEF", Paroi_flux_impose_Rayo_transp);
 
-Sortie& Frontiere_Ouverte_Rayo_transp::printOn(Sortie& is) const { return is; }
+Sortie& Paroi_flux_impose_Rayo_transp_VEF::printOn(Sortie& s) const { return s; }
 
-Entree& Frontiere_Ouverte_Rayo_transp::readOn(Entree& s) { return Neumann_sortie_libre::readOn(s); }
+Entree& Paroi_flux_impose_Rayo_transp_VEF::readOn(Entree& is) { return Paroi_flux_impose_Rayo_transp::readOn(is); }
 
-void Frontiere_Ouverte_Rayo_transp::completer()
+void Paroi_flux_impose_Rayo_transp_VEF::completer()
 {
-  Neumann_sortie_libre::completer();
-  preparer_surface(frontiere_dis(), domaine_Cl_dis());
+  Paroi_flux_impose_Rayo_transp::completer();
+
+  const DoubleTab& T_p = mon_dom_cl_dis->equation().inconnue().valeurs();
+  const Front_VF& la_frontiere_VF = ref_cast(Front_VF, frontiere_dis());
+  int ndeb = la_frontiere_VF.num_premiere_face();
+  int nb_faces_bord = la_frontiere_VF.nb_faces();
+
+  for (int numfa = 0; numfa < nb_faces_bord; numfa++)
+    teta_i_[numfa] = T_p(numfa + ndeb);
 }
 
-void Frontiere_Ouverte_Rayo_transp::mettre_a_jour(double temps)
+void Paroi_flux_impose_Rayo_transp_VEF::calculer_Teta_i()
 {
-  Neumann_sortie_libre::mettre_a_jour(temps);
-  calculer_Teta_i();
-}
-
-void Frontiere_Ouverte_Rayo_transp::calculer_Teta_i()
-{
-  const Front_VF& front_vf = ref_cast(Front_VF, frontiere_dis());
-  for (int numfa = 0; numfa < front_vf.nb_faces(); numfa++)
-    teta_i_[numfa] = val_ext(numfa);
+  const DoubleTab& T_p = mon_dom_cl_dis->equation().inconnue().valeurs();
+  double Temp;
+  const Front_VF& la_frontiere_VF = ref_cast(Front_VF, frontiere_dis());
+  int ndeb = la_frontiere_VF.num_premiere_face();
+  int nb_faces_bord = la_frontiere_VF.nb_faces();
+  int is_relax = 1;
+  if (le_modele_rayo->relaxation() == 0)
+    is_relax = 0;
+  for (int numfa = 0; numfa < nb_faces_bord; numfa++)
+    {
+      Temp = T_p(numfa + ndeb);
+      double omega = 0.8;
+      if (is_relax == 0)
+        omega = 1.;
+      teta_i_[numfa] = omega * (Temp) + (1. - omega) * teta_i_[numfa];
+    }
 }

@@ -13,48 +13,37 @@
 *
 *****************************************************************************/
 
-#include <Paroi_Rayo_transp.h>
 #include <Modele_Rayonnement_Milieu_Transparent.h>
-#include <Milieu_base.h>
-#include <Champ_Uniforme.h>
-#include <Equation_base.h>
+#include <Paroi_Rayo_transp.h>
 #include <Front_VF.h>
-#include <Fluide_Quasi_Compressible.h>
-Implemente_base(Paroi_Rayo_transp,"Paroi_Rayo_transp",Neumann_paroi);
 
-//
-// printOn et readOn
+Implemente_base(Paroi_Rayo_transp, "Paroi_Rayo_transp", Neumann_paroi);
 
-Sortie& Paroi_Rayo_transp::printOn(Sortie& s ) const
-{
-  return s;
-}
+Sortie& Paroi_Rayo_transp::printOn(Sortie& s) const { return s; }
 
-Entree& Paroi_Rayo_transp::readOn(Entree& is )
-{
-  return is ;
-}
+Entree& Paroi_Rayo_transp::readOn(Entree& is) { return is; }
 
 double Paroi_Rayo_transp::flux_impose(int i) const
 {
-  const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
+  const Front_VF& la_frontiere_VF = ref_cast(Front_VF, frontiere_dis());
   int ndeb = la_frontiere_VF.num_premiere_face();
-  double flux_radia=le_modele_rayo->flux_radiatif(i+ndeb);
-  if (le_champ_front->valeurs().size()==1)
-    return le_champ_front->valeurs()(0,0)-flux_radia;
-  else if (le_champ_front->valeurs().dimension(1)==1)
-    return le_champ_front->valeurs()(i,0)-flux_radia;
+  double flux_radia = le_modele_rayo->flux_radiatif(i + ndeb);
+  if (le_champ_front->valeurs().size() == 1)
+    return le_champ_front->valeurs()(0, 0) - flux_radia;
+  else if (le_champ_front->valeurs().dimension(1) == 1)
+    return le_champ_front->valeurs()(i, 0) - flux_radia;
   else
     Cerr << "Paroi_Rayo_transp::flux_impose erreur" << finl;
+
   Process::exit();
   return 0.;
 }
 
-double Paroi_Rayo_transp::flux_impose(int i,int j) const
+double Paroi_Rayo_transp::flux_impose(int i, int j) const
 {
-  const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
+  const Front_VF& la_frontiere_VF = ref_cast(Front_VF, frontiere_dis());
   int ndeb = la_frontiere_VF.num_premiere_face();
-  double flux_radia=le_modele_rayo->flux_radiatif(i+ndeb);
+  double flux_radia = le_modele_rayo->flux_radiatif(i + ndeb);
   const int k = (le_champ_front->valeurs().size() == 1) ? 0 : i;
-  return le_champ_front->valeurs()(k, j)-flux_radia;
+  return le_champ_front->valeurs()(k, j) - flux_radia;
 }

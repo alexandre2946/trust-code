@@ -16,92 +16,40 @@
 #ifndef Champ_front_contact_rayo_transp_VEF_included
 #define Champ_front_contact_rayo_transp_VEF_included
 
-#include <Champ_front_contact_VEF.h>
 #include <Modele_Rayonnement_Milieu_Transparent.h>
+#include <Champ_front_contact_VEF.h>
 
 class Champ_front_contact_rayo_transp_VEF: public Champ_front_contact_VEF
 {
   Declare_instanciable(Champ_front_contact_rayo_transp_VEF);
+public:
 
-public :
+  Champ_front_base& affecter_(const Champ_front_base& ch) override;
   int initialiser(double temps, const Champ_Inc_base& inco) override;
   void calculer_temperature_bord(double temps);
-  Champ_front_base& affecter_(const Champ_front_base& ch) override ;
   void mettre_a_jour(double temps) override;
-  inline Champ_Inc_base& inconnue1();
-  inline const Champ_Inc_base& inconnue1() const;
-
-  inline Champ_Inc_base& inconnue2();
-  inline const Champ_Inc_base& inconnue2() const;
-
-  inline Nom& nom_prob1();
-  inline const Nom& nom_prob1() const;
-  inline Nom& nom_prob2();
-  inline const Nom& nom_prob2() const;
-
-  inline void associer_modele_rayo(Modele_Rayonnement_Milieu_Transparent& mod);
-  inline Modele_Rayonnement_Milieu_Transparent& modele_rayo();
   void mettre_a_jour_flux_radiatif(); // Le fait calculer par le modele et le stocke
   void calcul_grads_locaux(double temps) override;
   void modifie_gradients_pour_rayonnement(DoubleVect& gradient_num_transf, DoubleVect& gradient_num_transf_autre_pb);
   void calculer_coeffs_echange(double temps) override;
 
-protected:
-  DoubleVect flux_radiatif;
+  inline Champ_Inc_base& inconnue1() { return l_inconnue1.valeur(); }
+  inline const Champ_Inc_base& inconnue1() const { return l_inconnue1.valeur(); }
 
-  OBS_PTR(Modele_Rayonnement_Milieu_Transparent) le_modele_rayo;
+  inline Champ_Inc_base& inconnue2() { return l_inconnue2.valeur(); }
+  inline const Champ_Inc_base& inconnue2() const { return l_inconnue2.valeur(); }
+
+  inline Nom& nom_prob1() { return nom_pb1; }
+  inline const Nom& nom_prob1() const { return nom_pb1; }
+  inline Nom& nom_prob2() { return nom_pb2; }
+  inline const Nom& nom_prob2() const { return nom_pb2; }
+
+  inline void associer_modele_rayo(Modele_Rayonnement_Milieu_Transparent& mod) { le_modele_rayo_ = mod; }
+  inline Modele_Rayonnement_Milieu_Transparent& modele_rayo() { return le_modele_rayo_; }
+
+protected:
+  DoubleVect flux_radiatif_;
+  OBS_PTR(Modele_Rayonnement_Milieu_Transparent) le_modele_rayo_;
 };
 
-
-inline void Champ_front_contact_rayo_transp_VEF::associer_modele_rayo(Modele_Rayonnement_Milieu_Transparent& mod)
-{
-  le_modele_rayo = mod;
-}
-
-
-inline Modele_Rayonnement_Milieu_Transparent& Champ_front_contact_rayo_transp_VEF::modele_rayo()
-{
-  return le_modele_rayo;
-}
-
-inline Nom& Champ_front_contact_rayo_transp_VEF::nom_prob1()
-{
-  return nom_pb1;
-}
-
-inline const Nom& Champ_front_contact_rayo_transp_VEF::nom_prob1() const
-{
-  return nom_pb1;
-}
-
-inline Nom& Champ_front_contact_rayo_transp_VEF::nom_prob2()
-{
-  return nom_pb2;
-}
-
-inline const Nom& Champ_front_contact_rayo_transp_VEF::nom_prob2() const
-{
-  return nom_pb2;
-}
-
-inline Champ_Inc_base& Champ_front_contact_rayo_transp_VEF::inconnue1()
-{
-  return l_inconnue1.valeur();
-}
-
-inline const Champ_Inc_base& Champ_front_contact_rayo_transp_VEF::inconnue1() const
-{
-  return l_inconnue1.valeur();
-}
-
-inline Champ_Inc_base& Champ_front_contact_rayo_transp_VEF::inconnue2()
-{
-  return l_inconnue2.valeur();
-}
-
-inline const Champ_Inc_base& Champ_front_contact_rayo_transp_VEF::inconnue2() const
-{
-  return l_inconnue2.valeur();
-}
-
-#endif
+#endif /* Champ_front_contact_rayo_transp_VEF_included */

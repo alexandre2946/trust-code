@@ -13,30 +13,21 @@
 *
 *****************************************************************************/
 
-#include <Frontiere_Ouverte_Rayo_transp.h>
-#include <Front_VF.h>
+#include <Paroi_flux_impose_Rayo_transp.h>
 
-Implemente_instanciable(Frontiere_Ouverte_Rayo_transp, "Frontiere_Ouverte_Rayo_transp", Neumann_sortie_libre);
+Implemente_base(Paroi_flux_impose_Rayo_transp, "Paroi_flux_impose_Rayo_transp", Paroi_Rayo_transp);
 
-Sortie& Frontiere_Ouverte_Rayo_transp::printOn(Sortie& is) const { return is; }
+Sortie& Paroi_flux_impose_Rayo_transp::printOn(Sortie& s) const { return s; }
 
-Entree& Frontiere_Ouverte_Rayo_transp::readOn(Entree& s) { return Neumann_sortie_libre::readOn(s); }
+Entree& Paroi_flux_impose_Rayo_transp::readOn(Entree& is) { return Neumann_paroi::readOn(is); }
 
-void Frontiere_Ouverte_Rayo_transp::completer()
+void Paroi_flux_impose_Rayo_transp::mettre_a_jour(double temps)
 {
-  Neumann_sortie_libre::completer();
-  preparer_surface(frontiere_dis(), domaine_Cl_dis());
-}
-
-void Frontiere_Ouverte_Rayo_transp::mettre_a_jour(double temps)
-{
-  Neumann_sortie_libre::mettre_a_jour(temps);
+  Neumann_paroi::mettre_a_jour(temps);
   calculer_Teta_i();
 }
 
-void Frontiere_Ouverte_Rayo_transp::calculer_Teta_i()
+void Paroi_flux_impose_Rayo_transp::completer()
 {
-  const Front_VF& front_vf = ref_cast(Front_VF, frontiere_dis());
-  for (int numfa = 0; numfa < front_vf.nb_faces(); numfa++)
-    teta_i_[numfa] = val_ext(numfa);
+  preparer_surface(frontiere_dis(), domaine_Cl_dis());
 }

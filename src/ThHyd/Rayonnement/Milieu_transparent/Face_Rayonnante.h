@@ -19,92 +19,36 @@
 #include <Ensemble_Faces_base.h>
 #include <TRUST_Vector.h>
 
-class Face_Rayonnante : public Objet_U
+class Face_Rayonnante: public Objet_U
 {
   Declare_instanciable(Face_Rayonnante);
+public:
 
-public :
-
-  inline double T_face_rayo() const ;
-  inline double emissivite() const;
-  inline double flux_radiatif() const;
-  inline double surface_rayo() const;
-  inline const Nom& nom_bord_rayo() const;
-  inline const Nom& nom_bord_rayo_lu() const;
-
-  inline const IntVect& num_faces(int j) const;
-  inline const Ensemble_Faces_base& ensembles_faces_bord(int j) const;
-  inline Ensemble_Faces_base& ensembles_faces_bord(int j);
-  double calculer_temperature();
-  //double calculer_flux_radiatif();
-  double imprimer_flux_radiatif(Sortie&,Sortie&, Sortie&  ) const;
-  int chercher_ensemble_faces(const Nom& ) const;
-  inline int nb_ensembles_faces() const;
-  inline void mettre_a_jour_flux_radiatif(double J);
+  int chercher_ensemble_faces(const Nom&) const;
   void ecrire_temperature_bord() const;
-private :
 
-  VECT(Ensemble_Faces_base) Les_ensembles_faces_bord;
+  double calculer_temperature();
+  double imprimer_flux_radiatif(Sortie&, Sortie&, Sortie&) const;
+
+  inline double T_face_rayo() const { return T_face_rayo_; }
+  inline double emissivite() const { return emissivite_; }
+  inline double flux_radiatif() const { return flux_radiatif_; }
+  inline double surface_rayo() const { return surf_; }
+  inline void mettre_a_jour_flux_radiatif(double J) { flux_radiatif_ = J; }
+  inline const Nom& nom_bord_rayo() const { return nom_bord_rayo_; }
+  inline const Nom& nom_bord_rayo_lu() const { return nom_bord_rayo_lu_; }
+  inline const IntVect& num_faces(int j) const { return num_faces_; }
+  inline int nb_ensembles_faces() const { return nb_ensembles_faces_; }
+
+  inline const Ensemble_Faces_base& ensembles_faces_bord(int j) const { return les_ensembles_faces_bord_[j]; }
+  inline Ensemble_Faces_base& ensembles_faces_bord(int j) { return les_ensembles_faces_bord_[j]; }
+
+private:
+  VECT(Ensemble_Faces_base) les_ensembles_faces_bord_;
   IntVect num_faces_;
-  double T_face_rayo_;
-  double emissivite_;
-  double surf_;
-  Nom nom_bord_rayo_,nom_bord_rayo_lu_;
-  //double radiosite;
-  double flux_radiatif_;
-  int nb_ensembles_faces_;
+  Nom nom_bord_rayo_, nom_bord_rayo_lu_;
+  double T_face_rayo_ = -123., emissivite_ = -123., surf_ = -123., flux_radiatif_ = 0.;
+  int nb_ensembles_faces_ = 1;
 };
 
-inline const IntVect& Face_Rayonnante::num_faces(int j) const
-{
-  return num_faces_;
-}
-
-inline double Face_Rayonnante::T_face_rayo() const
-{
-  return T_face_rayo_;
-}
-
-inline double Face_Rayonnante::emissivite() const
-{
-  return emissivite_;
-}
-
-inline int Face_Rayonnante::nb_ensembles_faces() const
-{
-  return nb_ensembles_faces_;
-}
-inline double Face_Rayonnante::flux_radiatif() const
-{
-  return flux_radiatif_;
-}
-
-inline double Face_Rayonnante::surface_rayo() const
-{
-  return  surf_;
-}
-
-inline const Nom& Face_Rayonnante::nom_bord_rayo() const
-{
-  return nom_bord_rayo_;
-}
-inline const Nom& Face_Rayonnante::nom_bord_rayo_lu() const
-{
-  return nom_bord_rayo_lu_;
-}
-
-inline void Face_Rayonnante::mettre_a_jour_flux_radiatif(double J)
-{
-  flux_radiatif_ = J;
-}
-
-inline const Ensemble_Faces_base& Face_Rayonnante::ensembles_faces_bord(int j) const
-{
-  return Les_ensembles_faces_bord[j];
-}
-
-inline Ensemble_Faces_base& Face_Rayonnante::ensembles_faces_bord(int j)
-{
-  return Les_ensembles_faces_bord[j];
-}
-#endif
+#endif /* Face_Rayonnante_included */

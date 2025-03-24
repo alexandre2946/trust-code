@@ -14,57 +14,18 @@
 *****************************************************************************/
 
 #include <Frontiere_Ouverte_temperature_imposee_Rayo_transp.h>
-#include <Equation_base.h>
-#include <Modele_Rayonnement_Milieu_Transparent.h>
-#include <Domaine_VF.h>
+#include <Front_VF.h>
 
-Implemente_instanciable(Frontiere_Ouverte_temperature_imposee_Rayo_transp,"Frontiere_Ouverte_temperature_imposee_Rayo_transp",Entree_fluide_temperature_imposee);
+Implemente_instanciable(Frontiere_Ouverte_temperature_imposee_Rayo_transp, "Frontiere_Ouverte_temperature_imposee_Rayo_transp", Entree_fluide_temperature_imposee);
 
+Sortie& Frontiere_Ouverte_temperature_imposee_Rayo_transp::printOn(Sortie& is) const { return is; }
 
-// printOn et readOn
-
-Sortie& Frontiere_Ouverte_temperature_imposee_Rayo_transp::printOn(Sortie& is ) const
-{
-  return is;
-}
-
-Entree& Frontiere_Ouverte_temperature_imposee_Rayo_transp::readOn(Entree& s )
-{
-  /*
-    le_champ_front.typer("Champ_front_uniforme");
-    Motcle motlu;
-    Motcles les_motcles(1);
-    {
-    les_motcles[0] = "T_ext";
-    }
-    s >> motlu;
-    int rang = les_motcles.search(motlu);
-    switch(rang)
-    {
-    case 0:
-    {
-    s >> le_champ_ext;
-    break;
-    }
-    default:
-    {
-    Cerr << "Erreur a la lecture de la condition aux limites de type: " << finl;
-    Cerr << que_suis_je() << finl;
-    Cerr << "On attendait " << les_motcles << " a la place de " <<  motlu << finl;
-    Process::exit();
-    }
-    }
-    return s;
-  */
-  return Entree_fluide_temperature_imposee::readOn(s);
-}
-
+Entree& Frontiere_Ouverte_temperature_imposee_Rayo_transp::readOn(Entree& s) { return Entree_fluide_temperature_imposee::readOn(s); }
 
 void Frontiere_Ouverte_temperature_imposee_Rayo_transp::completer()
 {
-  //  Paroi_Rayo_transp::completer();
   Entree_fluide_temperature_imposee::completer();
-  preparer_surface(frontiere_dis(),domaine_Cl_dis());
+  preparer_surface(frontiere_dis(), domaine_Cl_dis());
 }
 
 void Frontiere_Ouverte_temperature_imposee_Rayo_transp::mettre_a_jour(double temps)
@@ -73,12 +34,9 @@ void Frontiere_Ouverte_temperature_imposee_Rayo_transp::mettre_a_jour(double tem
   calculer_Teta_i();
 }
 
-
 void Frontiere_Ouverte_temperature_imposee_Rayo_transp::calculer_Teta_i()
 {
-  const Front_VF& front_vf = ref_cast(Front_VF,frontiere_dis());
-  int nb_faces_bord = front_vf.nb_faces();
-  for (int numfa=0; numfa<nb_faces_bord; numfa++)
-    Teta_i[numfa]=val_imp(numfa);
+  const Front_VF& front_vf = ref_cast(Front_VF, frontiere_dis());
+  for (int numfa = 0; numfa < front_vf.nb_faces(); numfa++)
+    teta_i_[numfa] = val_imp(numfa);
 }
-
