@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -41,15 +41,26 @@
 Implemente_instanciable(VEF_discretisation, "VEFPreP1B|VEF", Discret_Thyd);
 // XD vef discretisation_base vefprep1b -1 Finite element volume discretization (P1NC/P1-bubble element). Since the 1.5.5 version, several new discretizations are available thanks to the optional keyword Read. By default, the VEFPreP1B keyword is equivalent to the former VEFPreP1B formulation (v1.5.4 and sooner). P0P1 (if used with the strong formulation for imposed pressure boundary) is equivalent to VEFPreP1B but the convergence is slower. VEFPreP1B dis is equivalent to VEFPreP1B dis Read dis { P0 P1 Changement_de_base_P1Bulle 1 Cl_pression_sommet_faible 0 }
 
-// Par defaut, P0+P1 et changement de base pour faire P0+P1->P1Bulle
+// By default, P0+P1 and changing basis to do P0+P1->P1Bulle
+// REMEMBER: we don't necessarily go through the readOn() piece of code if we just write
+//     VEF dis
+// instead of
+//     VEF dis
+//     Read dis { ... }
+// !!!!
 Entree& VEF_discretisation::readOn(Entree& is)
 {
-  alphaE_ = alphaS_ = alphaA_ = alphaRT_ = false; // why are defaults overriden here ???? xdata comments below are wrong because of this...
+  alphaE_ = false;
+  alphaS_ = false;
   P1Bulle_ = 0;
   cl_pression_sommet_faible_ = 1;
-  modif_div_face_dirichlet_ = 0;
+  return Discret_Thyd::readOn(is);
+}
 
-  Param param(que_suis_je());
+void VEF_discretisation::set_param(Param& param) const
+{
+  Discret_Thyd::set_param(param);
+
   param.ajouter("changement_de_base_P1bulle", &P1Bulle_); // XD_ADD_P entier(into=[0,1]) changement_de_base_p1bulle 1 This option may be used to have the P1NC/P0P1 formulation (value set to 0) or the P1NC/P1Bulle formulation (value set to 1, the default).
   param.ajouter_flag("P0", &alphaE_); // XD_ADD_P rien Pressure nodes are added on element centres
   param.ajouter_flag("P1", &alphaS_); // XD_ADD_P rien Pressure nodes are added on vertices
@@ -57,41 +68,27 @@ Entree& VEF_discretisation::readOn(Entree& is)
   param.ajouter_flag("RT", &alphaRT_); // XD_ADD_P rien For P1NCP1B (in TrioCFD)
   param.ajouter("modif_div_face_dirichlet", &modif_div_face_dirichlet_); // XD_ADD_P entier(into=[0,1]) This option (by default 0) is used to extend control volumes for the momentum equation.
   param.ajouter("CL_pression_sommet_faible", &cl_pression_sommet_faible_); // XD_ADD_P entier(into=[0,1]) This option is used to specify a strong formulation (value set to 0, the default) or a weak formulation (value set to 1) for an imposed pressure boundary condition. The first formulation converges quicker and is stable in general cases. The second formulation should be used if there are several outlet boundaries with Neumann condition (see Ecoulement_Neumann test case for example).
-  param.lire_avec_accolades(is);
+}
 
+void VEF_discretisation::check_param()
+{
   // Quelques verifications
   if (dimension != 3 && alphaA_)
-    {
-      Cerr << "Le support Pa n'est disponible qu'en 3D." << finl;
-      Process::exit();
-    }
+    Process::exit("Pa support is only available in 3D.");
   if (!alphaE_ && !alphaS_ && !alphaA_)
-    {
-      Cerr << "Il faut choisir au moins un support parmi P0, P1, Pa." << finl;
-      Process::exit();
-    }
+    Process::exit("You must choose at least one support among P0, P1, Pa.");
   if (alphaA_ && !alphaE_)
-    {
-      Cerr << "Les discretisations Pa ou P1+Pa ne sont pas encore supportees." << finl;
-      Process::exit();
-    }
+    Process::exit("Discretisations Pa or P1+Pa are not yet supported.");
   if (P1Bulle_)
     if (!((alphaE_) && (alphaS_) && (!alphaA_)))
-      {
-        Cerr << "L'option changement_de_base_P1bulle n'est disponible qu'en P0/P1" << finl;
-        Process::exit();
-      }
+      Process::exit("Option 'changement_de_base_P1bulle' is available only in P0/P1");
 
   if (alphaRT_)
     {
       if (!alphaE_ && !alphaS_ && !alphaA_)
-        {
-          Cerr << "Choose P0 discretization." << finl;
-          Process::exit();
-        }
+        Process::exit("Choose P0 discretization.");
       Cerr << "Linke's scheme, OK for steady-state pb. The pressure computed is the Bernoulli pressure P =p+|u|^2" << finl;
     }
-  return is;
 }
 
 Sortie& VEF_discretisation::printOn(Sortie& s) const

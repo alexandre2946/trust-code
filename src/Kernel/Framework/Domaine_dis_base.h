@@ -26,6 +26,8 @@ class Domaine_Cl_dis_base;
 class Frontiere_dis_base;
 class Probleme_base;
 class Conds_lim;
+class Reorder_Mesh;
+class Discretisation_base;
 
 /*! @brief classe Domaine_dis_base Cette classe est la base de la hierarchie des domaines discretisees.
  *
@@ -81,6 +83,7 @@ public :
   ///
   void associer_domaine(const Domaine&);
   void discretiser_root(const Nom& typ);
+  void completer(const Discretisation_base& disc) ;
   virtual void discretiser() { }
   virtual void build_map_mc_Cmesh(const bool with_faces) { /* Do nothing */ }
   virtual void discretiser_no_face() = 0;
@@ -108,8 +111,12 @@ public :
   bool has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const override;
   bool has_champ(const Motcle& nom) const override;
 
+  // Mesh reordering (Morton/Hilbert)
+  void set_reorder(const Reorder_Mesh& r) { reorder_ = r; }
+
 protected :
   OBS_PTR(Domaine) le_dom_;
+  OBS_PTR(Reorder_Mesh) reorder_;  ///< An observer to the Reorder_Mesh option filled in the discretisation itself.
 
   TRUST_Vector<OWN_PTR(Sous_domaine_dis_base)> les_sous_domaines_dis_;
   int dist_paroi_initialisee_ = 0;

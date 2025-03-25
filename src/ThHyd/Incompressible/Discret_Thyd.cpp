@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -24,7 +24,29 @@ Implemente_base(Discret_Thyd, "Discret_Thyd", Discret_Thermique);
 
 Sortie& Discret_Thyd::printOn(Sortie& s) const { return s; }
 
-Entree& Discret_Thyd::readOn(Entree& s) { return s; }
+Entree& Discret_Thyd::readOn(Entree& is)
+{
+  Param p(que_suis_je());
+  set_param(p);
+  p.lire_avec_accolades(is);
+  check_param();
+  return is;
+}
+
+void Discret_Thyd::set_param(Param& p) const
+{
+  p.ajouter("reorder", &reorder_); // XD_ADD_P reorder_mesh Reordering directive.
+}
+
+/**! Override to make sure reordering options are passed to Domaine_dis_base
+ */
+Domaine_dis_base& Discret_Thyd::discretiser() const
+{
+  Domaine_dis_base& disb = Discret_Thermique::discretiser();
+  if(reorder_.algo() != Reorder_Algo::None)
+    disb.set_reorder(reorder_);
+  return disb;
+}
 
 void Discret_Thyd::vitesse(const Schema_Temps_base& sch, Domaine_dis_base& z, OWN_PTR(Champ_Inc_base) &ch, int nb_comp) const
 {

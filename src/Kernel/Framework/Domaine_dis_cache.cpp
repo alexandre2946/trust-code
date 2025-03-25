@@ -15,6 +15,7 @@
 
 #include <Domaine_dis_cache.h>
 #include <Domaine_dis_base.h>
+#include <Discretisation_base.h>
 #include <Interprete_bloc.h>
 #include <Domaine.h>
 #include <sstream>
@@ -61,7 +62,7 @@ void Domaine_dis_cache::Clear()
  *      }
  *      Lire pb { ... }
  */
-Domaine_dis_base& Domaine_dis_cache::build_or_get(const Nom& type, const Domaine& dom)
+Domaine_dis_base& Domaine_dis_cache::build_or_get(const Nom& type, const Domaine& dom, const Discretisation_base * disc)
 {
   // Do we have the prefix "NO_FACE_" at the begining of type:
   Nom typ_short(type);
@@ -82,11 +83,14 @@ Domaine_dis_base& Domaine_dis_cache::build_or_get(const Nom& type, const Domaine
   std::string key_no_face = make_key(typ_short.getString());
   if (cache_.count(key_no_face)) return cache_[key_no_face].valeur();
 
-  // OK, not in cache, we have to really discretized:
+  // OK, not in cache, we really have to discretize:
+
   cache_[key] = OWN_PTR(Domaine_dis_base)();
   OWN_PTR(Domaine_dis_base)& ddp = cache_[key];
   ddp.typer(typ_short);
   ddp->associer_domaine(dom);
+  if(disc != nullptr)
+    ddp->completer(*disc);
   ddp->discretiser_root(type);
 
   // If a full discretisation was requested, we can also register the NO_FACE_ version:
@@ -112,9 +116,9 @@ Domaine_dis_base& Domaine_dis_cache::build_or_get_poly_post(const Nom& type, con
   return build_or_get(type, dom);
 }
 
-Domaine_dis_base& Domaine_dis_cache::Build_or_get(const Nom& type, const Domaine& dom)
+Domaine_dis_base& Domaine_dis_cache::Build_or_get(const Nom& type, const Domaine& dom, const Discretisation_base * disc)
 {
-  return Get_instance().build_or_get(type, dom);
+  return Get_instance().build_or_get(type, dom, disc);
 }
 
 Domaine_dis_base& Domaine_dis_cache::Build_or_get_poly_post(const Nom& type, const Domaine& dom)

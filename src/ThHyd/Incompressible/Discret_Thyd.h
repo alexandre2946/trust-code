@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,12 +18,12 @@
 
 #include <Discret_Thermique.h>
 
-
 class Convection_Diffusion_Temperature;
 class Navier_Stokes_std;
 class Fluide_Ostwald;
 class Equation_base;
 class Fluide_base;
+class Param;
 
 /*! @brief classe Discret_Thyd Cette classe est la classe de base representant une discretisation
  *
@@ -39,6 +39,11 @@ class Discret_Thyd : public Discret_Thermique
   Declare_base(Discret_Thyd);
 
 public :
+
+  void set_param(Param& param) const override;
+  virtual void check_param() { }
+
+  Domaine_dis_base& discretiser() const override;
 
   void vitesse(const Schema_Temps_base&, Domaine_dis_base&, OWN_PTR(Champ_Inc_base)&, int nb_comp = 1) const;
   void translation(const Schema_Temps_base&, Domaine_dis_base&, OWN_PTR(Champ_Fonc_base)&) const;
@@ -89,6 +94,7 @@ public :
     Cerr << "Taux_cisaillement keyword not available for this discretization." << finl;
     Process::exit();
   }
+
 };
 
 #endif /* Discret_Thyd_included */

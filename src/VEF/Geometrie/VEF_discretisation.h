@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -42,6 +42,9 @@ class VEF_discretisation : public Discret_Thyd
 {
   Declare_instanciable(VEF_discretisation);
 public :
+  void set_param(Param& param) const override;
+  void check_param() override;
+
   void discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& nom, const Noms& unite, int nb_comp, int nb_pas_dt, double temps, OWN_PTR(Champ_Inc_base)& champ,
                          const Nom& sous_type = NOM_VIDE) const override;
   void discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& nom, const Noms& unite, int nb_comp, double temps, OWN_PTR(Champ_Fonc_base)& champ) const override;
@@ -72,13 +75,13 @@ public :
   inline int get_cl_pression_sommet_faible() const { return cl_pression_sommet_faible_; }
 
 private:
-  bool alphaE_=true;
-  bool alphaS_=true;
-  bool alphaA_=false;
-  bool alphaRT_=false;
+  bool alphaE_ = true;
+  bool alphaS_ = true;
+  bool alphaA_ = false;
+  bool alphaRT_ = false;
   int P1Bulle_ = 1;
   int modif_div_face_dirichlet_ = 0;
-  int cl_pression_sommet_faible_ = 0; // determine si les cl de pression sont imposees de facon faible ou forte -> voir divergence et assembleur, zcl
+  int cl_pression_sommet_faible_ = 0; ///< determine si les cl de pression sont imposees de facon faible ou forte -> voir divergence et assembleur, zcl
 
   void discretiser_champ_(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& nom, const Noms& unite, int nb_comp, int nb_pas_dt, double temps, OWN_PTR(Champ_Inc_base)& champ,
                           const Nom& sous_type = NOM_VIDE) const;

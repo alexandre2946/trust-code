@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2025, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,8 +20,7 @@
 #include <Champ_base.h> // Pour Nature_du_champ
 
 #include <TRUST_Ref.h>
-
-
+#include <Reorder_Mesh.h>
 
 class Champ_Fonc_Tabule;
 class Schema_Temps_base;
@@ -107,10 +106,13 @@ public :
   virtual bool is_PolyMAC_HFV() const { return false; }
   virtual bool is_poly_family() const { return false; }
 
+  const Reorder_Mesh& get_reorder() const { return reorder_; }
+
 protected:
   static const Motcle DEMANDE_DESCRIPTION;
   static const Nom NOM_VIDE;
   OBS_PTR(Domaine) le_domaine_;
+  Reorder_Mesh reorder_;   ///< Helper object to renumber entities (nodes, elems, faces) if requested
 
 private:
   void test_demande_description(const Motcle& , const Nom&) const;

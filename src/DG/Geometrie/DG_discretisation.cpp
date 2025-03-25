@@ -33,7 +33,10 @@ Implemente_instanciable(DG_discretisation, "DG", Discret_Thyd);
 // XD DG discretisation_base DG -1 DG discretization
 
 
-Entree& DG_discretisation::readOn(Entree& s) { return s; }
+Entree& DG_discretisation::readOn(Entree& s)
+{
+  return Discret_Thyd::readOn(s);
+}
 
 Sortie& DG_discretisation::printOn(Sortie& s) const { return s; }
 

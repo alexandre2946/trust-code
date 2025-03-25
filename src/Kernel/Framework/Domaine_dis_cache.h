@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2025, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -24,6 +24,7 @@
 #include <map>
 
 class Domaine_dis_base;
+class Discretisation_base;
 
 /*! @brief Cache of discretized domains. Avoid repeating the discretize operation when not
  * necessary.
@@ -36,10 +37,10 @@ public:
   static Domaine_dis_cache& Get_instance();
   static void Clear();
 
-  static Domaine_dis_base& Build_or_get(const Nom& type, const Domaine& dom);
+  static Domaine_dis_base& Build_or_get(const Nom& type, const Domaine& dom, const Discretisation_base * disc=nullptr);
   static Domaine_dis_base& Build_or_get_poly_post(const Nom& type, const Domaine& dom);
 
-  Domaine_dis_base& build_or_get(const Nom& type, const Domaine& dom);
+  Domaine_dis_base& build_or_get(const Nom& type, const Domaine& dom, const Discretisation_base * disc=nullptr);
   Domaine_dis_base& build_or_get_poly_post(const Nom& type, const Domaine& dom);
 
   void clear() override { cache_.clear(); }

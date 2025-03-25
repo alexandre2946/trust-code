@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -40,7 +40,10 @@
 Implemente_instanciable(EF_discretisation, "EF", Discret_Thyd);
 // XD ef discretisation_base ef -1 Element Finite discretization.
 
-Entree& EF_discretisation::readOn(Entree& s) { return s; }
+Entree& EF_discretisation::readOn(Entree& s)
+{
+  return Discret_Thyd::readOn(s);
+}
 
 Sortie& EF_discretisation::printOn(Sortie& s) const { return s; }
 

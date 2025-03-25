@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -39,7 +39,10 @@
 Implemente_instanciable(VDF_discretisation, "VDF", Discret_Thyd);
 // XD vdf discretisation_base vdf -1 Finite difference volume discretization.
 
-Entree& VDF_discretisation::readOn(Entree& s) { return s; }
+Entree& VDF_discretisation::readOn(Entree& s)
+{
+  return Discret_Thyd::readOn(s);
+}
 
 Sortie& VDF_discretisation::printOn(Sortie& s) const { return s; }
 

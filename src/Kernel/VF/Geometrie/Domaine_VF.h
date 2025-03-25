@@ -260,9 +260,10 @@ protected:
   mutable IntTab face_dual_; ///< For each face f, face_dual_(f, j) returns the element built on the left and right of the face in the dual mesh. Same sorting as face_voisins_
 
   void order_faces(Faces& les_faces);
-  virtual void renumber_faces(Faces& les_faces, IntTab& sort_key);
   virtual void prepare_elem_non_std(Faces& les_faces);
   virtual void compute_sort_key(Faces& les_faces, IntTab& sort_key);
+  void sort_along_zcurve(const Faces& les_faces, IntTab& sort_key) const;
+  virtual void renumber_faces(Faces& les_faces, IntTab& sort_key);
 
   /*
    * XXX Elie Saikali
@@ -272,6 +273,7 @@ protected:
    */
 public:
   void build_map_mc_Cmesh(const bool with_faces) override;
+
 
 #ifdef MEDCOUPLING_
 private:

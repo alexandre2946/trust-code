@@ -262,7 +262,7 @@ Domaine_dis_base& Discretisation_base::discretiser() const
   if (dis == "VEFPreP1B") dis = "VEF";
   type += dis;
   const Domaine& dom = le_domaine_.valeur();
-  return Domaine_dis_cache::Build_or_get(type, dom);
+  return Domaine_dis_cache::Build_or_get(type, dom, this);
 }
 
 void Discretisation_base::volume_maille(const Schema_Temps_base& sch, const Domaine_dis_base& z, OWN_PTR(Champ_Fonc_base)& ch) const

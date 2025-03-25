@@ -41,6 +41,8 @@ using MEDCoupling::OverlapDEC;
 // Forward decl:
 class Domaine_dis_base;
 class Conds_lim;
+class Reorder_Mesh;
+
 template <typename _SIZE_> class OctreeRoot_32_64;
 template <typename _SIZE_> class Sous_Domaine_32_64;
 
@@ -331,7 +333,7 @@ public:
   void read_former_domaine(Entree& s);  // used in Scatter
   void merge_wo_vertices_with(Domaine_32_64& z);
   void fill_from_list(std::list<Domaine_32_64*>& lst);
-  void reordering();
+  void reorder_domain(const Reorder_Mesh& reorder);
 
   ///
   /// MEDCoupling:

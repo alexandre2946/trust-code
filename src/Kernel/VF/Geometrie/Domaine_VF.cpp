@@ -37,12 +37,17 @@
 #include <iomanip>
 #include <utility>
 #include <set>
+
 #ifdef MPI_
 #if __cplusplus > 201703L // C++20
 #define TRUST_USE_ARBORX
 #include <ArborX.hpp>
 #endif
 #endif
+
+#include <Array_tools.h>
+#include <Reorder_Mesh.h>
+
 #include <medcoupling++.h>
 #ifdef MEDCOUPLING_
 #include <MEDCouplingMemArray.hxx>
@@ -96,9 +101,6 @@ Sortie& Domaine_VF::printOn(Sortie& os) const
   return os ;
 }
 
-//// readOn
-//
-
 Entree& Domaine_VF::readOn(Entree& is)
 {
   volumes_.lit(is);
@@ -114,6 +116,28 @@ Entree& Domaine_VF::readOn(Entree& is)
   is >> nb_faces_unused;
   is >> les_bords_;
   return is ;
+}
+
+/*! @brief This method (that may be overriden in various discretisations) is used to order faces according to the
+ * constraints of each discretisation.
+ * By default we identify the non-standard faces and put them at the begining of the face list.
+ * Non-standard faces are faces whose control volumes are affected by boundary conditions.
+ */
+void Domaine_VF::order_faces(Faces& les_faces)
+{
+  Cerr << "Domaine_VF::order_faces()" << finl;
+
+  prepare_elem_non_std(les_faces);
+
+  IntTab sort_key;
+  compute_sort_key(les_faces, sort_key);
+  tri_lexicographique_tableau(sort_key);
+  if (reorder_.non_nul() && reorder_->algo() != Reorder_Algo::None && !reorder_->skip_faces())
+    {
+      les_faces.calculer_centres_gravite(xv_);
+      sort_along_zcurve(les_faces, sort_key);
+    }
+  renumber_faces(les_faces, sort_key);
 }
 
 /*! @brief Identify non-standard elements (will be used later to identify non standard faces)
@@ -158,26 +182,10 @@ void Domaine_VF::prepare_elem_non_std(Faces& les_faces)
       if (rang_elem_non_std_[elem] == 0)
         rang_elem_non_std_[elem] = count++;
   }
+
 }
 
-/*! @brief This method (that may be overriden in various discretisations) is used to order faces according to the
- * constraints of each discretisation.
- * By default we identify the non-standard faces and put them at the begining of the face list.
- * Non-standard faces are faces whose control volumes are affected by boundary conditions.
- */
-void Domaine_VF::order_faces(Faces& les_faces)
-{
-  Cerr << "Domaine_VF::order_faces()" << finl;
-
-  prepare_elem_non_std(les_faces);
-
-  IntTab sort_key;
-  compute_sort_key(les_faces, sort_key);
-  tri_lexicographique_tableau(sort_key);
-  renumber_faces(les_faces, sort_key);
-}
-
-/* @brief Generate an IntTab (sort_key) with two columns allowing to sort the faces along a specific order.
+/*! @brief Generate an IntTab (sort_key) with two columns allowing to sort the faces along a specific order.
  * sort_key(i, 0) gives the sorting key
  * sort_key(i, 1) gives the original face index
  */
@@ -223,7 +231,71 @@ void Domaine_VF::compute_sort_key(Faces& les_faces, IntTab& sort_key)
     }
 }
 
-/* @brief Re-index faces according to the new order given by 'sort_key'
+
+/*! @brief Tweak the face sorting keys so that internal faces (=standard faces) follow
+ * a Z-curve indexing scheme.
+ * Assumption: all special faces are already at the begining of the array in sort_key (see caller of this method)
+ * See class Reorder_Mesh
+ */
+void Domaine_VF::sort_along_zcurve(const Faces& les_faces, IntTab& sort_key) const
+{
+  assert(reorder_.non_nul());
+  const int nbfaces = les_faces.nb_faces();
+  std::string algon = reorder_->algo() == Reorder_Algo::Morton ? "Morton" : "Hilbert";
+  Cerr << "****************************************************************" << finl;
+  Cerr << "[Reordering] mesh *faces* using " << algon << " scheme ..." << finl;
+  Cerr << "Nb of non-std faces put at the begining: " << nbfaces-nb_faces_std_ << "\n";
+
+  //
+  // Assumption: all special faces are already at the begining of the array (see caller of this method)
+  //
+
+  const int nb_fac = sort_key.dimension(0);
+  const int nb_fac_non_std = nb_fac - nb_faces_std_;
+
+  const int dim1 = xv_.dimension(1);  // == Objet_U::dimension
+  DoubleTab face_pts(nb_faces_std_, dim1);
+  ArrOfInt renum;  // will be sized by compute_renumbering
+
+  // Extract center of mass of std faces (other non std faces should remain at the begining)
+  // At this point xv_ is still "unordered" (sort_key was never used)
+  for (int i=nb_fac_non_std; i < nb_fac; i++)
+    {
+      for (int j=0; j < dim1; j++)
+        {
+          const auto f_idx = sort_key(i, 1);  // the original face index
+          face_pts(i-nb_fac_non_std, j) = xv_(f_idx,j);
+        }
+    }
+
+  reorder_->dump_to_file(face_pts, "reordering_faces_before.txt");
+  reorder_->compute_renumbering(face_pts, renum);
+
+  // apply renumbering to the end of the sort_key array corresponding to standard faces
+  auto sort_key2(sort_key);
+  for (int i = nb_fac_non_std; i < nb_fac; i++)
+    {
+      int j = i-nb_fac_non_std;
+      int idx = renum[j];
+      sort_key(nb_fac_non_std+idx, 0) = sort_key2(i, 0);
+    }
+
+  // Debug - if dump is requested:
+  if (reorder_->is_dump())
+    {
+      auto face_pts2(face_pts);
+      for (int i = 0; i < nb_faces_std_; i++)
+        for (int j = 0; j < dim1; j++)
+          face_pts2(renum(i), j) = face_pts(i,j);
+      reorder_->dump_to_file(face_pts2, "reordering_faces_after.txt");
+    }
+
+  Cerr << "[Reordering] Ordering faces done!" << finl;
+  Cerr << "****************************************************************" << finl;
+}
+
+
+/*! @brief Re-index faces according to the new order given by 'sort_key'
  *
  */
 void Domaine_VF::renumber_faces(Faces& les_faces, IntTab& sort_key)
@@ -295,18 +367,18 @@ void Domaine_VF::renumber_faces(Faces& les_faces, IntTab& sort_key)
   groupes_faces.renumerote(reverse_index);
 }
 
-
 /*! @brief Genere les faces construits les frontieres
  *
  */
 void Domaine_VF::discretiser()
 {
-  // ToDo reordering, best place here ?
-  if (getenv("TRUST_MESH_REORDERING")!=nullptr) domaine().reordering();
-
   Cerr << "<<<<<<<<<< Discretization VF >>>>>>>>>>" << finl;
 
   Domaine_dis_base::discretiser();
+
+  // Re-order the domain indices of elements and/or nodes (faces are handled later)
+  if(reorder_.non_nul())
+    domaine().reorder_domain(reorder_.valeur());
 
   Domaine& ledomaine=domaine();
   histogramme_angle(ledomaine,Cerr);
@@ -393,6 +465,7 @@ void Domaine_VF::discretiser()
 
     // Changement a la v1.5.7 beta: xv_ a maintenant un descripteur parallele: dimension(0)=nb_faces
     les_faces.calculer_centres_gravite(xv_);
+//    ZCurve::Dump_to_file(xv_, "faces_after.txt");
 
     // Calcul des volumes
     ledomaine.calculer_volumes(volumes_, inverse_volumes_);

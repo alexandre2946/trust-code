@@ -151,6 +151,13 @@ const IntTab& Domaine_dis_base::face_voisins() const
   throw;
 }
 
+/**! Make sure the reordering option passed to the discretisation options is known to the Domaine_dis_base:
+ */
+void Domaine_dis_base::completer(const Discretisation_base& disc)
+{
+  reorder_ = disc.get_reorder();
+}
+
 void Domaine_dis_base::discretiser_root(const Nom& typ)
 {
   // Should we handle faces
