@@ -469,7 +469,7 @@ void Domaine_VF::typer_discretiser_ss_domaine(int i)
 {
   Domaine& dom = domaine();
 
-  auto& sds = les_sous_domaines_dis[i];
+  auto& sds = les_sous_domaines_dis_[i];
   sds.typer("Sous_domaine_VF");
   sds->associer_sous_domaine(dom.ss_domaine(i));
   sds->associer_domaine_dis(*this);

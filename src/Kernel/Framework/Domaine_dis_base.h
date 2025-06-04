@@ -41,8 +41,8 @@ public :
   ///
   /// Accessors and shortcuts
   ///
-  inline const Domaine& domaine() const { return le_dom.valeur(); }
-  inline Domaine& domaine() { return le_dom.valeur(); }
+  inline const Domaine& domaine() const { return le_dom_.valeur(); }
+  inline Domaine& domaine() { return le_dom_.valeur(); }
 
   inline int nb_elem() const { return domaine().nb_elem(); }
   inline int nb_elem_tot() const { return domaine().nb_elem_tot(); }
@@ -109,9 +109,9 @@ public :
   bool has_champ(const Motcle& nom) const override;
 
 protected :
-  OBS_PTR(Domaine) le_dom;
+  OBS_PTR(Domaine) le_dom_;
 
-  TRUST_Vector<OWN_PTR(Sous_domaine_dis_base)> les_sous_domaines_dis;
+  TRUST_Vector<OWN_PTR(Sous_domaine_dis_base)> les_sous_domaines_dis_;
   int dist_paroi_initialisee_ = 0;
   DoubleTab y_elem_, y_faces_;
   Champs_compris champs_compris_;

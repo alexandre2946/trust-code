@@ -35,17 +35,17 @@ Entree& Domaine_dis_base::readOn(Entree& is)
 
 int Domaine_dis_base::nombre_de_sous_domaines_dis() const
 {
-  return les_sous_domaines_dis.size();
+  return les_sous_domaines_dis_.size();
 }
 
 const Sous_domaine_dis_base& Domaine_dis_base::sous_domaine_dis(int i) const
 {
-  return les_sous_domaines_dis[i].valeur();
+  return les_sous_domaines_dis_[i].valeur();
 }
 
 Sous_domaine_dis_base& Domaine_dis_base::sous_domaine_dis(int i)
 {
-  return les_sous_domaines_dis[i].valeur();
+  return les_sous_domaines_dis_[i].valeur();
 }
 
 /*! @brief Associe un Domaine a l'objet.
@@ -54,7 +54,7 @@ Sous_domaine_dis_base& Domaine_dis_base::sous_domaine_dis(int i)
  */
 void Domaine_dis_base::associer_domaine(const Domaine& un_domaine)
 {
-  le_dom=un_domaine;
+  le_dom_=un_domaine;
 }
 
 /*! @brief Renvoie la frontiere de Nom nom.
@@ -158,7 +158,7 @@ void Domaine_dis_base::discretiser_root(const Nom& typ)
   ze_typ.suffix("NO_FACE_");
   bool face_ok = (ze_typ == typ);
 
-  const Domaine& dom = le_dom.valeur();
+  const Domaine& dom = le_dom_.valeur();
 
   if (face_ok)
     discretiser();
@@ -169,7 +169,7 @@ void Domaine_dis_base::discretiser_root(const Nom& typ)
     build_map_mc_Cmesh(face_ok); /* ici pour avoir l'info sur face_normals */
 
   // Remplit les sous_domaines_dis, les type, et leur associe les domaine_dis et les sous_domaine correspondantes.
-  les_sous_domaines_dis.dimensionner(dom.nb_ss_domaines());
+  les_sous_domaines_dis_.dimensionner(dom.nb_ss_domaines());
 
   for (int i=0; i<dom.nb_ss_domaines(); i++)
     {
