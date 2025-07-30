@@ -74,39 +74,32 @@ double Op_Dift_Multiphase_VDF_Face::calculer_dt_stab() const
   const Domaine_VDF& domaine_VDF = iter_->domaine();
   const Champ_base& champ_diffu = diffusivite_pour_pas_de_temps();
   const DoubleTab& diffu = diffusivite().valeurs() /* mu */, &rho = equation().milieu().masse_volumique().passe(), &diffu_dt = champ_diffu.valeurs() /* nu */;
-  const DoubleTab* alp = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()).equation_masse().inconnue().passe() : nullptr;
+  //const DoubleTab* alp = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()).equation_masse().inconnue().passe() : nullptr;
   const int cN = (diffu_dt.dimension(0) == 1), cM = (diffu.dimension(0) == 1), cR = (rho.dimension(0) == 1);
+
+  double mu_turbulent, mu_physique, nu_physique;
 
   for (int elem = 0; elem < domaine_VDF.nb_elem(); elem++)
     {
       double diflo = 0.;
+      double deltax = 0.;
       for (int i = 0; i < Objet_U::dimension; i++)
         {
           const double h = domaine_VDF.dim_elem(elem, i);
-          diflo += 1. / (h * h);
+          //cout << "h= "<< h << endl;
+          deltax += 1. / (h * h);
         }
 
-      // TODO : FIXME : pt etre alp > 1 e-3 pour eviter dt <<<< ??
-      double mu_physique = diffu(!cM * elem, 0), alpha_mu_physique = (alp ? (*alp)(elem, 0) : 1.0) * diffu(!cM * elem, 0),
-             alpha_mu_turbulent = (alp ? (*alp)(elem, 0) : 1.0) * rho(!cR * elem, 0) * nu_ou_lambda_turb_(elem, 0), nu_physique = diffu_dt(!cN * elem, 0);
-
-      for (int ncomp = 1; ncomp < diffu.line_size(); ncomp++)
+      for (int ncomp = 0; ncomp < nu_ou_lambda_turb_.line_size(); ncomp++)
         {
-          mu_physique = std::max(mu_physique, diffu(!cM * elem, ncomp));
-          alpha_mu_physique = std::max(alpha_mu_physique, (alp ? (*alp)(elem, ncomp) : 1.0) * diffu(!cM * elem, ncomp));
+          mu_turbulent = rho(!cR * elem, ncomp) * nu_ou_lambda_turb_(elem, ncomp);
+          mu_physique = diffu(!cM * elem, ncomp);
+          nu_physique = diffu_dt(!cN * elem, ncomp);
+          diflo = deltax * (mu_physique + mu_turbulent) * (nu_physique / mu_physique);
+          coef = std::max(coef, diflo);
         }
-
-      for (int ncomp = 1; ncomp < nu_ou_lambda_turb_.line_size(); ncomp++)
-        alpha_mu_turbulent = std::max(alpha_mu_turbulent, (alp ? (*alp)(elem, 0) : 1.0) * rho(!cR * elem, ncomp) * nu_ou_lambda_turb_(elem, ncomp));
-
-      for (int ncomp = 1; ncomp < diffu_dt.line_size(); ncomp++)
-        nu_physique = std::max(nu_physique, diffu_dt(!cN * elem, ncomp));
-
-      // si on a associe mu au lieu de nu , on a nu sans diffu_dt
-      // le pas de temps de stab est alpha(nu+nu_t), on calcule a(mu+mu_t)*(nu/mu)=a(mu+mu_t)/rho=a(nu+nu_t) (avantage par rapport a la division par rho ca marche aussi pour alpha et lambda et en VEF
-      diflo *= (alpha_mu_physique + alpha_mu_turbulent) * (nu_physique / mu_physique);
-      coef = std::max(coef, diflo);
     }
+
   coef = Process::mp_max(coef);
   dt_stab = 0.5 / (coef + DMINFLOAT);
 

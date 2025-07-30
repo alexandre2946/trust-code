@@ -83,45 +83,49 @@ double Op_Dift_Multiphase_VDF_Elem::calculer_dt_stab() const
   const IntTab& elem_faces = domaine_VDF.elem_faces();
   const DoubleTab& lambda = alpha_() /* comme mu */, &diffu = diffusivite_pour_pas_de_temps().valeurs() /* comme nu */;
   const DoubleTab* alp = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()).equation_masse().inconnue().passe() : nullptr;
-  const int cL = (lambda.dimension(0) == 1), cD = (diffu.dimension(0) == 1), dim = Objet_U::dimension;
+  const DoubleTab& rho = equation().milieu().masse_volumique().passe();
+  const int cL = (lambda.dimension(0) == 1), cD = (diffu.dimension(0) == 1), cR = (rho.dimension(0) == 1), dim = Objet_U::dimension;
+
+  double mu_turbulent, mu_physique, nu_physique, alfa;
 
   ArrOfInt numfa(2 * dim);
   for (int elem = 0; elem < domaine_VDF.nb_elem(); elem++)
     {
-      double moy = 0.;
+      double diflo = 0.;
+      double deltax = 0.;
       for (int i = 0; i < 2 * dim; i++)
         numfa[i] = elem_faces(elem, i);
 
       for (int d = 0; d < dim; d++)
         {
           const double hd = domaine_VDF.dist_face(numfa[d], numfa[dim + d], d);
-          moy += 1. / (hd * hd);
+          deltax += 1. / (hd * hd);
         }
 
-      // TODO : FIXME : peut etre si alp > 1 e-3 pour eviter dt <<<< ??
-      double alpha_diff_physique = (alp ? (*alp)(elem, 0) : 1.0) * lambda(!cL * elem, 0), alpha_diff_turbulent = (alp ? (*alp)(elem, 0) : 1.0) * nu_ou_lambda_turb_(elem, 0),
-             diff_physique = lambda(!cL * elem, 0), diffu_ = diffu(!cD * elem, 0);
-
-      for (int ncomp = 1; ncomp < lambda.line_size(); ncomp++)
+      // nu_ou_lambda_turb = alpha * nut * sigma
+      for (int ncomp = 0; ncomp < nu_ou_lambda_turb_.line_size(); ncomp++)
         {
-          alpha_diff_physique = std::max(alpha_diff_physique, (alp ? (*alp)(elem, ncomp) : 1.0) * lambda(!cL * elem, ncomp));
-          diff_physique = std::max(diff_physique, lambda(!cL * elem, ncomp));
+          //if (elem==0) cout << "ncomp "<< ncomp << " nu_ou_lambda_turb = alpha * nut * sigma "<< nu_ou_lambda_turb_(elem, ncomp) << endl;
+          alfa = (alp ? (*alp)(elem, ncomp) : 1.0);
+          mu_turbulent = rho(!cR * elem, ncomp) * nu_ou_lambda_turb_(elem, ncomp);
+          //if (elem==0) cout << "ncomp "<< ncomp << " mu_turbulent avec alpha "<< mu_turbulent << endl;
+          if (alfa != 0.0 ) mu_turbulent = mu_turbulent/alfa;
+          //if (elem==0) cout << "ncomp "<< ncomp << " mu_turbulent sans alpha "<< mu_turbulent << endl;
+          mu_physique = rho(!cR * elem, ncomp) * lambda(!cL * elem, ncomp);
+          nu_physique = diffu(!cD * elem, ncomp);
+          //if (elem==0) cout << "ncomp "<< ncomp << " mu_physique "<< mu_physique << endl;
+          //if (elem==0) cout << "ncomp "<< ncomp << " nu_physique "<< nu_physique << endl;
+
+          // le pas de temps de stab est alpha(nu+nu_t), on calcule a(mu+mu_t)*(nu/mu)=a(mu+mu_t)/rho=a(nu+nu_t) (avantage par rapport a la division par rho ca marche aussi pour alpha et lambda et en VEF
+          diflo = deltax * (mu_physique + mu_turbulent) * (nu_physique / mu_physique);
+          //if (elem==0) cout << "ncomp "<< ncomp << " dt "<< 0.5 / (diflo + DMINFLOAT) << endl;
+          coef = std::max(coef, diflo);
         }
-
-      for (int ncomp = 1; ncomp < nu_ou_lambda_turb_.line_size(); ncomp++)
-        alpha_diff_turbulent = std::max(alpha_diff_turbulent, (alp ? (*alp)(elem, ncomp) : 1.0) * nu_ou_lambda_turb_(elem, ncomp));
-
-      for (int ncomp = 1; ncomp < diffu.line_size(); ncomp++)
-        diffu_ = std::max(diffu_, diffu(!cD * elem, ncomp));
-
-      // si on a associe mu au lieu de nu , on a nu sans diffu_dt
-      // le pas de temps de stab est alpha(nu+nu_t), on calcule a(mu+mu_t)*(nu/mu)=a(mu+mu_t)/rho=a(nu+nu_t) (avantage par rapport a la division par rho ca marche aussi pour alpha et lambda et en VEF
-      const double alpha_local = (alpha_diff_physique + alpha_diff_turbulent) / (diff_physique / diffu_) * moy;
-      coef = std::max(coef, alpha_local);
     }
 
   coef = Process::mp_max(coef);
   dt_stab = 0.5 / (coef + DMINFLOAT);
+  //cout << "dt_stab "<< dt_stab << endl;
 
   return dt_stab;
 }
