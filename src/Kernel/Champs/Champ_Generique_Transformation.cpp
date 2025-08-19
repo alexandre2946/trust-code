@@ -788,32 +788,39 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
 
       if (directive == "temperature") //This is for DG
         {
-          Parser_U& f = fxyz[0];
-          f.setVar("t",temps);
-          double x, y, z;
-          // DG version with nb_points correspond to the nb of integration point in one cell TODO DG mettre quadrature dans Kernel Math !
+          int dim = dimension;
           int nb_elem = valeurs_espace.dimension(0);
+          Kokkos::Array<CDoubleTabView, max_nb_sources> sources;
+          for (int so=0; so<nb_sources; so++)
+            sources[so] = sources_val[so].view_ro();
           IntTab nb_points, ind_integ_points;
           zvf.get_ind_integ_points(ind_integ_points);
           zvf.get_nb_integ_points(nb_points);
-          for (int i = 0; i<nb_elem; i++)
-            {
-              for (int j=0; j<nb_points(i); j++)
-                {
-                  int k = ind_integ_points(i)+j;
-                  x = positions(k,0);
-                  y = positions(k,1);
-                  z = 0;
-                  if (dimension>2)
-                    z = positions(k,2);
-                  f.setVar(0,x);
-                  f.setVar(1,y);
-                  f.setVar(2,z);
-                  for (int so=0; so<nb_sources; so++)
-                    f.setVar(so+4,sources_val[so](i,j));
-                  valeurs_espace(i,j) = f.eval();
-                }
-            }
+
+          CIntArrView ind_integ_points_w = static_cast<const ArrOfInt&>(ind_integ_points).view_ro();
+          CIntArrView nb_points_w = static_cast<const ArrOfInt&>(nb_points).view_ro();
+          CDoubleTabView pos = positions.view_ro();
+          DoubleTabView valeurs = valeurs_espace.view_wo();
+          Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_elem, KOKKOS_LAMBDA(const int i)
+          {
+            for (int j=0; j<nb_points_w(i); j++)
+              {
+                int threadId = parser.acquire();
+                int k = ind_integ_points_w(i)+j;
+                double x = special ? 1e38 : pos(k,0);
+                double y = special ? 1e38 : pos(k,1);
+                double z = special ? 1e38 : (dim>2 ? pos(k,2) : 0);
+                parser.setVar(0,x,threadId);
+                parser.setVar(1,y,threadId);
+                parser.setVar(2,z,threadId);
+                parser.setVar(3,temps,threadId);
+
+                for (int so=0; so<nb_sources; so++)
+                  parser.setVar(so+4,sources[so](i,j),threadId);
+                valeurs(i, j) = parser.eval(threadId);
+              }
+          });
+          end_gpu_timer(__KERNEL_NAME__);
         }
       else
         {
