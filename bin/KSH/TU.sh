@@ -18,6 +18,10 @@ elif [ $2 = "-ndt" ]
 then
    # Number of time steps
    awk '/Number of time steps:/ {val=$NF} END {print val}' $TU
+elif [ $2 = "-solver" ]
+then
+   # Solver Ax=b
+   awk '/Linear solver/ {val=$6} END {print val}' $TU
 else
    echo "Option $2 unknown"
    exit -1

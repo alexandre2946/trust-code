@@ -212,6 +212,19 @@ void SETS::init_cv_ctx(const DoubleTab& secmem, const DoubleVect& norme)
   KSPConvergedDefaultCreate(&cv_ctx->defctx);
 }
 
+#if PETSC_VERSION_GE(3,24,0)
+PetscErrorCode destroy_cvctx(void **mctx)
+{
+  SETS::cv_test_t *ctx = (SETS::cv_test_t *)*mctx;
+  if (ctx->v)
+    VecDestroy(&ctx->v);
+  if (ctx->t)
+    VecDestroy(&ctx->t);
+  PetscErrorCode err = KSPConvergedDefaultDestroy(&ctx->defctx);
+  free(ctx);
+  return err;
+}
+#else
 PetscErrorCode destroy_cvctx(void *mctx)
 {
   SETS::cv_test_t *ctx = (SETS::cv_test_t *)mctx;
@@ -223,6 +236,7 @@ PetscErrorCode destroy_cvctx(void *mctx)
   free(ctx);
   return err;
 }
+#endif
 
 /* test de convergence */
 PetscErrorCode convergence_test(KSP ksp, PetscInt it, PetscReal rnorm, KSPConvergedReason *reason,void *mctx)

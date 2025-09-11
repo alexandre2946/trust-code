@@ -1,0 +1,23 @@
+#!/bin/bash
+# Enabling Kokkos in PETSc
+[ "$TRUST_USE_GPU" != 1 ] && exit 0
+echo "Checking Kokkos support in PETSC:"
+echo "Sequential..."
+jdd=$1"_ENABLED"
+cp $1.data $jdd.data
+PETSC_USE_KOKKOS=1 trust $jdd -ksp_view 1>$jdd.out_err 2>&1 || exit -1
+grep seqaijkokkos $jdd.out_err 1>/dev/null 2>&1 || exit -1
+compare_lata $1.lml $jdd.lml --max_delta || exit -1
+#Do not bench, test case too small to be representative
+#echo "PETSc Ax=b: "`TU.sh $1.TU -solver`" Kokkos enabled: "`TU.sh $jdd.TU -solver`
+
+echo "Parallel..."
+make_PAR.data $1.data 2 1>/dev/null 2>&1
+trust PAR_$1 2 1>PAR_$1.out_err 2>&1 || exit -1
+make_PAR.data $jdd.data 2 1>/dev/null 2>&1
+PETSC_USE_KOKKOS=1 trust PAR_$jdd 2 -ksp_view 1>PAR_$jdd.out_err 2>&1 || exit -1
+grep mpiaijkokkos PAR_$jdd.out_err 1>/dev/null 2>&1 || exit -1
+compare_lata PAR_$1.lml PAR_$jdd.lml --max_delta || exit -1
+#echo "PETSc Ax=b: "`TU.sh PAR_$1.TU -solver`" Kokkos enabled: "`TU.sh PAR_$jdd.TU -solver`
+exit 0
+

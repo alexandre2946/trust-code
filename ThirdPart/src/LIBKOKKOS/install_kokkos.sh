@@ -31,6 +31,7 @@ if [ ! -f $KOKKOS_ROOT_DIR/lib64/libkokkos.a ]; then
       else
          build_debug=$TRUST_ENABLE_KOKKOS_DEBUG
       fi
+      build_debug=0 # Cause issue when building unit
       BUILD_TYPES="Release `[ "$build_debug" = "1" ] && echo Debug`"
       for CMAKE_BUILD_TYPE in $BUILD_TYPES
       do
@@ -42,7 +43,7 @@ if [ ! -f $KOKKOS_ROOT_DIR/lib64/libkokkos.a ]; then
            CMAKE_OPT="-DCMAKE_CXX_COMPILER=$TRUST_CC_BASE_EXTP"
         elif [ "$TRUST_USE_ROCM" = 1 ]
         then
-           CMAKE_OPT="-DCMAKE_CXX_COMPILER=hipcc" # $TRUST_CC_BASE pour profiter de ccache ?
+           CMAKE_OPT="-DCMAKE_CXX_COMPILER=$TRUST_CC_BASE"
         else # Serial
            CMAKE_OPT="-DCMAKE_CXX_COMPILER=$TRUST_CC_BASE"
            # Optimisations pour Serial (important pour F5,C3D)
@@ -130,7 +131,7 @@ if [ ! -f $KOKKOS_ROOT_DIR/lib64/libkokkos.a ]; then
         cmake $src_dir $CMAKE_OPT 2>&1 | tee -a $log_file
         [ ${PIPESTATUS[0]} != 0 ] && echo "Error when configuring Kokkos (CMake) - look at $log_file" && exit -1
 
-        make -j$TRUST_NB_PHYSICAL_PROCS install 2>&1 | tee -a $log_file
+        make -j$TRUST_NB_PHYSICAL_CORES install 2>&1 | tee -a $log_file
         [ ${PIPESTATUS[0]} != 0 ] && echo "Error when compiling Kokkos - look at $log_file" && exit -1
         echo "Kokkos $CMAKE_BUILD_TYPE installed under $CMAKE_INSTALL_PREFIX"
         cd ..

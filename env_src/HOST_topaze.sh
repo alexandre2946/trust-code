@@ -27,7 +27,7 @@ define_modules_config()
    # Load modules
    if [ "$TRUST_USE_CUDA" = 1 ]
    then
-      module="gnu/8.3.0 nvhpc/23.7 mpi/openmpi/4.1.4" # Passage a Cuda 11.8 et NVHPC 23.7 OK
+      module="gnu/8.3.0 nvhpc/24.5 mpi/openmpi/4.1.4" && sw="flavor/ucx/cuda-12.4"
       #module="flavor/openmpi/cuda-12.4 nvhpc/24.5 mpi/openmpi/5.0.5" # Passage a Cuda 12.4 et OpenMPI 5.0.5 pour PETSc MPI GPU-Aware
       module="gnu/14.1.0 nvhpc/25.7 mpi/openmpi/4.1.4" # Passage a Cuda 12.9 et NVHPC 25.7
       [ "$TRUST_CUDA_CC" = "" ] && TRUST_CUDA_CC=80 # A100
@@ -38,13 +38,10 @@ define_modules_config()
       module="gnu/11 mpi/openmpi/4.0.5 mkl/20.0.0" # Regression perf 1.9.1-1.9.2 a cause de Lapack dans OpenBlas plus lent que Lapack de Mkl
    fi
    module="python3/3.8.10 swig/4.0.2 texlive gnuplot cmake/3.26.4 "$module # cmake 3.22 important pour AmgX et Nvidia-HPC
-   #
-   # Ajout pour charger l'espace disque a la place de SCRATCHDIR pas encore disponible sur topaze:
-   #[ "`id | grep gch0504`" != "" ] && sw=dfldatadir/gch0504
    echo "# Module $module detected and loaded on $HOST."
    echo "module purge 1>/dev/null 2>&1" >> $env
    echo "module load $module 1>/dev/null || exit -1" >> $env
-   #[ "$sw" != "" ] && echo "module sw $sw 1>/dev/null" >> $env  # fait planter soumission de jobs pour utilisateur qui n'ont pas ce projet
+   [ "$sw" != "" ] && echo "module sw $sw 1>/dev/null" >> $env
    echo "export TRUST_DISABLE_SUPERLU_DIST=1" >> $env
    . $env
 }

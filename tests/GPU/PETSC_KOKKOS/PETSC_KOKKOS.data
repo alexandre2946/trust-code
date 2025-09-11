@@ -1,0 +1,137 @@
+# PARALLEL RUNS #
+dimension 3
+Pb_Thermohydraulique_QC pb_fluide
+
+Domaine dom_fluide
+# BEGIN MESH #
+Mailler dom_fluide
+{
+    Pave Entree
+    {
+        Origine 0. 0. 0.
+        Nombre_de_Noeuds 6 6 6
+        /* Nombre_de_Noeuds 41 41 41 */
+        Longueurs 1 1 1
+    }
+    {
+        Bord cavern  X = 0.  0. <= Y <= 1. 0. <= Z <= 1.
+        Bord cavern  X = 1.  0. <= Y <= 1. 0. <= Z <= 1.
+        Bord chimney Y = 0.  0. <= X <= 1. 0. <= Z <= 1.
+        Bord chimney Y = 1.  0. <= X <= 1. 0. <= Z <= 1.
+        Bord bas1    Z = 0.  0. <= X <= 1. 0. <= Y <= 1.
+        Bord entree  Z = 1.  0. <= X <= 1. 0. <= Y <= 1.
+    }
+}
+Tetraedriser_homogene dom_fluide
+VerifierCoin dom_fluide {  }
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom_fluide
+{
+    Partition_tool metis { Nb_parts 4 }
+    Larg_joint 2
+    zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom_fluide
+END SCATTER #
+
+
+VEFPreP1B dis
+
+Scheme_euler_implicit sch
+Read sch
+{
+nb_pas_dt_max 10
+        tinit 0
+        tmax 172800
+        tcpumax 335.5
+      	dt_min  1e-6
+        dt_max 10
+	dt_start dt_fixe 1e-5
+        dt_impr 1.e-5
+        dt_sauv 1000
+        seuil_statio -1
+	solveur implicite
+        {
+            solveur petsc_gpu gmres { precond diag { } rtol 1.e-3 impr }
+        }
+	Facsec 100
+	facsec_max 100
+}
+
+Associate pb_fluide dom_fluide
+Associate pb_fluide sch
+Discretize pb_fluide dis
+
+
+Read pb_fluide
+{
+
+    fluide_quasi_compressible {
+        gravite champ_uniforme 3  0. 0 -9.81
+        pression 210e+5
+        mu Champ_Uniforme 1 2.0e-5
+        lambda Champ_Uniforme 1 41e-3
+        loi_etat gaz_parfait_QC
+        {
+            Prandtl 1.5731707317073171382
+            Cp 3225.
+            gamma 1.19
+        }
+        traitement_pth CONSERVATION_MASSE
+    }
+
+    Navier_Stokes_QC
+    {
+        projection_initiale 0
+        solveur_pression AMG GCP { rtol 1.e-8 impr }
+        convection { ef_stab { alpha 0.5 } }
+        diffusion { }
+        initial_conditions { vitesse champ_uniforme 3 0. 0. 0. }
+        boundary_conditions
+        {
+            entree	frontiere_ouverte_rho_u_impose Champ_front_fonc_t 3 0. 0. -0.2777777777777778
+            cavern	paroi_fixe
+            bas1	paroi_fixe
+            chimney  	paroi_fixe
+        }
+    }
+
+    Convection_Diffusion_Chaleur_QC
+    {
+        diffusion { }
+        convection { ef_stab { alpha 0.5 }  }
+        boundary_conditions
+        {
+            entree	frontiere_ouverte_temperature_imposee  champ_front_uniforme 1 326.05
+            bas1  	Paroi_temperature_imposee champ_front_uniforme 1 326.49
+            cavern	Paroi_echange_externe_impose H_IMP champ_front_fonc_xyz 1 3 T_ext champ_front_fonc_xyz 1 273.15+(z_GT_18)*(56.5-0.02*z)+(z_LE_18)*(53.34+2.8/18*z)
+            chimney  	Paroi_echange_externe_impose H_IMP champ_front_fonc_xyz 1 3 T_ext champ_front_fonc_xyz 1 273.15+(z_GT_18)*(56.5-0.02*z)+(z_LE_18)*(53.34+2.8/18*z)
+        }
+        initial_conditions { temperature Champ_uniforme 1 331 }
+    }
+
+    Post_processing
+    {
+        Definition_champs
+        {
+            Delta transformation { methode formule expression 1 vol^(1/3) localisation elem source refChamp { Pb_champ pb_fluide volume_maille nom_source vol } } 
+        }
+        format lml
+        Champs dt_post 43200
+        {
+            pression elem
+            delta
+        }
+    }
+}
+
+Solve pb_fluide
+End
+
+

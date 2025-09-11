@@ -105,7 +105,11 @@ public :
   {
     return amgx_initialized_;
   };
+#if PETSC_VERSION_GE(3,24,0)
+  PetscErrorCode set_convergence_test(PetscErrorCode (*converge)(KSP,PetscInt,PetscReal,KSPConvergedReason*,void*),void *cctx,PetscErrorCode (*destroy)(void**))
+#else
   PetscErrorCode set_convergence_test(PetscErrorCode (*converge)(KSP,PetscInt,PetscReal,KSPConvergedReason*,void*),void *cctx,PetscErrorCode (*destroy)(void*))
+#endif
   {
     if (SolveurPetsc_==nullptr) create_solver();
     return KSPSetConvergenceTest(SolveurPetsc_, converge, cctx, destroy);
@@ -133,6 +137,7 @@ protected :
   using ArrOfPetscInt = TRUSTArray<PetscInt, PetscInt>;
 
   bool isViennaCLVector();
+  bool isKokkosVector();
   void check_aij(const Matrice_Morse&);
   void Create_DM(const DoubleVect& ); // Construit un DM (Distributed Mesh)
   virtual void Create_objects(const Matrice_Morse&, int); // Construit differents objets PETSC dont matrice

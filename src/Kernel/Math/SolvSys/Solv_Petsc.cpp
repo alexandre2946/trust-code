@@ -2318,9 +2318,7 @@ void Solv_Petsc::Update_vectors(const DoubleVect& secmem, DoubleVect& solution)
     {
       // We update PETSc vectors with the arrays on device:
       Update_lhs_rhs<Kokkos::DefaultExecutionSpace>(secmem, solution);
-      VecType vec_type;
-      VecGetType(SecondMembrePetsc_, &vec_type);
-      if (std::string(vec_type) == VECKOKKOS)
+      if (isKokkosVector())
         {
 #ifdef PETSC_HAVE_KOKKOS
           VecKokkosPlaceArray(SecondMembrePetsc_, addrOnDevice(rhs_));
@@ -2373,6 +2371,13 @@ void Solv_Petsc::Update_vectors(const DoubleVect& secmem, DoubleVect& solution)
   //  VecView(SolutionPetsc_,PETSC_VIEWER_STDOUT_WORLD);
 }
 
+bool Solv_Petsc::isKokkosVector()
+{
+  VecType type;
+  VecGetType(SecondMembrePetsc_, &type);
+  return strcmp(type, VECSEQKOKKOS)==0 || strcmp(type, VECMPIKOKKOS)==0;
+}
+
 bool Solv_Petsc::isViennaCLVector()
 {
   VecType type;
@@ -2388,9 +2393,7 @@ void Solv_Petsc::Update_solution(DoubleVect& solution)
   if (gpu_ && DataOnDevice && !isViennaCLVector()) // solution is on the device to SolutionPetsc_ -> solution update without copy
     {
       Solv_Externe::Update_solution<Kokkos::DefaultExecutionSpace>(solution);
-      VecType vec_type;
-      VecGetType(SecondMembrePetsc_, &vec_type);
-      if (std::string(vec_type) == VECKOKKOS)
+      if (isKokkosVector())
         {
 #ifdef PETSC_HAVE_KOKKOS
           VecKokkosResetArray(SecondMembrePetsc_);

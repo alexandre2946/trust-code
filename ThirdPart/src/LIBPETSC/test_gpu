@@ -63,9 +63,7 @@ do
 
 
       gpu_options="-mat_type aijcusparse -vec_type cuda" 
-      gpu_options="-mat_type aijviennacl -vec_type viennacl" # Semble mieux marcher !
 	# Obtenu le 20/05/2020 sur PC is234639: 
-# Running "ex2 -ksp_type cg -pc_type jacobi -m 1000 -n 1000" (GPU options: -mat_type aijviennacl -vec_type viennacl -cuda_synchronize -cuda_view) on Device 0: "Quadro P600":
 # With 1 MPI task on 1 CPU         (cpu_per_task="    " so 1 cores reserved): 3.8413e+01 s ex2_1CPU_0GPU_on_1cores.cpu created.
 # With 1 MPI task on 1 CPU + 1 GPU (cpu_per_task="    " so 1 cores reserved): 7.5926e+00 s ex2_1CPU_1GPU_on_1cores.gpu created.
 # Acceleration PETSc between 1 MPI task on 1 CPU + 1 GPU (1000000 cells/MPI task) vs 1 MPI task on 1 CPU (1000000 cells/MPI task) : *5.05927

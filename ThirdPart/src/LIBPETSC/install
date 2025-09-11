@@ -1,8 +1,17 @@
 #!/bin/bash
 # Script d'installation de PETSC
-# wget https://gitlab.com/petsc/petsc/-/archive/main/petsc-main.tar.gz
-package=petsc-main.tar.gz
-package=petsc-3.23.2.tar.gz
+if [ "$TRUST_USE_LAST_PETSC" != "" ]
+then
+   cd $TRUST_ROOT/externalpackages/petsc
+   archive=https://gitlab.com/petsc/petsc/-/archive/main/petsc-main.tar.gz
+   package=`basename $archive`
+   rm -f $package
+   wget $archive
+   cd -
+else
+   # package=petsc-3.24.2.tar.gz # Huge issue with 3.24.x : make ctest_optim hangs
+   package=petsc-3.23.7.tar.gz && [ "$TRUST_USE_GPU" = 1 ] && package=petsc-19cb9159.tar.gz # 2025_11_10
+fi
 
 ######################################
 # Ajout d'un package au build de PETSc
@@ -35,20 +44,21 @@ add_package()
       j="-j$TRUST_NB_PROCS"
       if [ $lower_name = "scalapack" ]
       then
-         sed -i "1,$ s?ARCH         = ?ARCH         = flock $TRUST_TMP/lib.lock ?g" $config/scalapack.py || exit -1
-         sed -i "1,$ s?RANLIB       = ?RANLIB       = flock $TRUST_TMP/lib.lock ?g" $config/scalapack.py || exit -1
-	 sed -i "1,$ s?make lib?make $j lib \|\| make lib?g"                        $config/scalapack.py || exit -1
+         scalapack=`ls $config | grep -i scalapack`
+         sed -i "1,$ s?ARCH         = ?ARCH         = flock $TRUST_TMP/lib.lock ?g" $config/$scalapack || exit -1
+         sed -i "1,$ s?RANLIB       = ?RANLIB       = flock $TRUST_TMP/lib.lock ?g" $config/$scalapack || exit -1
+	 sed -i "1,$ s?make lib?make $j lib \|\| make lib?g"                        $config/$scalapack || exit -1
       elif [ $lower_name = "mumps_marche_pas" ]
       then
          sed -i "1,$ s?FL = ?FL = flock $TRUST_TMP/lib.lock ?g"           $config/MUMPS.py || exit -1
          sed -i "1,$ s?AR      = ?AR      = flock $TRUST_TMP/lib.lock ?g" $config/MUMPS.py || exit -1
          sed -i "1,$ s?RANLIB  = ?RANLIB  = flock $TRUST_TMP/lib.lock ?g" $config/MUMPS.py || exit -1
 	 sed -i "1,$ s?make alllib?make $j alllib \|\| make alllib?g"     $config/MUMPS.py || exit -1
-      elif [ $lower_name = "ptscotch" ]
+      elif [ $lower_name = "ptscotch_marche_plus" ]
       then
-         sed -i "1,$ s?make clean ptesmumps esmumps?make clean \&\& make $j ptesmumps \&\& make $j esmumps?g" $config/PTScotch.py || exit -1
+         sed -i "1,$ s?make clean ptesmumps esmumps?make clean \&\& make $j ptesmumps \&\& make $j esmumps?g" $config/PTSCOTCH.py || exit -1
          # -std=c99 ne marche pas toujours, on ajoute -std=gnu99
-         sed -i "1,$ s? -DINT? -std=gnu99 -DINT?g" $config/PTScotch.py || exit -1
+         sed -i "1,$ s? -DINT? -std=gnu99 -DINT?g" $config/PTSCOTCH.py || exit -1
       elif [ $lower_name = "suitesparse" ]
       then
          sed -i "1,$ s?library?library $j?g" $config/SuiteSparse.py || exit -1
@@ -192,7 +202,6 @@ for file in `ls $TRUST_ROOT/externalpackages/petsc/*`
 do
    ln -sf $file .
 done
-ln -sf `ls $TRUST_ROOT/externalpackages/petsc/scotch*.tar.gz` ptscotch.tar.gz
 
 ####################
 # Download if needed
@@ -205,21 +214,20 @@ ln -sf `ls $TRUST_ROOT/externalpackages/petsc/scotch*.tar.gz` ptscotch.tar.gz
 #############
 rm -r -f ${package%.tar.gz}
 gunzip -f -c $package | tar -xf -
-package=${package%.tar.gz}
-[ ! -d $package ] && echo "Error, directory $package not found!" && exit -1
-ROOT=`dirname $PETSC_ROOT`
+package=`find . -maxdepth 1 -type d | grep petsc-`
 ROOT=`pwd`
 
 ###################################
 # Correction eventuelle des sources
 ###################################
 cd $ROOT/$package
+# Fixed in 3.24 ?
 #fix mhypre.c pour PCHMG
-patch -p2 < $DIR/fix_mhypre.patch
-[ $? != 0 ] && echo "Patch fix_mhypre.patch impossible a appliquer!" && exit -1
+#patch -p2 < $DIR/fix_mhypre.patch
+#[ $? != 0 ] && echo "Patch fix_mhypre.patch impossible a appliquer!" && exit -1
 #fix strumpack pour magma
-patch -p1 < $DIR/fix_strumpack.patch
-[ $? != 0 ] && echo "Patch fix_strumpack.patch impossible a appliquer!" && exit -1
+#patch -p1 < $DIR/fix_strumpack.patch
+#[ $? != 0 ] && echo "Patch fix_strumpack.patch impossible a appliquer!" && exit -1
 # Hack sur topaze, sinon plus de place disque (fichiers sous groupe genden...)
 if [ $HOST = topaze ]
 then
@@ -268,18 +276,23 @@ echo "****************************************"
 
 with_gpu=""
 
+##################
+# Kokkos-Kernels #
+##################
 # Toujours un pb de link en debug avec kokkos-kernels
 # Et les performances de kokkos-kernels est moindre (x4 slowdown on A6000) par rapport aux kernels PETSc CUDA
 # Mais utilise avec GAMG de PETSc cela permet d'avoir une alternative a AmgX (int64?) et Hypre
 # Build error on HIP also and orcus: on active ponctuellement
-ENABLE_KOKKOS=0 && [ "$HOST" = topaze ] && ENABLE_KOKKOS=1
-if [ "$TRUST_USE_GPU" = 1 ] && [ "$ENABLE_KOKKOS" = 1 ]
+ENABLE_KOKKOS=1 # && [ "$HOST" = topaze ] && ENABLE_KOKKOS=1
+if [ "$ENABLE_KOKKOS" = 1 ] && [ -f $TRUST_ROOT/lib/src/LIBKOKKOS/$TRUST_ARCH"_opt"/lib64/libkokkoskernels.a ]
 then
-   # Kokkos #
-   with_gpu=$with_gpu" --with-kokkos=1"
-   with_gpu=$with_gpu" --with-kokkos-dir=$TRUST_ROOT/lib/src/LIBKOKKOS/$TRUST_ARCH"_opt
-   add_package kokkos-kernels
+   with_gpu=$with_gpu" --with-kokkos=1 --with-kokkos-dir=$TRUST_ROOT/lib/src/LIBKOKKOS/$TRUST_ARCH"_opt
+   with_gpu=$with_gpu" --with-kokkos-kernels=1 --with-kokkos-kernels-dir=$TRUST_ROOT/lib/src/LIBKOKKOS/$TRUST_ARCH"_opt
 fi 
+
+####################
+# GPU: CUDA & ROCM #
+####################
 if [ "$TRUST_USE_CUDA" = 1 ]
 then
    PETSC_HAVE_CUDA=$TRUST_USE_CUDA
@@ -292,8 +305,7 @@ then
       # See https://github.com/spack/spack/issues/42825
       ln -s -f $CUDA_ROOT/lib64/stubs/libcuda.so libcuda.so.1
       export LD_LIBRARY_PATH=`pwd`:$LD_LIBRARY_PATH
-   fi      
-   add_package viennacl
+   fi
    echo "CUDA support for PETSc with: "$with_gpu
 elif [ "$TRUST_USE_ROCM" = 1 ]
 then
@@ -364,12 +376,6 @@ else
 fi
 
 #################################################
-# Trilinos Multi Level Preconditionning package #
-#################################################
-# Il se peut que PetscInitialize plante sur machine CCRT en sequentiel sans mpirun a cause de ml:
-#[ "$TRUST_DISABLE_MPI" = 0 ] && [ "$TRUST_INT64" = 0 ] && add_package ml
-
-#################################################
 # Choix de Scalapack & Blacs (natives ou de base)
 #################################################
 if [ "$TRUST_DISABLE_MPI" = 0 ]
@@ -390,7 +396,7 @@ then
 	 echo "Native optimized SCALAPACK will be used in $TRUST_BLAS_LAPACK"
 	 with_packages=$with_packages" --with-scalapack-lib=$libscalapack --with-scalapack-include=$TRUST_BLAS_LAPACK/../../include"
       else
-	 add_package scalapack
+	 add_package ScaLAPACK
       fi
       ##########################
       # Choix de BLACS natives #
@@ -426,7 +432,7 @@ then
 	 # On arrete si on ne trouve pas les BLAS du compilateur INTEL.
 	 echo "What a pity that MKL libraries are not found on $HOST for PETSc build with Intel compilers. Contact TRUST support." && exit -1
       fi
-      add_package scalapack
+      add_package ScaLAPACK
    fi
 fi
 
@@ -452,12 +458,13 @@ then
    # On prend MUMPS (plus performant)
    if [ "$TRUST_USE_OPENBLAS" = 1 ]
    then
-      add_package MUMPS 5.5.1 # F5 Ecarts // des 5.6.0. TRUST: echg_interne_jdd7 avec NNZ plus grand qu'avant...
+      # add_package 5.8.1: moins de pbs que 5.6.0-5.7.2, un peu plus rapide que 5.5.1 mais ne bat pas PETSc LU sur F5: donc on temporise
+      add_package MUMPS 5.5.1 # F5 Ecarts // des 5.6.0. TRUST: echg_interne_jdd7 avec NNZ plus grand qu'avant... Idem 5.7.2
    else
       add_package MUMPS 5.5.1 # Pas d'ecarts sur F5, G+, C3D
    fi
 fi
-add_package metis
+add_package METIS
 
 ########
 # AmgX #
@@ -499,7 +506,7 @@ then
       [ "${TRUST_CUDA_CC#10}" != "$TRUST_CUDA_CC" ] && target=Blackwell
       [ "${TRUST_CUDA_CC#12}" != "$TRUST_CUDA_CC" ] && target=Blackwell
       [ "$target" = "" ] && echo "Configure Magma target!" && exit -1
-      add_package magma && with_packages=$with_packages" --with-magma-gputarget=$target"
+      add_package MAGMA && with_packages=$with_packages" --with-magma-gputarget=$target"
 
       # Slate (multi-gpu) necessite OpenMP et MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
       # On desactive car crash au run
@@ -531,7 +538,7 @@ fi
 if [ "$TRUST_DISABLE_MPI" = 0 ]
 then
    # SuperLU_dist on GPU suppressed:
-   #[ "$PETSC_HAVE_CUDA" = 1 ] && [ "$TRUST_DISABLE_SUPERLU_DIST" != 1 ] && add_package superlu_dist
+   #[ "$PETSC_HAVE_CUDA" = 1 ] && [ "$TRUST_DISABLE_SUPERLU_DIST" != 1 ] && add_package SuperLU_DIST
 
    # New (SuiteSparse/Cholmod/UmfPack):
    if [ "$TRUST_USE_CUDA" = 1 ] && [ "$TRUST_USE_CHOLMOD_GPU" = 1 ]
@@ -551,13 +558,13 @@ then
    fi
 
    # MUMPS et SUPERLU necessitent desormais parmetis
-   add_package parmetis
+   add_package ParMETIS
 
    ##########
    # SCOTCH #
    ##########
    # On ajoute Scotch sur certaines machines
-   add_package ptscotch
+   add_package PTSCOTCH
 
    # flex et bison necessaires pour scotch desormais installes dans conda.
    if [ "`flex --version 1>/dev/null 2>&1;echo $?`" != 0 ] || [ "`bison --version 1>/dev/null 2>&1;echo $?`" != 0 ]
@@ -570,7 +577,8 @@ then
    #######
    # Hypre
    #######
-   add_package hypre
+   add_package hypre 2.33.0
+   # add_package hypre
    if [ "$TRUST_USE_GPU" = 1 ]
    then
        # Ne surtout pas activer UVM: lent sur AMD et CUDA :
@@ -578,14 +586,18 @@ then
 
       # Enable MPI GPU awareness for Hypre (plantage encore sur adastra MI250 pendant KSPSolve: Memory access fault by GPU)
       #[ "$TRUST_MPI_GPU_AWARE" = 1 ] && [ "$ROCM_ARCH" != gfx90a ] && hypre_configure=$hypre_configure" --enable-gpu-aware-mpi"
-      
+      # PL: I disable --enable-gpu-aware-mpi cause issue on adastra (perf or crash)
+      sed -i "1,$ s?--enable-gpu-aware-mpi??g" config/BuildSystem/config/packages/hypre.py || exit -1
+
       # Hack pour Hypre car --download-hypre-configure-arguments difficile a faire marcher avec plusieurs arguments...
       sed -i "1,$ s?--with-MPI-libs?$hypre_configure --with-MPI-libs?g" config/BuildSystem/config/packages/hypre.py || exit -1
+
       #nedit config/BuildSystem/config/packages/hypre.py
 
       [ "$TRUST_USE_CUDA" = 1 ] && GPU_ARCH=$TRUST_CUDA_CC
       [ "$TRUST_USE_ROCM" = 1 ] && GPU_ARCH=$ROCM_ARCH
       with_packages=$with_packages" --with-hypre-gpu-arch=$GPU_ARCH"
+      #add_package Umpire # Recommended for performance See later some issue when linking with Hypre
    fi
 fi
 

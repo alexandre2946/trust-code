@@ -1358,6 +1358,8 @@ then
       echo "ADD_PATH \$NVHPC_ROOT/$MPI/bin" >> $env
       echo "ADD_LD_LIBRARY_PATH \$NVHPC_ROOT/$MPI/lib" >> $env
    fi
+   # nvidia-ml for PETSc (energy measure):
+   [ -f /usr/lib64/libnvidia-ml.so ] && echo "ADD_LD_LIBRARY_PATH /usr/lib64" >> $env
 fi
 m="# TRUST will use CUDA ?";e="TRUST_USE_CUDA=\"$TRUST_USE_CUDA\" && export TRUST_USE_CUDA";ecrit $m"|"$e"|"$env
 

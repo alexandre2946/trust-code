@@ -50,7 +50,7 @@ then
       [ -f libcmumps.a ] && PETSC_L=$PETSC_L" cmumps dmumps mumps_common smumps zmumps pord"
       [ -f libpastix.a ] && PETSC_L=$PETSC_L" pastix"
       [ -f libml.a ] && PETSC_L=$PETSC_L" ml"
-      for lib in HYPRE strumpack magma sbutterflypack dbutterflypack cbutterflypack zbutterflypack zfp slate blaspp lapackpp scalapack kokkoskernels blacs spai parms parmetis metis ptesmumps ptscotcherr ptscotcherrexit ptscotchparmetisv3 ptscotch scotch scotcherr scotcherrexit Vc
+      for lib in HYPRE strumpack magma sbutterflypack dbutterflypack cbutterflypack zbutterflypack zfp slate blaspp lapackpp scalapack blacs spai parms parmetis metis ptesmumps ptscotcherr ptscotcherrexit ptscotchparmetisv3 ptscotch scotch scotcherr scotcherrexit Vc
       do
          [ -f lib$lib.a ] && PETSC_L=$PETSC_L" $lib"
       done
@@ -83,7 +83,7 @@ then
          then
             # ToDo comme dans install de AmgX et PETSc, factoriser dans configure_env la recherche de CUDA_MATH
             PETSC_P=$PETSC_P" \$ENV{CUDA_ROOT}/lib64 \$ENV{CUDA_ROOT}/lib64/stubs `echo $CUDA_ROOT | sed '1,$ s?/cuda?/math_libs?g'`/lib64"
-            PETSC_L=$PETSC_L" cuda cublas cublasLt cufft cusparse cusolver curand"
+            PETSC_L=$PETSC_L" cuda nvidia-ml cublas cublasLt cufft cusparse cusolver curand"
             # -lnvToolsExt: ajoute suite undefined reference sur cobalt:
             # PETSC_L=$PETSC_L" nvToolsExt"
             # -lnvJitLink : ajout necessaire sur JeanZay si MPI GPU-Aware:
@@ -224,8 +224,9 @@ fi
 ########
 if [ "$TRUST_USE_KOKKOS" = 1 ] ; then
    KOKKOS_P="\$ENV{TRUST_KOKKOS_ROOT}/\$ENV{TRUST_ARCH}\${OPT}/lib64"
-   KOKKOS_L="kokkoscontainers kokkoscore "
-   [ -f $TRUST_KOKKOS_ROOT/$TRUST_ARCH$OPT/libkokkossimd.a ] && KOKKOS_L=$KOKKOS_L" kokkossimd"
+   [ -f $TRUST_KOKKOS_ROOT/$TRUST_ARCH$OPT/lib64/libkokkoskernels.a ] && KOKKOS_L="kokkoskernels"
+   KOKKOS_L=$KOKKOS_L" kokkoscontainers kokkoscore "
+   [ -f $TRUST_KOKKOS_ROOT/$TRUST_ARCH$OPT/lib64/libkokkossimd.a ] && KOKKOS_L=$KOKKOS_L" kokkossimd"
 fi
 ALL_P=$ALL_P" "$KOKKOS_P
 ALL_L=$ALL_L" "$KOKKOS_L
