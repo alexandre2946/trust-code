@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -71,11 +71,11 @@ void Ecrire_CGNS::cgns_open_file()
     {
       if (Process::is_parallel() && Option_CGNS::FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
         init_proc_maitre_local_comm();
-      else if (!Option_CGNS::USE_LINKS) /* Si deformable et pas FILE_PER_COMM_GROUP/USE_LINKS => force to use links ! */
-        {
-          Option_CGNS::USE_LINKS = true;
-          Option_CGNS::SINGLE_SAFE_FILE = false;
-        }
+//      else if (!Option_CGNS::USE_LINKS) /* Si deformable et pas FILE_PER_COMM_GROUP/USE_LINKS => force to use links ! */
+//        {
+//          Option_CGNS::USE_LINKS = true;
+//          Option_CGNS::SINGLE_SAFE_FILE = false;
+//        }
     }
 
   if (Option_CGNS::USE_LINKS && !postraiter_domaine_)
@@ -131,6 +131,9 @@ void Ecrire_CGNS::finir_ecriture(double temps)
     }
   else
     {
+//      if (is_deformable_)
+//        cgns_write_iters_deformable(); // fixme
+
       if (Option_CGNS::SINGLE_SAFE_FILE && singlefile_open_)
         {
           const bool will_flush = (Option_CGNS::FLUSH_EVERY_N > 0) &&
@@ -171,7 +174,12 @@ void Ecrire_CGNS::cgns_finir()
     return; /* All done */
 
   if (!postraiter_domaine_ && !first_time_post_)
-    cgns_write_iters();
+    {
+      if (is_deformable_)
+        cgns_write_iters_deformable();
+      else
+        cgns_write_iters();
+    }
 
   const std::string fn = baseFile_name_ + ".cgns"; // file name
 
@@ -286,6 +294,7 @@ void Ecrire_CGNS::cgns_write_field(const Domaine& domaine, const Noms& noms_comp
   if (first_time_post_)
     cgns_fill_field_loc_map(domaine, LOC);
 
+  /* si link et deformable et multi-loc ... */
   if (is_deformable_ && has_elem_som_loc_ && !multi_loc_deformable_support_linked_)
     link_multi_loc_support_pb_deformable();
 
@@ -330,7 +339,6 @@ void Ecrire_CGNS::cgns_write_field(const Domaine& domaine, const Noms& noms_comp
  * METHODES PRIVEES CLASSE Ecrire_CGNS *
  * *********************************** *
  */
-
 void Ecrire_CGNS::cgns_fill_field_loc_map(const Domaine& domaine, const std::string& LOC)
 {
   assert (static_cast<int>(time_post_.size()) == 1 && first_time_post_);

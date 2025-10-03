@@ -70,7 +70,7 @@ struct Ecrire_CGNS_helper
 
   template<TYPE_ECRITURE_CGNS _TYPE_>
   inline void cgns_write_zone_grid_coord(const int, const int, const int, const char*, const cgsize_t*, int&,
-                                         const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, int&, int&, int&);
+                                         const std::vector<double>&, const std::vector<double>&, const std::vector<double>&, int&, int&, int&, bool with_zone = true);
 
   template<TYPE_ECRITURE_CGNS _TYPE_>
   inline std::enable_if_t< _TYPE_ != TYPE_ECRITURE_CGNS::SEQ, void>
