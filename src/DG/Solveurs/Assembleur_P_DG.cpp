@@ -1,0 +1,460 @@
+/****************************************************************************
+* Copyright (c) 2025, CEA
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+* 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*****************************************************************************/
+/****************************************************************************
+* Copyright (c) 2025, CEA
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+* 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*****************************************************************************/
+
+#include <Neumann_sortie_libre.h>
+#include <Assembleur_P_DG.h>
+#include <Domaine_Cl_DG.h>
+#include <Champ_Elem_DG.h>
+#include <Matrice_Diagonale.h>
+#include <Matrice_Morse_Sym.h>
+#include <Matrice_Bloc_Sym.h>
+#include <Static_Int_Lists.h>
+#include <Domaine_DG.h>
+#include <TRUSTTab_parts.h>
+#include <Operateur_Grad.h>
+#include <Matrix_tools.h>
+#include <Milieu_base.h>
+#include <Array_tools.h>
+#include <Dirichlet.h>
+#include <Debog.h>
+#include <Perf_counters.h>
+
+Implemente_instanciable(Assembleur_P_DG,"Assembleur_P_DG",Assembleur_base);
+
+Sortie& Assembleur_P_DG::printOn(Sortie& s) const { return s << que_suis_je() << " " << le_nom(); }
+
+Entree& Assembleur_P_DG::readOn(Entree& s) { return Assembleur_base::readOn(s); }
+
+int Assembleur_P_DG::assembler(Matrice& la_matrice)
+{
+  DoubleVect rien;
+  return assembler_mat(la_matrice, rien, 1, 1);
+}
+
+int Assembleur_P_DG::assembler_rho_variable(Matrice& la_matrice, const Champ_Don_base& rho)
+{
+  abort();
+  return 0;
+}
+
+int Assembleur_P_DG::assembler_mat(Matrice& la_matrice, const DoubleVect& diag, int incr_pression, int resoudre_en_u)
+{
+  set_resoudre_increment_pression(incr_pression);
+  set_resoudre_en_u(resoudre_en_u);
+  Cerr << "Assemblage de la matrice de pression ... ";
+  statistics().begin_count(STD_COUNTERS::matrix_assembly,statistics().get_last_opened_counter_level()+1);
+  la_matrice.typer("Matrice_Morse");
+  Matrice_Morse& mat = ref_cast(Matrice_Morse, la_matrice.valeur());
+
+  const Domaine_DG& domaine = ref_cast(Domaine_DG, le_dom_DG.valeur());
+  const Champ_Elem_DG& ch = ref_cast(Champ_Elem_DG, mon_equation->inconnue());
+  int nordre = ch.get_order();
+  int nb_bfunc = Option_DG::Nb_col_from_order(nordre);
+
+  const IntTab& indices_glob_elem = ch.indices_glob_elem();
+
+  int nb_elem_tot = le_dom_DG->nb_elem_tot();
+  int size_inc = indices_glob_elem(nb_elem_tot);
+
+  const IntTab& stencil_sorted = domaine.get_stencil_sorted();
+  const int nb_stencil_max = stencil_sorted.dimension(1);
+
+  if (!stencil_done)
+    {
+
+      tab1.resize(size_inc,RESIZE_OPTIONS::NOCOPY_NOINIT);
+
+      int nb_indices_line;
+      int row, col, indice;
+
+      tab1(0) = 1;
+      for (int nelem = 0 ; nelem < nb_elem_tot ; nelem++)
+        {
+          nb_indices_line = 0;
+          for (int k = 0 ; k < nb_stencil_max; k++)
+            {
+              if ( stencil_sorted(nelem,k) < 0 ) break;
+              nb_indices_line += nb_bfunc;
+            }
+          for (int k=0; k<nb_bfunc; k++)
+            tab1(indices_glob_elem(nelem) + k + 1) = nb_indices_line + tab1(indices_glob_elem(nelem) + k);
+        }
+
+      tab2.resize(tab1(size_inc) - 1,RESIZE_OPTIONS::NOCOPY_NOINIT);
+
+
+      for (int nelem = 0 ; nelem < nb_elem_tot ; nelem++)
+        {
+          row = tab1[indices_glob_elem(nelem)]-1 ;
+          nb_indices_line = tab1[indices_glob_elem(nelem)+1] - tab1[indices_glob_elem(nelem)];
+          indice = 0;
+          for (int k = 0 ; k < nb_stencil_max; k++)
+            {
+              if ( stencil_sorted(nelem,k) < 0 ) break;
+              col = indices_glob_elem(stencil_sorted(nelem,k))+1;
+              for (int j=0; j<nb_bfunc; j++)
+                for (int i=0; i<nb_bfunc; i++)
+                  tab2[row+indice+j+nb_indices_line*i] = col+j;
+              indice += nb_bfunc;
+            }
+        }
+      mat.dimensionner(size_inc, tab1(size_inc) - 1);
+      tab1.ref_array(mat.get_set_tab1()), tab2.ref_array(mat.get_set_tab2());
+      stencil_done = 1;
+    }
+  else //sinon, on recycle
+    {
+      mat.get_set_tab1().ref_array(tab1);
+      mat.get_set_tab2().ref_array(tab2);
+      mat.get_set_coeff().resize(tab2.size());
+      mat.set_nb_columns(size_inc);
+    }
+
+  const DoubleTab& eta_F = ch.get_eta_facet();  // Compute the penalisation coefficient
+  const Quadrature_base& quad = domaine.get_quadrature();
+  int nb_pts_integ_max = quad.nb_pts_integ_max();
+
+  DoubleTab grad_fbase_elem(nb_bfunc,nb_pts_integ_max, Objet_U::dimension);
+  DoubleTab divergence(nb_pts_integ_max);
+  double coeff;
+
+  for (int e = 0; e < le_dom_DG->nb_elem(); e++)
+    {
+      ch.eval_grad_bfunc(quad, e, grad_fbase_elem);
+      int ind_elem=indices_glob_elem(e);
+
+      for (int i=0; i<nb_bfunc; i++)
+        for (int j=0; j<nb_bfunc; j++)
+          {
+            divergence = 0.;
+            for (int k = 0; k < quad.nb_pts_integ(e) ; k++)
+              for (int d=0; d<Objet_U::dimension; d++)
+                divergence(k) += grad_fbase_elem(i,k,d) * grad_fbase_elem(j,k,d);
+
+            coeff = quad.compute_integral_on_elem(e, divergence);
+            mat(ind_elem+i, ind_elem+j) += coeff;
+          }
+    }
+
+  int nb_pts_int_fac = quad.nb_pts_integ_facets();
+  const IntTab& face_voisins = domaine.face_voisins();
+
+  int premiere_face_int = domaine.premiere_face_int();
+  const DoubleTab& face_normales = domaine.face_normales();
+
+  int elem0, elem1;
+
+  DoubleTab product(nb_pts_int_fac);
+  DoubleTab scalar_product(nb_pts_int_fac);
+
+  DoubleTab fbase0(nb_bfunc, nb_pts_int_fac);
+  DoubleTab fbase1(nb_bfunc, nb_pts_int_fac);
+
+  DoubleTab grad_fbase0(nb_bfunc,nb_pts_int_fac, Objet_U::dimension);
+  DoubleTab grad_fbase1(nb_bfunc,nb_pts_int_fac, Objet_U::dimension);
+
+
+  for (int f = premiere_face_int; f < domaine.nb_faces(); f++)
+    {
+
+      elem0 = face_voisins(f,0);
+      elem1 = face_voisins(f,1);
+
+      int ind_elem0 = indices_glob_elem(elem0);
+      int ind_elem1 = indices_glob_elem(elem1);
+
+      double sur_f = domaine.face_surfaces(f);
+
+      double h_T = sqrt(std::min(domaine.carre_pas_maille(elem0), domaine.carre_pas_maille(elem1))); //TODO possibilite de prendre moyenne harmonique (stabilite)
+      double invh_T = 1./h_T;
+
+      //*****************//
+      // penalizing term //
+      //*****************//
+      for( int i_elem = 0; i_elem<2; i_elem++)
+        {
+          int elem=face_voisins(f,i_elem);
+          int ind_elem=indices_glob_elem(elem);
+
+          ch.eval_bfunc_on_facets(quad, elem, f, fbase0);
+
+          for (int i=0; i<nb_bfunc; i++)
+            for (int j=0; j<nb_bfunc; j++)
+              {
+                for (int k = 0; k < nb_pts_int_fac ; k++)
+                  product(k) = fbase0(i,k) * fbase0(j,k); //TODO DG kronecker ?
+
+                coeff = eta_F(f)* invh_T* quad.compute_integral_on_facet(f, product);
+                mat(ind_elem+i, ind_elem+j) += coeff;
+              }
+        }
+
+
+      //crossed_term
+      ch.eval_bfunc_on_facets(quad, elem0, f, fbase0);
+      ch.eval_bfunc_on_facets(quad, elem1, f, fbase1);
+
+      for (int i=0; i<nb_bfunc; i++)
+        for (int j=0; j<nb_bfunc; j++)
+          {
+            for (int k = 0; k < nb_pts_int_fac ; k++)
+              product(k) = fbase0(i,k) * fbase1(j,k);
+
+            double integral = quad.compute_integral_on_facet(f, product);
+            coeff =  eta_F(f)* invh_T *integral;
+            mat(ind_elem0+i, ind_elem1+j) -= coeff;
+            mat(ind_elem1+j, ind_elem0+i) -= coeff; //symmetry
+          }
+
+      //****************//
+      // symmetric term //
+      //****************//
+      ch.eval_grad_bfunc_on_facets(quad, elem0, f, grad_fbase0);
+      ch.eval_grad_bfunc_on_facets(quad, elem1, f, grad_fbase1);
+
+      for (int i=0; i<nb_bfunc; i++)
+        {
+          scalar_product = 0.;
+          for (int k = 0; k < nb_pts_int_fac ; k++)
+            for (int d=0; d<Objet_U::dimension; d++)
+              scalar_product(k) += face_normales(f,d)/sur_f * grad_fbase0(i, k, d);
+
+          for (int j=0; j<nb_bfunc; j++)
+            {
+              for (int k = 0; k < nb_pts_int_fac ; k++)
+                product(k) = scalar_product(k) * fbase0(j,k);
+              double integral = quad.compute_integral_on_facet(f, product);
+
+              mat(ind_elem0+i, ind_elem0+j) -= 0.5 *integral;
+              mat(ind_elem0+j, ind_elem0+i) -= 0.5 *integral; //symmetry
+            }
+
+
+          for (int j=0; j<nb_bfunc; j++)
+            {
+              for (int k = 0; k < nb_pts_int_fac ; k++)
+                product(k) = scalar_product(k) * fbase1(j,k);
+              double integral = quad.compute_integral_on_facet(f, product);
+
+              mat(ind_elem0+i, ind_elem1+j) += 0.5 *integral;
+              mat(ind_elem1+j, ind_elem0+i) += 0.5 *integral; //symmetry
+
+            }
+
+          scalar_product = 0.;
+          for (int k = 0; k < nb_pts_int_fac ; k++)
+            for (int d=0; d<Objet_U::dimension; d++)
+              scalar_product(k) += face_normales(f,d)/sur_f * grad_fbase1(i, k, d);
+
+          for (int j=0; j<nb_bfunc; j++)
+            {
+              for (int k = 0; k < nb_pts_int_fac ; k++)
+                product(k) = scalar_product(k) * fbase1(j,k);
+              double integral = quad.compute_integral_on_facet(f, product);
+              mat(ind_elem1+i, ind_elem1+j) += 0.5 *integral;
+              mat(ind_elem1+j, ind_elem1+i) += 0.5 *integral; //symmetry
+            }
+
+          for (int j=0; j<nb_bfunc; j++)
+            {
+              for (int k = 0; k < nb_pts_int_fac ; k++)
+                product(k) = scalar_product(k) * fbase0(j,k);
+              double integral = quad.compute_integral_on_facet(f, product);
+
+              mat(ind_elem1+i, ind_elem0+j) -= 0.5 *integral;
+              mat(ind_elem0+j, ind_elem1+i) -= 0.5 *integral; //symmetry
+
+            }
+        }
+    }
+
+  for (int f = 0; f < premiere_face_int; f++) // For the boundary
+    {
+
+      if ((ch.fcl()(f, 0)==6)||(ch.fcl()(f, 0)==7))
+        {
+          int elem = face_voisins(f, 0); // The cell that have one facet on the boundary
+          int ind_elem = indices_glob_elem(elem);
+
+          ch.eval_bfunc_on_facets(quad, elem, f, fbase0);
+          ch.eval_grad_bfunc_on_facets(quad, elem, f, grad_fbase0);
+
+          double h_T = sqrt(domaine.carre_pas_maille(elem));
+          double invh_T = 1./h_T; //TODO regarder penalisation remplacer h_T par h_F
+          double sur_f = domaine.face_surfaces(f);
+
+          for (int i=0; i<nb_bfunc; i++)
+            {
+              scalar_product = 0.;
+              for (int k = 0; k < nb_pts_int_fac ; k++)
+                for (int d=0; d<Objet_U::dimension; d++)
+                  scalar_product(k) += face_normales(f,d)/sur_f * grad_fbase0(i, k, d);
+
+              for (int j=0; j<nb_bfunc; j++)
+                {
+                  for (int k = 0; k < nb_pts_int_fac ; k++)
+                    product(k) = fbase0(i, k) * fbase0(j, k); //TODO DG kronecker ?
+
+                  coeff = eta_F(f) * invh_T * quad.compute_integral_on_facet(f, product);
+                  mat(ind_elem+i, ind_elem+j) += coeff;
+
+                  for (int k = 0; k < nb_pts_int_fac ; k++)
+                    product(k) = scalar_product(k) * fbase0(j, k);
+
+                  double integral = quad.compute_integral_on_facet(f, product);
+                  mat(ind_elem+i, ind_elem+j) -= integral;
+                  mat(ind_elem+j, ind_elem+i) -= integral;
+                }
+            }
+        }
+    }
+
+
+  Cerr << statistics().get_time_since_last_open(STD_COUNTERS::matrix_assembly) << " s" << finl;
+  statistics().end_count(STD_COUNTERS::matrix_assembly);
+  return 1;
+}
+
+/*! @brief Assemble la matrice de pression pour un fluide quasi compressible laplacein(P) est remplace par div(grad(P)/rho).
+ *
+ * @param (DoubleTab& tab_rho) mass volumique Valeurs par dDGaut:
+ * @return (int) renvoie toujours 1
+ * @throws DGfets de bord:
+ */
+int Assembleur_P_DG::assembler_QC(const DoubleTab& tab_rho, Matrice& matrice)
+{
+  Cerr << "Assemblage de la matrice de pression pour Quasi Compressible en cours..." << finl;
+  assembler(matrice);
+  set_resoudre_increment_pression(1);
+  set_resoudre_en_u(0);
+  abort();
+  Matrice_Bloc& matrice_bloc = ref_cast(Matrice_Bloc, matrice.valeur());
+  Matrice_Morse_Sym& la_matrice = ref_cast(Matrice_Morse_Sym, matrice_bloc.get_bloc(0, 0).valeur());
+  if ((la_matrice.get_est_definie() != 1) && (1))
+    {
+      Cerr << "Pas de pression imposee  --> P(0)=0" << finl;
+//      if (je_suis_maitre())
+//        la_matrice(0, 0) *= 2; //TODO dg a adapter
+      la_matrice.set_est_definie(1);
+    }
+
+  Cerr << "Fin de l'assemblage de la matrice de pression" << finl;
+  return 1;
+}
+
+int Assembleur_P_DG::modifier_secmem(DoubleTab& secmem)
+{
+//  Debog::verifier("secmem dans modifier secmem", secmem);
+//
+//  const Domaine_DG& le_dom = le_dom_DG.valeur();
+//  const Domaine_Cl_DG& le_dom_cl = le_dom_Cl_DG.valeur();
+//  int nb_cond_lim = le_dom_cl.nb_cond_lim();
+//  const IntTab& face_voisins = le_dom.face_voisins();
+//
+//  // Modification du second membre :
+//  int i;
+//  for (i = 0; i < nb_cond_lim; i++)
+//    {
+//      const Cond_lim_base& la_cl_base = le_dom_cl.les_conditions_limites(i).valeur();
+//      const Front_VF& la_front_dis = ref_cast(Front_VF, la_cl_base.frontiere_dis());
+//      const Champ_front_base& champ_front = la_cl_base.champ_front();
+//      int ndeb = la_front_dis.num_premiere_face();
+//      int nfin = ndeb + la_front_dis.nb_faces();
+//
+//      // GF on est passe en increment de pression
+//      if ((sub_type(Neumann_sortie_libre, la_cl_base)) && (!get_resoudre_increment_pression()))
+//        {
+//          double Pimp, coDG;
+//          const Neumann_sortie_libre& la_cl_Neumann = ref_cast(Neumann_sortie_libre, la_cl_base);
+//          // const Front_VF& la_front_dis = ref_cast(Front_VF,la_cl_base.frontiere_dis());
+//          //int ndeb = la_front_dis.num_premiere_face();
+//          //int nfin = ndeb + la_front_dis.nb_faces();
+//          for (int num_face = ndeb; num_face < nfin; num_face++)
+//            {
+//              Pimp = la_cl_Neumann.flux_impose(num_face - ndeb);
+//              coDG = les_coeff_pression[num_face] * Pimp;
+//              secmem[face_voisins(num_face, 0)] += coDG;
+//            }
+//        }
+//      else if (sub_type(Dirichlet, la_cl_base) && champ_front.instationnaire() && get_resoudre_en_u() )
+//        {
+//          const DoubleTab& Gpt = champ_front.derivee_en_temps();
+//          bool ch_unif = (Gpt.nb_dim() == 1);
+//          for (int num_face = ndeb; num_face < nfin; num_face++)
+//            {
+//              double Stt = 0.;
+//              for (int k = 0; k < dimension; k++)
+//                {
+//                  double Gpoint = ch_unif ? Gpt(k) : Gpt(num_face - ndeb, k);
+//                  Stt -= Gpoint * le_dom.face_normales(num_face, k);
+//                }
+//              secmem(face_voisins(num_face, 0)) += Stt;
+//            }
+//        }
+//    }
+//
+//  secmem.echange_espace_virtuel();
+//  Debog::verifier("secmem dans modifier secmem fin", secmem);
+  return 1;
+}
+
+int Assembleur_P_DG::modifier_solution(DoubleTab& pression)
+{
+  Debog::verifier("pression dans modifier solution in", pression);
+  //on ne considere pas les pressions aux faces dans le min (solveur_U_P ne les met pas a jour)
+  DoubleTab_parts ppart(pression);
+  if (!has_P_ref) pression -= mp_min_vect(ppart[0]);
+  return 1;
+}
+
+const Domaine_dis_base& Assembleur_P_DG::domaine_dis_base() const
+{
+  return le_dom_DG.valeur();
+}
+
+const Domaine_Cl_dis_base& Assembleur_P_DG::domaine_Cl_dis_base() const
+{
+  return le_dom_Cl_DG.valeur();
+}
+
+void Assembleur_P_DG::associer_domaine_dis_base(const Domaine_dis_base& le_dom_dis)
+{
+  le_dom_DG = ref_cast(Domaine_DG, le_dom_dis);
+}
+
+void Assembleur_P_DG::associer_domaine_cl_dis_base(const Domaine_Cl_dis_base& le_dom_Cl_dis)
+{
+  le_dom_Cl_DG = ref_cast(Domaine_Cl_DG, le_dom_Cl_dis);
+}
+
+void Assembleur_P_DG::completer(const Equation_base& Eqn)
+{
+  mon_equation = Eqn;
+  stencil_done = 0;
+}
