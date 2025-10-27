@@ -1,1 +1,5 @@
+<<<<<<<< HEAD:tests/Verification/PoissonSolver_jdd20/lien_fiche_validation
 Validation/Rapports_automatiques/Verification/Verification_codage/PoissonSolver/build/Triangles/1/DG/Himmelblau/DG_Himmelblau.data
+========
+Validation/Rapports_automatiques/Verification/Verification_codage/poissonSolver/build/Triangles/1/DG/Himmelblau/DG_Himmelblau.data
+>>>>>>>> a31374348e ([Op_Diff_DG] corresponding regression tests cases and rename):tests/Verification/poissonSolver_jdd20/lien_fiche_validation
