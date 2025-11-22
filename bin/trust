@@ -316,6 +316,7 @@ do
       [ "`echo $TRUST_ROOT | grep tmptrust`" != "" ] || [ "`echo $TRUST_ROOT | grep trust_trio`" != "" ] && project_name=$project_name"_Network"
       eclipseconfigpath=`pwd`"/eclipse-trust-config"
       sed -i "s/TRUSTV/$project_name/; s?TRUSTROOT?$TRUST_ROOT?g" $eclipseconfigpath/.project
+      sed -i "s/TRUSTV/$project_name/; s?TRUSTROOT?$TRUST_ROOT?g" $eclipseconfigpath/.cproject
       sed -i "s/TRUSTV/$project_name/; s?TRUSTROOT?$TRUST_ROOT?g; s?eclipse-config?$eclipseconfigpath/..?g" $eclipseconfigpath/TRUST_debug_in_Eclipse.launch
       mv eclipse-trust-config/TRUST_debug_in_Eclipse.launch eclipse-trust-config/$project_name"_Debug.launch"
       sed -i "s?eclipse-config?$eclipseconfigpath?g; s?project_name?$project_name?g" $eclipseconfigpath/README
