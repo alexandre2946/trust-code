@@ -69,20 +69,19 @@ void DG_discretisation::discretiser_champ(const Motcle& directive, const Domaine
 //  Nom type_champ_vitesse("Champ_Face_DG");
   Nom type_elem("Champ_Elem_DG");
   Nom type;
-  int default_order = 0; // Valeur par defaut du nombre de composantes
+  int nb_basis_func = 0; // Valeur par defaut du nombre de composantes
   int rang = motcles.search(directive);
   const int order_DG = Option_DG::Get_order_for(noms[0]);
   switch(rang)
     {
-    case 0: // TODO for velocity
-      throw;
+    case 0:
     case 1:
     case 2:
     case 3:
     case 4:
     case 5:
       type = type_elem;
-      default_order = Option_DG::Nb_col_from_order(order_DG);
+      nb_basis_func = Option_DG::Nb_col_from_order(order_DG);
       break;
     default:
       assert(rang < 0);
@@ -110,7 +109,7 @@ void DG_discretisation::discretiser_champ(const Motcle& directive, const Domaine
   else
     assert(0);
 
-  creer_champ(champ, dom_dis, type, noms[0], unites[0], nb_comp*default_order, nb_ddl, nb_pas_dt, temps, directive, que_suis_je());
+  creer_champ(champ, dom_dis, type, noms[0], unites[0], nb_comp*nb_basis_func, nb_ddl, nb_pas_dt, temps, directive, que_suis_je());
 
   champ->fixer_nature_du_champ(basis_function);
 

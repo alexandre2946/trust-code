@@ -180,8 +180,19 @@ void Discretisation_base::champ_fixer_membres_communs(Champ_base& ch, const Doma
   if (z.que_suis_je() == "Domaine_DG")
     {
       Noms noms(nb_comp);
-      for (int k = 0; k<nb_comp; k++)
-        noms[k] = nom + "_phi_" + std::to_string(k);
+      if (!nom.debute_par("vitesse"))
+        for (int k = 0; k<nb_comp; k++)
+          noms[k] = nom + "_phi_" + std::to_string(k);
+      else
+        {
+          const int nb_basis_func = nb_comp/Objet_U::dimension;
+          for (int d = 0; d<Objet_U::dimension; d++)
+            {
+              std::string suffix = (d == 0) ? "X" : ((d == 1) ? "Y" : "Z");
+              for (int k = 0; k<nb_basis_func; k++)
+                noms[k + d*nb_basis_func] = nom + suffix + "_phi_" + std::to_string(k);
+            }
+        }
       ch.fixer_noms_compo(noms);
     }
   else if ((nb_comp > 1) && (nb_comp == dimension))
