@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -29,12 +29,14 @@ class Champ_Elem_DG: public Champ_Inc_P0_base
 public:
   Champ_base& affecter_(const Champ_base& ch) override;
   int imprime(Sortie&, int) const override;
+  int create_index(IntTab& indice);
 
   int fixer_nb_valeurs_nodales(int n) override;
 
   void associer_domaine_dis_base(const Domaine_dis_base&) override;
 
   inline const int& get_order() const { return order_; }
+  inline const bool& get_is_scalar() const { return is_scalar_; }
   inline const IntTab& indices_glob_elem() const { return indices_glob_elem_; }
 
   inline const int& nb_bfunc() const { return nb_bfunc_; }
@@ -48,15 +50,13 @@ public:
   void eval_grad_bfunc(const Quadrature_base& quad, const int& nelem, DoubleTab& fbasis) const;
   void eval_grad_bfunc_on_facets(const Quadrature_base& quad, const int& nelem, const int& num_face, DoubleTab& grad_fbasis) const;
 
+  const Matrice_Dense eval_invMassMatrix(const Quadrature_base& quad, const int& nelem) const;
 
   inline const Matrice_Morse& get_mass_matrix() const { return mass_matrix_; }
 //  inline const Matrice_Morse& get_inv_mass_matrix() const { return inv_mass_matrix_; }
 
   inline const DoubleTab& get_eta_elem() const { return eta_elem; }
   inline const DoubleTab& get_eta_facet() const { return eta_facet; }
-
-  const Matrice_Dense eval_invMassMatrix(const Quadrature_base& quad, const int& nelem) const;
-  const Matrice_Dense build_local_mass_matrix(const Quadrature_base& quad, const int nelem) const;
 
   /* fonctions pour reconstruire la valeur du champ selon la localisation */
   DoubleTab& valeur_aux_elems(const DoubleTab& positions, const IntVect& les_polys, DoubleTab& valeurs) const override;
@@ -70,6 +70,8 @@ protected:
   void allocate_transition_matrix();
   void compute_stab_param();
 
+  const Matrice_Dense build_local_mass_matrix(const Quadrature_base& quad, const int nelem) const;
+
   void build_mass_matrix();
   void build_transition_matrix();
   void orthonormalize(const int& nelem, DoubleTab& fbasis) const;
@@ -81,6 +83,7 @@ protected:
 
   int order_ = -1;
   int nb_bfunc_ = -1;
+  bool is_scalar_ = true;
 
   bool is_orthonormalized_ = false;
 

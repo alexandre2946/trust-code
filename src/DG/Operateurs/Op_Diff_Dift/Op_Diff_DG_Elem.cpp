@@ -69,7 +69,8 @@ void Op_Diff_DG_Elem::dimensionner(Matrice_Morse& la_matrice) const //TODO a rem
 
   const Champ_Elem_DG& ch = ref_cast(Champ_Elem_DG, equation().inconnue());
   int nordre = ch.get_order();
-  int nddl = Option_DG::Nb_col_from_order(nordre);
+  const int dim = ch.get_is_scalar() ? 1 : Objet_U::dimension;
+  int nb_basis_func = Option_DG::Nb_col_from_order(nordre);
 
   const IntTab& indices_glob_elem = ch.indices_glob_elem();
 
@@ -95,9 +96,9 @@ void Op_Diff_DG_Elem::dimensionner(Matrice_Morse& la_matrice) const //TODO a rem
       for (int k = 0 ; k < nb_stencil_max; k++)
         {
           if ( stencil_sorted(nelem,k) < 0 ) break;
-          nb_indices_line += nddl;
+          nb_indices_line += nb_basis_func;
         }
-      for (int k=0; k<nddl; k++)
+      for (int k=0; k<nb_basis_func*dim; k++)
         tab1(indices_glob_elem(nelem) + k + 1) = nb_indices_line + tab1(indices_glob_elem(nelem) + k);
     }
 
@@ -112,52 +113,15 @@ void Op_Diff_DG_Elem::dimensionner(Matrice_Morse& la_matrice) const //TODO a rem
         {
           if ( stencil_sorted(nelem,k) < 0 ) break;
           col = indices_glob_elem(stencil_sorted(nelem,k))+1;
-          for (int j=0; j<nddl; j++)
-            for (int i=0; i<nddl; i++)
-              tab2[row+indice+j+nb_indices_line*i] = col+j;
-          indice += nddl;
+          for (int d=0 ; d<dim ; d++)
+            {
+              for (int j=0; j<nb_basis_func; j++)
+                for (int i=0; i<nb_basis_func; i++)
+                  tab2[row+indice+j+nb_indices_line*i] = col+j+d*nb_basis_func;
+              indice += nb_basis_func;
+            }
         }
     }
-
-//
-//  int premiere_face_int = domaine.premiere_face_int();
-//
-//  int elem0, elem1;
-//  for (int f = premiere_face_int; f < domaine.nb_faces(); f++)
-//    {
-//      elem0 = face_voisins(f,0);
-//      elem1 = face_voisins(f,1);
-//
-//      int ind_elem0 = indices_glob_elem(elem0);
-//      int ind_elem1 = indices_glob_elem(elem1);
-//
-//      for( int i_elem = 0; i_elem<2; i_elem++)
-//        {
-//          int elem=face_voisins(f,i_elem);
-//          int ind_elem=indices_glob_elem(elem);
-//
-//          for (int i = 0; i < nddl; i++ )
-//            for (int j = 0; j < nddl; j++ )
-//              indice.append_line( ind_elem+i, ind_elem+j);
-//        }
-//
-//      for (int i = 0; i < nddl; i++ )
-//        for (int j = 0; j < nddl; j++ )
-//          {
-//            indice.append_line( ind_elem0+i, ind_elem1+j);
-//            indice.append_line( ind_elem1+i, ind_elem0+j);
-//          }
-//    }
-//
-//  tableau_trier_retirer_doublons(indice);
-//
-//  int nb_elem_tot = le_dom_dg_->nb_elem_tot();
-//
-//  int size_inc = indices_glob_elem(nb_elem_tot);
-//
-//  Matrix_tools::allocate_morse_matrix(size_inc, size_inc, indice, mat);
-
-
 }
 
 void Op_Diff_DG_Elem::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
