@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -24,6 +24,7 @@
 #include <TRUSTTab.h>
 #include <Champ_Elem_DG.h>
 #include <Domaine_DG.h>
+#include <BasisFunction.h>
 
 class Eval_Puiss_Th_DG_Elem: public Evaluateur_Source_Elem
 {
@@ -52,16 +53,22 @@ inline void Eval_Puiss_Th_DG_Elem::calculer_terme_source(const int e, Type_Doubl
   //  for (int i = 0; i < size; i++) S[i] = puissance(k, i) * volumes(e) * porosite_vol(e);
 
   const Champ_Elem_DG& ch = ref_cast(Champ_Elem_DG, la_zcl->inconnue());
+  const Nom& nom_inc = ch.le_nom();
+
   const Domaine_DG& dom = ref_cast(Domaine_DG, le_dom.valeur());
+
+  int order = Option_DG::Get_order_for(nom_inc);
+
+  const BasisFunction& bfunc = dom.get_basisFunction(order);
+  const int nb_bfunc = bfunc.nb_bfunc();
 
   const Quadrature_base& quad = dom.get_quadrature(5);
   int nb_pts_integ_max = quad.nb_pts_integ_max();
-  const int nb_bfunc = ch.nb_bfunc();
 
   DoubleTab product(nb_pts_integ_max);
 
   DoubleTab fbase(nb_bfunc, nb_pts_integ_max);
-  ch.eval_bfunc(quad, e, fbase);
+  bfunc.eval_bfunc(quad, e, fbase);
 
   for (int fb = 0; fb < nb_bfunc; fb++)
     {

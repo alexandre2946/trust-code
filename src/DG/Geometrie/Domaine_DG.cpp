@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -35,6 +35,7 @@
 #include <Quadrature_Ord1_Polygone.h>
 #include <Quadrature_Ord3_Polygone.h>
 #include <Quadrature_Ord5_Polygone.h>
+#include <BasisFunction.h>
 #include <Champ_Elem_DG.h>
 
 Implemente_instanciable(Domaine_DG, "Domaine_DG", Domaine_Poly_base);
@@ -60,7 +61,6 @@ void Domaine_DG::discretiser()
   quad1_ = std::make_shared<Quadrature_Ord1_Polygone>(*this);
   quad3_ = std::make_shared<Quadrature_Ord3_Polygone>(*this);
   quad5_ = std::make_shared<Quadrature_Ord5_Polygone>(*this);
-
 
   int nelem_tot = nb_elem_tot();
   const int nb_faces_max = elem_faces_.dimension(1);
@@ -100,7 +100,7 @@ void Domaine_DG::discretiser()
  *
  * @param order : order to specify
  */
-void Domaine_DG::set_default_order(int order)
+void Domaine_DG::set_default_order(int order) //TODO DG adapt the default order for P1 P2...
 {
   order_quad_=order;
 }
@@ -149,12 +149,26 @@ void Domaine_DG::get_ind_integ_points(IntTab& ind_integ_points) const
 //  ind_integ_points.ref(ind_pts_integ);
 }
 
+const BasisFunction& Domaine_DG::get_basisFunction(int order) const
+{
+  BasisFunction_Key key {order};  //possibility to add other key later
+  auto it = bfunc_maps_.find(key);
+  if (it == bfunc_maps_.end())
+    {
+      // Lazy build so we only compute mass/transition matrices once per unique configuration
+      auto tk = std::make_shared<BasisFunction>();
+      tk->initialize(*this, order, gram_schmidt_);
+      it = bfunc_maps_.emplace(key, std::move(tk)).first;
+    }
+  return *it->second;
+}
+
 /*! @brief Compute L_1 norm
  *
  */
 double Domaine_DG::compute_L1_norm(const DoubleVect& val_source) const
 {
-  const Quadrature_base& quad = get_quadrature();
+  const Quadrature_base& quad = get_quadrature(5);
   int nb_pts_integ_max = quad.nb_pts_integ_max();
   int nelem = nb_elem();
 
@@ -177,7 +191,7 @@ double Domaine_DG::compute_L1_norm(const DoubleVect& val_source) const
  */
 double Domaine_DG::compute_L2_norm(const DoubleVect& val_source) const
 {
-  const Quadrature_base& quad = get_quadrature();
+  const Quadrature_base& quad = get_quadrature(5);
   int nb_pts_integ_max = quad.nb_pts_integ_max();
   int nelem = nb_elem();
 

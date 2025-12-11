@@ -34,6 +34,7 @@
 #include <Quadrature_base.h>
 #include <Champ_front_txyz.h>
 #include <Champ_front_softanalytique.h>
+#include <BasisFunction.h>
 
 Implemente_instanciable(Op_Diff_DG_Elem, "Op_Diff_DG_Elem", Op_Diff_DG_base);
 
@@ -63,13 +64,18 @@ void Op_Diff_DG_Elem::completer()
 
 void Op_Diff_DG_Elem::dimensionner(Matrice_Morse& la_matrice) const // TODO a remonter dans Op_DG_Elem
 {
+
+  const Nom& nom_inco = equation().inconnue().le_nom();
+  int nordre = Option_DG::Get_order_for(nom_inco);
+  int dim = nom_inco.debute_par("vitesse") ? Objet_U::dimension : 1;
+
   const Domaine_DG& domaine = le_dom_dg_.valeur();
 
-  const Champ_Elem_DG& ch = ref_cast(Champ_Elem_DG, equation().inconnue());
-  int nordre = ch.get_order();
-  const int dim = ch.get_is_scalar() ? 1 : Objet_U::dimension;
-  int nb_basis_func = Option_DG::Nb_col_from_order(nordre);
+  const BasisFunction& bfunc = domaine.get_basisFunction(nordre);
+  const int nb_basis_func = bfunc.nb_bfunc();
 
+
+  const Champ_Elem_DG& ch = ref_cast(Champ_Elem_DG, equation().inconnue());
   const IntTab& indices_glob_elem = ch.indices_glob_elem();
 
   int nb_elem_tot = le_dom_dg_->nb_elem_tot();
@@ -159,9 +165,10 @@ void Op_Diff_DG_Elem::dimensionner_blocs(matrices_t matrices, const tabs_t& semi
 void Op_Diff_DG_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
 
-  const std::string& nom_inco = equation().inconnue().le_nom().getString();
-  const DoubleTab& inco = semi_impl.count(nom_inco) ? semi_impl.at(nom_inco) : equation().inconnue().valeurs();
-  Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr;
+  const Nom& nom_inco = equation().inconnue().le_nom();
+  const std::string& nom_inco_str = equation().inconnue().le_nom().getString();
+  const DoubleTab& inco = semi_impl.count(nom_inco_str) ? semi_impl.at(nom_inco_str) : equation().inconnue().valeurs();
+  Matrice_Morse *mat = matrices.count(nom_inco_str) ? matrices.at(nom_inco_str) : nullptr;
 
   update_nu();
 
@@ -170,19 +177,26 @@ void Op_Diff_DG_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, cons
 
   const Champ_Elem_DG& ch = ref_cast(Champ_Elem_DG, equation().inconnue());
   const int dim = ch.get_is_scalar() ? 1 : Objet_U::dimension;
-  const DoubleTab& eta_F = ch.get_eta_facet(); // Compute the penalisation coefficient
-  const Quadrature_base& quad = domaine.get_quadrature();
   const IntTab& indices_glob_elem = ch.indices_glob_elem();
+
+  int order = Option_DG::Get_order_for(nom_inco);
+
+  const BasisFunction& bfunc = le_dom_dg_->get_basisFunction(order);
+  const int nb_bfunc = bfunc.nb_bfunc();
+
+  const DoubleTab& eta_F = bfunc.get_eta_facet(); // Compute the penalisation coefficient
+
+  const int quad_order = bfunc.get_default_quadrature_order();
+  const Quadrature_base& quad = domaine.get_quadrature(quad_order);
   int nb_pts_integ_max = quad.nb_pts_integ_max();
   double coeff;
 
-  const int nb_bfunc = ch.nb_bfunc();
   DoubleTab grad_fbase_elem(nb_bfunc, nb_pts_integ_max, Objet_U::dimension);
   DoubleTab diffusion(nb_pts_integ_max);
 
   for (int e = 0; e < le_dom_dg_->nb_elem(); e++)
     {
-      ch.eval_grad_bfunc(quad, e, grad_fbase_elem);
+      bfunc.eval_grad_bfunc(quad, e, grad_fbase_elem);
       int ind_elem = indices_glob_elem(e);
       for (int i = 0; i < nb_bfunc; i++)
         for (int j = 0; j < nb_bfunc; j++)
@@ -260,7 +274,7 @@ void Op_Diff_DG_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, cons
           int elem = face_voisins(f, i_elem);
           int ind_elem = indices_glob_elem(elem);
 
-          ch.eval_bfunc_on_facets(quad, elem, f, fbase0);
+          bfunc.eval_bfunc_on_facets(quad, elem, f, fbase0);
 
           for (int i = 0; i < nb_bfunc; i++)
             for (int j = 0; j < nb_bfunc; j++)
@@ -279,8 +293,8 @@ void Op_Diff_DG_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, cons
         }
 
       // crossed_term
-      ch.eval_bfunc_on_facets(quad, elem0, f, fbase0);
-      ch.eval_bfunc_on_facets(quad, elem1, f, fbase1);
+      bfunc.eval_bfunc_on_facets(quad, elem0, f, fbase0);
+      bfunc.eval_bfunc_on_facets(quad, elem1, f, fbase1);
 
       for (int i = 0; i < nb_bfunc; i++)
         for (int j = 0; j < nb_bfunc; j++)
@@ -305,8 +319,8 @@ void Op_Diff_DG_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, cons
       //****************//
       // symmetric term //
       //****************//
-      ch.eval_grad_bfunc_on_facets(quad, elem0, f, grad_fbase0);
-      ch.eval_grad_bfunc_on_facets(quad, elem1, f, grad_fbase1);
+      bfunc.eval_grad_bfunc_on_facets(quad, elem0, f, grad_fbase0);
+      bfunc.eval_grad_bfunc_on_facets(quad, elem1, f, grad_fbase1);
 
       for (int i = 0; i < nb_bfunc; i++)
         {
@@ -406,8 +420,8 @@ void Op_Diff_DG_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, cons
           int elem = face_voisins(f, 0); // The cell that have one facet on the boundary
           int ind_elem = indices_glob_elem(elem);
 
-          ch.eval_bfunc_on_facets(quad, elem, f, fbase0);
-          ch.eval_grad_bfunc_on_facets(quad, elem, f, grad_fbase0);
+          bfunc.eval_bfunc_on_facets(quad, elem, f, fbase0);
+          bfunc.eval_grad_bfunc_on_facets(quad, elem, f, grad_fbase0);
 
           double h_T = sqrt(domaine.carre_pas_maille(elem));
           double invh_T = 1. / h_T; // TODO regarder penalisation remplacer h_T par h_F
@@ -461,9 +475,8 @@ void Op_Diff_DG_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, cons
                 }
             }
         }
-
-      contribuer_au_second_membre(secmem); // TODO DG a integrer proprement dans la boucle
     }
+  contribuer_au_second_membre(secmem); // TODO DG a integrer proprement dans la boucle
 }
 
 void Op_Diff_DG_Elem::dimensionner_termes_croises(Matrice_Morse& matrice, const Probleme_base& autre_pb, int nl, int nc) const
@@ -494,20 +507,26 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
   const IntTab& face_voisins = domaine.face_voisins();
   const DoubleTab& face_normales = domaine.face_normales();
 
-  const Champ_Elem_DG& ch = ref_cast(Champ_Elem_DG, equation().inconnue());
-  const int dim = ch.get_is_scalar() ? 1 : Objet_U::dimension;
-  const Quadrature_base& quad = domaine.get_quadrature();
+  const Nom& nom_inco = equation().inconnue().le_nom();
+  int order = Option_DG::Get_order_for(nom_inco);
+  int dim = nom_inco.debute_par("vitesse") ? Objet_U::dimension : 1;
+
+  const BasisFunction& bfunc = le_dom_dg_->get_basisFunction(order);
+  const int nb_bfunc = bfunc.nb_bfunc();
+
+  assert(nb_bfunc == equation().inconnue().valeurs().line_size());
+
+  const int quad_order = bfunc.get_default_quadrature_order();
+  const Quadrature_base& quad = domaine.get_quadrature(quad_order);
   const DoubleTab& integ_points_facets = quad.get_integ_points_facets();
   int nb_pts_int_fac = integ_points_facets.dimension(1);
-
-  const int nb_bfunc = ch.nb_bfunc();
 
   DoubleTab fbase(nb_bfunc, nb_pts_int_fac);
   DoubleTab grad_fbase(nb_bfunc, nb_pts_int_fac, Objet_U::dimension);
   DoubleTab scalar_product_dim(dim, nb_pts_int_fac); // DoubleTab used for storing scalar products of the RHS and the basis functions in x, y, (z)
   DoubleTab scalar_product(nb_pts_int_fac);          // DoubleTab used for reftab scalar_product_dim for a given dimension
   // Les conditions aux limites pour le second membre
-  const DoubleTab& eta_F = ch.get_eta_facet(); // Compute the penalisation coefficient
+  const DoubleTab& eta_F = bfunc.get_eta_facet(); // Compute the penalisation coefficient
   int ind_face;
   for (int n_bord = 0; n_bord < nb_bords; n_bord++)
     {
@@ -546,7 +565,7 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
                       ind_face = le_bord.num_face(ind_faceb);
                       int elem = face_voisins(ind_face, 0); // The cell that have one facet on the boundary
 
-                      ch.eval_bfunc_on_facets(quad, elem, ind_face, fbase);
+                      bfunc.eval_bfunc_on_facets(quad, elem, ind_face, fbase);
 
                       for (int i = 0; i < nb_bfunc; i++)
                         {
@@ -567,7 +586,7 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
                             }
                           for (int d_base = 0; d_base < dim; d_base++)
                             {
-                              scalar_product.ref_tab(scalar_product_dim, d_base, 1);
+                              scalar_product.ref_array(scalar_product_dim, d_base*nb_pts_int_fac, nb_pts_int_fac);
                               resu(elem, i + d_base * nb_bfunc) += quad.compute_integral_on_facet(ind_face, scalar_product);
                             }
                         }
@@ -583,7 +602,7 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
                   ind_face = le_bord.num_face(ind_faceb);
                   int elem = face_voisins(ind_face, 0); // The cell that have one facet on the boundary
 
-                  ch.eval_bfunc_on_facets(quad, elem, ind_face, fbase);
+                  bfunc.eval_bfunc_on_facets(quad, elem, ind_face, fbase);
 
                   for (int i = 0; i < nb_bfunc; i++)
                     {
@@ -598,7 +617,7 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
                         }
                       for (int d_base = 0; d_base < dim; d_base++)
                         {
-                          scalar_product.ref_tab(scalar_product_dim, d_base, 1);
+                          scalar_product.ref_array(scalar_product_dim, d_base*nb_pts_int_fac, nb_pts_int_fac);
                           resu(elem, i + d_base * nb_bfunc) += quad.compute_integral_on_facet(ind_face, scalar_product);
                         }
                     }
@@ -626,8 +645,8 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
 
                       int elem = face_voisins(ind_face, 0); // The cell that have one facet on the boundary
 
-                      ch.eval_bfunc_on_facets(quad, elem, ind_face, fbase);
-                      ch.eval_grad_bfunc_on_facets(quad, elem, ind_face, grad_fbase);
+                      bfunc.eval_bfunc_on_facets(quad, elem, ind_face, fbase);
+                      bfunc.eval_grad_bfunc_on_facets(quad, elem, ind_face, grad_fbase);
 
                       sur_f = domaine.face_surfaces(ind_face);
 
@@ -671,7 +690,7 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
                             }
                           for (int d_base = 0; d_base < dim; d_base++)
                             {
-                              scalar_product.ref_tab(scalar_product_dim, d_base, 1);
+                              scalar_product.ref_array(scalar_product_dim, d_base*nb_pts_int_fac, nb_pts_int_fac);
                               resu(elem, i + d_base * nb_bfunc) += quad.compute_integral_on_facet(ind_face, scalar_product);
                             }
                         }
@@ -689,8 +708,8 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
 
                   int elem = face_voisins(ind_face, 0); // The cell that have one facet on the boundary
 
-                  ch.eval_bfunc_on_facets(quad, elem, ind_face, fbase);
-                  ch.eval_grad_bfunc_on_facets(quad, elem, ind_face, grad_fbase);
+                  bfunc.eval_bfunc_on_facets(quad, elem, ind_face, fbase);
+                  bfunc.eval_grad_bfunc_on_facets(quad, elem, ind_face, grad_fbase);
 
                   sur_f = domaine.face_surfaces(ind_face);
 
@@ -721,7 +740,7 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
                                 }
                               scalar_product_dim(d_base, k) += nu_F * eta_F(ind_face) * invh_T * u_bord * fbase(i, k); // \eta/H_F \int g \vvec_h
                             }
-                          scalar_product.ref_tab(scalar_product_dim, d_base, 1);
+                          scalar_product.ref_array(scalar_product_dim, d_base*nb_pts_int_fac, nb_pts_int_fac);
                           resu(elem, i + d_base * nb_bfunc) += quad.compute_integral_on_facet(ind_face, scalar_product);
                         }
                     }

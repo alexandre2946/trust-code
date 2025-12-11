@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -36,13 +36,16 @@ class Op_Div_DG: public Operateur_Div_base
 public:
 
   void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&, const Champ_Inc_base&) override;
-  DoubleTab& ajouter(const DoubleTab&, DoubleTab&) const override;
+
+
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = { }) const override;
+  //DoubleTab& ajouter(const DoubleTab&, DoubleTab&) const override;
   DoubleTab& calculer(const DoubleTab&, DoubleTab&) const override;
   int impr(Sortie& os) const override;
   void volumique(DoubleTab&) const override;
 
   void dimensionner(Matrice_Morse& matrice) const override;
-  void contribuer_a_avec(const DoubleTab&, Matrice_Morse& matrice) const override;
+  //void contribuer_a_avec(const DoubleTab&, Matrice_Morse& matrice) const override;
 
 protected:
   OBS_PTR(Domaine_DG) le_dom_DG;

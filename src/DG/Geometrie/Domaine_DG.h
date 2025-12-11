@@ -19,9 +19,16 @@
 
 #include <Domaine_Poly_base.h>
 #include <Option_DG.h>
+<<<<<<< HEAD
 #include <Matrice_Base.h>
+=======
+#include <memory>
+#include <map>
+#include <tuple>
+>>>>>>> bb644372cc (wip)
 
 class Quadrature_base;
+class BasisFunction;
 
 class Domaine_DG : public Domaine_Poly_base
 {
@@ -43,6 +50,7 @@ public :
 
   inline const Stencil& get_stencil_sorted() const { return stencil_sorted_;}
 
+  const BasisFunction& get_basisFunction(int order) const;
 
   void set_default_order(int order);
   void get_position(DoubleTab& positions) const override;
@@ -67,7 +75,7 @@ protected:
   DoubleTab rho_;
   DoubleTab sig_;
   IntTab nfaces_elem_;
-  int order_quad_=-1;
+  int order_quad_=-1; // 3*(Option_DG::DEFAULT_ORDER==1)+5*(Option_DG::DEFAULT_ORDER==2)
   bool gram_schmidt_ = true; // init from Option_DG::GRAM_SCHMIDT which is 1 by default
 // DoubleVect h_, sigma;
 
@@ -75,6 +83,18 @@ protected:
 
   void compute_mesh_param(); // Compute the stabilization parameters
   bool build_nfaces_elem_();
+
+  struct BasisFunction_Key
+  {
+    int order;
+    bool operator<(const BasisFunction_Key& other) const
+    {
+      return order < other.order;
+      //return std::tie(order, is_scalar, is_diagonal) < std::tie(other.order, other.is_scalar, other.is_diagonal);
+    }
+  };
+
+  mutable std::map<BasisFunction_Key, std::shared_ptr<BasisFunction>> bfunc_maps_;
 };
 
 const Quadrature_base& Domaine_DG::get_quadrature(int order) const
@@ -101,6 +121,5 @@ const Quadrature_base& Domaine_DG::get_quadrature() const // overloaded to give 
 {
   return get_quadrature(order_quad_);
 }
-
 
 #endif /* Domaine_DG_included */

@@ -19,6 +19,7 @@
 #include <Equation_base.h>
 #include <Matrix_tools.h>
 #include <Array_tools.h>
+#include <BasisFunction.h>
 
 Implemente_instanciable(Masse_DG_Elem, "Masse_DG_Elem", Masse_DG_base);
 
@@ -36,8 +37,16 @@ DoubleTab& Masse_DG_Elem::appliquer_impl(DoubleTab& sm) const
     }
   else
     {
-      const Champ_Elem_DG& ch = ref_cast(Champ_Elem_DG, equation().inconnue());
-      const Quadrature_base& quad = le_dom_dg_->get_quadrature();
+      const Nom& nom_inco = equation().inconnue().le_nom();
+      int order = Option_DG::Get_order_for(nom_inco);
+      int dim = nom_inco.debute_par("vitesse") ? Objet_U::dimension : 1;
+
+      const BasisFunction& bfunc = le_dom_dg_->get_basisFunction(order);
+      const int nb_bfunc = bfunc.nb_bfunc();
+
+      const int quad_order = bfunc.get_default_quadrature_order();
+      const Quadrature_base& quad = le_dom_dg_->get_quadrature(quad_order);
+
       DoubleTab res, loc;
       DoubleTab invMsm, temp_sm;
       invMsm.copy(sm, RESIZE_OPTIONS::COPY_INIT);
@@ -45,11 +54,17 @@ DoubleTab& Masse_DG_Elem::appliquer_impl(DoubleTab& sm) const
 
       for (int num_elem = 0; num_elem < le_dom_dg_->nb_elem(); num_elem++)
         {
-          Matrice_Dense invM = ch.eval_invMassMatrix(quad, num_elem);
-          res.ref_tab(temp_sm, num_elem, 1);
-          loc.ref_tab(invMsm, num_elem, 1);
+          Matrice_Dense invM = bfunc.eval_invMassMatrix(quad, num_elem);
+          for (int d = 0 ; d<dim; d++)
+            {
+              //res.ref_tab(temp_sm, num_elem, 1);
+              //loc.ref_tab(invMsm, num_elem, 1);
 
-          invM.multvect_(loc, res);
+              res.ref_array(temp_sm, num_elem*dim*nb_bfunc + d*nb_bfunc, nb_bfunc);
+              loc.ref_array(invMsm, num_elem*dim*nb_bfunc + d*nb_bfunc, nb_bfunc);
+
+              invM.multvect_(loc, res);
+            }
         }
       sm.copy(temp_sm, RESIZE_OPTIONS::COPY_INIT);
     }

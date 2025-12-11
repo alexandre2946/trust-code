@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,7 +20,7 @@
 
 
 int Option_DG::DEFAULT_ORDER = 1;
-std::map<std::string, int> Option_DG::ORDER_OVERRIDE = {};
+std::map<std::string, int> Option_DG::ORDERS = {};
 int Option_DG::GRAM_SCHMIDT = 1;
 
 Implemente_instanciable(Option_DG,"Option_DG",Interprete);
@@ -33,7 +33,8 @@ Entree& Option_DG::readOn(Entree& is) {  return is; }
 
 Entree& Option_DG::interpreter(Entree& is)
 {
-  int vo=-1, po=-1, to=-1;
+  //int vo=DEFAULT_ORDER+1, po=DEFAULT_ORDER, to=DEFAULT_ORDER; // Default orders for velocity, pressure, and temperature
+  int vo=-1, po=-1, to=-1; // Default orders for velocity, pressure, and temperature
 
   Param param(que_suis_je());
   param.ajouter("order",&DEFAULT_ORDER); // XD_ADD_P int global order for the DG unknowns (1 by default)
@@ -44,11 +45,11 @@ Entree& Option_DG::interpreter(Entree& is)
   param.lire_avec_accolades_depuis(is);
 
   if (vo != -1)
-    ORDER_OVERRIDE["velocity"] = vo;
+    ORDERS["velocity"] = vo;
   if (to != -1)
-    ORDER_OVERRIDE["temperature"] = to;
+    ORDERS["temperature"] = to;
   if (po != -1)
-    ORDER_OVERRIDE["pressure"] = to;
+    ORDERS["pressure"] = to;
 
   return is;
 }
@@ -57,8 +58,8 @@ Entree& Option_DG::interpreter(Entree& is)
 int Option_DG::Get_order_for(const Nom& n)
 {
   const std::string& s = n.getString();
-  if(ORDER_OVERRIDE.count(s))
-    return ORDER_OVERRIDE.at(s);
+  if(ORDERS.count(s))
+    return ORDERS.at(s);
   return DEFAULT_ORDER;
 }
 

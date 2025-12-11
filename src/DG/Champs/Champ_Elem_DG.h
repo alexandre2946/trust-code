@@ -41,61 +41,18 @@ public:
 
   inline const int& nb_bfunc() const { return nb_bfunc_; }
 
-  //Evaluation of the basis functions on integration points for elements and facets
-  void eval_bfunc(const Quadrature_base& quad, const int& nelem, DoubleTab& fbasis) const;
-  void eval_bfunc_on_facets(const Quadrature_base& quad, const int& nelem, const int& num_face, DoubleTab& grad_fbasis) const;
-  void eval_bfunc(const DoubleTab& coord, const int& nelem, DoubleTab& fbasis) const;
-
-  //Evaluation of the gradient of the basis functions on integration points for elements and facets
-  void eval_grad_bfunc(const Quadrature_base& quad, const int& nelem, DoubleTab& fbasis) const;
-  void eval_grad_bfunc_on_facets(const Quadrature_base& quad, const int& nelem, const int& num_face, DoubleTab& grad_fbasis) const;
-
-  const Matrice_Dense eval_invMassMatrix(const Quadrature_base& quad, const int& nelem) const;
-
-  inline const Matrice_Morse& get_mass_matrix() const { return mass_matrix_; }
-//  inline const Matrice_Morse& get_inv_mass_matrix() const { return inv_mass_matrix_; }
-
-  inline const DoubleTab& get_eta_elem() const { return eta_elem; }
-  inline const DoubleTab& get_eta_facet() const { return eta_facet; }
-
   /* fonctions pour reconstruire la valeur du champ selon la localisation */
   DoubleTab& valeur_aux_elems(const DoubleTab& positions, const IntVect& les_polys, DoubleTab& valeurs) const override;
   DoubleTab& valeur_aux(const DoubleTab& positions, DoubleTab& valeurs) const override;
   DoubleTab& eval_elem(DoubleTab& valeurs) const override;
 
 protected:
-  /*! Compute the mass matrix
-   */
-  void allocate_mass_matrix();
-  void allocate_transition_matrix();
-  void compute_stab_param();
-
-  const Matrice_Dense build_local_mass_matrix(const Quadrature_base& quad, const int nelem) const;
-
-  void build_mass_matrix();
-  void build_transition_matrix();
-  void orthonormalize(const int& nelem, DoubleTab& fbasis) const;
-
-
-  void gramSchmidt(DoubleTab& fbase, const Quadrature_base& quad, const int& num_elem, const int& current_indice, const int& nb_pts_integ, const double& volume, int index);
-
-//  void build_inv_mass_matrix();
 
   int order_ = -1;
   int nb_bfunc_ = -1;
   bool is_scalar_ = true;
 
-  bool is_orthonormalized_ = false;
-
   IntTab indices_glob_elem_;
-
-  Matrice_Morse mass_matrix_;
-//  Matrice_Morse inv_mass_matrix_;
-  Matrice_Morse transition_matrix_;
-
-  DoubleTab eta_elem;
-  DoubleTab eta_facet;
-
 };
 
 

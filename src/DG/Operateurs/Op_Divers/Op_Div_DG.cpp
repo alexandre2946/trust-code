@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -25,6 +25,7 @@
 #include <Array_tools.h>
 #include <SFichier.h>
 #include <Debog.h>
+#include <BasisFunction.h>
 
 Implemente_instanciable(Op_Div_DG, "Op_Div_DG", Operateur_Div_base);
 
@@ -38,26 +39,116 @@ void Op_Div_DG::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_d
   le_dcl_DG = ref_cast(Domaine_Cl_DG, domaine_Cl_dis);
 }
 
-DoubleTab& Op_Div_DG::ajouter(const DoubleTab& vit, DoubleTab& div) const
-{
-  if (has_interface_blocs()) return Operateur_Div_base::ajouter(vit, div);
-  // calcul de flux bord
 
 
-  div.echange_espace_virtuel();
-  Debog::verifier("div out", div);
-  return div;
-}
-void Op_Div_DG::contribuer_a_avec(const DoubleTab& incoo, Matrice_Morse& matrice) const
+void Op_Div_DG::ajouter_blocs([[maybe_unused]] matrices_t matrices, [[maybe_unused]] DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  if (has_interface_blocs())
+
+  /* const DoubleTab& inco_v = semi_impl.count("vitesse") ? semi_impl.at("vitesse") : equation().inconnue().valeurs(); // NB : is this working ?
+  Matrice_Morse *mat = matrices.count("vitesse") ? matrices.at("vitesse") : nullptr; // pression for the stabilisation term if np==nv
+
+  const Domaine_DG& domaine = le_dom_DG.valeur();
+  const IntTab& face_voisins = domaine.face_voisins();
+
+  int order_v = Option_DG::Get_order_for("vitesse");
+  int order_p = Option_DG::Get_order_for("pression");
+
+  const BasisFunction& bfunc_v = le_dom_dg_->get_basisFunction(order_v);
+  const int nb_bfunc_v = bfunc_v.nb_bfunc();
+
+  const BasisFunction& bfunc_p = le_dom_dg_->get_basisFunction(order_p);
+  const int nb_bfunc_p = bfunc_p.nb_bfunc();
+
+  const int quad_order = bfunc_v.get_default_quadrature_order();
+  const Quadrature_base& quad = domaine.get_quadrature(quad_order);  // Same quadrature for all champs
+  int nb_pts_integ_max = quad.nb_pts_integ_max();
+  double coeff, coeff0, coeff1;
+
+  DoubleTab Div_fbase(Objet_U::dimension, nb_bfunc_v, nb_pts_integ_max);
+  DoubleTab f_base_p(nb_bfunc_p, nb_pts_integ_max);
+  DoubleTab scalar_product_dim(nb_pts_integ_max);
+
+  // Loop over elements to compute \int q_h div(u_h) dV
+  for (int elem = 0; elem < domaine.nb_elem(); elem++)
     {
-      Operateur_base::contribuer_a_avec(incoo, matrice);
-      return;
+      int ind_elem_v = bfunc_v.indices_glob_elem_v(elem);
+      int ind_elem_p = bfunc_p.indices_glob_elem_p(elem);
+      bfunc_v.eval_div_bfunc(quad, elem, Div_fbase);
+      bfunc_p.eval_bfunc(quad, elem, f_base_p);
+      for (int pressure_index = 0; pressure_index < nb_bfunc_p; pressure_index++)
+        for (int d = 0; d < Objet_U::dimension; d++)
+          for (int velocity_index = 0; velocity_index < nb_bfunc_v; velocity_index++)
+            {
+              scalar_product_dim = 0.;
+              for (int k = 0; k < quad.nb_pts_integ(elem); k++)
+                scalar_product_dim(k) += Div_fbase(d, velocity_index, k) * f_base_p(pressure_index, k);
+              coeff = quad.compute_integral_on_elem(elem, scalar_product_dim);
+              if (mat)
+                (*mat)(ind_elem_p + pressure_index, ind_elem_v*dim + velocity_index + d * nb_bfunc_v) += coeff;
+              secmem(elem, pressure_index) -= coeff * inco_v(elem, velocity_index + d * nb_bfunc_v);
+            }
     }
 
+  const DoubleTab& face_normales = domaine.face_normales();
+  int nb_pts_int_fac = quad.nb_pts_integ_facets();
+
+  DoubleTab eval_jump_on_facet0(nb_pts_int_fac);
+  DoubleTab eval_jump_on_facet1(nb_pts_int_fac);
+
+  DoubleTab f_base_v0(nb_bfunc_v, nb_pts_int_fac);
+  DoubleTab f_base_v1(nb_bfunc_v, nb_pts_int_fac);
+  DoubleTab f_base_p0(nb_bfunc_p, nb_pts_int_fac);
+  DoubleTab f_base_p1(nb_bfunc_p, nb_pts_int_fac);
+
+  // Loop over facets to compute \int_f [u_h.n]_F q_h dS
+  for (int face = 0; face < domaine.nb_faces(); face++)
+    {
+      int elem0 = face_voisins(face,0);
+      int elem1 = face_voisins(face,1);
+      if (elem1 != -1) // internal face
+        {
+          int ind_elem0_v = bfunc_v.indices_glob_elem_v(elem0);
+          int ind_elem1_v = bfunc_v.indices_glob_elem_v(elem1);
+          int ind_elem0_p = bfunc_p.indices_glob_elem_p(elem0);
+          int ind_elem1_p = bfunc_p.indices_glob_elem_p(elem1);
+          bfunc_v.eval_bfunc_on_facets(quad, elem0, face, f_base_v0);
+          bfunc_v.eval_bfunc_on_facets(quad, elem1, face, f_base_v1);
+          bfunc_p.eval_bfunc_on_facets(quad, elem0, face, f_base_p0);
+          bfunc_p.eval_bfunc_on_facets(quad, elem1, face, f_base_p1);
+          for (int pressure_index = 0; pressure_index < nb_bfunc_p; pressure_index++)
+            for (int d = 0; d < Objet_U::dimension; d++)
+              for (int velocity_index = 0; velocity_index < nb_bfunc_v; velocity_index++)
+                {
+                  eval_jump_on_facet0 = 0.;
+                  eval_jump_on_facet1 = 0.;
+                  for (int k = 0; k < quad.nb_pts_integ_on_facet(elem0, face); k++)
+                    {
+                      double mean_P = 0.5*(f_base_p0(pressure_index, k) + f_base_p1(pressure_index, k));
+                      for (int dim = 0 ; dim < Objet_U::dimension ; dim++)
+                        {
+                          eval_jump_on_facet0(k) += f_base_v0(velocity_index, k) * face_normales(face, dim)  * mean_P;
+                          eval_jump_on_facet1(k) -= f_base_v1(velocity_index, k) * face_normales(face, dim)  * mean_P;
+                        }
+                    }
+                  coeff0 = quad.compute_integral_on_facet(elem0, face, eval_jump_on_facet0);
+                  coeff1 = quad.compute_integral_on_facet(elem1, face, eval_jump_on_facet1);
+
+                  if (mat)
+                    {
+                      (*mat)(ind_elem0_p + pressure_index, ind_elem0_v*dim + velocity_index + d * nb_bfunc_v) -= coeff0;
+                      (*mat)(ind_elem1_p + pressure_index, ind_elem1_v*dim + velocity_index + d * nb_bfunc_v) += coeff1;
+                    }
+                  secmem(elem0, pressure_index) -= coeff0 * inco_v(elem0, velocity_index + d * nb_bfunc_v);
+                  secmem(elem1, pressure_index) += coeff1 * inco_v(elem1, velocity_index + d * nb_bfunc_v);
+                }
+        }
+    }
+
+  */
 
 }
+
+
 
 void Op_Div_DG::dimensionner(Matrice_Morse& matrice) const
 {
@@ -71,7 +162,7 @@ void Op_Div_DG::dimensionner(Matrice_Morse& matrice) const
   int nb_faces = domaine_DG.nb_faces();
   int nb_faces_tot = domaine_DG.nb_faces_tot();
   int nb_elem_tot = domaine_DG.nb_elem_tot();
-  IntTab stencyl(0, 2);
+  IntTab stencil(0, 2);
 
   const IntTab& face_voisins = domaine_DG.face_voisins();
 
@@ -83,15 +174,15 @@ void Op_Div_DG::dimensionner(Matrice_Morse& matrice) const
           const int elem = face_voisins(face, dir);
           if (elem != -1)
             {
-              stencyl.resize(nb_coef + 1, 2);
-              stencyl(nb_coef, 0) = elem;
-              stencyl(nb_coef, 1) = face;
+              stencil.resize(nb_coef + 1, 2);
+              stencil(nb_coef, 0) = elem;
+              stencil(nb_coef, 1) = face;
               nb_coef++;
             }
         }
     }
-  tableau_trier_retirer_doublons(stencyl);
-  Matrix_tools::allocate_morse_matrix(nb_elem_tot, nb_faces_tot, stencyl, matrice);
+  tableau_trier_retirer_doublons(stencil);
+  Matrix_tools::allocate_morse_matrix(nb_elem_tot, nb_faces_tot, stencil, matrice);
 }
 
 DoubleTab& Op_Div_DG::calculer(const DoubleTab& vit, DoubleTab& div) const

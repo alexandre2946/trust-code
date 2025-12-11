@@ -44,6 +44,7 @@
 #include <Dirichlet.h>
 #include <Debog.h>
 #include <Perf_counters.h>
+#include <BasisFunction.h>
 
 Implemente_instanciable(Assembleur_P_DG,"Assembleur_P_DG",Assembleur_base);
 
@@ -73,11 +74,14 @@ int Assembleur_P_DG::assembler_mat(Matrice& la_matrice, const DoubleVect& diag, 
   Matrice_Morse& mat = ref_cast(Matrice_Morse, la_matrice.valeur());
 
   const Domaine_DG& domaine = ref_cast(Domaine_DG, le_dom_DG.valeur());
-  const Champ_Elem_DG& ch = ref_cast(Champ_Elem_DG, mon_equation->inconnue());
-  int nordre = ch.get_order();
-  int nb_bfunc = Option_DG::Nb_col_from_order(nordre);
+  const Champ_Elem_DG& ch = ref_cast(Champ_Elem_DG, equation().inconnue());
 
-  const IntTab& indices_glob_elem = ch.indices_glob_elem();
+  int nordre = Option_DG::Get_order_for("pression");
+
+  const BasisFunction& bfunc = domaine.get_basisFunction(nordre);
+  const int nb_bfunc = bfunc.nb_bfunc();
+
+  const IntTab& indices_glob_elem = bfunc.indices_glob_elem();
 
   int nb_elem_tot = le_dom_DG->nb_elem_tot();
   int size_inc = indices_glob_elem(nb_elem_tot);
@@ -136,8 +140,9 @@ int Assembleur_P_DG::assembler_mat(Matrice& la_matrice, const DoubleVect& diag, 
       mat.set_nb_columns(size_inc);
     }
 
-  const DoubleTab& eta_F = ch.get_eta_facet();  // Compute the penalisation coefficient
-  const Quadrature_base& quad = domaine.get_quadrature();
+  const DoubleTab& eta_F = bfunc.get_eta_facet();  // Compute the penalisation coefficient
+  const int quad_order = bfunc.get_default_quadrature_order();
+  const Quadrature_base& quad = domaine.get_quadrature(quad_order);
   int nb_pts_integ_max = quad.nb_pts_integ_max();
 
   DoubleTab grad_fbase_elem(nb_bfunc,nb_pts_integ_max, Objet_U::dimension);
@@ -146,7 +151,7 @@ int Assembleur_P_DG::assembler_mat(Matrice& la_matrice, const DoubleVect& diag, 
 
   for (int e = 0; e < le_dom_DG->nb_elem(); e++)
     {
-      ch.eval_grad_bfunc(quad, e, grad_fbase_elem);
+      bfunc.eval_grad_bfunc(quad, e, grad_fbase_elem);
       int ind_elem=indices_glob_elem(e);
 
       for (int i=0; i<nb_bfunc; i++)
@@ -202,7 +207,7 @@ int Assembleur_P_DG::assembler_mat(Matrice& la_matrice, const DoubleVect& diag, 
           int elem=face_voisins(f,i_elem);
           int ind_elem=indices_glob_elem(elem);
 
-          ch.eval_bfunc_on_facets(quad, elem, f, fbase0);
+          bfunc.eval_bfunc_on_facets(quad, elem, f, fbase0);
 
           for (int i=0; i<nb_bfunc; i++)
             for (int j=0; j<nb_bfunc; j++)
@@ -217,8 +222,8 @@ int Assembleur_P_DG::assembler_mat(Matrice& la_matrice, const DoubleVect& diag, 
 
 
       //crossed_term
-      ch.eval_bfunc_on_facets(quad, elem0, f, fbase0);
-      ch.eval_bfunc_on_facets(quad, elem1, f, fbase1);
+      bfunc.eval_bfunc_on_facets(quad, elem0, f, fbase0);
+      bfunc.eval_bfunc_on_facets(quad, elem1, f, fbase1);
 
       for (int i=0; i<nb_bfunc; i++)
         for (int j=0; j<nb_bfunc; j++)
@@ -235,8 +240,8 @@ int Assembleur_P_DG::assembler_mat(Matrice& la_matrice, const DoubleVect& diag, 
       //****************//
       // symmetric term //
       //****************//
-      ch.eval_grad_bfunc_on_facets(quad, elem0, f, grad_fbase0);
-      ch.eval_grad_bfunc_on_facets(quad, elem1, f, grad_fbase1);
+      bfunc.eval_grad_bfunc_on_facets(quad, elem0, f, grad_fbase0);
+      bfunc.eval_grad_bfunc_on_facets(quad, elem1, f, grad_fbase1);
 
       for (int i=0; i<nb_bfunc; i++)
         {
@@ -302,8 +307,8 @@ int Assembleur_P_DG::assembler_mat(Matrice& la_matrice, const DoubleVect& diag, 
           int elem = face_voisins(f, 0); // The cell that have one facet on the boundary
           int ind_elem = indices_glob_elem(elem);
 
-          ch.eval_bfunc_on_facets(quad, elem, f, fbase0);
-          ch.eval_grad_bfunc_on_facets(quad, elem, f, grad_fbase0);
+          bfunc.eval_bfunc_on_facets(quad, elem, f, fbase0);
+          bfunc.eval_grad_bfunc_on_facets(quad, elem, f, grad_fbase0);
 
           double h_T = sqrt(domaine.carre_pas_maille(elem));
           double invh_T = 1./h_T; //TODO regarder penalisation remplacer h_T par h_F
