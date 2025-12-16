@@ -10,7 +10,7 @@ then
    cd -
 else
    # package=petsc-3.24.2.tar.gz # Huge issue with 3.24.x : make ctest_optim hangs
-   package=petsc-3.23.7.tar.gz && [ "$TRUST_USE_GPU" = 1 ] && package=petsc-19cb9159.tar.gz # 2025_11_10
+   package=petsc-3.23.7.tar.gz && [ "$TRUST_USE_GPU" = 1 ] && package=petsc-5d4b16a5b.tar.gz # 2026_01_06
 fi
 
 ######################################
@@ -304,6 +304,7 @@ then
       # PL: Avec spack (JeanZay, orcus), erreur libcuda.so.1 not found qui fait ch..r (plantage de l'installation de ptscotch et magma)
       # See https://github.com/spack/spack/issues/42825
       ln -s -f $CUDA_ROOT/lib64/stubs/libcuda.so libcuda.so.1
+      ln -s -f $CUDA_ROOT/lib64/stubs/libnvidia-ml.so libnvidia-ml.so.1
       export LD_LIBRARY_PATH=`pwd`:$LD_LIBRARY_PATH
    fi
    echo "CUDA support for PETSc with: "$with_gpu
@@ -475,6 +476,8 @@ then
    CONFIG=config/BuildSystem/config/packages/amgx.py
    # Try to hack int32 limitation:
    sed -i "1,$ s?self.requires32bitint = 1?self.requires32bitint = 0?" $CONFIG || exit -1
+   # Try to hack C++17 limitation:
+   sed -i "1,$ s?c++17?c++20?" $CONFIG || exit -1
    #nedit $CONFIG
    diff $DIR/amgx_int32.cxx src/ksp/pc/impls/amgx/amgx.cxx 1>/dev/null 2>&1
    if [ $? != 0 ]
@@ -483,7 +486,6 @@ then
       meld src/ksp/pc/impls/amgx/amgx.cxx $DIR/amgx_int32.cxx $DIR/amgx_int64.cxx   
    fi
    cp $DIR/amgx_int64.cxx src/ksp/pc/impls/amgx/amgx.cxx || exit -1
-   TRUST_STDCPP=c++17
 fi
 
 #############

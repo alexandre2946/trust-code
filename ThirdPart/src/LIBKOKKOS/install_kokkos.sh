@@ -1,11 +1,15 @@
 #!/bin/bash
 
-if [ "$TRUST_USE_GPU" = 1 ] || [ "$TRUST_USE_KOKKOS_SIMD" = 1 ]
+if [ "$TRUST_STDCPP" = c++20 ]
 then
-   # Kokkos pour SIMD ou GPU (C++17):
+   # Kokkos (C++20):
+   archive=$TRUST_ROOT/externalpackages/kokkos/kokkos-5.0.0.tar.gz
+elif [ "$TRUST_STDCPP" = c++17 ]
+then
+   # Kokkos (C++17):
    archive=$TRUST_ROOT/externalpackages/kokkos/kokkos-4.7.00.tar.gz
 else
-   # Kokkos Serial (C++14)
+   # Kokkos (C++14):
    archive=$TRUST_ROOT/externalpackages/kokkos/kokkos-3.7.02.tgz
 fi
 
@@ -23,6 +27,9 @@ if [ ! -f $KOKKOS_ROOT_DIR/lib64/libkokkos.a ]; then
       cd $build_dir
       tar xzf $archive --no-same-owner || exit -1
       src_dir=$build_dir/`ls $build_dir | grep kokkos`
+
+      # Hack Kokkos pour C++20 car bug cmake que n'autorise -std=c++20 qu'a partir de 11.1
+      sed -i "1,$ s?set(STANDARD_NAME CMAKE_CXX\${standard}_STANDARD_COMPILE_OPTION)?set(STANDARD_NAME -std=c++20)?g" $src_dir/cmake/kokkos_test_cxx_std.cmake || exit -1
 
       # Set this flag to 1 to have Kokkos compiled/linked in Debug mode for $exec_debug or when developping on GPU:
       if [ $HOST = $TRUST_HOST_ADMIN ] || [ "$TRUST_USE_KOKKOS_SIMD" = 1 ]

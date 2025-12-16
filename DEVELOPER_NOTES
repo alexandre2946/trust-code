@@ -1,13 +1,15 @@
+XX/XX/25 (TRUST) GPU          : Update to Kokkos 5.0, AmgX 2.5.0, PETSc 2.23.7 (latest branch for GPU build)
+XX/XX/25 (TRUST) Library      : ArborX library (geometric search) available with C++20 build
 -------------------------------------------------------------
 Developer notes version 1.9.8_beta : Changes since version 1.9.7 :
 -------------------------------------------------------------
-28/01/26 (TRUST) Change       : For ICoCo, Petsc and Kokkos are initialised/finalized only once in the TRUST main allowing the possibility to run as much as TRUST simulations as required in a single supervisor 
-26/01/26 (TRUST) Change       : Rename PolyMAC discretisation family: PolyMAC-->PolyMAC_CDO ; PolyMAC_P0-->PolyMAC_MPFA ; PolyMAC_P0P1NC-->PolyMAC_HFV ; Option_PolyMAC-->Option_PolyMAC_family ; is_polymac_family-->is_poly_family. 
-16/01/26 (TRUST) NR           : Add a new target "make check_perf" to assess performance non-regression on archived .TU.ref_$HOST files
-16/01/26 (TRUST) GPU          : Add ArborX Kokkos-based library to provide performance portable algorithms for geometric search (e.g: nearest search, cells containing points, raytracing, ...)
-16/01/26 (TRUST) GPU          : Cuda 12.9 and NVHPC 25.5 supported to build TRUST Nvidia version
-16/01/26 (TRUST) GPU          : Use public_for_cuda macro to declare protected/private methods with Kokkos regions as Cuda kernels should be implemented into public methods
-16/01/26 (TRUST) GPU          : As Cuda build with nvc++ will be soon deprecated, enable it with Kokkos nvcc wrapper with: ./configure -cuda -c++=nvcc_wrapper
+28/01/26 (TRUST) Change       : For ICoCo, Petsc and Kokkos are initialised/finalized only once in the TRUST main allowing the possibility to run as much as TRUST simulations as required in a single supervisor
+26/01/26 (TRUST) Change       : Rename PolyMAC discretisation family: PolyMAC-->PolyMAC_CDO ; PolyMAC_P0-->PolyMAC_MPFA ; PolyMAC_P0P1NC-->PolyMAC_HFV ; Option_PolyMAC-->Option_PolyMAC_family ; is_polymac_family-->is_poly_family.
+16/01/25 (TRUST) NR           : Add a new target "make check_perf" to assess performance non-regression on archived .TU.ref_$HOST files
+16/01/25 (TRUST) GPU          : Add ArborX Kokkos-based library to provide performance portable algorithms for geometric search (e.g: nearest search, cells containing points, raytracing, ...)
+16/01/25 (TRUST) GPU          : Cuda 12.9 and NVHPC 25.5 supported to build TRUST Nvidia version
+16/01/25 (TRUST) GPU          : Use public_for_cuda macro to declare protected/private methods with Kokkos regions as Cuda kernels should be implemented into public methods
+16/01/25 (TRUST) GPU          : As Cuda build with nvc++ will be soon deprecated, enable it with Kokkos nvcc wrapper with: ./configure -cuda -c++=nvcc_wrapper
 -------------------------------------------------------------
 Developer notes version 1.9.7 : Changes since version 1.9.6 :
 -------------------------------------------------------------

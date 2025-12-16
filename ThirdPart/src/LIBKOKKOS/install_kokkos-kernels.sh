@@ -3,7 +3,7 @@
 [ "$TRUST_USE_GPU" != 1 ] && exit 0
 
 # Kokkos-kernels:
-archive=$TRUST_ROOT/externalpackages/kokkos/kokkos-kernels-4.7.00.tar.gz
+archive=$TRUST_ROOT/externalpackages/kokkos/kokkos-kernels-5.0.0.tar.gz
 build_dir=$TRUST_ROOT/build/kokkos-kernels
 KOKKOS_ROOT_DIR=$TRUST_ROOT/lib/src/LIBKOKKOS
 # Log file of the process:
@@ -36,9 +36,9 @@ then
 	then
 	   CMAKE_OPT="$CMAKE_OPT -DCMAKE_CXX_COMPILER=$TRUST_CC_BASE_EXTP"
            # Shit on NVHPC single CUDA bundle: If $CUDA_ROOT/bin/nvcc or $CUDA_ROOT/compilers/bin/nvcc: KK cmake fails...
-           [ "$CUDA_VERSION" = "" ] && CMAKE_OPT="-DCMAKE_CUDA_COMPILER=`find $CUDA_ROOT -name nvcc`"
+           [ "$CUDA_VERSION" = "" ] && CMAKE_OPT="$CMAKE_OPT -DCMAKE_CUDA_COMPILER=`find $CUDA_ROOT -name nvcc`"
            # What a shit to find cublas/cusolver/cusparse !
-           cublas=`find $CUDA_ROOT/../math_libs -name cublas.h`
+           cublas=`find $CUDA_ROOT/../math_libs/$CUDA_VERSION -name cublas.h`
            rep=`dirname $cublas`
            rep=`dirname $rep`
 	   CMAKE_OPT=$CMAKE_OPT" -DCUDAToolkit_ROOT=$rep -DKokkosKernels_CUBLAS_ROOT=$rep -DKokkosKernels_CUSPARSE_ROOT=$rep -DKokkosKernels_CUSOLVER_ROOT=$rep"
@@ -65,7 +65,11 @@ then
         [ ${PIPESTATUS[0]} != 0 ] && echo "Error when configuring Kokkos (CMake) - look at $log_file" && exit -1
 
         # Build
-        make -j$TRUST_NB_PHYSICAL_CORES install 2>&1 | tee -a $log_file
+        J=$TRUST_NB_PHYSICAL_CORES
+	# Possible lack of RAM so:
+	[ "$HOST" = topaze ] && J=4
+	[ "$HOST" = jean-zay ] && J=4
+        make -j$J install 2>&1 | tee -a $log_file
         [ ${PIPESTATUS[0]} != 0 ] && echo "Error when compiling Kokkos-kernels - look at $log_file" && exit -1
         echo "Kokkos-kernels $CMAKE_BUILD_TYPE installed under $CMAKE_INSTALL_PREFIX"
         cd ..

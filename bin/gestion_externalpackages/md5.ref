@@ -272,7 +272,8 @@ ea0931758fc180e3b1950931b9869921  gnuplot/gnuplot-6.0.2.tar.gz
 a51b0a245c34151f42a4c6120d2aceec  kokkos/arborx-2.0.1.tar.gz
 36abe803480d07db87f9ba03cd5a842c  kokkos/kokkos-3.7.02.tgz
 24cd603e2a047fc8d67d814f33769f54  kokkos/kokkos-4.7.00.tar.gz
-79bd0b0e9ee96b4719c3636b2b7e97f3  kokkos/kokkos-kernels-4.7.00.tar.gz
+15603ce16092352199c8000aca647f08  kokkos/kokkos-5.0.0.tar.gz
+95541834ccbe695a41e2ae834a0ef8ad  kokkos/kokkos-kernels-5.0.0.tar.gz
 853a0c5c0747c5943e7ef4bbb793162d  lapack/OpenBLAS-0.3.29.tar.gz
 44c3869c38c8335c2b9c2a8bb276eb55  lapack/lapack-3.4.1.tgz
 b5e558f981326d9ca1bfdb841640721a  make-4.0.tar.gz
@@ -290,9 +291,9 @@ da990c4e944ede86879fd29ee309d8c4  petsc/Umpire-2025.09.0.tar.gz
 0877da1174550688e98df31b76c1c7b0  petsc/check_packages.sh
 d4990384b7b1d8b0357fc34d91530d49  petsc/hypre-2.33.0.tar.gz
 60ebfc49ab481ffed181ed6d47d3173e  petsc/hypre-3.0.0.tar.gz
-6310e2e8e9fb674f0559eb7da2dae376  petsc/petsc-19cb9159.tar.gz
 88a40e3bf9e8ee28af8725a73f9e3bc3  petsc/petsc-3.23.7.tar.gz
 d4c79d4859cd6770439e7a4d880777de  petsc/petsc-3.24.2.tar.gz
+6a53e417a59d7cbde483babb624703f7  petsc/petsc-5d4b16a5b.tar.gz
 f121c9d7ef5e43a20899acd93f425b22  petsc/slate-v2023.06.00.tgz
 5390282424f874836d572e2ae4e3c185  petsc/zfp-1.0.1.tar.gz
 e97ed4ddf3b59a05729097ab66a46b03  pip/mpi4py-4.0.0.tar.gz
