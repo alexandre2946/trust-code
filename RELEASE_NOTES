@@ -1,5 +1,6 @@
+XX/XX/26 (TRUST) Performance  : Reduce MPI communications in several parts of the code especially in TRUST GMRES, CG solvers and matrix-free CG used in diffusive-implicited scheme
 XX/XX/26 (TRUST) Change       : Bug fixed in VDF for the distance to the wall compute used by some turbulence models
-XX/XX/25 (TRUST) Performance  : Fix slow TrioCFD initialization for K-Omega calculation 
+XX/XX/26 (TRUST) Performance  : Fix slow TrioCFD initialization for K-Omega calculation
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.8_beta : Enhancements, modifications and corrected bugs since version 1.9.7 :
 --------------------------------------------------------------------------------------------------

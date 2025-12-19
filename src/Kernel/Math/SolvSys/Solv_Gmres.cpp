@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -184,9 +184,10 @@ int Solv_Gmres::gmres_local(const Matrice_Morse& A, const DoubleVect& b, DoubleV
   A.multvect_(tab_x,tab_v0);
   tab_v0 *= -1.;
   tab_v0 += b;
-  tab_v0.echange_espace_virtuel();
-  double res0 = mp_norme_vect(tab_v0);
+  //tab_v0.echange_espace_virtuel(); // PL useless
 
+  // Reduce 2 mp_sum calls to 1 by computing local norms before and after GPU kernel
+  double res0 = local_carre_norme_vect(tab_v0);
   {
     CDoubleArrView Diag = tab_Diag.view_ro();
     DoubleArrView v0 = tab_v0.view_rw();
@@ -197,7 +198,12 @@ int Solv_Gmres::gmres_local(const Matrice_Morse& A, const DoubleVect& b, DoubleV
     });
     end_gpu_timer(__KERNEL_NAME__);
   }
-  double res = mp_norme_vect(tab_v0);
+  double res = local_carre_norme_vect(tab_v0);
+  // Single collective operation
+  Process::mp_sum_for_each(res0, res);
+  res0 = sqrt(res0);
+  res = sqrt(res);
+
   if (limpr()==1)
     Cout<<"Gmres : initial residual = "<<res0<<finl;
   // See http://stackoverflow.com/questions/3437085/check-nan-number
@@ -225,8 +231,8 @@ int Solv_Gmres::gmres_local(const Matrice_Morse& A, const DoubleVect& b, DoubleV
       for(int j=0; j<nkr; j++)
         {
           tab_v0.echange_espace_virtuel();
-          v[j] = tab_v0;
-          A.multvect(tab_v0,tab_v1);
+          A.multvect_(tab_v0,tab_v1);
+          //tab_v1.echange_espace_virtuel(); Useless ?
           {
             CDoubleArrView Diag = tab_Diag.view_ro();
             DoubleArrView v1 = tab_v1.view_rw();
@@ -237,6 +243,7 @@ int Solv_Gmres::gmres_local(const Matrice_Morse& A, const DoubleVect& b, DoubleV
             });
             end_gpu_timer(__KERNEL_NAME__);
           }
+          v[j] = tab_v0;
           tab_v0 = tab_v1 ;
           // Modifie par DJ
           //---------------
@@ -255,7 +262,7 @@ int Solv_Gmres::gmres_local(const Matrice_Morse& A, const DoubleVect& b, DoubleV
                 });
                 end_gpu_timer(__KERNEL_NAME__);
               }
-              tab_v0.echange_espace_virtuel();
+              //tab_v0.echange_espace_virtuel(); Useless ?
             }
           double tem=mp_norme_vect(tab_v0);
 
