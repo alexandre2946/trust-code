@@ -33,6 +33,7 @@ public:
   inline const int& get_order() const { return order_; }
   inline const int& get_default_quadrature_order() const { return default_quad_order_; }
   inline const IntTab& indices_glob_elem() const { return indices_glob_elem_; }
+  inline const int& indices_glob_elem(int elem) const { return indices_glob_elem_(elem); }
   inline const int& nb_bfunc() const { return nb_bfunc_; }
 
   //Evaluation of the basis functions on integration points for elements and facets

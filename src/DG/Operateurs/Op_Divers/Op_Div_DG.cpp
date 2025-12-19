@@ -41,10 +41,10 @@ void Op_Div_DG::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_d
 
 
 
-void Op_Div_DG::ajouter_blocs([[maybe_unused]] matrices_t matrices, [[maybe_unused]] DoubleTab& secmem, const tabs_t& semi_impl) const
+void Op_Div_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
 
-  /* const DoubleTab& inco_v = semi_impl.count("vitesse") ? semi_impl.at("vitesse") : equation().inconnue().valeurs(); // NB : is this working ?
+  const DoubleTab& inco_v = semi_impl.count("vitesse") ? semi_impl.at("vitesse") : equation().inconnue().valeurs(); // NB : is this working ?
   Matrice_Morse *mat = matrices.count("vitesse") ? matrices.at("vitesse") : nullptr; // pression for the stabilisation term if np==nv
 
   const Domaine_DG& domaine = le_dom_DG.valeur();
@@ -53,10 +53,10 @@ void Op_Div_DG::ajouter_blocs([[maybe_unused]] matrices_t matrices, [[maybe_unus
   int order_v = Option_DG::Get_order_for("vitesse");
   int order_p = Option_DG::Get_order_for("pression");
 
-  const BasisFunction& bfunc_v = le_dom_dg_->get_basisFunction(order_v);
+  const BasisFunction& bfunc_v = domaine.get_basisFunction(order_v);
   const int nb_bfunc_v = bfunc_v.nb_bfunc();
 
-  const BasisFunction& bfunc_p = le_dom_dg_->get_basisFunction(order_p);
+  const BasisFunction& bfunc_p = domaine.get_basisFunction(order_p);
   const int nb_bfunc_p = bfunc_p.nb_bfunc();
 
   const int quad_order = bfunc_v.get_default_quadrature_order();
@@ -68,15 +68,20 @@ void Op_Div_DG::ajouter_blocs([[maybe_unused]] matrices_t matrices, [[maybe_unus
   DoubleTab f_base_p(nb_bfunc_p, nb_pts_integ_max);
   DoubleTab scalar_product_dim(nb_pts_integ_max);
 
+  const IntTab& indices_glob_elem_v = bfunc_v.indices_glob_elem();
+  const IntTab& indices_glob_elem_p = bfunc_p.indices_glob_elem();
+
+  const int dim = Objet_U::dimension;
+
   // Loop over elements to compute \int q_h div(u_h) dV
   for (int elem = 0; elem < domaine.nb_elem(); elem++)
     {
-      int ind_elem_v = bfunc_v.indices_glob_elem_v(elem);
-      int ind_elem_p = bfunc_p.indices_glob_elem_p(elem);
+      int ind_elem_v = indices_glob_elem_v(elem);
+      int ind_elem_p = indices_glob_elem_p(elem);
       bfunc_v.eval_div_bfunc(quad, elem, Div_fbase);
       bfunc_p.eval_bfunc(quad, elem, f_base_p);
       for (int pressure_index = 0; pressure_index < nb_bfunc_p; pressure_index++)
-        for (int d = 0; d < Objet_U::dimension; d++)
+        for (int d = 0; d < dim; d++)
           for (int velocity_index = 0; velocity_index < nb_bfunc_v; velocity_index++)
             {
               scalar_product_dim = 0.;
@@ -107,10 +112,10 @@ void Op_Div_DG::ajouter_blocs([[maybe_unused]] matrices_t matrices, [[maybe_unus
       int elem1 = face_voisins(face,1);
       if (elem1 != -1) // internal face
         {
-          int ind_elem0_v = bfunc_v.indices_glob_elem_v(elem0);
-          int ind_elem1_v = bfunc_v.indices_glob_elem_v(elem1);
-          int ind_elem0_p = bfunc_p.indices_glob_elem_p(elem0);
-          int ind_elem1_p = bfunc_p.indices_glob_elem_p(elem1);
+          int ind_elem0_v = bfunc_v.indices_glob_elem(elem0);
+          int ind_elem1_v = bfunc_v.indices_glob_elem(elem1);
+          int ind_elem0_p = bfunc_p.indices_glob_elem(elem0);
+          int ind_elem1_p = bfunc_p.indices_glob_elem(elem1);
           bfunc_v.eval_bfunc_on_facets(quad, elem0, face, f_base_v0);
           bfunc_v.eval_bfunc_on_facets(quad, elem1, face, f_base_v1);
           bfunc_p.eval_bfunc_on_facets(quad, elem0, face, f_base_p0);
@@ -121,17 +126,17 @@ void Op_Div_DG::ajouter_blocs([[maybe_unused]] matrices_t matrices, [[maybe_unus
                 {
                   eval_jump_on_facet0 = 0.;
                   eval_jump_on_facet1 = 0.;
-                  for (int k = 0; k < quad.nb_pts_integ_on_facet(elem0, face); k++)
+                  for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
                     {
                       double mean_P = 0.5*(f_base_p0(pressure_index, k) + f_base_p1(pressure_index, k));
-                      for (int dim = 0 ; dim < Objet_U::dimension ; dim++)
+                      for (int d_base = 0 ; d_base < dim ; d_base++)
                         {
-                          eval_jump_on_facet0(k) += f_base_v0(velocity_index, k) * face_normales(face, dim)  * mean_P;
-                          eval_jump_on_facet1(k) -= f_base_v1(velocity_index, k) * face_normales(face, dim)  * mean_P;
+                          eval_jump_on_facet0(k) += f_base_v0(velocity_index, k) * face_normales(face, d_base)  * mean_P;
+                          eval_jump_on_facet1(k) -= f_base_v1(velocity_index, k) * face_normales(face, d_base)  * mean_P;
                         }
                     }
-                  coeff0 = quad.compute_integral_on_facet(elem0, face, eval_jump_on_facet0);
-                  coeff1 = quad.compute_integral_on_facet(elem1, face, eval_jump_on_facet1);
+                  coeff0 = quad.compute_integral_on_facet(face, eval_jump_on_facet0);
+                  coeff1 = quad.compute_integral_on_facet(face, eval_jump_on_facet1);
 
                   if (mat)
                     {
@@ -143,8 +148,6 @@ void Op_Div_DG::ajouter_blocs([[maybe_unused]] matrices_t matrices, [[maybe_unus
                 }
         }
     }
-
-  */
 
 }
 
