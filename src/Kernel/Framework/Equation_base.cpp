@@ -1551,18 +1551,6 @@ void Equation_base::Gradient_conjugue_diff_impl(DoubleTrav& secmem, DoubleTab& s
   else
     {
       statistics().begin_count(STD_COUNTERS::implicit_diffusion,statistics().get_last_opened_counter_level()+1);
-      // on retire les sources dependantes de l inco ; on les rajoutera apres
-      if (marq_tot)
-        {
-          DoubleTrav toto(secmem);
-          statistics().end_count(STD_COUNTERS::implicit_diffusion,0,0);
-          for (int i = 0; i < size_s; i++)
-            if (marq[i])
-              sources()(i).ajouter(toto);
-          statistics().begin_count(STD_COUNTERS::implicit_diffusion,statistics().get_last_opened_counter_level()+1);
-          solv_masse().appliquer(toto);
-          secmem.ajoute(-1., toto); // ,VECT_REAL_ITEMS);
-        }
       int n = secmem.size_totale();
       if (solution.size_totale() != n)
         {
@@ -1591,15 +1579,6 @@ void Equation_base::Gradient_conjugue_diff_impl(DoubleTrav& secmem, DoubleTab& s
           if (param.crank())
             aCKN = 0.5;
           precond_diag = param.precoditionnement_diag();
-          // Bug fixed : Diagonal preconditionning is fixed with periodic BC (it is OK for a parallel calculation)
-          //if (precond_diag==1 && Process::is_parallel())
-          //  {
-          //    Cerr << "Error with the value of preconditionnement_diag option which is set to " << precond_diag << "." << finl;
-          //    Cerr << "The diagonal preconditionning is unavailable for a parallel calculation." << finl;
-          //    Cerr << "The CG used to solve the implicitation of the equation diffusion operator can not preconditioned." << finl;
-          //    Cerr << "So edit your .data file with preconditionnement_diag = 0 and run your case." << finl;
-          //    exit();
-          //  }
           if (param.seuil_diffusion_implicite() > 0)
             seuil_diffusion_implicite = param.seuil_diffusion_implicite();
           if (param.nb_it_max() > 0)
@@ -1663,39 +1642,33 @@ void Equation_base::Gradient_conjugue_diff_impl(DoubleTrav& secmem, DoubleTab& s
             });
             end_gpu_timer(__KERNEL_NAME__);
           }
-          statistics().end_count(STD_COUNTERS::matrix_assembly,0,0);
+          statistics().end_count(STD_COUNTERS::matrix_assembly);
         }
+      // Lambda function to apply diffusive operator and source terms to avoid code repetition
+      auto matvec = [&](const DoubleTab& input_field, DoubleTab& output_field)
+      {
+        // Stop the counter because operator diffusion is also counted
+        statistics().end_count(STD_COUNTERS::implicit_diffusion,0,0);
+        operateur(0).ajouter(input_field, output_field);
+        if (marq_tot)
+          {
+            for (int i = 0; i < size_s; i++)
+              if (marq[i])
+                ref_cast(Source_dep_inco_base, sources()(i).valeur()).ajouter_(input_field, output_field);
+          }
+        statistics().begin_count(STD_COUNTERS::implicit_diffusion,statistics().get_last_opened_counter_level()+1);
+        output_field*=-1;
+      };
+      statistics().begin_count(STD_COUNTERS::implicit_diffusion,statistics().get_last_opened_counter_level()+1);
       // On utilise p pour calculer phiB :
       DoubleTrav p(solution);
-      DoubleTrav moins_phiB(solution); // la partie Bord de l'operateur.
-      operateur(0).ajouter(p, moins_phiB);
-      if (marq_tot)
-        {
-          for (int i = 0; i < size_s; i++)
-            if (marq[i])
-              ref_cast(Source_dep_inco_base, sources()(i).valeur()).ajouter_(p, moins_phiB);
-        }
-      statistics().begin_count(STD_COUNTERS::implicit_diffusion,statistics().get_last_opened_counter_level()+1);
-      moins_phiB*=-1;
-      // phiB *= aCKN;  // Crank - Nicholson
-      // fait maintenant avant l'appel
-      //solveur_masse->appliquer(secmem);
+      DoubleTrav moins_phiB(solution); // la partie Bord de l'operateur avec p=0
+      matvec(p, moins_phiB);
 
-      // Stop the counter because operator diffusion is also counted
-      statistics().end_count(STD_COUNTERS::implicit_diffusion,0,0);
       DoubleTrav resu(solution);
-      operateur(0).ajouter(solution, resu);
-      if (marq_tot)
-        {
-          for (int i = 0; i < size_s; i++)
-            if (marq[i])
-              ref_cast(Source_dep_inco_base, sources()(i).valeur()).ajouter_(solution, resu);
-        }
-      statistics().begin_count(STD_COUNTERS::implicit_diffusion,statistics().get_last_opened_counter_level()+1);
+      matvec(solution, resu);
       solveur_masse->appliquer(resu);
       resu.echange_espace_virtuel();
-      resu *= -1.;
-
       {
         // Create scope to release DoubleTrav quickly
         DoubleTrav sol;
@@ -1710,6 +1683,19 @@ void Equation_base::Gradient_conjugue_diff_impl(DoubleTrav& secmem, DoubleTab& s
           }
         else
           sol.ref(solution);
+
+        // on retire les sources dependantes de l inco ; on les rajoutera apres
+        if (marq_tot)
+          {
+            DoubleTrav sum_sources(secmem);
+            statistics().end_count(STD_COUNTERS::implicit_diffusion,0,0);
+            for (int i = 0; i < size_s; i++)
+              if (marq[i])
+                sources()(i).ajouter(sum_sources);
+            statistics().begin_count(STD_COUNTERS::implicit_diffusion,statistics().get_last_opened_counter_level()+1);
+            solv_masse().appliquer(sum_sources);
+            secmem.ajoute(-1., sum_sources); // ,VECT_REAL_ITEMS);
+          }
         secmem.ajoute(1. / dt, sol, VECT_REAL_ITEMS);
         resu.ajoute(1. / dt, sol, VECT_REAL_ITEMS);
       }
@@ -1755,39 +1741,31 @@ void Equation_base::Gradient_conjugue_diff_impl(DoubleTrav& secmem, DoubleTab& s
           {
             resu = moins_phiB; // On retire la contribution des bords.
             p.echange_espace_virtuel();
-
-            // Stop the counter during diffusive operator:
-            statistics().end_count(STD_COUNTERS::implicit_diffusion,0,0);
-            operateur(0).ajouter(p, resu);
-            if (marq_tot)
-              {
-                for (int i = 0; i < size_s; i++)
-                  if (marq[i])
-                    ref_cast(Source_dep_inco_base, sources()(i).valeur()).ajouter_(p, resu);
-              }
-            statistics().begin_count(STD_COUNTERS::implicit_diffusion,statistics().get_last_opened_counter_level()+1);
+            matvec(p, resu);
             solveur_masse->appliquer(resu);
-            resu.echange_espace_virtuel();
 
             if (aCKN!=1) resu *= aCKN; // Crank - Nicholson
             if (size_terme_mul)
               {
                 for (int i = 0; i < size_terme_mul; i++)
                   pp(i) = p(i) * terme_mul(i);
-                resu.ajoute(-1. / dt, pp, VECT_REAL_ITEMS);
+                resu.ajoute(1. / dt, pp, VECT_REAL_ITEMS);
               }
             else
-              resu.ajoute(-1. / dt, p, VECT_REAL_ITEMS);
+              resu.ajoute(1. / dt, p, VECT_REAL_ITEMS);
             double alfa = prodrz_old / mp_prodscal(resu, p);
             // Inutile de faire un echange espace virtuel:
-            solution.ajoute(-alfa, p, VECT_REAL_ITEMS);
+            solution.ajoute(alfa, p, VECT_REAL_ITEMS);
             residu.ajoute(alfa, resu, VECT_REAL_ITEMS);
 
             if (precond_diag)
               diag_.multvect(residu, z); // preconditionnement par diag^(-1)
             // sinon z=residu
 
-            residual = mp_carre_norme_vect(z);
+            // Optimization: combine 2 MPI reductions into 1
+            residual = local_carre_norme_vect(z);
+            double prodrz_new = local_prodscal(residu, z);
+            Process::mp_sum_for_each(residual, prodrz_new);
             if (le_schema_en_temps->impr_diffusion_implicite())
               Cout << "Iteration n=" << niter << " Residu(n)/Residu(0)=" << residual / initial_residual << finl;
 
@@ -1795,7 +1773,6 @@ void Equation_base::Gradient_conjugue_diff_impl(DoubleTrav& secmem, DoubleTab& s
               break;
             else
               {
-                double prodrz_new = mp_prodscal(residu, z);
                 p *= (prodrz_new / prodrz_old);
                 p -= z;
                 prodrz_old = prodrz_new;
@@ -1834,20 +1811,15 @@ void Equation_base::Gradient_conjugue_diff_impl(DoubleTrav& secmem, DoubleTab& s
       solution -= merk;
       solution.echange_espace_virtuel();
 
-      // End the counter
-      statistics().end_count(STD_COUNTERS::implicit_diffusion);
-
-      // CHD 230501 : Call to diffusive operator to update flux_bords (boundary fluxes):
+      // CHD 230501 : last call to update flux_bords (boundary fluxes):
       resu = 0.;
-      operateur(0).ajouter(inconnue(), resu);
-      if (marq_tot)
-        {
-          for (int i = 0; i < size_s; i++)
-            if (marq[i])
-              ref_cast(Source_dep_inco_base, sources()(i).valeur()).ajouter_(inconnue().valeurs(), resu);
-        }
+      matvec(inconnue().valeurs(), resu);
+
       // Since 1.6.8 returns dI/dt:
       solution/=dt;
+
+      // End the counter
+      statistics().end_count(STD_COUNTERS::implicit_diffusion);
     }
 }
 
