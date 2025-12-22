@@ -33,12 +33,11 @@ then
       PACKAGE=$TRUST_ROOT/externalpackages/AmgX/$LIB"_"$commit.tar.gz
       tar cfz $PACKAGE --exclude .git $LIB && echo "Creation du package $PACKAGE"
    else
-      commit=4d1bda0016
-      #commit=v2.4.0 # Soucis encore selon version Cuda...
       commit=69e625e99b # Meilleures performances sur A6000 et meilleur support sur JZ avec update cmake
+      commit=v2.5.0
       tar xfz $TRUST_ROOT/externalpackages/AmgX/AmgX_$commit.tar.gz
    fi
-   cd $LIB && mkdir -p build && cd build
+   cd `find . -maxdepth 1 -type d | grep -i amgx` && rm -rf build && mkdir -p build && cd build
 
    # Compilers: See https://github.com/NVIDIA/AMGX
    # Don't use unset CPATH, i get cusparse_v2.h not found on JeanZay after cmake upgrade !
@@ -47,16 +46,10 @@ then
    AMGX_COMPILERS="-DCMAKE_CXX_COMPILER=$TRUST_CC_BASE -DCMAKE_C_COMPILER=$TRUST_cc_BASE -DCMAKE_CXX_FLAGS=-std=c++14"
    AMGX_COMPILERS=$AMGX_COMPILERS" -DCMAKE_CXX_FLAGS=-fno-openmp" # Important de specifier car AmgX cherche OpenMP par defaut
    # Ajout de l'architecture:
-   # Attention, ne pas forcer TRUST_CUDA_CC=80 sur H100 !!! Crash thrust failure sur bench OpenMP_Iterateur par exemple.
-   [ "${TRUST_CUDA_CC#7}" != "$TRUST_CUDA_CC" ] && TRUST_CUDA_CC=70 # Volta
-   [ "${TRUST_CUDA_CC#8}" != "$TRUST_CUDA_CC" ] && TRUST_CUDA_CC=80 # Ampere
-   AMGX_COMPILERS=$AMGX_COMPILERS" -DCUDA_ARCH=$TRUST_CUDA_CC"
+   AMGX_COMPILERS=$AMGX_COMPILERS" -DCMAKE_CUDA_ARCHITECTURES=$TRUST_CUDA_CC"
    
    # Hack du CMakeLists.txt (vu sur orcus avec Cuda 12) car manque de cublasLt
    sed -i "1,$ s?CUDA::cublas?CUDA::cublas CUDA::cublasLt?g" ../CMakeLists.txt || exit -1
-   # Switch to nvtx3 with Cuda >= 12.9 cause nvtx deprecated
-   sed -i "1,$ s?CUDA::nvToolsExt??g" ../CMakeLists.txt || exit -1
-   sed -i "1,$ s?nvToolsExt.h?nvtx3/nvToolsExt.h?g" ../include/amgx_timer.h || exit -1
    
    if [ "$HOST" = jean-zay ]
    then
@@ -67,10 +60,7 @@ then
       cmake -DCMAKE_CUDA_COMPILER=$TRUST_NVCC -DCUDAToolkit_ROOT=$CUDA_ROOT -DCMAKE_CUDA_FLAGS=-L$CUDA_ROOT/lib64 $CUDA_NVCC_FLAGS -DAMGX_NO_RPATH=1 -DCMAKE_INSTALL_PREFIX=$AMGX_DIR/$LIB $AMGX_COMPILERS -DCMAKE_CUDA_FLAGS_RELEASE="-DNDEBUG" .. || exit -1
       $TRUST_MAKE install || exit -1 # Important de faire en 1 fois car sur cluster make install recompile a nouveau apres make !!!
    fi
-   cp -f ../examples/matrix.mtx $AMGX_DIR/$LIB/lib/examples
-   # Install cuSPARSE 11.2 to fix multi-gpu bug for C-AMG if cuda>11.2
-   # NB_GPUS=`nvidia-smi 2>/dev/null | grep -e Off -e On | wc -l`
-   # [ $NB_GPUS != 1 ] && cusparse=$TRUST_ROOT/externalpackages/AmgX/libcusparse.so.11 && [ -f $cusparse.gz ] && gunzip -c $cusparse.gz > $AMGX_DIR/$LIB/lib/`basename $cusparse`
+   cp -f ../examples/matrix.mtx $AMGX_DIR/$LIB/lib/examples || exit -1
    # Clean:
    cd $ROOT && rm -r -f $LIB
 fi
