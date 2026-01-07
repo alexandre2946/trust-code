@@ -1,3 +1,4 @@
+XX/XX/25 (TRUST) GPU          : Mandatory C++20 compiler (e.g. GNU>=10.4.0) to build the GPU version of the code (prepare to Kokkos 5.x migration)
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.8_beta : Enhancements, modifications and corrected bugs since version 1.9.7 :
 --------------------------------------------------------------------------------------------------

@@ -615,11 +615,33 @@ fi
 #######################
 # Quelle norme C++ ?
 #######################
+# Norme
+# C++20 si GPU ou GNU>10.4.0
+# C++17 sinon
+# C++XX si force
+if [ "$TRUST_FORCE_STDCPP" != "" ]
+then
+  TRUST_STDCPP=$TRUST_FORCE_STDCPP
+elif [ "$TRUST_USE_GPU" = 1 ]
+then
+   TRUST_STDCPP=c++20
+else
+   TRUST_VERSION_GNU_NUMERIC=`g++ -v 2>&1 | awk '/gcc / && /version / {split($3,a,".");print a[1]*100+a[2]*10+a[3]*1}'`
+   if [ "$TRUST_VERSION_GNU_NUMERIC" -ge 1040 ]
+   then
+      TRUST_STDCPP=c++20 # On tente C++20 au lieu de C++17 si GNU OK:
+   else
+      TRUST_STDCPP=c++17
+   fi
+fi   
+echo "Trying $TRUST_STDCPP build ..."
+m="# C++ standard to build TRUST ";e="TRUST_STDCPP=\"$TRUST_STDCPP\" && export TRUST_STDCPP";ecrit $m"|"$e"|"$env
+
 if [ "$TRUST_STDCPP" = c++14 ]
 then
    if [ "$TRUST_USE_KOKKOS_SIMD" = 1 ] || [ "$TRUST_USE_KOKKOS_OPENMP" = 1 ] || [ "$TRUST_USE_GPU" = 1 ]
    then
-      echo "You need a C++17 compiler to use Kokkos SIMD or OpenMP or CUDA or ROCM/HIP." && exit -1
+      echo "You need a C++20 compiler to use Kokkos SIMD or OpenMP or CUDA or ROCM/HIP." && exit -1
    fi
 elif [ "$TRUST_STDCPP" = c++17 ] && [ "$TRUST_VERSION_GNU" != "" ] && [ "`echo $TRUST_VERSION_GNU | awk -F. '{ver=$1*100+$2*10+$3;if (ver<820) print 0}'`" = 0 ]
 then
