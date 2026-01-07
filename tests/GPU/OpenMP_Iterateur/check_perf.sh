@@ -65,7 +65,7 @@ else
    run $HOST$GPU_ARCH 1 OpenMP_Iterateur && run $HOST$GPU_ARCH
    # Multi-GPU:
    unset CUDA_VISIBLE_DEVICES
-   [ $HOST = is157091 ]     && run $HOST$GPU_ARCH 2
+   [ $HOST = is157091 ]     && run $HOST$GPU_ARCH 2 OpenMP_Iterateur_BENCH_PETSc
    [ "`hostname`" = petra ] && run $HOST$GPU_ARCH 2
    [ $HOST = topaze ]       && run $HOST$GPU_ARCH 4 && run $HOST$GPU_ARCH 8 OpenMP_Iterateur_BENCH_AmgX_10
    [ $HOST = adastra ]      && run $HOST$GPU_ARCH 4 && run $HOST$GPU_ARCH 16 OpenMP_Iterateur_BENCH_PETSc_10
