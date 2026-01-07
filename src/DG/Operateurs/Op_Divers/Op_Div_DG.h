@@ -37,6 +37,10 @@ public:
 
   void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&, const Champ_Inc_base&) override;
 
+  void dimensionner(Matrice_Morse& mat) const override;
+
+  inline int has_interface_blocs() const override { return 1; }
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
 
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = { }) const override;
   //DoubleTab& ajouter(const DoubleTab&, DoubleTab&) const override;
@@ -44,7 +48,6 @@ public:
   int impr(Sortie& os) const override;
   void volumique(DoubleTab&) const override;
 
-  void dimensionner(Matrice_Morse& matrice) const override;
   //void contribuer_a_avec(const DoubleTab&, Matrice_Morse& matrice) const override;
 
 protected:

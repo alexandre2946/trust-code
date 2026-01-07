@@ -39,6 +39,64 @@ void Op_Div_DG::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_d
   le_dcl_DG = ref_cast(Domaine_Cl_DG, domaine_Cl_dis);
 }
 
+void Op_Div_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
+{
+  const std::string nom_inco = equation().inconnue().le_nom().getString();
+  if (semi_impl.count("vitesse"))
+    return; // semi-implicite -> rien a dimensionner
+
+  int n_ext = 1; //TODO DG what is op_ext in this case ?
+  std::vector<Matrice_Morse *> mat(n_ext);
+  for (int i = 0; i < n_ext; i++)
+    {
+      std::string nom_mat = i ? nom_inco + "/" + (this)->equation().probleme().le_nom().getString() : nom_inco; //TODO DG is that correspond ?
+      mat[i] = matrices.count(nom_mat) ? matrices.at(nom_mat) : nullptr;
+      if (!mat[i])
+        continue;
+      Matrice_Morse mat2;
+      if (i == 0)
+        dimensionner(mat2);
+      else
+        throw; // TODO DG for dimensionner_terme_croises
+
+      mat[i]->nb_colonnes() ? *mat[i] += mat2 : *mat[i] = mat2;
+    }
+}
+
+void Op_Div_DG::dimensionner(Matrice_Morse& matrice) const
+{
+  if (has_interface_blocs())
+    {
+      Operateur_base::dimensionner(matrice);
+      return;
+    }
+
+  const Domaine_DG& domaine_DG = le_dom_DG.valeur();
+  int nb_faces = domaine_DG.nb_faces();
+  int nb_faces_tot = domaine_DG.nb_faces_tot();
+  int nb_elem_tot = domaine_DG.nb_elem_tot();
+  IntTab stencil(0, 2);
+
+  const IntTab& face_voisins = domaine_DG.face_voisins();
+
+  int nb_coef = 0;
+  for (int face = 0; face < nb_faces; face++)
+    {
+      for (int dir = 0; dir < 2; dir++)
+        {
+          const int elem = face_voisins(face, dir);
+          if (elem != -1)
+            {
+              stencil.resize(nb_coef + 1, 2);
+              stencil(nb_coef, 0) = elem;
+              stencil(nb_coef, 1) = face;
+              nb_coef++;
+            }
+        }
+    }
+  tableau_trier_retirer_doublons(stencil);
+  Matrix_tools::allocate_morse_matrix(nb_elem_tot, nb_faces_tot, stencil, matrice);
+}
 
 
 void Op_Div_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
@@ -149,43 +207,6 @@ void Op_Div_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs
         }
     }
 
-}
-
-
-
-void Op_Div_DG::dimensionner(Matrice_Morse& matrice) const
-{
-  if (has_interface_blocs())
-    {
-      Operateur_base::dimensionner(matrice);
-      return;
-    }
-
-  const Domaine_DG& domaine_DG = le_dom_DG.valeur();
-  int nb_faces = domaine_DG.nb_faces();
-  int nb_faces_tot = domaine_DG.nb_faces_tot();
-  int nb_elem_tot = domaine_DG.nb_elem_tot();
-  IntTab stencil(0, 2);
-
-  const IntTab& face_voisins = domaine_DG.face_voisins();
-
-  int nb_coef = 0;
-  for (int face = 0; face < nb_faces; face++)
-    {
-      for (int dir = 0; dir < 2; dir++)
-        {
-          const int elem = face_voisins(face, dir);
-          if (elem != -1)
-            {
-              stencil.resize(nb_coef + 1, 2);
-              stencil(nb_coef, 0) = elem;
-              stencil(nb_coef, 1) = face;
-              nb_coef++;
-            }
-        }
-    }
-  tableau_trier_retirer_doublons(stencil);
-  Matrix_tools::allocate_morse_matrix(nb_elem_tot, nb_faces_tot, stencil, matrice);
 }
 
 DoubleTab& Op_Div_DG::calculer(const DoubleTab& vit, DoubleTab& div) const
