@@ -1,5 +1,6 @@
 #!/bin/bash
-[ "$TRUST_USE_GPU" != 1 ] && exit 0
+[ "$TRUST_STDCPP" = c++14 ] && exit 0
+[ "$TRUST_STDCPP" = c++17 ] && exit 0
 archive=$TRUST_ROOT/externalpackages/kokkos/arborx-2.0.1.tar.gz # C++ 20 
 
 build_dir=$TRUST_ROOT/build/arborx

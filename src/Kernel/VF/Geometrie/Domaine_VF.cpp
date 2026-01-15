@@ -36,7 +36,8 @@
 #include <iomanip>
 #include <utility>
 #include <set>
-#ifdef TRUST_USE_GPU
+#if __cplusplus > 201703L // C++20
+#define TRUST_USE_ARBORX
 #include <ArborX.hpp>
 #endif
 #include <medcoupling++.h>
@@ -1133,7 +1134,7 @@ void Domaine_VF::get_ind_integ_points(IntTab& ) const
   //surcharge dans domaine_DG mais qui n'est pas dans kernel
 }
 
-#ifdef TRUST_USE_GPU
+#ifdef TRUST_USE_ARBORX
 // Callback to store the result indices
 struct ExtractIndex
 {
@@ -1150,8 +1151,6 @@ struct ExtractIndex
 void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
 {
   if(dist_paroi_initialisee_) return;
-  // TODO needs some optimization since very slow (cf bttriocfd #277330)
-  Cerr << "Calling Domaine_VF::init_dist_paroi_globale. This may take some time..." << finl;
 
   const Domaine_VF& domaine_ = *this;
   int D=Objet_U::dimension, nf = domaine_.nb_faces(), ne = domaine_.nb_elem();
@@ -1272,9 +1271,8 @@ void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
 
   MCAuto <DataArrayIdType> glob_idx(DataArrayIdType::New());
 
-#ifdef TRUST_USE_GPU
+#ifdef TRUST_USE_ARBORX
   // Use ArborX on GPU to compute the nearest points cause too slow on large meshes
-  // ToDo: replace MC by ArborX on CPU too ?
   int dim = dimension;
   using ExecutionSpace = Kokkos::DefaultExecutionSpace;
   using MemorySpace = ExecutionSpace::memory_space;
@@ -1415,6 +1413,8 @@ void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
       glob_idx->setIJ(fe, 0, indices_host[fe]);
     }
 #else
+  Cerr << "Calling Domaine_VF::init_dist_paroi_globale. This may take some time..." << finl;
+  Cerr << "Try to use a C++20 TRUST version (built with a more recent compiler) to benefit from a faster algorithm." << finl;
   //indices des points de remote_xvs les plus proches de chaque point de local_xv
   glob_idx = remote_xvs->findClosestTupleId(local_xs);
 #endif
