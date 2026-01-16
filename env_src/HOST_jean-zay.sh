@@ -24,6 +24,8 @@ define_modules_config()
    else
       # 21/06/2023 : ND : passage a gcc
       module="gcc/8.5.0 openmpi/4.0.5"
+      # PL: 12.2.0 pour C++20
+      module="gcc/12.2.0 openmpi/4.0.5"
    fi
    #module=$module" cmake/3.31.4"
    #
