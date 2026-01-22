@@ -1201,7 +1201,16 @@ void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
     Process::exit(que_suis_je() + " : at least one boundary must be solid for the distance to the edge to be calculated !!!");
 
   remote_xv[moi].resize(nb_faces_bord_ + (int)soms.size() + nb_aretes,D);
-
+  int index[5] = { -1, -1, -1, -1, -1 };
+  bool Z_numbered = que_suis_je() == "Domaine_VDF" && dimension==3;
+  if (Z_numbered) // Numerotation en Z des sommets dans une face...
+    {
+      index[0] = 0;
+      index[1] = 1;
+      index[2] = 3;
+      index[3] = 2;
+      index[4] = 0;
+    }
   // On remplit les coordonnes des faces et aretes de bord locales
   int ind_tab = 0 ; // indice de la face/sommet/arete dans le tableau
   for (int ind_cl = 0 ; ind_cl < conds_lim.size() ; ind_cl++)
@@ -1218,17 +1227,30 @@ void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
 
             if (D==3) // Remplissage des aretes
               {
-                int id_som = 1 ;
-                while ( (id_som < nb_som_face()) && (f_s(f, id_som) != -1))
+                if (Z_numbered) // Numerotation en Z des sommets dans une face...
                   {
-                    for (int d=0 ; d<D ; d++)
-                      remote_xv[moi](ind_tab,d) = (xs(f_s(f, id_som), d) + xs(f_s(f, id_som-1), d)) / 2;
-                    id_som++;
+                    for (int id_som=1; id_som<=nb_som_face(); id_som++)
+                      {
+                        for (int d = 0; d < D; d++)
+                          remote_xv[moi](ind_tab, d) =
+                            (xs(f_s(f, index[id_som]), d) + xs(f_s(f, index[id_som - 1]), d)) / 2;
+                        ind_tab++;
+                      }
+                  }
+                else
+                  {
+                    int id_som = 1;
+                    while ((id_som < nb_som_face()) && (f_s(f, id_som) != -1))
+                      {
+                        for (int d = 0; d < D; d++)
+                          remote_xv[moi](ind_tab, d) = (xs(f_s(f, id_som), d) + xs(f_s(f, id_som - 1), d)) / 2;
+                        id_som++;
+                        ind_tab++;
+                      }
+                    for (int d = 0; d < D; d++)
+                      remote_xv[moi](ind_tab, d) = (xs(f_s(f, 0), d) + xs(f_s(f, id_som - 1), d)) / 2;
                     ind_tab++;
                   }
-                for (int d=0 ; d<D ; d++)
-                  remote_xv[moi](ind_tab,d) = (xs(f_s(f, 0), d) + xs(f_s(f, id_som-1), d)) / 2;
-                ind_tab++;
               }
           }
       }
@@ -1344,73 +1366,52 @@ void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
     glob_idx->alloc(nf+ne);
   for (int fe = 0; fe<nf+ne; fe++)
     {
+      int ar_global = indices_host[fe];
       if (compare_with_mc)
         {
           int proc_mc = 0;
           mcIdType mc_global = glob_idx->getIJ(fe, 0);
-          while (mc_global >= remote_xv[proc_mc].dimension(0))
+          int mc = (int) mc_global;
+          while (mc >= remote_xv[proc_mc].dimension(0))
             {
-              mc_global -= remote_xv[proc_mc].dimension(0);
+              mc -= remote_xv[proc_mc].dimension(0);
               proc_mc++;
             }
-          int mc = (int) mc_global;
-
           int proc_ar = 0;
-          int ar_global = indices_host[fe];
-          while (ar_global >= remote_xv[proc_ar].dimension(0))
+          int ar = ar_global;
+          while (ar >= remote_xv[proc_ar].dimension(0))
             {
-              ar_global -= remote_xv[proc_ar].dimension(0);
+              ar -= remote_xv[proc_ar].dimension(0);
               proc_ar++;
             }
-          int ar = ar_global;
-          if (fe < nf)
+          double dist_mc = 0, dist_ar = 0;
+          for (int i = 0; i < dimension; i++)
             {
-              double dist_mc = 0, dist_ar = 0;
-              for (int i = 0; i < dimension; i++)
-                {
-                  dist_mc +=
-                    (local_xv(fe, i) - remote_xv[proc_mc](mc, i)) * (local_xv(fe, i) - remote_xv[proc_mc](mc, i));
-                  dist_ar +=
-                    (local_xv(fe, i) - remote_xv[proc_ar](ar, i)) * (local_xv(fe, i) - remote_xv[proc_ar](ar, i));
-                }
-              //Cerr << "Face " << fe << " nearest face found by MC: " << mc << " and by ArborX: " << ar << finl;
-              //Cerr << "dist_mc=" << dist_mc << " dist_ar=" << dist_ar << finl;
-              if (!est_egal(dist_mc, dist_ar))
-                {
-                  Cerr << "Face " << fe << " nearest face found by MC: " << mc << " and by ArborX: " << ar << finl;
-                  Cerr << "dist_mc=" << dist_mc << " dist_ar=" << dist_ar << finl;
-                  for (int i = 0; i < dimension; i++)
-                    Cerr << "Face x(" << i << "): " << local_xv(fe, i) << " MC:" << remote_xv[proc_mc](mc, i)
-                         << " ArborX:" << remote_xv[proc_ar](ar, i) << finl;
-                  Cerr << "MEDCoupling and ArborX do not have same results for nearest faces !" << finl;
-                  Process::exit();
-                }
+              double xi = fe < nf ? local_xv(fe, i) : local_xp(fe - nf, i);
+              dist_mc += (xi - remote_xv[proc_mc](mc, i)) * (xi - remote_xv[proc_mc](mc, i));
+              dist_ar += (xi - remote_xv[proc_ar](ar, i)) * (xi - remote_xv[proc_ar](ar, i));
             }
-          else
+          if (!est_egal(dist_mc, dist_ar))
             {
-              double dist_mc = 0, dist_ar = 0;
-              for (int i = 0; i < dimension; i++)
+              if (fe<nf)
                 {
-                  dist_mc += (local_xp(fe - nf, i) - remote_xv[proc_mc](mc, i)) *
-                             (local_xp(fe - nf, i) - remote_xv[proc_mc](mc, i));
-                  dist_ar += (local_xp(fe - nf, i) - remote_xv[proc_ar](ar, i)) *
-                             (local_xp(fe - nf, i) - remote_xv[proc_ar](ar, i));
+                  Cerr << "Face " << fe << " nearest point found by MC: " << mc << " and by ArborX: " << ar << finl;
+                  for (int j = 0; j < dimension; j++)
+                    Cerr << "Face x(" << j << "): " << local_xv(fe, j) << " MC:" << remote_xv[proc_mc](mc, j) << " ArborX:" << remote_xv[proc_ar](ar, j) << finl;
+                  Cerr << "MEDCoupling and ArborX do not have same results for nearest boundary items from faces !" << finl;
                 }
-              //Cerr << "Cell " << fe-nf << " nearest face found by MC: " << mc << " and by ArborX: " << ar << finl;
-              //Cerr << "dist_mc=" << dist_mc << " dist_ar=" << dist_ar << finl;
-              if (!est_egal(dist_mc, dist_ar))
+              else
                 {
-                  Cerr << "Cell " << fe - nf << " nearest face found by MC: " << mc << " and by ArborX: " << ar << finl;
-                  Cerr << "dist_mc=" << dist_mc << " dist_ar=" << dist_ar << finl;
-                  for (int i = 0; i < dimension; i++)
-                    Cerr << "Face x(" << i << "): " << local_xv(fe, i) << " MC:" << remote_xv[proc_mc](mc, i)
-                         << " ArborX:" << remote_xv[proc_ar](ar, i) << finl;
-                  Cerr << "MEDCoupling and ArborX do not have same results for nearest cells !" << finl;
-                  Process::exit();
+                  Cerr << "Cell " << fe - nf << " nearest point found by MC: " << mc << " and by ArborX: " << ar << finl;
+                  for (int j = 0; j < dimension; j++)
+                    Cerr << "Cell x(" << j << "): " << local_xp(fe - nf, j) << " MC:"
+                         << remote_xv[proc_mc](mc, j) << " ArborX:" << remote_xv[proc_ar](ar, j) << finl;
+                  Cerr << "MEDCoupling and ArborX do not have same results for nearest boundary items from cells !" << finl;
                 }
+              Process::exit();
             }
         }
-      glob_idx->setIJ(fe, 0, indices_host[fe]);
+      glob_idx->setIJ(fe, 0, ar_global);
     }
 #else
   Cerr << "Calling Domaine_VF::init_dist_paroi_globale. This may take some time..." << finl;

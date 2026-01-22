@@ -1,4 +1,5 @@
-XX/XX/25 (TRUST) GPU          : Mandatory C++20 compiler (e.g. GNU>=10.4.0) to build the GPU version of the code (prepare to Kokkos 5.x migration)
+XX/XX/26 (TRUST) Change       : Bug fixed in VDF for the distance to the wall compute used by some turbulence models
+XX/XX/25 (TRUST) Performance  : Fix slow TrioCFD initialization for K-Omega calculation 
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.8_beta : Enhancements, modifications and corrected bugs since version 1.9.7 :
 --------------------------------------------------------------------------------------------------
