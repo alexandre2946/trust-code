@@ -147,6 +147,7 @@ help()
    [ "`nsys --version 1>/dev/null 2>&1;echo $?`" = 0 ] && echo "-nsys                         : Run Nsight system tool (GPU profiling)."
    [ "`ncu --version 1>/dev/null 2>&1;echo $?`" = 0 ] && echo "-ncu kernel                    : Run Nsight compute tool on given kernel (GPU Kernel profiling)."
    [ "`compute-sanitizer --version 1>/dev/null 2>&1;echo $?`" = 0 ] && echo "-cs memcheck|racecheck|initcheck|synccheck : Run compute sanitizer tool (GPU debugging)."
+   echo "-energy [slurm_job_id]        : Print the energy consumption if data available on the cluster."
    echo "-create_sub_file              : Create a submission file only."
    echo "-prod                         : Create a submission file and submit the job on the main production class with exclusive resource."
    echo "-bigmem                       : Create a submission file and submit the job on the big memory production class."
@@ -465,6 +466,11 @@ do
    then
       CS=1;shift;CS_OPTION=$1
       [ "$CS_OPTION" = racecheck ] && CS_OPTION=$CS_OPTION" --racecheck-detect-level=error" # On ne regarde que les erreurs detectees, pas les warnings
+   elif [ "$1" = "-energy" ]
+   then
+      shift;SLURM_JOB_ID=$1
+      sacct --format=ElapsedRaw,ConsumedEnergyRaw --jobs=$SLURM_JOB_ID | awk '(NR==3 && $2!=0) {kw=0.001*$2/$1;kwh=$2/3.6e6;print "Power consumption: "kw" kW " kwh" kWh " kwh*0.12" € (0.12€/kWh)"}'
+      exit $?
    elif [ "$1" = "-gdb" ]
    then
       gdb=gdb.sh && mpirun_options="-gdb"
@@ -1253,7 +1259,7 @@ export FI_CXI_DEFAULT_CQ_SIZE=393216" >> $GPU_DIRECT
    #########################
    if [ "$sub" = SLURM ]
    then
-      echo "sacct --format=ElapsedRaw,ConsumedEnergyRaw --jobs=\$SLURM_JOB_ID | awk '(NR==3 && $2!=0) {kw=0.001*\$2/\$1;kwh=\$2/3.6e6;print \"Power consumption: \"kw\" kW \" kwh\" kWh \" kwh*0.12\" Euros\"}' >> \$case.TU" >> $sub_file
+      echo "trust -energy \$SLURM_JOB_ID >> \$case.TU" >> $sub_file
    fi
    #######
    # IPM #
