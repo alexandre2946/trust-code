@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -94,8 +94,8 @@ void Sortie_libre_pression_moyenne_imposee::mettre_a_jour(double temps)
       S += s;
       Ptot += s * tab_P(elem);
     }
-  Ptot = mp_sum(Ptot);
-  S = mp_sum(S);
+  // Optimization: combine 2 mp_sum into 1 collective call
+  mp_sum_for_each(Ptot, S);
   Ptot /= S;
 
   Cerr << "Sortie_libre_pression_moyenne_imposee  pmoy= " << Ptot << finl;

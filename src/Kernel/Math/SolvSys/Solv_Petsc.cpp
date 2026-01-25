@@ -26,7 +26,7 @@
 #include <Matrice_Morse_Sym.h>
 #include <Matrice_Bloc_Sym.h>
 #include <Matrice_Bloc.h>
-#include <communications.h>
+#include <Process.h>
 #include <MD_Vector_tools.h>
 #include <PE_Groups.h>
 #include <Comm_Group_MPI.h>

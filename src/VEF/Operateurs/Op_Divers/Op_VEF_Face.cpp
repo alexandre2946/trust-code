@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -27,7 +27,7 @@
 #include <Op_Conv_VEF_base.h>
 #include <EcrFicPartage.h>
 #include <SFichier.h>
-#include <communications.h>
+#include <Process.h>
 #include <Matrice_Morse_Diag.h>
 #include <TRUSTTrav.h>
 #include <Dirichlet_homogene.h>
@@ -472,7 +472,7 @@ int Op_VEF_Face::impr(Sortie& os, const Operateur_base& op) const
     } // fin for num_cl
 
   // On somme les contributions de chaque processeur
-  mp_sum_for_each_item(flux_bords);
+  Process::mp_sum_for_each_item(flux_bords);
 
   // Ecriture dans les fichiers
   if (Process::je_suis_maitre())

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -154,8 +154,8 @@ void Champ_front_debit_QC::mettre_a_jour(double tps)
           S+=s;
           rho_moy+=s*tab_rhonp1P0(n0);
         }
-      S = mp_sum(S);
-      rho_moy = mp_sum(rho_moy);
+      // Optimization: combine 2 mp_sum into 1 collective call
+      mp_sum_for_each(S, rho_moy);
       rho_moy/=S;
       for ( num_face=ndeb; num_face<nfin; num_face++)
         for (int ori=0; ori<dim; ori++)

@@ -796,8 +796,10 @@ void Champ_P1NC::calcul_h_conv(const Domaine_Cl_VEF& domaine_Cl_VEF, DoubleTab& 
               h_moy += h_conv(elem);
             }
         }
-      h_moy = Process::mp_sum(h_moy);
-      int nb_faces = static_cast<int>(Process::mp_sum(le_bord.nb_faces()));  // a single 'bord' should not have so many faces
+      // Optimization: combine 2 mp_sum into 1 collective call
+      double nb_faces_d = static_cast<double>(le_bord.nb_faces());
+      mp_sum_for_each(h_moy, nb_faces_d);
+      int nb_faces = static_cast<int>(nb_faces_d);  // a single 'bord' should not have so many faces
       h_moy /= nb_faces;
       if (je_suis_maitre())
         {

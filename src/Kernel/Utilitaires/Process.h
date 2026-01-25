@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,6 +17,7 @@
 #define Process_included
 
 #include <TRUST_Version.h>  // so that it is accessible from everywhere in TRUST
+#include <TRUSTTabs_forward.h>
 #include <arch.h>
 
 #ifdef LATATOOLS
@@ -65,6 +66,12 @@ public:
   static int mp_min(int x) { return x; }
   static trustIdType mp_sum(int x) { return x; }
   static trustIdType mp_sum(trustIdType x) { return x; }
+  template<typename _TYPE_>
+  static void mp_sum_for_each_item(TRUSTArray<_TYPE_>& x) { }
+  template<typename _TYPE_>
+  static void mp_max_for_each_item(TRUSTArray<_TYPE_>& x) { }
+  template<typename _TYPE_>
+  static void mp_min_for_each_item(TRUSTArray<_TYPE_>& x) { }
 #else
   static int me(); /* mon rang dans le groupe courant */
   static int nproc();
@@ -72,27 +79,22 @@ public:
   static void exit(int exit_code = -1);
 
   //
-  // Min/max across all procs
+  // Reduction
   //
+  static double mp_sum(double);
+  static float mp_sum(float);
+  static trustIdType mp_sum(trustIdType);
   static double mp_max(double);
   static double mp_min(double);
   static int mp_max(int);
   static int mp_min(int);
 #if INT_is_64_ == 2
+  // Careful, the sum of many 'int' on several procs, might return a 'long'!!
+  static trustIdType mp_sum(int v) { return mp_sum(static_cast<trustIdType>(v)); }
   static trustIdType mp_max(trustIdType);
   static trustIdType mp_min(trustIdType);
 #endif
 
-  //
-  // Sum across all procs
-  //
-  static double mp_sum(double);
-  static float mp_sum(float);
-#if INT_is_64_ == 2
-  // Careful, the sum of many 'int' on several procs, might return a 'long'!!
-  static trustIdType mp_sum(int v) { return mp_sum(static_cast<trustIdType>(v)); }
-#endif
-  static trustIdType mp_sum(trustIdType);
   // When computing percentages or ratios, useful:
   static double mp_sum_as_double(int v) { return static_cast<double>(mp_sum(v)); }
 #if INT_is_64_ == 2
@@ -105,8 +107,41 @@ public:
   static trustIdType mppartial_sum(int i) { return mppartial_sum(static_cast<trustIdType>(i)); }
 #endif
 
-  // Summing two doubles at once
-  static void mpsum_multiple(double& x1, double& x2);
+  // Reduction on several values (C++14 compatible - explicit overloads)
+  // mp_sum_for_each
+  template<typename T>
+  static void mp_sum_for_each(T& arg1, T& arg2);
+  template<typename T>
+  static void mp_sum_for_each(T& arg1, T& arg2, T& arg3);
+  template<typename T>
+  static void mp_sum_for_each(T& arg1, T& arg2, T& arg3, T& arg4);
+  template<typename T>
+  static void mp_sum_for_each(T& arg1, T& arg2, T& arg3, T& arg4, T& arg5);
+  // mp_max_for_each
+  template<typename T>
+  static void mp_max_for_each(T& arg1, T& arg2);
+  template<typename T>
+  static void mp_max_for_each(T& arg1, T& arg2, T& arg3);
+  template<typename T>
+  static void mp_max_for_each(T& arg1, T& arg2, T& arg3, T& arg4);
+  template<typename T>
+  static void mp_max_for_each(T& arg1, T& arg2, T& arg3, T& arg4, T& arg5);
+  // mp_min_for_each
+  template<typename T>
+  static void mp_min_for_each(T& arg1, T& arg2);
+  template<typename T>
+  static void mp_min_for_each(T& arg1, T& arg2, T& arg3);
+  template<typename T>
+  static void mp_min_for_each(T& arg1, T& arg2, T& arg3, T& arg4);
+  template<typename T>
+  static void mp_min_for_each(T& arg1, T& arg2, T& arg3, T& arg4, T& arg5);
+  // Reduction on values of a TRUSTArray
+  template<typename _TYPE_>
+  static void mp_sum_for_each_item(TRUSTArray<_TYPE_>& x);
+  template<typename _TYPE_>
+  static void mp_max_for_each_item(TRUSTArray<_TYPE_>& x);
+  template<typename _TYPE_>
+  static void mp_min_for_each_item(TRUSTArray<_TYPE_>& x);
 
   static bool mp_and(bool);
   static bool mp_or(bool);

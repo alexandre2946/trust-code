@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -21,6 +21,7 @@
 #include <IJK_Vector.h>
 #include <Interprete_bloc.h>
 #include <Perf_counters.h>
+#include <Process.h>
 
 template <typename _TYPE_, typename _TYPE_ARRAY_>
 void Multigrille_base::resoudre_systeme_IJK(const IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& rhs, IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& x)
@@ -565,7 +566,7 @@ void calcul_produits_scalaires(IJK_Vector<IJK_Field_template, _TYPE_, _TYPE_ARRA
         calcul_produits_scalaires_(x, 4, i, n, resu);
       i += nn;
     }
-  mp_sum_for_each_item(resu);
+  Process::mp_sum_for_each_item(resu);
 }
 
 static inline void triangularise(const DoubleTab& hessenberg, const double norme_b, DoubleTab& resu, ArrOfDouble& r)

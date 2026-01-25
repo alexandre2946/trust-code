@@ -1918,7 +1918,6 @@ void Navier_Stokes_std::uzawa(const DoubleTab& secmem, const Matrice_Base& A, So
 
     DoubleTrav R(resu);
     divergence->multvect(U, R);
-    Cerr << "Ending Uzawa : mass residue : " << mp_norme_vect(R) <<finl;
 
     gradient->multvect(P, grad);
     grad-=grad0;
@@ -1929,7 +1928,13 @@ void Navier_Stokes_std::uzawa(const DoubleTab& secmem, const Matrice_Base& A, So
 
     solveur.resoudre_systeme(A, F, UU);
     UU-=U;
-    Cerr << "Ending Uzawa : Qdm residue : " << mp_norme_vect(UU)<<finl;
+
+    // Optimization: combine 2 mp_norme_vect into 1 collective call
+    double R_carre = local_carre_norme_vect(R);
+    double UU_carre = local_carre_norme_vect(UU);
+    Process::mp_sum_for_each(R_carre, UU_carre);
+    Cerr << "Ending Uzawa : mass residue : " << sqrt(R_carre) <<finl;
+    Cerr << "Ending Uzawa : Qdm residue : " << sqrt(UU_carre)<<finl;
   }
 }
 

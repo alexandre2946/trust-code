@@ -526,7 +526,7 @@ int Solv_GCP::resoudre_(const Matrice_Base& matrice,
           double residu_scalaire_resu = local_prodscal(residu_, resu_);
           norme = norme_residu_locale;
           // optimisation: on calcule en une seule fois les deux sommes
-          mpsum_multiple(residu_scalaire_resu, norme);
+          mp_sum_for_each(residu_scalaire_resu, norme);
           assert(residu_scalaire_resu >= 0);
           multiply_sub(tmp_p_, resu_, residu_scalaire_resu / dold);
           dold = residu_scalaire_resu;

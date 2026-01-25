@@ -491,11 +491,21 @@ bool Simple::iterer_eqs(LIST(OBS_PTR(Equation_base)) eqs, int nb_iter, int& ok)
   inconnues.echange_espace_virtuel();
 
   // mise a jour
-  bool converge = true;
+  // Optimization: combine N mp_norme_vect into 1 collective call
+  // First pass: compute local squared norms
+  ArrOfDouble dudt_carres((int)eqs.size());
   for(i = 0; i < eqs.size(); i++)
     {
       dudt_parts[i] -= inconnues_parts[i];
-      double dudt_norme = mp_norme_vect(dudt_parts[i]);
+      dudt_carres[(int)i] = local_carre_norme_vect(dudt_parts[i]);
+    }
+  // Single MPI reduction for all norms
+  Process::mp_sum_for_each_item(dudt_carres);
+  // Second pass: use the norms and do updates
+  bool converge = true;
+  for(i = 0; i < eqs.size(); i++)
+    {
+      double dudt_norme = sqrt(dudt_carres[(int)i]);
       eqs[i]->inconnue().valeurs() = inconnues_parts[i];
 
       converge &= (dudt_norme < seuil_convg);

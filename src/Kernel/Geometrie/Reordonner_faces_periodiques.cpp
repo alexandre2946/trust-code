@@ -280,8 +280,7 @@ int Reordonner_faces_periodiques_32_64<_SIZE_>::check_faces_periodiques(const Fr
   vecteur_delta = -1.e37;
   if (n > 0)
     calculer_vecteur_2faces<_SIZE_>(coord, faces, 0, n, vecteur_delta);
-  for (i = 0; i < dim; i++)
-    vecteur_delta[i] = Process::mp_max(vecteur_delta[i]);
+  Process::mp_max_for_each_item(vecteur_delta);
 
   // Calculer pour chaque face l'erreur par rapport a ce vecteur delta.
   ArrOfDouble vect(dim);
@@ -292,13 +291,11 @@ int Reordonner_faces_periodiques_32_64<_SIZE_>::check_faces_periodiques(const Fr
       for (int compo = 0; compo < dim; compo++)
         erreur[compo] = std::max(erreur[compo], std::fabs(vecteur_delta[compo] - vect[compo]));
     }
-  double maxerr = 0.;
   // Calcul du max sur tous les procs:
+  Process::mp_max_for_each_item(erreur);
+  double maxerr = 0.;
   for (i = 0; i < dim; i++)
-    {
-      erreur[i] = Process::mp_max(erreur[i]);
-      maxerr = std::max(maxerr, erreur[i]);
-    }
+    maxerr = std::max(maxerr, erreur[i]);
 
   if (verbose && Process::je_suis_maitre())
     {

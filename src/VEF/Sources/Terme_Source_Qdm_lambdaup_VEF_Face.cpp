@@ -156,8 +156,12 @@ DoubleTab& Terme_Source_Qdm_lambdaup_VEF_Face::ajouter(DoubleTab& resu) const
 
   la_vitesse->filtrer_L2(ubar);
   uprime-=ubar;
-  double normbar=mp_norme_vect(ubar);
-  double normprim=mp_norme_vect(uprime);
+  // Optimization: combine 2 mp_norme_vect into 1 collective call
+  double normbar_carre = local_carre_norme_vect(ubar);
+  double normprim_carre = local_carre_norme_vect(uprime);
+  Process::mp_sum_for_each(normbar_carre, normprim_carre);
+  double normbar = sqrt(normbar_carre);
+  double normprim = sqrt(normprim_carre);
   //double rapport=normbar/(normprim+DMINFLOAT) ;
   double rapport=(normprim!=0?normbar/normprim:0);
   double& l=lambda;

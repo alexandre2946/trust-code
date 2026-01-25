@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -441,11 +441,8 @@ int Op_Grad_EF::impr(Sortie& os) const
         }
       if (dimension == 2)
         {
-          fluxx_s=Process::mp_sum(fluxx_s);
-          fluxy_s=Process::mp_sum(fluxy_s);
-          fluxx_sum_s=Process::mp_sum(fluxx_sum_s);
-          fluxy_sum_s=Process::mp_sum(fluxy_sum_s);
-          moment_z=Process::mp_sum(moment_z);
+          // Optimization: combine 5 mp_sum into 1 collective call
+          mp_sum_for_each(fluxx_s, fluxy_s, fluxx_sum_s, fluxy_sum_s, moment_z);
           if (je_suis_maitre())
             {
               Flux_grad.add_col(fluxx_s);
@@ -460,15 +457,27 @@ int Op_Grad_EF::impr(Sortie& os) const
         }
       if (dimension == 3)
         {
-          fluxx_s=Process::mp_sum(fluxx_s);
-          fluxy_s=Process::mp_sum(fluxy_s);
-          fluxz_s=Process::mp_sum(fluxz_s);
-          fluxx_sum_s=Process::mp_sum(fluxx_sum_s);
-          fluxy_sum_s=Process::mp_sum(fluxy_sum_s);
-          fluxz_sum_s=Process::mp_sum(fluxz_sum_s);
-          moment_x=Process::mp_sum(moment_x);
-          moment_y=Process::mp_sum(moment_y);
-          moment_z=Process::mp_sum(moment_z);
+          // Optimization: combine 9 mp_sum into 1 collective call
+          ArrOfDouble tmp(9);
+          tmp[0] = fluxx_s;
+          tmp[1] = fluxy_s;
+          tmp[2] = fluxz_s;
+          tmp[3] = fluxx_sum_s;
+          tmp[4] = fluxy_sum_s;
+          tmp[5] = fluxz_sum_s;
+          tmp[6] = moment_x;
+          tmp[7] = moment_y;
+          tmp[8] = moment_z;
+          mp_sum_for_each_item(tmp);
+          fluxx_s = tmp[0];
+          fluxy_s = tmp[1];
+          fluxz_s = tmp[2];
+          fluxx_sum_s = tmp[3];
+          fluxy_sum_s = tmp[4];
+          fluxz_sum_s = tmp[5];
+          moment_x = tmp[6];
+          moment_y = tmp[7];
+          moment_z = tmp[8];
           if(je_suis_maitre())
             {
               Flux_grad.add_col(fluxx_s);

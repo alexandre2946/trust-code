@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,7 +16,7 @@
 #include <Schema_Temps_base.h>
 #include <Equation_base.h>
 #include <Probleme_base.h>
-#include <communications.h>
+#include <Process.h>
 #include <Source_base.h>
 #include <TRUSTTrav.h>
 #include <TRUSTTabs.h>

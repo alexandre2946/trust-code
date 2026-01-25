@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -132,31 +132,6 @@ inline assert_parallel(const _TYPE_ x)
       Process::exit();
     }
 }
-
-template<typename _TYPE_>
-inline void mp_collective_op_arr(TRUSTArray<_TYPE_>& x, Comm_Group::Collective_Op op)
-{
-  int sz = x.size_array();
-  assert_parallel<_TYPE_>(sz);
-  if (sz > 0)
-    {
-      _TYPE_ *data = x.addr();
-      _TYPE_ *tmp = new _TYPE_[sz];
-      const Comm_Group& grp = PE_Groups::current_group();
-      grp.mp_collective_op(data, tmp, sz, op);
-      memcpy(data, tmp, sz * sizeof(_TYPE_));
-      delete[] tmp;
-    }
-}
-
-template<typename _TYPE_>
-inline void mp_sum_for_each_item(TRUSTArray<_TYPE_>& x) { mp_collective_op_arr(x, Comm_Group::COLL_SUM); }
-
-template<typename _TYPE_>
-inline void mp_max_for_each_item(TRUSTArray<_TYPE_>& x) { mp_collective_op_arr(x, Comm_Group::COLL_MAX); }
-
-template<typename _TYPE_>
-inline void mp_min_for_each_item(TRUSTArray<_TYPE_>& x) { mp_collective_op_arr(x, Comm_Group::COLL_MIN); }
 
 /*! @brief On suppose que les tableaux en entree et en sortie sont de taille nproc() .
  *

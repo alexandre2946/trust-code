@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -107,9 +107,9 @@ double EDO_Pression_th_VDF_Gaz_Parfait::resoudre(double Pth_n)
             }
         }
 
-      double cnt = mp_sum(cn);
-      double cn1t = mp_sum(cn1);
-      double cmt = mp_sum(cm);
+      // Optimization: combine 3 mp_sum into 1 collective call
+      double cnt = cn, cn1t = cn1, cmt = cm;
+      mp_sum_for_each(cnt, cn1t, cmt);
       double Pt = Pth_n * cnt / cn1t / (1 + dt / cn1t * cmt);
       return Pt;
     }
@@ -277,9 +277,9 @@ void EDO_Pression_th_VDF_Gaz_Parfait::resoudre(DoubleTab& Pth_n)
             }
         }
 
-      double cnt = mp_sum(cn);
-      double cn1t = mp_sum(cn1);
-      double cmt = mp_sum(cm);
+      // Optimization: combine 3 mp_sum into 1 collective call
+      double cnt = cn, cn1t = cn1, cmt = cm;
+      mp_sum_for_each(cnt, cn1t, cmt);
 
       for (int elem = 0; elem < le_dom->nb_elem(); elem++)
         Pth_n(elem) = Pth_n(elem) * cnt / cn1t / (1. + dt / cn1t * cmt);

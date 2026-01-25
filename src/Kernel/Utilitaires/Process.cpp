@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -173,6 +173,188 @@ trustIdType Process::mp_sum(trustIdType x)
   return y;
 }
 
+template<typename _TYPE_>
+void mp_collective_op_arr(TRUSTArray<_TYPE_>& x, Comm_Group::Collective_Op op)
+{
+  int sz = x.size_array();
+  assert_parallel<_TYPE_>(sz);
+  if (sz > 0)
+    {
+      _TYPE_ *data = x.addr();
+      _TYPE_ *tmp = new _TYPE_[sz];
+      const Comm_Group& grp = PE_Groups::current_group();
+      grp.mp_collective_op(data, tmp, sz, op);
+      memcpy(data, tmp, sz * sizeof(_TYPE_));
+      delete[] tmp;
+    }
+}
+
+template<typename _TYPE_>
+void Process::mp_sum_for_each_item(TRUSTArray<_TYPE_>& x) { mp_collective_op_arr(x, Comm_Group::COLL_SUM); }
+
+template<typename _TYPE_>
+void Process::mp_max_for_each_item(TRUSTArray<_TYPE_>& x) { mp_collective_op_arr(x, Comm_Group::COLL_MAX); }
+
+template<typename _TYPE_>
+void Process::mp_min_for_each_item(TRUSTArray<_TYPE_>& x) { mp_collective_op_arr(x, Comm_Group::COLL_MIN); }
+
+/*! @brief C++14 compatible mp_sum_for_each: combine multiple mp_sum calls into one collective operation
+ *  Usage: mp_sum_for_each(a, b); mp_sum_for_each(a, b, c); mp_sum_for_each(a, b, c, d); mp_sum_for_each(a, b, c, d, e);
+ *  All arguments must be of the same type (double or int) and are modified in place.
+ *  Supports 2-5 parameters.
+ */
+template<typename T>
+void Process::mp_sum_for_each(T& arg1, T& arg2)
+{
+  T data[2] = {arg1, arg2};
+  T tmp[2];
+  const Comm_Group& grp = PE_Groups::current_group();
+  grp.mp_collective_op(data, tmp, 2, Comm_Group::COLL_SUM);
+  arg1 = tmp[0];
+  arg2 = tmp[1];
+}
+
+template<typename T>
+void Process::mp_sum_for_each(T& arg1, T& arg2, T& arg3)
+{
+  T data[3] = {arg1, arg2, arg3};
+  T tmp[3];
+  const Comm_Group& grp = PE_Groups::current_group();
+  grp.mp_collective_op(data, tmp, 3, Comm_Group::COLL_SUM);
+  arg1 = tmp[0];
+  arg2 = tmp[1];
+  arg3 = tmp[2];
+}
+
+template<typename T>
+void Process::mp_sum_for_each(T& arg1, T& arg2, T& arg3, T& arg4)
+{
+  T data[4] = {arg1, arg2, arg3, arg4};
+  T tmp[4];
+  const Comm_Group& grp = PE_Groups::current_group();
+  grp.mp_collective_op(data, tmp, 4, Comm_Group::COLL_SUM);
+  arg1 = tmp[0];
+  arg2 = tmp[1];
+  arg3 = tmp[2];
+  arg4 = tmp[3];
+}
+
+/*! @brief C++14 compatible mp_max_for_each: combine multiple mp_max calls into one collective operation */
+template<typename T>
+void Process::mp_max_for_each(T& arg1, T& arg2)
+{
+  T data[2] = {arg1, arg2};
+  T tmp[2];
+  const Comm_Group& grp = PE_Groups::current_group();
+  grp.mp_collective_op(data, tmp, 2, Comm_Group::COLL_MAX);
+  arg1 = tmp[0];
+  arg2 = tmp[1];
+}
+
+template<typename T>
+void Process::mp_max_for_each(T& arg1, T& arg2, T& arg3)
+{
+  T data[3] = {arg1, arg2, arg3};
+  T tmp[3];
+  const Comm_Group& grp = PE_Groups::current_group();
+  grp.mp_collective_op(data, tmp, 3, Comm_Group::COLL_MAX);
+  arg1 = tmp[0];
+  arg2 = tmp[1];
+  arg3 = tmp[2];
+}
+
+template<typename T>
+void Process::mp_max_for_each(T& arg1, T& arg2, T& arg3, T& arg4)
+{
+  T data[4] = {arg1, arg2, arg3, arg4};
+  T tmp[4];
+  const Comm_Group& grp = PE_Groups::current_group();
+  grp.mp_collective_op(data, tmp, 4, Comm_Group::COLL_MAX);
+  arg1 = tmp[0];
+  arg2 = tmp[1];
+  arg3 = tmp[2];
+  arg4 = tmp[3];
+}
+
+/*! @brief C++14 compatible mp_min_for_each: combine multiple mp_min calls into one collective operation */
+template<typename T>
+void Process::mp_min_for_each(T& arg1, T& arg2)
+{
+  T data[2] = {arg1, arg2};
+  T tmp[2];
+  const Comm_Group& grp = PE_Groups::current_group();
+  grp.mp_collective_op(data, tmp, 2, Comm_Group::COLL_MIN);
+  arg1 = tmp[0];
+  arg2 = tmp[1];
+}
+
+template<typename T>
+void Process::mp_min_for_each(T& arg1, T& arg2, T& arg3)
+{
+  T data[3] = {arg1, arg2, arg3};
+  T tmp[3];
+  const Comm_Group& grp = PE_Groups::current_group();
+  grp.mp_collective_op(data, tmp, 3, Comm_Group::COLL_MIN);
+  arg1 = tmp[0];
+  arg2 = tmp[1];
+  arg3 = tmp[2];
+}
+
+template<typename T>
+void Process::mp_min_for_each(T& arg1, T& arg2, T& arg3, T& arg4)
+{
+  T data[4] = {arg1, arg2, arg3, arg4};
+  T tmp[4];
+  const Comm_Group& grp = PE_Groups::current_group();
+  grp.mp_collective_op(data, tmp, 4, Comm_Group::COLL_MIN);
+  arg1 = tmp[0];
+  arg2 = tmp[1];
+  arg3 = tmp[2];
+  arg4 = tmp[3];
+}
+
+// 5-parameter versions
+template<typename T>
+void Process::mp_sum_for_each(T& arg1, T& arg2, T& arg3, T& arg4, T& arg5)
+{
+  T data[5] = {arg1, arg2, arg3, arg4, arg5};
+  T tmp[5];
+  const Comm_Group& grp = PE_Groups::current_group();
+  grp.mp_collective_op(data, tmp, 5, Comm_Group::COLL_SUM);
+  arg1 = tmp[0];
+  arg2 = tmp[1];
+  arg3 = tmp[2];
+  arg4 = tmp[3];
+  arg5 = tmp[4];
+}
+
+template<typename T>
+void Process::mp_max_for_each(T& arg1, T& arg2, T& arg3, T& arg4, T& arg5)
+{
+  T data[5] = {arg1, arg2, arg3, arg4, arg5};
+  T tmp[5];
+  const Comm_Group& grp = PE_Groups::current_group();
+  grp.mp_collective_op(data, tmp, 5, Comm_Group::COLL_MAX);
+  arg1 = tmp[0];
+  arg2 = tmp[1];
+  arg3 = tmp[2];
+  arg4 = tmp[3];
+  arg5 = tmp[4];
+}
+
+template<typename T>
+void Process::mp_min_for_each(T& arg1, T& arg2, T& arg3, T& arg4, T& arg5)
+{
+  T data[5] = {arg1, arg2, arg3, arg4, arg5};
+  T tmp[5];
+  const Comm_Group& grp = PE_Groups::current_group();
+  grp.mp_collective_op(data, tmp, 5, Comm_Group::COLL_MIN);
+  arg1 = tmp[0];
+  arg2 = tmp[1];
+  arg3 = tmp[2];
+  arg4 = tmp[3];
+  arg5 = tmp[4];
+}
 
 namespace
 {
@@ -220,19 +402,6 @@ trustIdType Process::mppartial_sum(trustIdType x)
   grp.mp_collective_op(&xx, &y, 1, Comm_Group::COLL_PARTIAL_SUM);
   return y;
 }
-
-void Process::mpsum_multiple(double& x1, double& x2)
-{
-  const Comm_Group& grp = PE_Groups::current_group();
-  double x[2];
-  double y[2];
-  x[0] = x1;
-  x[1] = x2;
-  grp.mp_collective_op(x, y, 2, Comm_Group::COLL_SUM);
-  x1 = y[0];
-  x2 = y[1];
-}
-
 
 /*! @brief Calcule le 'et' logique de b sur tous les processeurs du groupe courant.
  *
@@ -658,3 +827,41 @@ void change_disable_stop(int new_stop)
 {
   disable_stop_ = new_stop;
 }
+
+// Explicit template instantiations for mp_*_for_each_item
+template void Process::mp_sum_for_each_item<double>(TRUSTArray<double>&);
+template void Process::mp_sum_for_each_item<long>(TRUSTArray<long>&);
+template void Process::mp_sum_for_each_item<int>(TRUSTArray<int>&);
+template void Process::mp_max_for_each_item<double>(TRUSTArray<double>&);
+template void Process::mp_max_for_each_item<int>(TRUSTArray<int>&);
+template void Process::mp_min_for_each_item<double>(TRUSTArray<double>&);
+template void Process::mp_min_for_each_item<int>(TRUSTArray<int>&);
+
+// Explicit template instantiations for mp_*_for_each (C++14 overloads)
+// mp_sum_for_each
+template void Process::mp_sum_for_each<double>(double&, double&);
+template void Process::mp_sum_for_each<double>(double&, double&, double&);
+template void Process::mp_sum_for_each<double>(double&, double&, double&, double&);
+template void Process::mp_sum_for_each<double>(double&, double&, double&, double&, double&);
+template void Process::mp_sum_for_each<int>(int&, int&);
+template void Process::mp_sum_for_each<int>(int&, int&, int&);
+template void Process::mp_sum_for_each<int>(int&, int&, int&, int&);
+template void Process::mp_sum_for_each<int>(int&, int&, int&, int&, int&);
+// mp_max_for_each
+template void Process::mp_max_for_each<double>(double&, double&);
+template void Process::mp_max_for_each<double>(double&, double&, double&);
+template void Process::mp_max_for_each<double>(double&, double&, double&, double&);
+template void Process::mp_max_for_each<double>(double&, double&, double&, double&, double&);
+template void Process::mp_max_for_each<int>(int&, int&);
+template void Process::mp_max_for_each<int>(int&, int&, int&);
+template void Process::mp_max_for_each<int>(int&, int&, int&, int&);
+template void Process::mp_max_for_each<int>(int&, int&, int&, int&, int&);
+// mp_min_for_each
+template void Process::mp_min_for_each<double>(double&, double&);
+template void Process::mp_min_for_each<double>(double&, double&, double&);
+template void Process::mp_min_for_each<double>(double&, double&, double&, double&);
+template void Process::mp_min_for_each<double>(double&, double&, double&, double&, double&);
+template void Process::mp_min_for_each<int>(int&, int&);
+template void Process::mp_min_for_each<int>(int&, int&, int&);
+template void Process::mp_min_for_each<int>(int&, int&, int&, int&);
+template void Process::mp_min_for_each<int>(int&, int&, int&, int&, int&);

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,6 +17,7 @@
 #define TRUSTTab_tools_TPP_included
 
 #include <limits>
+#include <Process.h>
 
 // NB: all those methods are never used on big (64b) arrays, so the size type is always 'int'.
 
@@ -31,7 +32,7 @@ template <typename _T_>
 inline void mp_carre_norme_tab(const TRUSTTab<_T_,int>& tableau, TRUSTArray<_T_,int>& norme_colonne)
 {
   local_carre_norme_tab(tableau, norme_colonne);
-  mp_sum_for_each_item(norme_colonne);
+  Process::mp_sum_for_each_item(norme_colonne);
 }
 
 template <>
@@ -60,7 +61,7 @@ template <typename _T_>
 inline void mp_max_abs_tab(const TRUSTTab<_T_,int>& tableau, TRUSTArray<_T_,int>& max_colonne)
 {
   local_max_abs_tab(tableau, max_colonne);
-  mp_max_for_each_item(max_colonne);
+  Process::mp_max_for_each_item(max_colonne);
 }
 
 #ifndef LATATOOLS

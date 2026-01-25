@@ -348,8 +348,12 @@ void Piso::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pression,
       correction_en_vitesse += resu;
       // ajout des increments
 
-      vitesse_norme = mp_norme_vect(correction_en_vitesse);
-      pression_norme = mp_norme_vect(correction_en_pression);
+      // Optimization: combine 2 mp_norme_vect into 1 collective call
+      double vitesse_carre = local_carre_norme_vect(correction_en_vitesse);
+      double pression_carre = local_carre_norme_vect(correction_en_pression);
+      mp_sum_for_each(vitesse_carre, pression_carre);
+      vitesse_norme = sqrt(vitesse_carre);
+      pression_norme = sqrt(pression_carre);
 
       if ( (vitesse_norme>vitesse_norme_old) || (pression_norme>pression_norme_old) )
         {

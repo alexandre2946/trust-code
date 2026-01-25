@@ -192,9 +192,10 @@ void DP_Impose_VEF_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, c
                     (*mat)(N * (D * f + d) + n, N * (D * f + db) + n) -= nf(f, d) * nf(f, db) / fs(f) * pf(f) * DP(i, 1) * surf * fac_rho;
           }
 
-      bilan()(0) = Process::mp_max(num_faces.size() ? DP(0, 0) : -DBL_MAX);
-      bilan()(1) = Process::mp_max(num_faces.size() ? DP(0, 1) / rho : -DBL_MAX);
-      bilan()(3) = Process::mp_max(num_faces.size() ? DP(0, 2) * rho : -DBL_MAX);
+      bilan()(0) = num_faces.size() ? DP(0, 0) : -DBL_MAX;
+      bilan()(1) = num_faces.size() ? DP(0, 1) / rho : -DBL_MAX;
+      bilan()(3) = num_faces.size() ? DP(0, 2) * rho : -DBL_MAX;
+      Process::mp_max_for_each(bilan()(0), bilan()(1), bilan()(3));
       if (Process::me())
         bilan() = 0; //pour eviter un sommage en sortie
     }

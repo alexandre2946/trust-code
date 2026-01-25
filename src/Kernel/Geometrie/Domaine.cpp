@@ -1135,14 +1135,20 @@ void Domaine_32_64<_SZ_>::imprimer() const
   Cerr << "The extreme coordinates of the domain " << le_nom() << " are:" << finl;
   // Il n'existe pas de recherche du min et du max dans DoubleTab donc je code:
   DoubleTab BB = getBoundingBox();
+  ArrOfDouble bb_min(dimension), bb_max(dimension);
   for (int j=0; j<dimension; j++)
     {
-      double min_ = mp_min(BB(j,0));
-      double max_ = mp_max(BB(j,1));
+      bb_min[j] = BB(j,0);
+      bb_max[j] = BB(j,1);
+    }
+  Process::mp_min_for_each_item(bb_min);
+  Process::mp_max_for_each_item(bb_max);
+  for (int j=0; j<dimension; j++)
+    {
       if (j==0) Cerr << "x ";
       if (j==1) Cerr << "y ";
       if (j==2) Cerr << "z ";
-      Cerr << "is between " << min_ << " and " << max_ << finl;
+      Cerr << "is between " << bb_min[j] << " and " << bb_max[j] << finl;
     }
   Cerr << "==============================================" << finl;
   // We recompute volumes (cause stored in Domaine_VF and so not available from Domaine...):

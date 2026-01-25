@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -114,8 +114,8 @@ void  Champ_front_pression_from_u::mettre_a_jour(double tps)
       surf+=domaine_VF.face_surfaces(face);
       fluxb+=Flux(face,0);
     }
-  surf=mp_sum(surf);
-  fluxb=mp_sum(fluxb);
+  // Optimization: combine 2 mp_sum into 1 collective call
+  mp_sum_for_each(surf, fluxb);
   double u_moy=fluxb/surf;
 
 

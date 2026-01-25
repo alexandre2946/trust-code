@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -626,9 +626,11 @@ void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVec
               volume+=volume_controle_(i);
             }
         }
-      val_extraite = mp_sum(sum);
+      // Optimization: combine 2 mp_sum into 1 collective call
+      mp_sum_for_each(sum, volume);
+      val_extraite = sum;
       if (methode_=="moyenne_ponderee" || methode_=="weighted_average")
-        val_extraite /= mp_sum(volume);
+        val_extraite /= volume;
     }
   else if (methode_=="moyenne_ponderee_porosite" || methode_=="somme_ponderee_porosite" || methode_=="weighted_average_porosity" || methode_=="weighted_sum_porosity")
     {
@@ -682,9 +684,11 @@ void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVec
 
         }
 
-      val_extraite = mp_sum(sum);
+      // Optimization: combine 2 mp_sum into 1 collective call
+      mp_sum_for_each(sum, volume);
+      val_extraite = sum;
       if (methode_=="moyenne_ponderee_porosite" || methode_=="weighted_average_porosity")
-        val_extraite /= mp_sum(volume);
+        val_extraite /= volume;
     }
 
   else if (methode_=="somme" || methode_=="moyenne" || methode_=="sum" || methode_=="average")

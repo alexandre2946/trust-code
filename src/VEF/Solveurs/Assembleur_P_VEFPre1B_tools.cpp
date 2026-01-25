@@ -232,8 +232,13 @@ int verifier( const Assembleur_P_VEFPreP1B& ass,
               resu*=-1;
               // Cas ou la diagonale est *2, on corrige:
               if (est_egal(2*resu(i),resu2(i))) erreur(i)=0;
-              double erreur_absolue=mp_norme_vect(erreur);
-              double erreur_relative=erreur_absolue/(mp_norme_vect(resu2)+mp_norme_vect(resu)+DMINFLOAT);
+              // Optimization: combine 3 mp_norme_vect into 1 collective call
+              double erreur_carre = local_carre_norme_vect(erreur);
+              double resu2_carre = local_carre_norme_vect(resu2);
+              double resu_carre = local_carre_norme_vect(resu);
+              Process::mp_sum_for_each(erreur_carre, resu2_carre, resu_carre);
+              double erreur_absolue = sqrt(erreur_carre);
+              double erreur_relative = erreur_absolue / (sqrt(resu2_carre) + sqrt(resu_carre) + DMINFLOAT);
               double app=mp_prodscal(resu,pre);
               if(erreur_absolue>1.e-12 && erreur_relative>1.e-6)
                 {
