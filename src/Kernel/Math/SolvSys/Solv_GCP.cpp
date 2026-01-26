@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -466,12 +466,15 @@ int Solv_GCP::resoudre_(const Matrice_Base& matrice,
     {
       tmp_p_.inject_array(residu_, n_items_reels);
     }
-  double dold = mp_prodscal(residu_, tmp_p_);
 
+  // Reduce 3 mp_sum calls to 1 by using mp_sum_for_each
+  double dold = local_prodscal(residu_, tmp_p_);
   operator_negate(tmp_p_, VECT_REAL_ITEMS);
-
-  double norme = mp_norme_vect(residu_);
-  double norme_b = mp_norme_vect(resu_);
+  double norme = local_carre_norme_vect(residu_);
+  double norm_b = local_carre_norme_vect(resu_);
+  Process::mp_sum_for_each(dold, norme, norm_b);
+  norme = sqrt(norme);
+  double norme_b = sqrt(norm_b);
 
   if (limpr()==1)
     {
