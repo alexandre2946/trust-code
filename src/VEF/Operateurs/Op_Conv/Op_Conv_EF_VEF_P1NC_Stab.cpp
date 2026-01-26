@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -640,7 +640,7 @@ DoubleTab& Op_Conv_EF_VEF_P1NC_Stab::ajouter_partie_compressible(const DoubleTab
   const int vit_size0 = tab_vitesse.dimension(0);
   const int vit_size1 = tab_vitesse.dimension(1);
   Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__),
-                       Kokkos::MDRangePolicy<Kokkos::Rank<2>>({0, vit_size0}, {0, vit_size1}), KOKKOS_LAMBDA(
+                       Kokkos::MDRangePolicy<Kokkos::Rank<2>>({0, 0}, {vit_size0, vit_size1}), KOKKOS_LAMBDA(
                          const int i, const int j)
   {
     tab_vitesse_v(i,j)*=porosite_face_v(i);
