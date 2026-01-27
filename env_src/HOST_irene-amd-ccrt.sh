@@ -31,6 +31,8 @@ define_modules_config()
       # Contact support pour regler des crashes MPI sur 80 GPUs:
       module="gnu/8.3.0 nvhpc/23.7 mpi/openmpi/4.1.4 flavor/hcoll/cuda-12.2" && sw="hcoll/4.8.3221"
       module="gnu/14.1.0 nvhpc/25.7 mpi/openmpi/4.1.4" # Passage a Cuda 12.9 et NVHPC 25.7
+      # NVHPC installe avec 8.5.0 incompatible KK5.0+C++20:
+      echo "CUDAFLAGS=--gcc-toolchain=/ccc/products/gcc-14.1.0/system/default/bin/gcc" >> $env 
       [ "$TRUST_CUDA_CC" = "" ] && TRUST_CUDA_CC=70 # V100
    else
       module="gnu/11 mpi/openmpi/4.0.5 mkl/20.0.0"

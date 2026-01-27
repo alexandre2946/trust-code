@@ -30,6 +30,8 @@ define_modules_config()
       module="gnu/8.3.0 nvhpc/24.5 mpi/openmpi/4.1.4" && sw="flavor/ucx/cuda-12.4"
       #module="flavor/openmpi/cuda-12.4 nvhpc/24.5 mpi/openmpi/5.0.5" # Passage a Cuda 12.4 et OpenMPI 5.0.5 pour PETSc MPI GPU-Aware
       module="gnu/14.1.0 nvhpc/25.7 mpi/openmpi/4.1.4" # Passage a Cuda 12.9 et NVHPC 25.7
+      # NVHPC installe avec 8.5.0 incompatible KK5.0+C++20:
+      echo "CUDAFLAGS=--gcc-toolchain=/ccc/products/gcc-14.1.0/system/default/bin/gcc" >> $env 
       [ "$TRUST_CUDA_CC" = "" ] && TRUST_CUDA_CC=80 # A100
    else
       #module="intel/20.0.4 mpi/openmpi/4.0.5"

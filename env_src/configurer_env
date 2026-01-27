@@ -2021,7 +2021,7 @@ case $TRUST_ARCH_CC in
            CppFlags="-cuda" # nvc++ compile cuda code to avoid use of "nvcc -ccbin=nvc++"
            # Si CUDA_VERSION est specifie explicitement dans le HOST sinon on prend le SDK:
            [ "$CUDA_VERSION" = "" ] && CUDA_VERSION=`ls $CUDA_ROOT | grep "[0-9]\.[0-9]" | tail -1`
-           gpu=" -gpu=nordc,cc$TRUST_CUDA_CC,cuda$CUDA_VERSION"
+           gpu=" $CUDAFLAGS -gpu=nordc,cc$TRUST_CUDA_CC,cuda$CUDA_VERSION"
            CppFlags=$CppFlags$gpu
         fi
 	[ $HOST = jean-zay ] && [ "$TRUST_CUDA_CC" = 80 ] && CppFlags=$CppFlags" -tp=zen3" # Build sur AMD sinon illegal instruction
