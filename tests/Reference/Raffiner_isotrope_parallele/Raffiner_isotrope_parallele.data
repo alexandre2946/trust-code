@@ -20,8 +20,8 @@ Mailler initial_dom
         Bord Sortie  	X = 1.  0. <= Y <= 1.   0. <= Z <= 1
         Bord Box   	Y = 0.  0. <= X <= 1.  	0. <= Z <= 1
         Bord Box   	Y = 1.  0. <= X <= 1.  	0. <= Z <= 1
-        Bord Box  	Z = 0.  0. <= X <= 1.   0. <= Y <= 1.
-        Bord Box  	Z = 1 	0. <= X <= 1.   0. <= Y <= 1.
+        Bord Perio  	Z = 0.  0. <= X <= 1.   0. <= Y <= 1.
+        Bord Perio  	Z = 1 	0. <= X <= 1.   0. <= Y <= 1.
     }
 }
 Tetraedriser_par_prisme initial_dom
@@ -33,15 +33,18 @@ Ecrire_fichier initial_dom initial_dom.geom
 
 Read_file dom initial_dom.geom
 Raffiner_isotrope dom
+Corriger_frontiere_periodique { domaine dom bord Perio }
 # END MESH #
 
 # BEGIN PARTITION
+Corriger_frontiere_periodique { domaine initial_dom bord Perio }
 Partition initial_dom
 {
     Partition_tool metis { Nb_parts 4 }
     Larg_joint 2
     zones_name DOM
     single_hdf
+    periodique 1 Perio
 }
 End
 END PARTITION #
@@ -90,6 +93,7 @@ Read pb
         }
         boundary_conditions {
             Box  		paroi_fixe
+            Perio		periodique
             Sortie 		frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.
             Entree 		frontiere_ouverte_vitesse_imposee  Champ_front_Uniforme 3 1. 0. 0.
         }
@@ -101,6 +105,7 @@ Read pb
         boundary_conditions
         {
             Box 		paroi_temperature_imposee Champ_front_Uniforme 1 30.
+            Perio		periodique
             Sortie 		frontiere_ouverte_temperature_imposee Champ_front_Uniforme 1 20.
             Entree 		frontiere_ouverte_temperature_imposee Champ_front_Uniforme 1 20.
         }

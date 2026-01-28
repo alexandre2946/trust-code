@@ -14,6 +14,7 @@
 *****************************************************************************/
 
 #include <Raffiner_isotrope_parallele.h>
+#include <Reordonner_faces_periodiques.h>
 #include <LecFicDistribue.h>
 #include <EcrFicCollecte.h>
 #include <FichierHDFPar.h>
@@ -221,7 +222,7 @@ Entree&  Raffiner_isotrope_parallele::interpreter(Entree& is)
 
   if (!is_hdf)
     {
-      LecFicDistribue    fichier;
+      LecFicDistribue  fichier;
       fichier.set_bin(binaire);
       fichier.ouvrir(org);
       fichier >> dom_org;
@@ -235,21 +236,30 @@ Entree&  Raffiner_isotrope_parallele::interpreter(Entree& is)
       org = copy;
       fic_hdf.open(org, true);
       Entree_Brute data;
-
       fic_hdf.read_dataset("//zone", Process::me(), data);
-
       // Feed TRUST objects:
       data >> dom_org;
       dom_org.set_fichier_lu(org);
       data >> liste_bords_periodiques;
-
       fic_hdf.close();
     }
 
   Scatter::uninit_sequential_domain(dom_org);
   Domaine dom_new(dom_org);
-
+  dom_new.typer(dom_org.type_elem()->que_suis_je());
   refine_domain(dom_org,dom_new);
+
+  // After spliting the mesh and the boundaries, we reorder perdiodic faces:
+  for (auto nom_bord : liste_bords_periodiques)
+    {
+      Cerr << "Reordering faces of the periodic boundary " << nom_bord << finl;
+      ArrOfDouble direction_perio;
+      Reordonner_faces_periodiques::chercher_direction_perio(direction_perio, dom_new, nom_bord);
+      Bord& bord = dom_new.bord(nom_bord);
+      IntTab& faces = bord.faces().les_sommets();
+      Reordonner_faces_periodiques::reordonner_faces_periodiques(dom_new, faces, direction_perio, Objet_U::precision_geom);
+    }
+
   if (nproc() > 1)
     {
       Scatter::uninit_sequential_domain(dom_new);
@@ -304,6 +314,7 @@ Entree&  Raffiner_isotrope_parallele::interpreter(Entree& is)
             dom_new.les_elems().resize( nb_elem_reel,dom_new.les_elems().dimension(1));
             dom_new.les_sommets().resize(nb_sommet_avant_completion,dimension);
 
+
             Scatter::uninit_sequential_domain(dom_new);
             newd+=".Zones";
 
@@ -338,6 +349,5 @@ Entree&  Raffiner_isotrope_parallele::interpreter(Entree& is)
     {
       Scatter::init_sequential_domain(dom_new);
     }
-
   return is;
 }
