@@ -121,6 +121,6 @@ define_soumission_batch()
    mpirun="ccc_mprun $binding -n \$BRIDGE_MSUB_NPROC"
    sub=CCC
    espacedir="work,scratch"
-   project="dendm2s" 
+   project="desdm2s" 
    [ "$project" = "" ] && project=`PYTHONPATH=/usr/lib64/python2.7/site-packages ccc_myproject 2>/dev/null | $TRUST_Awk '/project/ {print $4;exit}'` # Add project
 }
