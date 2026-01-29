@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -27,7 +27,6 @@
 
 Implemente_instanciable_32_64(Raffiner_Simplexes_32_64,"Raffiner_Simplexes",Interprete_geometrique_base_32_64<_T_>) ;
 Add_synonym(Raffiner_Simplexes,"Raffiner_isotrope"); // Raffiner_Simplexes class replaces the obsolete Raffiner_isotrope class
-
 // XD raffiner_isotrope interprete raffiner_isotrope -1 For VDF and VEF discretizations, allows to cut triangles/quadrangles or tetrahedral/hexaedras elements respectively in 4 or 8 new ones by defining new summits located at the middle of edges (and center of faces and elements for quadrangles and hexaedra). Such a cut preserves the shape of original elements (isotropic). For 2D elements: \includepng{{raffinerisotrirect.jpeg}}{{6}} NL2 For 3D elements: \includepng{{raffinerisotetra.jpeg}}{{6}} NL2 \includepng{{raffinerisohexa.jpeg}}{{5}}.
 // XD attr domain_name ref_domaine domain_name 0 Name of domain.
 
@@ -224,7 +223,10 @@ int type_elem(const Nom& cell_type)
   understood_keywords[3] = "Hexaedre";
   understood_keywords[4] = "Quadrangle";
   understood_keywords[5] = "Hexaedre_VEF";
-  int rank = understood_keywords.search(cell_type);
+  Nom reduce_call_type(cell_type);
+  reduce_call_type.prefix("_64");
+  const Motcle c(reduce_call_type);
+  int rank = understood_keywords.search(c);
   if (rank>3) rank-=2;
   return rank;
 }
@@ -725,6 +727,12 @@ void Impl_32_64<_SIZE_>:: build_cells(const IntTab_t& nodes_of_cells_src, const 
   const int nb_nodes_per_cell         = nodes_of_cells_src.dimension_int(1);
   const int nb_refined_cells_per_cell = pattern.dimension(0);
 
+  if (std::is_same<_SIZE_, int>::value)
+    {
+      _SIZE_ size = (_SIZE_) (nb_cells_src * nb_refined_cells_per_cell);
+      if (size < 0)
+        Process::exit("Refined mesh too big ! Update your data file by using int64 geometric interpretors, like Domaine_64, Mailler_64, Raffiner_simplexes_64, Partition_64.");
+    }
   nodes_of_cells_dest.resize(nb_cells_src * nb_refined_cells_per_cell, nb_nodes_per_cell);
 
   int_t nb_cells_dest = 0;

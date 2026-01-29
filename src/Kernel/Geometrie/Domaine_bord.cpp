@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -139,7 +139,9 @@ void Domaine_bord_32_64<_SIZE_>::extraire_domaine_bord(const Domaine_t& src,
   // Type des elements du domaine dest:
   Motcle type_elem;
   type_face_to_type_elem(src.type_elem().valeur(), src.type_elem()->type_face(), type_elem);
-  dest.type_elem().typer(type_elem);
+  const std::string suff = !std::is_same<_SIZE_, int>::value ? "_64" : "";
+  Nom type_elem_64 = type_elem + suff;
+  dest.type_elem().typer(type_elem_64);
   dest.type_elem()->associer_domaine(dest);
 
   const Frontiere_t& front = src.frontiere(nom_bord);

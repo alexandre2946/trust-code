@@ -1,0 +1,52 @@
+# Check geometric interprets on big mesh, so with _64 # 
+
+dimension 3
+
+# VDF domain #
+Domaine_64 dom
+
+Mailler_64 dom
+{
+    Pave_64 Cavite
+    {
+        Origine 0. 0. 0.
+        Nombre_de_Noeuds 5 5 5
+        Longueurs 1 1 1
+    }
+    {
+        Bord entree   	X = 0.   	0. <= Y <= 1.    	0. <= Z <= 1.
+        Bord sortie  	X = 1.  	0. <= Y <= 1.   	0. <= Z <= 1.
+        Bord paroiY   	Y =  0.  	0. <= X <= 1.  		0. <= Z <= 1.
+        Bord paroiY   	Y =  1.  	0. <= X <= 1.  		0. <= Z <= 1.
+        Bord symetrie   Z =  0.  	0. <= X <= 1.  		0. <= Y <= 1.
+        Bord paroi   	Z =  1.  	0. <= X <= 1.   	0. <= Y <= 1.
+    }
+}
+Raffiner_simplexes_64 dom
+
+Partition_64 dom
+{
+    Partition_tool metis_64 { nb_parts 4 }
+    single_hdf
+    Larg_joint 2
+    zones_name DOM
+    periodique 1 paroiY
+}
+
+# VEF domain #
+lire_med_64 { domaine dom file tetra.med }
+
+RegroupeBord_64 dom perioz { entree sortie }
+
+Raffiner_simplexes_64 dom
+
+Corriger_frontiere_periodique_64 { domaine dom bord paroiY }
+
+Decouper_64 dom	{
+	partitionneur metis_64 { Nb_parts 3 }
+	larg_joint 2
+	single_hdf
+	nom_Zones dom
+	periodique 1 paroiY
+}
+Fin

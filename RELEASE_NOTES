@@ -1,4 +1,5 @@
-XX/XX/26 (TURST) Bug fix      : Raffiner_isotrope_parallele couldn't be used on a mesh with periodic boundaries
+XX/XX/26 (TRUST) Bug fix      : Add test to check several int64 geometric interpretors and fix some of them (Corriger_Frontiere_Periodique_64, Raffiner_Simplexes_64)
+XX/XX/26 (TRUST) Bug fix      : Raffiner_isotrope_parallele couldn't be used on a mesh with periodic boundaries
 XX/XX/26 (TRUST) Performance  : Reduce MPI communications in several parts of the code especially in TRUST GMRES, CG solvers and matrix-free CG used in diffusive-implicited scheme
 XX/XX/26 (TRUST) Change       : Bug fixed in VDF for the distance to the wall compute used by some turbulence models
 XX/XX/26 (TRUST) Performance  : Fix slow TrioCFD initialization for K-Omega calculation
