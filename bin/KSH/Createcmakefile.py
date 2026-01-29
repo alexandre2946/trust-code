@@ -322,7 +322,7 @@ if(NOT VISUAL)
     set(TRUST_CGNS_ROOT $ENV{TRUST_CGNS_ROOT})
     set(TRUST_MEDCOUPLING_ROOT $ENV{TRUST_MEDCOUPLING_ROOT})
     set(TRUST_KOKKOS_ROOT $ENV{TRUST_KOKKOS_ROOT})
-
+    set(CUDA_ROOT $ENV{CUDA_ROOT})
     set(LIBRARY_OUTPUT_PATH ${TRUST_ROOT}/lib)
     set(EXECUTABLE_OUTPUT_PATH ${TRUST_ROOT}/exec)
 
@@ -339,20 +339,35 @@ if(NOT VISUAL)
     #
     # Find external (pre-requisite) libraries
     #
-    foreach(liba ${list_libs})
-        find_library( lib${liba} NAMES lib${liba}.a lib${liba}.so lib${liba}.dylib PATHS ${list_path_libs} NO_DEFAULT_PATH )
-        if (${lib${liba}} STREQUAL lib${liba}-NOTFOUND)
-           find_library( lib${liba} NAMES ${liba} PATHS ${list_path_sys} REQUIRED)
-        endif(${lib${liba}} STREQUAL lib${liba}-NOTFOUND)
-        # pour supermuc on cherche ligfortran.so.3  en dur
-        #if (${liba} STREQUAL gfortran)
-        #  if (${lib${liba}} STREQUAL libgfortran-NOTFOUND)
-        #    find_library( lib${liba} NAMES  libgfortran.so.3 PATHS ${list_path_sys} )
-        #  endif()
-        #endif()
-        mark_as_advanced(lib${liba})
-        set(libs ${libs} ${lib${liba}})
-    endforeach()
+foreach(lib ${list_libs})
+
+  if (lib STREQUAL "nvidia-ml")
+    set (lib${lib} /usr/lib64/libnvidia-ml.so.1) # PC, some clusters
+    if(NOT EXISTS ${lib${lib}}) # Other clusters, cmake can't find this sh.t
+       set (lib${lib} ${TRUST_ROOT}/lib/libnvidia-ml.so.1)
+    endif()   
+  else()
+    find_library(
+      lib${lib}
+      NAMES lib${lib}.a lib${lib}.so lib${lib}.dylib
+      PATHS ${list_path_libs}
+      NO_DEFAULT_PATH
+    )
+  endif()
+
+  if (${lib${lib}} STREQUAL lib${lib}-NOTFOUND)
+    find_library(
+      lib${lib}
+      NAMES ${lib}
+      PATHS ${list_path_sys}
+      REQUIRED
+    )
+  endif()
+#message(${lib${lib}})
+  mark_as_advanced(lib${lib})
+  list(APPEND libs ${lib${lib}})
+
+endforeach()
 
 else(NOT VISUAL)
     include(windows/CMake.win)

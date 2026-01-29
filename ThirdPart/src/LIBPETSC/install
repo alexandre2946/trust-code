@@ -69,6 +69,7 @@ add_package()
 DIR=`dirname $0`
 DIR=`(cd $DIR;pwd)`
 mkdir -p ${PETSC_ROOT}
+rm -rf $TRUST_TMP/build
 mkdir -p $TRUST_TMP/build
 cd $TRUST_TMP/build
 
@@ -304,9 +305,10 @@ then
       # PL: Avec spack (JeanZay, orcus), erreur libcuda.so.1 not found qui fait ch..r (plantage de l'installation de ptscotch et magma)
       # See https://github.com/spack/spack/issues/42825
       ln -s -f $CUDA_ROOT/lib64/stubs/libcuda.so libcuda.so.1
-      ln -s -f $CUDA_ROOT/lib64/stubs/libnvidia-ml.so libnvidia-ml.so.1
       export LD_LIBRARY_PATH=`pwd`:$LD_LIBRARY_PATH
    fi
+   # Hack for this sh.t :
+   [ ! -f /usr/lib64/libnvidia-ml.so.1 ] && cp -f $TRUST_ROOT/ThirdPart/src/LIBPETSC/libnvidia-ml.so.1 $TRUST_LIB/libnvidia-ml.so.1
    echo "CUDA support for PETSc with: "$with_gpu
 elif [ "$TRUST_USE_ROCM" = 1 ]
 then
