@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -1061,6 +1061,7 @@ int Probleme_base::postraiter(int force)
     imprimer(Cout);
   if (force)
     {
+      if (Process::nproc()>=100) Cerr << "[Post] Probleme_base::postraiter... " << finl;
       //Les sources postraitables (Terme_Source_Acceleration) ne sont pas mis a jour
       //pour le temps final et ne font pas partie des champs_crees_ du postraitement
       //qui eux sont mis a jour par les_postraitements.mettre_a_jour.
@@ -1087,6 +1088,7 @@ int Probleme_base::postraiter(int force)
           if (est_egal(t_init, t_max))
             indice_tps_final = true;
         }
+      if (Process::nproc()>=100) Cerr << "[Post] Done in " << statistics().get_time_since_last_open(STD_COUNTERS::postreatment) << " s. If too slow consider using CGNS format." << finl;
     }
   else
     les_postraitements_.traiter_postraitement();
