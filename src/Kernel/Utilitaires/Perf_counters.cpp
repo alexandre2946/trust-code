@@ -1337,7 +1337,7 @@ void Perf_counters::Impl::print_global_TU(const std::string& message)
       if(message == "Time loop statistics" && c_total_time.total_time_.count()>1.0e-12 && c_timeloop.total_time_.count()>1.0e-12)
         {
           total_time = c_total_time.total_time_.count();
-          double other = total_time/nb_ts;
+          double other = time_tl/nb_ts;
           perfs_TU<<std::endl;
           perfs_TU << std::left <<std::setw(counter_description_width) << "Standard counter description" << separator << std::setw(time_per_step_width) << "Time/step" << separator << std::setw(percent_loop_time_width) << "% loop time" << separator << std::setw(count_per_ts_width) << "Call(s)/step"<<std::endl;
           perfs_TU << line_sep_tabular << std::endl;
