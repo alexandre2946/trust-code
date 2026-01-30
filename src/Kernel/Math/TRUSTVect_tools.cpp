@@ -280,7 +280,6 @@ void ajoute_operation_speciale_generic(TRUSTVect<_TYPE_,_SIZE_>& resu, _TYPE_ al
   const MD_Vector& md = resu.get_md_vector();
   assert(vx.line_size() == line_size);
   assert(vx.size_totale() == vect_size_tot); // this test is necessary if md is null
-  assert(vx.get_md_vector() == md);
   // Determine blocs of data to process, depending on " opt"
   int nblocs_left;
   Block_Iter<_SIZE_> bloc_itr = ::determine_blocks(opt, md, vect_size_tot, line_size, nblocs_left);

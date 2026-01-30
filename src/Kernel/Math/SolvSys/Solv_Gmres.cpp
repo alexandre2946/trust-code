@@ -156,6 +156,8 @@ int Solv_Gmres::gmres_local(const Matrice_Morse& A, const DoubleVect& b, DoubleV
       v.dimensionner(nkr);                         // Krilov vectors
       h.resize(nkr + 1, nkr);                // Heisenberg maatrix of coefficients
       r.resize(nkr + 1);
+      h_loc.resize(nkr);
+      dh_loc.resize(nkr+1);
     }
 
   if (tab_Diag.size_array()!=ns)
@@ -184,7 +186,6 @@ int Solv_Gmres::gmres_local(const Matrice_Morse& A, const DoubleVect& b, DoubleV
   A.multvect_(tab_x,tab_v0);
   tab_v0 *= -1.;
   tab_v0 += b;
-  //tab_v0.echange_espace_virtuel(); // PL useless
 
   // Reduce 2 mp_sum calls to 1 by computing local norms before and after GPU kernel
   double res0 = local_carre_norme_vect(tab_v0);
@@ -216,6 +217,7 @@ int Solv_Gmres::gmres_local(const Matrice_Morse& A, const DoubleVect& b, DoubleV
     }
   rec_min = (rec_min<res*epsGMRES) ? res*epsGMRES : rec_min;
   rec_min = (rec_min<rec_max) ? rec_min : rec_max ;
+  bool legacy = getenv("TRUST_GMRES_REDUCE_COLLECTIVES") == nullptr;
 
   // iterations
   for(int it=0; it<nit; it++)
@@ -232,7 +234,6 @@ int Solv_Gmres::gmres_local(const Matrice_Morse& A, const DoubleVect& b, DoubleV
         {
           tab_v0.echange_espace_virtuel();
           A.multvect_(tab_v0,tab_v1);
-          //tab_v1.echange_espace_virtuel(); Useless ?
           {
             CDoubleArrView Diag = tab_Diag.view_ro();
             DoubleArrView v1 = tab_v1.view_rw();
@@ -247,24 +248,43 @@ int Solv_Gmres::gmres_local(const Matrice_Morse& A, const DoubleVect& b, DoubleV
           tab_v0 = tab_v1 ;
           // Modifie par DJ
           //---------------
-          for(int i=0; i<=j; i++)
+          double tem;
+          if (legacy)
             {
-              DoubleVect& tab_vvi=v[i];
-              h(i,j) += mp_prodscal(tab_v0,tab_vvi);
-              double hij = h(i,j);
-              {
-                CDoubleArrView vvi = tab_vvi.view_ro();
-                DoubleArrView v0 = tab_v0.view_rw();
-                Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), ns, KOKKOS_LAMBDA(
-                                       const int ii)
+              // GMRES using classical Gram–Schmidt
+              for (int i = 0; i <= j; i++)
                 {
-                  v0(ii) -= hij * vvi(ii);
-                });
-                end_gpu_timer(__KERNEL_NAME__);
-              }
-              //tab_v0.echange_espace_virtuel(); Useless ?
+                  h(i, j) += mp_prodscal(tab_v0, v[i]);
+                  tab_v0.ajoute(-h(i, j), v[i], VECT_REAL_ITEMS);
+                }
+              tem=mp_norme_vect(tab_v0);
             }
-          double tem=mp_norme_vect(tab_v0);
+          else
+            {
+              // Communication-reduced GMRES using classical Gram–Schmidt with reorthogonalization (CGS-2), reducing global MPI collectives but at higher computational cost
+              // Compute local dot products
+              for (int i = 0; i <= j; i++)
+                h_loc[i] = local_prodscal(tab_v0, v[i]);
+              Process::mp_sum_for_each_item(h_loc, j+1); // One collective
+              // Orthoganalization
+              for (int i = 0; i <= j; i++)
+                {
+                  h(i, j) = h_loc[i]; // Store in Hessenberg
+                  tab_v0.ajoute(-h(i, j), v[i], VECT_REAL_ITEMS);
+                }
+              // Compute correction terms
+              for (int i = 0; i <= j; i++)
+                dh_loc[i] = local_prodscal(tab_v0, v[i]);
+              dh_loc[j + 1] = local_carre_norme_vect(tab_v0);
+              Process::mp_sum_for_each_item(dh_loc, j+2); // One collective
+              // Accumulate + correct
+              for (int i = 0; i <= j; i++)
+                {
+                  h(i, j) += dh_loc[i];
+                  tab_v0.ajoute(-dh_loc[i], v[i], VECT_REAL_ITEMS);
+                }
+              tem=std::sqrt(dh_loc[j + 1]); // Save one more collective
+            }
 
           h(j+1,j) = tem;
           if(tem<rec_min)
@@ -300,20 +320,8 @@ l5:
             r[i0] -= h(i0,i)* r[i];
         }
       for(int i=0; i<nk; i++)
-        {
-          DoubleVect& tab_vvi=v[i];
-          double ri = r[i];
-          {
-            CDoubleArrView vvi = tab_vvi.view_ro();
-            DoubleArrView x1 = tab_x.view_rw();
-            Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), ns, KOKKOS_LAMBDA(
-                                   const int ii)
-            {
-              x1(ii) += ri * vvi(ii);
-            });
-            end_gpu_timer(__KERNEL_NAME__);
-          }
-        }
+        tab_x.ajoute(r[i], v[i], VECT_REAL_ITEMS);
+
       tab_x.echange_espace_virtuel();
       A.multvect_(tab_x,tab_v0);
       tab_v0 *= -1. ;

@@ -137,11 +137,11 @@ public:
   static void mp_min_for_each(T& arg1, T& arg2, T& arg3, T& arg4, T& arg5);
   // Reduction on values of a TRUSTArray
   template<typename _TYPE_>
-  static void mp_sum_for_each_item(TRUSTArray<_TYPE_>& x);
+  static void mp_sum_for_each_item(TRUSTArray<_TYPE_>& x, int n=-1);
   template<typename _TYPE_>
-  static void mp_max_for_each_item(TRUSTArray<_TYPE_>& x);
+  static void mp_max_for_each_item(TRUSTArray<_TYPE_>& x, int n=-1);
   template<typename _TYPE_>
-  static void mp_min_for_each_item(TRUSTArray<_TYPE_>& x);
+  static void mp_min_for_each_item(TRUSTArray<_TYPE_>& x, int n=-1);
 
   static bool mp_and(bool);
   static bool mp_or(bool);

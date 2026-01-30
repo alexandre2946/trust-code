@@ -174,9 +174,9 @@ trustIdType Process::mp_sum(trustIdType x)
 }
 
 template<typename _TYPE_>
-void mp_collective_op_arr(TRUSTArray<_TYPE_>& x, Comm_Group::Collective_Op op)
+void mp_collective_op_arr(TRUSTArray<_TYPE_>& x, Comm_Group::Collective_Op op, int n)
 {
-  int sz = x.size_array();
+  int sz = n==-1 ? x.size_array() : n;
   assert_parallel<_TYPE_>(sz);
   if (sz > 0)
     {
@@ -190,13 +190,13 @@ void mp_collective_op_arr(TRUSTArray<_TYPE_>& x, Comm_Group::Collective_Op op)
 }
 
 template<typename _TYPE_>
-void Process::mp_sum_for_each_item(TRUSTArray<_TYPE_>& x) { mp_collective_op_arr(x, Comm_Group::COLL_SUM); }
+void Process::mp_sum_for_each_item(TRUSTArray<_TYPE_>& x, int n) { mp_collective_op_arr(x, Comm_Group::COLL_SUM, n); }
 
 template<typename _TYPE_>
-void Process::mp_max_for_each_item(TRUSTArray<_TYPE_>& x) { mp_collective_op_arr(x, Comm_Group::COLL_MAX); }
+void Process::mp_max_for_each_item(TRUSTArray<_TYPE_>& x, int n) { mp_collective_op_arr(x, Comm_Group::COLL_MAX, n); }
 
 template<typename _TYPE_>
-void Process::mp_min_for_each_item(TRUSTArray<_TYPE_>& x) { mp_collective_op_arr(x, Comm_Group::COLL_MIN); }
+void Process::mp_min_for_each_item(TRUSTArray<_TYPE_>& x, int n) { mp_collective_op_arr(x, Comm_Group::COLL_MIN, n); }
 
 /*! @brief C++14 compatible mp_sum_for_each: combine multiple mp_sum calls into one collective operation
  *  Usage: mp_sum_for_each(a, b); mp_sum_for_each(a, b, c); mp_sum_for_each(a, b, c, d); mp_sum_for_each(a, b, c, d, e);
@@ -829,13 +829,13 @@ void change_disable_stop(int new_stop)
 }
 
 // Explicit template instantiations for mp_*_for_each_item
-template void Process::mp_sum_for_each_item<double>(TRUSTArray<double>&);
-template void Process::mp_sum_for_each_item<long>(TRUSTArray<long>&);
-template void Process::mp_sum_for_each_item<int>(TRUSTArray<int>&);
-template void Process::mp_max_for_each_item<double>(TRUSTArray<double>&);
-template void Process::mp_max_for_each_item<int>(TRUSTArray<int>&);
-template void Process::mp_min_for_each_item<double>(TRUSTArray<double>&);
-template void Process::mp_min_for_each_item<int>(TRUSTArray<int>&);
+template void Process::mp_sum_for_each_item<double>(TRUSTArray<double>&, int);
+template void Process::mp_sum_for_each_item<long>(TRUSTArray<long>&, int);
+template void Process::mp_sum_for_each_item<int>(TRUSTArray<int>&, int);
+template void Process::mp_max_for_each_item<double>(TRUSTArray<double>&, int);
+template void Process::mp_max_for_each_item<int>(TRUSTArray<int>&, int);
+template void Process::mp_min_for_each_item<double>(TRUSTArray<double>&, int);
+template void Process::mp_min_for_each_item<int>(TRUSTArray<int>&, int);
 
 // Explicit template instantiations for mp_*_for_each (C++14 overloads)
 // mp_sum_for_each
