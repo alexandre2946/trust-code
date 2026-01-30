@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -227,6 +227,7 @@ void Domain_Graph::construire_graph_elem_elem(const Domaine_32_64<_SIZE_>& dom,
     construire_connectivite_som_elem(dom.nb_som(), elem_som, som_elem,
                                      0 /* ne pas inclure les elements virtuels */);
 
+  Process::imprimer_ram_totale();
   int_t nb_connexions_perio = 0;
   if (liste_bords_periodiques.size() > 0)
     {
@@ -285,6 +286,7 @@ void Domain_Graph::construire_graph_elem_elem(const Domaine_32_64<_SIZE_>& dom,
   else
     vtxdist[Process::nproc()] =  Process::mp_sum(nb_elem);
 
+  Process::imprimer_ram_totale();
   Cerr << " Construction of the elem_elem connectivity" << finl;
   // ***************************************************************
   // DEUXIEME ETAPE: remplissage du graph
@@ -476,7 +478,7 @@ void Domain_Graph::construire_graph_elem_elem(const Domaine_32_64<_SIZE_>& dom,
            << finl;
       Process::exit();
     }
-
+  Process::imprimer_ram_totale();
 }
 
 
