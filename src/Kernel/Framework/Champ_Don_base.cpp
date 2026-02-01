@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,6 +14,7 @@
 *****************************************************************************/
 
 #include <Champ_Don_base.h>
+#include <Check_espace_virtuel.h>
 
 Implemente_base(Champ_Don_base,"Champ_Don_base",Champ_base);
 // XD champ_don_base field_base champ_don_base -1 Basic class for data fields (not calculated), p.e. physics properties.
@@ -57,7 +58,6 @@ Champ_base& Champ_Don_base::affecter_compo(const Champ_base&, int)
 void Champ_Don_base::mettre_a_jour(double t)
 {
   changer_temps(t);
-  valeurs_.echange_espace_virtuel();
 }
 
 /*!
