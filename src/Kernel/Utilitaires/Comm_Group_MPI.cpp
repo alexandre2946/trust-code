@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -160,26 +160,43 @@ void Comm_Group_MPI::mp_collective_op_template(const _TYPE_ *x, _TYPE_ *resu, in
   static_assert(TYP_IDX >= 1 && TYP_IDX <= 4, "Invalid type index!");
   MPI_Datatype mpi_typ = TYP_IDX==1 ? MPI_INT : (TYP_IDX==2 ? MPI_LONG : (TYP_IDX==3 ? MPI_DOUBLE : MPI_FLOAT));
   if (n <= 0) return;
+  double s = -1;
+  bool clock_on = statistics().is_gpu_verbose_on() && Process::je_suis_maitre();
   switch(op)
     {
     case Comm_Group::COLL_SUM:
       statistics().begin_count(STD_COUNTERS::mpi_sumdouble);
       mpi_error(MPI_Allreduce(x, resu, n, mpi_typ, MPI_SUM, mpi_comm_));
+      if (clock_on && statistics().is_running(STD_COUNTERS::mpi_sumdouble))
+        s = statistics().get_time_since_last_open(STD_COUNTERS::mpi_sumdouble);
       statistics().end_count(STD_COUNTERS::mpi_sumdouble);
       break;
     case Comm_Group::COLL_MIN:
       statistics().begin_count(STD_COUNTERS::mpi_mindouble);
       mpi_error(MPI_Allreduce(x, resu, n, mpi_typ, MPI_MIN, mpi_comm_));
+      if (clock_on && statistics().is_running(STD_COUNTERS::mpi_mindouble))
+        s = statistics().get_time_since_last_open(STD_COUNTERS::mpi_mindouble);
       statistics().end_count(STD_COUNTERS::mpi_mindouble);
       break;
     case Comm_Group::COLL_MAX:
       statistics().begin_count(STD_COUNTERS::mpi_maxdouble);
       mpi_error(MPI_Allreduce(x, resu, n, mpi_typ, MPI_MAX, mpi_comm_));
+      if (clock_on && statistics().is_running(STD_COUNTERS::mpi_maxdouble))
+        s = statistics().get_time_since_last_open(STD_COUNTERS::mpi_maxdouble);
       statistics().end_count(STD_COUNTERS::mpi_maxdouble);
       break;
     case Comm_Group::COLL_PARTIAL_SUM:
       internal_collective(x, resu, n, &op, -1 /* only one operation */, 0 /* recursion level */);
       break;
+    }
+  if (s>0) // Affichage
+    {
+      std::string clock(Process::is_parallel() ? "[clock]#" + std::to_string(Process::me()) : "[clock]  ");
+      std::string mpi_reduce = "mp_sum";
+      if (op==Comm_Group::COLL_MIN)  mpi_reduce = "mp_min";
+      else if (op==Comm_Group::COLL_MAX)  mpi_reduce = "mp_max";
+      printf("%s %7.3f ms [MPI]    %s\n", clock.c_str(), 0.001 * s, mpi_reduce.c_str());
+      fflush(stdout);
     }
 }
 #endif
@@ -394,6 +411,13 @@ void Comm_Group_MPI::send_recv_finish() const
 #ifdef MPI_
   assert(mpi_nrequests_ >= 0);
   mpi_error(MPI_Waitall(mpi_nrequests_, mpi_requests_, mpi_status_));
+  if (statistics().is_gpu_verbose_on() && Process::je_suis_maitre()) // Affichage
+    {
+      std::string clock(Process::is_parallel() ? "[clock]#" + std::to_string(Process::me()) : "[clock]  ");
+      double ms = 0.001 * statistics().get_time_since_last_open(STD_COUNTERS::mpi_sendrecv) ;
+      printf("%s %7.3f ms [MPI]   Comm_Group_MPI::exchange\n", clock.c_str(), ms);
+      fflush(stdout);
+    }
   statistics().end_count(STD_COUNTERS::mpi_sendrecv,mpi_nrequests_,current_msg_size_);
   /*
   for (int r=0;r<mpi_nrequests_;r++)
