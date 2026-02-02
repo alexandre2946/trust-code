@@ -16,9 +16,11 @@
 #include <TRUSTVect.h>
 #include <TRUSTVect_tools.tpp>
 #include <TRUSTTabs.h>
+#ifndef LATATOOLS
 #include <View_Types.h>
-#include <MD_Vector_seq.h>
 #include <TRUSTTrav.h>
+#endif
+#include <MD_Vector_seq.h>
 
 #ifndef LATATOOLS
 #include <Perf_counters.h>

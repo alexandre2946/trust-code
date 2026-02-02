@@ -256,6 +256,7 @@ private:
   int myRealSize;
   int myMaxSizeInt;
   Field myField;
+  file_pos_t size_file;
   std::string myInFile;
 
   bool myIsC3;
@@ -338,11 +339,14 @@ public:
   template <typename _TYPE_> void getInterpolatedValuesVarField(const std::string& name_stack, const std::string& name_field, std::vector<_TYPE_>& data, const int& global_id_time) const;
   void getInterpolatedValuesVarPos(const std::string& name_stack, const std::string& name_field, std::vector<float>& data) const;
   void getInterpolatedValuesVarPos(const std::string& name_stack, const std::string& name_field, std::vector<double>& data) const;
+  template <typename _TYPE1_, typename _TYPE2_> void getPosAndValuesLine3d(const std::string& elem, const std::string& field, int dir, float x, float y,float z, const float& time,  std::vector<_TYPE1_>& pos, std::vector<_TYPE2_>& data) const;
   int getIndexFromPos(const std::string& name_stack, const std::string& name_field, const double& x, const double& y, const double& z) const;
   std::vector<std::vector<float>>  getXYZS(const std::string& name_stack, const std::string& name_field) const;
   int getIndexFromPos(const std::string& name_stack, const std::string& name_field, const double& x, const double& y, const double& z, const  std::vector<std::vector<float>>& xyzs, int& i,int& j,int& k, int control =1) const;
   int getIndexFromPos(const std::string& name_stack, const std::string& name_field, const double& pos) const ;
-  float getPosFromIndex(const std::string& name_stack, const std::string& name_field, int index) const;
+  std::vector<int> getIJKFromIndex(const std::string& name_stack, const std::string& name_field, int index) const;
+  std::vector<int> getIJKFromPos(const std::string& name_stack, const std::string& name_field, const double& x, const double& y, const double& z ) const;
+  std::vector<float> getPosFromIndex(const std::string& name_stack, const std::string& name_field, int index) const;
   int getIndexFromTime(const std::string& name_stack, const double& t, const std::string& method="") const;
 
 
@@ -392,5 +396,7 @@ public:
   };
   BasicMesh getMeshStack(const std::string& name_stack) const;
   bool is3D(const std::string& name_stack) const;
+protected:
+  BasicMesh getMeshStack_(const std::string& name_stack, bool incomplet) const;
 };
 #endif

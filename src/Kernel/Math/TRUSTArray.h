@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -26,11 +26,11 @@
 #include <TRUSTTabs_forward.h>
 
 #include <Device.h>
-#include <View_Types.h>  // Kokkos stuff
 
 //Booleans for checking if an execution space is host or device
 #ifndef LATATOOLS
 
+#include <View_Types.h>  // Kokkos stuff
 //When compiled on CPU, DefaultExecutionSpace=DefaultHostExecutionSpace = serial or OpenMP
 //When compiled on GPU, DefaultExecutionSpace=Cuda, DefaultHostExecutionSpace=serial or OpenMP
 
@@ -415,7 +415,9 @@ using BigArrOfTID = BigTRUSTArray<trustIdType>;
  * ******************************* */
 
 #include <TRUSTArray_device.tpp> // OMP stuff
+#ifndef LATATOOLS
 #include <TRUSTArray_kokkos.tpp> // Kokkos stuff
+#endif
 
 #include <TRUSTArray.tpp> // The rest here!
 

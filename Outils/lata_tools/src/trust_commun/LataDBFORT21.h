@@ -83,7 +83,7 @@ void LataDB::read_master_file_fort21(const char *prefix, const char *filename)
       ReaderFORT21::BasicMesh mesh= parser.getMeshStack(geoms[i]);
 
       if (Nom(filename).finit_par(".21"))
-        if (Nom(filename)!="FORT.21")
+        if (!Nom(filename).finit_par("FORT.21"))
           {
             if (!Nom(filename).finit_par(Nom(geoms[i])+Nom(".21")))
               {
@@ -198,9 +198,15 @@ void LataDB::read_master_file_fort21(const char *prefix, const char *filename)
           for (unsigned int  index=0; index<times.size(); index++)
             {
               file_pos_t fp;
+	      if (indexf>=int(timesf.size()))
+	      {
+		indexf--;
+                  Journal(0) << geomname<< " "<< fields[i]<<" We use time "<< timesf[indexf] <<" for " << times[index]<<std::endl;
+	      }
               fp  = parser.getOffsetVarField(geomname,fields[i],indexf) ;
               som.datatype_.file_offset_ = fp;
               add(index+1,som);
+	      
               if (times[index]<timesf[indexf])
                 {
                   Journal(0) <<" We use time "<< timesf[indexf] <<" for " << times[index]<<std::endl;

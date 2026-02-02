@@ -16,7 +16,9 @@
 #include <arch.h>
 #include <TRUSTArray.h>
 #include <string.h>
+#ifdef TRUST_USE_GPU
 #include <DeviceMemory.h>
+#endif
 
 #ifndef LATATOOLS
 #include <Perf_counters.h>

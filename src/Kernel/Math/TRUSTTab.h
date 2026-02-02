@@ -20,7 +20,6 @@
 #include <TRUSTVect.h>
 #include <math.h>
 
-#include <View_Types.h>  // Kokkos stuff
 
 /*! @brief : Tableau a n entrees pour n<= 4.
  *

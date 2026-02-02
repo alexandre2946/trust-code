@@ -17,8 +17,6 @@ using namespace MEDCoupling;
 %include "medcoupling++.h"
 #ifndef __CYGWIN__
 
-%include "MEDCouplingCommon.i"
-
 %inline %{
 int GetNumberOfTimeSteps(const char* file)
 {

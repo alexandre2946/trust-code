@@ -19,7 +19,6 @@
 #include <math.h>
 #include <algorithm>
 #include <cmath>
-#include <kokkos++.h>
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Nom,"Nom",Objet_U);
 // XD nom objet_u nom 0 Class to name the TRUST objects.
@@ -55,9 +54,6 @@ Entree& Nom::readOn(Entree& s)
     operator=("??");
   return s;
 }
-
-//// Nom()
-//
 
 /*! @brief Constructeur par defaut.
  *

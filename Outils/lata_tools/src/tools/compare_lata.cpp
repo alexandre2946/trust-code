@@ -90,7 +90,7 @@ void open(Nom& filename, LataFilter& filter, LataOptions& opt, LataDB& lata_db)
 
 void usage(const char *arg0)
 {
-  cerr << "usage " << arg0 << " file1 file2 [--dernier] [--seuil val] [--valmin val] [--max_delta] [--same-mesh]" << endl;
+  cerr << "usage " << arg0 << " file1 file2 [--dernier] [--seuil val] [--valmin val] [--max_delta] [--same_mesh]" << endl;
 }
 
 const Domain& get_domain(LataFilter& filter, Domain_Id& id, Nom& filename)

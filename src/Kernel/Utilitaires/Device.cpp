@@ -15,17 +15,19 @@
 
 #include <TRUSTArray.h>
 #include <Device.h>
+#ifdef TRUST_USE_GPU
 #include <DeviceMemory.h>
+#endif
 #include <ctime>
 #include <string>
 #include <sstream>
 #include <map>
 #include <tuple>
-#include <kokkos++.h>
 #include <chrono>
 
 #ifndef LATATOOLS
 #include <Perf_counters.h>
+#include <kokkos++.h>
 #include <comm_incl.h>
 #include <Comm_Group_MPI.h>
 #include <PE_Groups.h>
