@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,11 +18,11 @@
 #include <MD_Vector_seq.h>
 #include <limits>
 
-template <typename _TYPE_>
-void local_carre_norme_tab(const TRUSTTab<_TYPE_>& tableau, TRUSTArray<_TYPE_>& norme_colonne)
+namespace
 {
-  norme_colonne = 0.;
-
+template <typename ExecSpace, typename _TYPE_>
+void local_carre_norme_tab_kernel(const TRUSTTab<_TYPE_>& tableau, TRUSTArray<_TYPE_>& norme_colonne)
+{
   const TRUSTVect<_TYPE_,int>& vect = tableau;
   const int lsize = vect.line_size(), vect_size_tot = vect.size_totale();
   assert(lsize == norme_colonne.size_array());
@@ -30,19 +30,51 @@ void local_carre_norme_tab(const TRUSTTab<_TYPE_>& tableau, TRUSTArray<_TYPE_>& 
   int nblocs_left;
   Block_Iter<int> bloc_itr = ::determine_blocks(VECT_SEQUENTIAL_ITEMS, tableau.get_md_vector(), vect_size_tot, lsize, nblocs_left);
 
+  for (int j = 0; j < lsize; j++) norme_colonne[j] = 0;
+
+  auto tableau_view = tableau.template view_ro<2, ExecSpace>();
+  auto norme_colonne_view = norme_colonne.template view_rw<1, ExecSpace>();
+#ifdef TRUST_USE_GPU
+  if (nblocs_left>3) ToDo_Kokkos("nblocs_left too high, optimize by rewriting as local_operations_vect_bis_generic_kernel");
+#endif
   for (; nblocs_left; nblocs_left--)
     {
       const int begin_bloc = (*(bloc_itr++)), end_bloc = (*(bloc_itr++));
-      for (int i = begin_bloc; i < end_bloc; i++)
+      if (begin_bloc<end_bloc) // very important: empty bloc at the end would erase norme_colonne
         {
-          int k = i * lsize;
-          for (int j = 0; j < lsize; j++)
+          Kokkos::RangePolicy<ExecSpace> policy(begin_bloc, end_bloc);
+
+          for (int j=0; j<lsize; j++) //Outer loop
             {
-              const _TYPE_ x = vect[k++];
-              norme_colonne[j] += x*x;
+              if (statistics().get_use_gpu()) start_gpu_timer(__KERNEL_NAME__);
+              Kokkos::parallel_reduce(policy,
+                                      KOKKOS_LAMBDA(const int i, _TYPE_& local_sum)
+              {
+                const _TYPE_ x = tableau_view(i,j);
+                local_sum += x*x;
+              },
+              //Reduce in a subview, enabled by specifying execspace in the reducer !
+              Kokkos::Sum<_TYPE_, ExecSpace>(Kokkos::subview(norme_colonne_view,j)));
+
+              bool kernelOnDevice = is_default_exec_space<ExecSpace>;
+              if (statistics().get_use_gpu()) end_gpu_timer(__KERNEL_NAME__, kernelOnDevice);
             }
         }
     }
+}
+
+}
+
+template <typename _TYPE_>
+void local_carre_norme_tab(const TRUSTTab<_TYPE_>& tableau, TRUSTArray<_TYPE_>& norme_colonne)
+{
+  norme_colonne = 0.;
+  bool kernelOnDevice = tableau.checkDataOnDevice();
+
+  if (kernelOnDevice)
+    local_carre_norme_tab_kernel<Kokkos::DefaultExecutionSpace, _TYPE_>(tableau, norme_colonne);
+  else
+    local_carre_norme_tab_kernel<Kokkos::DefaultHostExecutionSpace, _TYPE_>(tableau, norme_colonne);
 }
 
 namespace
