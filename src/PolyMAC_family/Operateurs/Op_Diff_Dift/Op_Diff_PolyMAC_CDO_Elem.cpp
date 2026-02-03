@@ -24,9 +24,9 @@
 #include <Array_tools.h>
 
 Implemente_instanciable( Op_Diff_PolyMAC_CDO_Elem , "Op_Diff_PolyMAC_CDO_Elem|Op_Diff_PolyMAC_CDO_var_Elem" , Op_Diff_PolyMAC_CDO_base );
-Implemente_instanciable( Op_Dift_PolyMAC_CDO_Elem , "Op_Dift_PolyMAC_MPFA_PolyMAC_CDO|Op_Dift_PolyMAC_CDO_var_P0_PolyMAC_CDO" , Op_Diff_PolyMAC_CDO_Elem );
+Implemente_instanciable( Op_Dift_PolyMAC_CDO_Elem , "Op_Dift_PolyMAC_CDO|Op_Dift_PolyMAC_CDO_var_P0_PolyMAC_CDO" , Op_Diff_PolyMAC_CDO_Elem );
 Implemente_instanciable( Op_Diff_Nonlinear_PolyMAC_CDO_Elem, "Op_Diff_nonlinear_PolyMAC_CDO_Elem|Op_Diff_nonlinear_PolyMAC_CDO_var_Elem" , Op_Diff_PolyMAC_CDO_Elem );
-Implemente_instanciable( Op_Dift_Nonlinear_PolyMAC_CDO_Elem, "Op_Dift_PolyMAC_MPFA_PolyMAC_CDO_nonlinear|Op_Dift_PolyMAC_CDO_var_P0_PolyMAC_CDO_nonlinear", Op_Diff_PolyMAC_CDO_Elem );
+Implemente_instanciable( Op_Dift_Nonlinear_PolyMAC_CDO_Elem, "Op_Dift_PolyMAC_CDO_nonlinear|Op_Dift_PolyMAC_CDO_var_P0_PolyMAC_CDO_nonlinear", Op_Diff_PolyMAC_CDO_Elem );
 
 Sortie& Op_Diff_PolyMAC_CDO_Elem::printOn(Sortie& os) const { return Op_Diff_PolyMAC_CDO_base::printOn(os); }
 Sortie& Op_Dift_PolyMAC_CDO_Elem::printOn(Sortie& os) const { return Op_Diff_PolyMAC_CDO_base::printOn(os); }

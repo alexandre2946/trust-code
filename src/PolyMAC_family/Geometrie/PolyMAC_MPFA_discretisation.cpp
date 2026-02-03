@@ -37,7 +37,7 @@ Entree& PolyMAC_MPFA_discretisation::readOn(Entree& s) { return s; }
 Sortie& PolyMAC_MPFA_discretisation::printOn(Sortie& s) const { return s; }
 
 /**
- * @brief Creates a velocity gradient field for PolyMAC_CDO P0 discretization
+ * @brief Creates a velocity gradient field for PolyMAC_MPFA discretization
  *
  * This method creates and initializes a gradient field of the velocity field,
  * computing the tensor ∇u where u is the velocity field. The resulting field
@@ -94,7 +94,7 @@ void PolyMAC_MPFA_discretisation::grad_u(const Domaine_dis_base& z, const Domain
 }
 
 /**
- * @brief Creates a shear rate field for PolyMAC_CDO P0 discretization
+ * @brief Creates a shear rate field for PolyMAC_MPFA discretization
  *
  * This method creates and initializes a field representing the shear rate magnitude,
  * which is derived from the velocity gradient tensor. The shear rate is computed
@@ -134,7 +134,7 @@ void PolyMAC_MPFA_discretisation::taux_cisaillement(const Domaine_dis_base& z, c
 }
 
 /**
- * @brief Creates a vorticity field for PolyMAC_CDO P0 discretization
+ * @brief Creates a vorticity field for PolyMAC_MPFA discretization
  *
  * This method creates and initializes a vorticity field, which represents
  * the curl of the velocity field (∇ × u). The field structure depends on

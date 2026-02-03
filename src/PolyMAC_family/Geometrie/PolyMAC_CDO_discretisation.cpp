@@ -388,7 +388,6 @@ Nom PolyMAC_CDO_discretisation::get_name_of_type_for(const Nom& class_operateur,
         type += "_Elem";
       if (type_ch.debute_par("Champ_Face"))
         type += "_Face";
-      type += "_PolyMAC_CDO";
     }
 
   else

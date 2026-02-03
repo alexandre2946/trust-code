@@ -28,9 +28,9 @@
 #include <Param.h>
 #include <cmath>
 
-Implemente_instanciable( Op_Conv_EF_Stab_PolyMAC_CDO_Face, "Op_Conv_EF_Stab_PolyMAC_CDO_Face_PolyMAC_CDO", Op_Conv_PolyMAC_CDO_base );
-Implemente_instanciable( Op_Conv_Amont_PolyMAC_CDO_Face, "Op_Conv_Amont_PolyMAC_CDO_Face_PolyMAC_CDO", Op_Conv_EF_Stab_PolyMAC_CDO_Face );
-Implemente_instanciable( Op_Conv_Centre_PolyMAC_CDO_Face, "Op_Conv_Centre_PolyMAC_CDO_Face_PolyMAC_CDO", Op_Conv_EF_Stab_PolyMAC_CDO_Face );
+Implemente_instanciable( Op_Conv_EF_Stab_PolyMAC_CDO_Face, "Op_Conv_EF_Stab_PolyMAC_CDO_Face", Op_Conv_PolyMAC_CDO_base );
+Implemente_instanciable( Op_Conv_Amont_PolyMAC_CDO_Face, "Op_Conv_Amont_PolyMAC_CDO_Face", Op_Conv_EF_Stab_PolyMAC_CDO_Face );
+Implemente_instanciable( Op_Conv_Centre_PolyMAC_CDO_Face, "Op_Conv_Centre_PolyMAC_CDO_Face", Op_Conv_EF_Stab_PolyMAC_CDO_Face );
 
 // XD Op_Conv_EF_Stab_PolyMAC_CDO_Face interprete Op_Conv_EF_Stab_PolyMAC_CDO_Face 1 Class Op_Conv_EF_Stab_PolyMAC_CDO_Face_PolyMAC_CDO
 

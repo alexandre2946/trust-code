@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,7 +17,7 @@
 #include <Champ_Elem_PolyMAC_CDO.h>
 #include <Champ_Face_PolyMAC_CDO.h>
 
-Implemente_instanciable_sans_constructeur(Op_Conv_Amont_PolyMAC_CDO_Elem, "Op_Conv_Amont_PolyMAC_CDO_Elem_PolyMAC_CDO", Op_Conv_PolyMAC_CDO_iterateur_base);
+Implemente_instanciable_sans_constructeur(Op_Conv_Amont_PolyMAC_CDO_Elem, "Op_Conv_Amont_PolyMAC_CDO_Elem", Op_Conv_PolyMAC_CDO_iterateur_base);
 
 Sortie& Op_Conv_Amont_PolyMAC_CDO_Elem::printOn(Sortie& s) const
 {

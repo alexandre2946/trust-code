@@ -69,12 +69,12 @@ void Loi_paroi_base::completer()
 
   const IntTab& f_e = domaine.face_voisins();
 
-  const bool is_PolyMAC_CDOp0 = pb_->discretisation().is_PolyMAC_MPFA(), is_vdf = pb_->discretisation().is_vdf();
+  const bool is_PolyMAC_MPFA = pb_->discretisation().is_PolyMAC_MPFA(), is_vdf = pb_->discretisation().is_vdf();
   DoubleTab& tab_y = valeurs_loi_paroi_["y"];
   for (int f = 0; f < tab_y.dimension_tot(0); f++)
     for (int n = 0; n < tab_y.dimension_tot(1); n++)
       {
-        if ((is_vdf) || (is_PolyMAC_CDOp0))
+        if ((is_vdf) || (is_PolyMAC_MPFA))
           tab_y(f, n) = (Faces_a_calculer_(f, 0)) ? (f_e(f, 0) >= 0 ? domaine.dist_face_elem0(f, f_e(f, 0)) : domaine.dist_face_elem1(f, f_e(f, 1))) : -1;
         else
           Process::exit(que_suis_je() + " : you cannot have a wall law with this discretization yet ! But you are welcome to add it in the code if you so choose");

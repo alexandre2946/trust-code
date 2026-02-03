@@ -13,15 +13,15 @@
 *
 *****************************************************************************/
 
-#ifndef Couplage_Parietal_PolyMAC_CDO_helper_included
-#define Couplage_Parietal_PolyMAC_CDO_helper_included
+#ifndef Couplage_Parietal_PolyMAC_MPFA_helper_included
+#define Couplage_Parietal_PolyMAC_MPFA_helper_included
 
 #include <Operateur_Diff_base.h>
 #include <TRUST_Ref.h>
 
 class Op_Diff_PolyMAC_MPFA_Elem;
 
-class Couplage_Parietal_PolyMAC_CDO_helper
+class Couplage_Parietal_PolyMAC_MPFA_helper
 {
 public:
   void associer(const Op_Diff_PolyMAC_MPFA_Elem& op);
@@ -52,4 +52,4 @@ private:
   mutable DoubleTab d_nuc_;
 };
 
-#endif /* Couplage_Parietal_PolyMAC_CDO_helper_included */
+#endif /* Couplage_Parietal_PolyMAC_MPFA_helper_included */

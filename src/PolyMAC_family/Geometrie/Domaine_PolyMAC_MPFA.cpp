@@ -78,7 +78,7 @@ void Domaine_PolyMAC_MPFA::discretiser()
 /*! @brief Initializes the face stencils for gradient computation
  *
  * This method builds the connectivity stencils required for face-based gradient calculations
- * in the PolyMAC_CDO P0 discretization scheme. It establishes the relationship between faces
+ * in the PolyMAC_MPFA discretization scheme. It establishes the relationship between faces
  * and all elements/boundary faces that are connected through shared vertices.
  *
  * The stencil for each face includes:

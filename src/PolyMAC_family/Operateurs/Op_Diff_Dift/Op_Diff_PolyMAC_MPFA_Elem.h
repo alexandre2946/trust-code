@@ -16,7 +16,7 @@
 #ifndef Op_Diff_PolyMAC_MPFA_Elem_included
 #define Op_Diff_PolyMAC_MPFA_Elem_included
 
-#include <Couplage_Parietal_PolyMAC_CDO_helper.h>
+#include <Couplage_Parietal_PolyMAC_MPFA_helper.h>
 #include <Op_Diff_PolyMAC_MPFA_base.h>
 
 class Matrice_Morse;
@@ -43,11 +43,11 @@ public :
   const DoubleTab& d_nucleation() const;
 
   inline const bool& has_echange_contact() const { return has_echange_contact_; }
-  inline const Couplage_Parietal_PolyMAC_CDO_helper& couplage_parietal_helper() const { return couplage_parietal_helper_; }
+  inline const Couplage_Parietal_PolyMAC_MPFA_helper& couplage_parietal_helper() const { return couplage_parietal_helper_; }
 
 private:
   bool is_pb_multi_ = false, is_pb_coupl_ = false, has_echange_contact_ = false, has_flux_par_ = false;
-  Couplage_Parietal_PolyMAC_CDO_helper couplage_parietal_helper_;
+  Couplage_Parietal_PolyMAC_MPFA_helper couplage_parietal_helper_;
 };
 
 /* comme des synonymes, mais avec l'info de ce qu'on est dans que_suis_je() */

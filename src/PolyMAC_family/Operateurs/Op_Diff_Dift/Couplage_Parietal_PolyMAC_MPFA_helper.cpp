@@ -13,7 +13,7 @@
 *
 *****************************************************************************/
 
-#include <Couplage_Parietal_PolyMAC_CDO_helper.h>
+#include <Couplage_Parietal_PolyMAC_MPFA_helper.h>
 #include <Convection_Diffusion_Temperature.h>
 #include <Flux_interfacial_PolyMAC_HFV.h>
 #include <Echange_contact_PolyMAC_MPFA.h>
@@ -33,12 +33,12 @@
 #include <cmath>
 #include <Matrix_tools.h>
 
-void Couplage_Parietal_PolyMAC_CDO_helper::associer(const Op_Diff_PolyMAC_MPFA_Elem& op)
+void Couplage_Parietal_PolyMAC_MPFA_helper::associer(const Op_Diff_PolyMAC_MPFA_Elem& op)
 {
   op_elem_ = op;
 }
 
-void Couplage_Parietal_PolyMAC_CDO_helper::completer_d_nuc()
+void Couplage_Parietal_PolyMAC_MPFA_helper::completer_d_nuc()
 {
   const Champ_Elem_PolyMAC_MPFA& ch = ref_cast(Champ_Elem_PolyMAC_MPFA, op_elem_->equation().inconnue());
   const Domaine_PolyMAC_MPFA& domaine = ref_cast(Domaine_PolyMAC_MPFA, op_elem_->domaine_poly());
@@ -47,7 +47,7 @@ void Couplage_Parietal_PolyMAC_CDO_helper::completer_d_nuc()
 }
 
 /* construction de s_dist : sommets du porbleme coincidant avec des sommets de problemes distants */
-void Couplage_Parietal_PolyMAC_CDO_helper::init_s_dist() const
+void Couplage_Parietal_PolyMAC_MPFA_helper::init_s_dist() const
 {
   if (s_dist_init_)
     return; //deja fait
@@ -72,7 +72,7 @@ void Couplage_Parietal_PolyMAC_CDO_helper::init_s_dist() const
   s_dist_init_ = 1;
 }
 
-void Couplage_Parietal_PolyMAC_CDO_helper::init_op_ext() const
+void Couplage_Parietal_PolyMAC_MPFA_helper::init_op_ext() const
 {
   if (som_ext_init_)
     return; //deja fait
@@ -253,7 +253,7 @@ void Couplage_Parietal_PolyMAC_CDO_helper::init_op_ext() const
   som_ext_init_ = 1;
 }
 
-void Couplage_Parietal_PolyMAC_CDO_helper::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
+void Couplage_Parietal_PolyMAC_MPFA_helper::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const std::string nom_inco = op_elem_->equation().inconnue().le_nom().getString();
   const Domaine_PolyMAC_MPFA& domaine = ref_cast(Domaine_PolyMAC_MPFA, op_elem_->domaine_poly());
@@ -350,7 +350,7 @@ void Couplage_Parietal_PolyMAC_CDO_helper::dimensionner_blocs(matrices_t matrice
        << mp_somme_vect_as_double(tpfa) * 100. / (N[0] * face_t) << "% TPFA " << finl;
 }
 
-void Couplage_Parietal_PolyMAC_CDO_helper::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
+void Couplage_Parietal_PolyMAC_MPFA_helper::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const std::string& nom_inco = op_elem_->equation().inconnue().le_nom().getString();
 

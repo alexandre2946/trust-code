@@ -115,12 +115,12 @@ double Op_Conv_EF_Stab_PolyMAC_MPFA_Face::calculer_dt_stab() const
   return Process::mp_min(dt);
 }
 
-/*! @brief Dimensions the matrix blocks for the PolyMAC_CDO P0 Face convection operator with EF stabilization.
+/*! @brief Dimensions the matrix blocks for the PolyMAC_MPFA Face convection operator with EF stabilization.
  *
  * This method constructs the sparsity pattern and allocates memory for the system matrix by analyzing
  * face-element connectivity and establishing the stencil relationships between degrees of freedom.
  * The resulting matrix structure accounts for face-face and element-element contributions based on
- * the PolyMAC_CDO P0 Face discretization scheme.
+ * the PolyMAC_MPFA Face discretization scheme.
  *
  * @param matrices Map containing the system matrices indexed by unknown field names
  * @param semi_impl Map of semi-implicit terms indexed by unknown field names
@@ -211,7 +211,7 @@ void Op_Conv_EF_Stab_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, 
 
 /*! @brief Adds convection contributions to the system matrix and right-hand side vector.
  *
- * This method implements the convection operator with EF stabilization for PolyMAC_CDO P0 Face discretization.
+ * This method implements the convection operator with EF stabilization for PolyMAC_MPFA Face discretization.
  * It computes face-based convection fluxes using upwind stabilization and assembles the corresponding
  * matrix coefficients and source terms. The method handles both face-face and element-element contributions,
  * accounting for face equivalence relationships and boundary conditions.

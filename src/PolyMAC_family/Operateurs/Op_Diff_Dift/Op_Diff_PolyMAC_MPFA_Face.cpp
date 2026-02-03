@@ -98,10 +98,10 @@ double Op_Diff_PolyMAC_MPFA_Face::calculer_dt_stab() const
     }
   return Process::mp_min(dt);
 }
-/*! @brief Dimensions the blocks of matrices for the PolyMAC_CDO P0 face diffusion operator
+/*! @brief Dimensions the blocks of matrices for the PolyMAC_MPFA face diffusion operator
  *
  * This method is responsible for dimensioning the matrix blocks used in the diffusion
- * operation for the PolyMAC_CDO P0 face discretization scheme. It calculates the stencil
+ * operation for the PolyMAC_MPFA face discretization scheme. It calculates the stencil
  * for the diffusion operator and allocates the necessary memory for the matrix.
  *
  * @param matrices A map of matrices where the matrix for the unknown field will be stored.
@@ -229,7 +229,7 @@ void Op_Diff_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const ta
 }
 
 
-/*! @brief Adds blocks to the matrices for the PolyMAC_CDO P0 face diffusion operator.
+/*! @brief Adds blocks to the matrices for the PolyMAC_MPFA face diffusion operator.
  *
  * This method adds the diffusion contributions to the matrix and the secondary memory.
  * It handles both internal and boundary faces, and updates the matrix and secondary
