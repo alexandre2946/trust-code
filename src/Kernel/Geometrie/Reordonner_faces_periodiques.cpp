@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -331,7 +331,7 @@ void Reordonner_faces_periodiques_32_64<_SIZE_>::renum_som_perio(const Domaine_3
   for (int_t i = 0; i < nb_som; i++)
     renum[i] = renum_som_perio[i];
 
-  const DoubleTab_t coord = domaine.coord_sommets();
+  const DoubleTab_t& coord = domaine.coord_sommets();
   const int dim = coord.dimension_int(1);
 
   // Etape 1: pour chaque sommet reel, trouver un sommet associe (si plusieurs directions
