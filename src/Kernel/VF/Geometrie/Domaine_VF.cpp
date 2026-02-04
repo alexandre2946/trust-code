@@ -1263,180 +1263,165 @@ void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
       ind_tab++;
     }
 
+
   // Puis on echange les tableaux des centres de gravites
   // envoi des tableaux
+  Cerr << "[MPI] Broadcasting remote_xv..." << finl;
   for (int p = 0; p < parts; p++)
     envoyer_broadcast(remote_xv[p], p);
 
+  int nb_total_points=0;
+  for (int p = 0; p < parts; p++)
+    nb_total_points+=remote_xv[p].dimension(0);
+
+  Cerr << "Number of boundary points: " << nb_total_points << finl;
+  double GBytes = nb_total_points * 4.0 /* float */ * D / 1024.0 / 1024.0 / 1024.0;
+  Cerr << "Estimated memory needed: " << GBytes << " GB" << finl;
+
   // On traite les informations, chaque proc connait tous les XV
 
-  // On boucle sur toutes les faces puis tous les elems
-  const DoubleTab& local_xv = domaine_.xv(),
-                   & local_xp = domaine_.xp();
-
-  //DataArrayDoubles des xv locaux et de tous les remote_xv (a la suite)
-  std::vector<MCAuto<DataArrayDouble> > vxv(parts);
-  std::vector<const DataArrayDouble*> cvxv(parts);
-  for (int p = 0; p < parts; p++)
-    {
-      vxv[p] = DataArrayDouble::New();
-      vxv[p]->useExternalArrayWithRWAccess(remote_xv[p].addr(), remote_xv[p].dimension(0), remote_xv[p].dimension(1));
-      cvxv[p] = vxv[p];
-    }
-  MCAuto<DataArrayDouble> remote_xvs(DataArrayDouble::Aggregate(cvxv));
-
-#ifdef TRUST_USE_ARBORX
-  bool compute_with_mc = ne < 10000 || getenv("TRUST_CHECK_ARBORX") != nullptr;
-#else
-  Cerr << "Calling Domaine_VF::init_dist_paroi_globale. This may take some time..." << finl;
-  Cerr << "Try to use a C++20 TRUST version (built with a more recent compiler) to benefit from a faster algorithm." << finl;
-  bool compute_with_mc = true;
-#endif
-  //indices des points de remote_xvs les plus proches de chaque point de local_xv
-  MCAuto <DataArrayIdType> glob_idx(DataArrayIdType::New());
-  if (compute_with_mc)
-    {
-      MCAuto<DataArrayDouble> local_xs(DataArrayDouble::New());
-      local_xs->alloc(nf+ne, D);
-      for (int f = 0; f < nf; f++)
-        for (int d = 0; d < D; d++)
-          local_xs->setIJ(f, d, local_xv(f, d));
-      for (int e = 0; e < ne; e++)
-        for (int d = 0; d < D; d++)
-          local_xs->setIJ(nf+e, d, local_xp(e, d));
-      glob_idx = remote_xvs->findClosestTupleId(local_xs);
-    }
-  else
-    glob_idx->alloc(nf+ne);
-
+// On boucle sur toutes les faces puis tous les elems
+  const DoubleTab& local_xv = domaine_.xv();
+  const DoubleTab& local_xp = domaine_.xp();
+  ArrOfInt glob_idx(Process::check_int_overflow(nf+ne));
 #ifdef TRUST_USE_ARBORX
   // Use ArborX on GPU to compute the nearest points cause too slow on large meshes
   int dim = dimension;
   using ExecutionSpace = Kokkos::DefaultExecutionSpace;
   using MemorySpace = ExecutionSpace::memory_space;
   using Point = ArborX::Point<3>;
-  Kokkos::View < Point * , MemorySpace > points("remote_xvs", remote_xvs->getNumberOfTuples());
-  int k = 0;
-  for (int p = 0; p < parts; p++)
-    {
-      int size = remote_xv[p].dimension(0);
-      CDoubleTabView coord = remote_xv[p].view_ro();
-      Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), size, KOKKOS_LAMBDA(
-                             const int i)
-      {
-        points[k + i] = {(float)coord(i, 0), (float)coord(i, 1), dim==3 ? (float)coord(i, 2) : 0.f};
-        //printf("Provisoire remote_xvs= %d %f %f\n",k+i,coord(i, 0), coord(i, 1));
-      });
-      end_gpu_timer(__KERNEL_NAME__);
-      k += size;
-    }
-  if (k != remote_xvs->getNumberOfTuples()) Process::exit("Error!");
-
-  Kokkos::View < Point * , MemorySpace > query_points("local_xs", nf+ne);
+  ExecutionSpace space;
+  Kokkos::View<Point *, MemorySpace> query_points("local_xs", nf + ne);
   CDoubleTabView xv = local_xv.view_ro();
   Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nf, KOKKOS_LAMBDA(
                          const int i)
   {
-    query_points[i] = {(float)xv(i, 0), (float)xv(i, 1), dim==3 ? (float)xv(i, 2) : 0.f};
+    query_points[i] = {(float) xv(i, 0), (float) xv(i, 1), dim == 3 ? (float) xv(i, 2) : 0.f};
   });
   end_gpu_timer(__KERNEL_NAME__);
   CDoubleTabView xp = local_xp.view_ro();
   Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), ne, KOKKOS_LAMBDA(
                          const int i)
   {
-    query_points[nf + i] = {(float)xp(i, 0), (float)xp(i, 1), dim==3 ? (float)xp(i, 2) : 0.f};
+    query_points[nf + i] = {(float) xp(i, 0), (float) xp(i, 1), dim == 3 ? (float) xp(i, 2) : 0.f};
   });
   end_gpu_timer(__KERNEL_NAME__);
-
-  // BVH
-  ExecutionSpace space;
-  Cerr << "ArborX::BoundingVolumeHierarchy...";
-  ArborX::BoundingVolumeHierarchy bvh(space, ArborX::Experimental::attach_indices(points));
-  Cerr << "created!" << finl;
-  Kokkos::View<int *, MemorySpace> offsets("Example::offsets", 0);
-  Kokkos::View<int *, MemorySpace> indices("Example::indices", 0);
-  Cerr << "ArborX query...";
-  bvh.query(space, ArborX::Experimental::make_nearest(query_points, 1), ExtractIndex {}, indices, offsets);
-  Cerr << "completed!" << finl;
-
-  auto offsets_host = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace {}, offsets);
-  auto indices_host = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace {}, indices);
-  if (ne<10)
+  // One BVH per batch of parts (slower but less memory expensive than single BVH)
+  ArrOfDouble distances(nf+ne);
+  distances=DMAXFLOAT;
+  // Define batch_size (parts per batch) to not use more than 1GB per batch
+  double target_GB = 1.0;
+  int num_batches = std::max(1, (int)std::ceil(GBytes / target_GB));
+  int batch_size = std::max(1, (parts + num_batches - 1) / num_batches);  // ceil(parts / num_batches)
+  Cerr << "Number of batches: " << num_batches << ", parts per batch: " << batch_size
+       << ", points per batch: ~" << nb_total_points / num_batches << finl;
+  for (int batch_start = 0; batch_start < parts; batch_start += batch_size)
     {
-      std::cout << "Provisoire offsets: ";
-      std::copy(offsets_host.data(), offsets_host.data() + offsets.size(),
-                std::ostream_iterator<int>(std::cout, " "));
-      std::cout << "\nProvisoire indices: ";
-      std::copy(indices_host.data(), indices_host.data() + indices.size(),
-                std::ostream_iterator<int>(std::cout, " "));
-      std::cout << "\n";
-    }
-  for (int fe = 0; fe<nf+ne; fe++)
-    {
-      int ar_global = indices_host[fe];
-      if (compute_with_mc) // To compare
+      int batch_end = std::min(batch_start + batch_size, parts);
+
+      // Compute total number of points in this batch
+      int nb_points = 0;
+      for (int part = batch_start; part < batch_end; part++)
+        nb_points += remote_xv[part].dimension(0);
+      if (nb_points == 0) continue;
+
+      // Fill points view with all parts in this batch
+      Kokkos::View<Point *, MemorySpace> points("remote_xv", nb_points);
+      int point_offset = 0;
+      for (int part = batch_start; part < batch_end; part++)
         {
-          int proc_mc = 0;
-          mcIdType mc_global = glob_idx->getIJ(fe, 0);
-          int mc = (int) mc_global;
-          while (mc >= remote_xv[proc_mc].dimension(0))
+          int size = remote_xv[part].dimension(0);
+          if (size > 0)
             {
-              mc -= remote_xv[proc_mc].dimension(0);
-              proc_mc++;
+              CDoubleTabView coord = remote_xv[part].view_ro();
+              int local_offset = point_offset; // Capture for lambda
+              Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), size, KOKKOS_LAMBDA(const int i)
+              {
+                points[local_offset + i] = {(float) coord(i, 0), (float) coord(i, 1),
+                                            dim == 3 ? (float) coord(i, 2) : 0.f
+                                           };
+              });
+              end_gpu_timer(__KERNEL_NAME__);
             }
-          int proc_ar = 0;
-          int ar = ar_global;
-          while (ar >= remote_xv[proc_ar].dimension(0))
-            {
-              ar -= remote_xv[proc_ar].dimension(0);
-              proc_ar++;
-            }
-          double dist_mc = 0, dist_ar = 0;
-          for (int i = 0; i < dimension; i++)
-            {
-              double xi = fe < nf ? local_xv(fe, i) : local_xp(fe - nf, i);
-              dist_mc += (xi - remote_xv[proc_mc](mc, i)) * (xi - remote_xv[proc_mc](mc, i));
-              dist_ar += (xi - remote_xv[proc_ar](ar, i)) * (xi - remote_xv[proc_ar](ar, i));
-            }
-          if (!est_egal(dist_mc, dist_ar))
-            {
-              if (fe<nf)
-                {
-                  Cerr << "Face " << fe << " nearest point found by MC: " << mc << " and by ArborX: " << ar << finl;
-                  for (int j = 0; j < dimension; j++)
-                    Cerr << "Face x(" << j << "): " << local_xv(fe, j) << " MC:" << remote_xv[proc_mc](mc, j) << " ArborX:" << remote_xv[proc_ar](ar, j) << finl;
-                  Cerr << "MEDCoupling and ArborX do not have same results for nearest boundary items from faces !" << finl;
-                }
-              else
-                {
-                  Cerr << "Cell " << fe - nf << " nearest point found by MC: " << mc << " and by ArborX: " << ar << finl;
-                  for (int j = 0; j < dimension; j++)
-                    Cerr << "Cell x(" << j << "): " << local_xp(fe - nf, j) << " MC:"
-                         << remote_xv[proc_mc](mc, j) << " ArborX:" << remote_xv[proc_ar](ar, j) << finl;
-                  Cerr << "MEDCoupling and ArborX do not have same results for nearest boundary items from cells !" << finl;
-                }
-              Process::exit();
-            }
+          point_offset += size;
         }
-      glob_idx->setIJ(fe, 0, ar_global);
+
+      // BVH
+      Cerr << "ArborX::BoundingVolumeHierarchy for parts " << batch_start << " to " << batch_end - 1;
+      ArborX::BoundingVolumeHierarchy bvh(space, ArborX::Experimental::attach_indices(points));
+      Cerr << " created!" << finl;
+      Kokkos::View<int *, MemorySpace> offsets("Example::offsets", 0);
+      Kokkos::View<int *, MemorySpace> indices("Example::indices", 0);
+      Cerr << "ArborX query...";
+      bvh.query(space, ArborX::Experimental::make_nearest(query_points, 1), ExtractIndex {}, indices, offsets);
+      Cerr << " completed!" << finl;
+      // Compute global offset to the start of this batch
+      int global_offset = 0;
+      for (int pp = 0; pp < batch_start; pp++)
+        global_offset += remote_xv[pp].dimension(0);
+
+      // GPU kernel: compute distances and update best matches
+      // Use points[ar] directly (already on device) instead of remote_xv[part](ar_local, i)
+      DoubleArrView dist = static_cast<ArrOfDouble&>(distances).view_rw();
+      IntArrView glob = static_cast<ArrOfInt&>(glob_idx).view_rw();
+      int total_fe = nf + ne;
+      Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), total_fe, KOKKOS_LAMBDA(const int fe)
+      {
+        int ar = indices(fe);
+        float d = 0;
+        for (int i = 0; i < dim; i++)
+          {
+            float diff = query_points(fe)[i] - points(ar)[i];
+            d += diff * diff;
+          }
+        if (d < dist(fe))
+          {
+            dist(fe) = (double)d;
+            glob(fe) = ar + global_offset;
+          }
+      });
+      end_gpu_timer(__KERNEL_NAME__);
     }
+#else
+  // MedCoupling implementation (C++14, soon deprecated):
+  //indices des points de remote_xvs les plus proches de chaque point de local_xv
+  MCAuto <DataArrayIdType> glob(DataArrayIdType::New());
+  //DataArrayDoubles des xv locaux et de tous les remote_xv (a la suite)
+  std::vector<MCAuto<DataArrayDouble> > vxv(parts);
+  std::vector<const DataArrayDouble*> cvxv(parts);
+  MCAuto<DataArrayDouble> remote_xvs(DataArrayDouble::New());
+  for (int p = 0; p < parts; p++)
+    {
+      vxv[p] = DataArrayDouble::New();
+      vxv[p]->useExternalArrayWithRWAccess(remote_xv[p].addr(), remote_xv[p].dimension(0), remote_xv[p].dimension(1));
+      cvxv[p] = vxv[p];
+    }
+  remote_xvs = DataArrayDouble::Aggregate(cvxv);
+  MCAuto<DataArrayDouble> local_xs(DataArrayDouble::New());
+  local_xs->alloc(nf+ne, D);
+  for (int f = 0; f < nf; f++)
+    for (int d = 0; d < D; d++)
+      local_xs->setIJ(f, d, local_xv(f, d));
+  for (int e = 0; e < ne; e++)
+    for (int d = 0; d < D; d++)
+      local_xs->setIJ(nf+e, d, local_xp(e, d));
+  glob = remote_xvs->findClosestTupleId(local_xs);
+  for (int i=0; i<nf+ne; i++)
+    glob_idx(i) = (int)glob->getIJ(i,0);
 #endif
 
+  ToDo_Kokkos("critical");
 //pour chaque element et face de local_xs : remplissage des tableaux
   for (int fe = 0; fe<nf+ne; fe++)
     {
       //retour de l'indice global (glob_idx(ind_face)) au couple (proc, ind_face2)
       int proc = 0;
-      mcIdType fe2_big = glob_idx->getIJ(fe, 0);
-      while (fe2_big >= remote_xv[proc].dimension(0))
+      int fe2 = glob_idx(fe);
+      while (fe2 >= remote_xv[proc].dimension(0))
         {
-          fe2_big -= remote_xv[proc].dimension(0);
+          fe2 -= remote_xv[proc].dimension(0);
           proc++;
         }
-      assert(fe2_big < std::numeric_limits<int>::max());
-      int fe2 = (int)fe2_big;
-      assert(fe2 <  remote_xv[proc].dimension(0));
-
       double distance2 = 0;
       for (int d=0; d<D; d++)
         {
