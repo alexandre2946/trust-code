@@ -41,6 +41,8 @@ Sortie& Convection_Diffusion_std::printOn(Sortie& is) const
 Entree& Convection_Diffusion_std::readOn(Entree& is)
 {
   Equation_base::readOn(is);
+  if (idx_phase_transportante_ > -1 && terme_convectif)
+    terme_convectif->set_transporting_velocity_phase_index(idx_phase_transportante_);
   return is;
 }
 
@@ -49,6 +51,7 @@ void Convection_Diffusion_std::set_param(Param& param) const
   Equation_base::set_param(param);
   param.ajouter_non_std("diffusion",(this));
   param.ajouter_non_std("convection",(this));
+  param.ajouter("phase_transportante", &idx_phase_transportante_);
 }
 
 

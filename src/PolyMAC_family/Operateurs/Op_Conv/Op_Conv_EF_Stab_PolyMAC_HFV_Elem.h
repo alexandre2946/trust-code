@@ -48,6 +48,7 @@ public :
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
 
   void mettre_a_jour(double temps) override;
+  void set_transporting_velocity_phase_index(int idx) override { idx_phase_transportante_ = idx; }
 
   double alpha_ = 1.0; //alpha = 0 -> centre, alpha = 1 -> amont
 
@@ -62,6 +63,7 @@ protected :
   Motcles noms_vd_phases_; //leurs noms
   std::vector<OWN_PTR(Champ_Inc_base)> x_phases_; //titres par phase
   Motcles noms_x_phases_; //leurs noms
+  int idx_phase_transportante_ = -1;
 };
 
 class Op_Conv_Amont_PolyMAC_HFV_Elem : public Op_Conv_EF_Stab_PolyMAC_HFV_Elem

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -67,4 +67,12 @@ void Operateur_Conv_base::set_incompressible(const int flag)
       Process::exit();
     }
   incompressible_ = flag;
+}
+
+void Operateur_Conv_base::set_transporting_velocity_phase_index(int /*idx*/)
+{
+  Cerr << "Operateur_Conv_base::set_transporting_velocity_phase_index: "
+       << "not implemented for operator '" << que_suis_je()
+       << "'. Override in the derived class if needed." << finl;
+  Process::exit();
 }

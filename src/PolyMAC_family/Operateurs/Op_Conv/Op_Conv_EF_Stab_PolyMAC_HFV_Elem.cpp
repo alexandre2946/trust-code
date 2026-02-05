@@ -131,7 +131,10 @@ double Op_Conv_EF_Stab_PolyMAC_HFV_Elem::calculer_dt_stab_gen(const DoubleTab& v
 
           if (!Option_PolyMAC_family::TRAITEMENT_AXI || (Option_PolyMAC_family::TRAITEMENT_AXI && !(fcl(f, 0) == 4 || fcl(f, 0) == 5)))
             for (int n = 0; n < N; n++)
-              flux(n) += pf(f) * fs(f) * std::max((e == f_e(f, 1) ? 1 : -1) * vit(f, n), 0.); //seul le flux entrant dans e compte
+              {
+                const int idx_phase = idx_phase_transportante_ > -1 ? idx_phase_transportante_ : n;
+                flux(n) += pf(f) * fs(f) * std::max((e == f_e(f, 1) ? 1 : -1) * vit(f, idx_phase), 0.); //seul le flux entrant dans e compte
+              }
         }
 
       for (int n = 0; n < N; n++)
@@ -172,7 +175,10 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::dimensionner_blocs(matrices_t mats, const
 
                       if (e < domaine.nb_elem())
                         for (int n = 0; n < N; n++)
-                          stencil.append_line(N * e + n, M * f + n * (M > 1));
+                          {
+                            const int idx_phase = idx_phase_transportante_ > -1 ? idx_phase_transportante_ : n * (M > 1);
+                            stencil.append_line(N * e + n, M * f + idx_phase);
+                          }
                     }
             }
           else
@@ -261,7 +267,8 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::ajouter_blocs_gen(matrices_t mats, Double
 
               for (int n = 0; n < N; n++, m += (Mv > 1))
                 {
-                  const double vit_f = vit(f, m);
+                  const int idx_phase = idx_phase_transportante_ > -1 ? idx_phase_transportante_ : m;
+                  const double vit_f = vit(f, idx_phase);
                   const double v = vit_f ? vit_f : DBL_MIN;
                   const double fac = pf(f) * fs(f) * (1. + (v * (i ? -1 : 1) > 0 ? 1. : -1) * alpha_) / 2;
 
@@ -280,7 +287,10 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::ajouter_blocs_gen(matrices_t mats, Double
                 {
                   int m = 0;
                   for (int n = 0; n < N; n++, m += (Mv > 1))
-                    secmem(e, n) -= (i ? -1 : 1) * dv_flux(n) * vit(f, m);
+                    {
+                      const int idx_phase = idx_phase_transportante_ > -1 ? idx_phase_transportante_ : m;
+                      secmem(e, n) -= (i ? -1 : 1) * dv_flux(n) * vit(f, idx_phase);
+                    }
                 }
             }
 
@@ -295,7 +305,10 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::ajouter_blocs_gen(matrices_t mats, Double
                   {
                     int m = 0;
                     for (int n = 0; n < N; n++, m += (Mv > 1))
-                      (*m_vit)(N * e + n, Mv * f + m) += (i ? -1 : 1) * dv_flux(n);
+                      {
+                        const int idx_phase = idx_phase_transportante_ > -1 ? idx_phase_transportante_ : m;
+                        (*m_vit)(N * e + n, Mv * f + idx_phase) += (i ? -1 : 1) * dv_flux(n);
+                      }
                   }
               }
 
@@ -409,12 +422,18 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::mettre_a_jour_gen(double temps, const Dou
           int e = f_e(f, i);
           int m = 0;
           for (int n = 0; n < N; n++, m += (M > 1))
-            cc_f(n) += (1. + (vit(f, m) * (i ? -1 : 1) >= 0 ? 1. : -1.) * alpha_) / 2 * (e >= 0 ? vcc(e, n) : bcc(f, n));
+            {
+              const int idx_phase = idx_phase_transportante_ > -1 ? idx_phase_transportante_ : m;
+              cc_f(n) += (1. + (vit(f, idx_phase) * (i ? -1 : 1) >= 0 ? 1. : -1.) * alpha_) / 2 * (e >= 0 ? vcc(e, n) : bcc(f, n));
+            }
         }
 
       int m = 0;
       for (int n = 0; n < N; n++, m += (M > 1))
-        flux_bords_(f, n) = pf(f) * fs(f) * vit(f, m) * cc_f(n);
+        {
+          const int idx_phase = idx_phase_transportante_ > -1 ? idx_phase_transportante_ : m;
+          flux_bords_(f, n) = pf(f) * fs(f) * vit(f, idx_phase) * cc_f(n);
+        }
     }
 
   if (cc_phases_.size())
@@ -429,7 +448,8 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::mettre_a_jour_gen(double temps, const Dou
             for (int f = 0; f < domaine.nb_faces(); f++)
               {
                 v_ph(f) = 0.;
-
+                const int idx_phase = idx_phase_transportante_ > -1 ? idx_phase_transportante_ : m;
+                if (m != idx_phase) continue;
                 for (int i = 0; i < 2; i++)
                   {
                     int e = f_e(f, i);
@@ -460,7 +480,8 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::mettre_a_jour_gen(double temps, const Dou
             for (int f = 0; f < domaine.nb_faces(); f++)
               {
                 v_ph(f) = 0.;
-
+                const int idx_phase = idx_phase_transportante_ > -1 ? idx_phase_transportante_ : m;
+                if (m != idx_phase) continue;
                 for (int i = 0; i < 2; i++)
                   {
                     int e = f_e(f, i);
@@ -511,4 +532,3 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::mettre_a_jour_gen(double temps, const Dou
       if (x_phases_[n])
         x_phases_[n]->changer_temps(temps);
 }
-

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -41,6 +41,7 @@ public :
   virtual void associer_vitesse_pour_pas_de_temps(const Champ_base& vitesse);
   virtual void set_incompressible(const int);
   virtual void associer_champ_temp(const Champ_Inc_base&, bool) const { }
+  virtual void set_transporting_velocity_phase_index(int idx);
 
 protected :
   OBS_PTR(Champ_base) la_norme_vitesse;
