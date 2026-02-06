@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -246,42 +246,48 @@ Eval_Conv_VDF_Face<DERIVED_T>::flux_arete(const DoubleTab& inco, const DoubleTab
   if (DERIVED_T::IS_AXI && is_SYM) return;
   const int ncomp = flux3.size_array();
 
-  double psc = 0.25*((dt_vitesse(fac1)*porosite(fac1)+dt_vitesse(fac2)*porosite(fac2))*(surface(fac1)+surface(fac2)));
-  if ((psc*signe)>0)
-    for (int k = 0; k < ncomp; k++)
-      {
-        const int elem = elem_(fac3, 0), elem2 = elem_(fac3, 1);
-        const int e = dt_vitesse(fac3, k) > 0 ? (elem > -1 ? elem : elem2) : (elem2 > -1 ? elem2 : elem);
-        const double aa_r = (a_r && DERIVED_T::IS_AMONT) ? (*a_r)(e, k) : 1.0;
-        flux3[k] = -aa_r*inco(fac3,k)*psc ;
-      }
-  else
+  const int pfb = premiere_face_bord(), ori = orientation(fac3), rang1 = DERIVED_T::IS_QUICK ? fac1 : (fac1-pfb), rang2 = DERIVED_T::IS_QUICK ? fac2 :(fac2-pfb); // TODO : FIXME : euh ? pourquoi ca ?
+
+  for (int k = 0; k < ncomp; k++)
     {
-      const int pfb = premiere_face_bord(), ori = orientation(fac3), rang1 = DERIVED_T::IS_QUICK ? fac1 : (fac1-pfb), rang2 = DERIVED_T::IS_QUICK ? fac2 :(fac2-pfb); // TODO : FIXME : euh ? pourquoi ca ?
-      for (int k = 0; k < ncomp; k++)
+      double psc = 0.25*((dt_vitesse(fac1,k)*porosite(fac1)+dt_vitesse(fac2,k)*porosite(fac2))*(surface(fac1)+surface(fac2)));
+      if ((psc*signe)>0)
         {
-          const double vf1 = Champ_Face_get_val_imp_face_bord_sym(inco,inconnue->temps(),rang1,ori,la_zcl());
-          const double vf2 = Champ_Face_get_val_imp_face_bord_sym(inco,inconnue->temps(),rang2,ori,la_zcl());
-          flux3[k] = -0.5 * (vf1 + vf2) * psc ;
+          const int elem = elem_(fac3, 0), elem2 = elem_(fac3, 1);
+          const int e = dt_vitesse(fac3, k) > 0 ? (elem > -1 ? elem : elem2) : (elem2 > -1 ? elem2 : elem);
+          const double aa_r = (a_r && DERIVED_T::IS_AMONT) ? (*a_r)(e, k) : 1.0;
+          flux3[k] = -aa_r*inco(fac3,k)*psc ;
+        }
+      else
+        {
+          const int ind = ncomp*ori+k;
+          const double vf1 = Champ_Face_get_val_imp_face_bord_sym(inco,inconnue->temps(),rang1,ind,la_zcl());
+          const double vf2 = Champ_Face_get_val_imp_face_bord_sym(inco,inconnue->temps(),rang2,ind,la_zcl());
+          const int elem = elem_(fac3, 0), elem2 = elem_(fac3, 1);
+          const int e = dt_vitesse(fac3, k) > 0 ? (elem > -1 ? elem : elem2) : (elem2 > -1 ? elem2 : elem);
+          const double aa_r = (a_r && DERIVED_T::IS_AMONT) ? (*a_r)(e, k) : 1.0;
+          flux3[k] = -aa_r * 0.5 * (vf1 + vf2) * psc ;
         }
     }
 
-  psc = 0.5*dt_vitesse(fac3)*surface(fac3)*porosite(fac3);
-  if (psc>0)
-    for (int k = 0; k < ncomp; k++)
-      {
-        const int elem = elem_(fac1, 0), elem2 = elem_(fac1, 1);
-        const int e = dt_vitesse(fac1, k) > 0 ? (elem > -1 ? elem : elem2) : (elem2 > -1 ? elem2 : elem);
-        const double aa_r = (a_r && DERIVED_T::IS_AMONT) ? (*a_r)(e, k) : 1.0;
-        flux1_2[k] = -aa_r * psc * inco(fac1, k);
-      }
-  else for (int k = 0; k < ncomp; k++)
-      {
-        const int elem = elem_(fac2, 0), elem2 = elem_(fac2, 1);
-        const int e = dt_vitesse(fac2, k) > 0 ? (elem > -1 ? elem : elem2) : (elem2 > -1 ? elem2 : elem);
-        const double aa_r = (a_r && DERIVED_T::IS_AMONT) ? (*a_r)(e, k) : 1.0;
-        flux1_2[k] = (DERIVED_T::IS_CENTRE || DERIVED_T::IS_CENTRE4) ? -psc*0.5*(inco(fac1,k)+inco(fac2,k)) : -aa_r * psc * inco(fac2, k);
-      }
+  for (int k = 0; k < ncomp; k++)
+    {
+      double psc = 0.5*dt_vitesse(fac3,k)*surface(fac3)*porosite(fac3);
+      if (psc>0)
+        {
+          const int elem = elem_(fac1, 0), elem2 = elem_(fac1, 1);
+          const int e = dt_vitesse(fac1, k) > 0 ? (elem > -1 ? elem : elem2) : (elem2 > -1 ? elem2 : elem);
+          const double aa_r = (a_r && DERIVED_T::IS_AMONT) ? (*a_r)(e, k) : 1.0;
+          flux1_2[k] = -aa_r * psc * inco(fac1, k);
+        }
+      else
+        {
+          const int elem = elem_(fac2, 0), elem2 = elem_(fac2, 1);
+          const int e = dt_vitesse(fac2, k) > 0 ? (elem > -1 ? elem : elem2) : (elem2 > -1 ? elem2 : elem);
+          const double aa_r = (a_r && DERIVED_T::IS_AMONT) ? (*a_r)(e, k) : 1.0;
+          flux1_2[k] = (DERIVED_T::IS_CENTRE || DERIVED_T::IS_CENTRE4) ? -psc*0.5*(inco(fac1,k)+inco(fac2,k)) : -aa_r * psc * inco(fac2, k);
+        }
+    }
 }
 
 template <typename DERIVED_T> template<Type_Flux_Arete Arete_Type, typename Type_Double> inline std::enable_if_t< Arete_Type == Type_Flux_Arete::PERIODICITE, void>
