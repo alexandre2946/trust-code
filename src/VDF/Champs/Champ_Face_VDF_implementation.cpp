@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -115,30 +115,29 @@ DoubleVect& Champ_Face_VDF_implementation::valeur_a_elem_(const DoubleTab& val_f
   return val;
 }
 
-double Champ_Face_VDF_implementation::interpolation(const double val1, const double val2, const double psi) const
-{
-  double epsilon=1.e-12;
-  if (std::fabs(psi) < epsilon)
-    return val1 ;
-  else if (std::fabs(1.-psi) < epsilon)
-    return val2 ;
-  else
-    return val1 + psi * (val2-val1) ;
-}
-
 DoubleVect& Champ_Face_VDF_implementation::valeur_aux_elems_compo(const DoubleTab& positions, const IntVect& les_polys, DoubleVect& val, int ncomp) const
 {
   assert(val.size_totale() >= les_polys.size());
-
   const int D = Objet_U::dimension;
-  DoubleVect x(D);
-
-  for(int p = 0; p < les_polys.size(); p++)
+  const DoubleTab& coord = domaine_vdf().domaine().coord_sommets();
+  const IntTab& f_s = domaine_vdf().face_sommets(), &e_f = domaine_vdf().elem_faces();
+  const DoubleTab& vals = le_champ().valeurs();
+  int size = les_polys.size();
+  for(int p = 0; p < size; p++)
     {
-      for (int d = 0; d < D; d++) x(d) = positions(p, d);
-      val(p) = valeur_a_elem_compo(x, les_polys(p), ncomp);
+      int e = les_polys(p);
+      if (e<0)
+        {
+          val(p) = 0;
+        }
+      else
+        {
+          const double val1 = vals(e_f(e, ncomp)), val2 = vals(e_f(e, D + ncomp));
+          const int som0 = f_s(e_f(e, ncomp), 0), som1 = f_s(e_f(e, D + ncomp), 0);
+          const double psi = (positions(p, ncomp) - coord(som0, ncomp)) / (coord(som1, ncomp) - coord(som0, ncomp));
+          val(p) = interpolation(val1, val2, psi);
+        }
     }
-
   return val;
 }
 

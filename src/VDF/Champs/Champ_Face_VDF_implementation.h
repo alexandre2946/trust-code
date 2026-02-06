@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -40,12 +40,21 @@ public:
 
 protected:
   virtual const Domaine_VDF& domaine_vdf() const = 0;
-  double interpolation(const double, const double, const double) const;
+  inline double interpolation(const double, const double, const double) const;
   DoubleTab& trace(const Frontiere_dis_base& fr, const DoubleTab& y, DoubleTab& x, int distant) const;
 
 private:
   DoubleTab& valeur_aux_elems_(const DoubleTab& val_face, const DoubleTab& positions, const IntVect& les_polys, DoubleTab& valeurs) const;
   DoubleVect& valeur_a_elem_(const DoubleTab& val_face, const DoubleVect& position, DoubleVect& val, int le_poly) const;
 };
-
+inline double Champ_Face_VDF_implementation::interpolation(const double val1, const double val2, const double psi) const
+{
+  double epsilon=1.e-12;
+  if (std::fabs(psi) < epsilon)
+    return val1 ;
+  else if (std::fabs(1.-psi) < epsilon)
+    return val2 ;
+  else
+    return val1 + psi * (val2-val1) ;
+}
 #endif /* Champ_Face_VDF_implementation_included */
