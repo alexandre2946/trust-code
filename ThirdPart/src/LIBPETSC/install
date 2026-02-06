@@ -222,6 +222,10 @@ ROOT=`pwd`
 # Correction eventuelle des sources
 ###################################
 cd $ROOT/$package
+# Hypre
+sed -i "1,$ s?HYPRE_Int rstart?HYPRE_BigInt rstart?g" src/mat/impls/hypre/mhypre.c || exit -1
+sed -i "1,$ s?(HYPRE_Int)A?(HYPRE_BigInt)A?g" src/mat/impls/hypre/mhypre.c || exit -1
+sed -i "16 s?(HYPRE_Int)?(HYPRE_BigInt)?g" src/vec/vec/impls/hypre/vhyp.c || exit -1
 # Fixed in 3.24 ?
 #fix mhypre.c pour PCHMG
 #patch -p2 < $DIR/fix_mhypre.patch
