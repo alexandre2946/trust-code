@@ -868,7 +868,7 @@ elif [ "$PERF" = 1 ]
 then
    if [ $NB_PROCS = 1 ]
    then
-      exec="perf record --call-graph dwarf -o $NOM.perf $binary" # Plus complet
+      exec="perf record -F 4000 --call-graph dwarf -o $NOM.perf $binary" # Plus complet
    else
       Mpirun="perf record --call-graph dwarf -o $NOM.perf $Mpirun"
    fi   
@@ -1260,10 +1260,11 @@ export FI_CXI_DEFAULT_CQ_SIZE=393216" >> $GPU_DIRECT
    #########################
    # Consommation electrique
    #########################
-   if [ "$sub" = SLURM ]
-   then
-      echo "trust -energy \$SLURM_JOB_ID >> \$case.TU" >> $sub_file
-   fi
+   # sacct not working before end of the job
+   #if [ "$sub" = SLURM ] || [ "$sub" = CCC ]
+   #then
+   #   echo "trust -energy \$SLURM_JOB_ID >> \$case.TU" >> $sub_file
+   #fi
    #######
    # IPM #
    #######
@@ -1387,9 +1388,9 @@ fi
 if [ "$CALLGRIND" = 1 ]
 then
    echo "Callgrind log $NOM.callgrind is created."
-   echo "You could try now: kcachegrind $NOM.callgrind" && [ ! -f /usr/bin/kcachegrind ] && echo "But kcachegrind is not installed."
    echo "To see source code, you need a binary built with -g -O0, eg: \$exec_gcov"
-   echo "You can build it with: make gcov"
+   echo "You could try now: kcachegrind $NOM.callgrind" && [ ! -f /usr/bin/kcachegrind ] && echo "But kcachegrind is not installed."
+   [ -f /usr/bin/kcachegrind ] && /usr/bin/kcachegrind $NOM.callgrind
 elif [ "$MASSIF" = 1 ]
 then
    echo "Massif log $NOM.massif.* are created."
