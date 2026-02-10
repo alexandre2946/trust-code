@@ -462,6 +462,7 @@ void Probleme_base::init_postraitements()
                   Cerr << "Error, the values of dt_post (" << autre_post.dt_post() << " and " << post.dt_post() << ") of two postprocessing blocks writing in the same file" << nom_fichier
                        << " are different!" << finl;
                   Cerr << "Specify the same dt_post, or use two different files for postprocessing." << finl;
+                  Cerr << "INFO: For Probleme_couple, if you do not specify different filenames, postpros in subproblems must also have the same dt_post." << finl;
                   exit();
                 }
             }
