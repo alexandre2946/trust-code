@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -26,7 +26,7 @@ Implemente_instanciable(My_Comm_Group, "My_Comm_Group", Interprete);
 
 static OWN_PTR(Comm_Group) my_comm_group;
 
-Entree& My_Comm_Group::readOn(Entree& is) { return Interprete::readOn(is); }
+Entree& My_Comm_Group::readOn(Entree& is) { return interpreter(is); }
 
 Sortie& My_Comm_Group::printOn(Sortie& os) const { return Interprete::printOn(os); }
 

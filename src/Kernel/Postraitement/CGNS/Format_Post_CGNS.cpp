@@ -33,7 +33,7 @@ static void init_my_com_group()
           Option_CGNS::USE_LINKS = true;
           Option_CGNS::PARALLEL_OVER_ZONE = false;
           Option_CGNS::SINGLE_SAFE_FILE = false;
-          Nom ech = "My_Comm_Group { Group_nb ";
+          Nom ech = "{ Group_nb ";
           ech += Nom(nb_nodes);
           ech += " }";
 
