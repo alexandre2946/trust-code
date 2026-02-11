@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -22,43 +22,55 @@
 
 Implemente_instanciable(Partitionneur_Union,"Partitionneur_Union",Partitionneur_base);
 // XD partitionneur_union partitionneur_deriv union 0 Let several local domains be generated from a bigger one using the keyword create_domain_from_sub_domain, and let their partitions be generated in the usual way. Provided the list of partition files for each small domain, the keyword 'union' will partition the global domain in a conform fashion with the smaller domains.
-// XD attr liste bloc_lecture liste 0 List of the partition files with the following syntaxe: {sous_domaine1 decoupage1  ... sous_domaineim decoupageim } where sous_domaine1 ... sous_zomeim are small domains names and decoupage1 ... decoupageim are partition files.
 
-/*! @brief Lecture des parametres du partitionneur sur disque.
- *
- * Fomat attendu:
- *     { sous_domaine decoupage_sous_domaine }
- *   FILENAME est le nom d'un fichier existant au format ArrOfInt ascii.
- *
- */
-Entree& Partitionneur_Union::readOn(Entree& is)
-{
-  Nom mot, fic;
-  is >> mot;
-  if (mot != "{")
-    {
-      Cerr << "Partitionneur_Union : list { sous_domaine decoupage } expected." << finl;
-      abort();
-    }
-  for (is >> mot; mot != "}"; is >> mot)
-    {
-      is >> fic;
-      if (fic == "}")
-        {
-          Cerr << "Partitionneur_Union : partition file expected for sub-domaine " << mot << finl;
-          abort();
-        }
-      fic_ssz[mot.getString()] = fic.getString();
-    }
-  return is;
-}
+
+
 
 Sortie& Partitionneur_Union::printOn(Sortie& os) const
 {
   Cerr << "Partitionneur_Union::printOn invalid\n" << finl;
-  exit();
+  Process::exit();
   return os;
 }
+
+
+/*! @brief Lecture des parametres du partitionneur sur disque.
+ *
+ * Format attendu:
+ *    {
+ *      sous_domaines N ssdom1 ... ssdomN
+ *      fichiers_decoupage N file1 ... fileN
+ *    }
+ *
+ */
+void Partitionneur_Union::set_param(Param& param) const
+{
+
+  param.ajouter("sous_domaines", &sous_domaines_, Param::REQUIRED); // XD_ADD_P listchaine list of sous_domaines names. They must be valid Sous_Domaine that have been declared earlier in the dataset
+  param.ajouter("fichiers_decoupage", &fichiers_decoupage_, Param::REQUIRED); // XD_ADD_P listchaine list of files which contain the partittion for the corresponding subdomain
+}
+void Partitionneur_Union::validate_params() const
+{
+  Cerr << que_suis_je() << "::validate_params" << finl;
+  if (sous_domaines_.size() != fichiers_decoupage_.size())
+    {
+      Process::exit("Expected same number of elements in sous_domaines and fichiers_decoupage");
+    }
+
+  for (int i = 0; i< sous_domaines_.size(); i++)
+    {
+      if (Interprete::objet_existant(sous_domaines_[i]) == 0)
+        {
+          Process::exit(sous_domaines_[i] + "is not an existing TRUST object");
+        }
+      if (not sub_type(Sous_Domaine, Interprete::objet(sous_domaines_[i])))
+        {
+          Process::exit(sous_domaines_[i] + " is not a Sous_Domaine object");
+        }
+    }
+
+}
+
 
 void Partitionneur_Union::associer_domaine(const Domaine& domaine)
 {
@@ -72,20 +84,20 @@ void Partitionneur_Union::construire_partition(IntVect& elem_part, int& nb_parts
 {
   elem_part.resize(ref_domaine_->nb_elem());
   elem_part = -1;
-  for (auto &&kv : fic_ssz)
+
+  for (int i_dom = 0; i_dom< sous_domaines_.size(); i_dom++)
     {
       //on recupere le sous-domaine par son nom et le decoupage en ouvrant le fichier...
-      Nom tmp(kv.first);
-      const Sous_Domaine& ssz = ref_cast(Sous_Domaine, Interprete::objet(tmp));
+      const Sous_Domaine& ssz = ref_cast(Sous_Domaine, Interprete::objet(sous_domaines_[i_dom]));
       EFichier file;
-      file.ouvrir(kv.second.c_str());
+      file.ouvrir(fichiers_decoupage_[i_dom].getString().c_str());
       IntVect dec_ssz;
       file >> dec_ssz;
       file.close();
       //... et on remplit un morceau de elem_part avec
       if (dec_ssz.size_array() != ssz.nb_elem_tot())
         {
-          Cerr << "Partitionneur_Union : incoherent element number for sub-domaine " << kv.first << finl;
+          Cerr << "Partitionneur_Union : incoherent element number for sub-domaine " << sous_domaines_[i_dom] << finl;
           Process::exit();
         }
       for (int i = 0; i < ssz.nb_elem_tot(); i++)

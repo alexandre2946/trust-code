@@ -30,9 +30,9 @@
 
 class Partitionneur_Fichier_MED : public Partitionneur_base
 {
-  Declare_instanciable(Partitionneur_Fichier_MED);
+  Declare_instanciable_with_param(Partitionneur_Fichier_MED);
+
 public:
-  void set_param(Param& param) const override;
   void associer_domaine(const Domaine& domaine) override;
   void initialiser(const char *filename);
   void construire_partition(IntVect& elem_part, int& nb_parts_tot) const override;

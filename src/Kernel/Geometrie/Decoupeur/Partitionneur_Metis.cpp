@@ -55,12 +55,6 @@ Sortie& Partitionneur_Metis_32_64<_SIZE_>::printOn(Sortie& os) const
   return os;
 }
 
-template <typename _SIZE_>
-Entree& Partitionneur_Metis_32_64<_SIZE_>::readOn(Entree& is)
-{
-  Partitionneur_base_32_64<_SIZE_>::readOn(is);
-  return is;
-}
 
 template <typename _SIZE_>
 void Partitionneur_Metis_32_64<_SIZE_>::set_param(Param& param) const

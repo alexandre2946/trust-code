@@ -34,9 +34,9 @@
 
 class Partitionneur_Fichier_Decoupage : public Partitionneur_base
 {
-  Declare_instanciable(Partitionneur_Fichier_Decoupage);
+  Declare_instanciable_with_param(Partitionneur_Fichier_Decoupage);
+
 public:
-  void set_param(Param& param) const override;
   void associer_domaine(const Domaine& domaine) override;
   void initialiser(const char *filename);
   void construire_partition(IntVect& elem_part, int& nb_parts_tot) const override;
@@ -44,7 +44,7 @@ public:
 protected:
   // Parametres du partitionneur
   OBS_PTR(Domaine) ref_domaine_;
-  Nom filename_;
+  Nom filename_ = "";
   bool corriger_partition_ = false;
 };
 #endif

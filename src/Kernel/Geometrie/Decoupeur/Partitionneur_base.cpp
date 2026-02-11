@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -23,7 +23,7 @@
 #include <Domaine.h>
 #include <Param.h>
 
-Implemente_base_32_64(Partitionneur_base_32_64,"Partitionneur_base",Objet_U);
+Implemente_base_32_64(Partitionneur_base_32_64,"Partitionneur_base",Objet_U_With_Params);
 // XD partitionneur_deriv objet_u partitionneur_deriv -1 not_set
 // XD  attr nb_parts entier nb_parts 1 The number of non empty parts that must be generated (generally equal to the number of processors in the parallel run).
 
@@ -35,13 +35,8 @@ Sortie& Partitionneur_base_32_64<_SIZE_>::printOn(Sortie& os) const
 }
 
 template <typename _SIZE_>
-Entree& Partitionneur_base_32_64<_SIZE_>::readOn(Entree& is)
+void Partitionneur_base_32_64<_SIZE_>::set_param(Param& param) const
 {
-  Cerr << "Reading parameters of " << this->que_suis_je() << finl;
-  Param param(this->que_suis_je());
-  set_param(param);
-  param.lire_avec_accolades_depuis(is);
-  return is;
 }
 
 /*! @brief corrige la partition pour que l'element 0 du domaine initial se trouve sur le premier sous-domaine de la partition.

@@ -28,17 +28,6 @@ Partitionneur_Sous_Domaines::Partitionneur_Sous_Domaines()
 {
 }
 
-Entree& Partitionneur_Sous_Domaines::readOn(Entree& is)
-{
-  if (! ref_domaine_.non_nul())
-    {
-      Cerr << " Error: the domain has not been associated" << finl;
-      exit();
-    }
-  Partitionneur_base::readOn(is);
-  Cerr << " Subareas names : ";
-  return is;
-}
 
 Sortie& Partitionneur_Sous_Domaines::printOn(Sortie& os) const
 {
@@ -57,6 +46,11 @@ Sortie& Partitionneur_Sous_Domaines::printOn(Sortie& os) const
  */
 void Partitionneur_Sous_Domaines::set_param(Param& param) const
 {
+  if (ref_domaine_.est_nul())
+    {
+      Cerr << " Error: the domain has not been associated" << finl;
+      Process::exit();
+    }
   param.ajouter("sous_zones",&noms_sous_domaines_);  // XD attr sous_zones listchaine sous_zones 1 N SUBZONE_NAME_1 SUBZONE_NAME_2 ...
   param.ajouter("domaines",&noms_domaines_);         // XD attr domaines   listchaine domaines   1 N DOMAIN_NAME_1  DOMAIN_NAME_2  ...
 }

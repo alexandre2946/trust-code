@@ -17,9 +17,6 @@
 
 #include <Partitionneur_base.h>
 #include <TRUST_Ref.h>
-#include <string>
-#include <map>
-
 #include <Domaine_forward.h>
 
 /*! @brief Decoupeur permettant de decouper un domaine global de maniere conforme avec un ensemble de sous-domaines deja decoupes.
@@ -28,20 +25,22 @@
  *
  *  Syntaxe:
  *     partitionneur union
- *     {
- *       <sous-domaine 1>  <fichier ecrire_decoupage du sous-domaine 1>
- *       ...
- *       <sous-domaine N>  <fichier ecrire_decoupage du sous-domaine N>
- *     }
+ *      {
+ *        sous_domaines N ssdom1 ... ssdomN
+ *        fichiers_decoupage N file1 ... fileN
+ *      }
  *
  *
  * @sa Partitionneur_Sous_Domaine Create_domain_from_sub_domain
  */
 class Partitionneur_Union : public Partitionneur_base
 {
-  Declare_instanciable(Partitionneur_Union);
+  Declare_instanciable_with_param(Partitionneur_Union);
+
+protected:
+  void validate_params() const override;
+
 public:
-  void set_param(Param& param) const override { };
   void associer_domaine(const Domaine& dom) override;
   void initialiser(const char *filename, const char *filename_ssz);
   void construire_partition(IntVect& elem_part, int& nb_parts_tot) const override;
@@ -49,6 +48,7 @@ public:
 protected:
   // Parametres du partitionneur
   OBS_PTR(Domaine) ref_domaine_;
-  std::map<std::string, std::string> fic_ssz; //fic_ssz[nom de la sous domaine] = { fichier de decoupage }
+  VECT(Nom) sous_domaines_ ;
+  VECT(Nom) fichiers_decoupage_;
 };
 #endif

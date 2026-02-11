@@ -30,7 +30,7 @@
 template <typename _SIZE_>
 class Partitionneur_Metis_32_64 : public Partitionneur_base_32_64<_SIZE_>
 {
-  Declare_instanciable_32_64(Partitionneur_Metis_32_64);
+  Declare_instanciable_with_param_32_64(Partitionneur_Metis_32_64);
 
 public:
   using int_t = _SIZE_;
@@ -41,7 +41,6 @@ public:
 
   using BigIntVect_ = TRUSTVect<int, _SIZE_>;
 
-  void set_param(Param& param) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   void associer_domaine(const Domaine_t& domaine) override { ref_domaine_ = domaine; }
   void construire_partition(BigIntVect_& elem_part, int& nb_parts_tot) const override;

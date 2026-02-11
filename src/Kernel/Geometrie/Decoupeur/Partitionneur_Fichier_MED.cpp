@@ -36,21 +36,6 @@ Partitionneur_Fichier_MED::Partitionneur_Fichier_MED()
 {
 }
 
-/*! @brief Lecture des parametres du partitionneur sur disque.
- *
- * Fomat attendu:
- *     { file FILENAME field FIELDNAME }
- *   FILENAME est le nom d'un fichier MED, le champ FIELDNAME comporte un ArrayOfInt avec le numero du processeur.
- *
- */
-Entree& Partitionneur_Fichier_MED::readOn(Entree& is)
-{
-  Partitionneur_base::readOn(is);
-  Cerr << " filename : " << filename_ << finl;
-  Cerr << " fieldname : " << fieldname_ << finl;
-  return is;
-}
-
 Sortie& Partitionneur_Fichier_MED::printOn(Sortie& os) const
 {
   Cerr << "Partitionneur_MED::printOn invalid\n" << finl;
@@ -58,6 +43,13 @@ Sortie& Partitionneur_Fichier_MED::printOn(Sortie& os) const
   return os;
 }
 
+/*! @brief Lecture des parametres du partitionneur sur disque.
+ *
+ * Fomat attendu:
+ *     { file FILENAME field FIELDNAME }
+ *   FILENAME est le nom d'un fichier MED, le champ FIELDNAME comporte un ArrayOfInt avec le numero du processeur.
+ *
+ */
 void Partitionneur_Fichier_MED::set_param(Param& param) const
 {
   param.ajouter("file",&filename_,Param::REQUIRED); // XD_ADD_P chaine file name of the MED file to load

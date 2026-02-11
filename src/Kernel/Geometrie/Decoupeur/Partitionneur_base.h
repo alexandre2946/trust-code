@@ -19,7 +19,7 @@
 #include <Noms.h>
 #include <Static_Int_Lists.h>
 
-#include <Domaine_forward.h>
+#include <Objet_U_With_Params.h>
 class Param;
 #include <Domaine_forward.h>
 
@@ -48,9 +48,9 @@ class Param;
  *
  */
 template <typename _SIZE_>
-class Partitionneur_base_32_64 : public Objet_U
+class Partitionneur_base_32_64 : public Objet_U_With_Params
 {
-  Declare_base_32_64(Partitionneur_base_32_64);
+  Declare_base_with_param_32_64(Partitionneur_base_32_64);
 
 public:
   using int_t = _SIZE_;
@@ -64,7 +64,6 @@ public:
   using BigArrOfInt_ = TRUSTArray<int, _SIZE_>;  // always int as value type, will hold proc/partition number.
   using BigIntVect_ = TRUSTVect<int, _SIZE_>;
 
-  virtual void set_param(Param& param) const override=0;
   int lire_motcle_non_standard(const Motcle&, Entree&) override { return -1; }
   virtual void associer_domaine(const Domaine_t& domaine) = 0;
   virtual void declarer_bords_periodiques(const Noms& noms_bords_periodiques) { liste_bords_periodiques_ = noms_bords_periodiques; }

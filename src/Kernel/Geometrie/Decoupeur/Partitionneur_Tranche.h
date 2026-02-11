@@ -29,7 +29,10 @@
 template <typename _SIZE_>
 class Partitionneur_Tranche_32_64 : public Partitionneur_base_32_64<_SIZE_>
 {
-  Declare_instanciable_32_64(Partitionneur_Tranche_32_64);
+  Declare_instanciable_with_param_32_64(Partitionneur_Tranche_32_64);
+
+protected:
+  void validate_params() const override;
 
 public:
   using int_t = _SIZE_;
@@ -40,7 +43,6 @@ public:
 
   using BigIntVect_ = TRUSTVect<int, _SIZE_>;  // always int as value type, will hold proc/partition number.
 
-  void set_param(Param& param) const override;
   void associer_domaine(const Domaine_t& domaine) override;
   void initialiser(const ArrOfInt& nb_tranches);
   void construire_partition(BigIntVect_& elem_part, int& nb_parts_tot) const override;

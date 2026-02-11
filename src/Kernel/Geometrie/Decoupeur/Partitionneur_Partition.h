@@ -26,10 +26,13 @@
  */
 class Partitionneur_Partition : public Partitionneur_base
 {
-  Declare_instanciable(Partitionneur_Partition);
+  Declare_instanciable_with_param(Partitionneur_Partition);
+
+protected:
+  void validate_params() const override;
+
 public:
 
-  void set_param(Param& param) const override;
   void associer_domaine(const Domaine& domaine) override;
   void initialiser();
   void construire_partition(IntVect& elem_part, int& nb_parts_tot) const override;
@@ -37,7 +40,6 @@ public:
 private:
   // Parametres du partitionneur
   OBS_PTR(Domaine) ref_domaine_interpol_;
-  OBS_PTR(Domaine) ref_domaine_calcul_;
-  Nom dom_calcul_;
+  Nom dom_calcul_ = "";
 };
 #endif

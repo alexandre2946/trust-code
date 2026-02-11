@@ -12,37 +12,19 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
+#include <Cast.h>
+#include <Interprete.h>
 #include <Partitionneur_Partition.h>
 #include <Domaine.h>
 #include <Reordonner_faces_periodiques.h>
 #include <EFichier.h>
 #include <Param.h>
 
-Implemente_instanciable_sans_constructeur(Partitionneur_Partition,"Partitionneur_Partition",Partitionneur_base);
+Implemente_instanciable(Partitionneur_Partition,"Partitionneur_Partition",Partitionneur_base);
 // XD partitionneur_partition partitionneur_deriv PARTITION -1 This algorithm re-use the partition of the domain named DOMAINE_NAME. It is useful to partition for example a post processing domain. The partition should match with the calculation domain.
 // XD attr domaine ref_domaine domaine 0 domain name
 
-Partitionneur_Partition::Partitionneur_Partition()
-{
-  dom_calcul_ = "";
-}
 
-/*! @brief La syntaxe est { Domaine NOM_DOM }
- *
- */
-Entree& Partitionneur_Partition::readOn(Entree& is)
-{
-  if (! ref_domaine_interpol_.non_nul())
-    {
-      Cerr << " Error: the domain has not been associated" << finl;
-      exit();
-    }
-
-  Partitionneur_base::readOn(is);
-  Cerr << " Reference domain : " << dom_calcul_ << finl;
-  ref_domaine_calcul_ = ref_cast(Domaine, Interprete::objet(dom_calcul_));
-  return is;
-}
 
 Sortie& Partitionneur_Partition::printOn(Sortie& os) const
 {
@@ -51,9 +33,35 @@ Sortie& Partitionneur_Partition::printOn(Sortie& os) const
   return os;
 }
 
+/*! @brief La syntaxe est { Domaine NOM_DOM }
+ *
+ */
 void Partitionneur_Partition::set_param(Param& param) const
 {
+  if (ref_domaine_interpol_.est_nul())
+    {
+      Cerr << " Error: the domain has not been associated" << finl;
+      Process::exit();
+    }
   param.ajouter("domaine",&dom_calcul_,Param::REQUIRED);
+}
+
+void Partitionneur_Partition::validate_params() const
+{
+  Cerr << que_suis_je() << "::validate_params" << finl;
+  Cerr << " Reference domain : " << dom_calcul_ << finl;
+
+  if (Interprete::objet_existant(dom_calcul_) == 0)
+    {
+      Cerr << "ERROR:  provided name '" << dom_calcul_ <<"' does not name an existing object."<< finl;
+      Process::exit();
+    }
+
+  if (not sub_type(Domaine, Interprete::objet(dom_calcul_)))
+    {
+      Cerr << "ERROR:  provided name '" << dom_calcul_ <<"' is not a domain."<< finl;
+      Process::exit();
+    }
 }
 
 /*! @brief Premiere etape d'initialisation du partitionneur: on associe un domaine.
@@ -68,14 +76,20 @@ void Partitionneur_Partition::associer_domaine(const Domaine& domaine)
  *
  * (on peut utiliser readOn a la place).
  *
+ * WARNING: le message ci dessus est un copier-coller de Partitionneur_Tranche et est faux
+ * merci a une personne sachante de corriger ça.
  */
 void Partitionneur_Partition::initialiser()
 {
+
   assert(ref_domaine_interpol_.non_nul());
 }
 
 void Partitionneur_Partition::construire_partition(IntVect& elem_part, int& nb_parts_tot) const
 {
+
+
+  OBS_PTR(Domaine) ref_domaine_calcul_ = ref_cast(Domaine, Interprete::objet(dom_calcul_));
   assert(ref_domaine_interpol_.non_nul());
   assert(ref_domaine_calcul_.non_nul());
 

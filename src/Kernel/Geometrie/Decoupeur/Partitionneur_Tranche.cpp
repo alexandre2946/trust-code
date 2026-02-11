@@ -23,26 +23,6 @@ Implemente_instanciable_32_64(Partitionneur_Tranche_32_64, "Partitionneur_Tranch
 // XD partitionneur_tranche partitionneur_deriv tranche -1 This algorithm will create a geometrical partitionning by slicing the mesh in the two or three axis directions, based on the geometric center of each mesh element. nz must be given if dimension=3. Each slice contains the same number of elements (slices don\'t have the same geometrical width, and for VDF meshes, slice boundaries are generally not flat except if the number of mesh elements in each direction is an exact multiple of the number of slices). First, nx slices in the X direction are created, then each slice is split in ny slices in the Y direction, and finally, each part is split in nz slices in the Z direction. The resulting number of parts is nx*ny*nz. If one particular direction has been declared periodic, the default slicing (0, 1, 2, ..., n-1)is replaced by (0, 1, 2, ... n-1, 0), each of the two \'0\' slices having twice less elements than the other slices.
 // XD attr tranches listentierf tranches 1 Partitioned by nx in the X direction, ny in the Y direction, nz in the Z direction. Works only for structured meshes. No warranty for unstructured meshes.
 
-/*! @brief La syntaxe est { Tranches nx ny [ nz ] }
- */
-template <typename _SIZE_>
-Entree& Partitionneur_Tranche_32_64<_SIZE_>::readOn(Entree& is)
-{
-  if (! ref_domaine_.non_nul())
-    {
-      Cerr << " Error: the domain has not been associated" << finl;
-      Process::exit();
-    }
-
-  Partitionneur_base_32_64<_SIZE_>::readOn(is);
-  if (min_array(nb_tranches_)<1)
-    {
-      Cerr << "Error for the cutting domain tool (Tranche) specifications : " <<finl;
-      Cerr<< " the number of slice must be greater than 0 for each direction. " << finl;
-      Process::exit();
-    }
-  return is;
-}
 
 template <typename _SIZE_>
 Sortie& Partitionneur_Tranche_32_64<_SIZE_>::printOn(Sortie& os) const
@@ -52,10 +32,33 @@ Sortie& Partitionneur_Tranche_32_64<_SIZE_>::printOn(Sortie& os) const
   return os;
 }
 
+/*! @brief La syntaxe est { Tranches nx ny [ nz ] }
+ */
 template <typename _SIZE_>
 void Partitionneur_Tranche_32_64<_SIZE_>::set_param(Param& param) const
 {
+  if (ref_domaine_.est_nul())
+    {
+      Cerr << " Error: the domain has not been associated" << finl;
+      Process::exit();
+    }
   param.ajouter_arr_size_predefinie("tranches",&nb_tranches_,Param::REQUIRED);
+
+}
+
+/*! @brief La syntaxe est { Tranches nx ny [ nz ] }
+ */
+template <typename _SIZE_>
+void Partitionneur_Tranche_32_64<_SIZE_>::validate_params() const
+{
+
+  // used to be done in readOn
+  if (min_array(nb_tranches_)<1)
+    {
+      Cerr << "Error for the cutting domain tool (Tranche) specifications : " <<finl;
+      Cerr<< " the number of slice must be greater than 0 for each direction. " << finl;
+      Process::exit();
+    }
 }
 
 /*! @brief Premiere etape d'initialisation du partitionneur: on associe un domaine.
@@ -77,6 +80,7 @@ void Partitionneur_Tranche_32_64<_SIZE_>::associer_domaine(const Domaine_t& doma
 template <typename _SIZE_>
 void Partitionneur_Tranche_32_64<_SIZE_>::initialiser(const ArrOfInt& nb_tranches)
 {
+
   assert(ref_domaine_.non_nul());
   assert(nb_tranches.size_array() == nb_tranches_.size_array());
   assert(min_array(nb_tranches) > 0);

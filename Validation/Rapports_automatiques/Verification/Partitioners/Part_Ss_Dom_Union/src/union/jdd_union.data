@@ -48,8 +48,8 @@ Decouper domaine_glob
 {
     partitionneur union
     {
-        sous_zone_dom1 domaine1.txt
-        sous_zone_dom2 domaine2.txt
+        sous_domaines 2 sous_zone_dom1 sous_zone_dom2
+        fichiers_decoupage 2 domaine1.txt domaine2.txt
     }
     nb_parts_tot 7
     ecrire_lata domaine_glob_decoup.lata

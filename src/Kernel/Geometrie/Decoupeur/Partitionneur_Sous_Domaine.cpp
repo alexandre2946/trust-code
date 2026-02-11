@@ -20,12 +20,15 @@
 #include <EChaine.h>
 
 // XD partitionneur_sous_dom partitionneur_deriv sous_dom -1 Given a global partition of a global domain, 'sous-domaine' allows to produce a conform partition of a sub-domain generated from the bigger one using the keyword create_domain_from_sub_domain. The sub-domain will be partitionned in a conform fashion with the global domain.
-Implemente_instanciable_sans_constructeur(Partitionneur_Sous_Domaine,"Partitionneur_Sous_Dom",Partitionneur_base);
+Implemente_instanciable(Partitionneur_Sous_Domaine,"Partitionneur_Sous_Dom",Partitionneur_base);
 
-Partitionneur_Sous_Domaine::Partitionneur_Sous_Domaine()
+
+
+Sortie& Partitionneur_Sous_Domaine::printOn(Sortie& os) const
 {
-  filename_ = "";
-  filename_ssz_ = "";
+  Cerr << "Partitionneur_Sous_Domaine::printOn invalid\n" << finl;
+  exit();
+  return os;
 }
 
 /*! @brief Lecture des parametres du partitionneur sur disque.
@@ -38,29 +41,25 @@ Partitionneur_Sous_Domaine::Partitionneur_Sous_Domaine()
  *   FILENAME est le nom d'un fichier existant au format ArrOfInt ascii.
  *
  */
-Entree& Partitionneur_Sous_Domaine::readOn(Entree& is)
+void Partitionneur_Sous_Domaine::set_param(Param& param) const
 {
-  Partitionneur_base::readOn(is);
+  // TODO (teo boutin) this might be cleaner/easier to understand if a flag/boolean option
+  // is used to choose between using a file or a subdomain from runtime instanciation in trust datafile
+  // rather than having 2 params and checking only one is used
+  param.ajouter("fichier",&filename_,Param::REQUIRED); // XD_ADD_P chaine fichier
+  param.ajouter("fichier_ssz",&filename_ssz_); // XD_ADD_P chaine fichier sous zone
+  param.ajouter("name_ssz",&name_ssz_); // XD_ADD_P chaine nom sous zone (nom d'un objet Sous_Domaine declare dans le jdd)
+}
+
+void Partitionneur_Sous_Domaine::validate_params() const
+{
   if (filename_ssz_ == "" && name_ssz_ == "")
     Process::exit(que_suis_je() + " : at least one of filename_ssz or name_ssz are needed");
+  if (filename_ssz_ != "" && name_ssz_ != "")
+    Process::exit(que_suis_je() + " : only one of filename_ssz or name_ssz must be specified"); // not sure about that, but
   Cerr << " filename : " << filename_ << finl;
   Cerr << " filename_ssz : " << filename_ssz_ << finl;
   Cerr << " name_ssz : " << name_ssz_ << finl;
-  return is;
-}
-
-Sortie& Partitionneur_Sous_Domaine::printOn(Sortie& os) const
-{
-  Cerr << "Partitionneur_Sous_Domaine::printOn invalid\n" << finl;
-  exit();
-  return os;
-}
-
-void Partitionneur_Sous_Domaine::set_param(Param& param) const
-{
-  param.ajouter("fichier",&filename_,Param::REQUIRED); // XD_ADD_P chaine fichier
-  param.ajouter("fichier_ssz",&filename_ssz_); // XD_ADD_P chaine fichier sous zonne
-  param.ajouter("name_ssz",&name_ssz_); // XD_ADD_P chaine nom sous zonne
 }
 
 /*! @brief Lit le contenu du fichier "filename_" et stocke le resultat dans elem_part

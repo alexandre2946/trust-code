@@ -29,10 +29,11 @@
 
 class Partitionneur_Ptscotch : public Partitionneur_base
 {
-  Declare_instanciable(Partitionneur_Ptscotch);
+  Declare_instanciable_with_param(Partitionneur_Ptscotch);
+
+
 public:
 
-  void set_param(Param& param) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   void associer_domaine(const Domaine& domaine) override;
   void construire_partition(IntVect& elem_part, int& nb_parts_tot) const override;

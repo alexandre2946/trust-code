@@ -50,15 +50,19 @@
  */
 class Partitionneur_Sous_Domaine : public Partitionneur_base
 {
-  Declare_instanciable(Partitionneur_Sous_Domaine);
+  Declare_instanciable_with_param(Partitionneur_Sous_Domaine);
+
+protected:
+  void validate_params() const override;
+
 public:
-  void set_param(Param& param) const override;
   void associer_domaine(const Domaine& dom) override { };
   void construire_partition(IntVect& elem_part, int& nb_parts_tot) const override;
 
 protected:
   // Parametres du partitionneur
-  Nom filename_;      ///! Nom du fichier de decoupe globale
-  Nom filename_ssz_, name_ssz_; ///! Nom du fichier de sous-domaines
+  Nom filename_ = "";      ///! Nom du fichier de decoupe globale
+  Nom filename_ssz_ = ""; ///! Nom du fichier de sous-domaines
+  Nom name_ssz_ = ""; ///! Nom du sous_domaine (declare dans le jdd)
 };
 #endif

@@ -17,12 +17,15 @@
 #include <Domaine.h>
 #include <Param.h>
 
-Implemente_instanciable_sans_constructeur(Partitionneur_Fichier_Decoupage,"Partitionneur_Fichier_Decoupage",Partitionneur_base);
+Implemente_instanciable(Partitionneur_Fichier_Decoupage,"Partitionneur_Fichier_Decoupage",Partitionneur_base);
 // XD partitionneur_fichier_decoupage partitionneur_deriv fichier_decoupage -1 This algorithm reads an array of integer values on the disc, one value for each mesh element. Each value is interpreted as the target part number n>=0 for this element. The number of parts created is the highest value in the array plus one. Empty parts can be created if some values are not present in the array. NL2 The file format is ASCII, and contains space, tab or carriage-return separated integer values. The first value is the number nb_elem of elements in the domain, followed by nb_elem integer values (positive or zero). NL2 This algorithm has been designed to work together with the \'ecrire_decoupage\' option. You can generate a partition with any other algorithm, write it to disc, modify it, and read it again to generate the .Zone files. NL2 Contrary to other partitioning algorithms, no correction is applied by default to the partition (eg. element 0 on processor 0 and corrections for periodic boundaries). If \'corriger_partition\' is specified, these corrections are applied.
 
-Partitionneur_Fichier_Decoupage::Partitionneur_Fichier_Decoupage()
+
+Sortie& Partitionneur_Fichier_Decoupage::printOn(Sortie& os) const
 {
-  filename_ = "";
+  Cerr << "Partitionneur_Metis::printOn invalid\n" << finl;
+  exit();
+  return os;
 }
 
 /*! @brief Lecture des parametres du partitionneur sur disque.
@@ -32,22 +35,6 @@ Partitionneur_Fichier_Decoupage::Partitionneur_Fichier_Decoupage()
  *   FILENAME est le nom d'un fichier existant au format ArrOfInt ascii.
  *
  */
-Entree& Partitionneur_Fichier_Decoupage::readOn(Entree& is)
-{
-  Partitionneur_base::readOn(is);
-  Cerr << " filename : " << filename_ << finl;
-  if (corriger_partition_)
-    Cerr << " corriger_partition => partition will be corrected (periodic + elem0_on_proc0)" << finl;
-  return is;
-}
-
-Sortie& Partitionneur_Fichier_Decoupage::printOn(Sortie& os) const
-{
-  Cerr << "Partitionneur_Metis::printOn invalid\n" << finl;
-  exit();
-  return os;
-}
-
 void Partitionneur_Fichier_Decoupage::set_param(Param& param) const
 {
   param.ajouter("fichier",&filename_,Param::REQUIRED);            // XD attr fichier chaine fichier 0 File name

@@ -46,11 +46,6 @@ Sortie& Partitionneur_Ptscotch::printOn(Sortie& os) const
   return os;
 }
 
-Entree& Partitionneur_Ptscotch::readOn(Entree& is)
-{
-  Partitionneur_base::readOn(is);
-  return is;
-}
 
 void Partitionneur_Ptscotch::set_param(Param& param) const
 {

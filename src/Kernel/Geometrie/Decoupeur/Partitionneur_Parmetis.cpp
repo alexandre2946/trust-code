@@ -47,17 +47,18 @@ Sortie& Partitionneur_Parmetis::printOn(Sortie& os) const
   return os;
 }
 
-Entree& Partitionneur_Parmetis::readOn(Entree& is)
-{
-  Partitionneur_base::readOn(is);
-  return is;
-}
-
 void Partitionneur_Parmetis::set_param(Param& param) const
 {
   param.ajouter("nb_parts",&nb_parties_,Param::REQUIRED);
-  param.ajouter_condition("(value_of_nb_parts_ge_1)_and_(value_of_nb_parts_le_100000)","The following condition must be satisfied : 1 <= nb_parties <= 100000");
   param.ajouter_flag("use_weights",&use_weights_);
+}
+
+void Partitionneur_Parmetis::validate_params() const
+{
+  if (nb_parties_ < 1 || nb_parties_ > 100000)
+    {
+      Process::exit("Partitionneur_Parmetis::validate_params: The following condition must be satisfied : 1 <= nb_parts <= 100000");
+    }
 }
 
 int Partitionneur_Parmetis::lire_motcle_non_standard(const Motcle& mot, Entree& is)
