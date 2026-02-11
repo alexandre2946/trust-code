@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -29,18 +29,21 @@
 #include <arch.h>
 
 #ifdef LATATOOLS
-#define Declare_instanciable_sans_constructeur_ni_destructeur(_TYPE_)        \
+#define Declare_instanciable_sans_constructeur_ni_destructeur_ni_readon(_TYPE_)        \
                                                                         \
   public :                                                                \
   unsigned taille_memoire() const override { return 0; };                                      \
   int duplique() const override { return 0; };                                                \
   protected :                                                                \
-  Sortie& printOn(Sortie& x) const override;                                \
+  Sortie& printOn(Sortie& x) const override
+
+#define Declare_instanciable_sans_constructeur_ni_destructeur(_TYPE_)      \
+  Declare_instanciable_sans_constructeur_ni_destructeur_ni_readon(_TYPE_); \
   Entree& readOn(Entree&) override
 
 #else
-#define Declare_instanciable_sans_constructeur_ni_destructeur(_TYPE_)        \
-                                                                        \
+
+#define Declare_instanciable_sans_constructeur_ni_destructeur_ni_readon(_TYPE_)        \
   public :                                                                \
   static Objet_U* cree_instance() ;                                        \
   unsigned taille_memoire() const override;                                        \
@@ -52,8 +55,12 @@
   static _TYPE_& self_cast( Objet_U&) ;                                        \
   static const _TYPE_& self_cast(const Objet_U&) ;                        \
   protected :                                                                \
-  Sortie& printOn(Sortie& x) const override;                                \
+  Sortie& printOn(Sortie& x) const override
+
+#define Declare_instanciable_sans_constructeur_ni_destructeur(_TYPE_)      \
+  Declare_instanciable_sans_constructeur_ni_destructeur_ni_readon(_TYPE_); \
   Entree& readOn(Entree&) override
+
 #endif
 
 #define Declare_instanciable_sans_constructeur(_TYPE_)                \
@@ -71,6 +78,12 @@
   _TYPE_();                                                        \
   ~_TYPE_();                                                        \
   Declare_instanciable_sans_constructeur_ni_destructeur(_TYPE_) \
+ 
+#define Declare_instanciable_sans_readon(_TYPE_)                                \
+  public:                                                        \
+  _TYPE_();                                                        \
+  ~_TYPE_();                                                        \
+  Declare_instanciable_sans_constructeur_ni_destructeur_ni_readon(_TYPE_) \
  
 #ifdef LATATOOLS
 #define Implemente_instanciable_sans_constructeur_ni_destructeur(_TYPE_,_NOM_,_BASE_)
@@ -140,6 +153,7 @@
 #define Declare_instanciable_sans_constructeur_32_64(_TYPE_) Declare_instanciable_sans_constructeur(_TYPE_)
 #define Declare_instanciable_sans_destructeur_32_64(_TYPE_) Declare_instanciable_sans_destructeur(_TYPE_)
 #define Declare_instanciable_32_64(_TYPE_) Declare_instanciable(_TYPE_)
+#define Declare_instanciable_sans_readon_32_64(_TYPE_) Declare_instanciable_sans_readon(_TYPE_)
 
 // Helper macro for info_obj static variable definition:
 #if INT_is_64_ == 2
