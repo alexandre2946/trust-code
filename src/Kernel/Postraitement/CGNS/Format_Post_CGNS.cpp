@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,10 +14,36 @@
 *****************************************************************************/
 
 #include <Format_Post_CGNS.h>
+#include <My_Comm_Group.h>
 #include <Option_CGNS.h>
+#include <PE_Groups.h>
+#include <EChaine.h>
 #include <Param.h>
 
 Implemente_instanciable_sans_constructeur(Format_Post_CGNS, "Format_Post_CGNS", Format_Post_base);
+
+static void init_my_com_group()
+{
+  if (!PE_Groups::has_user_defined_group())
+    {
+      const int nb_nodes = PE_Groups::get_node_group().get_number_of_nodes();
+      if (nb_nodes > 1)
+        {
+          Option_CGNS::FILE_PER_COMM_GROUP = true;
+          Option_CGNS::USE_LINKS = true;
+          Option_CGNS::PARALLEL_OVER_ZONE = false;
+          Option_CGNS::SINGLE_SAFE_FILE = false;
+          Nom ech = "My_Comm_Group { Group_nb ";
+          ech += Nom(nb_nodes);
+          ech += " }";
+
+          My_Comm_Group comm;
+          EChaine ech2(ech);
+
+          ech2 >> comm;
+        }
+    }
+}
 
 Format_Post_CGNS::Format_Post_CGNS()
 {
@@ -38,6 +64,7 @@ Sortie& Format_Post_CGNS::printOn(Sortie& os) const
 Entree& Format_Post_CGNS::readOn(Entree& is)
 {
   verify_if_cgns(__func__);
+  init_my_com_group();
   return Format_Post_base::readOn(is);
 }
 
@@ -50,6 +77,7 @@ void Format_Post_CGNS::set_param(Param& param)
 int Format_Post_CGNS::initialize_by_default(const Nom& file_basename)
 {
   verify_if_cgns(__func__);
+  init_my_com_group();
   cgns_basename_ = file_basename;
 #ifdef HAS_CGNS
   cgns_writer_.cgns_set_base_name(cgns_basename_);
@@ -60,6 +88,7 @@ int Format_Post_CGNS::initialize_by_default(const Nom& file_basename)
 int Format_Post_CGNS::initialize(const Nom& file_basename, const int format, const Nom& option_para)
 {
   verify_if_cgns(__func__);
+  init_my_com_group();
   cgns_basename_ = file_basename;
 #ifdef HAS_CGNS
   cgns_writer_.cgns_set_base_name(cgns_basename_);
