@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -316,7 +316,7 @@ void TRUST_2_CGNS::get_domaine_dis_vf_if_poly(Domaine_dis_base*& domaine_dis, Do
 
   if (fs_dual_.est_nul() && ef_dual_.est_nul())
     {
-      const Nom polym("Domaine_PolyMAC_CDO");
+      const Nom polym("Domaine_PolyMAC");
       domaine_dis = domaine_dis_.non_nul() ? &(domaine_dis_.valeur()) :
                     &(Domaine_dis_cache::Build_or_get_poly_post(polym, dom_trust_.valeur()));
 
