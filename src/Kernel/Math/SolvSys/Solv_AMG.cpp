@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -92,7 +92,7 @@ void Solv_AMG::create_block_amg(int n, Nom precond)
   if (getenv("TRUST_AMG")!=nullptr) precond = getenv("TRUST_AMG");
   // ToDo: not efficient on P0P1Pa (n==3)
   chaine_lue_="cli { -ksp_type ";
-  chaine_lue_+=petsc_cg_issue_ ? "bcgs" : "cg";
+  chaine_lue_+=petsc_cg_issue_ ? "gmres" : "cg"; // Switch CG to GMRES for more robustness (BiCGstab is slower than GMRES 2xSPMV vs 1)
   chaine_lue_+=rtol_>0 ? Nom(rtol_, " -ksp_rtol %e") : "";
   chaine_lue_+=atol_>0 ? Nom(atol_, " -ksp_atol %e") : "";
   chaine_lue_+=" -ksp_norm_type UNPRECONDITIONED \
@@ -200,13 +200,11 @@ void Solv_AMG::create_amg()
 #if defined(TRUST_USE_CUDA)
   library_ = "petsc_gpu";
   chaine_lue_ += boomeramg(st_); // Best GPU solver
+  // KSP divergence with cg+boomeramg/amgx on multi-node with MPI GPU Aware (seen also on Lumi) so we switch to gmres (bgcs slower) !
+  if (Process::nproc()>4) petsc_cg_issue_ = true;
 #if defined(MPIX_CUDA_AWARE_SUPPORT)
-  // KSP divergence with cg+boomeramg/amgx on multi-node with MPI Cuda Aware so we switch to bcgs !
-  // Strangely KSPSolve is 2x-3x slower on A100X vs MI250X... rocsparse better than cusparse ? And Kokkos-Kernels ?
-  // With Cuda backend, BCGS+AmgX seems better than BCGS+Boomeramg (A100)
   if (Process::nproc()>4)
     {
-      petsc_cg_issue_ = true;
       library_ = "amgx";
       chaine_lue_ = solver_;
       chaine_lue_ += " { precond c-amg {";
