@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -32,7 +32,7 @@ class Operateur_Grad_base  : public Operateur_base
   Declare_base(Operateur_Grad_base);
 public :
 
-  /* pour Operteur_Grad, ces methodes agissent sur la matrice pression -> vitesse */
+  /* pour Operateur_Grad, ces methodes agissent sur la matrice pression -> vitesse */
   void dimensionner(Matrice_Morse& ) const override;
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override;
 
