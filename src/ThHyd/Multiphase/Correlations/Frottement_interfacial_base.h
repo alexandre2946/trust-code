@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -44,6 +44,10 @@ public:
   virtual void coefficient_CD(const DoubleTab& alpha, const DoubleTab& p, const DoubleTab& T,
                               const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma, double Dh,
                               const DoubleTab& ndv, const DoubleTab& d_bulles, DoubleTab& coeff) const  {Process::exit(que_suis_je() + " : you must calculate CD in your interfacial drag correlation !");};
+
+protected:
+  /*! @brief Finds the continuous liquid phase index in a multiphase problem. */
+  int find_liquid_phase() const;
 };
 
 #endif

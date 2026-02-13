@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -43,6 +43,9 @@ public:
   virtual void coeff(const DoubleTab& alpha, const DoubleTab& rho, DoubleTab& coeff) const  = 0 ;
 
 protected:
+  /*! @brief Finds the continuous liquid phase index in a multiphase problem. */
+  int find_liquid_phase() const;
+
   double limiter_liquid_ = 0.5 ; // Maximum percentage of the liquid that can be entrained by the bubbles
 };
 
