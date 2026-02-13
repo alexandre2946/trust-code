@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -61,6 +61,15 @@ public:
   };
 
   virtual void coefficient(const input_t& input, output_t& output) const  = 0;
+
+protected:
+  /*! @brief Finds the continuous liquid phase index in a multiphase problem.
+   *
+   *         Searches for a phase whose name starts with "liquide", preferring
+   *         those ending with "continu". Exits if the problem is single-phase
+   *         or no liquid phase is found.
+   */
+  int find_liquid_phase() const;
 };
 
 #endif

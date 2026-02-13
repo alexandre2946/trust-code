@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,6 +14,7 @@
 *****************************************************************************/
 
 #include <Dispersion_bulles_base.h>
+#include <Pb_Multiphase.h>
 Implemente_base(Dispersion_bulles_base, "Dispersion_bulles_base", Correlation_base);
 
 Sortie& Dispersion_bulles_base::printOn(Sortie& os) const
@@ -24,4 +25,15 @@ Sortie& Dispersion_bulles_base::printOn(Sortie& os) const
 Entree& Dispersion_bulles_base::readOn(Entree& is)
 {
   return is;
+}
+
+int Dispersion_bulles_base::find_liquid_phase() const
+{
+  const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : nullptr;
+  if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : not needed for single-phase flow!");
+  int n_l = -1;
+  for (int n = 0; n < pbm->nb_phases(); n++)
+    if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu"))) n_l = n;
+  if (n_l < 0) Process::exit(que_suis_je() + " : liquid phase not found!");
+  return n_l;
 }
