@@ -545,7 +545,15 @@ void Process::exit(const Nom& message ,int i)
       else
         {
 #ifdef MPI_
-          MPI_Finalize();
+          // On MPI_Finalize si MPI_Initialized and not MPI_Finalized
+          True_int flag;
+          MPI_Initialized(&flag);
+          if (flag)
+            {
+              MPI_Finalized(&flag);
+              if (!flag)
+                MPI_Finalize();
+            }
 #endif
           PE_Groups::finalize();
         }
