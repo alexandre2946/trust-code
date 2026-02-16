@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -40,18 +40,18 @@ public:
   enum Nature { OPTIONAL = 0, REQUIRED = 1 };
   Param(const char *);
   // ajout d'argument
-  void ajouter(const char *,int* ,Param::Nature nat = Param::OPTIONAL);
+  void ajouter(const char *, const int* ,Param::Nature nat = Param::OPTIONAL);
 #if INT_is_64_ == 2
-  void ajouter(const char *,trustIdType* ,Param::Nature nat = Param::OPTIONAL);
+  void ajouter(const char *, const trustIdType* ,Param::Nature nat = Param::OPTIONAL);
 #endif
-  void ajouter(const char *,double* ,Param::Nature nat = Param::OPTIONAL);
-  void ajouter(const char *, Objet_U* ,Param::Nature nat = Param::OPTIONAL);
-  void ajouter_arr_size_predefinie(const char *, ArrOfInt* ,Param::Nature nat = Param::OPTIONAL);
-  void ajouter_arr_size_predefinie(const char *, ArrOfDouble* ,Param::Nature nat = Param::OPTIONAL);
+  void ajouter(const char *, const double* ,Param::Nature nat = Param::OPTIONAL);
+  void ajouter(const char *, const Objet_U* ,Param::Nature nat = Param::OPTIONAL);
+  void ajouter_arr_size_predefinie(const char *, const ArrOfInt* ,Param::Nature nat = Param::OPTIONAL);
+  void ajouter_arr_size_predefinie(const char *, const ArrOfDouble* ,Param::Nature nat = Param::OPTIONAL);
 
-  void ajouter_flag(const char *,bool* ,Param::Nature nat = Param::OPTIONAL);
+  void ajouter_flag(const char *, const bool* ,Param::Nature nat = Param::OPTIONAL);
   Param& ajouter_param(const char *, Param::Nature nat = Param::OPTIONAL);
-  void ajouter_non_std(const char *,Objet_U* ,Param::Nature nat = Param::OPTIONAL);
+  void ajouter_non_std(const char *,const Objet_U* ,Param::Nature nat = Param::OPTIONAL);
   void ajouter_condition(const char* condition, const char* message,const char*  name=0);
   void supprimer(const char *);
   void supprimer_condition(const char*  name);
@@ -59,9 +59,9 @@ public:
   Param& dictionnaire_param(const char *, int);
 
   // ajout type (pour eli)
-  inline void ajouter_int(const char * c,int* val,Param::Nature nat = Param::OPTIONAL) { ajouter(c,val,nat); }
-  inline void ajouter_double(const char * c,double* val,Param::Nature nat = Param::OPTIONAL) { ajouter(c,val,nat); }
-  inline void ajouter_objet(const char *c , Objet_U* obj,Param::Nature nat = Param::OPTIONAL) { ajouter(c,obj,nat); }
+  inline void ajouter_int(const char * c, const int* val,Param::Nature nat = Param::OPTIONAL) { ajouter(c,val,nat); }
+  inline void ajouter_double(const char * c, const double* val,Param::Nature nat = Param::OPTIONAL) { ajouter(c,val,nat); }
+  inline void ajouter_objet(const char *c , const Objet_U* obj,Param::Nature nat = Param::OPTIONAL) { ajouter(c,obj,nat); }
 
   int lire_avec_accolades_depuis(Entree& is);
   int lire_sans_accolade(Entree& is);
