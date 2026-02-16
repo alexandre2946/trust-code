@@ -367,7 +367,7 @@ void Ecrire_CGNS::cgns_fill_field_loc_map(const Domaine& domaine, const std::str
       if (grid_file_opened_ && !is_deformable_)
         cgns_close_grid_or_solution_link_file(0. /* inutile */, TYPE_LINK_CGNS::GRID, false);
 
-      if (!solution_file_opened_ || is_deformable_)
+      if (!solution_file_opened_ || (is_deformable_ && !multi_loc_deformable_support_linked_))
         {
           Nom nom_dom;
           std::string loc_link;
