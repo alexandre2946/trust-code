@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,6 +17,8 @@
 #define Sources_Multiphase_base_included
 
 #include <Source_base.h>
+#include <set>
+#include <string>
 
 class Sources_Multiphase_base: public Source_base
 {
@@ -27,6 +29,10 @@ public :
   void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override { /* Do nothing */ }
   void associer_pb(const Probleme_base& ) override { /* Do nothing */ }
   void mettre_a_jour(double temps) override { /* Do nothing */ }
+
+protected:
+  static void dimensionner_blocs_diagonal(matrices_t matrices, const Probleme_base& pb, int ne, int ne_tot, int Nk,
+                                          const std::set<std::string>& diagonal_fields, bool handle_pression);
 };
 
 #endif /* Sources_Multiphase_base_included */
