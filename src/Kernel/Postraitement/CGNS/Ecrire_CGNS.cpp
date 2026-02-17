@@ -37,7 +37,7 @@ void Ecrire_CGNS::cgns_associer_domaine_dis(const Domaine_dis_base& domaine_dis_
   domaine_dis_ = domaine_dis_base;
 }
 
-void Ecrire_CGNS::cgns_init_MPI() const
+void Ecrire_CGNS::cgns_init_MPI()
 {
 #ifdef MPI_
   if (Option_CGNS::FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group() && !postraiter_domaine_)
@@ -45,6 +45,9 @@ void Ecrire_CGNS::cgns_init_MPI() const
       const Comm_Group_MPI& comm_loc = ref_cast(Comm_Group_MPI, PE_Groups::get_user_defined_group());
       if (cgp_mpi_comm(comm_loc.get_mpi_comm()) != CG_OK)
         Cerr << "Error Ecrire_CGNS::cgns_init_MPI : cgp_mpi_comm -- Comm_Group_MPI !" << finl, TRUST_CGNS_ERROR();
+
+      if (is_deformable_)
+        init_proc_maitre_local_comm();
     }
   else
     {
@@ -66,17 +69,6 @@ void Ecrire_CGNS::cgns_open_file()
   if (Process::is_parallel()) cgns_init_MPI(); // 1er truc a faire
 
   fill_infos_loc();
-
-  if (is_deformable_) /* Si deformable => force to use links ! */
-    {
-      if (Process::is_parallel() && Option_CGNS::FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
-        init_proc_maitre_local_comm();
-//      else if (!Option_CGNS::USE_LINKS) /* Si deformable et pas FILE_PER_COMM_GROUP/USE_LINKS => force to use links ! */
-//        {
-//          Option_CGNS::USE_LINKS = true;
-//          Option_CGNS::SINGLE_SAFE_FILE = false;
-//        }
-    }
 
   if (Option_CGNS::USE_LINKS && !postraiter_domaine_)
     return; /* rien a faire si USE_LINKS ou FILE_PER_COMM_GROUP */
@@ -138,9 +130,6 @@ void Ecrire_CGNS::finir_ecriture(double temps)
     }
   else
     {
-//      if (is_deformable_)
-//        cgns_write_iters_deformable(); // fixme
-
       if (Option_CGNS::SINGLE_SAFE_FILE && singlefile_open_)
         {
           const bool will_flush = (Option_CGNS::FLUSH_EVERY_N > 0) &&
@@ -153,7 +142,12 @@ void Ecrire_CGNS::finir_ecriture(double temps)
           if (will_flush || will_close)
             {
               if (!first_time_post_) /* write iters */
-                cgns_write_iters();
+                {
+                  if (is_deformable_)
+                    cgns_write_iters_deformable();
+                  else
+                    cgns_write_iters();
+                }
 
               if (!will_close)
                 cgns_flush_to_disk();

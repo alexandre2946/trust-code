@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -27,7 +27,7 @@ class Ecrire_CGNS
 #ifdef HAS_CGNS
 public:
   void cgns_associer_domaine_dis(const Domaine_dis_base& );
-  void cgns_init_MPI() const;
+  void cgns_init_MPI();
   void cgns_set_postraiter_domain() { postraiter_domaine_ = true; }
   void cgns_set_is_dual_domain() { is_dual_ = true; }
   void cgns_set_is_deformable_domain() { is_deformable_ = true; }
