@@ -733,6 +733,8 @@ class Show(object):
         """
         slice through the point origin in the direction normale.
 
+
+
         Parameters
         ---------
         origin: float array
@@ -741,6 +743,8 @@ class Show(object):
             coordinates of the normale
         var: "x", "y" or "z"
             to impose the normal to the var axis
+        type_op: string
+            'slice' for normal behavior or 'slice2d' for 2d projection (uses SetProject2d(1) from visit)
 
         Returns
         -------
