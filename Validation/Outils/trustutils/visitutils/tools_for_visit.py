@@ -33,27 +33,35 @@ def visitTmpFile_(justFile=False):
     return os.path.join(BUILD_DIRECTORY, thefile)
 
 
-def setFrame(self, iteration=-1):
+def _extractTimes(filename):
     """
 
-    To set frame in visit
+    To fill times table with all the time available in the lata file
 
     Parameters
     ---------
-    iteration: int
-        If iteration = -1, the last frame chosen, else it select the frame in visit.
+    fileName: str
+        name of the lata file
 
     Returns
     -------
+    table 
 
     """
-    self.iteration = str(iteration)
-    with open(visitTmpFile_(), "a") as f:
-        if iteration == -1:  # last frame
-            f.write("SetTimeSliderState(TimeSliderGetNStates()-1)\n")
-        else:
-            f.write("SetTimeSliderState(" + str(iteration) + ")\n")
-    f.close()
+    times_values = []
+    with open(filename, 'r') as f:
+        for ligne in f:
+            if "TEMPS" in ligne:
+                # On cherche tous les floats apres "TEMPS"
+                mots = ligne.split()
+                for i, mot in enumerate(mots):
+                    if mot == "TEMPS" and i+1 < len(mots):
+                        try:
+                            val = float(mots[i+1])
+                            times_values.append(val)
+                        except ValueError:
+                            continue
+    return times_values
 
 
 def saveFile(file, plottype, name, iteration, active=False):
@@ -248,8 +256,10 @@ class Show(object):
         self.axes = nY
         #
         self.flag = False
-        # Temps
+        # numero de la frame regardee
         self.iteration = iteration
+        # Temps disponible dans le lata
+        self.times = []
         # Photo vide(if true)
         self.empty = empty
         # size image
@@ -711,29 +721,44 @@ class Show(object):
             f.write(self._genAddPlot("'Mesh'", f"'{mesh}'", self.iteration))
             f.write("DrawPlots() \n")
 
-    def iteration(self, iteration=0):
+    def setIteration(self, iteration=-1):
         """
 
-        Increase the time step.
+        To set frame in visit
 
         Parameters
         ---------
         iteration: int
-            choice of the time frame or iteration
+            If iteration = -1, the last frame chosen, else it select the frame in visit
 
         Returns
         -------
 
         """
-        self.iteration = str(iteration)
-        with open(visitTmpFile_(), "a") as f:
-            f.write(f"SetTimeSliderState('{iteration}')\n")
+        self.iteration = iteration
+
+    def getIterationTime(self):
+        """
+        To get the time of the current iteration
+
+        Returns
+        -------
+        int
+            time of the current iteration
+        """
+        
+        from ..jupyter.run import BUILD_DIRECTORY
+        if self.times==[]:
+            origin = os.getcwd()
+            os.chdir(BUILD_DIRECTORY)
+            self.times = _extractTimes(self.filename)
+            os.chdir(origin)
+
+        return self.times[self.iteration]
 
     def slice(self, origin=[0, 0, 0], normal=[1, 0, 0], var=None, all=0, type_op="slice"):
         """
         slice through the point origin in the direction normale.
-
-
 
         Parameters
         ---------
@@ -743,6 +768,9 @@ class Show(object):
             coordinates of the normale
         var: "x", "y" or "z"
             to impose the normal to the var axis
+        all: int 
+            An optional integer argument that tells the function to apply the operator attributes to all plots 
+            containing the specified operator if the value of the argument is non-zero.
         type_op: string
             'slice' for normal behavior or 'slice2d' for 2d projection (uses SetProject2d(1) from visit)
 
@@ -806,7 +834,7 @@ class Show(object):
         -------
 
         """
-        self.iteration = str(int(self.iteration) + 1)
+        self.iteration = int(self.iteration) + 1
         with open(visitTmpFile_(), "a") as f:
             f.write("TimeSliderNextState()\n")
 
@@ -828,7 +856,7 @@ class Show(object):
         -------
 
         """
-        self.iteration = str(int(self.iteration) + 1)
+        self.iteration = int(self.iteration) + 1
         with open(visitTmpFile_(), "a") as f:
             f.write('QueryOverTime("Pick")\n')
 
@@ -1178,6 +1206,7 @@ class export_lata_base:
         self.name = name
         self.saveFile = saveFile
         self.frame = frame
+        self.iteration = -1
         self._reset()
 
     def _reset(self):
@@ -1196,24 +1225,20 @@ class export_lata_base:
             f.write("ActivateDatabase(dbs) \n")
         self.addPlot(self.plottype, self.name, self.frame)
 
-    def getFrames(self):
+    def getNbIterations(self):
         """
 
-        CMethod for getting the Frames.
+        CMethod for getting the number of frames.
 
         """
-        with open(visitTmpFile_(), "a") as f:
-            f.write('with open("frames.txt","w") as f:\n')
-            f.write("   f.write(str(TimeSliderGetNStates()-1))\n")
-            f.write("f.close()\n")
-            f.write("sys.exit()\n")
+        from ..jupyter.run import BUILD_DIRECTORY
+        if self.times==[]:
+            origin = os.getcwd()
+            os.chdir(BUILD_DIRECTORY)
+            self.times = _extractTimes(self.filename)
+            os.chdir(origin)
 
-        self.run()
-        with open("frames.txt", "r") as f:
-            N = f.read()
-
-        os.remove("frames.txt")
-        return int(N)
+        print(len(self.times))
 
     def getDimensions(self):
         """
@@ -1279,7 +1304,7 @@ class export_lata_base:
 
         return s
 
-    def setFrame(self, iteration=-1):
+    def setIteration(self, iteration=-1):
         """
 
         To set frame in visit
@@ -1293,12 +1318,8 @@ class export_lata_base:
         -------
 
         """
+        self.iteration = iteration
 
-        with open(visitTmpFile_(), "a") as f:
-            if iteration == -1:  # last frame
-                f.write("SetTimeSliderState(TimeSliderGetNStates()-1)\n")
-            else:
-                f.write(f"SetTimeSliderState({iteration})\n")
 
     def lineout(self, a, b):
         """
@@ -1393,7 +1414,7 @@ class export_lata_base:
         if VisItDisabled():
             return
 
-        self.setFrame(iteration=iteration)
+        self.setIteration(iteration=iteration)
         with open(visitTmpFile_(), "a") as f:
             f.write('Query("Max", use_actual_data=1) \n')
             f.write('f=open("' + file + self.saveFile + '","w") \n')
@@ -1421,7 +1442,7 @@ class export_lata_base:
         """
         if VisItDisabled():
             return
-        self.setFrame(iteration=iteration)
+        self.setIteration(iteration=iteration)
         with open(visitTmpFile_(), "a") as f:
             f.write('Query("Min", use_actual_data=1) \n')
             f.write('f=open("' + file + self.saveFile + '","w") \n')
