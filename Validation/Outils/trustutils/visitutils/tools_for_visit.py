@@ -768,6 +768,8 @@ class Show(object):
                 f.write("s.SetProject2d(0)\n")
             elif type_op == "slice2d":
                 f.write("s.SetProject2d(1)\n")
+            else:
+                raise ValueError("type_op should be 'slice' or 'slice2d'.")
             f.write("SetOperatorOptions(s,0,%d)\n" % all)
             f.write("DrawPlots() \n")
 
