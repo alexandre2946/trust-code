@@ -113,6 +113,13 @@ void Ecrire_CGNS::fill_infos_loc()
 
   if (has_som_field_ && has_elem_field_)
     has_elem_som_loc_ = true;
+
+  if (has_faces_field_ && is_deformable_)
+    {
+      Cerr << "Error in Ecrire_CGNS::" << __func__ << " !!! Postprocessing face fields with a deformable problem is not yet allowed ..." << finl;
+      Cerr << "Contact the TRUST team" << finl;
+      Process::exit();
+    }
 }
 
 void Ecrire_CGNS::finir_ecriture(double temps)
@@ -282,13 +289,6 @@ void Ecrire_CGNS::cgns_write_field(const Domaine& domaine, const Noms& noms_comp
                                    const DoubleTab& valeurs)
 {
   const std::string LOC = Motcle(localisation).getString();
-
-  if (is_deformable_ && LOC == "FACES")
-    {
-      has_faces_field_ = false;
-      Cerr << "Field " << id_du_champ << " located at " << LOC << " is skipped !! " << finl;
-      return; // TODO FIXME
-    }
 
   /* 1 : if first time called ... build different links to support mixed locations */
   if (first_time_post_)
