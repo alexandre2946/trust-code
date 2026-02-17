@@ -54,20 +54,6 @@ void Ecrire_CGNS::cgns_write_iters_deformable()
     return grid_name;
   };
 
-  auto build_sol_ptrs = [&](const std::string& LOC) -> std::string
-  {
-    std::string sol_name;
-    sol_name.reserve(static_cast<size_t>(CGNS_STR_SIZE) * nsteps);
-
-    for (double t : time_post_)
-      {
-        std::string s = "FlowSolution" + cgns_helper_.convert_double_to_string(t) + "_" + LOC;
-        s.resize(CGNS_STR_SIZE, ' ');
-        sol_name += s;
-      }
-    return sol_name;
-  };
-
   auto write_iters_one = [&](int baseId, int zoneId, const std::string& LOC, bool has_field)
   {
     if (cg_biter_write(fileId_, baseId, "TimeIterValues", nsteps) != CG_OK)
@@ -94,8 +80,8 @@ void Ecrire_CGNS::cgns_write_iters_deformable()
 
     if (has_field)
       {
-        const std::string sol_ptrs = build_sol_ptrs(LOC);
-        if (cg_array_write("FlowSolutionPointers", CGNS_ENUMV(Character), 2, idata, sol_ptrs.c_str()) != CG_OK)
+        const char* solname = (LOC == "SOM") ? solname_som_.c_str() : (LOC == "FACES") ? solname_faces_.c_str() : solname_elem_.c_str();
+        if (cg_array_write("FlowSolutionPointers", CGNS_ENUMV(Character), 2, idata, solname) != CG_OK)
           Cerr << "Error Ecrire_CGNS::cgns_write_iters_deformable : cg_array_write !" << finl, TRUST_CGNS_ERROR();
       }
   };
@@ -284,7 +270,7 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group_pb_deformable()
                   grid_name_loc = "GridCoordinates";
 
                   if (conn_written) // Pas la premiere fois
-                    grid_name_loc += cgns_helper_.convert_double_to_string(itr_t) + "_" + LOC;
+                    grid_name_loc += cgns_helper_.convert_double_to_string(itr_t);// + "_" + LOC;
 
                   grid_name_loc.resize(CGNS_STR_SIZE, ' ');
                   grid_name += grid_name_loc;
@@ -399,7 +385,7 @@ void Ecrire_CGNS::cgns_write_final_link_file_pb_deformable()
               grid_name_loc = "GridCoordinates";
 
               if (conn_written) // Pas la premiere fois
-                grid_name_loc += cgns_helper_.convert_double_to_string(itr_t) + "_" + LOC;
+                grid_name_loc += cgns_helper_.convert_double_to_string(itr_t);// + "_" + LOC;
 
               grid_name_loc.resize(CGNS_STR_SIZE, ' ');
               grid_name += grid_name_loc;
