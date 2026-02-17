@@ -138,6 +138,10 @@ void Ecrire_CGNS::cgns_write_iters_deformable()
 void Ecrire_CGNS::link_multi_loc_support_pb_deformable()
 {
   // TODO FIXME : a factoriser avec 3 methodes ...
+
+  const bool enter_group_comm = Process::is_parallel() && Option_CGNS::FILE_PER_COMM_GROUP &&
+                                PE_Groups::has_user_defined_group() && !postraiter_domaine_;
+
   // loop and write linked supports !
   if (Option_CGNS::USE_LINKS)
     {
@@ -175,7 +179,8 @@ void Ecrire_CGNS::link_multi_loc_support_pb_deformable()
               linkpath = "/" + baseZone_name_[ind_base] + "/" + baseZone_name_[ind_base] + "/" + itr_conn + "/";
 
               if (!first_time_post_)
-                linkfile = baseFile_name_ + ".solution." + cgns_helper_.convert_double_to_string(time_post_[0]) + ".cgns";
+                linkfile = (enter_group_comm ? Nom(baseFile_name_).nom_me(proc_maitre_local_comm_).getString() : baseFile_name_) +
+                           ".solution." + cgns_helper_.convert_double_to_string(time_post_[0]) + ".cgns";
 
               if (cg_link_write(itr_conn.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
                 Cerr << "Error Ecrire_CGNS::link_multi_loc_support_pb_deformable : cg_link_write !" << finl, TRUST_CGNS_ERROR();
@@ -515,7 +520,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_seq(const Domaine * domaine,cons
 
           for (auto &itr_conn : connectname_[ind])
             {
-              std::string linkpath = "/" + baseZone_name_[ind] + "/" + baseZone_name_[ind] + "/" + itr_conn + "/";
+              const std::string linkpath = "/" + baseZone_name_[ind] + "/" + baseZone_name_[ind] + "/" + itr_conn + "/";
 
               if (cg_link_write(itr_conn.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
                 Cerr << "Error Ecrire_CGNS::cgns_write_domaine_deformable_seq : cg_link_write connectivity !" << finl, TRUST_CGNS_ERROR();
@@ -621,7 +626,9 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
                                                                               coordsIdx, coordsIdy, coordsIdz, min, max, xCoords, yCoords, zCoords);
 
           /* Set element connectivity */
-          std::string linkfile = baseFile_name_ + ".solution." + cgns_helper_.convert_double_to_string(time_post_[0]) + ".cgns";
+          std::string linkfile = (enter_group_comm ? Nom(baseFile_name_).nom_me(proc_maitre_local_comm_).getString() : baseFile_name_) +
+                                 ".solution." + cgns_helper_.convert_double_to_string(time_post_[0]) + ".cgns";
+
           TRUST_2_CGNS::remove_slash_linkfile(linkfile);
 
           if (cg_goto(fileId_, baseId_[ind], "Zone_t", zoneId_[ind], "end") != CG_OK)
@@ -629,7 +636,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
 
           for (auto &itr_conn : connectname_[ind])
             {
-              std::string linkpath = "/" + baseZone_name_[ind] + "/" + baseZone_name_[ind] + "/" + itr_conn + "/";
+              const std::string linkpath = "/" + baseZone_name_[ind] + "/" + baseZone_name_[ind] + "/" + itr_conn + "/";
 
               if (cg_link_write(itr_conn.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
                 Cerr << "Error Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone : cg_link_write connectivity !" << finl, TRUST_CGNS_ERROR();
