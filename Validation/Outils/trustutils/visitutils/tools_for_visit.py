@@ -64,7 +64,7 @@ def _extractTimes(filename):
     return times_values
 
 
-def saveFile(file, plottype, name, iteration, active=False):
+def _saveFile(file, plottype, name, iteration):
     """
 
     Save files for testing non-regression.
@@ -85,23 +85,22 @@ def saveFile(file, plottype, name, iteration, active=False):
     None
 
     """
-    if active:
-        origin = os.getcwd()
-        from ..jupyter.run import BUILD_DIRECTORY
+    origin = os.getcwd()
+    from ..jupyter.run import BUILD_DIRECTORY
 
-        path = os.path.join(origin, BUILD_DIRECTORY)
-        os.chdir(path)
+    path = os.path.join(origin, BUILD_DIRECTORY)
+    os.chdir(path)
 
-        FileAccumulator.active = True
-        if plottype in {"Mesh", "Subset"}:
-            FileAccumulator.AppendVisuMesh(file, name)
-            FileAccumulator.WriteToFile("used_files")
-        else:
-            field, loc, dom = FileAccumulator.ParseDirectName(name)
-            FileAccumulator.AppendVisuComplex(file, dom, field, loc, iteration)
-            FileAccumulator.WriteToFile("used_files")
+    FileAccumulator.active = True
+    if plottype in {"Mesh", "Subset"}:
+        FileAccumulator.AppendVisuMesh(file, name)
+        FileAccumulator.WriteToFile("used_files")
+    else:
+        field, loc, dom = FileAccumulator.ParseDirectName(name)
+        FileAccumulator.AppendVisuComplex(file, dom, field, loc, iteration)
+        FileAccumulator.WriteToFile("used_files")
 
-        os.chdir(origin)
+    os.chdir(origin)
 
 
 def showMesh(filename, mesh="dom"):
@@ -219,21 +218,6 @@ class Show(object):
         if not empty:
             if not all([filename, plottype, name]):
                 raise ValueError("Error: A filename, plottype and name are needed!!")
-            else:
-                # Remove former PNG files
-                # Formatage du chemin
-                tmp = filename.rsplit("/", 1)
-                if len(tmp) != 1:
-                    tmp = tmp[0] + "/"
-                else:
-                    tmp = ""
-
-                from glob import glob
-                from ..jupyter.run import BUILD_DIRECTORY
-
-                #path = os.path.join(BUILD_DIRECTORY, tmp)
-                #for f in glob(path + r"*_\d\d\d\d.png"):
-                #    os.remove(f)
 
         self.gestMsg = GestionMessages(verbose, "")
         self.plottype = plottype
@@ -255,7 +239,6 @@ class Show(object):
         # dimension 1D
         self.axes = nY
         #
-        self.flag = False
         # numero de la frame regardee
         self.iteration = iteration
         # Temps disponible dans le lata
@@ -290,7 +273,8 @@ class Show(object):
         -------
 
         """
-        # Assure qu'il n'y a pas deja une image,  si oui, il l'efface
+        # Reinitialize a matplotlib canvas
+        plt.clf()
         if self.show:
             plt.rc("xtick", labelsize=14)  # Font size
             plt.rc("ytick", labelsize=14)
@@ -355,15 +339,13 @@ class Show(object):
             if self.nX == 1 and self.nY == 1:
                 # raise ValueError("Use plot and not plot2!!!")
                 self.flag = True
-            elif self.nX == 1 or self.nY == 1:
-                self.xIndice = coordinates
-            else:
-                self.xIndice = coordinates[0]
-                self.yIndice = coordinates[1]
-
-            if self.flag:
                 self.subplot = self.axs
             else:
+                if self.nX == 1 or self.nY == 1:
+                    self.xIndice = coordinates
+                else:
+                    self.xIndice = coordinates[0]
+                    self.yIndice = coordinates[1]
                 try:
                     self.subplot = self.axs[self.coordinates()]
                 except:
@@ -434,7 +416,7 @@ class Show(object):
                 f.write(f"p.max = {max}\n")
             f.write("SetPlotOptions(p)\n")
 
-        saveFile(filename, plottype, name, self.iteration, active=True)
+        _saveFile(filename, plottype, name, self.iteration)
 
     def visitCommand(self, string):
         """
@@ -663,7 +645,9 @@ class Show(object):
             return
 
         # finalization of the previous subplot
-        self.plot(show=False)
+        if not self.empty:
+            self.plot(show=False)
+        self.empty = False
 
         self.xIndice = xIndice
         self.yIndice = yIndice
@@ -1290,7 +1274,7 @@ class export_lata_base:
             f.write(self._genAddPlot(f"'{plottype}'", f"'{name}'", iteration))
             f.write("DrawPlots() \n")
 
-        saveFile(self.filename, plottype, name, iteration, active=True)
+        _saveFile(self.filename, plottype, name, iteration)
 
     def _genAddPlot(self, arg1, arg2, arg3):
         s = "try:\n"
