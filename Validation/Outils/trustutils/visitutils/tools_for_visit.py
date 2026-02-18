@@ -128,7 +128,7 @@ def showMesh(filename, mesh="dom"):
 
 
 def showField(filename, plottype, name,
-              plotmesh=True, title="", iteration=-1, size=10, max=None, min=None,):
+              plotmesh=True, meshName=None, title="", iteration=-1, size=10, max=None, min=None,):
     """
     Methods to plot a field from a .lata file.
     If environment variable NO_VISIT is set, VisIt plots (visu) are not generated.
@@ -141,6 +141,8 @@ def showField(filename, plottype, name,
         The plottype we want (Pseudocolor, vector, ...)
     name : str
         The name of the field with localisation and name of the mesh such as read in VisIt.
+    meshName : str 
+        To force the name of the mesh if it cannot be found automatically
     plotmesh : bool
         display the mesh (default=True)
     title : str
@@ -163,7 +165,7 @@ def showField(filename, plottype, name,
     if VisItDisabled():
         return
     
-    field = Show(filename, plottype, name, plotmesh=plotmesh,
+    field = Show(filename, plottype, name, plotmesh=plotmesh, meshName=meshName, 
                  title=title, iteration=iteration, size=size, max=max, min=min,)
     field.plot()
 
@@ -175,7 +177,7 @@ class Show(object):
     """
 
     def __init__(self, filename="", plottype="", name="", nX=1, nY=1,
-                 plotmesh=True, iteration=-1, empty=False, size=10, title="",
+                 plotmesh=True, meshName=None, iteration=-1, empty=False, size=10, title="",
                  subtitle="", max=None, min=None, active=True, visitLog=False,
                  verbose=0, show=True):
         """
@@ -191,6 +193,8 @@ class Show(object):
             The name of the field.
         plotmesh : bool
             If true plot the mesh asociate with .lata file (default=True)
+        meshName : 
+            To force the name of the mesh if it cannot be found automatically
         iteration : int
             Time frame or iteration of the plot.
         empty : bool
@@ -227,9 +231,11 @@ class Show(object):
         self.nom = str(self.plottype + self.name)
         # Mesh(if true il la visualise)
         self.plotmesh = plotmesh
+        self.meshName = meshName
         # Mesh
         if not empty:
-            self.mesh = _extractMeshName(plottype, name)
+            if meshName != None: self.mesh = meshName
+            else: self.mesh = _extractMeshName(plottype, name)
         # Coordinates
         self.xIndice = 0
         self.yIndice = 0
@@ -333,7 +339,7 @@ class Show(object):
 
         if not self.empty:
             self.addField(filename=self.filename, plottype=self.plottype,
-                          name=self.name, plotmesh=self.plotmesh,)
+                          name=self.name, plotmesh=self.plotmesh,meshName=self.meshName)
 
         if self.show:
             if self.nX == 1 and self.nY == 1:
@@ -358,7 +364,7 @@ class Show(object):
                 self.subplot.set_title(self.subtitle)
 
     def addField(self, filename=None, plottype=None, name=None,
-                 plotmesh=True, min=None, max=None):
+                 plotmesh=True, meshName=None, min=None, max=None):
         """
 
         Method for adding a Field to a plot.
@@ -373,6 +379,8 @@ class Show(object):
             The name of the field.
         plotmesh : bool
             If true plot the mesh asociate with .lata file (default=True)
+        meshName : str 
+            To force the name of the mesh if it cannot be found automatically
         min : float
             Minimum value ploted.
         max : float
@@ -400,7 +408,8 @@ class Show(object):
                 f.write("dbs = ('" + filename + "') \n")
                 f.write("ActivateDatabase(dbs) \n")
             if plotmesh and not plottype == "Mesh" and not plottype == "Histogram":
-                mesh = _extractMeshName(plottype, name)
+                if meshName == None : mesh = _extractMeshName(plottype, name)
+                else : mesh = meshName
                 f.write(self._genAddPlot("'Mesh'", "'" + mesh + "'", self.iteration))
             f.write(
                 self._genAddPlot("'" + plottype + "'", "'" + name + "'", self.iteration)
@@ -609,7 +618,7 @@ class Show(object):
         self.visitCommand("SetPlotOptions(MeshAtts)")
 
     def add(self, filename, plottype, name, xIndice=0, yIndice=0,
-            iteration=-1, title="", plotmesh=True, max=None, min=None,):
+            iteration=-1, title="", plotmesh=True, meshName=None, max=None, min=None,):
         """
 
         Add a plot.
@@ -628,6 +637,8 @@ class Show(object):
             Indice of the y axe.
         plotmesh : bool
             If true plot the mesh asociate with .lata file.
+        meshName : str 
+            To force the name of the mesh if it cannot be found automatically
         iteration : int
             Time frame or iteration of the plot.
         size : int
@@ -656,6 +667,7 @@ class Show(object):
         self.name = name
         self.iteration = iteration
         self.plotmesh = plotmesh
+        self.meshName = meshName
         self.subtitle = title
         self.max = max
         self.min = min
