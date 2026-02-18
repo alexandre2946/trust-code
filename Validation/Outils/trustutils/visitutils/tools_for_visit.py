@@ -1485,7 +1485,7 @@ def _extractMeshName(plottype, name):
         else:
             raise ValueError("Error: Names of the Subset must be in the format blocks($mesh)")
     else:
-        pattern = r'(FACES|ELEM|SOM)_(\S+)'
+        pattern = r'(_FACES|_ELEM|_SOM)_(\S+)'
         match = re.search(pattern, name)
         if match:
             return match.group(2)
