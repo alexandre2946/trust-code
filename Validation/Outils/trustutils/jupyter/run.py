@@ -1349,6 +1349,16 @@ def isExtractingNR_ListOnly():
 
     return IS_EXTRACTING_NR_LIST_ONLY
 
+def is_NOT_RUN():
+    """
+    Check global variable _NOT_RUN to know if option -not_run was set.
+
+    Useful if lata files are read by the user (eg. with lataloader).
+    And probably a lot of other use cases
+    """
+
+    return _NOT_RUN
+
 def needPrepareForNRCaseList():
     """
     Sets IS_EXTRACTING_NR_LIST_ONLY to False.
