@@ -809,15 +809,6 @@ class TRUSTSuite(object):
         for image in image_files:
             saveFileAccumulator(str(image))
         
-        import sys
-        # add imports directory to path and save contained scripts
-        import_path=os.path.join(ORIGIN_DIRECTORY, "src", "python_modules")
-        if not os.path.exists(import_path):
-            os.makedirs(import_path)
-        sys.path.append(import_path)
-        imports = list(pathlib.Path(import_path).rglob("*.py"))
-        for f in imports:
-            saveFileAccumulator(str(f))
 
     def addCase(self, case):
         self.cases_.append(case)
@@ -1715,5 +1706,19 @@ IS_EXTRACTING_NR_LIST_ONLY=(os.getenv("IS_EXTRACTING_NR_LIST_ONLY") == '1')
 
 defaultSuite_ = None  # a TRUSTSuite instance
 
+
+
+import sys
+# add imports directory to path and save contained scripts
+import_path=os.path.join(ORIGIN_DIRECTORY, "src", "python_modules")
+if not os.path.exists(import_path):
+    os.makedirs(import_path)
+sys.path.append(import_path)
+# imports = list(pathlib.Path(import_path).rglob("*.py"))
+# for f in imports:
+#     saveFileAccumulator(str(f))
+
+
 # I think it is IMPORTANT to call this at the very end. Not sure though, but be careful when expanding this file
 BUILD_DIRECTORY = _initBuildDir()
+
