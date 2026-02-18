@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -877,11 +877,16 @@ DoubleVect& Matrice_Morse::ajouter_multvect_(const DoubleVect& tab_x,DoubleVect&
                            Kokkos::RangePolicy<>(0, n), KOKKOS_LAMBDA(
                              const int i)
       {
-        for (int k = tab1(i) - 1; k < tab1(i + 1) - 1; k++)
+        int start = tab1(i)-1;
+        int end = tab1(i + 1)-1;
+        double tmp {};
+
+        for (int k = start; k < end; k++)
           {
             int j = tab2(k) - 1;
-            resu(i) += coeff(k) * x(j);
+            tmp+= coeff(k) * x(j);
           }
+        resu(i) += tmp;
       });
       end_gpu_timer(__KERNEL_NAME__);
     }
