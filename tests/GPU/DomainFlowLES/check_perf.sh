@@ -58,7 +58,7 @@ run()
    fi
    rm -f $jdd.TU
    # Try to mitigate variablity by setting exclusive mode on GPU (firefox, slack, edge, chrome, use device !)
-   [ "$np" = "" ] && [ "$TRUST_WITHOUT_HOST" = 1 ] && set_EXCLUSIVE_PROCESS=`sudo ls 2>/dev/null`
+   [ "$np" = "" ] && [ "$TRUST_WITHOUT_HOST" = 1 ] && [ "`hostname`" = is157091 ] && set_EXCLUSIVE_PROCESS=`sudo ls 2>/dev/null`
    [ "$set_EXCLUSIVE_PROCESS" = "" ] && [ "$TRUST_WITHOUT_HOST" != 0 ] && echo "Warning, we can't set EXCLUSIVE_PROCESS mode on GPU ! Check than no other process use the GPU..."
    [ "$set_EXCLUSIVE_PROCESS" != "" ] && sudo nvidia-smi -c EXCLUSIVE_PROCESS 1>/dev/null
    trust $nsys $jdd $np 1>$jdd.out_err 2>&1
