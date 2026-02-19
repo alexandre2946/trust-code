@@ -223,7 +223,7 @@ void Champ_Generique_Transformation::completer(const Postraitement_base& post)
           if ((Motcle(methode_) == "vecteur"))
             {
 
-              if (source.nature_du_champ()!=scalaire)
+              if (source.nature_du_champ()!=scalaire && source.nature_du_champ()!=basis_function_scalar)
                 {
                   Cerr<<que_suis_je()<<" The source fields must be of scalar nature for option vecteur."<<finl;
                   exit();
@@ -600,20 +600,17 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
       //pour recuperer un tableau avec autant de composantes que la dimension du probleme
       if (directive!=directive_so)
         {
-          if (directive_so == "champ_elem_DG") //TODO DG a changer quand nb_compso sera egal a 1
+          sources_val[so].resize(nb_pos,nb_compso);
+          if (directive == "CHAMP_FACE") source_so.valeur_aux_faces(sources_val[so]);
+          else if (directive == "CHAMP_ELEM" && nb_pos==domaine_dis.domaine().nb_elem()) source_so.valeur_aux_centres_de_gravite(domaine_dis.domaine(), sources_val[so]);
+          else if ((directive == "CHAMP_FONC_QUAD_DG") & (directive_so == "CHAMP_ELEM_DG"))
             {
               int nelem = valeurs_espace.dimension(0);
               int npoints = valeurs_espace.dimension(1);
               sources_val[so].resize(nelem,npoints);
               source_so.eval_elem(sources_val[so]);
             }
-          else
-            {
-              sources_val[so].resize(nb_pos,nb_compso);
-              if (directive == "CHAMP_FACE") source_so.valeur_aux_faces(sources_val[so]);
-              else if (directive == "CHAMP_ELEM" && nb_pos==domaine_dis.domaine().nb_elem()) source_so.valeur_aux_centres_de_gravite(domaine_dis.domaine(), sources_val[so]);
-              else source_so.valeur_aux(positions,sources_val[so]);
-            }
+          else source_so.valeur_aux(positions,sources_val[so]);
         }
       else
         {
@@ -710,32 +707,67 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
         }
       else
         {
-          Kokkos::Array<CDoubleTabView, max_nb_sources> sources;
-          for (int so=0; so<nb_sources; so++)
-            sources[so] = sources_val[so].view_ro();
-          int dim = dimension;
-          CDoubleTabView pos = positions.view_ro();
-          DoubleTabView valeurs = valeurs_espace.view_wo();
-          for (int j=0; j<nb_comp_; j++)
+          if (directive=="champ_fonc_quad_dg") //This is for DG
             {
-              ParserView fxyzj(fxyz[j]);
-              fxyzj.parseString();
-              Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_pos, KOKKOS_LAMBDA(const int i)
-              {
-                double x = pos(i,0);
-                double y = pos(i,1);
-                double z = (dim>2 ? pos(i,2) : 0);
-                int threadId = fxyzj.acquire();
-                fxyzj.setVar(0,x,threadId);
-                fxyzj.setVar(1,y,threadId);
-                fxyzj.setVar(2,z,threadId);
-                fxyzj.setVar(3,temps,threadId);
-                for (int so=0; so<nb_sources; so++)
-                  fxyzj.setVar(so+4,sources[so](i,0),threadId);
-                valeurs(i,j) = fxyzj.eval(threadId);
-                fxyzj.release(threadId);
-              });
-              end_gpu_timer(__KERNEL_NAME__);
+              IntTab nb_points, ind_integ_points;
+              zvf.get_ind_integ_points(ind_integ_points);
+              zvf.get_nb_integ_points(nb_points);
+
+              for (int i=0; i<nb_pos; i++)
+                {
+                  for (int pt=0; pt<nb_points[i]; pt++)
+                    {
+                      int k = ind_integ_points[i]+pt;
+                      double x = positions(k,0);
+                      double y = positions(k,1);
+                      double z = (dimension>2 ? positions(k,2) : 0);
+
+                      for (int j=0; j<nb_comp_; j++)
+                        {
+                          fxyz[j].setVar(0,x);
+                          fxyz[j].setVar(1,y);
+                          fxyz[j].setVar(2,z);
+                          fxyz[j].setVar(3,temps);
+                          for (int so=0; so<nb_sources; so++)
+                            {
+                              const DoubleTab& source_so_val = sources_val[so];
+                              fxyz[j].setVar(so+4,source_so_val(i,0));
+                            }
+                          int l = nb_points[i]*nb_comp_+j;
+                          valeurs_espace(i,l) = fxyz[j].eval();
+                        }
+                    }
+                }
+            }
+          else
+            {
+          		Kokkos::Array<CDoubleTabView, max_nb_sources> sources;
+          		for (int so=0; so<nb_sources; so++)
+          		  sources[so] = sources_val[so].view_ro();
+          		int dim = dimension;
+          		CDoubleTabView pos = positions.view_ro();
+          		DoubleTabView valeurs = valeurs_espace.view_wo();
+          		for (int j=0; j<nb_comp_; j++)
+          		  {
+          		    ParserView fxyzj(fxyz[j]);
+          		    fxyzj.parseString();
+          		    Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_pos, KOKKOS_LAMBDA(const int i)
+          		    {
+          		      double x = pos(i,0);
+          		      double y = pos(i,1);
+          		      double z = (dim>2 ? pos(i,2) : 0);
+          		      int threadId = fxyzj.acquire();
+          		      fxyzj.setVar(0,x,threadId);
+          		      fxyzj.setVar(1,y,threadId);
+          		      fxyzj.setVar(2,z,threadId);
+          		      fxyzj.setVar(3,temps,threadId);
+          		      for (int so=0; so<nb_sources; so++)
+          		        fxyzj.setVar(so+4,sources[so](i,0),threadId);
+          		      valeurs(i,j) = fxyzj.eval(threadId);
+          		      fxyzj.release(threadId);
+          		    });
+          		    end_gpu_timer(__KERNEL_NAME__);
+								}
             }
         }
     }
@@ -786,7 +818,7 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
           nb_pos = valeurs_espace.dimension(0);
         }
 
-      if (directive == "temperature") //This is for DG
+      if (directive == "champ_fonc_quad_dg") //This is for DG
         {
           int dim = dimension;
           int nb_elem = valeurs_espace.dimension(0);
@@ -933,7 +965,7 @@ const Motcle Champ_Generique_Transformation::get_directive_pour_discr() const
   if (localisation_=="elem")
     {
       const Domaine_dis_base& domaine_dis = get_ref_domaine_dis_base();
-      directive = (domaine_dis.que_suis_je() == "Domaine_DG") ? "temperature" : "champ_elem";
+      directive = (domaine_dis.que_suis_je() == "Domaine_DG") ? "champ_fonc_quad_dg" : "champ_elem";
     }
   else if (localisation_=="som")
     {

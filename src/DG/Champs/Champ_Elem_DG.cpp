@@ -103,6 +103,9 @@ Champ_base& Champ_Elem_DG::affecter_(const Champ_base& ch)
   //creation d'un DoubleTab intermediaire pour recuperer les valeurs du champ ch sur les points de quadrature ?
   const DoubleTab& integ_points = quad.get_integ_points();
   int nb_pts_integ_max = quad.nb_pts_integ_max();
+
+  if (nom_.debute_par("vitesse"))
+    is_scalar_ = false;
   const int dim = is_scalar_ ? 1: Objet_U::dimension;
 
   int nb_elem = domaine.nb_elem();

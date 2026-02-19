@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -111,7 +111,8 @@ void DG_discretisation::discretiser_champ(const Motcle& directive, const Domaine
 
   creer_champ(champ, dom_dis, type, noms[0], unites[0], nb_comp*nb_basis_func, nb_ddl, nb_pas_dt, temps, directive, que_suis_je());
 
-  champ->fixer_nature_du_champ(basis_function);
+  if (nb_comp == 1) champ->fixer_nature_du_champ(basis_function_scalar);
+  else champ->fixer_nature_du_champ(basis_function_vectorial);
 
   if (nature == multi_scalaire)
     {
@@ -164,7 +165,7 @@ void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
   Motcles motcles(8);
   motcles[0] = "pression";    // Choix standard pour la pression
   motcles[1] = "temperature"; // Choix standard pour la temperature
-  motcles[2] = "divergence_vitesse"; // Le type de champ obtenu en calculant div v
+  motcles[2] = "champ_fonc_quad_dg"; // With value on quadrature points
   motcles[3] = "champ_elem";  // Creer un champ aux elements (de type P0)
   motcles[6] = "champ_sommets";  // Creer un champ aux elements (de type P1)
   motcles[4] = "vitesse";     // Choix standard pour la vitesse
@@ -182,10 +183,10 @@ void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
     {
     case 0:
     case 1:
-      type = "Champ_Fonc_P1_DG";
+    case 2:
+      type = "Champ_Fonc_Quad_DG";
       default_nb_comp = nb_pts_integ_max; //Option_DG::Nb_col_from_order(order_DG);;
       break;
-    case 2:
     case 3:
       type = "Champ_Fonc_Elem_DG";
       default_nb_comp = 1;
@@ -193,8 +194,8 @@ void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
     case 4:
     case 5:
     case 7:
-      type = "Champ_Fonc_P1_DG";
-      default_nb_comp = 3;
+      type = "Champ_Fonc_Quad_DG";
+      default_nb_comp = nb_pts_integ_max;
       break;
     case 6:
       type = "Champ_Fonc_Som_DG";
@@ -221,7 +222,7 @@ void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
 
   // Calcul du nombre de ddl
   int nb_ddl = 0;
-  if (type == "Champ_Fonc_Elem_DG" || type == "Champ_Fonc_P1_DG")
+  if (type == "Champ_Fonc_Elem_DG" || type == "Champ_Fonc_Quad_DG")
     nb_ddl = z.nb_elem();
   else if (type == "Champ_Fonc_Som_DG")
     nb_ddl = domaine_DG.nb_som();
@@ -350,7 +351,7 @@ Nom DG_discretisation::get_name_of_type_for(const Nom& class_operateur, const No
     }
   else if (class_operateur == "Operateur_Grad")
     {
-      type = "Op_Grad_DG_Face";
+      type = "Op_Grad_DG";
     }
   else if (class_operateur == "Operateur_Div")
     {

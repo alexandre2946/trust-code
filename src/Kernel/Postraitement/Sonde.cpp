@@ -730,7 +730,7 @@ int Sonde::get_nb_compo_champ() const
 {
   const Noms noms_comp = mon_champ->get_property("composantes");
   Motcle directive = mon_champ->get_directive_pour_discr();
-  int nb_comp = (directive == "temperature" || directive == "champ_elem_DG") ? 1 : noms_comp.size();
+  int nb_comp = (directive == "champ_Fonc_Quad_DG" || directive == "champ_elem_DG") ? 1 : noms_comp.size();
   return nb_comp;
 }
 

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -24,7 +24,7 @@
  * It handles all the generic aspect of a field:
  *      - its name and synonyms
  *      - its number and names of components
- *      - its nature (scalar, vectorial, multi_scalar, basis_function)
+ *      - its nature (scalar, vectorial, multi_scalar, basis_function_scalar, basis_function_vectorial)
  *      - the units associated to each component
  *
  *
@@ -32,7 +32,7 @@
  */
 
 // Definition of the nature of a field:
-enum Nature_du_champ { scalaire, multi_scalaire, vectoriel, basis_function };
+enum Nature_du_champ { scalaire, multi_scalaire, vectoriel, basis_function_scalar, basis_function_vectorial };
 
 class Field_base : public Objet_U
 {

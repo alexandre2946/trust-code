@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,17 +13,17 @@
 *
 *****************************************************************************/
 
-#include <Champ_Fonc_P1_DG.h>
+#include <Champ_Fonc_Quad_DG.h>
 #include <Domaine_DG.h>
 #include <Quadrature_base.h>
 
-Implemente_instanciable(Champ_Fonc_P1_DG, "Champ_Fonc_P1_DG", Champ_Fonc_P0_base);
+Implemente_instanciable(Champ_Fonc_Quad_DG, "Champ_Fonc_Quad_DG", Champ_Fonc_P0_base);
 
-Sortie& Champ_Fonc_P1_DG::printOn(Sortie& s) const { return s << que_suis_je() << " " << le_nom(); }
+Sortie& Champ_Fonc_Quad_DG::printOn(Sortie& s) const { return s << que_suis_je() << " " << le_nom(); }
 
-Entree& Champ_Fonc_P1_DG::readOn(Entree& s) { return s; }
+Entree& Champ_Fonc_Quad_DG::readOn(Entree& s) { return s; }
 
-Champ_base& Champ_Fonc_P1_DG::affecter_(const Champ_base& ch)
+Champ_base& Champ_Fonc_Quad_DG::affecter_(const Champ_base& ch)
 {
   const Domaine_DG& domaine = ref_cast(Domaine_DG, le_dom_VF.valeur());
 
@@ -44,7 +44,7 @@ Champ_base& Champ_Fonc_P1_DG::affecter_(const Champ_base& ch)
   return *this;
 }
 
-DoubleTab& Champ_Fonc_P1_DG::valeur_aux_elems(const DoubleTab& positions, const IntVect& polys, DoubleTab& result) const
+DoubleTab& Champ_Fonc_Quad_DG::valeur_aux_elems(const DoubleTab& positions, const IntVect& polys, DoubleTab& result) const
 {
 
   const Domaine_DG& domaine = ref_cast(Domaine_DG,le_dom_VF.valeur());
