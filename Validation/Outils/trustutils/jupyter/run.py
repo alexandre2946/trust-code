@@ -1,5 +1,5 @@
 """
-Victor Banon Garcia / Adrien Bruneton
+Victor Banon Garcia / Adrien Bruneton / Teo Boutin
 CEA Saclay - DM2S/STMF/LGLS
 03/2021
 
@@ -271,14 +271,14 @@ class TRUSTCase(object):
         """
         full path of the test case in the build directory
         """
-        fullPath = os.path.join(self._fullDir(), self.name_)
+        fullPath = os.path.join(self._fullDir(), self.dataFileName_)
         return fullPath + ".data"
 
     def _relPath(self):
         """
         relative path of the test case in the build directory
         """
-        fullPath = os.path.join(self._fullDir(), self.name_)
+        fullPath = os.path.join(self._fullDir(), self.dataFileName_)
         relPath = os.path.relpath(fullPath, start = BUILD_DIRECTORY)
         return relPath + ".data"
 
@@ -542,7 +542,7 @@ class TRUSTCase(object):
                 s += "  if [ -f pre_run ]; then\n"
                 s += "     chmod +x pre_run\n"
                 s +=f'     echo "-> Running the pre_run script in the {d} directory ..."\n'
-                s +=f"     (./pre_run {n} || (echo '  FAILED!' && exit -1)) || exit -1 \n"
+                s +=f"     (./pre_run {n} || (echo '  FAILED pre_run!' && exit -1)) || exit -1 \n"
                 s += "fi\n"
 
             # Running case
@@ -554,7 +554,7 @@ class TRUSTCase(object):
                 s += "  if [ -f post_run ]; then\n"
                 s += "     chmod +x post_run\n"
                 s +=f'     echo "-> Running the post_run script in the {d} directory ..."\n'
-                s +=f"     (./post_run {n} || (echo '  FAILED!' && exit -1)) || exit -1\n"
+                s +=f"     (./post_run {n} || (echo '  FAILED post_run!' && exit -1)) || exit -1\n"
                 s += "fi\n"
 
             s += "  exit 0;"
@@ -1548,10 +1548,11 @@ def _is_process_finished(p):
 
 def _handle_error_in_RUNNING_CASES():
 
-    err_msg = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
-    err_msg += "Case '%s/%s.data' FAILED !! Here are the last 20 lines of the err file:\n"
-    err_msg += "(If you don't see anything suspicious, also check pre/post_run scripts!!)\n"
-    err_msg += "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
+    sep = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    err_msg = sep
+    err_msg += "\nCase '%s' FAILED !! Below you will find the last 20 lines of the trust cerr and the log of the wrapper:"
+    err_msg += "\n(If you don't see anything suspicious, also check pre/post_run scripts!!)\n"
+    err_msg += sep
 
     allOK=True
     for i,r in enumerate(_RUNNING_CASES):
@@ -1563,10 +1564,18 @@ def _handle_error_in_RUNNING_CASES():
             # if it failed, print error and abort
             if p.returncode != 0:
                 allOK = False
+                _print(err_msg % (case._relPath()), also_to_nb=True)
                 err_file=case._fullPath_ErrFile()
-                _print(err_msg % (case._relPath(), case.name_), also_to_nb=True)
-                _print(getLastLines_(err_file), also_to_nb=True)
-                _print("errfile path:" ,err_file, also_to_nb=True)
+                if os.path.isfile(err_file):
+                    print(sep)
+                    _print("errfile path:" ,err_file, "\n", also_to_nb=True)
+                    _print(getLastLines_(err_file), also_to_nb=True)
+                logFile=r["logFile"]
+                if os.path.isfile(logFile):
+                    print(sep)
+                    _print("logFile path:" ,logFile, also_to_nb=True)
+                    print(sep)
+                    _print(getLastLines_(logFile), also_to_nb=True)
                 # only report about the first failed case.
                 # otherwise, too much clutter
                 # user will learn about each failed case after fixing previous one
