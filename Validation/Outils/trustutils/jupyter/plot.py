@@ -700,6 +700,11 @@ class Table:  # ancien tableau
         s = s.replace(r"\textbackslash", "")
         s = s.replace(r"\$","$")
         s = s.replace("_",r"\_")
+
+        # replace % to \%. ignores \% if already done by user
+        tmp="dza,nkocnraz"
+        s = s.replace(r"\%",tmp).replace("%",r"\%").replace(tmp,r"\%")
+
         s = r"\begin{center} %s \end{center}" % s
         return s
 
