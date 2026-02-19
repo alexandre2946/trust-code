@@ -178,6 +178,10 @@ class Write_notebook:
                         point_number = 1000
                         if figure.rangeX != "auto":
                             rangeX = figure.rangeX.split()
+                            if "auto" in rangeX[0]:
+                                rangeX[0]="0"
+                            if "auto" in rangeX[1]:
+                                rangeX[1]="1"
                         if figure.logX:
                             point_number = 10000
                         code += f"x = np.linspace({float(rangeX[0])},{float(rangeX[1])},{point_number}) \n"
