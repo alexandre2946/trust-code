@@ -58,9 +58,9 @@ nb_pas_dt_max 10
         seuil_statio -1
 	solveur implicite
         {
-            solveur petsc_gpu gmres { precond diag { } rtol 1.e-3 impr }
+            solveur gmres { diag seuil 1.e-10 impr }
         }
-	Facsec 100
+	Facsec 1
 	facsec_max 100
 }
 
@@ -125,7 +125,7 @@ Read pb_fluide
         format lml
         Champs dt_post 43200
         {
-            temperature elem
+            pression elem
             delta
         }
     }

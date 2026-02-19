@@ -1,6 +1,8 @@
+XX/XX/26 (TRUST) GPU          : Single GPU performance on MI250X (adastra, lumi) and MI300A (adastra) improved by 30% after ROCm update (6.4.x)
 XX/XX/26 (TRUST) Bug fix      : Replace CG by GMRES in AMG solver for better robustness and speed especially on GPU (may not converge)
 XX/XX/26 (TRUST) Bug fix      : Add test to check several int64 geometric interpretors and fix some of them (Corriger_Frontiere_Periodique_64, Raffiner_Simplexes_64)
 XX/XX/26 (TRUST) Bug fix      : Raffiner_isotrope_parallele couldn't be used on a mesh with periodic boundaries
+XX/XX/26 (TRUST) GPU          : Faster GMRES TRUST implementation (used for implicit schemes) thanks to SPMV optimization
 XX/XX/26 (TRUST) Performance  : Reduce MPI communications in several parts of the code especially in TRUST GMRES, CG solvers and matrix-free CG used in diffusive-implicited scheme
 XX/XX/26 (TRUST) Change       : Bug fixed in VDF for the distance to the wall compute used by some turbulence models
 XX/XX/26 (TRUST) Performance  : Fix slow TrioCFD initialization and possible OOM on large mesh in the CPU version for K-Omega calculation (distance to the wall compute)

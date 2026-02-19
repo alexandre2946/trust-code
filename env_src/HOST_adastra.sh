@@ -23,7 +23,7 @@ define_modules_config()
          echo "$ROCM_ARCH not supported on adastra!"
       fi
       # Compilateur hipcc
-      module="PrgEnv-gnu/8.5.0 craype-accel-amd-$ROCM_ARCH rocm/6.2.1"
+      module="PrgEnv-gnu/8.6.0 craype-accel-amd-$ROCM_ARCH rocm/6.4.3"
       module=$module" firefox" # For profiling
    else
       # Compilateur GNU

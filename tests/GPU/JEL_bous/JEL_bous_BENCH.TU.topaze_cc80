@@ -8,53 +8,52 @@ Time is given in seconds
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                               Context of the computation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Date:     16-11-2025 -- 08:28:26
-OS:       topaze7066__Linux__x86_64__4.18.0-553.69.1.el8_10.x86_64__#1 SMP Thu Aug 7 18:10:00 EDT 2025
-CPU:      Model name:  AMD EPYC 7763 64-Core Processor ; Thread(s) per core:  2
-GPU:      | NVIDIA-SMI 570.195.03  Driver Version: 570.195.03  CUDA Version: 12.8  |
-|  0  NVIDIA A100-SXM4-80GB  On  |  0000000
-Nb procs: 1
-TRUST version: 1.9.7_beta
+Date:     20-02-2026 -- 17:49:16
+OS:       topaze7050__Linux__x86_64__4.18.0-553.89.1.el8_10.x86_64__#1 SMP Sat Nov 29 00:49:18 EST 2025
+CPU model : AMD EPYC 7763 64-Core Processor
+Total number of threads:256
+GPU model: NVIDIA A100-SXM4-80GB
+CUDA runtime version: 12.90
+CUDA drivers version: 13.0
+Nb procs used for the computation: 1
+TRUST version: 1.9.8_beta
+Total number of elements used for the calculation: 2332800
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                            Computation start-up statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Total time of the start-up:                                                39.5574        
-Percent of untracked time during computation start-up:                     1.46622e-08    
+Total time of the start-up:                                                41.3779        
 
 Number of calls to the linear solver per time step:                        2              
-Average time of the resolution of the linear problem per call:             1.64103        
+Average time of the resolution of the linear problem per call:             2.0777         
 Average number of iteration of the linear solver per call:                 19.5           
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                                  Time loop statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The first time step is not accounted for the computation of the time loop statistics
-Total time of the time loop:                                               2.70011        
+Total time of the time loop:                                               2.51937        
 Number of time steps:                                                      9              
 Skipped time steps:                                                        1              
-Average time per time step:                                                0.300012       
-Standard deviation between time steps:                                     0.0103106      
-Time elapsed in the skipped time steps:                                    1.21056        
+Average time per time step:                                                0.27993        
+Standard deviation between time steps:                                     0.00755805     
+Time elapsed in the skipped time steps:                                    1.24275        
 
 
 Standard counter description             | Time/step       | % loop time | Call(s)/step   
 ------------------------------------------------------------------------------------------
-Linear solver resolutions Ax=B           | 0.0896355       | 29.9        | 2              
-Convection operator                      | 0.03561813      | 11.9        | 4              
-Diffusion operator                       | 0.07667833      | 25.6        | 26             
-Gradient operator                        | 0.01685105      |  5.6        | 4              
-Divergence operator                      | 0.006003557     |  2.0        | 3              
-Source terms                             | 0.01086835      |  3.6        | 2              
-Update ::mettre_a_jour                   | 0.005881792     |  2.0        | 1              
-Solver for implicit diffusion            | 0.02578495      |  8.6        | 4              
-Computation of the time step dt          | 0.01245983      |  4.2        | 8              
-Turbulence model::update                 | 0.002655456     |  0.9        | 1              
-Post-treatment operations                | 0.008057816     |  2.7        | 1              
-Other operations                         | 0.009517474     |  3.2        | 
-
-Untracked time                           | 7.93e-05        | 0.00294     | 
-
+Linear solver resolutions Ax=B           | 0.095653        | 22.9        | 2              
+Convection operator                      | 0.02602373      |  6.2        | 4              
+Diffusion operator                       | 0.06149648      | 14.7        | 26             
+Gradient operator                        | 0.01634973      |  3.9        | 4              
+Divergence operator                      | 0.005980824     |  1.4        | 3              
+Source terms                             | 0.0107638       |  2.6        | 2              
+Update ::mettre_a_jour                   | 0.004935778     |  1.2        | 1              
+Solver for implicit diffusion            | 0.02931744      |  7.0        | 4              
+Computation of the time step dt          | 0.01242498      |  3.0        | 8              
+Turbulence model::update                 | 0.001668194     |  0.4        | 1              
+Post-treatment operations                | 0.006153714     |  1.5        | 1              
+Other operations                         | 0.009161827     |  2.2        | 
 
 Average number of iteration of the linear solver per call:                 33             
 
@@ -64,16 +63,16 @@ Average number of iteration of the linear solver per call:                 33
 -----------------------------------------------------------------------------------------------------------
 Counter description                      | Time per step   | % loop time | Call(s)/step    | Bandwidth 
 -----------------------------------------------------------------------------------------------------------
-Libraries:                               | 0.089301        | 29.8        | 2               | 
-Kernels:                                 | 0.200272        | 66.8        | 890             | 
-Copy host to device:                     | 0.000518749     |  0.2        | 18              | 6.9 GB/s
-Copy device to host:                     | 0.00107591      |  0.4        | 7               | 9.8 GB/s
-Alloc/Free on device:                    | 9.30504e-05     |  0.0        | 0               | 
-GPU: 97% Copy H<->D: 0.53% Alloc/free: 0.031% Comm: 0% CPU & I/O: 2.9%
+Libraries:                               | 0.0953374       | 34.1        | 2               | 
+Kernels:                                 | 0.176263        | 63.0        | 912             | 
+Copy host to device:                     | 0.000504537     |  0.2        | 18              | 7.1 GB/s
+Copy device to host:                     | 0.000921495     |  0.3        | 7               | 11.5 GB/s
+Alloc/Free on device:                    | 9.07312e-05     |  0.0        | 0               | 
+GPU: 97% Copy H<->D: 0.51% Alloc/free: 0.032% Comm: 0% CPU & I/O: 2.4%
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                               Post-resolution statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Time of the post-resolution:                                               0.199303       
+Time of the post-resolution:                                               0.193253       
 
-Total time for the whole computation                                       43.6674        
+Total time for the whole computation                                       45.3332        
 

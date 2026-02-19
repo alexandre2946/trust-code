@@ -410,7 +410,6 @@ if (IS_DIRECTORY "${TRUST_KOKKOS_ROOT}/${TRUST_ARCH}${OPT}/include/ArborX")
     ${TRUST_KOKKOS_ROOT}/${TRUST_ARCH}${OPT}/include/ArborX
     ${TRUST_KOKKOS_ROOT}/${TRUST_ARCH}${OPT}/include/ArborX/geometry
     ${TRUST_KOKKOS_ROOT}/${TRUST_ARCH}${OPT}/include/ArborX/kokkos_ext
-    ${TRUST_KOKKOS_ROOT}/${TRUST_ARCH}${OPT}/include/ArborX/details
     ${TRUST_KOKKOS_ROOT}/${TRUST_ARCH}${OPT}/include/ArborX/spatial
     ${TRUST_KOKKOS_ROOT}/${TRUST_ARCH}${OPT}/include/ArborX/distributed
 )
