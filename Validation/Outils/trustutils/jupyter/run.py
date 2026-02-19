@@ -1260,7 +1260,7 @@ def initCaseSuite():
         # When called for the first time, will copy src to build, and execute 'prepare' script if any
         defaultSuite_ = TRUSTSuite()
 
-def reset():
+def reset(keepBuildDir=True,keepSubdirectories=False):
     """ 
     Wipe out build directory completly and reset default suite.
     """
@@ -1271,10 +1271,20 @@ def reset():
 
     import shutil
 
+
     global defaultSuite_
     defaultSuite_ = None
     if os.path.exists(BUILD_DIRECTORY):
-        shutil.rmtree(BUILD_DIRECTORY)
+        # only delete content. to avoid killing your terminal if you are inside BUILD_DIRECTORY
+        # can even choose to keep empty dirs with the optional variable
+        for root, dirs, files in os.walk(BUILD_DIRECTORY, topdown=False):
+            for name in files:
+                os.remove(os.path.join(root, name))
+            if not keepSubdirectories:
+                for name in dirs:
+                    os.rmdir(os.path.join(root, name))
+        if not keepBuildDir:
+            shutil.rmtree(BUILD_DIRECTORY)
 
 
 def getCases():
