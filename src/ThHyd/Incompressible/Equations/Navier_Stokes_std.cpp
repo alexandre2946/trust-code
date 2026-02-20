@@ -1961,3 +1961,36 @@ void Navier_Stokes_std::update_y_plus(const DoubleTab& tab)
     for (int i = 0 ; i < tab_y_p.dimension_tot(0) ; i++)
       for (int n = 0 ; n < tab_y_p.dimension_tot(1) ; n++) tab_y_p(i,n) = tab(i,0,n);
 }
+
+void Navier_Stokes_std::setPressureTimeN()
+{
+  if(probleme().domaine().getCouplingMethod()) //implicit IFS coupling
+    // Equivalent of setting present = past for velocity done in for eg. Schema_Euler_Implicite::test_stationnaire.
+    // Ensures sub-iterations start with the correct pressure for implicit coupling
+    pression().valeurs()= P_n;
+}
+
+bool Navier_Stokes_std::getCouplingInfoForFiltering() const
+{
+  return probleme().domaine().getCouplingMethod();
+}
+
+void Navier_Stokes_std::updateFluidForce(DoubleTab& velocity)
+{
+  // in case of implicit coupling with a structural code: update the fluxes (used for computing the fluid force) during implicit sub-iterations
+
+  if(probleme().domaine().getCouplingMethod()) //implicit IFS coupling case
+    {
+      Cout<<" Implicit coupling: Navier_Stokes_std_ALE::updateFluidForce "<<finl;
+      //update diffusion operator
+      DoubleTab field_value = velocity;
+      field_value = 0.;
+      operateur_diff().ajouter(velocity, field_value);
+
+
+      //update gradient operator
+      pression().mettre_a_jour(schema_temps().temps_courant());
+      calculer_la_pression_en_pa();
+      gradient->calculer_flux_bords();
+    }
+}
