@@ -73,89 +73,78 @@ int Assembleur_P_DG::assembler_mat(Matrice& la_matrice, const DoubleVect& diag, 
   la_matrice.typer("Matrice_Morse");
   Matrice_Morse& mat = ref_cast(Matrice_Morse, la_matrice.valeur());
 
-  const Domaine_DG& domaine = ref_cast(Domaine_DG, le_dom_DG.valeur());
+  const Domaine_DG& domaine = ref_cast(Domaine_DG, le_dom_dg_.valeur());
   const Champ_Elem_DG& ch = ref_cast(Champ_Elem_DG, equation().inconnue());
 
   int nordre = Option_DG::Get_order_for("pression");
 
   const BasisFunction& bfunc = domaine.get_basisFunction(nordre);
-  const int nb_bfunc = bfunc.nb_bfunc();
+  const int nb_basis_func = bfunc.nb_bfunc();
 
-  const IntTab& indices_glob_elem = bfunc.indices_glob_elem();
+  const IntTab& indices_glob_elem = ch.indices_glob_elem();
 
-  int nb_elem_tot = le_dom_DG->nb_elem_tot();
+  int nb_elem_tot = le_dom_dg_->nb_elem_tot();
   int size_inc = indices_glob_elem(nb_elem_tot);
 
   const IntTab& stencil_sorted = domaine.get_stencil_sorted();
   const int nb_stencil_max = stencil_sorted.dimension(1);
 
-  if (!stencil_done)
+  mat.dimensionner(size_inc, size_inc, 0);
+  IntVect& tab1 = mat.get_set_tab1();
+  IntVect& tab2 = mat.get_set_tab2();
+
+  int nb_indices_line;
+  int row, col, indice;
+
+  tab1(0) = 1;
+  for (int nelem = 0; nelem < nb_elem_tot; nelem++)
     {
-
-      tab1.resize(size_inc,RESIZE_OPTIONS::NOCOPY_NOINIT);
-
-      int nb_indices_line;
-      int row, col, indice;
-
-      tab1(0) = 1;
-      for (int nelem = 0 ; nelem < nb_elem_tot ; nelem++)
+      nb_indices_line = 0;
+      for (int k = 0; k < nb_stencil_max; k++)
         {
-          nb_indices_line = 0;
-          for (int k = 0 ; k < nb_stencil_max; k++)
-            {
-              if ( stencil_sorted(nelem,k) < 0 ) break;
-              nb_indices_line += nb_bfunc;
-            }
-          for (int k=0; k<nb_bfunc; k++)
-            tab1(indices_glob_elem(nelem) + k + 1) = nb_indices_line + tab1(indices_glob_elem(nelem) + k);
+          if (stencil_sorted(nelem, k) < 0)
+            break;
+          nb_indices_line += nb_basis_func;
         }
-
-      tab2.resize(tab1(size_inc) - 1,RESIZE_OPTIONS::NOCOPY_NOINIT);
-
-
-      for (int nelem = 0 ; nelem < nb_elem_tot ; nelem++)
-        {
-          row = tab1[indices_glob_elem(nelem)]-1 ;
-          nb_indices_line = tab1[indices_glob_elem(nelem)+1] - tab1[indices_glob_elem(nelem)];
-          indice = 0;
-          for (int k = 0 ; k < nb_stencil_max; k++)
-            {
-              if ( stencil_sorted(nelem,k) < 0 ) break;
-              col = indices_glob_elem(stencil_sorted(nelem,k))+1;
-              for (int j=0; j<nb_bfunc; j++)
-                for (int i=0; i<nb_bfunc; i++)
-                  tab2[row+indice+j+nb_indices_line*i] = col+j;
-              indice += nb_bfunc;
-            }
-        }
-      mat.dimensionner(size_inc, tab1(size_inc) - 1);
-      tab1.ref_array(mat.get_set_tab1()), tab2.ref_array(mat.get_set_tab2());
-      stencil_done = 1;
-    }
-  else //sinon, on recycle
-    {
-      mat.get_set_tab1().ref_array(tab1);
-      mat.get_set_tab2().ref_array(tab2);
-      mat.get_set_coeff().resize(tab2.size());
-      mat.set_nb_columns(size_inc);
+      for (int k = 0; k < nb_basis_func; k++)
+        tab1(indices_glob_elem(nelem) + k + 1) = nb_indices_line + tab1(indices_glob_elem(nelem) + k);
     }
 
-  const DoubleTab& eta_F = bfunc.get_eta_facet();  // Compute the penalisation coefficient
+  mat.dimensionner(size_inc, tab1(size_inc) - 1);
+
+  for (int nelem = 0; nelem < nb_elem_tot; nelem++)
+    {
+      row = tab1[indices_glob_elem(nelem)] - 1;
+      nb_indices_line = tab1[indices_glob_elem(nelem) + 1] - tab1[indices_glob_elem(nelem)];
+      indice = 0;
+      for (int k = 0; k < nb_stencil_max; k++)
+        {
+          if (stencil_sorted(nelem,k) < 0) break;
+          col = indices_glob_elem(stencil_sorted(nelem,k))+1;
+          for (int j=0; j<nb_basis_func; j++)
+            for (int i=0; i<nb_basis_func; i++)
+              tab2[row+indice+j+nb_indices_line*i] = col+j;
+          indice += nb_basis_func;
+        }
+    }
+  mat.sort_stencil();
+
+  const DoubleTab& eta_F = bfunc.get_eta_facet(); // Compute the penalisation coefficient
+
   const int quad_order = bfunc.get_default_quadrature_order();
   const Quadrature_base& quad = domaine.get_quadrature(quad_order);
   int nb_pts_integ_max = quad.nb_pts_integ_max();
-
-  DoubleTab grad_fbase_elem(nb_bfunc,nb_pts_integ_max, Objet_U::dimension);
-  DoubleTab divergence(nb_pts_integ_max);
   double coeff;
 
-  for (int e = 0; e < le_dom_DG->nb_elem(); e++)
+  DoubleTab grad_fbase_elem(nb_basis_func, nb_pts_integ_max, Objet_U::dimension);
+  DoubleTab divergence(nb_pts_integ_max);
+
+  for (int e = 0; e < le_dom_dg_->nb_elem(); e++)
     {
       bfunc.eval_grad_bfunc(quad, e, grad_fbase_elem);
-      int ind_elem=indices_glob_elem(e);
-
-      for (int i=0; i<nb_bfunc; i++)
-        for (int j=0; j<nb_bfunc; j++)
+      int ind_elem = indices_glob_elem(e);
+      for (int i = 0; i < nb_basis_func; i++)
+        for (int j = 0; j < nb_basis_func; j++)
           {
             divergence = 0.;
             for (int k = 0; k < quad.nb_pts_integ(e) ; k++)
@@ -178,63 +167,61 @@ int Assembleur_P_DG::assembler_mat(Matrice& la_matrice, const DoubleVect& diag, 
   DoubleTab product(nb_pts_int_fac);
   DoubleTab scalar_product(nb_pts_int_fac);
 
-  DoubleTab fbase0(nb_bfunc, nb_pts_int_fac);
-  DoubleTab fbase1(nb_bfunc, nb_pts_int_fac);
+  DoubleTab fbase0(nb_basis_func, nb_pts_int_fac);
+  DoubleTab fbase1(nb_basis_func, nb_pts_int_fac);
 
-  DoubleTab grad_fbase0(nb_bfunc,nb_pts_int_fac, Objet_U::dimension);
-  DoubleTab grad_fbase1(nb_bfunc,nb_pts_int_fac, Objet_U::dimension);
-
+  DoubleTab grad_fbase0(nb_basis_func, nb_pts_int_fac, Objet_U::dimension);
+  DoubleTab grad_fbase1(nb_basis_func, nb_pts_int_fac, Objet_U::dimension);
 
   for (int f = premiere_face_int; f < domaine.nb_faces(); f++)
     {
 
-      elem0 = face_voisins(f,0);
-      elem1 = face_voisins(f,1);
+      elem0 = face_voisins(f, 0);
+      elem1 = face_voisins(f, 1);
 
       int ind_elem0 = indices_glob_elem(elem0);
       int ind_elem1 = indices_glob_elem(elem1);
 
       double sur_f = domaine.face_surfaces(f);
 
-      double h_T = sqrt(std::min(domaine.carre_pas_maille(elem0), domaine.carre_pas_maille(elem1))); //TODO possibilite de prendre moyenne harmonique (stabilite)
-      double invh_T = 1./h_T;
+      double h_T = sqrt(std::min(domaine.carre_pas_maille(elem0), domaine.carre_pas_maille(elem1))); // TODO possibilite de prendre moyenne harmonique (stabilite)
+      double invh_T = 1. / h_T;
 
       //*****************//
       // penalizing term //
       //*****************//
-      for( int i_elem = 0; i_elem<2; i_elem++)
+      for (int i_elem = 0; i_elem < 2; i_elem++)
         {
-          int elem=face_voisins(f,i_elem);
-          int ind_elem=indices_glob_elem(elem);
+          int elem = face_voisins(f, i_elem);
+          int ind_elem = indices_glob_elem(elem);
 
           bfunc.eval_bfunc_on_facets(quad, elem, f, fbase0);
 
-          for (int i=0; i<nb_bfunc; i++)
-            for (int j=0; j<nb_bfunc; j++)
+          for (int i = 0; i < nb_basis_func; i++)
+            for (int j = 0; j < nb_basis_func; j++)
               {
-                for (int k = 0; k < nb_pts_int_fac ; k++)
-                  product(k) = fbase0(i,k) * fbase0(j,k); //TODO DG kronecker ?
+                for (int k = 0; k < nb_pts_int_fac; k++)
+                  product(k) = fbase0(i, k) * fbase0(j, k); // TODO DG kronecker ?
 
-                coeff = eta_F(f)* invh_T* quad.compute_integral_on_facet(f, product);
-                mat(ind_elem+i, ind_elem+j) += coeff;
+                coeff = eta_F(f) * invh_T * quad.compute_integral_on_facet(f, product);
+                mat(ind_elem + i, ind_elem + j) += coeff;
               }
         }
 
-
-      //crossed_term
+      // crossed_term
       bfunc.eval_bfunc_on_facets(quad, elem0, f, fbase0);
       bfunc.eval_bfunc_on_facets(quad, elem1, f, fbase1);
 
-      for (int i=0; i<nb_bfunc; i++)
-        for (int j=0; j<nb_bfunc; j++)
+      for (int i = 0; i < nb_basis_func; i++)
+        for (int j = 0; j < nb_basis_func; j++)
           {
-            for (int k = 0; k < nb_pts_int_fac ; k++)
-              product(k) = fbase0(i,k) * fbase1(j,k);
+            for (int k = 0; k < nb_pts_int_fac; k++)
+              product(k) = fbase0(i, k) * fbase1(j, k);
 
             double integral = quad.compute_integral_on_facet(f, product);
-            coeff =  eta_F(f)* invh_T *integral;
-            mat(ind_elem0+i, ind_elem1+j) -= coeff;
-            mat(ind_elem1+j, ind_elem0+i) -= coeff; //symmetry
+            coeff =  eta_F(f) * invh_T *integral;
+            mat(ind_elem0 + i, ind_elem1 + j) -= coeff;
+            mat(ind_elem1 + j, ind_elem0 + i) -= coeff; //symmetry
           }
 
       //****************//
@@ -243,57 +230,56 @@ int Assembleur_P_DG::assembler_mat(Matrice& la_matrice, const DoubleVect& diag, 
       bfunc.eval_grad_bfunc_on_facets(quad, elem0, f, grad_fbase0);
       bfunc.eval_grad_bfunc_on_facets(quad, elem1, f, grad_fbase1);
 
-      for (int i=0; i<nb_bfunc; i++)
+      for (int i = 0; i < nb_basis_func; i++)
         {
           scalar_product = 0.;
-          for (int k = 0; k < nb_pts_int_fac ; k++)
-            for (int d=0; d<Objet_U::dimension; d++)
-              scalar_product(k) += face_normales(f,d)/sur_f * grad_fbase0(i, k, d);
+          for (int k = 0; k < nb_pts_int_fac; k++)
+            for (int d = 0; d < Objet_U::dimension; d++)
+              scalar_product(k) += face_normales(f, d) / sur_f * grad_fbase0(i, k, d);
 
-          for (int j=0; j<nb_bfunc; j++)
+          for (int j = 0; j < nb_basis_func; j++)
             {
-              for (int k = 0; k < nb_pts_int_fac ; k++)
-                product(k) = scalar_product(k) * fbase0(j,k);
+              for (int k = 0; k < nb_pts_int_fac; k++)
+                product(k) = scalar_product(k) * fbase0(j, k);
               double integral = quad.compute_integral_on_facet(f, product);
 
-              mat(ind_elem0+i, ind_elem0+j) -= 0.5 *integral;
-              mat(ind_elem0+j, ind_elem0+i) -= 0.5 *integral; //symmetry
+              mat(ind_elem0 + i, ind_elem0 + j) -= 0.5 *integral;
+              mat(ind_elem0 + j, ind_elem0 + i) -= 0.5 *integral; //symmetry
             }
 
-
-          for (int j=0; j<nb_bfunc; j++)
+          for (int j = 0; j < nb_basis_func; j++)
             {
-              for (int k = 0; k < nb_pts_int_fac ; k++)
-                product(k) = scalar_product(k) * fbase1(j,k);
+              for (int k = 0; k < nb_pts_int_fac; k++)
+                product(k) = scalar_product(k) * fbase1(j, k);
               double integral = quad.compute_integral_on_facet(f, product);
 
-              mat(ind_elem0+i, ind_elem1+j) += 0.5 *integral;
-              mat(ind_elem1+j, ind_elem0+i) += 0.5 *integral; //symmetry
+              mat(ind_elem0 + i, ind_elem1 + j) += 0.5 *integral;
+              mat(ind_elem1 + j, ind_elem0 + i) += 0.5 *integral; //symmetry
 
             }
 
           scalar_product = 0.;
-          for (int k = 0; k < nb_pts_int_fac ; k++)
-            for (int d=0; d<Objet_U::dimension; d++)
-              scalar_product(k) += face_normales(f,d)/sur_f * grad_fbase1(i, k, d);
+          for (int k = 0; k < nb_pts_int_fac; k++)
+            for (int d = 0; d < Objet_U::dimension; d++)
+              scalar_product(k) += face_normales(f, d) / sur_f * grad_fbase1(i, k, d);
 
-          for (int j=0; j<nb_bfunc; j++)
+          for (int j = 0; j < nb_basis_func; j++)
             {
-              for (int k = 0; k < nb_pts_int_fac ; k++)
-                product(k) = scalar_product(k) * fbase1(j,k);
+              for (int k = 0; k < nb_pts_int_fac; k++)
+                product(k) = scalar_product(k) * fbase1(j, k);
               double integral = quad.compute_integral_on_facet(f, product);
-              mat(ind_elem1+i, ind_elem1+j) += 0.5 *integral;
-              mat(ind_elem1+j, ind_elem1+i) += 0.5 *integral; //symmetry
+              mat(ind_elem1 + i, ind_elem1 + j) += 0.5 *integral;
+              mat(ind_elem1 + j, ind_elem1 + i) += 0.5 *integral; //symmetry
             }
 
-          for (int j=0; j<nb_bfunc; j++)
+          for (int j = 0; j < nb_basis_func; j++)
             {
-              for (int k = 0; k < nb_pts_int_fac ; k++)
-                product(k) = scalar_product(k) * fbase0(j,k);
+              for (int k = 0; k < nb_pts_int_fac; k++)
+                product(k) = scalar_product(k) * fbase0(j, k);
               double integral = quad.compute_integral_on_facet(f, product);
 
-              mat(ind_elem1+i, ind_elem0+j) -= 0.5 *integral;
-              mat(ind_elem0+j, ind_elem1+i) -= 0.5 *integral; //symmetry
+              mat(ind_elem1 + i, ind_elem0 + j) -= 0.5 *integral;
+              mat(ind_elem0 + j, ind_elem1 + i) -= 0.5 *integral; //symmetry
 
             }
         }
@@ -311,30 +297,30 @@ int Assembleur_P_DG::assembler_mat(Matrice& la_matrice, const DoubleVect& diag, 
           bfunc.eval_grad_bfunc_on_facets(quad, elem, f, grad_fbase0);
 
           double h_T = sqrt(domaine.carre_pas_maille(elem));
-          double invh_T = 1./h_T; //TODO regarder penalisation remplacer h_T par h_F
+          double invh_T = 1. / h_T; //TODO regarder penalisation remplacer h_T par h_F
           double sur_f = domaine.face_surfaces(f);
 
-          for (int i=0; i<nb_bfunc; i++)
+          for (int i = 0; i < nb_basis_func; i++)
             {
               scalar_product = 0.;
-              for (int k = 0; k < nb_pts_int_fac ; k++)
-                for (int d=0; d<Objet_U::dimension; d++)
-                  scalar_product(k) += face_normales(f,d)/sur_f * grad_fbase0(i, k, d);
+              for (int k = 0; k < nb_pts_int_fac; k++)
+                for (int d = 0; d < Objet_U::dimension; d++)
+                  scalar_product(k) += face_normales(f, d) / sur_f * grad_fbase0(i, k, d);
 
-              for (int j=0; j<nb_bfunc; j++)
+              for (int j = 0; j < nb_basis_func; j++)
                 {
-                  for (int k = 0; k < nb_pts_int_fac ; k++)
-                    product(k) = fbase0(i, k) * fbase0(j, k); //TODO DG kronecker ?
+                  for (int k = 0; k < nb_pts_int_fac; k++)
+                    product(k) = fbase0(i, k) * fbase0(j, k); // TODO DG kronecker ?
 
                   coeff = eta_F(f) * invh_T * quad.compute_integral_on_facet(f, product);
-                  mat(ind_elem+i, ind_elem+j) += coeff;
+                  mat(ind_elem + i, ind_elem + j) += coeff;
 
-                  for (int k = 0; k < nb_pts_int_fac ; k++)
+                  for (int k = 0; k < nb_pts_int_fac; k++)
                     product(k) = scalar_product(k) * fbase0(j, k);
 
                   double integral = quad.compute_integral_on_facet(f, product);
-                  mat(ind_elem+i, ind_elem+j) -= integral;
-                  mat(ind_elem+j, ind_elem+i) -= integral;
+                  mat(ind_elem + i, ind_elem + j) -= integral;
+                  mat(ind_elem + j, ind_elem + i) -= integral;
                 }
             }
         }
@@ -377,8 +363,8 @@ int Assembleur_P_DG::modifier_secmem(DoubleTab& secmem)
 {
 //  Debog::verifier("secmem dans modifier secmem", secmem);
 //
-//  const Domaine_DG& le_dom = le_dom_DG.valeur();
-//  const Domaine_Cl_DG& le_dom_cl = le_dom_Cl_DG.valeur();
+//  const Domaine_DG& le_dom = le_dom_dg_.valeur();
+//  const Domaine_Cl_DG& le_dom_cl = le_dom_Cl_dg_.valeur();
 //  int nb_cond_lim = le_dom_cl.nb_cond_lim();
 //  const IntTab& face_voisins = le_dom.face_voisins();
 //
@@ -440,22 +426,22 @@ int Assembleur_P_DG::modifier_solution(DoubleTab& pression)
 
 const Domaine_dis_base& Assembleur_P_DG::domaine_dis_base() const
 {
-  return le_dom_DG.valeur();
+  return le_dom_dg_.valeur();
 }
 
 const Domaine_Cl_dis_base& Assembleur_P_DG::domaine_Cl_dis_base() const
 {
-  return le_dom_Cl_DG.valeur();
+  return le_dom_Cl_dg_.valeur();
 }
 
 void Assembleur_P_DG::associer_domaine_dis_base(const Domaine_dis_base& le_dom_dis)
 {
-  le_dom_DG = ref_cast(Domaine_DG, le_dom_dis);
+  le_dom_dg_ = ref_cast(Domaine_DG, le_dom_dis);
 }
 
 void Assembleur_P_DG::associer_domaine_cl_dis_base(const Domaine_Cl_dis_base& le_dom_Cl_dis)
 {
-  le_dom_Cl_DG = ref_cast(Domaine_Cl_DG, le_dom_Cl_dis);
+  le_dom_Cl_dg_ = ref_cast(Domaine_Cl_DG, le_dom_Cl_dis);
 }
 
 void Assembleur_P_DG::completer(const Equation_base& Eqn)

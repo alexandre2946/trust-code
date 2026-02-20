@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -52,13 +52,12 @@ public:
 
 protected:
   OBS_PTR(Equation_base) mon_equation;
-  OBS_PTR(Domaine_DG) le_dom_DG;
-  OBS_PTR(Domaine_Cl_DG) le_dom_Cl_DG;
+  OBS_PTR(Domaine_DG) le_dom_dg_;
+  OBS_PTR(Domaine_Cl_DG) le_dom_Cl_dg_;
 
   DoubleTab les_coeff_pression;
 
   int has_P_ref = 0, stencil_done = 0;
-  IntVect tab1, tab2; //tableaux tab1 / tab2 de la Matrice_Morse (ne changent pas)
   Matrice_Morse rec; //pour reconstruire les vitesses
 };
 
