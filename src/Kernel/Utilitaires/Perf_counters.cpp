@@ -1110,7 +1110,7 @@ void Perf_counters::Impl::print_global_TU(const std::string& message)
         int count = c_to_print_.count_;
         line << std::left <<std::setw(counter_description_width) << c_to_print_.description_ <<separator ;
         double t = nb_ts>0 ? c_to_print_.avg_time_per_step_ : t_c;
-        line << std::left << std::setw(time_per_step_width) <<t << separator << std::setprecision(3) << std::setw(percent_loop_time_width) << fmt("%4.1f", t_c/total_time*100);
+        line << std::left << std::setw(time_per_step_width) <<t << separator << std::setprecision(3) << std::setw(percent_loop_time_width) << fmt("%4.1f", t_c/time_tl*100);
         if (nb_ts>0)
           {
             double n = static_cast<double>(count)/nb_ts;
@@ -1128,7 +1128,7 @@ void Perf_counters::Impl::print_global_TU(const std::string& message)
         int count = c_to_print_.count_;
         line << std::left <<std::setw(counter_description_width) << "Custom_counter::"+c_to_print_.description_ <<separator ;
         double t = nb_ts>0 ? t_c/nb_ts : t_c;
-        line << std::left << std::setw(time_per_step_width) <<t << separator << std::setprecision(3) << std::setw(percent_loop_time_width) << t_c/total_time*100 ;
+        line << std::left << std::setw(time_per_step_width) <<t << separator << std::setprecision(3) << std::setw(percent_loop_time_width) << t_c/time_tl*100 ;
         if (nb_ts>0)
           {
             double n = static_cast<double>(count)/nb_ts;
@@ -1359,7 +1359,7 @@ void Perf_counters::Impl::print_global_TU(const std::string& message)
                   write_globalTU_line_custom_counters(c_to_print, perfs_TU);
                 }
             }
-          perfs_TU << std::left <<std::setw(counter_description_width) << "Other operations" << separator << std::setw(time_per_step_width) << other << separator << std::setprecision(3) <<  std::setw(percent_loop_time_width) << fmt("%4.1f", other/(total_time/nb_ts)*100) << separator <<std::endl;
+          perfs_TU << std::left <<std::setw(counter_description_width) << "Other operations" << separator << std::setw(time_per_step_width) << other << separator << std::setprecision(3) <<  std::setw(percent_loop_time_width) << fmt("%4.1f", other/(time_tl/nb_ts)*100) << separator <<std::endl;
         }
       if (max_virtual_swap_c>0)
         {
