@@ -166,11 +166,11 @@ void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
   motcles[0] = "pression";    // Choix standard pour la pression
   motcles[1] = "temperature"; // Choix standard pour la temperature
   motcles[2] = "champ_fonc_quad_dg"; // With value on quadrature points
+  motcles[5] = "champ_elem_dg"; // With value on quadrature points
   motcles[3] = "champ_elem";  // Creer un champ aux elements (de type P0)
   motcles[6] = "champ_sommets";  // Creer un champ aux elements (de type P1)
   motcles[4] = "vitesse";     // Choix standard pour la vitesse
   motcles[7] = "champ_face";     // Choix standard pour la vitesse
-  motcles[5] = "gradient_pression";  // Le type de champ obtenu en calculant grad P
 
   Nom type;
   int default_nb_comp = 0; // Valeur par defaut du nombre de composantes
@@ -232,8 +232,9 @@ void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
   //TODO DG basis_function and champ_fonc_P1 have more dimension than the postprocess field but only for scalar field for now
   //it s difficult to discriminate the field P0 and P1 before postreatment
   // + how to do it for vector champ_inc like velocity ?
-  Cout << "champ " << noms[0] << " " << type << " " << " " << nb_comp << " " << default_nb_comp << finl;
   if (nature!=vectoriel) nb_comp = default_nb_comp;
+  else nb_comp = nb_comp*default_nb_comp;
+  Cout << "champ " << noms[0] << " " << type << " " << " " << nb_comp << " " << default_nb_comp << finl;
   if (champ_fonc)
     creer_champ(*champ_fonc, z, type, noms[0], unites[0], nb_comp, nb_ddl, temps, directive, que_suis_je());
   else

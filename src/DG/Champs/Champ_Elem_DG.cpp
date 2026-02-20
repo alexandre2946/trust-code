@@ -223,21 +223,27 @@ DoubleTab& Champ_Elem_DG::eval_elem(DoubleTab& tab_valeurs) const
   const Quadrature_base& quad = domaine.get_quadrature(5);
   int nb_pts_integ_max = quad.nb_pts_integ_max();
 
+  const int dim = tab_valeurs.dimension(1)/nb_pts_integ_max;
+
   const Champ_base& ch_base = le_champ();
   const DoubleTab& values = ch_base.valeurs();
 
-  assert(tab_valeurs.dimension(0) == nb_elem && tab_valeurs.dimension(1) == nb_pts_integ_max );
+  assert(tab_valeurs.dimension(0) == nb_elem && tab_valeurs.dimension(1) == dim*nb_pts_integ_max );
 
   DoubleTab fbase(nb_bfunc_,nb_pts_integ_max);
   for (int i = 0; i < nb_elem; i++)
     {
       bfunc.eval_bfunc(quad, i, fbase);
 
-      for (int j = 0; j < quad.nb_pts_integ(i) ; j++)
+      for (int d =0; d<dim; d++)
         {
-          tab_valeurs(i,j) = 0.;
-          for (int l =0; l<nb_bfunc_; l++)
-            tab_valeurs(i,j) += values(i,l) * fbase(l,j); // reconstruction valeurs du champ aux points d'integrations
+
+          for (int j = 0; j < quad.nb_pts_integ(i) ; j++)
+            {
+              tab_valeurs(i,j) = 0.;
+              for (int l =0; l<nb_bfunc_; l++)
+                tab_valeurs(i,j+d*nb_pts_integ_max) += values(i,l+d*nb_bfunc_) * fbase(l,j); // reconstruction valeurs du champ aux points d'integrations
+            }
         }
     }
 

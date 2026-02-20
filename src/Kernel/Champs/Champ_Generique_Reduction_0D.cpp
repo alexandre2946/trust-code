@@ -329,6 +329,12 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ(OWN_PTR(Champ_base)&) 
 //Extrait la valeur du vecteur val_source dans val_extraite
 void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVect& val_source, const int composante_VDF) const
 {
+
+  // TODO DG
+  // for DG, sometimes, the reduction 0D have to be a value for the cell, but sometimes if there is additional postreatment, it has to be a Champ_Fonc_Quad_elem type,
+  // how to discriminate the two possibilities
+  // For now, the norm reductions are consider to be cell values, but for the reductions weighted average and weighted sum are probably have to give values on quadrature points
+
   if (methode_=="min")
     {
       val_extraite = mp_min_vect(val_source);
