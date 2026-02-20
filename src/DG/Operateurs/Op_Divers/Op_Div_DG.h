@@ -36,19 +36,16 @@ class Op_Div_DG: public Operateur_Div_base
 public:
 
   void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&, const Champ_Inc_base&) override;
-
-  void dimensionner(Matrice_Morse& mat) const override;
-
-  inline int has_interface_blocs() const override { return 1; }
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
-
-  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = { }) const override;
-  //DoubleTab& ajouter(const DoubleTab&, DoubleTab&) const override;
   DoubleTab& calculer(const DoubleTab&, DoubleTab&) const override;
+  //DoubleTab& ajouter(const DoubleTab&, DoubleTab&) const override;
+  //void contribuer_a_avec(const DoubleTab&, Matrice_Morse& matrice) const override;
   int impr(Sortie& os) const override;
   void volumique(DoubleTab&) const override;
 
-  //void contribuer_a_avec(const DoubleTab&, Matrice_Morse& matrice) const override;
+  inline int has_interface_blocs() const override { return 1; }
+  void dimensionner(Matrice_Morse& mat) const override;
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
+  void ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = { }) const override;
 
 protected:
   OBS_PTR(Domaine_DG) le_dom_DG;

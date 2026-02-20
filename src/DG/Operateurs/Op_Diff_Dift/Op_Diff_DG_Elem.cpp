@@ -515,7 +515,7 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
   const BasisFunction& bfunc = le_dom_dg_->get_basisFunction(order);
   const int nb_bfunc = bfunc.nb_bfunc();
 
-  assert(nb_bfunc == equation().inconnue().valeurs().line_size());
+  assert(dim*nb_bfunc == equation().inconnue().valeurs().line_size());
 
   const int quad_order = bfunc.get_default_quadrature_order();
   const Quadrature_base& quad = domaine.get_quadrature(quad_order);

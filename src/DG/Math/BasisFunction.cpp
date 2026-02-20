@@ -282,7 +282,7 @@ void BasisFunction::eval_bfunc(const DoubleTab& coords, const int& nelem, Double
  */
 void BasisFunction::eval_div_bfunc(const Quadrature_base& quad, const int& nelem, DoubleTab& div_fbasis) const
 {
-  int nb_pts_integ_max = div_fbasis.dimension(1);
+  int nb_pts_integ_max = div_fbasis.dimension(2);
   DoubleTab grad_fbase_elem(nb_bfunc_, nb_pts_integ_max, Objet_U::dimension);
   eval_grad_bfunc(quad, nelem, grad_fbase_elem);
   for(int dim=0; dim<Objet_U::dimension; dim++)
