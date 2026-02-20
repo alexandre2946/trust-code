@@ -190,8 +190,16 @@ void Probleme_base_interface_proto::resetTimeWithDir_impl(Probleme_base& pb, dou
   if (!initialized || terminated)
     throw WrongContext(pb.le_nom().getChar(), "resetTime", "resetTime can not be called before initialize or after terminate");
 
+  bool managePostTreatments=true; // This is the default
+  if (pb.checkOutputIntEntry("skipPostTreatmentDuringReset"))
+    {
+      int val=pb.getOutputIntValue("skipPostTreatmentDuringReset");
+      if (val == 1) managePostTreatments=false;
+    }
+
   // We postreat once before reseting:
-  pb.postraiter(true);
+  if (!managePostTreatments) Cerr << pb.que_suis_je() << ": skip post-treatments in resetTime" << finl ;
+  if (managePostTreatments) pb.postraiter(true);
 
   // Possible to create a new directory:
   if (!dirname.empty())
@@ -212,12 +220,15 @@ void Probleme_base_interface_proto::resetTimeWithDir_impl(Probleme_base& pb, dou
   for (int i = 0; i < pb.nombre_d_equations(); i++)
     pb.equation(i).resetTime(time);  // will also reset fields there
 
-  // Trigger the change of basename for the output files, and the reinit of the post:
-  pb.postraitements().resetTime(time, dirname);
-  pb.init_postraitements();
+  if (managePostTreatments)
+    {
+      // Trigger the change of basename for the output files, and the reinit of the post:
+      pb.postraitements().resetTime(time, dirname);
+      pb.init_postraitements();
 
-  // We postreat after reset:
-  pb.postraiter(true);
+      // We postreat after reset:
+      pb.postraiter(true);
+    }
 
 }
 
