@@ -290,7 +290,7 @@ f8559a94ee64c8b70ebd79b65576d08d  petsc/SuperLU_DIST-9.1.0.tar.gz
 da990c4e944ede86879fd29ee309d8c4  petsc/Umpire-2025.09.0.tar.gz
 0877da1174550688e98df31b76c1c7b0  petsc/check_packages.sh
 d4990384b7b1d8b0357fc34d91530d49  petsc/hypre-2.33.0.tar.gz
-60ebfc49ab481ffed181ed6d47d3173e  petsc/hypre-3.0.0.tar.gz
+c33d67d1ae475460002782b09929e5cf  petsc/hypre-3.1.0.tar.gz
 88a40e3bf9e8ee28af8725a73f9e3bc3  petsc/petsc-3.23.7.tar.gz
 d4c79d4859cd6770439e7a4d880777de  petsc/petsc-3.24.2.tar.gz
 6a53e417a59d7cbde483babb624703f7  petsc/petsc-5d4b16a5b.tar.gz
