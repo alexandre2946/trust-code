@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -980,13 +980,13 @@ void Sous_Domaine_32_64<_SIZE_>::build(Entree& is)
             if (dim==3)
               parser.setVar(2,x[2],threadId);
             double test=parser.eval(threadId);
+            parser.release(threadId);
             // attention le test absolu est voulu
             // si on fait une fonction qui vaut 0 ou 1 ....
             if (test>0)
               local_compteur++;
             else
               les_polys_possibles(i) = -1;
-            parser.release(threadId);
           }, compteur);
           end_gpu_timer(__KERNEL_NAME__);
           les_elems_.resize(compteur);

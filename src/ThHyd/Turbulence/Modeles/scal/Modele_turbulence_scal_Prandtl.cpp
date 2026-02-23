@@ -152,8 +152,8 @@ Champ_Fonc_base& Modele_turbulence_scal_Prandtl::calculer_diffusivite_turbulente
       DoubleArrView alpha_t = static_cast<DoubleVect&>(tab_alpha_t).view_rw();
       Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), Kokkos::RangePolicy<>(0, n), KOKKOS_LAMBDA(const int i)
       {
-        int threadId = parser.acquire();
         double alpha_val = is_alpha_unif ? d_alpha : alpha_vals(i);
+        int threadId = parser.acquire();
         parser.setVar(0, alpha_val, threadId);
         parser.setVar(1, nu_t[i], threadId);
         alpha_t[i] = parser.eval(threadId);
@@ -173,16 +173,16 @@ Champ_Fonc_base& Modele_turbulence_scal_Prandtl::calculer_diffusivite_turbulente
           DoubleArrView alpha_t = static_cast<DoubleVect&>(tab_alpha_t).view_rw();
           Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), Kokkos::RangePolicy<>(0, n), KOKKOS_LAMBDA(const int i)
           {
-            int threadId = parser.acquire();
             double x = xp(i, 0);
             double y = xp(i, 1);
             double z = nb_dim == 3 ? xp(i, 2) : 0.;
+            int threadId = parser.acquire();
             parser.setVar(0, x, threadId);
             parser.setVar(1, y, threadId);
             parser.setVar(2, z, threadId);
             double NbPrandtlCell = parser.eval(threadId);
-            alpha_t[i] = nu_t[i] / NbPrandtlCell;
             parser.release(threadId);
+            alpha_t[i] = nu_t[i] / NbPrandtlCell;
           });
           end_gpu_timer(__KERNEL_NAME__);
         }

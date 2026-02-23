@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -822,10 +822,10 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
           DoubleTabView valeurs = valeurs_espace.view_wo();
           Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_pos, KOKKOS_LAMBDA(const int i)
           {
-            int threadId = parser.acquire();
             double x = special ? 1e38 : pos(i,0);
             double y = special ? 1e38 : pos(i,1);
             double z = special ? 1e38 : (dim>2 ? pos(i,2) : 0);
+            int threadId = parser.acquire();
             parser.setVar(0,x,threadId);
             parser.setVar(1,y,threadId);
             parser.setVar(2,z,threadId);

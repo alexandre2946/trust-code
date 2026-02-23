@@ -171,8 +171,8 @@ void Loi_Etat_rhoT_GP_QC::calculer_masse_volumique()
         int threadId = parser.acquire();
         parser.setVar(0, T, threadId);
         rho_np1(i) = parser.eval(threadId);
-        rho(i, 0) = 0.5 * (rho_n(i) + rho_np1(i));
         parser.release(threadId);
+        rho(i, 0) = 0.5 * (rho_n(i) + rho_np1(i));
       });
       end_gpu_timer(__KERNEL_NAME__);
     }

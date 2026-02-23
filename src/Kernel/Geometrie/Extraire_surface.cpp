@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -142,8 +142,8 @@ void Extraire_surface::extraire_surface_without_cleaning(Domaine& domaine_surfac
     if (dim==3)
       parser_condition_elements.setVar(2,xp(elem,2),threadId);
     double res = parser_condition_elements.eval(threadId);
-    marq_elem(elem) = std::fabs(res)>1e-5 ? 1 : 0;
     parser_condition_elements.release(threadId);
+    marq_elem(elem) = std::fabs(res)>1e-5 ? 1 : 0;
   });
   end_gpu_timer(__KERNEL_NAME__);
   tab_marq_elem.echange_espace_virtuel();
@@ -223,13 +223,14 @@ void Extraire_surface::extraire_surface_without_cleaning(Domaine& domaine_surfac
             if (dim==3)
               parser_condition_faces.setVar(2,xv(fac,2),threadId);
             double res=parser_condition_faces.eval(threadId);
+            parser_condition_faces.release(threadId);
             if (std::fabs(res)>1e-5)
               if (marq[fac]!=-1)  // pas un joint, ou on est le proprietaire
                 {
                   marq[fac]=1;
                   local_nb_t++;
                 }
-            parser_condition_faces.release(threadId);
+
           }
       }
   }, nb_t);

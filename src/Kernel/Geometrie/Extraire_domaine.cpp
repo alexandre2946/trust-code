@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -88,6 +88,7 @@ Entree& Extraire_domaine::interpreter_(Entree& is)
         if (dim==3)
           parser_condition_elements.setVar(2,xp(elem,2),threadId);
         double res=parser_condition_elements.eval(threadId);
+        parser_condition_elements.release(threadId);
         if (std::fabs(res)>1e-5)
           {
             marq_elem(elem)=1;
@@ -95,7 +96,6 @@ Entree& Extraire_domaine::interpreter_(Entree& is)
           }
         else
           marq_elem(elem)=0;
-        parser_condition_elements.release(threadId);
       }, nb_elem_m);
       end_gpu_timer(__KERNEL_NAME__);
     }
