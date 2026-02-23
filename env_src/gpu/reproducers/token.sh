@@ -3,10 +3,10 @@ run()
 {
    echo "Build OK"
    rm -f *nsys-rep
-   touch dumb.data && exec=`pwd`/kernels trust dumb 1
-   [ "$1" = -nsys ] && nsys profile ./kernels && nsys-ui report1.nsys-rep
+   touch dumb.data && exec=`pwd`/token trust dumb 1
+   [ "$1" = -nsys ] && nsys profile ./token && nsys-ui report1.nsys-rep
 }
-rm -f kernels 
+rm -f token 
 # -gpu=loadcache:L1|L2s
 # -gpu=ccnative
 # Aucun effet (meme O3 !) sur le device...
@@ -16,20 +16,20 @@ if [ "$ROCM_PATH" != ""  ]
 then
    # Build HIP code with hipcc:
    HIP="hipcc --offload-arch=$ROCM_ARCH" # -march=$ROCM_ARCH"
-   cmd="$HIP -g -O3 -std=c++20 $KOKKOS_INC -o kernels kernels.cpp $KOKKOS_LIB -ldl  -L/opt/cray/pe/mpich/9.0.1/ofi/gnu/11.2/lib   -L/opt/cray/pe/mpich/9.0.1/gtl/lib -lmpi_gtl_hsa"
+   cmd="$HIP -g -O3 -std=c++20 $KOKKOS_INC -o token token.cpp $KOKKOS_LIB -ldl  -L/opt/cray/pe/mpich/9.0.1/ofi/gnu/11.2/lib   -L/opt/cray/pe/mpich/9.0.1/gtl/lib -lmpi_gtl_hsa"
    echo $cmd
    time eval $cmd || exit -1
    run
 else
    # Using nvcc -ccbin=g++ (build time 5.7s)
    COMPILER="nvcc -x cu -arch=sm_$TRUST_CUDA_CC --extended-lambda -ccbin=g++ -Xcompiler=\"-O3\" -L$CUDA_ROOT/lib64/stubs -lcuda"
-   cmd="$COMPILER -g -O3 -std=c++17 $KOKKOS_INC -o kernels kernels.cpp $KOKKOS_LIB"
+   cmd="$COMPILER -g -O3 -std=c++17 $KOKKOS_INC -o token token.cpp $KOKKOS_LIB"
    echo $cmd
    time eval $cmd || exit -1
    run
    # Use nvc++ -cuda (build time 7.2s)
    COMPILER="nvc++ -cuda -gpu=nordc,cc$TRUST_CUDA_CC -L$CUDA_ROOT/lib64/stubs -lcuda"
-   cmd="$COMPILER -g -O3 -std=c++17 $KOKKOS_INC -o kernels kernels.cpp $KOKKOS_LIB"
+   cmd="$COMPILER -g -O3 -std=c++17 $KOKKOS_INC -o token token.cpp $KOKKOS_LIB"
    echo $cmd
    time eval $cmd || exit -1
    run
