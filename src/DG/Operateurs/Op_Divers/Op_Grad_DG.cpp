@@ -152,45 +152,49 @@ void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tab
     }
 
   const DoubleTab& face_normales = domaine.face_normales();
+  const DoubleVect& face_surfaces = domaine.face_surfaces();
   int nb_pts_int_fac = quad.nb_pts_integ_facets();
 
   DoubleTab eval_jump_on_facet0(nb_pts_int_fac);
   DoubleTab eval_jump_on_facet1(nb_pts_int_fac);
+  DoubleTab mean_v(nb_pts_int_fac);
 
   DoubleTab f_base_v0(nb_bfunc_v, nb_pts_int_fac);
   DoubleTab f_base_v1(nb_bfunc_v, nb_pts_int_fac);
   DoubleTab f_base_p0(nb_bfunc_p, nb_pts_int_fac);
   DoubleTab f_base_p1(nb_bfunc_p, nb_pts_int_fac);
 
+  int premiere_face_int = domaine.premiere_face_int();
+
   // Loop over facets to compute \int_f [u_h.n]_F {{q_h}} dS
-  for (int face = 0; face < domaine.nb_faces(); face++)
+  for (int face = premiere_face_int; face < domaine.nb_faces(); face++)
     {
       int elem0 = face_voisins(face,0);
       int elem1 = face_voisins(face,1);
-      if (elem1 != -1) // internal face
+      double sur_f = face_surfaces(face);
+      int ind_elem0_v = bfunc_v.indices_glob_elem(elem0);
+      int ind_elem1_v = bfunc_v.indices_glob_elem(elem1);
+      int ind_elem0_p = bfunc_p.indices_glob_elem(elem0);
+      int ind_elem1_p = bfunc_p.indices_glob_elem(elem1);
+      bfunc_v.eval_bfunc_on_facets(quad, elem0, face, f_base_v0);
+      bfunc_v.eval_bfunc_on_facets(quad, elem1, face, f_base_v1);
+      bfunc_p.eval_bfunc_on_facets(quad, elem0, face, f_base_p0);
+      bfunc_p.eval_bfunc_on_facets(quad, elem1, face, f_base_p1);
+      for (int velocity_index = 0; velocity_index < nb_bfunc_v; velocity_index++)
         {
-          int ind_elem0_v = bfunc_v.indices_glob_elem(elem0);
-          int ind_elem1_v = bfunc_v.indices_glob_elem(elem1);
-          int ind_elem0_p = bfunc_p.indices_glob_elem(elem0);
-          int ind_elem1_p = bfunc_p.indices_glob_elem(elem1);
-          bfunc_v.eval_bfunc_on_facets(quad, elem0, face, f_base_v0);
-          bfunc_v.eval_bfunc_on_facets(quad, elem1, face, f_base_v1);
-          bfunc_p.eval_bfunc_on_facets(quad, elem0, face, f_base_p0);
-          bfunc_p.eval_bfunc_on_facets(quad, elem1, face, f_base_p1);
-          for (int velocity_index = 0; velocity_index < nb_bfunc_v; velocity_index++)
-            for (int d = 0; d < Objet_U::dimension; d++)
-              for (int pressure_index = 0; pressure_index < nb_bfunc_p; pressure_index++)
+          for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
+            mean_v(k) = 0.5*(f_base_v0(velocity_index, k) + f_base_v1(velocity_index, k));
+
+          for (int pressure_index = 0; pressure_index < nb_bfunc_p; pressure_index++)
+            {
+              for (int d = 0; d < Objet_U::dimension; d++)
                 {
                   eval_jump_on_facet0 = 0.;
                   eval_jump_on_facet1 = 0.;
                   for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
                     {
-                      double mean_v = 0.5*(f_base_v0(pressure_index, k) + f_base_v1(pressure_index, k));
-                      for (int d_base = 0 ; d_base < dim ; d_base++)
-                        {
-                          eval_jump_on_facet0(k) -= f_base_p0(velocity_index, k) * face_normales(face, d_base)  * mean_v;
-                          eval_jump_on_facet1(k) += f_base_p1(velocity_index, k) * face_normales(face, d_base)  * mean_v;
-                        }
+                      eval_jump_on_facet0(k) -= f_base_p0(pressure_index, k) * face_normales(face, d)  * mean_v(k) / sur_f;
+                      eval_jump_on_facet1(k) += f_base_p1(pressure_index, k) * face_normales(face, d)  * mean_v(k) / sur_f;
                     }
                   coeff0 = quad.compute_integral_on_facet(face, eval_jump_on_facet0);
                   coeff1 = quad.compute_integral_on_facet(face, eval_jump_on_facet1);
@@ -198,15 +202,18 @@ void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tab
                   if (mat)
                     {
                       (*mat)(ind_elem0_v*dim + velocity_index + d * nb_bfunc_v, ind_elem0_p + pressure_index) -= coeff0;
-                      (*mat)(ind_elem1_v*dim + velocity_index + d * nb_bfunc_v, ind_elem1_p + pressure_index) += coeff1;
+                      (*mat)(ind_elem0_v*dim + velocity_index + d * nb_bfunc_v, ind_elem1_p + pressure_index) -= coeff1;
+                      (*mat)(ind_elem1_v*dim + velocity_index + d * nb_bfunc_v, ind_elem0_p + pressure_index) -= coeff0;
+                      (*mat)(ind_elem1_v*dim + velocity_index + d * nb_bfunc_v, ind_elem1_p + pressure_index) -= coeff1;
                     }
-                  secmem(elem0, velocity_index + d * nb_bfunc_v) -= coeff0 * inco_p(elem0, pressure_index);
+                  secmem(elem0, velocity_index + d * nb_bfunc_v) += coeff0 * inco_p(elem0, pressure_index);
+                  secmem(elem0, velocity_index + d * nb_bfunc_v) += coeff1 * inco_p(elem1, pressure_index);
+                  secmem(elem1, velocity_index + d * nb_bfunc_v) += coeff0 * inco_p(elem0, pressure_index);
                   secmem(elem1, velocity_index + d * nb_bfunc_v) += coeff1 * inco_p(elem1, pressure_index);
                 }
+            }
         }
     }
-
-  //TODO DG Boundary conditions
 
 }
 
