@@ -8,101 +8,100 @@ Time is given in seconds
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                               Context of the computation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Date:     20-11-2025 -- 21:44:54
-OS:       nid007971__Linux__x86_64__5.14.21-150500.55.49_13.0.56-cray_shasta_c__#1 SMP Mon Mar 4 14:19:49 UTC 2024 (9d8355b)
-CPU:      Model name:  AMD EPYC 7A53 64-Core Processor ; Thread(s) per core:  2
-GPU:        Marketing Name:  AMD Instinct MI250X  
-
-Nb procs: 8
-TRUST version: 1.9.7_beta
+Date:     24-02-2026 -- 00:10:38
+OS:       nid007971__Linux__x86_64__6.4.0-150600.23.73_15.0.14-cray_shasta_c__#1 SMP Tue Oct 21 20:32:25 UTC 2025 (89d3c98)
+CPU model : AMD EPYC 7A53 64-Core Processor
+Total number of threads:128
+GPU model: AMD Instinct MI250X
+HIP runtime version: 6.43
+HIP drivers version: 6.43
+Nb procs used for the computation: 8
+TRUST version: 1.9.8_beta
+Total number of elements used for the calculation: 2332800
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                            Computation start-up statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Total time of the start-up:                                                8.64247        
-Percent of untracked time during computation start-up:                     5.56554e-08    
+Total time of the start-up:                                                34.1602        
 Number of virtual exchanges:                                               88             
-Maximum number of MPI allreduce per time step                              234            
+Maximum number of MPI allreduce per time step                              230            
 
 Number of calls to the linear solver per time step:                        2              
-Average time of the resolution of the linear problem per call:             0.734631       
+Average time of the resolution of the linear problem per call:             2.11372        
 Average number of iteration of the linear solver per call:                 19.5           
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                                  Time loop statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The first time step is not accounted for the computation of the time loop statistics
-Total time of the time loop:                                               2.30815        
+Total time of the time loop:                                               1.73935        
 Number of time steps:                                                      9              
 Skipped time steps:                                                        1              
-Average time per time step:                                                0.256461       
-Standard deviation between time steps:                                     0.00487357     
-Time elapsed in the skipped time steps:                                    0.551883       
+Average time per time step:                                                0.193261       
+Standard deviation between time steps:                                     0.00394785     
+Time elapsed in the skipped time steps:                                    0.403044       
 
-Percent of total time spend in communication:                              7.59066        
+Percent of total time spend in communication:                              7.14789        
 
 Standard counter description             | Time/step       | % loop time | Call(s)/step   
 ------------------------------------------------------------------------------------------
-Linear solver resolutions Ax=B           | 0.138471        | 54.0        | 2              
-Convection operator                      | 0.01455196      |  5.7        | 4              
-Diffusion operator                       | 0.04328002      | 16.9        | 26             
-Gradient operator                        | 0.009829768     |  3.8        | 4              
-Divergence operator                      | 0.0029334       |  1.1        | 3              
-Source terms                             | 0.0100391       |  3.9        | 2              
-Update ::mettre_a_jour                   | 0.004551049     |  1.8        | 1              
-Solver for implicit diffusion            | 0.01783002      |  7.0        | 4              
-Computation of the time step dt          | 0.005614084     |  2.2        | 8              
-Turbulence model::update                 | 0.002277877     |  0.9        | 1              
-Post-treatment operations                | 0.002138896     |  0.8        | 1              
-Other operations                         | 0.004943987     |  1.9        | 
-
-Untracked time                           | 8.12e-05        | 0.00352     | 
-
-Total number of virtual exchanges:                                         848            
-Maximum number of MPI allreduce per time step                              76.6           
+Linear solver resolutions Ax=B           | 0.0995881       | 41.8        | 2              
+Convection operator                      | 0.008435531     |  3.5        | 4              
+Diffusion operator                       | 0.02842003      | 11.9        | 26             
+Gradient operator                        | 0.009849339     |  4.1        | 4              
+Divergence operator                      | 0.002951774     |  1.2        | 3              
+Source terms                             | 0.009550072     |  4.0        | 2              
+Update ::mettre_a_jour                   | 0.003524391     |  1.5        | 1              
+Solver for implicit diffusion            | 0.01629956      |  6.8        | 4              
+Computation of the time step dt          | 0.005308412     |  2.2        | 8              
+Turbulence model::update                 | 0.001210523     |  0.5        | 1              
+Post-treatment operations                | 0.002457478     |  1.0        | 1              
+Other operations                         | 0.005665654     |  2.4        | 
+Number of virtual exchanges per time step:                                 80             
+Maximum number of MPI allreduce per time step                              66.7           
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  Warning: number of MPI allreduce calls per time step is high. Contact TRUST team to run massive parallel calculations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Average number of iteration of the linear solver per call:                 33             
+Average number of iteration of the linear solver per call:                 30             
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                                Time loop statistics: IO
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Output write sequential:                                                   959            MB/s
+Output write sequential:                                                   963            MB/s
 
 ---------------------------------------------------------------------------------------------------------
 Warning: One or several PETSc solvers are used and thus the communication time below are under-estimated.
 ---------------------------------------------------------------------------------------------------------
 
-Average of the fraction of the time spent in communications between processors:      4.9            %
-Max of the fraction of the time spent in communications between processors:          8.1            %
-Min of the fraction of the time spent in communications between processors:          3.6            %
-Time of one mpsum measured by an internal bench over 0.1s (network latency):         2.41669e-06    
-Network maximum bandwidth on all processors:                                         42.0 GB/s      
-Total network traffic:                                                               1288           MB/time step
-Average message size:                                                                461.906        kB
-Min waiting time:                                                                    3.5            % of total time
-Max waiting time:                                                                    7.5            % of total time
-Avg waiting time:                                                                    4.8625         % of total time
+Average of the fraction of the time spent in communications between processors:      4.7            %
+Max of the fraction of the time spent in communications between processors:          9              %
+Min of the fraction of the time spent in communications between processors:          4.4            %
+Time of one mpsum measured by an internal bench over 0.1s (network latency):         3.59628e-06    
+Network maximum bandwidth on all processors:                                         41.8 GB/s      
+Total network traffic:                                                               1136.61        MB/time step
+Average message size:                                                                473.762        kB
+Min waiting time:                                                                    4.3            % of total time
+Max waiting time:                                                                    8.6            % of total time
+Avg waiting time:                                                                    5.675          % of total time
 
 -----------------------------------------------------------------------------------------------------------
                                                     GPU statistics
 -----------------------------------------------------------------------------------------------------------
 Counter description                      | Time per step   | % loop time | Call(s)/step    | Bandwidth 
 -----------------------------------------------------------------------------------------------------------
-Libraries:                               | 0.138107        | 53.9        | 2               | 
-Kernels:                                 | 0.0931738       | 36.3        | 1090            | 
-Copy host to device:                     | 0.000234067     |  0.1        | 12              | 5.5 GB/s
-Copy device to host:                     | 0.000354545     |  0.1        | 10              | 6.3 GB/s
-Alloc/Free on device:                    | 0.000158403     |  0.1        | 60              | 
-GPU: 90% Copy H<->D: 0.23% Alloc/free: 0.062% Comm: 7.6% CPU & I/O: 1.9%
+Libraries:                               | 0.0991658       | 51.3        | 2               | 
+Kernels:                                 | 0.0714553       | 37.0        | 1084            | 
+Copy host to device:                     | 0.000330243     |  0.2        | 12              | 3.9 GB/s
+Copy device to host:                     | 0.00048114      |  0.2        | 10              | 4.7 GB/s
+Alloc/Free on device:                    | 0.000176988     |  0.1        | 60              | 
+GPU: 88% Copy H<->D: 0.42% Alloc/free: 0.092% Comm: 8.8% CPU & I/O: 2.4%
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                               Post-resolution statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Time of the post-resolution:                                               0.0325629      
+Time of the post-resolution:                                               0.0405752      
 Maximum number of MPI allreduce per time step                              7              
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -110,5 +109,6 @@ Max waiting time big    => probably due to a bad partitioning
 Communications > 30%    => too many processors or network too slow
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Total time for the whole computation                                       11.5351        
+Total time for the whole computation                                       36.3432        
 
+Power consumption: 0 kW 0 kWh 0 € (0.12€/kWh)

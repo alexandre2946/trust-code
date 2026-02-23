@@ -21,7 +21,7 @@ define_modules_config()
       else
          echo "$ROCM_ARCH not supported on lumi!"
       fi
-      module="PrgEnv-gnu/8.5.0 craype-accel-amd-$ROCM_ARCH LUMI/24.03 partition/G buildtools/24.03" # rocm/6.0.3"
+      module="PrgEnv-gnu/8.5.0 craype-accel-amd-$ROCM_ARCH LUMI/24.03 partition/G buildtools/24.03 CrayEnv rocm/6.4.4 gnuplot/5.4.10-cpeGNU-24.03"
    else
       echo "Not configured." && exit -1 
    fi

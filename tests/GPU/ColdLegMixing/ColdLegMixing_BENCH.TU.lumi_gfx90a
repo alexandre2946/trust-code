@@ -8,13 +8,13 @@ Time is given in seconds
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                               Context of the computation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Date:     20-02-2026 -- 12:30:09
-OS:       nid007954__Linux__x86_64__6.4.0-150600.23.73_15.0.14-cray_shasta_c__#1 SMP Tue Oct 21 20:32:25 UTC 2025 (89d3c98)
+Date:     23-02-2026 -- 23:48:26
+OS:       nid005023__Linux__x86_64__6.4.0-150600.23.73_15.0.14-cray_shasta_c__#1 SMP Tue Oct 21 20:32:25 UTC 2025 (89d3c98)
 CPU model : AMD EPYC 7A53 64-Core Processor
 Total number of threads:128
 GPU model: AMD Instinct MI250X
-HIP runtime version: 6.42
-HIP drivers version: 6.42
+HIP runtime version: 6.43
+HIP drivers version: 6.43
 Nb procs used for the computation: 1
 TRUST version: 1.9.8_beta
 Total number of elements used for the calculation: 2160000
@@ -22,38 +22,38 @@ Total number of elements used for the calculation: 2160000
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                            Computation start-up statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Total time of the start-up:                                                58.5927        
+Total time of the start-up:                                                91.1978        
 
 Number of calls to the linear solver per time step:                        2              
-Average time of the resolution of the linear problem per call:             2.10332        
+Average time of the resolution of the linear problem per call:             2.55527        
 Average number of iteration of the linear solver per call:                 0              
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                                  Time loop statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The first time step is not accounted for the computation of the time loop statistics
-Total time of the time loop:                                               9.15641        
+Total time of the time loop:                                               8.52122        
 Number of time steps:                                                      9              
 Skipped time steps:                                                        1              
-Average time per time step:                                                1.01738        
-Standard deviation between time steps:                                     0.16275        
-Time elapsed in the skipped time steps:                                    2.07954        
+Average time per time step:                                                0.946802       
+Standard deviation between time steps:                                     0.16259        
+Time elapsed in the skipped time steps:                                    2.11659        
 
 
 Standard counter description             | Time/step       | % loop time | Call(s)/step   
 ------------------------------------------------------------------------------------------
-Linear solver resolutions Ax=B           | 0.199905        | 16.0        | 2              
-Matrix assembly for implicit scheme      | 0.05091258      |  4.1        | 4              
-Convection operator                      | 0.1357176       | 10.9        | 10             
-Diffusion operator                       | 0.09375429      |  7.5        | 18             
-Gradient operator                        | 0.1033942       |  8.3        | 5              
-Divergence operator                      | 0.03938437      |  3.2        | 6              
-Source terms                             | 0.001086354     |  0.1        | 4              
-Update ::mettre_a_jour                   | 0.2615719       | 21.0        | 4              
-Solver for implicit diffusion            | 0.02900816      |  2.3        | 4              
-Computation of the time step dt          | 0.0225066       |  1.8        | 6              
-Post-treatment operations                | 0.06748877      |  5.4        | 1              
-Other operations                         | 0.01264975      |  1.0        | 
+Linear solver resolutions Ax=B           | 0.126681        | 10.7        | 2              
+Matrix assembly for implicit scheme      | 0.04888768      |  4.1        | 4              
+Convection operator                      | 0.135646        | 11.5        | 10             
+Diffusion operator                       | 0.0960296       |  8.1        | 18             
+Gradient operator                        | 0.1017056       |  8.6        | 5              
+Divergence operator                      | 0.03985055      |  3.4        | 6              
+Source terms                             | 0.001099669     |  0.1        | 4              
+Update ::mettre_a_jour                   | 0.2641825       | 22.4        | 4              
+Solver for implicit diffusion            | 0.02882276      |  2.4        | 4              
+Computation of the time step dt          | 0.02253647      |  1.9        | 6              
+Post-treatment operations                | 0.06878874      |  5.8        | 1              
+Other operations                         | 0.01257229      |  1.1        | 
 
 Average number of iteration of the linear solver per call:                 32.8           
 
@@ -63,17 +63,17 @@ Average number of iteration of the linear solver per call:                 32.8
 -----------------------------------------------------------------------------------------------------------
 Counter description                      | Time per step   | % loop time | Call(s)/step    | Bandwidth 
 -----------------------------------------------------------------------------------------------------------
-Libraries:                               | 0.197696        | 19.4        | 2               | 
-Kernels:                                 | 0.787313        | 77.4        | 1111            | 
-Copy host to device:                     | 0.00093238      |  0.1        | 42              | 2.3 GB/s
-Copy device to host:                     | 0.00270945      |  0.3        | 44              | 14.5 GB/s
-Alloc/Free on device:                    | 0.000132195     |  0.0        | 11              | 
-GPU: 97% Copy H<->D: 0.36% Alloc/free: 0.013% Comm: 0% CPU & I/O: 2.8%
+Libraries:                               | 0.125415        | 13.2        | 2               | 
+Kernels:                                 | 0.78776         | 83.2        | 1111            | 
+Copy host to device:                     | 0.00083821      |  0.1        | 42              | 2.6 GB/s
+Copy device to host:                     | 0.00291302      |  0.3        | 44              | 13.5 GB/s
+Alloc/Free on device:                    | 0.000130773     |  0.0        | 11              | 
+GPU: 96% Copy H<->D: 0.4% Alloc/free: 0.014% Comm: 0% CPU & I/O: 3.1%
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                               Post-resolution statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Time of the post-resolution:                                               2.41341        
+Time of the post-resolution:                                               2.85016        
 
-Total time for the whole computation                                       72.2421        
+Total time for the whole computation                                       104.686        
 
 Power consumption: 0 kW 0 kWh 0 € (0.12€/kWh)
