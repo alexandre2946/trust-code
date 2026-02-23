@@ -203,20 +203,16 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
                   coeff0 = quad.compute_integral_on_facet(face, eval_jump_on_facet0);
                   coeff1 = quad.compute_integral_on_facet(face, eval_jump_on_facet1);
 
-                  if (velocity_index == 0)
-                    {
-                      if (elem0 == 10)
-                        std::cout << face << " " << face_normales(face,0)/sur_f << " " << face_normales(face,1)/sur_f << " index " << pressure_index << " " << d << " " <<  velocity_index << " coeff0 " << coeff0 << std::endl;
-                      if (elem1 == 10)
-                        std::cout << face << " " << face_normales(face,0)/sur_f << " " << face_normales(face,1)/sur_f << " index " << pressure_index << " " << d << " " <<  velocity_index << " coeff1 " << coeff1 << std::endl;
-                    }
-
                   if (mat)
                     {
                       (*mat)(ind_elem0_p + pressure_index, ind_elem0_v*dim + velocity_index + d * nb_bfunc_v) -= coeff0;
+                      (*mat)(ind_elem0_p + pressure_index, ind_elem1_v*dim + velocity_index + d * nb_bfunc_v) -= coeff1;
+                      (*mat)(ind_elem1_p + pressure_index, ind_elem0_v*dim + velocity_index + d * nb_bfunc_v) -= coeff0;
                       (*mat)(ind_elem1_p + pressure_index, ind_elem1_v*dim + velocity_index + d * nb_bfunc_v) -= coeff1;
                     }
                   secmem(elem0, pressure_index) += coeff0 * vit(elem0, velocity_index + d * nb_bfunc_v);
+                  secmem(elem0, pressure_index) += coeff1 * vit(elem1, velocity_index + d * nb_bfunc_v);
+                  secmem(elem1, pressure_index) += coeff0 * vit(elem0, velocity_index + d * nb_bfunc_v);
                   secmem(elem1, pressure_index) += coeff1 * vit(elem1, velocity_index + d * nb_bfunc_v);
                 }
             }
@@ -226,6 +222,36 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
   /* Treatment of the boundary conditions */
   DoubleTab u_bord_k(nb_pts_int_fac, dim); // Dirichlet projection
   const DoubleTab& integ_points_facets = quad.get_integ_points_facets();
+
+  for (int face = 0; face < premiere_face_int; face++)
+    {
+      int elem = face_voisins(face, 0); // The cell that have one facet on the boundary
+      double sur_f = face_surfaces(face);
+
+      int ind_elem_v = bfunc_v.indices_glob_elem(elem);
+      int ind_elem_p = bfunc_p.indices_glob_elem(elem);
+      bfunc_v.eval_bfunc_on_facets(quad, elem, face, f_base_v0);
+      bfunc_p.eval_bfunc_on_facets(quad, elem, face, f_base_p0);
+      for (int pressure_index = 0; pressure_index < nb_bfunc_p; pressure_index++)
+        {
+          for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
+            mean_P(k) = f_base_p0(pressure_index, k); // TODO DG ?? we don't have information at this point on P behind the CL ?
+
+          for (int velocity_index = 0; velocity_index < nb_bfunc_v; velocity_index++)
+            {
+              for (int d = 0; d < Objet_U::dimension; d++)
+                {
+                  eval_jump_on_facet0 = 0.;
+                  for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
+                    eval_jump_on_facet0(k) -= f_base_v0(velocity_index, k) * face_normales(face, d)  * mean_P(k) / sur_f;
+                  coeff0 = quad.compute_integral_on_facet(face, eval_jump_on_facet0);
+                  if (mat)
+                    (*mat)(ind_elem_p + pressure_index, ind_elem_v*dim + velocity_index + d * nb_bfunc_v) -= coeff0;
+                  secmem(elem, pressure_index) += coeff0 * vit(elem, velocity_index + d * nb_bfunc_v);
+                }
+            }
+        }
+    }
 
   for (int num_cl = 0; num_cl < le_dom_DG->nb_front_Cl(); num_cl++)
     {
@@ -265,8 +291,6 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
                       int elem = face_voisins(face, 0); // The cell that have one facet on the boundary
                       double sur_f = face_surfaces(face);
 
-                      int ind_elem_v = bfunc_v.indices_glob_elem(elem);
-                      int ind_elem_p = bfunc_p.indices_glob_elem(elem);
                       bfunc_v.eval_bfunc_on_facets(quad, elem, face, f_base_v0);
                       bfunc_p.eval_bfunc_on_facets(quad, elem, face, f_base_p0);
 
@@ -279,9 +303,7 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
                             zk = integ_points_facets(face, k, 2);
 
                           for (int d = 0; d < Objet_U::dimension; d++)
-                            {
-                              u_bord_k(k, d) = champ_front.valeur_au_temps_et_au_point(temps, 0, xk, yk, zk, d);
-                            }
+                            u_bord_k(k, d) = champ_front.valeur_au_temps_et_au_point(temps, 0, xk, yk, zk, d);
                         }
 
                       for (int pressure_index = 0; pressure_index < nb_bfunc_p; pressure_index++)
@@ -293,27 +315,9 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
                             {
                               eval_jump_on_facet1 = 0.;
                               for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
-                                {
-                                  eval_jump_on_facet1(k) += u_bord_k(k, d) * face_normales(face, d)  * mean_P(k) / sur_f;
-                                }
+                                eval_jump_on_facet1(k) += u_bord_k(k, d) * face_normales(face, d)  * mean_P(k) / sur_f;
                               coeff1 = quad.compute_integral_on_facet(face, eval_jump_on_facet1);
                               secmem(elem, pressure_index) += coeff1;
-                            }
-
-                          for (int velocity_index = 0; velocity_index < nb_bfunc_v; velocity_index++)
-                            {
-                              for (int d = 0; d < Objet_U::dimension; d++)
-                                {
-                                  eval_jump_on_facet0 = 0.;
-                                  for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
-                                    {
-                                      eval_jump_on_facet0(k) -= f_base_v0(velocity_index, k) * face_normales(face, d)  * mean_P(k) / sur_f;
-                                    }
-                                  coeff0 = quad.compute_integral_on_facet(face, eval_jump_on_facet0);
-                                  if (mat)
-                                    (*mat)(ind_elem_p + pressure_index, ind_elem_v*dim + velocity_index + d * nb_bfunc_v) -= coeff0;
-                                  secmem(elem, pressure_index) += coeff0 * vit(elem, velocity_index + d * nb_bfunc_v);
-                                }
                             }
                         }
                     }
@@ -330,8 +334,6 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
                   int elem = face_voisins(face, 0); // The cell that have one facet on the boundary
                   double sur_f = face_surfaces(face);
 
-                  int ind_elem_v = bfunc_v.indices_glob_elem(elem);
-                  int ind_elem_p = bfunc_p.indices_glob_elem(elem);
                   bfunc_v.eval_bfunc_on_facets(quad, elem, face, f_base_v0);
                   bfunc_p.eval_bfunc_on_facets(quad, elem, face, f_base_p0);
 
@@ -345,40 +347,15 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
                           eval_jump_on_facet1 = 0.;
                           double u_bord = dirichlet.val_imp_au_temps(temps, ind_faceb, d);
                           for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
-                            {
-                              eval_jump_on_facet1(k) += u_bord * face_normales(face, d)  * mean_P(k) / sur_f;
-                            }
+                            eval_jump_on_facet1(k) += u_bord * face_normales(face, d)  * mean_P(k) / sur_f;
                           coeff1 = quad.compute_integral_on_facet(face, eval_jump_on_facet1);
                           secmem(elem, pressure_index) += coeff1;
-                        }
-
-                      for (int velocity_index = 0; velocity_index < nb_bfunc_v; velocity_index++)
-                        {
-                          for (int d = 0; d < Objet_U::dimension; d++)
-                            {
-                              eval_jump_on_facet0 = 0.;
-                              for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
-                                {
-                                  eval_jump_on_facet0(k) -= f_base_v0(velocity_index, k) * face_normales(face, d)  * mean_P(k) / sur_f;
-                                }
-                              coeff0 = quad.compute_integral_on_facet(face, eval_jump_on_facet0);
-                              if (velocity_index == 0)
-                                {
-                                  if (elem == 0)
-                                    std::cout << face << " " << face_normales(face,0)/sur_f << " " << face_normales(face,1)/sur_f << " index " << pressure_index << " " << d << " " <<  velocity_index << " coeff0 " << coeff0 << std::endl;
-                                }
-                              if (mat)
-                                (*mat)(ind_elem_p + pressure_index, ind_elem_v*dim + velocity_index + d * nb_bfunc_v) -= coeff0;
-                              secmem(elem, pressure_index) += coeff0 * vit(elem, velocity_index + d * nb_bfunc_v);
-                            }
-
                         }
                     }
                 }
             }
         }
     }
-  Cout << "secmem " << secmem << finl;
 }
 
 DoubleTab& Op_Div_DG::calculer(const DoubleTab& vit, DoubleTab& div) const
