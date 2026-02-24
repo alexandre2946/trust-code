@@ -841,7 +841,7 @@ class Show(object):
     def point(self, x, y, z=0):
         """
 
-        Draw a point.
+        Does nothing, must not be used. (but should draw a point one day)
 
         Parameters
         ---------
@@ -856,6 +856,9 @@ class Show(object):
         -------
 
         """
+        raise RuntimeError("This method (point) is not implemented.")
+        # below code has nothing to do with what this method is supposed to do
+        # arguments are not even used
         self.iteration = int(self.iteration) + 1
         with open(visitTmpFile_(), "a") as f:
             f.write('QueryOverTime("Pick")\n')
