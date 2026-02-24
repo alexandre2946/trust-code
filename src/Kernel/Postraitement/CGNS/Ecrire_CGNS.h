@@ -31,6 +31,7 @@ public:
   void cgns_set_postraiter_domain() { postraiter_domaine_ = true; }
   void cgns_set_is_dual_domain() { is_dual_ = true; }
   void cgns_set_is_deformable_domain() { is_deformable_ = true; }
+  void cgns_set_lagrangian_domain() { is_lagrangian_ = true, is_deformable_ = true; } /* pour FTD on active les 2 flags */
   void cgns_set_loc_vector(const std::vector<std::string>& vec) { loc_vect_ = vec; }
   void cgns_set_base_name(const Nom& );
   void cgns_open_file();
@@ -91,6 +92,9 @@ private:
 
   // gestion elem/som/faces
   void cgns_fill_field_loc_map(const Domaine&, const std::string&);
+
+  // Methodes pour Domaine Lagrangien; ie: FTD
+  bool is_lagrangian_ = false;
 
   // Methodes pour Domaine Deformable
   void cgns_write_final_link_file_pb_deformable();

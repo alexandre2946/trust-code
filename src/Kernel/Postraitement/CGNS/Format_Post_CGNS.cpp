@@ -139,6 +139,13 @@ void Format_Post_CGNS::set_deformable_domain()
 #endif
 }
 
+void Format_Post_CGNS::set_lagrangian_domain()
+{
+#ifdef HAS_CGNS
+  cgns_writer_.cgns_set_lagrangian_domain();
+#endif
+}
+
 void Format_Post_CGNS::set_loc_vector(const std::vector<std::string>& vec)
 {
 #ifdef HAS_CGNS

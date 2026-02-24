@@ -536,7 +536,7 @@ void Ecrire_CGNS::cgns_write_domaine_seq(const Domaine * domaine,const Nom& nom_
     Cerr << "Error Ecrire_CGNS::cgns_write_domaine_seq : cg_base_write !" << finl, TRUST_CGNS_ERROR();
 
   /* 4 : Vertex, cell & boundary vertex sizes */
-  cgsize_t isize[3] = { nb_som , nb_elem , 0 }; /* 0 => boundary vertex size (zero if elements not sorted) */
+  cgsize_t isize[3] = { (cgsize_t)nb_som , (cgsize_t)nb_elem , 0 }; /* 0 => boundary vertex size (zero if elements not sorted) */
 
   cgns_fill_info_grid_link_file(basename, cgns_type_elem, icelldim, nb_som, nb_elem, is_polyedre);
 

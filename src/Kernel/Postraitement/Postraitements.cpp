@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -121,12 +121,8 @@ int Postraitements::lire_postraitements(Entree& is, const Motcle& motlu, const P
       OWN_PTR(Postraitement_base) & post = add( OWN_PTR(Postraitement_base)() );
       if (mon_pb.que_suis_je() == "Pb_STT")
         post.typer("Postraitement_STT");
-      else if (mon_pb.que_suis_je().debute_par("Probleme_FT_Disc_gen"))
-        post.typer("Postraitement_ft_lata");
       else if (mon_pb.que_suis_je().contient("_IJK"))
         post.typer("Postprocessing_IJK");
-      else if (mon_pb.que_suis_je().debute_par("Probleme_FT_Disc_gen"))
-        post.typer("Postraitement_ft_lata");
       else
         post.typer("Postraitement");
       post->associer_nom_et_pb_base("neant", mon_pb);
