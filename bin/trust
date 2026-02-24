@@ -470,7 +470,7 @@ do
    elif [ "$1" = "-energy" ]
    then
       shift;SLURM_JOB_ID=$1
-      sacct --format=ElapsedRaw,ConsumedEnergyRaw --jobs=$SLURM_JOB_ID | awk '(NR==3 && $2!=0) {kw=0.001*$2/$1;kwh=$2/3.6e6;print "Power consumption: "kw" kW " kwh" kWh " kwh*0.12" € (0.12€/kWh)"}'
+      sacct --format=ElapsedRaw,ConsumedEnergyRaw --jobs=$SLURM_JOB_ID | tail -1 | awk '($2!=0 && $1!=0) {kw=0.001*$2/$1;kwh=$2/3.6e6;printf("Power consumption (%d s): %6.3f kW %6.3f kWh %6.3f € (0.10€/kWh)\n",$1,kw,kwh,kwh*0.10)}'
       exit $?
    elif [ "$1" = "-gdb" ]
    then
@@ -1262,11 +1262,10 @@ export FI_CXI_DEFAULT_CQ_SIZE=393216" >> $GPU_DIRECT
    #########################
    # Consommation electrique
    #########################
-   # sacct not working before end of the job
-   #if [ "$sub" = SLURM ] || [ "$sub" = CCC ]
-   #then
-   #   echo "trust -energy \$SLURM_JOB_ID >> \$case.TU" >> $sub_file
-   #fi
+   if [ "$sub" = SLURM ] || [ "$sub" = CCC ]
+   then
+      echo "trust -energy \$SLURM_JOB_ID >> \$case.TU" >> $sub_file
+   fi
    #######
    # IPM #
    #######
