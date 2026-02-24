@@ -17,7 +17,7 @@ import os
 import re
 import math
 from trustutils.jupyter.filelist import FileAccumulator
-from trustutils.jupyter.run import BUILD_DIRECTORY, saveFileAccumulator
+from trustutils.jupyter.run import BUILD_DIRECTORY, saveFileAccumulator, sanitizePathToBUILD_DIRECTORY
 
 pd.set_option("display.notebook_repr_html", True)
 pd.set_option("display.max_rows", None)
@@ -707,3 +707,22 @@ class Table:  # ancien tableau
         """ This method is invoked by 'display()' when generating the HTML view of
         the notebook. """
         return self.df.to_html()
+
+
+
+def displayImageFile(image_file):
+    """
+    Method to display an image from the BUILD_DIRECTORY in the notebook
+
+    Parameters
+    ---------
+    image_file : str
+        path to the image file, either absolute (must be inside BUILD_DIRECTORY) or relative to BUILD_DIRECTORY
+
+    """
+
+    from pathlib import Path
+    from IPython.display import Image
+    saveFileAccumulator(image_file)
+    display(Image(filename=sanitizePathToBUILD_DIRECTORY(image_file)))
+    
