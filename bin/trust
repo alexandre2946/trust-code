@@ -125,7 +125,6 @@ help()
    echo "-eclipse-baltik               : Generate Eclipse configuration files to import BALTIK sources (TRUST project should have been configured under Eclipse)."
    echo "-probes                       : Monitor the TRUST calculation only."
    echo "-evol                         : Monitor the TRUST calculation (GUI)."
-   echo "-prm                          : Write a prm file (deprecated)."
    echo "-jupyter                      : Create basic jupyter notebook file."
    echo "-clean                        : Clean the current directory from all the generated files by TRUST."
    echo "-search keywords              : Know the list of test cases from the data bases which contain keywords."
@@ -173,7 +172,6 @@ partition=""
 mesh=""
 monitor=""
 probes=""
-prm=""
 copy=""
 gdb=""
 taches=""
@@ -475,9 +473,6 @@ do
       conv_scr=$TRUST_ROOT/Outils/convert_data/convert.sh
       $conv_scr $2
       exit $?
-   elif [ "$1" = "-prm" ]
-   then
-      prm=1
    elif [ "$1" = "-jupyter" ]
    then
       shift
@@ -767,15 +762,6 @@ fi
 if [ "$mesh" = 1 ]
 then
    Check_maillage.ksh $NOM
-   exit $?
-fi
-
-#####################
-# Generate pdf file #
-#####################
-if [ "$prm" = 1 ]
-then
-   create_basic_prm_from_lata.sh $NOM
    exit $?
 fi
 

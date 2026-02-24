@@ -43,7 +43,6 @@ help()
    echo "-compare path_build            : Build one PDF report which compares results from the default build directory and several ones specified by one or more -compare option."
    echo "-archive                       : Build a preserve.tgz file containing all the needed files from the build directory to compare later, PDF reports each other."
    echo "-save                          : If the build is processed remotely on a cluster, save the previous build in a different directory."
-   echo "-create_prm                    : Build a minimal .prm with data files found in the src directory."
    echo "-convert_prm                   : Convert .prm file in jupyter notebook"
    #echo
    #echo "You could have a look at \$TRUST_ROOT/doc/TRUST/HowTo_Validation.pdf for the description of some (not all) of these options."
@@ -249,30 +248,6 @@ do
    then
       save=1
       shift
-   elif [ "$1" = -create_prm ]
-   then
-      shift
-      if [ "`basename $ici`" = src ]
-      then
-         prm=`cd ..;basename $PWD`.prm
-      else
-         prm=`cd ../..;basename $PWD`.prm
-         cd src
-      fi
-      datas=`ls *.data 2>/dev/null`
-      echo "Parameters {" > $prm
-      echo "   Title " >> $prm
-      echo "   Author `whoami`" >> $prm
-      for data in $datas
-      do
-         echo "   Testcase . ${data%.data}" >> $prm
-      done
-      echo "}" >> $prm
-      echo "Chapter {" >> $prm
-      echo "   Title Computer performance" >> $prm
-      echo "   Tableau_performance {" >> $prm
-      echo "   }" >> $prm
-      echo "}" >> $prm
    elif [ "$1" = -create ]
    then
       shift
