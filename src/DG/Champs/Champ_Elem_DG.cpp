@@ -71,7 +71,7 @@ void Champ_Elem_DG::associer_domaine_dis_base(const Domaine_dis_base& z_dis)
 
   order_ = Option_DG::Get_order_for(nom_);// Todo regler la relation ordre inconnu/quadrature avec dictionnaire ?
   nb_bfunc_ = Option_DG::Nb_col_from_order(order_);
-  if (nom_.debute_par("vitesse"))
+  if (nom_.debute_par("vitesse") || nom_.debute_par("gradient"))
     is_scalar_ = false;
 
   const int dim = is_scalar_ ? 1 : Objet_U::dimension;
@@ -104,7 +104,7 @@ Champ_base& Champ_Elem_DG::affecter_(const Champ_base& ch)
   const DoubleTab& integ_points = quad.get_integ_points();
   int nb_pts_integ_max = quad.nb_pts_integ_max();
 
-  if (nom_.debute_par("vitesse"))
+  if (nom_.debute_par("vitesse") || nom_.debute_par("gradient"))
     is_scalar_ = false;
   const int dim = is_scalar_ ? 1: Objet_U::dimension;
 

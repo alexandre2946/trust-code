@@ -119,7 +119,7 @@ void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tab
   const int quad_order = bfunc_p.get_default_quadrature_order(); //TODO DG should we choose the max or the p order quadrature ?
   const Quadrature_base& quad = domaine.get_quadrature(quad_order);  // Same quadrature for all champs
   int nb_pts_integ_max = quad.nb_pts_integ_max();
-  double coeff, coeff0, coeff1;
+  double coeff, coeff00, coeff10, coeff01, coeff11;
 
   DoubleTab grad_fbase_elem(nb_bfunc_p, nb_pts_integ_max, Objet_U::dimension);
   DoubleTab f_base_v(nb_bfunc_v, nb_pts_integ_max);
@@ -139,7 +139,7 @@ void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tab
       bfunc_v.eval_bfunc(quad, elem, f_base_v);
       for (int d = 0; d < dim; d++)
         for (int velocity_index = 0; velocity_index < nb_bfunc_v; velocity_index++)
-          for (int pressure_index = 0; pressure_index < nb_bfunc_v; pressure_index++)
+          for (int pressure_index = 0; pressure_index < nb_bfunc_p; pressure_index++)
             {
               scalar_product_dim = 0.;
               for (int k = 0; k < quad.nb_pts_integ(elem); k++)
@@ -155,9 +155,11 @@ void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tab
   const DoubleVect& face_surfaces = domaine.face_surfaces();
   int nb_pts_int_fac = quad.nb_pts_integ_facets();
 
-  DoubleTab eval_jump_on_facet0(nb_pts_int_fac);
-  DoubleTab eval_jump_on_facet1(nb_pts_int_fac);
-  DoubleTab mean_v(nb_pts_int_fac);
+  DoubleTab eval_jump_on_facet00(nb_pts_int_fac);
+  DoubleTab eval_jump_on_facet01(nb_pts_int_fac);
+  DoubleTab eval_jump_on_facet10(nb_pts_int_fac);
+  DoubleTab eval_jump_on_facet11(nb_pts_int_fac);
+  //DoubleTab mean_v(nb_pts_int_fac);
 
   DoubleTab f_base_v0(nb_bfunc_v, nb_pts_int_fac);
   DoubleTab f_base_v1(nb_bfunc_v, nb_pts_int_fac);
@@ -182,34 +184,40 @@ void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tab
       bfunc_p.eval_bfunc_on_facets(quad, elem1, face, f_base_p1);
       for (int velocity_index = 0; velocity_index < nb_bfunc_v; velocity_index++)
         {
-          for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
-            mean_v(k) = 0.5*(f_base_v0(velocity_index, k) + f_base_v1(velocity_index, k));
+          //for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
+          //  mean_v(k) = 0.5*(f_base_v0(velocity_index, k) + f_base_v1(velocity_index, k));
 
           for (int pressure_index = 0; pressure_index < nb_bfunc_p; pressure_index++)
             {
               for (int d = 0; d < Objet_U::dimension; d++)
                 {
-                  eval_jump_on_facet0 = 0.;
-                  eval_jump_on_facet1 = 0.;
+                  eval_jump_on_facet00 = 0.;
+                  eval_jump_on_facet01 = 0.;
+                  eval_jump_on_facet10 = 0.;
+                  eval_jump_on_facet11 = 0.;
                   for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
                     {
-                      eval_jump_on_facet0(k) -= f_base_p0(pressure_index, k) * face_normales(face, d)  * mean_v(k) / sur_f;
-                      eval_jump_on_facet1(k) += f_base_p1(pressure_index, k) * face_normales(face, d)  * mean_v(k) / sur_f;
+                      eval_jump_on_facet00(k) -= f_base_p0(pressure_index, k) * face_normales(face, d)  * 0.5 * f_base_v0(velocity_index, k) / sur_f;
+                      eval_jump_on_facet01(k) += f_base_p1(pressure_index, k) * face_normales(face, d)  * 0.5 * f_base_v0(velocity_index, k) / sur_f;
+                      eval_jump_on_facet10(k) -= f_base_p0(pressure_index, k) * face_normales(face, d)  * 0.5 * f_base_v1(velocity_index, k) / sur_f;
+                      eval_jump_on_facet11(k) += f_base_p1(pressure_index, k) * face_normales(face, d)  * 0.5 * f_base_v1(velocity_index, k) / sur_f;
                     }
-                  coeff0 = quad.compute_integral_on_facet(face, eval_jump_on_facet0);
-                  coeff1 = quad.compute_integral_on_facet(face, eval_jump_on_facet1);
+                  coeff00 = quad.compute_integral_on_facet(face, eval_jump_on_facet00);
+                  coeff01 = quad.compute_integral_on_facet(face, eval_jump_on_facet01);
+                  coeff10 = quad.compute_integral_on_facet(face, eval_jump_on_facet10);
+                  coeff11 = quad.compute_integral_on_facet(face, eval_jump_on_facet11);
 
                   if (mat)
                     {
-                      (*mat)(ind_elem0_v*dim + velocity_index + d * nb_bfunc_v, ind_elem0_p + pressure_index) -= coeff0;
-                      (*mat)(ind_elem0_v*dim + velocity_index + d * nb_bfunc_v, ind_elem1_p + pressure_index) -= coeff1;
-                      (*mat)(ind_elem1_v*dim + velocity_index + d * nb_bfunc_v, ind_elem0_p + pressure_index) -= coeff0;
-                      (*mat)(ind_elem1_v*dim + velocity_index + d * nb_bfunc_v, ind_elem1_p + pressure_index) -= coeff1;
+                      (*mat)(ind_elem0_v*dim + velocity_index + d * nb_bfunc_v, ind_elem0_p + pressure_index) += coeff00;
+                      (*mat)(ind_elem0_v*dim + velocity_index + d * nb_bfunc_v, ind_elem1_p + pressure_index) += coeff01;
+                      (*mat)(ind_elem1_v*dim + velocity_index + d * nb_bfunc_v, ind_elem0_p + pressure_index) += coeff10;
+                      (*mat)(ind_elem1_v*dim + velocity_index + d * nb_bfunc_v, ind_elem1_p + pressure_index) += coeff11;
                     }
-                  secmem(elem0, velocity_index + d * nb_bfunc_v) += coeff0 * inco_p(elem0, pressure_index);
-                  secmem(elem0, velocity_index + d * nb_bfunc_v) += coeff1 * inco_p(elem1, pressure_index);
-                  secmem(elem1, velocity_index + d * nb_bfunc_v) += coeff0 * inco_p(elem0, pressure_index);
-                  secmem(elem1, velocity_index + d * nb_bfunc_v) += coeff1 * inco_p(elem1, pressure_index);
+                  secmem(elem0, velocity_index + d * nb_bfunc_v) -= coeff00 * inco_p(elem0, pressure_index);
+                  secmem(elem0, velocity_index + d * nb_bfunc_v) -= coeff01 * inco_p(elem1, pressure_index);
+                  secmem(elem1, velocity_index + d * nb_bfunc_v) -= coeff10 * inco_p(elem0, pressure_index);
+                  secmem(elem1, velocity_index + d * nb_bfunc_v) -= coeff11 * inco_p(elem1, pressure_index);
                 }
             }
         }
