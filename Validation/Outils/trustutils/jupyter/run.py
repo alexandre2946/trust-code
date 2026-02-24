@@ -16,7 +16,7 @@ import argparse
 
 from string import Template
 
-from time import time, sleep, strftime
+from time import time, sleep, strftime 
 
 def saveFormOutput():
     """ Dummy method to indicate that the output of the notebook should be saved.
@@ -1009,12 +1009,49 @@ def saveFileAccumulator(data):
     path = os.getcwd()
     os.chdir(BUILD_DIRECTORY)
 
+    from pathlib import Path
+
+    data=sanitizePathToBUILD_DIRECTORY(data, relative=True)
+
     FileAccumulator.active = True
     new = FileAccumulator.Append(data)
     if new==True:
         FileAccumulator.WriteToFile("used_files")
 
     os.chdir(path)
+
+
+def sanitizePathToBUILD_DIRECTORY(input_path, relative=False):
+    """ Method for checking that a path given to trustutils is correctly located inside BUILD_DIRECTORY and for getting a sanitized version
+
+
+    Parameters
+    ---------
+    input_path: str
+        path that must be either absolute and located inside BUILD_DIRECTORY or relative (will check that it does not leave BUILD_DIRECTORY)
+    relative: bool
+        if False (default), path is returned as absolute
+        if True, path is returned as relative to BUILD_DIRECTORY (for use in saveFileAccumulator mostly)
+    """
+    from pathlib import Path
+    from os.path import normpath
+    path=Path(input_path)
+
+    if path.is_absolute():
+        output_path=Path(normpath(input_path))
+
+        try:
+            p=output_path.relative_to(Path(BUILD_DIRECTORY), walk_up=False)
+        except ValueError as e:
+            raise ValueError(f"Invalid path given to trustutils:'{input_path}' \npath must be absolute and located inside BUILD_DIRECTORY '{BUILD_DIRECTORY}' or relative (will then be searched inside BUILD_DIRECTORY).")
+
+    else:
+        output_path=Path(normpath(os.path.join(BUILD_DIRECTORY, input_path)))
+
+    if relative:
+        return output_path.relative_to(Path(BUILD_DIRECTORY), walk_up=False).as_posix()
+    else:
+        return output_path.as_posix()
 
 def introduction(auteur, creationDate=None):
     """ Function that creates an introduction cell Mardown
