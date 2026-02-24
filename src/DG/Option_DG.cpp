@@ -45,11 +45,18 @@ Entree& Option_DG::interpreter(Entree& is)
   param.lire_avec_accolades_depuis(is);
 
   if (vo != -1)
-    ORDERS["velocity"] = vo;
+    {
+      ORDERS["vitesse"] = vo;
+      ORDERS["divergence_U"] = vo;
+    }
   if (to != -1)
     ORDERS["temperature"] = to;
   if (po != -1)
-    ORDERS["pressure"] = to;
+    {
+      ORDERS["pression"] = po;
+      ORDERS["pression_pa"] = po;
+      ORDERS["gradient_pression"] = po;
+    }
 
   return is;
 }

@@ -174,8 +174,8 @@ void Discretisation_base::discretiser_variables() const
  */
 void Discretisation_base::champ_fixer_membres_communs(Champ_base& ch, const Domaine_dis_base& z, const Nom& type, const Nom& nom, const Nom& unite, int nb_comp, int nb_ddl, double temps)
 {
-  ch.associer_domaine_dis_base(z);
   ch.nommer(nom);
+  ch.associer_domaine_dis_base(z);
   ch.fixer_nb_comp(nb_comp);
   if (z.que_suis_je() == "Domaine_DG")
     {

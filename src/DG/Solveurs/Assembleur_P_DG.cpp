@@ -45,6 +45,7 @@
 #include <Debog.h>
 #include <Perf_counters.h>
 #include <BasisFunction.h>
+#include <Navier_Stokes_std.h>
 
 Implemente_instanciable(Assembleur_P_DG,"Assembleur_P_DG",Assembleur_base);
 
@@ -74,7 +75,7 @@ int Assembleur_P_DG::assembler_mat(Matrice& la_matrice, const DoubleVect& diag, 
   Matrice_Morse& mat = ref_cast(Matrice_Morse, la_matrice.valeur());
 
   const Domaine_DG& domaine = ref_cast(Domaine_DG, le_dom_dg_.valeur());
-  const Champ_Elem_DG& ch = ref_cast(Champ_Elem_DG, equation().inconnue());
+  const Champ_Elem_DG& ch = ref_cast(Champ_Elem_DG, ref_cast(Navier_Stokes_std, equation()).pression());
 
   int nordre = Option_DG::Get_order_for("pression");
 
