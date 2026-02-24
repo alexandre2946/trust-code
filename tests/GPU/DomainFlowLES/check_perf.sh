@@ -88,7 +88,7 @@ then
    run $nsys
 else
    # MPI Ranks:
-   [ "$TRUST_USE_GPU" != 1 ] && np=8
+   [ "$TRUST_USE_GPU" != 1 ] && np=`echo $TRUST_NB_PHYSICAL_CORES/4 | bc`
    # HOST:   
    HOST=${HOST%.intra.cea.fr} && [ "$HOST" = portable ] && HOST=is246827
    # ARCH:
