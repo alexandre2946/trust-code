@@ -11,6 +11,7 @@ This package can be used with jupyter and stats package.
 import os
 import subprocess
 from trustutils.jupyter.filelist import FileAccumulator
+from trustutils.jupyter.run import sanitizePathToBUILD_DIRECTORY
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
@@ -90,6 +91,8 @@ def _saveFile(file, plottype, name, iteration):
 
     path = os.path.join(origin, BUILD_DIRECTORY)
     os.chdir(path)
+
+    file = sanitizePathToBUILD_DIRECTORY(file, relative=True)
 
     FileAccumulator.active = True
     if plottype in {"Mesh", "Subset"}:
