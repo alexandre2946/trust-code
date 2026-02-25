@@ -14,27 +14,25 @@
  *****************************************************************************/
 
 #include <EOS_to_TRUST.h>
-#include <algorithm>
 #include <Process.h>
 
-using namespace NEPTUNE;
 
 void EOS_to_TRUST::desactivate_handler(bool op)
 {
 #ifdef HAS_EOS
   if (op)
     {
-      handler.set_exit_on_error(EOS_Std_Error_Handler::disable_feature); // EOS should never exit()
-      handler.set_throw_on_error(EOS_Std_Error_Handler::disable_feature); // EOS should never throw() an exception
-      handler.set_dump_on_error(EOS_Std_Error_Handler::disable_feature);
+      handler.set_exit_on_error(NEPTUNE::EOS_Std_Error_Handler::disable_feature); // EOS should never exit()
+      handler.set_throw_on_error(NEPTUNE::EOS_Std_Error_Handler::disable_feature); // EOS should never throw() an exception
+      handler.set_dump_on_error(NEPTUNE::EOS_Std_Error_Handler::disable_feature);
       // handler.set_dump_on_error(ok);
       // handler.set_dump_stream(cerr);
     }
   else
     {
-      handler.set_exit_on_error(ok);
-      handler.set_throw_on_error(ok);
-      handler.set_dump_on_error(ok);
+      handler.set_exit_on_error(NEPTUNE::ok);
+      handler.set_throw_on_error(NEPTUNE::ok);
+      handler.set_dump_on_error(NEPTUNE::ok);
     }
 #else
   Cerr << "EOS_to_TRUST::" <<  __func__ << " should not be called since TRUST is not compiled with the EOS library !!! " << finl;
@@ -47,11 +45,11 @@ int EOS_to_TRUST::compute_eos_field(const SpanD P_ou_T, SpanD res,const char *co
 #ifdef HAS_EOS
   const char *const pp_ = is_T ? "Temperature" : "Pressure";
   const char *const tt_ = is_T ? "T" : "P";
-  EOS_Field P_fld(pp_, tt_,  (int)P_ou_T.size(), (double*)P_ou_T.begin());
-  EOS_Field z_fld(property_title,property_name, (int)res.size(), (double*)res.begin());
-  ArrOfInt tmp((int)P_ou_T.size());
-  EOS_Error_Field ferr(tmp);
-  EOS_Error cr = fluide->compute(P_fld, z_fld, ferr);
+  NEPTUNE::EOS_Field P_fld(pp_, tt_, (int)P_ou_T.size(), (double*)P_ou_T.begin());
+  NEPTUNE::EOS_Field z_fld(property_title,property_name, (int)res.size(), (double*)res.begin());
+  NEPTUNE::ArrOfInt tmp((int)P_ou_T.size());
+  NEPTUNE::EOS_Error_Field ferr(tmp);
+  NEPTUNE::EOS_Error cr = fluide->compute(P_fld, z_fld, ferr);
   return (int)cr;
 #else
   Cerr << "EOS_to_TRUST::" <<  __func__ << " should not be called since TRUST is not compiled with the EOS library !!! " << finl;
@@ -62,11 +60,11 @@ int EOS_to_TRUST::compute_eos_field(const SpanD P_ou_T, SpanD res,const char *co
 int EOS_to_TRUST::compute_eos_field(const SpanD P, const SpanD T, SpanD res,const char *const property_title, const char *const property_name) const
 {
 #ifdef HAS_EOS
-  EOS_Field T_fld("Temperature", "T", (int)T.size(),(double*)T.begin()), P_fld("Pressure", "P", (int)P.size(), (double*)P.begin());
-  EOS_Field z_fld(property_title,property_name, (int)res.size(), (double*)res.begin());
-  ArrOfInt tmp((int)P.size());
-  EOS_Error_Field ferr(tmp);
-  EOS_Error cr = fluide->compute(P_fld, T_fld, z_fld, ferr);
+  NEPTUNE::EOS_Field T_fld("Temperature", "T", (int)T.size(),(double*)T.begin()), P_fld("Pressure", "P", (int)P.size(), (double*)P.begin());
+  NEPTUNE::EOS_Field z_fld(property_title,property_name, (int)res.size(), (double*)res.begin());
+  NEPTUNE::ArrOfInt tmp((int)P.size());
+  NEPTUNE::EOS_Error_Field ferr(tmp);
+  NEPTUNE::EOS_Error cr = fluide->compute(P_fld, T_fld, z_fld, ferr);
   return (int)cr;
 #else
   Cerr << "EOS_to_TRUST::" <<  __func__ << " should not be called since TRUST is not compiled with the EOS library !!! " << finl;
@@ -77,11 +75,11 @@ int EOS_to_TRUST::compute_eos_field(const SpanD P, const SpanD T, SpanD res,cons
 int EOS_to_TRUST::compute_eos_field_h(const SpanD P, const SpanD H, SpanD res,const char *const property_title, const char *const property_name) const
 {
 #ifdef HAS_EOS
-  EOS_Field H_fld("Enthalpy", "h", (int)H.size(),(double*)H.begin()), P_fld("Pressure", "P", (int)P.size(), (double*)P.begin());
-  EOS_Field z_fld(property_title,property_name, (int)res.size(), (double*)res.begin());
-  ArrOfInt tmp((int)P.size());
-  EOS_Error_Field ferr(tmp);
-  EOS_Error cr = fluide->compute(P_fld, H_fld, z_fld, ferr);
+  NEPTUNE::EOS_Field H_fld("Enthalpy", "h", (int)H.size(),(double*)H.begin()), P_fld("Pressure", "P", (int)P.size(), (double*)P.begin());
+  NEPTUNE::EOS_Field z_fld(property_title,property_name, (int)res.size(), (double*)res.begin());
+  NEPTUNE::ArrOfInt tmp((int)P.size());
+  NEPTUNE::EOS_Error_Field ferr(tmp);
+  NEPTUNE::EOS_Error cr = fluide->compute(P_fld, H_fld, z_fld, ferr);
   return (int)cr;
 #else
   Cerr << "EOS_to_TRUST::" <<  __func__ << " should not be called since TRUST is not compiled with the EOS library !!! " << finl;

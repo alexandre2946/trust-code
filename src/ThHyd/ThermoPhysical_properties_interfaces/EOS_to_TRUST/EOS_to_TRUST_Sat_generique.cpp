@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,6 @@
 
 #include <EOS_to_TRUST_Sat_generique.h>
 
-using namespace NEPTUNE ;
 
 // iterator index !
 #define i_it std::distance(TT.begin(), &val)
@@ -158,10 +157,10 @@ int EOS_to_TRUST_Sat_generique::tppi_get_all_flux_interfacial_pb_multiphase(cons
 
   const int sz = (int) P.size(), nb_out = 5; /* NOTA BENE : 5 car LV_SAT et LV_SAT_DP on recalcule apres  */
   int i_out = 0, err_;
-  ArrOfInt tmp(sz);
-  EOS_Error_Field ferr(tmp);
-  EOS_Fields flds_out(nb_out);
-  EOS_Field P_fld("Pressure", "P", sz, (double*) P.begin());
+  NEPTUNE::ArrOfInt tmp(sz);
+  NEPTUNE::EOS_Error_Field ferr(tmp);
+  NEPTUNE::EOS_Fields flds_out(nb_out);
+  NEPTUNE::EOS_Field P_fld("Pressure", "P", sz, (double*) P.begin());
 
   if (ncomp == 1)
     {
@@ -171,7 +170,7 @@ int EOS_to_TRUST_Sat_generique::tppi_get_all_flux_interfacial_pb_multiphase(cons
           SpanD span_ = itr.second;
           assert(ncomp * (int )P.size() == (int )span_.size());
           if (prop_ != SAT::LV_SAT && prop_ != SAT::LV_SAT_DP)
-            flds_out[i_out++] = EOS_Field(EOS_prop_sat[(int) prop_][0], EOS_prop_sat[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
+            flds_out[i_out++] = NEPTUNE::EOS_Field(EOS_prop_sat[(int) prop_][0], EOS_prop_sat[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
         }
       err_ = (int)fluide->compute(P_fld, flds_out, ferr);
 
@@ -196,7 +195,7 @@ int EOS_to_TRUST_Sat_generique::tppi_get_all_flux_interfacial_pb_multiphase(cons
         {
           SAT prop_ = itr.first;
           SpanD span_ = itr.second;
-          flds_out[i_out++] = EOS_Field(EOS_prop_sat[(int) prop_][0], EOS_prop_sat[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
+          flds_out[i_out++] = NEPTUNE::EOS_Field(EOS_prop_sat[(int) prop_][0], EOS_prop_sat[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
         }
 
       err_ = (int)fluide->compute(P_fld, flds_out, ferr);
@@ -227,17 +226,17 @@ int EOS_to_TRUST_Sat_generique::tppi_get_all_sat_loi_F5(const MSpanD input, MSat
   const SpanD P = input.at("pression");
 
   int i_out = 0, nb_out = (int) sats.size(), sz = (int) P.size();
-  ArrOfInt tmp(sz);
-  EOS_Error_Field ferr(tmp);
-  EOS_Fields flds_out(nb_out);
-  EOS_Field P_fld("Pressure", "P", (int) P.size(), (double*) P.begin());
+  NEPTUNE::ArrOfInt tmp(sz);
+  NEPTUNE::EOS_Error_Field ferr(tmp);
+  NEPTUNE::EOS_Fields flds_out(nb_out);
+  NEPTUNE::EOS_Field P_fld("Pressure", "P", (int) P.size(), (double*) P.begin());
 
   for (auto &itr : sats)
     {
       SAT prop_ = itr.first;
       SpanD span_ = itr.second;
       assert(sz == (int ) span_.size());
-      flds_out[i_out++] = EOS_Field(EOS_prop_sat[(int) prop_][0], EOS_prop_sat[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
+      flds_out[i_out++] = NEPTUNE::EOS_Field(EOS_prop_sat[(int) prop_][0], EOS_prop_sat[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
     }
 
   return (int)fluide->compute(P_fld, flds_out, ferr);

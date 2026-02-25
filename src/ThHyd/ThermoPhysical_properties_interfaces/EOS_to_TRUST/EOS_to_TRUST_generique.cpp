@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,8 +14,6 @@
 *****************************************************************************/
 
 #include <EOS_to_TRUST_generique.h>
-
-using namespace NEPTUNE ;
 
 // iterator index !
 #define i_it std::distance(TT.begin(), &val)
@@ -97,12 +95,12 @@ int EOS_to_TRUST_generique::tppi_get_beta_pT(const SpanD P, const SpanD T, SpanD
 
 // methodes particulieres par application pour gagner en performance : utilisees dans Pb_Multiphase (pour le moment !)
 #ifdef HAS_EOS
-int EOS_to_TRUST_generique::tppi_get_all_properties_T_(const MSpanD input , EOS_Fields& flds_out, EOS_Error_Field& ferr, int ncomp, int id) const
+int EOS_to_TRUST_generique::tppi_get_all_properties_T_(const MSpanD input , NEPTUNE::EOS_Fields& flds_out, NEPTUNE::EOS_Error_Field& ferr, int ncomp, int id) const
 {
   const SpanD T = input.at("temperature"), P = input.at("pressure");
   if (ncomp == 1)
     {
-      EOS_Field T_fld("Temperature", "T", (int) T.size(), (double*) T.begin()), P_fld("Pressure", "P", (int) P.size(), (double*) P.begin());
+      NEPTUNE::EOS_Field T_fld("Temperature", "T", (int) T.size(), (double*) T.begin()), P_fld("Pressure", "P", (int) P.size(), (double*) P.begin());
       return (int)fluide->compute(P_fld, T_fld, flds_out, ferr);
     }
   else /* attention stride */
@@ -111,17 +109,17 @@ int EOS_to_TRUST_generique::tppi_get_all_properties_T_(const MSpanD input , EOS_
       SpanD TT(temp_);
       for (auto &val : TT) val = T[i_it * ncomp + id];
 
-      EOS_Field T_fld("Temperature", "T", (int) TT.size(), (double*) TT.begin()), P_fld("Pressure", "P", (int) P.size(), (double*) P.begin());
+      NEPTUNE::EOS_Field T_fld("Temperature", "T", (int) TT.size(), (double*) TT.begin()), P_fld("Pressure", "P", (int) P.size(), (double*) P.begin());
       return (int)fluide->compute(P_fld, T_fld, flds_out, ferr);
     }
 }
 
-int EOS_to_TRUST_generique::tppi_get_all_properties_h_(const MSpanD input , EOS_Fields& flds_out, EOS_Error_Field& ferr, int ncomp, int id) const
+int EOS_to_TRUST_generique::tppi_get_all_properties_h_(const MSpanD input , NEPTUNE::EOS_Fields& flds_out, NEPTUNE::EOS_Error_Field& ferr, int ncomp, int id) const
 {
   const SpanD T = input.at("enthalpie"), P = input.at("pressure");
   if (ncomp == 1)
     {
-      EOS_Field T_fld("Enthalpy", "h", (int) T.size(), (double*) T.begin()), P_fld("Pressure", "P", (int) P.size(), (double*) P.begin());
+      NEPTUNE::EOS_Field T_fld("Enthalpy", "h", (int) T.size(), (double*) T.begin()), P_fld("Pressure", "P", (int) P.size(), (double*) P.begin());
       return (int)fluide->compute(P_fld, T_fld, flds_out, ferr);
     }
   else /* attention stride */
@@ -130,7 +128,7 @@ int EOS_to_TRUST_generique::tppi_get_all_properties_h_(const MSpanD input , EOS_
       SpanD TT(temp_);
       for (auto &val : TT) val = T[i_it * ncomp + id];
 
-      EOS_Field T_fld("Enthalpy", "h", (int) TT.size(), (double*) TT.begin()), P_fld("Pressure", "P", (int) P.size(), (double*) P.begin());
+      NEPTUNE::EOS_Field T_fld("Enthalpy", "h", (int) TT.size(), (double*) TT.begin()), P_fld("Pressure", "P", (int) P.size(), (double*) P.begin());
       return (int)fluide->compute(P_fld, T_fld, flds_out, ferr);
     }
 }
@@ -151,9 +149,9 @@ int EOS_to_TRUST_generique::tppi_get_CPMLB_pb_multiphase_pT(const MSpanD input, 
   const int nb_out = 5; /* 5 variables to fill */
   VectorD drho_dt_((int) P.size()), rho_((int) P.size());
   SpanD drho_dt(drho_dt_), rho(rho_);
-  ArrOfInt tmp((int)P.size());
-  EOS_Error_Field ferr(tmp);
-  EOS_Fields flds_out(nb_out);
+  NEPTUNE::ArrOfInt tmp((int)P.size());
+  NEPTUNE::EOS_Error_Field ferr(tmp);
+  NEPTUNE::EOS_Fields flds_out(nb_out);
   int i_out = 0;
 
   for (auto& itr : prop)
@@ -162,11 +160,11 @@ int EOS_to_TRUST_generique::tppi_get_CPMLB_pb_multiphase_pT(const MSpanD input, 
       Loi_en_T prop_ = itr.first;
       SpanD span_ = itr.second;
       if (prop_ != Loi_en_T::BETA)
-        flds_out[i_out++] = EOS_Field(EOS_prop_en_T[(int) prop_][0], EOS_prop_en_T[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
+        flds_out[i_out++] = NEPTUNE::EOS_Field(EOS_prop_en_T[(int) prop_][0], EOS_prop_en_T[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
       else /* pour beta on recalcule sans appel a beta de eos ... */
         {
-          flds_out[i_out++] = EOS_Field(EOS_prop_en_T[(int) Loi_en_T::RHO][0], EOS_prop_en_T[(int) Loi_en_T::RHO][1], (int) rho.size(), (double*) rho.begin());
-          flds_out[i_out++] = EOS_Field(EOS_prop_en_T[(int) Loi_en_T::RHO_DT][0], EOS_prop_en_T[(int) Loi_en_T::RHO_DT][1], (int) drho_dt.size(), (double*) drho_dt.begin());
+          flds_out[i_out++] = NEPTUNE::EOS_Field(EOS_prop_en_T[(int) Loi_en_T::RHO][0], EOS_prop_en_T[(int) Loi_en_T::RHO][1], (int) rho.size(), (double*) rho.begin());
+          flds_out[i_out++] = NEPTUNE::EOS_Field(EOS_prop_en_T[(int) Loi_en_T::RHO_DT][0], EOS_prop_en_T[(int) Loi_en_T::RHO_DT][1], (int) drho_dt.size(), (double*) drho_dt.begin());
         }
     }
 
@@ -196,9 +194,9 @@ int EOS_to_TRUST_generique::tppi_get_all_pb_multiphase_pT(const MSpanD input, ML
   Tk_(T), Tk_(bT);
 
   const int nb_out = (int )inter.size(), bnb_out = (int )bord.size();
-  ArrOfInt tmp((int)P.size()), btmp((int)bP.size());
-  EOS_Error_Field ferr(tmp), bferr(btmp);
-  EOS_Fields flds_out(nb_out), bflds_out(bnb_out);
+  NEPTUNE::ArrOfInt tmp((int)P.size()), btmp((int)bP.size());
+  NEPTUNE::EOS_Error_Field ferr(tmp), bferr(btmp);
+  NEPTUNE::EOS_Fields flds_out(nb_out), bflds_out(bnb_out);
 
   int i_out = 0, bi_out = 0;
 
@@ -207,7 +205,7 @@ int EOS_to_TRUST_generique::tppi_get_all_pb_multiphase_pT(const MSpanD input, ML
       Loi_en_T prop_ = itr.first;
       SpanD span_ = itr.second;
       assert((int ) bT.size() == ncomp * (int ) span_.size());
-      bflds_out[bi_out++] = EOS_Field(EOS_prop_en_T[(int) prop_][0], EOS_prop_en_T[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
+      bflds_out[bi_out++] = NEPTUNE::EOS_Field(EOS_prop_en_T[(int) prop_][0], EOS_prop_en_T[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
     }
 
   for (auto& itr : inter)
@@ -215,7 +213,7 @@ int EOS_to_TRUST_generique::tppi_get_all_pb_multiphase_pT(const MSpanD input, ML
       Loi_en_T prop_ = itr.first;
       SpanD span_ = itr.second;
       assert((int ) T.size() == ncomp * (int ) span_.size());
-      flds_out[i_out++] = EOS_Field(EOS_prop_en_T[(int) prop_][0], EOS_prop_en_T[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
+      flds_out[i_out++] = NEPTUNE::EOS_Field(EOS_prop_en_T[(int) prop_][0], EOS_prop_en_T[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
     }
 
   int err1_ = tppi_get_all_properties_T_( { { "temperature", bT }, { "pressure", bP } }, bflds_out, bferr, ncomp, id); // bords
@@ -236,19 +234,19 @@ int EOS_to_TRUST_generique::tppi_get_all_prop_loi_F5(const MSpanD input, MLoiSpa
   assert(ncomp == 1);
   const SpanD P = input.at("pression"), H = is_liq ? input.at("H_L") : input.at("H_V");
   int i_out = 0, nb_out = (int) spans.size(), sz = (int) P.size();
-  ArrOfInt tmp(sz);
-  EOS_Error_Field ferr(tmp);
-  EOS_Fields flds_out(nb_out);
+  NEPTUNE::ArrOfInt tmp(sz);
+  NEPTUNE::EOS_Error_Field ferr(tmp);
+  NEPTUNE::EOS_Fields flds_out(nb_out);
 
   for (auto &itr : spans)
     {
       Loi_en_h prop_ = itr.first;
       SpanD span_ = itr.second;
       assert(sz == (int ) span_.size());
-      flds_out[i_out++] = EOS_Field(EOS_prop_en_h[(int) prop_][0], EOS_prop_en_h[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
+      flds_out[i_out++] = NEPTUNE::EOS_Field(EOS_prop_en_h[(int) prop_][0], EOS_prop_en_h[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
     }
 
-  EOS_Field T_fld("Enthalpy", "h", (int) H.size(), (double*) H.begin()), P_fld("Pressure", "P", (int) P.size(), (double*) P.begin());
+  NEPTUNE::EOS_Field T_fld("Enthalpy", "h", (int) H.size(), (double*) H.begin()), P_fld("Pressure", "P", (int) P.size(), (double*) P.begin());
   return (int)fluide->compute(P_fld, T_fld, flds_out, ferr);
 
 #else
@@ -266,9 +264,9 @@ int EOS_to_TRUST_generique::tppi_get_CPMLB_pb_multiphase_ph(const MSpanD input, 
   if ((int )H.size() != ncomp * (int )P.size()) Process::exit("Ah bon ? NON !");
 
   const int nb_out = 3; /* 4 variables to fill --- without BETA :: TODO FIXME */
-  ArrOfInt tmp((int)P.size());
-  EOS_Error_Field ferr(tmp);
-  EOS_Fields flds_out(nb_out);
+  NEPTUNE::ArrOfInt tmp((int)P.size());
+  NEPTUNE::EOS_Error_Field ferr(tmp);
+  NEPTUNE::EOS_Fields flds_out(nb_out);
   int i_out = 0;
 
   for (auto& itr : prop)
@@ -277,7 +275,7 @@ int EOS_to_TRUST_generique::tppi_get_CPMLB_pb_multiphase_ph(const MSpanD input, 
       Loi_en_h prop_ = itr.first;
       SpanD span_ = itr.second;
       if (prop_ != Loi_en_h::BETA)
-        flds_out[i_out++] = EOS_Field(EOS_prop_en_h[(int) prop_][0], EOS_prop_en_h[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
+        flds_out[i_out++] = NEPTUNE::EOS_Field(EOS_prop_en_h[(int) prop_][0], EOS_prop_en_h[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
     }
 
   /* beta  FIXME */
@@ -301,9 +299,9 @@ int EOS_to_TRUST_generique::tppi_get_all_pb_multiphase_ph(const MSpanD input, ML
   assert ((int )bH.size() == ncomp * (int )bP.size() && (int )H.size() == ncomp * (int )P.size());
 
   const int nb_out = (int )inter.size(), bnb_out = (int )bord.size();
-  ArrOfInt tmp((int)P.size()), btmp((int)bP.size());
-  EOS_Error_Field ferr(tmp), bferr(btmp);
-  EOS_Fields flds_out(nb_out), bflds_out(bnb_out);
+  NEPTUNE::ArrOfInt tmp((int)P.size()), btmp((int)bP.size());
+  NEPTUNE::EOS_Error_Field ferr(tmp), bferr(btmp);
+  NEPTUNE::EOS_Fields flds_out(nb_out), bflds_out(bnb_out);
 
   int i_out = 0, bi_out = 0;
 
@@ -312,7 +310,7 @@ int EOS_to_TRUST_generique::tppi_get_all_pb_multiphase_ph(const MSpanD input, ML
       Loi_en_h prop_ = itr.first;
       SpanD span_ = itr.second;
       assert((int ) bH.size() == ncomp * (int ) span_.size());
-      bflds_out[bi_out++] = EOS_Field(EOS_prop_en_h[(int) prop_][0], EOS_prop_en_h[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
+      bflds_out[bi_out++] = NEPTUNE::EOS_Field(EOS_prop_en_h[(int) prop_][0], EOS_prop_en_h[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
     }
 
   for (auto& itr : inter)
@@ -320,7 +318,7 @@ int EOS_to_TRUST_generique::tppi_get_all_pb_multiphase_ph(const MSpanD input, ML
       Loi_en_h prop_ = itr.first;
       SpanD span_ = itr.second;
       assert((int ) H.size() == ncomp * (int ) span_.size());
-      flds_out[i_out++] = EOS_Field(EOS_prop_en_h[(int) prop_][0], EOS_prop_en_h[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
+      flds_out[i_out++] = NEPTUNE::EOS_Field(EOS_prop_en_h[(int) prop_][0], EOS_prop_en_h[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
     }
 
   int err1_ = tppi_get_all_properties_h_( { { "enthalpie", bH }, { "pressure", bP } }, bflds_out, bferr, ncomp, id); // bords
