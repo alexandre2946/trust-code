@@ -36,9 +36,11 @@
 #include <iomanip>
 #include <utility>
 #include <set>
+#ifdef MPI_
 #if __cplusplus > 201703L // C++20
 #define TRUST_USE_ARBORX
 #include <ArborX.hpp>
+#endif
 #endif
 #include <medcoupling++.h>
 #ifdef MEDCOUPLING_
