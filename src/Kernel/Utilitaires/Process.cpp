@@ -838,7 +838,7 @@ void change_disable_stop(int new_stop)
 
 // Explicit template instantiations for mp_*_for_each_item
 template void Process::mp_sum_for_each_item<double>(TRUSTArray<double>&, int);
-template void Process::mp_sum_for_each_item<long>(TRUSTArray<long>&, int);
+template void Process::mp_sum_for_each_item<trustIdType>(TRUSTArray<trustIdType>&, int);
 template void Process::mp_sum_for_each_item<int>(TRUSTArray<int>&, int);
 template void Process::mp_max_for_each_item<double>(TRUSTArray<double>&, int);
 template void Process::mp_max_for_each_item<int>(TRUSTArray<int>&, int);
