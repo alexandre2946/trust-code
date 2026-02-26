@@ -1197,7 +1197,7 @@ class StatisticalPostProcessing:
         sol = optimize.root(func, 0, method="hybr")
         # print(sol.x) # for debug
         StatisticalPostProcessing._COUNT_PARAB += 1
-        f = open("Roots_{0}.txt".format(StatisticalPostProcessing._COUNT_PARAB), "a")
+        f = open("Roots_{0}.txt".format(StatisticalPostProcessing._COUNT_PARAB), "w")
         f.write("{0}\n".format(round(sol.x[0], digit)))
         f.close()
         x = np.linspace(0, max(aaa), 1000)
