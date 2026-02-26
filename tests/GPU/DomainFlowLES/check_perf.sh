@@ -5,9 +5,7 @@ check()
    #grep "AMG solver" $1.out_err 2>/dev/null
    if [ ! -f $1.TU ] || [ "`grep 'Arret des processes' $1.out_err`" = "" ]
    then
-      echo "==================================================="
       echo "Performance is KO for $1 on $2 : case does not run!"
-      echo "==================================================="
       exit -1
    fi
    TU=$1.TU
@@ -26,10 +24,8 @@ check()
    [ "$UPDATE_REFERENCE" = 1 ] && cp -f $TU $TU_REF && echo "Forced update of $TU_REF"
    if [ $err = 1 ]
    then
-      sdiff -w 200 $TU_REF $TU
-      echo "=========================================="
+      #sdiff -w 200 $TU_REF $TU
       echo "Performance is KO ($ecart%) for $1 on $2 !"
-      echo "=========================================="
    else
       echo "Performance is OK ($ecart%) $new s < $ref s (reference) for $1 on $2"
       if [ `echo "$ecart<-0.99" | bc -l` = 1 ]
@@ -52,14 +48,13 @@ run()
    then
       np=""
    else  
-      echo "Partition for $np MPI..." 
+      #echo "Partition for $np MPI..." 
       make_PAR.data $jdd $np 1>/dev/null 2>&1
       jdd=PAR"_"$jdd
    fi
    rm -f $jdd.TU
    # Try to mitigate variablity by setting exclusive mode on GPU (firefox, slack, edge, chrome, use device !)
    [ "$np" = "" ] && [ "$TRUST_WITHOUT_HOST" = 1 ] && [ "`hostname`" = is157091 ] && set_EXCLUSIVE_PROCESS=`sudo ls 2>/dev/null`
-   [ "$set_EXCLUSIVE_PROCESS" = "" ] && [ "$TRUST_WITHOUT_HOST" != 0 ] && echo "Warning, we can't set EXCLUSIVE_PROCESS mode on GPU ! Check than no other process use the GPU..."
    [ "$set_EXCLUSIVE_PROCESS" != "" ] && sudo nvidia-smi -c EXCLUSIVE_PROCESS 1>/dev/null
    trust $nsys $jdd $np 1>$jdd.out_err 2>&1
    [ "$set_EXCLUSIVE_PROCESS" != "" ] && sudo nvidia-smi -c DEFAULT 1>/dev/null         
