@@ -469,9 +469,10 @@ do
       [ "$CS_OPTION" = racecheck ] && CS_OPTION=$CS_OPTION" --racecheck-detect-level=error" # On ne regarde que les erreurs detectees, pas les warnings
    elif [ "$1" = "-energy" ]
    then
-      shift;SLURM_JOB_ID=$1
-      sacct --format=ElapsedRaw,ConsumedEnergyRaw --jobs=$SLURM_JOB_ID | tail -1 | awk '($2!=0 && $1!=0) {kw=0.001*$2/$1;kwh=$2/3.6e6;printf("Power consumption (%d s): %6.3f kW %6.3f kWh %6.3f € (0.10€/kWh)\n",$1,kw,kwh,kwh*0.10)}'
-      exit $?
+      shift
+      SLURM_JOB_ID=$1
+      LANG=en_US.UTF-8 sacct -X --format=ElapsedRaw,ConsumedEnergyRaw,nodelist --jobs=$SLURM_JOB_ID | tail -1 | awk '($2!=0 && $1!=0) {kw=0.001*$2/$1;kwh=$2/3.6e6;printf("[Slurm] Power consumption (%d s): %6.3f kW %6.3f kWh %6.3f € (0.10€/kWh)\n",$1,kw,kwh,kwh*0.10)}'
+      exit 0
    elif [ "$1" = "-gdb" ]
    then
       gdb=gdb.sh && mpirun_options="-gdb"
@@ -1262,10 +1263,11 @@ export FI_CXI_DEFAULT_CQ_SIZE=393216" >> $GPU_DIRECT
    #########################
    # Consommation electrique
    #########################
-   if [ "$sub" = SLURM ] || [ "$sub" = CCC ]
-   then
-      echo "trust -energy \$SLURM_JOB_ID >> \$case.TU" >> $sub_file
-   fi
+   # Can't be called during job...
+   #if [ "$TRUST_USE_SACCT" = 1 ]
+   #then
+   #   echo "[ \$? = 0 ] && && trust -energy \$SLURM_JOB_ID >> \$case.TU" >> $sub_file
+   #fi
    #######
    # IPM #
    #######
@@ -1333,7 +1335,8 @@ export FI_CXI_DEFAULT_CQ_SIZE=393216" >> $GPU_DIRECT
    then
       err=1
    fi
-   ccc_myproject -P $queue 2>/dev/null # Sur CCRT heures de calcul
+   [ $sub = CCC ] && ccc_myproject -P $queue 2>/dev/null 		# Sur CCRT heures de calcul
+   [ "$TRUST_USE_SACCT" = 1 ] && trust -energy $id | tee -a $NOM.TU	# Energy consumption printed and added to .TU
 else
    # Pas de gestionnaire, example PC:
    [ "$cpus_per_task" != "" ]         && [ "$HOST" != "jean-zay" ] && echo "Number of core per task option not supported yet on $HOST. Contact TRUST support" && exit -1

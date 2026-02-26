@@ -43,6 +43,7 @@ define_modules_config()
    echo "module load $module 1>/dev/null || exit -1" >> $env
    echo "PATH=\$CRAY_MPICH_PREFIX/bin:\$PATH"  >> $env # Pour trouver mpicxx
    #echo "export TRUST_DEVICES_PER_NODE=8" >> $env # Devices per node
+   echo "export TRUST_USE_SACCT=1" >> $env # Energy data 
    . $env
 }
 

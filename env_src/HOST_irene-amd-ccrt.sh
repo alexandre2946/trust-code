@@ -45,6 +45,7 @@ define_modules_config()
    echo "module purge 1>/dev/null 2>/dev/null" >> $env
    echo "module load $module 1>/dev/null || exit -1" >> $env
    [ "$sw" != "" ] && echo "module sw $sw 1>/dev/null" >> $env
+   echo "export TRUST_USE_SACCT=1" >> $env # Energy data 
    . $env
 }
 

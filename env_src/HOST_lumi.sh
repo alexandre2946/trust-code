@@ -31,6 +31,7 @@ define_modules_config()
    echo "# Module $module detected and loaded on $HOST."
    echo "module purge 1>/dev/null 2>&1" >> $env
    echo "module load $module 1>/dev/null || exit -1" >> $env
+   echo "export TRUST_USE_SACCT=1" >> $env # Energy data 
    #echo "PATH=\$CRAY_MPICH_PREFIX/bin:\$PATH"  >> $env # Pour trouver mpicxx
    . $env
 }

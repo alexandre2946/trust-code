@@ -34,6 +34,7 @@ define_modules_config()
    echo "module load $module 1>/dev/null || exit -1" >> $env
    echo "export TRUST_DISABLE_STRUMPACK=1" >> $env
    echo "export TRUST_DISABLE_SUPERLU_DIST=1" >> $env
+   echo "export TRUST_USE_SACCT=1" >> $env # Energy data 
    . $env
    # Creation wrapper qstat -> squeue
    echo "#!/bin/bash
