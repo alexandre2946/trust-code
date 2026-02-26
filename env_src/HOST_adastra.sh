@@ -81,9 +81,9 @@ define_soumission_batch()
           cpus_per_task=24 # 1 GPU/MPI
           gpu_per_node=4
 	  # Not available on the GPU nodes:
-          cp -f /lib64/libsuitesparseconfig.so.4 .
-          echo "export LD_LIBRARY_PATH=.:\$LD_LIBRARY_PATH" > ld_env.sh
-	  echo "export TRUST_DISABLE_CHECK_OS=1" >> ld_env.sh
+          #cp -f /lib64/libsuitesparseconfig.so.4 .
+          #echo "export LD_LIBRARY_PATH=.:\$LD_LIBRARY_PATH" > ld_env.sh
+	  #echo "export TRUST_DISABLE_CHECK_OS=1" >> ld_env.sh
       fi
       noeuds=`echo "1+($NB_PROCS-1)/$gpu_per_node" | bc`
       # Important pour les performances ! le -c dans le srun est important il semble que SBATCH -c ne marche pas...
