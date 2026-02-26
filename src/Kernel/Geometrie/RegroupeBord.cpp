@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -22,6 +22,7 @@ Implemente_instanciable_32_64(RegroupeBord_32_64,"RegroupeBord",Interprete_geome
 // XD   attr new_bord chaine new_bord 0 Name of the new boundary
 // XD   attr bords bloc_lecture bords 0 { Bound1 Bound2 }
 
+// XD regroupebord_64 regroupebord  regroupebord_64 -1 Keyword to build one boundary new_bord with several boundaries of the big (64b) domain named domaine.
 template <typename _SIZE_>
 Sortie& RegroupeBord_32_64<_SIZE_>::printOn(Sortie& os) const
 {

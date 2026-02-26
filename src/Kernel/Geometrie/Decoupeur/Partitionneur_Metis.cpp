@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -29,6 +29,7 @@ inline void not_implemented(const Nom& chaine)
 }
 
 Implemente_instanciable_32_64(Partitionneur_Metis_32_64,"Partitionneur_Metis",Partitionneur_base_32_64<_T_>);
+// XD partitionneur_metis_64 partitionneur_deriv metis_64 -1 Metis is an external partitionning library. It is a general algorithm that will generate a partition of big (64b) domain.
 // XD partitionneur_metis partitionneur_deriv metis -1 Metis is an external partitionning library. It is a general algorithm that will generate a partition of the domain.
 
 namespace

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -33,6 +33,8 @@ Sortie& Corriger_frontiere_periodique_32_64<_SIZE_>::printOn(Sortie& os) const
 {
   return os;
 }
+
+// XD corriger_frontiere_periodique_64 corriger_frontiere_periodique corriger_frontiere_periodique_64 -1 The Corriger_frontiere_periodique_64 did the same thing as Corriger_frontiere_periodique for big (64b) domain.
 
 // XD corriger_frontiere_periodique interprete corriger_frontiere_periodique 1 The Corriger_frontiere_periodique keyword is mandatory to first define the periodic boundaries, to reorder the faces and eventually fix unaligned nodes of these boundaries. Faces on one side of the periodic domain are put first, then the faces on the opposite side, in the same order. It must be run in sequential before mesh splitting.
 //  XD attr domaine chaine domaine 0 Name of domain.

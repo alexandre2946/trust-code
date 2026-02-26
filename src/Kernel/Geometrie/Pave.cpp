@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -25,6 +25,8 @@ Implemente_instanciable_32_64(Pave_32_64,"Pave",Domaine_32_64<_T_>);
 // XD  attr name chaine name 0 Name of the pave (block).
 // XD  attr bloc bloc_pave bloc 0 Definition of the pave (block).
 // XD  attr list_bord list_bord list_bord 0 Domain boundaries definition.
+
+// XD pave_64 pave pave_64 0 Same as Pave for big (64b) domain
 
 // XD bloc_pave objet_lecture nul -1 Class to create a pave.
 // XD attr Origine listf Origine 1 Keyword to define the pave (block) origin, that is to say one of the 8 block points (or 4 in a 2D coordinate system).

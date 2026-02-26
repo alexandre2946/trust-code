@@ -1,5 +1,4 @@
 # Check geometric interprets on big mesh, so with _64 # 
-# TRUSTIFY NOT #
 dimension 3
 
 # VDF domain #

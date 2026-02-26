@@ -3527,7 +3527,7 @@ do
       if [ -f $nuit_log ]
       then
          echo " " | tee -a tmp.log
-         echo "Run: konqueror ftp://$TRUST_FTP/$SECRET/NUIT/nuit_$Composant.html" | tee -a tmp.log
+         echo "Run: wget ftp://$TRUST_FTP/$SECRET/NUIT/nuit_$Composant.html ; google-chrome nuit_$Composant.html" | tee -a tmp.log
       fi
    fi
    echo " "

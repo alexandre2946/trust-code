@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -216,6 +216,8 @@ template<> int Decouper_32_64<int>::print_more_infos_ = 0;
 #if INT_is_64_ == 2
 template<> int Decouper_32_64<trustIdType>::print_more_infos_ = 0;
 #endif
+
+// XD decouper_64 partition decouper_64 -1 Same as partition for big (64b) domain.
 
 // XD partition interprete decouper -1 Class for parallel calculation to cut a domain for each processor. By default, this keyword is commented in the reference test cases.
 // XD attr domaine ref_domaine domaine 0 Name of the domain to be cut.

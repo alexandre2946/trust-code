@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -26,6 +26,8 @@ Implemente_instanciable_32_64(Mailler_32_64,"Mailler",Interprete_geometrique_bas
 // XD mailler interprete mailler -1 The Mailler (Mesh) interpretor allows a Domain type object domaine to be meshed with objects objet_1, objet_2, etc...
 // XD attr domaine ref_domaine domaine 0 Name of domain.
 // XD attr bloc list_bloc_mailler bloc 0 Instructions to mesh.
+
+// XD mailler_64 mailler mailler_64 -1 The Mailler (Mesh) interpretor allows a big (64b) domain type object domaine to be meshed with objects objet_1, objet_2, etc...
 
 template <typename _SIZE_>
 Sortie& Mailler_32_64<_SIZE_>::printOn(Sortie& os) const
