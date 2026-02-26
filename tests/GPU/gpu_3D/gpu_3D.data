@@ -68,7 +68,7 @@ Read pb
 
     Navier_Stokes_standard
     {
-        solveur_pression amgx GCP { precond c-amg { } seuil 1.000000e-20 impr }
+        solveur_pression AMG GCP { atol 1.000000e-20 impr }
         convection { negligeable }
         diffusion { negligeable }
         initial_conditions {
