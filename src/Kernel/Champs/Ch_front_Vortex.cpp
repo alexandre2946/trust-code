@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -19,7 +19,7 @@
 #include <Interprete.h>
 #include <Domaine_VF.h>
 #include <time.h>
-#include <SFichier.h>
+#include <EcrFicCollecte.h>
 
 Implemente_instanciable_sans_destructeur(Ch_front_Vortex,"Champ_front_Vortex",Champ_front_var_instationnaire);
 
@@ -96,11 +96,10 @@ int Ch_front_Vortex::my_rand( )
 void Ch_front_Vortex::sauvegarder_vortex()
 {
   Nom fichier = "vortex.sauv";
-  if (nproc()>1) fichier=fichier.nom_me(me());
   if(la_frontiere_dis.non_nul())
     {
       Cerr << "Saving vortices in " << fichier << finl;
-      SFichier fic(fichier);
+      EcrFicCollecte fic(fichier);
       fic.setf(ios::scientific);
 
       int nbvortex =  xvort.size();
@@ -113,6 +112,7 @@ void Ch_front_Vortex::sauvegarder_vortex()
           fic << xvort(i) << " " << yvort(i) << " " << zvort(i) << " " << tvort(i) << " " ;
           fic << svort(i) << " " << fvort[i] << " " << gamma(i) << " " << sigma(i) << finl;
         }
+      fic.close();
     }
 }
 
