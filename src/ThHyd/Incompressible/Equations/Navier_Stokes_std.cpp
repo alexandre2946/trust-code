@@ -703,15 +703,9 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
   // In:  derivee = M-1(F - BtP(n))
   // Out: derivee = M-1(F - BtP(n+1)), P(n+1)=P(n)+Cp
 
-  // In case of ALE:
-  // Out: derivee = M-1(F + ALEconvectiveTerm - BtP(n+1)) = derivee_out, P(n+1)=P(n)+Cp
-  // Cp is calculated from the following equation:
-  // (BJ_{n}M-1Bt)Cp=B(J_{n}U_{n}/timestep+J_{n}derivee_out-J_{n+1}U_ALE), J-Jacobian, _{n}- at time n
-
   DoubleTab& tab_pression=la_pression->valeurs();
   DoubleTab& gradP=gradient_P->valeurs();
   DoubleTrav secmemP(tab_pression);
-  DoubleTrav deriveeALE(derivee);
 
   const bool is_ALE = probleme().domaine().deformable();
 
@@ -728,12 +722,12 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
       derivee2/=dt;
       divergence.calculer(derivee2, secmemP); // Div(M-1(F - BtP))
     }
-  else if (is_ALE)
+  /*else if (is_ALE)
     {
       DoubleTab derivee2(derivee);
       probleme().domaine().ajouter_correctif_volumique(la_vitesse->valeurs(), derivee, dt, derivee2);
       divergence.calculer(derivee2, secmemP);
-    }
+    }*/
   else
     divergence.calculer(derivee, secmemP); // Div(M-1(F - BtP))
 

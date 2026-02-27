@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -485,7 +485,9 @@ void Ecrire_YAML::set_data()
           std::vector<YAML_data> eqs = pb.equation(i_eq).data_a_sauvegarder();
           data.insert(data.end(), eqs.begin(), eqs.end());
         }
-
+      // domain-related data that needs to be saved (e.g. mobile domain)
+      std::vector<YAML_data> dom = pb.domaine().data_a_sauvegarder(pb);
+      data.insert(data.end(), dom.begin(), dom.end());
       // statistical post-processing fields
       for (const auto& post_base : pb.postraitements())
         {

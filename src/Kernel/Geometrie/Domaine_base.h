@@ -32,6 +32,7 @@
 #include <Joints.h>
 #include <Bords.h>
 #include <Noms.h>
+#include <YAML_data.h>
 
 class Probleme_base;
 class Domaine_dis_base;
@@ -96,8 +97,13 @@ public:
   virtual const DoubleVect& old_volumes_entrelaces() const { throw; }
   virtual const DoubleVect& old_volumes() const { throw; }
   virtual void apply_old_to_new_volume_scaling(DoubleTab& tab, const Domaine_dis_base& dvf) const { }
-  virtual void ajouter_correctif_volumique(const DoubleTab&, const DoubleTab&, double, DoubleTab& ) const {}
+  virtual void ajouter_correctif_volumique(const DoubleTab&, const DoubleTab&, double, DoubleTab&) const {}
+  // save additional information not handled by the default save mechanism.
+  virtual int save_additional_state(Sortie&, const Probleme_base&) const { return 0; }
+  // restore additional information during restart
+  virtual int restore_additional_state(Entree&, Probleme_base&) { return 0; }
 
+  virtual std::vector<YAML_data> data_a_sauvegarder(const Probleme_base& pb) const { return std::vector<YAML_data>(); }
 protected:
   /// Domaine name
   Nom nom_;

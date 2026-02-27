@@ -497,6 +497,7 @@ int Probleme_base::sauvegarder(Sortie& os) const
       bytes += equation(i).sauvegarder(os);
       assert(bytes % 4 == 0);
     }
+  bytes += domaine().save_additional_state(os, *this);  // save additional state (e.g. moving mesh data)
   bytes += les_postraitements_.sauvegarder(os);
   assert(bytes % 4 == 0); // To detect a sauvegarder() method which returns 1 instead of the number of bytes saved.
   return bytes;
@@ -515,6 +516,7 @@ int Probleme_base::reprendre(Entree& is)
   Cerr << "Resuming the problem " << le_nom() << finl;
   for(int i=0; i<nombre_d_equations(); i++)
     equation(i).reprendre(is);
+  domaine().restore_additional_state(is, *this); //restore additional state (e.g. moving mesh data)
   les_postraitements_.reprendre(is);
   Cerr << "End of resuming the problem " << le_nom() << " after " << statistics().get_time_since_last_open(STD_COUNTERS::restart) << " s" << finl;
   statistics().end_count(STD_COUNTERS::restart);
