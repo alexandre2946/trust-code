@@ -274,7 +274,7 @@ class Write_notebook:
             if plot[0].lower() == "instruction_visit":
                 code1 += f"visu.executeVisitCmds({plot[1]})\n"
         if len(visu.cycles) != 0:
-            code1 += f"visu.iteration({visu.cycles} )\n"
+            code1 += f"visu.setIteration({visu.cycles} )\n"
         code += f"{code0 + code1}visu.plot()"
 
         self.nb["cells"] += [nbf.v4.new_code_cell(code)]
