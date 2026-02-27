@@ -70,6 +70,8 @@ void Ecrire_CGNS::cgns_open_file()
 
   fill_infos_loc();
 
+  if (is_lagrangian_) return; /* for FT post and since we have a change of topology => one file per dt post */
+
   if (Option_CGNS::USE_LINKS && !postraiter_domaine_)
     return; /* rien a faire si USE_LINKS ou FILE_PER_COMM_GROUP */
 
@@ -118,12 +120,14 @@ void Ecrire_CGNS::finir_ecriture(double temps)
 {
   if (postraiter_domaine_) return; /* rien a faire */
 
-  if (Option_CGNS::USE_LINKS)
+  if (Option_CGNS::USE_LINKS || is_lagrangian_)
     {
       cgns_close_grid_or_solution_link_file(temps, TYPE_LINK_CGNS::SOLUTION);
 
       /* rewrite the link file so you can visualize during simulation !!! */
-      if (is_deformable_)
+      if (is_lagrangian_)
+        cgns_write_final_link_file_lagrangian();
+      else if (is_deformable_)
         cgns_write_final_link_file_pb_deformable();
       else
         cgns_write_final_link_file();
@@ -174,6 +178,8 @@ void Ecrire_CGNS::cgns_finir()
   if (Option_CGNS::SINGLE_SAFE_FILE && !singlefile_open_)
     return; /* All done */
 
+  if (is_lagrangian_) return; /* All done */
+
   if (!postraiter_domaine_ && !first_time_post_)
     {
       if (is_deformable_)
@@ -195,11 +201,15 @@ void Ecrire_CGNS::cgns_add_time(const double t)
   if (first_time_post_ && !time_post_.empty())
     first_time_post_ = false;
 
-  if (Option_CGNS::USE_LINKS && !postraiter_domaine_)
-    if (!first_time_post_ || is_deformable_) /* Si pas deformable, la 1er fois dans cgns_write_field (fill field_loc_map) */
-      cgns_open_solution_link_file(t);
+  if (is_lagrangian_)
+    cgns_open_solution_link_file(t); /* FT toujours un fichier par post ... */
+  else if (Option_CGNS::USE_LINKS && !postraiter_domaine_)
+    {
+      if (!first_time_post_ || is_deformable_) /* Si pas deformable, la 1er fois dans cgns_write_field (fill field_loc_map) */
+        cgns_open_solution_link_file(t);
+    }
 
-  if (Option_CGNS::SINGLE_SAFE_FILE && !postraiter_domaine_)
+  if (Option_CGNS::SINGLE_SAFE_FILE && !postraiter_domaine_ && !is_lagrangian_)
     {
       step_single_file_counter_++; // XXX
 
@@ -240,7 +250,7 @@ void Ecrire_CGNS::cgns_flush_to_disk() const
 
 void Ecrire_CGNS::ensure_modify_open_singlefile()
 {
-  if (ensure_modify_done_ || Option_CGNS::USE_LINKS || postraiter_domaine_) return;
+  if (ensure_modify_done_ || Option_CGNS::USE_LINKS || postraiter_domaine_ || is_lagrangian_) return;
 
   const std::string fn = baseFile_name_ + ".cgns";
 
@@ -346,7 +356,36 @@ void Ecrire_CGNS::cgns_fill_field_loc_map(const Domaine& domaine, const std::str
       cgns_write_domaine_dual(domaine, 0 /* pas premier post ... mais inutile */, nom_dom);
     }
 
-  if (!Option_CGNS::USE_LINKS || postraiter_domaine_)
+  if (is_lagrangian_)
+    {
+      if (multi_loc_deformable_support_linked_)
+        return; /* on sort */
+
+      Nom nom_dom = domaine.le_nom();;
+      std::string loc_link;
+
+      if (has_elem_som_loc_)
+        {
+          loc_link = "ELEM";
+          assert (!fld_loc_map_.count(loc_link));
+          nom_dom += "_ELEM";
+          fld_loc_map_.insert( { loc_link, nom_dom } );
+          cgns_init_solution_link_file(loc_link, nom_dom);
+
+          loc_link = "SOM";
+          assert (!fld_loc_map_.count(loc_link));
+          nom_dom = domaine.le_nom();
+          nom_dom += "_SOM";
+          fld_loc_map_.insert( { loc_link, nom_dom } );
+          cgns_init_solution_link_file(loc_link, nom_dom);
+        }
+      else
+        {
+          if (!fld_loc_map_.count(LOC))
+            fld_loc_map_.insert( { LOC, nom_dom } );
+        }
+    }
+  else if (!Option_CGNS::USE_LINKS || postraiter_domaine_)
     {
       Nom nom_dom = domaine.le_nom();
       if (LOC == "FACES" || has_elem_som_loc_)
@@ -417,6 +456,8 @@ void Ecrire_CGNS::cgns_fill_field_loc_map(const Domaine& domaine, const std::str
 
 void Ecrire_CGNS::cgns_write_iters()
 {
+  if (is_lagrangian_) return;
+
   if (Option_CGNS::SINGLE_SAFE_FILE && !ensure_modify_done_)
     ensure_modify_open_singlefile(); /* to make sure we can modify !! */
 

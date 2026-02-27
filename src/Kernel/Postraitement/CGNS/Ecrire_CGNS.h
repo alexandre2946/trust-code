@@ -95,6 +95,8 @@ private:
 
   // Methodes pour Domaine Lagrangien; ie: FTD
   bool is_lagrangian_ = false;
+  void cgns_write_final_link_file_lagrangian();
+  void link_multi_loc_support_lagrangian();
 
   // Methodes pour Domaine Deformable
   void cgns_write_final_link_file_pb_deformable();

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -78,7 +78,7 @@ void Ecrire_CGNS::cgns_open_grid_base_link_file()
 
 void Ecrire_CGNS::cgns_close_grid_or_solution_link_file(const double t, const TYPE_LINK_CGNS type, bool is_cerr)
 {
-  assert(Option_CGNS::USE_LINKS && !postraiter_domaine_);
+  assert((Option_CGNS::USE_LINKS && !postraiter_domaine_) || is_lagrangian_);
 
   std::string fn; // file name
 
@@ -342,7 +342,7 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
           const std::string& LOC = itr.first;
           int ind_base = -123;
 
-          const Nom nom_dom = fld_loc_map_.at(LOC);
+          const Nom& nom_dom = fld_loc_map_.at(LOC);
           const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
 
           if (has_elem_som_loc_ && LOC != "FACES")
@@ -443,7 +443,7 @@ void Ecrire_CGNS::cgns_init_solution_link_file(const std::string& LOC, const Nom
 
 void Ecrire_CGNS::cgns_open_solution_link_file(const double t, bool is_link)
 {
-  assert(Option_CGNS::USE_LINKS && !postraiter_domaine_);
+  assert((Option_CGNS::USE_LINKS && !postraiter_domaine_) || is_lagrangian_);
 
   const bool enter_group_comm = Process::is_parallel() && Option_CGNS::FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group();
 
@@ -482,7 +482,7 @@ void Ecrire_CGNS::cgns_open_solution_link_file(const double t, bool is_link)
       const std::string& LOC = itr.first;
       int ind_base = -123;
 
-      const Nom nom_dom = fld_loc_map_.at(LOC);
+      const Nom& nom_dom = fld_loc_map_.at(LOC);
       const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
 
       if (has_elem_som_loc_ && LOC != "FACES")
