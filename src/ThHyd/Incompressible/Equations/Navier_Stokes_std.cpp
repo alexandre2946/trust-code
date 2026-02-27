@@ -722,12 +722,13 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
       derivee2/=dt;
       divergence.calculer(derivee2, secmemP); // Div(M-1(F - BtP))
     }
-  /*else if (is_ALE)
-    {
-      DoubleTab derivee2(derivee);
-      probleme().domaine().ajouter_correctif_volumique(la_vitesse->valeurs(), derivee, dt, derivee2);
-      divergence.calculer(derivee2, secmemP);
-    }*/
+  else if (is_ALE)
+     {
+	   //deriveeALE= (Volume^n+1/Volume^n​)*U^n/delta t ​+ derivee
+       DoubleTab derivee2(derivee);
+       probleme().domaine().ajouter_correctif_volumique(la_vitesse->valeurs(), derivee, dt, derivee2);
+       divergence.calculer(derivee2, secmemP);
+     }
   else
     divergence.calculer(derivee, secmemP); // Div(M-1(F - BtP))
 
