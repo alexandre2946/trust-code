@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -140,7 +140,8 @@ Ecrire_CGNS_helper::cgns_write_grid_coord_data(const int icelldim, const int fil
   if (cgp_coord_write_data(fileId, baseId, zoneId, coordsIdy, &min, &max, yCoords.data()) != CG_OK)
     Cerr << "Error Ecrire_CGNS_helper::cgns_write_grid_coord_data : cgp_coord_write_data - Y !" << finl, TRUST_CGNS_ERROR();
 
-  if (icelldim > 2)
+//  if (icelldim > 2)
+  if (Objet_U::dimension > 2)
     if (cgp_coord_write_data(fileId, baseId, zoneId, coordsIdz, &min, &max, zCoords.data()) != CG_OK)
       Cerr << "Error Ecrire_CGNS_helper::cgns_write_grid_coord_data : cgp_coord_write_data - Z !" << finl, TRUST_CGNS_ERROR();
 #endif
