@@ -1660,9 +1660,10 @@ def wait_run(verbose=False):
         if reps>1 and not(isExtractingNR_ListOnly()):
             sleep(1)
 
-        tf=strftime('%H:%M:%S')
-        _print(f"\n[{tf}]")
-        _print("Running:", run_count, "| Waiting for pre_run:", waiting, "| Finished:", len(_RUNNING_CASES) - run_count - waiting, "| Total:", len(_RUNNING_CASES), "\n")
+        if os.getenv("TRUSTUTILS_VERBOSE") == '1':
+            tf=strftime('%H:%M:%S')
+            _print(f"\n[{tf}]")
+            _print("Running:", run_count, "| Waiting for pre_run:", waiting, "| Finished:", len(_RUNNING_CASES) - run_count - waiting, "| Total:", len(_RUNNING_CASES), "\n")
 
 
         allOK=_handle_error_in_RUNNING_CASES()
