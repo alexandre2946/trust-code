@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -29,7 +29,7 @@ class SFichier :  public Sortie_Fichier_base
 public:
   inline SFichier(const char* name, IOS_OPEN_MODE mode=ios::out):Sortie_Fichier_base(name,mode)
   {
-    if (Process::me()>1)
+    if (Process::me()>=1)
       {
         Cerr << "Error! You can't use SFichier to open the file " << name << " on several processes! Only on the master process." << finl;
         Process::exit();
