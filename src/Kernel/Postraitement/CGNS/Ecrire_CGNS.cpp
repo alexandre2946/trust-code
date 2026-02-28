@@ -114,6 +114,14 @@ void Ecrire_CGNS::fill_infos_loc()
       Cerr << "Contact the TRUST team" << finl;
       Process::exit();
     }
+
+  // j'ajoute ce test pour le moment ...
+  if (Option_CGNS::PARALLEL_OVER_ZONE && is_deformable_ && !postraiter_domaine_)
+    {
+      Cerr << "Error in Ecrire_CGNS::" << __func__ << " !!! You can not use the CGNS option PARALLEL_OVER_ZONE with your problem ..." << finl;
+      Cerr << "Contact the TRUST team" << finl;
+      Process::exit();
+    }
 }
 
 void Ecrire_CGNS::finir_ecriture(double temps)
@@ -310,15 +318,16 @@ void Ecrire_CGNS::cgns_write_field(const Domaine& domaine, const Noms& noms_comp
       for (int i = 0; i < nb_cmp; i++)
         {
           const Motcle field_name = nb_cmp > 1 ? Motcle(noms_compo[i]) : id_du_champ;
+          const Motcle field_name_check = is_lagrangian_ ? field_name + LOC.c_str() : field_name;
 
-          if (std::find(fieldName_dumped_.begin(), fieldName_dumped_.end(), field_name) == fieldName_dumped_.end()) // pas dedans => faut ecrire !
+          if (std::find(fieldName_dumped_.begin(), fieldName_dumped_.end(), field_name_check) == fieldName_dumped_.end()) // pas dedans => faut ecrire !
             {
               if (Option_CGNS::PARALLEL_OVER_ZONE || postraiter_domaine_)
                 cgns_write_field_par_over_zone(i /* compo */, temps, field_name, id_du_domaine, localisation, fld_loc_map_.at(LOC), valeurs);
               else
                 cgns_write_field_par_in_zone(i /* compo */, temps, field_name, id_du_domaine, localisation, fld_loc_map_.at(LOC), valeurs);
 
-              fieldName_dumped_.push_back(field_name);
+              fieldName_dumped_.push_back(field_name_check);
             }
           else
             Cerr << "Field " << field_name << " is already written => we skip it ..." << finl;
@@ -328,10 +337,13 @@ void Ecrire_CGNS::cgns_write_field(const Domaine& domaine, const Noms& noms_comp
     for (int i = 0; i < nb_cmp; i++)
       {
         const Motcle field_name = nb_cmp > 1 ? Motcle(noms_compo[i]) : id_du_champ;
-        if (std::find(fieldName_dumped_.begin(), fieldName_dumped_.end(), field_name) == fieldName_dumped_.end()) // pas dedans => faut ecrire !
+        const Motcle field_name_check = is_lagrangian_ ? field_name + LOC.c_str() : field_name;
+
+        if (std::find(fieldName_dumped_.begin(), fieldName_dumped_.end(), field_name_check) == fieldName_dumped_.end()) // pas dedans => faut ecrire !
           {
             cgns_write_field_seq(i /* compo */, temps, field_name, id_du_domaine, localisation, fld_loc_map_.at(LOC), valeurs);
-            fieldName_dumped_.push_back(field_name);
+
+            fieldName_dumped_.push_back(field_name_check);
           }
         else
           Cerr << "Field " << field_name << " is already written => we skip it ..." << finl;
