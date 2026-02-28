@@ -500,6 +500,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_seq(const Domaine * domaine,cons
   TRUST_2_CGNS& TRUST2CGNS = T2CGNS_[ind];
   TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_.non_nul() ? &(domaine_dis_.valeur()) : nullptr, les_som, les_elem, postraiter_domaine_);
 
+
   CGNS_TYPE cgns_type_elem = TRUST2CGNS.convert_elem_type(type_elem);
   const bool is_polyedre = (type_elem == "POLYEDRE" || type_elem == "PRISME" || type_elem == "PRISME_HEXAG");
   const int icelldim = TRUST2CGNS.topo_dim_from_elem(cgns_type_elem, is_polyedre); // avant ca : icelldim = les_som.dimension(1)
@@ -513,11 +514,6 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_seq(const Domaine * domaine,cons
   int coordsId = -1;
   char basename[CGNS_STR_SIZE];
   strcpy(basename, nom_dom.getChar()); // dom name
-
-  if (is_lagrangian_) // XXX
-    {
-      sizeId_.push_back( { (cgsize_t)nb_som, (cgsize_t)nb_elem } );
-    }
 
   if (!Option_CGNS::USE_LINKS && !is_lagrangian_)
     {
@@ -557,6 +553,8 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_seq(const Domaine * domaine,cons
 
           if (is_lagrangian_)
             {
+              sizeId_.push_back( { (cgsize_t)nb_som, (cgsize_t)nb_elem } ); // XXX required for links later !
+
               /* Set element connectivity : we rewrite since topology can change !! */
               int sectionId;
               cgsize_t start = 1, end;
@@ -618,13 +616,18 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
   char basename[CGNS_STR_SIZE];
   strcpy(basename, nom_dom.getChar()); // dom name
 
+  TRUST2CGNS.fill_global_infos(); // XXX utile car info change en //
+
+  if (cgns_type_elem == CGNS_ENUMV(NGON_n)) /*cas polygone/polyedre */
+    TRUST2CGNS.fill_global_infos_poly(is_polyedre);
+
   const int ns_tot = TRUST2CGNS.get_ns_tot(), ne_tot = TRUST2CGNS.get_ne_tot();
   const bool enter_group_comm = Option_CGNS::FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group() && !postraiter_domaine_;
   const int proc_me = enter_group_comm ? TRUST2CGNS.get_proc_me_local_comm() : Process::me();
 
   int coordsIdx = -123, coordsIdy = -123, coordsIdz = -123;
 
-  if (!Option_CGNS::USE_LINKS)
+  if (!Option_CGNS::USE_LINKS && !is_lagrangian_)
     {
       int G = -1;
       std::string gc_name = "GridCoordinates" + cgns_helper_.convert_double_to_string(time_post_.back());
@@ -678,7 +681,30 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
       cgns_helper_.cgns_write_zone_grid_coord<TYPE_ECRITURE_CGNS::PAR_IN>(icelldim, fileId_, baseId_[ind], basename /* Dom name */, isize,
                                                                           zoneId_[ind], xCoords, yCoords, zCoords, coordsIdx, coordsIdy, coordsIdz);
 
-      if (ne_tot == 0 && ns_tot == 0) return; // XXX Elie Saikali : zone vide creer, rien a faire de plus ... (cas FILE_PER_COMM_GROUP !!!)
+      int sectionId = -123;
+
+      if (is_lagrangian_)
+        {
+          sizeId_.push_back( { isize[0], isize[1] } ); // XXX required for links later !
+
+          if (ne_tot == 0 && ns_tot == 0) return; // XXX Elie Saikali : zone vide creer, rien a faire de plus ... (cas FILE_PER_COMM_GROUP !!!)
+
+          /* Construct the sections to host connectivity later */
+          cgsize_t start = 1, end = ne_tot;
+          assert(start <= end);
+
+          if (cgns_type_elem == CGNS_ENUMV(NGON_n)) // cas polyedre
+            throw std::runtime_error("Ecrire_CGNS::cgns_write_domaine_deformable_seq => You should not be here !!! ");
+          else
+            {
+              if (cgp_section_write(fileId_, baseId_[ind], zoneId_[ind], "Elem", cgns_type_elem, start, end, 0, &sectionId) != CG_OK)
+                Cerr << "Error Ecrire_CGNS::cgns_write_domaine_par_in_zone : cgp_section_write !" << finl, TRUST_CGNS_ERROR();
+            }
+        }
+      else
+        {
+          if (ne_tot == 0 && ns_tot == 0) return; // XXX Elie Saikali : zone vide creer, rien a faire de plus ... (cas FILE_PER_COMM_GROUP !!!)
+        }
 
       if (nb_elem > 0) // seulement si le proc a qlq chose a ecrire
         {
@@ -688,24 +714,44 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
           cgsize_t min = incr_min_som[proc_me], max = incr_max_som[proc_me];
           assert (min < max);
 
+          /* Write grid coordinates */
           cgns_helper_.cgns_write_grid_coord_data<TYPE_ECRITURE_CGNS::PAR_IN>(icelldim, fileId_, baseId_[ind], zoneId_[ind],
                                                                               coordsIdx, coordsIdy, coordsIdz, min, max, xCoords, yCoords, zCoords);
 
-          /* Set element connectivity */
-          std::string linkfile = (enter_group_comm ? Nom(baseFile_name_).nom_me(proc_maitre_local_comm_).getString() : baseFile_name_) +
-                                 ".solution." + cgns_helper_.convert_double_to_string(time_post_[0]) + ".cgns";
-
-          TRUST_2_CGNS::remove_slash_linkfile(linkfile);
-
-          if (cg_goto(fileId_, baseId_[ind], "Zone_t", zoneId_[ind], "end") != CG_OK)
-            Cerr << "Error Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone : cg_goto Zone_t !" << finl, TRUST_CGNS_ERROR();
-
-          for (auto &itr_conn : connectname_[ind])
+          if (is_lagrangian_)
             {
-              const std::string linkpath = "/" + baseZone_name_[ind] + "/" + baseZone_name_[ind] + "/" + itr_conn + "/";
+              assert(cgns_type_elem != CGNS_ENUMV(NGON_n));
 
-              if (cg_link_write(itr_conn.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
-                Cerr << "Error Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone : cg_link_write connectivity !" << finl, TRUST_CGNS_ERROR();
+              std::vector<cgsize_t> elems;
+              TRUST2CGNS.convert_connectivity(cgns_type_elem, elems);
+
+              const std::vector<int>& incr_max_elem = TRUST2CGNS.get_global_incr_max_elem(),
+                                      &incr_min_elem = TRUST2CGNS.get_global_incr_min_elem();
+
+              min = incr_min_elem[proc_me], max = incr_max_elem[proc_me];
+              assert (min <= max);
+
+              if (cgp_elements_write_data(fileId_, baseId_[ind], zoneId_[ind], sectionId, min, max, elems.data()) != CG_OK)
+                Cerr << "Error Ecrire_CGNS::cgns_write_domaine_par_in_zone : cgp_elements_write_data !" << finl, TRUST_CGNS_ERROR();
+            }
+          else
+            {
+              /* Set element connectivity */
+              std::string linkfile = (enter_group_comm ? Nom(baseFile_name_).nom_me(proc_maitre_local_comm_).getString() : baseFile_name_) +
+                                     ".solution." + cgns_helper_.convert_double_to_string(time_post_[0]) + ".cgns";
+
+              TRUST_2_CGNS::remove_slash_linkfile(linkfile);
+
+              if (cg_goto(fileId_, baseId_[ind], "Zone_t", zoneId_[ind], "end") != CG_OK)
+                Cerr << "Error Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone : cg_goto Zone_t !" << finl, TRUST_CGNS_ERROR();
+
+              for (auto &itr_conn : connectname_[ind])
+                {
+                  const std::string linkpath = "/" + baseZone_name_[ind] + "/" + baseZone_name_[ind] + "/" + itr_conn + "/";
+
+                  if (cg_link_write(itr_conn.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
+                    Cerr << "Error Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone : cg_link_write connectivity !" << finl, TRUST_CGNS_ERROR();
+                }
             }
         }
     }
