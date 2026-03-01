@@ -87,13 +87,12 @@ inline void Ecrire_CGNS_helper::cgns_close_file(const std::string& fn, const int
 template<TYPE_ECRITURE_CGNS _TYPE_>
 inline void Ecrire_CGNS_helper::cgns_write_zone_grid_coord(const int icelldim, const int fileId, const int baseId, const char *zonename, const cgsize_t *isize, int& zoneId,
                                                            const std::vector<double>& xCoords, const std::vector<double>& yCoords, const std::vector<double>& zCoords,
-                                                           int& coordsIdx, int& coordsIdy, int& coordsIdz, bool with_zone)
+                                                           int& coordsIdx, int& coordsIdy, int& coordsIdz)
 {
   constexpr bool is_SEQ = (_TYPE_ == TYPE_ECRITURE_CGNS::SEQ);
 
-  if (with_zone)
-    if (cg_zone_write(fileId, baseId, zonename, isize, CGNS_ENUMV(Unstructured), &zoneId) != CG_OK)
-      Cerr << "Error Ecrire_CGNS_helper::cgns_write_zone_grid_coord : cg_zone_write !" << finl, TRUST_CGNS_ERROR();
+  if (cg_zone_write(fileId, baseId, zonename, isize, CGNS_ENUMV(Unstructured), &zoneId) != CG_OK)
+    Cerr << "Error Ecrire_CGNS_helper::cgns_write_zone_grid_coord : cg_zone_write !" << finl, TRUST_CGNS_ERROR();
 
   if (is_SEQ)
     {
