@@ -760,13 +760,13 @@ void Ecrire_CGNS::cgns_write_domaine_par_over_zone(const Domaine * domaine,const
       zonename.resize(CGNS_STR_SIZE, ' ');
 
       coordsIdx.push_back(-123), coordsIdy.push_back(-123);
-      if (icelldim > 2)
+      if (Objet_U::dimension > 2)
         coordsIdz.push_back(-123);
 
       /* 5.1 : Create zone & Construct the grid coordinates nodes */
       cgns_helper_.cgns_write_zone_grid_coord<TYPE_ECRITURE_CGNS::PAR_OVER>(icelldim, fileId_, baseId_.back(), zonename.c_str(), isize,
                                                                             zoneId_.back(), xCoords, yCoords, zCoords,
-                                                                            coordsIdx.back(), coordsIdy.back(), coordsIdz.empty() ? coordsIdy.back() /* inutile */ : coordsIdz.back());
+                                                                            coordsIdx.back(), coordsIdy.back(), coordsIdz.back());
 
       /* 5.2 : Construct the sections to host connectivity later */
       sectionId.push_back(-123);
