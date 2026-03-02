@@ -599,10 +599,16 @@ class TRUSTCase(object):
         ok = True
         path = os.getcwd()
         os.chdir(self._fullDir())
-        opt = os.environ.get("JUPYTER_RUN_OPTIONS", "")
         self.dataFileName_ = "PAR_"+self.name_
+
+        # when getting list of test cases, no need for partition. But we need to get inside this partition()
+        # method to have the correct dataset name (see above). so only skip from here
+        if isExtractingNR_ListOnly():
+            return
+        opt = os.environ.get("JUPYTER_RUN_OPTIONS", "")
         if "-not_run" in opt:
             return
+
         if self.nbProcs_ == 1:
             err_msg = "Not allowed to call case.partition() on case = addCase(%s,..., nbProcs=1) \n" % (self.name_)
             err_msg += "You cannot run parallel computation on 1 proc!"
