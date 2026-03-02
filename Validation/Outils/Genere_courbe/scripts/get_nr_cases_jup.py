@@ -1,5 +1,6 @@
 import sys
 import os
+import argparse
 
 def usage():
    print("Extract list of test cases used in a Jupyter Notebook.")
@@ -9,11 +10,11 @@ def usage():
    print("")
    print("No input notebook specified!")
 
-def extract_cases(book):
+def extract_cases(args):
    import json
    import re
 
-   with open(book, "r", encoding='utf-8') as f:
+   with open(args.notebook, "r", encoding='utf-8') as f:
      root = json.loads(f.read())
      # Now parse tree to retrieve all Python up to the invocation of "runCases()":
      cells = root.get("cells", [])
@@ -25,7 +26,7 @@ def extract_cases(book):
      # because copie_cas_test will also use this, but needs to run cases that are lauched before run.runCases
      # we use os.environ to pass this message to the same script who later uses os.environ.get, which may seem absurd
      # but this is necessary as the script may also be executed from the jupyter notebook, and we need to use a method that provides a default
-     if os.environ.get("IS_EXTRACTING_NR_LIST_ONLY") == '1':
+     if args.listonly:
        s+="os.environ['IS_EXTRACTING_NR_LIST_ONLY'] = '1'\n"
      else:
        s+="os.environ['IS_EXTRACTING_NR_LIST_ONLY'] = '0'\n"
@@ -57,8 +58,11 @@ def extract_cases(book):
    exec(s, globals())
 
 if __name__ == "__main__":
-   if len(sys.argv) != 2:
-     usage()
-     sys.exit(-1)
-   extract_cases(sys.argv[1])
+
+   parser=argparse.ArgumentParser(prog="get_nr_cases_jup")
+   parser.add_argument("notebook", help="Path to the notebook") 
+   parser.add_argument("-l", "--listonly", action='store_true', help="Indicate if we only want the list of nr cases. In that case, an env variable will be set to indicate to trustutils that we only want the list.") 
+   args = parser.parse_args()
+
+   extract_cases(args)
 

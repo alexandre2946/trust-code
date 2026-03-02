@@ -28,16 +28,27 @@ else
     PYTHONPATH=$src_dir:$PYTHONPATH
     # Make sure the pipe fails when invoking get_nr_cases_jup.py if the script itself fails: 
 
+
+    get_nr_opts=""
+    if [ "$IS_EXTRACTING_NR_LIST_ONLY" = 1 ]
+    then
+        get_nr_opts="--listonly"
+    fi
+
+    cmd="python $DIR/get_nr_cases_jup.py $get_nr_opts $ze_file"
+
+    # echo "nb cas: get_nr_opts: $get_nr_opts" >> $TRUST_ROOT/log
+    
     if [ "$DEBUG_NR_CASES" = "1" ]
     then
        TMP_BUILD=`echo $* | $TRUST_Awk '/-dest/ {print $NF}'`
-       echo "calling:" >> $TMP_BUILD/log
-       echo "env JUPYTER_RUN_OPTIONS=\"$*\" python $DIR/get_nr_cases_jup.py $ze_file" >> $TMP_BUILD/log
-       env JUPYTER_RUN_OPTIONS="$*" python $DIR/get_nr_cases_jup.py $ze_file 1>>$TMP_BUILD/log 2>&1
+       echo "calling: $cmd" >> $TMP_BUILD/log
+       echo "with env: JUPYTER_RUN_OPTIONS=\"$*\"" >> $TMP_BUILD/log
+       env JUPYTER_RUN_OPTIONS="$*" $cmd 1>>$TMP_BUILD/log 2>&1
        echo "" >> $TMP_BUILD/log
     fi
 
-    env JUPYTER_RUN_OPTIONS="$*" python $DIR/get_nr_cases_jup.py $ze_file 2>/dev/null | grep "@@@CAS_NR_JY@@@" | wc -l
+    env JUPYTER_RUN_OPTIONS="$*" $cmd 2>/dev/null | grep "@@@CAS_NR_JY@@@" | wc -l
 
     if [ "${PIPESTATUS[0]}" != "0" ]; then
         # An error happened while running the Python
