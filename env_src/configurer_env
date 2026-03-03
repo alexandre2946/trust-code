@@ -2470,7 +2470,7 @@ fi
 suffixes=`echo $TRUST_ARCH_CC"_opt" $TRUST_ARCH_CC`
 for suffixe in $suffixes
 do
-   OPT_FLAG="" && [ "$AVX_SUPPORTED" = 1 ] && [ ${suffixe%_opt} != $suffixe ] && OPT_FLAG=$AVX_FLAG
+   OPT_FLAG="" && [ "$AVX_SUPPORTED" = 1 ] && OPT_FLAG=$AVX_FLAG
    tmp=`mktemp_`
    echo "Defines = $Defines
 SYSINC = $SYSINC
