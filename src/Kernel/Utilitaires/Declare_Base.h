@@ -37,27 +37,6 @@
   protected :                                                                \
   Sortie& printOn(Sortie& x) const override
 
-#define Declare_base_sans_constructeur_ni_destructeur(_TYPE_)  \
-  Declare_base_sans_constructeur_ni_destructeur_ni_readon(_TYPE_);   \
-  Entree& readOn(Entree&) override
-
-#define Declare_base_sans_constructeur(_TYPE_)  \
-  public :                                                                \
-  ~_TYPE_();                                                    \
-  Declare_base_sans_constructeur_ni_destructeur(_TYPE_)
-
-#define Declare_base(_TYPE_)                                \
-  public:                                                \
-  _TYPE_();                                                \
-  ~_TYPE_();                                                \
-  Declare_base_sans_constructeur_ni_destructeur(_TYPE_)
-
-#define Declare_base_sans_readon(_TYPE_)                                \
-  public:                                                \
-  _TYPE_();                                                \
-  ~_TYPE_() override;                                                \
-  Declare_base_sans_constructeur_ni_destructeur_ni_readon(_TYPE_)
-
 #define Implemente_base_sans_constructeur_ni_destructeur(_TYPE_,_NOM_,_BASE_)
 
 #else
@@ -75,8 +54,33 @@
   protected :                                                        \
   Sortie& printOn(Sortie& x) const override
 
+
+#define Implemente_base_sans_constructeur_ni_destructeur(_TYPE_,_NOM_,_BASE_) \
+                                                                        \
+  const Type_info* name2(_TYPE_,bases)[1]={                                \
+    &(_BASE_::info_obj)};                                                \
+  const Type_info _TYPE_::info_obj(_NOM_, 1, name2(_TYPE_,bases));        \
+                                                                        \
+  _TYPE_& _TYPE_::self_cast( Objet_U& r)   {                                \
+    return ref_cast_non_const(_TYPE_,r); /* _non_const important sinon recursion dans ref_cast */ \
+  }                                                                        \
+  const _TYPE_& _TYPE_::self_cast(const Objet_U& r)   {                        \
+    return ref_cast_non_const(_TYPE_,r); /* _non_const important sinon recursion dans ref_cast */ \
+  }                                                                        \
+  const Type_info*  _TYPE_::get_info() const {                                \
+    return &info_obj;                                                        \
+  }                                                                        \
+  const Type_info*  _TYPE_::info() {                                        \
+    return &info_obj;                                                        \
+  }                                                                          \
+  class __dummy__
+#endif
+
+/////////////////////////////////////////
+/////// Those are shared with LATATOOLS
+/////////////////////////////////////////
+
 #define Declare_base_sans_constructeur_ni_destructeur(_TYPE_)        \
-                                                                \
   Declare_base_sans_constructeur_ni_destructeur_ni_readon(_TYPE_);   \
   Entree& readOn(Entree&) override
 
@@ -102,26 +106,10 @@
   ~_TYPE_() override;                                                \
   Declare_base_sans_constructeur_ni_destructeur_ni_readon(_TYPE_)
 
-#define Implemente_base_sans_constructeur_ni_destructeur(_TYPE_,_NOM_,_BASE_) \
-                                                                        \
-  const Type_info* name2(_TYPE_,bases)[1]={                                \
-    &(_BASE_::info_obj)};                                                \
-  const Type_info _TYPE_::info_obj(_NOM_, 1, name2(_TYPE_,bases));        \
-                                                                        \
-  _TYPE_& _TYPE_::self_cast( Objet_U& r)   {                                \
-    return ref_cast_non_const(_TYPE_,r); /* _non_const important sinon recursion dans ref_cast */ \
-  }                                                                        \
-  const _TYPE_& _TYPE_::self_cast(const Objet_U& r)   {                        \
-    return ref_cast_non_const(_TYPE_,r); /* _non_const important sinon recursion dans ref_cast */ \
-  }                                                                        \
-  const Type_info*  _TYPE_::get_info() const {                                \
-    return &info_obj;                                                        \
-  }                                                                        \
-  const Type_info*  _TYPE_::info() {                                        \
-    return &info_obj;                                                        \
-  }                                                                          \
-  class __dummy__
-#endif
+#define Declare_base_with_param(_TYPE_)                                \
+  Declare_base_sans_readon(_TYPE_); \
+  protected: \
+  void set_param(Param&) const override
 
 #define Implemente_base_sans_constructeur(_TYPE_,_NOM_,_BASE_)                \
   _TYPE_::~_TYPE_() { }                                                        \
@@ -147,6 +135,7 @@
 #define Declare_base_sans_destructeur_32_64(_TYPE_) Declare_base_sans_destructeur(_TYPE_)
 #define Declare_base_32_64(_TYPE_) Declare_base(_TYPE_)
 #define Declare_base_sans_readon_32_64(_TYPE_) Declare_base_sans_readon(_TYPE_)
+#define Declare_base_with_param_32_64(_TYPE_) Declare_base_with_param(_TYPE_)
 
 // Helper macro for info_obj static variable definition:
 #if INT_is_64_ == 2

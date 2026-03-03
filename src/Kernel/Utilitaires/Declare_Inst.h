@@ -37,10 +37,6 @@
   protected :                                                                \
   Sortie& printOn(Sortie& x) const override
 
-#define Declare_instanciable_sans_constructeur_ni_destructeur(_TYPE_)      \
-  Declare_instanciable_sans_constructeur_ni_destructeur_ni_readon(_TYPE_); \
-  Entree& readOn(Entree&) override
-
 #else
 
 #define Declare_instanciable_sans_constructeur_ni_destructeur_ni_readon(_TYPE_)        \
@@ -57,11 +53,15 @@
   protected :                                                                \
   Sortie& printOn(Sortie& x) const override
 
+#endif
+
+/////////////////////////////////////////
+/////// Those are shared with LATATOOLS
+/////////////////////////////////////////
+
 #define Declare_instanciable_sans_constructeur_ni_destructeur(_TYPE_)      \
   Declare_instanciable_sans_constructeur_ni_destructeur_ni_readon(_TYPE_); \
   Entree& readOn(Entree&) override
-
-#endif
 
 #define Declare_instanciable_sans_constructeur(_TYPE_)                \
   public:                                                        \
@@ -85,6 +85,11 @@
   ~_TYPE_();                                                        \
   Declare_instanciable_sans_constructeur_ni_destructeur_ni_readon(_TYPE_) \
  
+#define Declare_instanciable_with_param(_TYPE_)                                \
+  Declare_instanciable_sans_readon(_TYPE_); \
+  protected: \
+  void set_param(Param&) const override
+
 #ifdef LATATOOLS
 #define Implemente_instanciable_sans_constructeur_ni_destructeur(_TYPE_,_NOM_,_BASE_)
 
@@ -154,6 +159,7 @@
 #define Declare_instanciable_sans_destructeur_32_64(_TYPE_) Declare_instanciable_sans_destructeur(_TYPE_)
 #define Declare_instanciable_32_64(_TYPE_) Declare_instanciable(_TYPE_)
 #define Declare_instanciable_sans_readon_32_64(_TYPE_) Declare_instanciable_sans_readon(_TYPE_)
+#define Declare_instanciable_with_param_32_64(_TYPE_) Declare_instanciable_with_param(_TYPE_)
 
 // Helper macro for info_obj static variable definition:
 #if INT_is_64_ == 2
