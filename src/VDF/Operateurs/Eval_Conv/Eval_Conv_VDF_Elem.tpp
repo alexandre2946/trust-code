@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -55,7 +55,15 @@ inline void Eval_Conv_VDF_Elem<DERIVED_T>::flux_face(const DoubleTab& inco, cons
       if (DERIVED_T::IS_CENTRE || DERIVED_T::IS_CENTRE4)
         qcentre_ < Type_Double > (psc, i, j, i_0, j_1, face, inco, flux); // on applique le schema centre 2 ou 4
       else
-        quick_fram_(psc, i, j, i_0, j_1, face, inco, flux); // on applique le schema Quick
+        {
+          Type_Double psc_multi(ncomp);
+          for (int k = 0; k < ncomp; k++)
+            {
+              const int ind = (tab_vitesse().line_size() == ncomp) ? k : 0;
+              psc_multi[k] = dt_vitesse(face, ind) * surface_porosite(face);
+            }
+          quick_fram_(psc_multi, i, j, i_0, j_1, face, inco, flux); // on applique le schema Quick
+        }
 
       for (int k = 0; k < ncomp; k++) flux[k] *= -1;
     }
@@ -101,13 +109,15 @@ inline void Eval_Conv_VDF_Elem<DERIVED_T>::flux_faces_interne(const DoubleTab& i
            * Pierre L. 14/10/04: Correction car le centre explose sur le cas VALIDA On revient au quick en essayant d'ameliorer: on prend le quick si psc est
            * encore favorable pour avoir les 3 points necessaires au calcul du quick. Cela est deja ce qui est fait pour le quick-sharp de l'evaluateur aux faces.
            * *****************************************************************************************************************************************************/
-          if ( (i_0 == -1 && psc >= 0 ) || (j_1 == -1 && psc <= 0 ) )
-            for (int k=0; k<ncomp; k++) flux[k] = (psc > 0) ? -psc*inco(i,k) : -psc*inco(j,k);
-          else // on applique le schema Quick
+
+          Type_Double psc_multi(ncomp);
+          for (int k = 0; k < ncomp; k++)
             {
-              quick_fram_(psc,i,j,i_0,j_1,face,inco,flux);
-              for (int k=0; k<ncomp; k++) flux[k] *= -1;
+              const int ind = (tab_vitesse().line_size() == ncomp) ? k : 0;
+              psc_multi[k] = dt_vitesse(face, ind) * surface_porosite(face);
             }
+          quick_fram_(psc_multi,i,j,i_0,j_1,face,inco,flux);
+          for (int k=0; k<ncomp; k++) flux[k] *= -1;
         }
     }
   else

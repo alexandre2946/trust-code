@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -32,5 +32,5 @@ Op_Conv_Centre4_VDF_Elem::Op_Conv_Centre4_VDF_Elem() : Op_Conv_VDF_base(Iterateu
 
 Implemente_instanciable_sans_constructeur(Op_Conv_Quick_VDF_Elem,"Op_Conv_Quick_VDF_P0_VDF",Op_Conv_VDF_base);
 Sortie& Op_Conv_Quick_VDF_Elem::printOn(Sortie& s ) const { return s << que_suis_je() ; }
-Entree& Op_Conv_Quick_VDF_Elem::readOn(Entree& s ) { return s ; }
+Entree& Op_Conv_Quick_VDF_Elem::readOn(Entree& s ) { return Op_Conv_VDF_base::readOn(s) ; }
 Op_Conv_Quick_VDF_Elem::Op_Conv_Quick_VDF_Elem() : Op_Conv_VDF_base(Iterateur_VDF_Elem<Eval_Quick_VDF_Elem>()) { }

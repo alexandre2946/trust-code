@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -40,7 +40,7 @@ public:
   void qcentre(const double, const int, const int, const int, const int, const int, const DoubleTab&, Type_Double& ) const { return dont_call<void>(__func__); }
 
   template <typename Type_Double>
-  void quick_fram(const double, const int, const int, const int, const int, const int, const DoubleTab&, Type_Double& ) const { return dont_call<void>(__func__); }
+  void quick_fram(const Type_Double&, const int, const int, const int, const int, const int, const DoubleTab&, Type_Double& ) const { return dont_call<void>(__func__); }
 
 protected:
   int face_amont_conj_axi_impl(int ,int ,int ,int , const IntTab& , const IntTab& , const IntVect&) const;
@@ -57,7 +57,7 @@ protected:
   void qcentre4_impl(const int,const double,const double,const double,const double,const int,const int,const int,const int,const int,const DoubleTab&,Type_Double&) const;
 
   template <typename Type_Double>
-  void quick_fram_impl(const int,const double,const double,const double,const double,const double,const double,const int,const int,const int,const int,const int,const DoubleTab&,Type_Double&) const;
+  void quick_fram_impl(const int,const double,const double,const double,const double,const double,const Type_Double&,const int,const int,const int,const int,const int,const DoubleTab&,Type_Double&) const;
 
 private:
   template <typename type>
@@ -137,7 +137,7 @@ void Eval_Conv_VDF_tools::qcentre4_impl(const int ori,const double dx, const dou
 }
 
 template <typename Type_Double>
-void Eval_Conv_VDF_tools::quick_fram_impl(const int ori,const double dx, const double dm0, const double dxam0, const double dm1, const double dxam1, const double psc,
+void Eval_Conv_VDF_tools::quick_fram_impl(const int ori,const double dx, const double dm0, const double dxam0, const double dm1, const double dxam1, const Type_Double& psc,
                                           const int num0, const int num1, const int num0_0, const int num1_1, const int face, const DoubleTab& transporte,Type_Double& flux) const
 {
   const int ncomp = flux.size_array();
@@ -145,27 +145,32 @@ void Eval_Conv_VDF_tools::quick_fram_impl(const int ori,const double dx, const d
 
   for (int k=0; k<ncomp; k++)
     {
-      T0 = transporte(num0,k);
-      T0_0 = (num0_0!=-1?transporte(num0_0,k):0);
-      T1 = transporte(num1,k);
-      T1_1 = (num1_1!=-1?transporte(num1_1,k):0);
-
-      if (psc > 0)
+      if ( (num0_0 == -1 && psc[k] >= 0 ) || (num1_1 == -1 && psc[k] <= 0 ) )
         {
-          assert(num0_0!=-1);
-          trans_amont = T0;
-          curv = ( (T1 - T0)/dx - (T0 - T0_0)/dxam0 )/dm0 ;
+          flux[k] = (psc[k] > 0) ? psc[k]*transporte(num0,k) : psc[k]*transporte(num1,k);
         }
       else
         {
-          assert(num1_1!=-1);
-          trans_amont = T1;
-          curv = ( (T1_1 - T1)/dxam1 - (T1 - T0)/dx )/dm1;
+          T0 = transporte(num0,k);
+          T0_0 = (num0_0!=-1?transporte(num0_0,k):0);
+          T1 = transporte(num1,k);
+          T1_1 = (num1_1!=-1?transporte(num1_1,k):0);
+
+          if (psc[k] > 0)
+            {
+              trans_amont = T0;
+              curv = ( (T1 - T0)/dx - (T0 - T0_0)/dxam0 )/dm0 ;
+            }
+          else
+            {
+              trans_amont = T1;
+              curv = ( (T1_1 - T1)/dxam1 - (T1 - T0)/dx )/dm1;
+            }
+          flux[k] = 0.5*(T0+T1) - 0.125*(dx*dx)*curv;
+          // On applique le filtre Fram:
+          fr = ( num0_0 != -1 && num1_1 != -1 ) ? Fram(T0_0,T0,T1,T1_1) : 1.;
+          flux[k] = ((1.-fr)*flux[k] + fr*trans_amont)*psc[k];
         }
-      flux[k] = 0.5*(T0+T1) - 0.125*(dx*dx)*curv;
-      // On applique le filtre Fram:
-      fr = ( num0_0 != -1 && num1_1 != -1 ) ? Fram(T0_0,T0,T1,T1_1) : 1.;
-      flux[k] = ((1.-fr)*flux[k] + fr*trans_amont)*psc;
     }
 }
 

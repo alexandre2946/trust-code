@@ -1,0 +1,186 @@
+dimension 2
+Domaine dom
+
+# BEGIN MESH #
+Mailler dom
+{
+	Pave gauche
+	{
+		Origine 0.0 0.0
+		Nombre_de_Noeuds $nx $ny
+		Longueurs 2.0 0.1
+		facteurs 1.0 1.0
+	}
+	{
+	Bord gauche	X = 0.0          0.0 <= Y <= 0.1
+	Bord droite     X = 2.0          0.0 <= Y <= 0.1
+	Bord haut	Y = 0.1		 0.0 <= X <= 2.0
+	Bord bas	Y = 0.0		 0.0 <= X <= 2.0
+	} 	
+}
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+        /* Choose Nb_parts so to have ~ 25000 cells per processor */
+        Partition_tool metis { nb_parts 4 }
+        Larg_joint 2
+        zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+$schema
+
+Schema_euler_implicite sch
+Read sch
+{
+        # Time step #
+          # Initial time [s] #
+	tinit .0
+          # Min time step #
+	dt_min 1.e-9
+          # Max time step #
+	dt_max 5.e-1  # dt_min=dt_max so dt imposed #
+
+        dt_start dt_fixe 1.e-8
+
+	# CLF #
+        facsec $facsec
+        facsec_max $facsec
+
+        # Output criteria #
+        # .out files printing period #
+        dt_impr 1.e-6
+        # .sauv files printing period #
+	dt_sauv 100
+        # periode_sauvegarde_securite_en_heures 23 #
+
+        # Stop if one of the following criteria is checked: #
+          # End time [s] #
+	tmax $tmax
+
+	# nb_pas_dt_max 1 #
+	
+        # Convergence threshold (see .dt_ev file) #
+	seuil_statio 1.e-4
+
+    solveur ice
+    {
+        criteres_convergence { alpha 1e-6 } 
+	solveur petsc cli { }
+	iter_min 2
+        seuil_convergence_implicite 1e30
+    }
+}
+
+Pb_Multiphase pb
+Associate pb dom
+Associate pb sch
+Discretize pb dis
+
+Read pb
+{
+
+	Milieu_Composite
+	{
+		fluide1 StiffenedGas { gamma 1.4 pinf 0.0 cv 717.1 mu 1e-6 }
+		fluide2 StiffenedGas { gamma 1.4 pinf 0.0 cv 717.1 mu 1e-6 }	
+	}
+
+	QDM_Multiphase
+	{	
+		evanescence { homogene { alpha_res 1e-5 alpha_res_min 5e-6 } }
+		solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg }
+		convection { amont }
+		diffusion  { negligeable }
+		initial_conditions
+		{
+			vitesse  Champ_Fonc_xyz dom 4 1.0 1.0 0.0 0.0
+			pression Champ_Uniforme 1 1.e5
+		}
+		boundary_conditions
+		{
+			droite    frontiere_ouverte_pression_imposee Champ_Front_Fonc_xyz 1 1.e5
+			haut symetrie
+			bas symetrie
+			gauche   frontiere_ouverte_vitesse_imposee champ_front_uniforme 4 1.0 1.0 0.0 0.0
+		}
+	}
+
+	Masse_Multiphase
+	{
+		initial_conditions
+		{
+	        alpha Champ_Fonc_xyz dom 2
+		0.9999*(x]0.0)*(x<0.1)+(1.0-(0.0001+0.5*(1-0.0001-0.1)*(1.0+cos(pi*(x-0.35)/(0.25)))))*(x]0.1)*(x[0.6)+0.9999*(x>0.6)*(x<0.7)+0.0001*(x]0.7)*(x[0.9)+0.9999*(x>0.9)*(x[2.0)
+		0.0001*(x]0.0)*(x<0.1)+(0.0001+0.5*(1-0.0001-0.1)*(1.0+cos(pi*(x-0.35)/(0.25))))*(x]0.1)*(x[0.6)+0.0001*(x>0.6)*(x<0.7)+0.9999*(x]0.7)*(x[0.9)+0.0001*(x>0.9)*(x[2.0)
+		}
+		convection { $convection }
+		boundary_conditions
+		{
+			droite frontiere_ouverte a_ext Champ_Front_Fonc_xyz 2 0.9999 0.0001
+			gauche frontiere_ouverte a_ext Champ_Front_Fonc_xyz 2 0.9999 0.0001
+			haut paroi
+			bas paroi
+		}
+	}
+
+	Energie_Multiphase
+	{
+		diffusion { negligeable }
+		convection { $convection }
+		initial_conditions { temperature Champ_fonc_xyz dom 2 0 0 }
+		boundary_conditions
+		{
+			droite frontiere_ouverte_temperature_imposee champ_front_uniforme 2 0 0
+			gauche frontiere_ouverte_temperature_imposee champ_front_uniforme 2 0 0
+			haut paroi_adiabatique
+			bas paroi_adiabatique
+		}
+	}
+
+	Post_processing
+	{
+
+		Definition_champs
+        	{
+            	alpha_analytique Transformation {
+                methode formule expression 1 0.0001*(x<1.1)+(0.0001+0.5*(1.0-0.0001-0.1)*(1.0+cos(pi*(x-0.35)/(0.25))))*(x]1.1)*(x[1.6)+0.0001*(x>1.6)*(x<1.7)+0.9999*(x]1.7)*(x[1.9)+0.0001*(x>1.9)*(x[2.0)
+                localisation elem
+		}
+        	}
+		
+		probes
+		{
+			alpha  alpha_analytique periode 0.01 segment $nx 0.0 0.05 2.0 0.05
+			alpha1 alpha_fluide1 periode 0.01 segment $nx 0.0 0.05 2.0 0.05
+			alpha2 alpha_fluide2 periode 0.01 segment $nx 0.0 0.05 2.0 0.05
+			vitesse1 grav vitesse_fluide1 periode 0.01 segment $nx 0.0 0.05 2.0 0.05
+			vitesse2 grav vitesse_fluide2 periode 0.01 segment $nx 0.0 0.05 2.0 0.05
+			pres pression periode 0.01 segment $nx 0.0 0.05 2.0 0.05
+		}
+
+        Format lata 
+        fields dt_post 0.05
+        {
+            vitesse_fluide1 elem
+	    vitesse_fluide2 elem
+            alpha_fluide1 elem
+            alpha_fluide2 elem
+            pression elem
+            temperature elem
+            masse_volumique elem
+            energie_interne elem
+        }
+
+
+	}
+}
+Solve pb
+End

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -100,11 +100,11 @@ public:
   inline int amont_amont(int face, int i) const override { return le_dom->amont_amont(face, i); }
   inline double dim_elem(int n1, int k) const override { return le_dom->dim_elem(n1,k); }
   inline double dist_elem(int n1, int n2, int k) const override { return le_dom->dist_elem_period(n1,n2,k); }
-  template <typename Type_Double> inline void quick_fram(const double, const int, const int,const int, const int ,const int ,const DoubleTab&, Type_Double& ) const;
+  template <typename Type_Double> inline void quick_fram(const Type_Double&, const int, const int,const int, const int ,const int ,const DoubleTab&, Type_Double& ) const;
 };
 
 template <typename Type_Double>
-inline void Eval_Quick_VDF_Elem::quick_fram(const double psc, const int num0, const int num1,const int num0_0, const int num1_1, const int face,const DoubleTab& transporte, Type_Double& flux) const
+inline void Eval_Quick_VDF_Elem::quick_fram(const Type_Double& psc, const int num0, const int num1,const int num0_0, const int num1_1, const int face,const DoubleTab& transporte, Type_Double& flux) const
 {
   const int ori = orientation(face);
   const double dx = dist_elem(num0, num1, ori),

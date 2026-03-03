@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -83,7 +83,7 @@ private:
   inline const DoubleTab& tab_vitesse() const { return static_cast<const DERIVED_T *>(this)->get_tab_vitesse(); }
   inline double surface_porosite(const int face) const { return static_cast<const DERIVED_T *>(this)->get_surface_porosite(face); }
 
-  template <typename Type_Double> inline void quick_fram_(const double psc, const int num0, const int num1, const int num0_0, const int num1_1, const int face, const DoubleTab& transporte, Type_Double& flux) const
+  template <typename Type_Double> inline void quick_fram_(const Type_Double& psc, const int num0, const int num1, const int num0_0, const int num1_1, const int face, const DoubleTab& transporte, Type_Double& flux) const
   { static_cast<const DERIVED_T *>(this)->template quick_fram<Type_Double>(psc, num0, num1, num0_0, num1_1, face, transporte, flux); }
 
   template <typename Type_Double> inline void qcentre_(const double psc, const int num0, const int num1, const int num0_0, const int num1_1, const int face, const DoubleTab& transporte, Type_Double& flux) const

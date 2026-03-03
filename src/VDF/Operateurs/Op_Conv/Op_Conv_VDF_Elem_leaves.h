@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -100,13 +100,14 @@ class Op_Conv_Quick_VDF_Elem : public Op_Conv_VDF_base, public Op_Conv_VDF<Op_Co
   Declare_instanciable_sans_constructeur(Op_Conv_Quick_VDF_Elem);
 public:
   Op_Conv_Quick_VDF_Elem();
+  void check_multiphase_compatibility() const override { }
   void preparer_calcul() override { Op_Conv_VDF_base::associer_champ_convecte_elem(); }
   inline void modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const override { modifier_pour_Cl_elem(matrice,secmem); }
   inline void associer(const Domaine_dis_base& zd, const Domaine_Cl_dis_base& zcd,const Champ_Inc_base& ch) override { associer_impl<Type_Operateur::Op_CONV_ELEM,Eval_Quick_VDF_Elem>(zd,zcd,ch); }
   inline void associer_vitesse(const Champ_base& ch_vit) override { associer_vitesse_impl<Eval_Quick_VDF_Elem>(ch_vit); }
   inline Champ_base& vitesse() override { return vitesse_impl<Eval_Quick_VDF_Elem>(); }
   inline const Champ_base& vitesse() const override { return vitesse_impl<Eval_Quick_VDF_Elem>(); }
-  inline void dimensionner_blocs(matrices_t mats, const tabs_t& semi_impl) const override { dimensionner_blocs_impl<Type_Operateur::Op_CONV_ELEM>(mats); }
+  inline void dimensionner_blocs(matrices_t mats, const tabs_t& semi_impl) const override { Op_Conv_VDF_base::dimensionner_blocs_elem(mats, semi_impl); }
 
 protected:
   inline Op_Conv_Quick_VDF_Elem(const Iterateur_VDF_base& it) : Op_Conv_VDF_base(it) { }
