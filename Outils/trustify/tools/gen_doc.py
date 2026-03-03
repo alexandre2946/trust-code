@@ -34,18 +34,32 @@ class TRUSTDocGenerator:
         self.script_dir = os.path.dirname(os.path.realpath(__file__))
         self.trust_base_cls = None
 
-    def get_top_parent(self, c):
-        """ Get ultimate parent class """
+    def get_parents(self, c):
+        """ Get tow things:
+            - the (direct) parent of the class
+            - and the ultimate parent class, below Objet_U.
+          For example, for Convection_Muscl, the direct parent is Convection_deriv, and the ultimate parent is 'objet_lecture'
+         """
+        first_parent = None
         # Recurse of course
         def get_parent(cls):
+            nonlocal first_parent
             bases = cls.__bases__
             if len(bases) != 1:
+                if first_parent is None:
+                    first_parent = cls
                 return cls
             if bases[0] is self.TRUST_BASE_CLS:
+                if first_parent is None:
+                    first_parent = cls
                 return cls
+            if first_parent is None:
+                first_parent = bases[0]
             return get_parent(bases[0])
 
-        return get_parent(c)
+        ultimate_p = get_parent(c)  # this will fill in first_parent too ...
+
+        return first_parent, ultimate_p
 
     def extract_type_and_desc(self, fld_nfo):
         """ From the pydantic type given in fld_nfo.annotation into a nice output like
@@ -62,7 +76,11 @@ class TRUSTDocGenerator:
             nice_typ = pars_inst.getFormattedType()
         else:
             _, typ, _ = break_type(ann)
-            nice_typ = f":ref:`{typ[0].__name__.lower()}`"
+            t = typ[0].__name__.lower() 
+            if t == 'objet_u':
+                nice_typ = f"objet_u"
+            else:
+                nice_typ = f":ref:`{typ[0].__name__.lower()}`"
         return nice_typ, fld_nfo.description
 
     def process_input_clauses(self, keyw, doc):
@@ -100,7 +118,7 @@ class TRUSTDocGenerator:
             doc = doc.replace(g0, s)
         return doc
 
-    def doc_single(self, c, parent):
+    def doc_single(self, c, direct_parent):
         """ Generate full RST string for a single keyword """
         from trustify.misc_utilities import break_type
         # Main name and synonyms
@@ -112,9 +130,12 @@ class TRUSTDocGenerator:
             syno = c._synonyms[None]
             s += "**Synonyms:** %s\n\n" % ", ".join(syno)
         # # Inheritance (if not parent)
-        # if not c is parent and parent.__name__ != "Objet_u":
-        #     par = ":ref:`%s`" % parent.__name__.lower()
-        #     s += "**Inherits from:** %s \n\n" % par
+        if not c is direct_parent and direct_parent.__name__ not in ["Objet_u", "Objet_lecture"]:
+            # if c.__name__.lower() == "convection_deriv":
+            #     print(c.__name__)
+            #     print(direct_parent.__name__)
+            par = ":ref:`%s`" % direct_parent.__name__.lower()
+            s += "**Inherits from:** %s \n\n" % par
 
         # Core description
         core_doc = self.process_input_clauses(nam, c.__doc__)
@@ -152,18 +173,19 @@ class TRUSTDocGenerator:
 
         # Identify top classes in the module
         all_cls = ClassFactory.GetAllConstrainBasePyd()
-        top_cls = {}
+        top_cls, direct_parent = {}, {}
         # Keep valid classes and find their parent class:
         for c in all_cls:
-            p = self.get_top_parent(c)
-            cn, pn = c.__name__.lower(), p.__name__.lower()
+            first_parent, ultimate_parent = self.get_parents(c)
+            cn, upn = c.__name__.lower(), ultimate_parent.__name__.lower()
             # Classes in self.TYPE_MAP (and their children) should simply be skipped:
-            if pn in self.TYPE_MAP or cn in self.TYPE_MAP:
-                # print("skiping ", pn)
+            if upn in self.TYPE_MAP or cn in self.TYPE_MAP:
+                # print("skiping ", upn)
                 continue
-            top_cls[c] = p
+            top_cls[c] = ultimate_parent
+            direct_parent[c] = first_parent
 
-        # Unique parents, sorted alphabetically
+        # Unique ultimate parents, sorted alphabetically
         prt = list(set(top_cls.values()))
         prt.sort(key=lambda c: c.__name__)
         # Invert dict top_cls:
@@ -172,7 +194,7 @@ class TRUSTDocGenerator:
             inv_top.setdefault(v, []).append(k)
         # Prepare the return value:
         single_s = ""
-        # One MD file per parent:
+        # One MD file per ultimate parent:
         for j, p in enumerate(prt):
             lst = inv_top[p]
             lst.sort(key=lambda c: c.__name__)
@@ -190,7 +212,8 @@ class TRUSTDocGenerator:
                     if p not in lst:
                         s += self.doc_single(p, p)
                         s += "\n\n----\n\n"
-                s += self.doc_single(c, p)
+                dp = direct_parent[c]
+                s += self.doc_single(c, dp)
             fname = os.path.join(out_dir, par + ".rst")
             with open(fname, "w") as f:
                 f.write(s)
