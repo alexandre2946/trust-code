@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -35,7 +35,7 @@ Entree& Source_Forchheimer_VEF_Face::readOn(Entree& is)
   return is;
 }
 
-void Source_Forchheimer_VEF_Face::set_param(Param& param)
+void Source_Forchheimer_VEF_Face::set_param(Param& param) const
 {
   param.ajouter_non_std("modele_K", (this), Param::REQUIRED);
   param.ajouter_non_std("Cf", (this), Param::REQUIRED);

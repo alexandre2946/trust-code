@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -27,7 +27,7 @@ class Solide : public Milieu_base
   Declare_instanciable(Solide);
 public:
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   void verifier_coherence_champs(int& err,Nom& message) override;
   void discretiser(const Probleme_base& pb, const Discretisation_base& dis) override;
 

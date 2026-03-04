@@ -39,7 +39,7 @@ Entree& Milieu_Elasticite::readOn(Entree& is)
   return is;
 }
 
-void Milieu_Elasticite::set_param(Param& param)
+void Milieu_Elasticite::set_param(Param& param) const
 {
   Milieu_base::set_param(param);
   param.ajouter("E", &ch_E_, Param::REQUIRED);

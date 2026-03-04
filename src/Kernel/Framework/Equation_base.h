@@ -269,7 +269,7 @@ protected :
   OBS_PTR(Domaine_dis_base) le_dom_dis;
   OWN_PTR(Domaine_Cl_dis_base) le_dom_Cl_dis;
   OBS_PTR(Probleme_base) mon_probleme;
-  virtual void set_param(Param& titi);
+  virtual void set_param(Param& titi) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   virtual Entree& lire_sources(Entree&);
   virtual Entree& lire_cond_init(Entree&);

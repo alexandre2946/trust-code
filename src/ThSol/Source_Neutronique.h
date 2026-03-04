@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -39,7 +39,7 @@ class Source_Neutronique : public Terme_Puissance_Thermique, public Source_base
   Declare_base(Source_Neutronique);
 
 public:
-  void set_param(Param& param);
+  void set_param(Param& param) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
 
   double rho(double, double);

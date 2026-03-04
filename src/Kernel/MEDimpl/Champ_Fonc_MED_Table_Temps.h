@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -35,7 +35,7 @@ public:
   bool instationnaire() const override;
 
 protected :
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   inline virtual const Champ_Fonc_base& le_champ0() const { return vrai_champ0_.valeur(); }
   inline virtual Champ_Fonc_base& le_champ0() { return vrai_champ0_.valeur(); }

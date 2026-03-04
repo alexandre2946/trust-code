@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -52,7 +52,7 @@ class Partitionneur_Sous_Domaine : public Partitionneur_base
 {
   Declare_instanciable(Partitionneur_Sous_Domaine);
 public:
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   void associer_domaine(const Domaine& dom) override { };
   void construire_partition(IntVect& elem_part, int& nb_parts_tot) const override;
 

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -30,7 +30,7 @@ Sortie& Modele_turbulence_hyd_LES_Smago_VDF::printOn(Sortie& s) const { return s
 
 Entree& Modele_turbulence_hyd_LES_Smago_VDF::readOn(Entree& is) { return Modele_turbulence_hyd_LES_VDF_base::readOn(is); }
 
-void Modele_turbulence_hyd_LES_Smago_VDF::set_param(Param& param)
+void Modele_turbulence_hyd_LES_Smago_VDF::set_param(Param& param) const
 {
   Modele_turbulence_hyd_LES_VDF_base::set_param(param);
   param.ajouter("cs", &cs_); // XD_ADD_P floattant This is an optional keyword and the value is used to set the constant used in the Smagorinsky model (This is currently only valid for Smagorinsky models and it is set to 0.18 by default) .

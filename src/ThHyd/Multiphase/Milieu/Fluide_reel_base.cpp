@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -42,7 +42,7 @@ Entree& Fluide_reel_base::readOn(Entree& is)
   return is;
 }
 
-void Fluide_reel_base::set_param(Param& param)
+void Fluide_reel_base::set_param(Param& param) const
 {
   param.ajouter("T_ref", &T_ref_);
   param.ajouter("P_ref", &P_ref_);

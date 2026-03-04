@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -85,7 +85,7 @@ Entree& Champ_front_recyclage::readOn(Entree& is)
   return is;
 }
 
-void Champ_front_recyclage::set_param(Param& param)
+void Champ_front_recyclage::set_param(Param& param) const
 {
   param.ajouter_non_std("pb_champ_evaluateur",(this),Param::REQUIRED);
   param.ajouter_non_std("distance_plan",(this));

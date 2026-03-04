@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -25,7 +25,7 @@ Sortie& Convection_Diffusion_Temperature_Turbulent::printOn(Sortie& is) const { 
 
 Entree& Convection_Diffusion_Temperature_Turbulent::readOn(Entree& is) { return Convection_Diffusion_Temperature::readOn(is); }
 
-void Convection_Diffusion_Temperature_Turbulent::set_param(Param& param)
+void Convection_Diffusion_Temperature_Turbulent::set_param(Param& param) const
 {
   Convection_Diffusion_Temperature::set_param(param);
   param.ajouter_non_std("modele_turbulence", (this), Param::REQUIRED);

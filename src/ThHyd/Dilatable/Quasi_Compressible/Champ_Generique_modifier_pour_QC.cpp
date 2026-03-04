@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -37,7 +37,7 @@ Entree& Champ_Generique_modifier_pour_QC::readOn(Entree& s )
   return s ;
 }
 
-void Champ_Generique_modifier_pour_QC::set_param(Param& param)
+void Champ_Generique_modifier_pour_QC::set_param(Param& param) const
 {
   Champ_Gen_de_Champs_Gen::set_param(param);
   param.ajouter_flag("division",&diviser_);

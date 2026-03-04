@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -65,7 +65,7 @@ void Sch_CN_iteratif::ajuster_facsec(type_convergence cv)
     }
   facsec_=std::min(facsec_,facsec_max);
 }
-void Sch_CN_iteratif::set_param(Param& param)
+void Sch_CN_iteratif::set_param(Param& param) const
 {
   param.ajouter("seuil",&seuil);  // XD attr seuil floattant seuil 1 criteria for ending iterative process (Max( || u(p) - u(p-1)||/Max || u(p) ||) < seuil) (0.001  by default)
   param.ajouter("niter_min",&niter_min);  // XD attr niter_min entier niter_min 1 minimal number of p-iterations to satisfy convergence criteria (2 by default)

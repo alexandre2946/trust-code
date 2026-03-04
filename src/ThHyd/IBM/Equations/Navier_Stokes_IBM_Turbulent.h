@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -33,7 +33,7 @@ class Navier_Stokes_IBM_Turbulent: public Navier_Stokes_IBM
   Declare_instanciable(Navier_Stokes_IBM_Turbulent);
 
 public:
-  void set_param(Param& titi) override;
+  void set_param(Param& titi) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   inline const Champ_Fonc_base& viscosite_turbulente() const { return le_modele_turbulence->viscosite_turbulente(); }
   inline const Modele_turbulence_hyd_base& modele_turbulence() const { return le_modele_turbulence.valeur(); }

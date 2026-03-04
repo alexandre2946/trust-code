@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -147,7 +147,7 @@ int Multi_Sch_ThHyd::mettre_a_jour()
   sch_scalaires_->mettre_a_jour();
   return 1;
 }
-void Multi_Sch_ThHyd::set_param(Param& param)
+void Multi_Sch_ThHyd::set_param(Param& param) const
 {
   param.ajouter("nb_ss_pas_dt",&nb_ss_pas_dt_);
   param.ajouter("Schema_Temps_NS",&sch_ns_);

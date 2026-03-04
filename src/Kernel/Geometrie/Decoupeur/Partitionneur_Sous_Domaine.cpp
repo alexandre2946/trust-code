@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -56,7 +56,7 @@ Sortie& Partitionneur_Sous_Domaine::printOn(Sortie& os) const
   return os;
 }
 
-void Partitionneur_Sous_Domaine::set_param(Param& param)
+void Partitionneur_Sous_Domaine::set_param(Param& param) const
 {
   param.ajouter("fichier",&filename_,Param::REQUIRED); // XD_ADD_P chaine fichier
   param.ajouter("fichier_ssz",&filename_ssz_); // XD_ADD_P chaine fichier sous zonne

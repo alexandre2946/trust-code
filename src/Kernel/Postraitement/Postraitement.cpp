@@ -433,7 +433,7 @@ static EChaineJDD get_file_content_for_bloc(const Nom& associated_word, Entree& 
   return read_and_broadcast_file(filename);
 }
 
-void Postraitement::set_param(Param& param)
+void Postraitement::set_param(Param& param) const
 {
 // XD postraitement postraitement_base postraitement -1 An object of post-processing (without name).
 // XD attr t_debut_statistiques floattant t_debut_statistiques 1 not_set (for IJK)

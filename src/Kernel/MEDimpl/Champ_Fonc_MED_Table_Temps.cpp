@@ -37,7 +37,7 @@ Implemente_instanciable( Champ_Fonc_MED_Table_Temps, "Champ_Fonc_MED_Table_Temps
 
 Sortie& Champ_Fonc_MED_Table_Temps::printOn(Sortie& os) const { return Champ_Fonc_MED::printOn(os); }
 
-void Champ_Fonc_MED_Table_Temps::set_param(Param& param)
+void Champ_Fonc_MED_Table_Temps::set_param(Param& param) const
 {
   Champ_Fonc_MED::set_param(param);
   param.ajouter_non_std("table_temps",(this));

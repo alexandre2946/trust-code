@@ -68,7 +68,7 @@ Entree& Format_Post_CGNS::readOn(Entree& is)
   return Format_Post_base::readOn(is);
 }
 
-void Format_Post_CGNS::set_param(Param& param)
+void Format_Post_CGNS::set_param(Param& param) const
 {
   verify_if_cgns(__func__);
   param.ajouter("nom_fichier", &cgns_basename_, Param::REQUIRED);

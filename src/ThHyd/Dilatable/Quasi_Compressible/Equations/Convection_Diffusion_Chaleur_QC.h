@@ -33,7 +33,7 @@ class Convection_Diffusion_Chaleur_QC : public Convection_Diffusion_Chaleur_Flui
 
 public :
   Convection_Diffusion_Chaleur_QC();
-  void set_param(Param& titi) override;
+  void set_param(Param& titi) const override;
   void calculer_div_u_ou_div_rhou(DoubleTab& res) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   void mettre_a_jour(double) override;

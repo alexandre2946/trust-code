@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -41,7 +41,7 @@ class Champ_Gen_de_Champs_Gen : public Champ_Generique_base
   Declare_base(Champ_Gen_de_Champs_Gen);
 public:
 
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   void   reset() override;
   std::vector<YAML_data> data_a_sauvegarder() const override;

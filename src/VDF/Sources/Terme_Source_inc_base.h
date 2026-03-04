@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -35,7 +35,7 @@ public:
   void mettre_a_jour(double temps) override { }
 
 protected :
-  void set_param(Param& param);
+  void set_param(Param& param) const override;
   OBS_PTR(Navier_Stokes_std) eq_hydraulique_;
   bool impr = false;
 };

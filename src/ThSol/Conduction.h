@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -42,7 +42,7 @@ class Conduction : public Equation_base
   Declare_instanciable_sans_constructeur(Conduction);
 public:
   Conduction();
-  void set_param(Param&) override;
+  void set_param(Param&) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   void associer_solide(const Solide& );
   void associer_milieu_base(const Milieu_base& ) override;

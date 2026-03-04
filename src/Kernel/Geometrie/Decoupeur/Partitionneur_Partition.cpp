@@ -51,7 +51,7 @@ Sortie& Partitionneur_Partition::printOn(Sortie& os) const
   return os;
 }
 
-void Partitionneur_Partition::set_param(Param& param)
+void Partitionneur_Partition::set_param(Param& param) const
 {
   param.ajouter("domaine",&dom_calcul_,Param::REQUIRED);
 }

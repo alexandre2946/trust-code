@@ -35,7 +35,7 @@ class Schema_Euler_Implicite : public Schema_Implicite_base
 public :
 
   bool initTimeStep(double dt) override;
-  void set_param(Param& ) override;
+  void set_param(Param& ) const override;
   int lire_motcle_non_standard(const Motcle& mot, Entree& is) override;
 
   ////////////////////////////////

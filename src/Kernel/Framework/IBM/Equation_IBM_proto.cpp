@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -25,7 +25,7 @@
 #include <Nom.h>
 #include <Perf_counters.h>
 
-void Equation_IBM_proto::set_param_ibm_proto(Param& param)
+void Equation_IBM_proto::set_param_ibm_proto(Param& param) const
 {
   param.ajouter("correction_variable_initiale",&correction_variable_initiale_,Param::OPTIONAL);
 }

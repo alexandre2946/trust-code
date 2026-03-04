@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -39,7 +39,7 @@ Sortie& Champ_Gen_de_Champs_Gen::printOn(Sortie& os) const
 //  sources_reference : declenche la lecture du nom d un ou plusieurs champs generiques qui doivent etre
 //                       deja definis afin de pouvoir initialiser une reference vers ce champ
 //  nom_source : option pour nommer le champ en tant que source (sinon nommer par defaut)
-void Champ_Gen_de_Champs_Gen::set_param(Param& param)
+void Champ_Gen_de_Champs_Gen::set_param(Param& param) const
 {
   param.ajouter_non_std("source",(this)); // XD attr source champ_generique_base source 1 the source field.
   param.ajouter_non_std("sources",(this)); // XD attr sources listchamp_generique sources 1 sources { Champ_Post.... { ... } Champ_Post.. { ... }}

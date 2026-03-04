@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -24,7 +24,7 @@ class Prepro_IBM_Uzawa :public Prepro_IBM_base
 public:
 
 private:
-  void set_param(Param&);
+  void set_param(Param&) const override;
   void intersect_iterative( );
   int lvl_= 1 ; // choix de la methode d'Uzawa par defaut
 };

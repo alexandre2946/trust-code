@@ -148,7 +148,7 @@ void Schema_Euler_Implicite::lire_facsec_func(Entree& is)
     facsec_func_ = true;
 }
 
-void Schema_Euler_Implicite::set_param(Param& param)
+void Schema_Euler_Implicite::set_param(Param& param) const
 {
   // XD schema_euler_implicite schema_implicite_base schema_euler_implicite -1 This is the Euler implicit scheme.
   param.ajouter("max_iter_implicite",&nb_ite_max);

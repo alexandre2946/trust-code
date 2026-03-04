@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -31,7 +31,7 @@ class Modele_turbulence_hyd_LES_Wale_VDF: public Modele_turbulence_hyd_LES_VDF_b
   Declare_instanciable_sans_constructeur(Modele_turbulence_hyd_LES_Wale_VDF);
 public:
   Modele_turbulence_hyd_LES_Wale_VDF();
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
 
 protected:
   double cw_ = 0.5;

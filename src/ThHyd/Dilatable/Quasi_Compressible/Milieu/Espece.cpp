@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -30,7 +30,7 @@ Entree& Espece::readOn(Entree& is)
   return is;
 }
 
-void Espece::set_param(Param& param)
+void Espece::set_param(Param& param) const
 {
   param.ajouter("mu",&ch_mu_,Param::REQUIRED); // XD_ADD_P field_base Species dynamic viscosity value (kg.m-1.s-1).
   param.ajouter("Cp",&ch_Cp_,Param::REQUIRED); // XD_ADD_P field_base Species specific heat value (J.kg-1.K-1).

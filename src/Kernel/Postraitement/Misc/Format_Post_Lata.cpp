@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -77,7 +77,7 @@ Entree& Format_Post_Lata::readOn(Entree& is)
   return is;
 }
 
-void Format_Post_Lata::set_param(Param& param)
+void Format_Post_Lata::set_param(Param& param) const
 {
   Cerr << "Format_Post_Lata::set_param: Not implemented." << finl;
   Process::exit();

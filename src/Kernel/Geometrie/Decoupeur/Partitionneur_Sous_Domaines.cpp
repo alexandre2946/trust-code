@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -55,7 +55,7 @@ Sortie& Partitionneur_Sous_Domaines::printOn(Sortie& os) const
  *   }
  *
  */
-void Partitionneur_Sous_Domaines::set_param(Param& param)
+void Partitionneur_Sous_Domaines::set_param(Param& param) const
 {
   param.ajouter("sous_zones",&noms_sous_domaines_);  // XD attr sous_zones listchaine sous_zones 1 N SUBZONE_NAME_1 SUBZONE_NAME_2 ...
   param.ajouter("domaines",&noms_domaines_);         // XD attr domaines   listchaine domaines   1 N DOMAIN_NAME_1  DOMAIN_NAME_2  ...

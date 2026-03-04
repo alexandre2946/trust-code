@@ -64,7 +64,7 @@ Entree& Modele_turbulence_hyd_Longueur_Melange_VEF::readOn(Entree& is)
   return is;
 }
 
-void Modele_turbulence_hyd_Longueur_Melange_VEF::set_param(Param& param)
+void Modele_turbulence_hyd_Longueur_Melange_VEF::set_param(Param& param) const
 {
   Modele_turbulence_hyd_Longueur_Melange_base::set_param(param);
   param.ajouter("canalx", &hauteur_);

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -72,7 +72,7 @@ const double& Convection_Diffusion_Concentration::masse_molaire() const
   return masse_molaire_;
 }
 
-void Convection_Diffusion_Concentration::set_param(Param& param)
+void Convection_Diffusion_Concentration::set_param(Param& param) const
 {
   Convection_Diffusion_std::set_param(param);
   param.ajouter_non_std("nom_inconnue",(this)); // XD_ADD_P chaine Keyword Nom_inconnue will rename the unknown of this equation with the given name. In the postprocessing part, the concentration field will be accessible with this name. This is usefull if you want to track more than one concentration (otherwise, only the concentration field in the first concentration equation can be accessed).

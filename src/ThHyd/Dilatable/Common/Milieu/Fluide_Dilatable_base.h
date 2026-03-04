@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -53,7 +53,7 @@ public :
   virtual void calculer_pression_tot();
   void preparer_pas_temps();
   void abortTimeStep() override;
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   void discretiser(const Probleme_base& pb, const  Discretisation_base& dis) override;
   void mettre_a_jour(double ) override;
   virtual void update_pressure_fields(double );

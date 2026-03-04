@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -76,7 +76,7 @@ Entree& Terme_Source_Canal_perio::readOn(Entree& is )
   return is;
 }
 
-void Terme_Source_Canal_perio::set_param(Param& param)
+void Terme_Source_Canal_perio::set_param(Param& param) const
 {
   param.ajouter_non_std("direction_ecoulement",(this));
   param.ajouter("u_etoile",&u_etoile);                     // XD attr u_etoile floattant u_etoile 1 not_set

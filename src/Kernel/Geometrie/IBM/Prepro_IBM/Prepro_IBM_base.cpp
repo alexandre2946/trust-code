@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -24,7 +24,7 @@ Entree& Prepro_IBM_base::readOn(Entree& s)
   return s;
 }
 
-void Prepro_IBM_base::set_param(Param& param)
+void Prepro_IBM_base::set_param(Param& param) const
 {
   param.ajouter("epsilon_prepro_IBM",&eps_,Param::OPTIONAL);  //
   param.ajouter("constante_c_IBM",&c_prepro_,Param::OPTIONAL);  //

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -32,7 +32,7 @@ Entree& Saturation_generique_EOS::readOn(Entree& is)
   return is;
 }
 
-void Saturation_generique_EOS::set_param(Param& param)
+void Saturation_generique_EOS::set_param(Param& param) const
 {
   Saturation_base::set_param(param); // T_ref_ et P_ref_ ?? sais pas si utile ...
   param.ajouter("model|modele", &model_name_, Param::REQUIRED);

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -30,7 +30,7 @@ class Convection_Diffusion_Espece_Binaire_base : public Convection_Diffusion_Esp
   Declare_base(Convection_Diffusion_Espece_Binaire_base);
 
 public :
-  void set_param(Param& titi) override;
+  void set_param(Param& titi) const override;
   void assembler( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) override ;
   void assembler_blocs_avec_inertie(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;

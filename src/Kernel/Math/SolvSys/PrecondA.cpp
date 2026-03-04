@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -36,7 +36,7 @@ Entree& PrecondA::readOn(Entree& is )
   return is;
 }
 
-void PrecondA::set_param(Param& param)
+void PrecondA::set_param(Param& param) const
 {
   param.ajouter("precond0",&le_precond_0); // XD attr precond0 precond_base precond0 1 not_set
   param.ajouter("precond1",&le_precond_1); // XD attr precond1 precond_base precond1 1 not_set

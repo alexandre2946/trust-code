@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -42,7 +42,7 @@ Entree& Perte_Charge_Anisotrope_VEF_P1NC::readOn(Entree& s )
   return s;
 }
 
-void Perte_Charge_Anisotrope_VEF_P1NC::set_param(Param& param)
+void Perte_Charge_Anisotrope_VEF_P1NC::set_param(Param& param) const
 {
   Perte_Charge_VEF::set_param(param);
   param.ajouter_non_std("lambda_ortho",(this),Param::REQUIRED);

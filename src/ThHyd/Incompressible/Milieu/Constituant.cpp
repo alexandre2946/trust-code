@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -25,7 +25,7 @@ Sortie& Constituant::printOn(Sortie& os) const { return os; }
 
 Entree& Constituant::readOn(Entree& is) { return Milieu_base::readOn(is); }
 
-void Constituant::set_param(Param& param)
+void Constituant::set_param(Param& param) const
 {
   Milieu_base::set_param(param);
   param.ajouter("coefficient_diffusion", &D_, Param::REQUIRED);

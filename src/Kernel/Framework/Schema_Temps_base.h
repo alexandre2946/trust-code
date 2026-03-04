@@ -101,7 +101,7 @@ public :
   inline const Nom& le_nom() const override;
   virtual int faire_un_pas_de_temps_eqn_base(Equation_base&) =0;
 
-  virtual void set_param(Param& titi);
+  virtual void set_param(Param& titi) const override;
   int sauvegarder(Sortie& ) const override;
   int reprendre(Entree& ) override ;
   virtual int mettre_a_jour();

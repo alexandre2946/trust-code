@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -39,7 +39,7 @@ public:
   Postraitement_base();
   virtual void associer_nom_et_pb_base(const Nom&, const Probleme_base&);
   const Nom& le_nom() const override;
-  virtual void set_param(Param& param)=0;
+  virtual void set_param(Param& param) const override=0;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   virtual void postraiter(int forcer) = 0;
   virtual void mettre_a_jour(double temps);

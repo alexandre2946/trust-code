@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -51,7 +51,7 @@ Entree& Champ_Generique_Morceau_Equation::readOn(Entree& s )
 //  unite          : pour imposer l'unite du champ
 //  compo            : numero de la composante a postraiter pour le cas des "flux_bords"
 //                     (si plusieurs composantes)
-void Champ_Generique_Morceau_Equation::set_param(Param& param)
+void Champ_Generique_Morceau_Equation::set_param(Param& param) const
 {
   Champ_Gen_de_Champs_Gen::set_param(param);
   param.ajouter("type",&type_morceau_,Param::REQUIRED); // XD_ADD_P chaine can only be operateur for equation operators.

@@ -35,7 +35,7 @@ Sortie& Navier_Stokes_IBM_Turbulent::printOn(Sortie& is) const { return Equation
 
 Entree& Navier_Stokes_IBM_Turbulent::readOn(Entree& is) { return Navier_Stokes_IBM::readOn(is); }
 
-void Navier_Stokes_IBM_Turbulent::set_param(Param& param)
+void Navier_Stokes_IBM_Turbulent::set_param(Param& param) const
 {
   Navier_Stokes_IBM::set_param(param);
   param.ajouter_non_std("modele_turbulence", (this), Param::REQUIRED);

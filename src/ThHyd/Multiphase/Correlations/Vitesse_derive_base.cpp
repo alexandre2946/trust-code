@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -25,7 +25,7 @@ Entree& Vitesse_derive_base::readOn(Entree& is)
   return Vitesse_relative_base::readOn(is);
 }
 
-void Vitesse_derive_base::set_param(Param& param)
+void Vitesse_derive_base::set_param(Param& param) const
 {
   param.ajouter("alpha_min", &alpha_min_);
   Vitesse_relative_base::set_param(param);

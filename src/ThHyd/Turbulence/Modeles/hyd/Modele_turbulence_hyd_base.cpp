@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -72,7 +72,7 @@ Entree& Modele_turbulence_hyd_base::readOn(Entree& is)
   return is;
 }
 
-void Modele_turbulence_hyd_base::set_param(Param& param)
+void Modele_turbulence_hyd_base::set_param(Param& param) const
 {
   param.ajouter_non_std("turbulence_paroi", (this), Param::REQUIRED); // XD attr turbulence_paroi turbulence_paroi_base turbulence_paroi 1 Keyword to set the wall law.
   param.ajouter_non_std("dt_impr_ustar", (this));                     // XD attr dt_impr_ustar floattant dt_impr_ustar 1 This keyword is used to print the values (U +, d+, u$\star$) obtained with the wall laws into a file named datafile_ProblemName_Ustar.face and periode refers to the printing period, this value is expressed in seconds.

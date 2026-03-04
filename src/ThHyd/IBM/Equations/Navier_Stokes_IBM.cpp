@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -47,7 +47,7 @@ Entree& Navier_Stokes_IBM::readOn(Entree& is)
   return is;
 }
 
-void Navier_Stokes_IBM::set_param(Param& param)
+void Navier_Stokes_IBM::set_param(Param& param) const
 {
   param.ajouter("correction_matrice_projection_initiale", &correction_matrice_projection_initiale_, Param::OPTIONAL);
   param.ajouter("correction_calcul_pression_initiale", &correction_calcul_pression_initiale_, Param::OPTIONAL);

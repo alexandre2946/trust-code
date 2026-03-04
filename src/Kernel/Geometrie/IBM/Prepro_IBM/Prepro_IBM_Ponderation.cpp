@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -19,7 +19,7 @@ Implemente_instanciable( Prepro_IBM_Ponderation,"Prepro_IBM_Ponderation|methode_
 
 Sortie& Prepro_IBM_Ponderation::printOn(Sortie& os) const { return Prepro_IBM_base::printOn(os); }
 
-void Prepro_IBM_Ponderation::set_param(Param& param)
+void Prepro_IBM_Ponderation::set_param(Param& param) const
 {
   Prepro_IBM_base::set_param(param);
   param.ajouter("type_de_ponderation",&pond_,Param::OPTIONAL); // choix de la methode de ponderation

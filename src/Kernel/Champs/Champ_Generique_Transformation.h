@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -86,7 +86,7 @@ class Champ_Generique_Transformation : public Champ_Gen_de_Champs_Gen
 
 public:
 
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   void verifier_coherence_donnees();
   void verifier_localisation();

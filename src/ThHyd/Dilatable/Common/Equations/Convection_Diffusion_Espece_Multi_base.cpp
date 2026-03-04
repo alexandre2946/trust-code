@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -41,7 +41,7 @@ Entree& Convection_Diffusion_Espece_Multi_base::readOn(Entree& is)
   return is;
 }
 
-void Convection_Diffusion_Espece_Multi_base::set_param(Param& param)
+void Convection_Diffusion_Espece_Multi_base::set_param(Param& param) const
 {
   Convection_Diffusion_Espece_Fluide_Dilatable_base::set_param(param);
   param.ajouter("alias",&alias_);

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -35,7 +35,7 @@ Sortie& Modele_turbulence_hyd_LES_Wale_VDF::printOn(Sortie& s) const { return s 
 
 Entree& Modele_turbulence_hyd_LES_Wale_VDF::readOn(Entree& is) { return Modele_turbulence_hyd_LES_VDF_base::readOn(is); }
 
-void Modele_turbulence_hyd_LES_Wale_VDF::set_param(Param& param)
+void Modele_turbulence_hyd_LES_Wale_VDF::set_param(Param& param) const
 {
   Modele_turbulence_hyd_LES_VDF_base::set_param(param);
   param.ajouter("cw", &cw_); // XD_ADD_P floattant The unique parameter (constant) of the WALE-model (by default value 0.5).

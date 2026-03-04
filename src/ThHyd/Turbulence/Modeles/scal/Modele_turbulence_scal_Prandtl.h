@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -31,7 +31,7 @@ class Modele_turbulence_scal_Prandtl: public Modele_turbulence_scal_diffturb_bas
   Declare_instanciable(Modele_turbulence_scal_Prandtl);
 public:
   void mettre_a_jour(double) override;
-  void set_param(Param&) override;
+  void set_param(Param&) const override;
 
 protected:
   double LePrdt_ = 0.9;

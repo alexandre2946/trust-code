@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -32,7 +32,7 @@ Entree& Loi_Fermeture_Test::readOn( Entree& is )
   return Loi_Fermeture_base::readOn( is );
 }
 
-void Loi_Fermeture_Test::set_param(Param& param)
+void Loi_Fermeture_Test::set_param(Param& param) const
 {
   param.ajouter("coef",&coef_); // XD_ADD_P floattant coefficient
 }

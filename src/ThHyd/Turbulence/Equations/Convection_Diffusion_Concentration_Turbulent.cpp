@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -32,7 +32,7 @@ Entree& Convection_Diffusion_Concentration_Turbulent::readOn(Entree& is)
   return is;
 }
 
-void Convection_Diffusion_Concentration_Turbulent::set_param(Param& param)
+void Convection_Diffusion_Concentration_Turbulent::set_param(Param& param) const
 {
   Convection_Diffusion_Concentration::set_param(param);
   param.ajouter("constituants", &nb_constituants_);

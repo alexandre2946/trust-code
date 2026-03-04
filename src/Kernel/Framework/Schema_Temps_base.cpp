@@ -257,7 +257,7 @@ void Schema_Temps_base::associer_pb(const Probleme_base& un_probleme)
 
 
 
-void Schema_Temps_base::set_param(Param& param)
+void Schema_Temps_base::set_param(Param& param) const
 {
   param.ajouter("tinit",&tinit_); // XD_ADD_P double Value of initial calculation time (0 by default).
   param.ajouter( "tmax",&tmax_); // XD_ADD_P double Time during which the calculation will be stopped (1e30s by default).

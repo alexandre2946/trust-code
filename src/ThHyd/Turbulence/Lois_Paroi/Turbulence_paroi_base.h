@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -41,7 +41,7 @@ public:
 
   static void typer_lire_turbulence_paroi(OWN_PTR(Turbulence_paroi_base)&, const Modele_turbulence_hyd_base&, Entree& );
 
-  virtual void set_param(Param& param) { /* Do nothing */ }
+  virtual void set_param(Param& param) const override { /* Do nothing */ }
   inline void associer_modele(const Modele_turbulence_hyd_base&);
   virtual void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&)=0;
   virtual void completer() { }

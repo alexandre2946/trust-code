@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -44,7 +44,7 @@ Entree& Source_Neutronique::readOn(Entree& is )
   return is;
 }
 
-void Source_Neutronique::set_param(Param& param)
+void Source_Neutronique::set_param(Param& param) const
 {
   param.ajouter("N",&N,Param::REQUIRED);
   param.ajouter_non_std("lambda",(this));

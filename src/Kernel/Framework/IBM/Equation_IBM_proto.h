@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@ class Equation_IBM_proto
 {
 public:
   void assembler_ibm_proto( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem)  ;
-  void set_param_ibm_proto(Param& param);
+  void set_param_ibm_proto(Param& param) const;
   Entree& readOn_ibm_proto(Entree& is, Equation_base& eq);
   bool initTimeStep_ibm_proto(double ddt);
   DoubleTab& derivee_en_temps_inco_ibm_proto(DoubleTab& );

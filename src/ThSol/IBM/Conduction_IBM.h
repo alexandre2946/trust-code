@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -23,7 +23,7 @@ class Conduction_IBM : public Conduction, public Equation_IBM_proto
 {
   Declare_instanciable(Conduction_IBM);
 public:
-  void set_param(Param& titi) override;
+  void set_param(Param& titi) const override;
   void assembler(Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) override;
   int preparer_calcul() override;
   bool initTimeStep(double dt) override;

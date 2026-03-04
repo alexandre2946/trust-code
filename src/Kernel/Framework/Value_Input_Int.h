@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -37,7 +37,7 @@ class Value_Input_Int : public Objet_U
   Declare_instanciable(Value_Input_Int);
 
 public :
-  virtual void set_param(Param& param);
+  virtual void set_param(Param& param) const override;
   inline Nom getName() const { return name; }
 
 protected :

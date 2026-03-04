@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -57,7 +57,7 @@ public:
   // Nouvelles methodes:
   virtual void associer_pb_base(const Probleme_base&);
   virtual void discretiser(const Discretisation_base& );
-  virtual void set_param(Param& param);
+  virtual void set_param(Param& param) const override;
   virtual void completer();
   virtual void preparer_calcul();
   virtual void mettre_a_jour(double temps);

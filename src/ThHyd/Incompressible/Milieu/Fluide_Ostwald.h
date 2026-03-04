@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -42,7 +42,7 @@ public :
   inline const Champ_Don_base& indice_struct() const { return N_.valeur(); }
   inline Champ_Don_base& indice_struct() { return N_.valeur(); }
 
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   void creer_champs_non_lus() override;
   void mettre_a_jour(double) override;
   int initialiser(const double temps) override;

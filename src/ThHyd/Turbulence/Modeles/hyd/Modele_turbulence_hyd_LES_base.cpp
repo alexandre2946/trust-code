@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -48,7 +48,7 @@ Entree& Modele_turbulence_hyd_LES_base::readOn(Entree& is)
   return Modele_turbulence_hyd_0_eq_base::readOn(is);
 }
 
-void Modele_turbulence_hyd_LES_base::set_param(Param& param)
+void Modele_turbulence_hyd_LES_base::set_param(Param& param) const
 {
   Modele_turbulence_hyd_base::set_param(param);
   param.ajouter("longueur_maille", &methode_); // XD_ADD_P chaine(into=["volume","volume_sans_lissage","scotti","arrete"]) Different ways to calculate the characteristic length may be specified : NL2 volume : It is the default option. Characteristic length is based on the cubic root of the volume cells. A smoothing procedure is applied to avoid discontinuities of this quantity in VEF from a cell to another. NL2 volume_sans_lissage : For VEF only. Characteristic length is based on the cubic root of the volume cells (without smoothing procedure).NL2 scotti : Characteristic length is based on the cubic root of the volume cells and the Scotti correction is applied to take into account the stretching of the cell in the case of anisotropic meshes. NL2 arete : For VEF only. Characteristic length relies on the max edge (+ smoothing procedure) is taken into account.

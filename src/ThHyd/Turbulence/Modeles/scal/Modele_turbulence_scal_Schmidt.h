@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -34,7 +34,7 @@ public:
   virtual int comprend_champ(const Motcle&) const;
   virtual int a_pour_Champ_Fonc(const Motcle&, OBS_PTR(Champ_base)&) const;
   void mettre_a_jour(double) override;
-  void set_param(Param&) override;
+  void set_param(Param&) const override;
   inline double get_Scturb() const { return LeScturb_; }
 
 protected:

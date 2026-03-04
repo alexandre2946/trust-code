@@ -77,7 +77,7 @@ void Convection_Diffusion_Chaleur_QC ::mettre_a_jour(double temps)
   Equation_base::mettre_a_jour(temps);
 }
 
-void Convection_Diffusion_Chaleur_QC::set_param(Param& param)
+void Convection_Diffusion_Chaleur_QC::set_param(Param& param) const
 {
   Convection_Diffusion_Chaleur_Fluide_Dilatable_base::set_param(param);
   param.ajouter_non_std("mode_calcul_convection",(this));

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -31,7 +31,7 @@ class Constituant : public Milieu_base
   Declare_instanciable(Constituant);
 public :
 
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
 
   inline const Champ_Don_base& diffusivite_constituant() const
   {

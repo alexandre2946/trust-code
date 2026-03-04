@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -31,7 +31,7 @@ Entree& Perte_Charge_Circulaire_VDF_Face::readOn(Entree& s)
   return s;
 }
 
-void Perte_Charge_Circulaire_VDF_Face::set_param(Param& param)
+void Perte_Charge_Circulaire_VDF_Face::set_param(Param& param) const
 {
   Perte_Charge_VDF_base::set_param(param);
   param.ajouter_non_std("lambda_ortho", (this), Param::REQUIRED);

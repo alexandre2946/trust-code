@@ -55,7 +55,7 @@ Entree& Solv_Gmres::readOn(Entree& is )
   return is;
 }
 
-void Solv_Gmres::set_param(Param& param)
+void Solv_Gmres::set_param(Param& param) const
 {
   param.ajouter_non_std("impr",(this));
   param.ajouter("seuil",&seuil_);

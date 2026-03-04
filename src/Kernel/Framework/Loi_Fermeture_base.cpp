@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -96,7 +96,7 @@ Sortie& Loi_Fermeture_base::printOn(Sortie& os) const
  *   Dans la classe de base: aucun parametre.
  *
  */
-void Loi_Fermeture_base::set_param(Param& param)
+void Loi_Fermeture_base::set_param(Param& param) const
 {
 }
 

@@ -36,7 +36,7 @@ Entree& Equation_Navier_Cauchy::readOn(Entree& is)
   return is;
 }
 
-void Equation_Navier_Cauchy::set_param(Param& param)
+void Equation_Navier_Cauchy::set_param(Param& param) const
 {
   Equation_base::set_param(param);
   param.ajouter_non_std("diffusion",(this));

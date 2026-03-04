@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -64,7 +64,7 @@ Sortie& Champ_Generique_Extraction::printOn(Sortie& os) const
 //  nom_frontiere : lecture du nom de la frontiere sur laquelle on veut faire l extraction
 //  methode           : specification de la methode choisie pour extraire les valeurs
 //                    (optionnel : trace par defaut ou champ_frontiere)
-void Champ_Generique_Extraction::set_param(Param& param)
+void Champ_Generique_Extraction::set_param(Param& param) const
 {
   Champ_Gen_de_Champs_Gen::set_param(param);
   param.ajouter("domaine",&dom_extrac_,Param::REQUIRED);   // XD attr domaine ref_domaine domaine 0 name of the volume field

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -32,7 +32,7 @@ class Modele_turbulence_hyd_0_eq_base: public Modele_turbulence_hyd_base
 {
   Declare_base(Modele_turbulence_hyd_0_eq_base);
 public:
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   int reprendre(Entree& is) override { return 1; }
   int comprend_mot(const Motcle& mot) const;
   int a_pour_Champ_Fonc(const Motcle& mot, OBS_PTR(Champ_base) &ch_ref) const;

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -36,7 +36,7 @@ Entree& Modele_turbulence_hyd_Longueur_Melange_VDF::readOn(Entree& s)
   return Modele_turbulence_hyd_Longueur_Melange_base::readOn(s);
 }
 
-void Modele_turbulence_hyd_Longueur_Melange_VDF::set_param(Param& param)
+void Modele_turbulence_hyd_Longueur_Melange_VDF::set_param(Param& param) const
 {
   Modele_turbulence_hyd_Longueur_Melange_base::set_param(param);
   param.ajouter("canal_hmin", &alt_min_);

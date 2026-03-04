@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -40,7 +40,7 @@ public :
 
   Fluide_Incompressible();
   void verifier_coherence_champs(int& err,Nom& message) override;
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   int is_incompressible() const override
   {
     return 1;

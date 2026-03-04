@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -33,7 +33,7 @@ class Convection_Diffusion_Temperature_Turbulent: public Convection_Diffusion_Tu
 {
   Declare_instanciable(Convection_Diffusion_Temperature_Turbulent);
 public:
-  void set_param(Param& titi) override;
+  void set_param(Param& titi) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   void completer() override;
   std::vector<YAML_data> data_a_sauvegarder() const override;

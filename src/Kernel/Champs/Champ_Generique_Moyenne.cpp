@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -37,7 +37,7 @@ Entree& Champ_Generique_Moyenne::readOn(Entree& s )
 //condition_initiale : pour fixer la valeur de l integrale
 //de l operateur moyenne en utilisant Champ_Fonc_reprise
 //pour lire la moyenne recuperee depuis un fichier .xyz
-void Champ_Generique_Moyenne::set_param(Param& param)
+void Champ_Generique_Moyenne::set_param(Param& param) const
 {
   Champ_Generique_Statistiques_base::set_param(param);
   param.ajouter_non_std("moyenne_convergee",(this)); // XD attr moyenne_convergee field_base moyenne_convergee 1 This option allows to read a converged time averaged field in a .xyz file in order to calculate, when resuming the calculation, the statistics fields (rms, correlation) which depend on this average. In that case, the time averaged field is not updated during the resume of calculation. In this case, the time averaged field must be fully converged to avoid errors when calculating high order statistics.

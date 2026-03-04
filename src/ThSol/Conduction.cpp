@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -36,7 +36,7 @@ Entree& Conduction::readOn(Entree& is )
   return is;
 }
 
-void Conduction::set_param(Param& param)
+void Conduction::set_param(Param& param) const
 {
   Equation_base::set_param(param);
   param.ajouter_non_std("diffusion",(this));

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -42,7 +42,7 @@ public :
   const Milieu_base& milieu() const override;
   Milieu_base& milieu() override;
 
-  void set_param(Param& titi) override;
+  void set_param(Param& titi) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
 
   // je sais, je sais ... mais pas maintenant !

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -77,7 +77,7 @@ Entree& Fluide_base::readOn(Entree& is)
   return is;
 }
 
-void Fluide_base::set_param(Param& param)
+void Fluide_base::set_param(Param& param) const
 {
   Milieu_base::set_param(param);
   //La lecture de rho n est pas specifiee obligatoire ici car ce champ ne doit pas etre lu pour un fluide dilatable

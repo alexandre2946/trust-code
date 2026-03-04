@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -48,7 +48,7 @@ Entree& Echange_contact_Correlation_VDF::readOn(Entree& is )
   return is;
 }
 
-void Echange_contact_Correlation_VDF::set_param(Param& param)
+void Echange_contact_Correlation_VDF::set_param(Param& param) const
 {
   param.ajouter("dir",&dir); // XD_ADD_P entier Direction (0 : axis X, 1 : axis Y, 2 : axis Z) of the 1D model.
   param.ajouter_condition("(value_of_dir_ge_0)_AND_(value_of_dir_le_2)", "La direction doit etre 0, 1 ou 2 dans Echange_contact_Correlation_VDF");

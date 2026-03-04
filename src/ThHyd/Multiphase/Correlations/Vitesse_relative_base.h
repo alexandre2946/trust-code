@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -55,7 +55,7 @@ public:
   virtual void vitesse_relative(const input_t& input, output_t& output) const = 0;
   virtual bool needs_grad_alpha() const {return 0;};
   virtual bool needs_vort() const {return 0;};
-  virtual void set_param(Param& param) { /* do nothing */ }
+  virtual void set_param(Param& param) const override { /* do nothing */ }
 
 protected:
   int n_l = -1, n_g = -1; // phases traitees : liquide / gaz continu

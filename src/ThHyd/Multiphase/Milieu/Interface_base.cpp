@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -26,7 +26,7 @@ Implemente_base(Interface_base, "Interface_base", Objet_U);
 
 Sortie& Interface_base::printOn(Sortie& os) const { return os; }
 
-void Interface_base::set_param(Param& param)
+void Interface_base::set_param(Param& param) const
 {
   param.ajouter("tension_superficielle|surface_tension", &sigma__); // XD_ADD_P floattant surface tension
 }

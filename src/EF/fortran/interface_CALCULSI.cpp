@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -72,7 +72,7 @@ void interface_CALCULSI::dump(Sortie& os)
   param.print(os);
 }
 
-void  interface_CALCULSI::set_param(Param& param)
+void  interface_CALCULSI::set_param(Param& param) const
 {
 }
 

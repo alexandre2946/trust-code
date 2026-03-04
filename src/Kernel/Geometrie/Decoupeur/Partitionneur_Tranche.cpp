@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -53,7 +53,7 @@ Sortie& Partitionneur_Tranche_32_64<_SIZE_>::printOn(Sortie& os) const
 }
 
 template <typename _SIZE_>
-void Partitionneur_Tranche_32_64<_SIZE_>::set_param(Param& param)
+void Partitionneur_Tranche_32_64<_SIZE_>::set_param(Param& param) const
 {
   param.ajouter_arr_size_predefinie("tranches",&nb_tranches_,Param::REQUIRED);
 }

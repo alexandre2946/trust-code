@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -64,7 +64,7 @@ public:
   using BigArrOfInt_ = TRUSTArray<int, _SIZE_>;  // always int as value type, will hold proc/partition number.
   using BigIntVect_ = TRUSTVect<int, _SIZE_>;
 
-  virtual void set_param(Param& param)=0;
+  virtual void set_param(Param& param) const override=0;
   int lire_motcle_non_standard(const Motcle&, Entree&) override { return -1; }
   virtual void associer_domaine(const Domaine_t& domaine) = 0;
   virtual void declarer_bords_periodiques(const Noms& noms_bords_periodiques) { liste_bords_periodiques_ = noms_bords_periodiques; }

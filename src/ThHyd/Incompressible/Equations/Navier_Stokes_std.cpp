@@ -95,7 +95,7 @@ Entree& Navier_Stokes_std::readOn(Entree& is)
   return is;
 }
 
-void Navier_Stokes_std::set_param(Param& param)
+void Navier_Stokes_std::set_param(Param& param) const
 {
   Equation_base::set_param(param);
   param.ajouter_non_std("diffusion",(this));

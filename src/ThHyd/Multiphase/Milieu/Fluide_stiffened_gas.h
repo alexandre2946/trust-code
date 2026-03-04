@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -26,7 +26,7 @@ class Fluide_stiffened_gas: public Fluide_reel_base
   Declare_instanciable_sans_constructeur(Fluide_stiffened_gas);
 public:
   Fluide_stiffened_gas();
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
 
 private:
   double pinf_, Cv_, q_, q_prim_, gamma_, R_, mu__, lambda__;

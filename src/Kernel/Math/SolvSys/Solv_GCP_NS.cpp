@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -38,7 +38,7 @@ Entree& Solv_GCP_NS::readOn(Entree& is)
   return is;
 }
 
-void Solv_GCP_NS::set_param(Param& param)
+void Solv_GCP_NS::set_param(Param& param) const
 {
   param.ajouter_non_std("impr", (this));
   param.ajouter("seuil", &seuil_);

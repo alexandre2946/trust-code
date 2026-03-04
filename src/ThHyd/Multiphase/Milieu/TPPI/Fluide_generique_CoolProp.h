@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -22,7 +22,7 @@ class Fluide_generique_CoolProp : public Fluide_generique_TPPI_base
 {
   Declare_instanciable( Fluide_generique_CoolProp ) ;
 public :
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
 
 private:
   Motcle phase_;

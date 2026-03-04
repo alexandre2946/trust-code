@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -42,7 +42,7 @@ Entree& Fluide_Weakly_Compressible::readOn(Entree& is)
   return Fluide_Dilatable_base::readOn(is);
 }
 
-void Fluide_Weakly_Compressible::set_param(Param& param)
+void Fluide_Weakly_Compressible::set_param(Param& param) const
 {
   Fluide_Dilatable_base::set_param(param);
   param.ajouter("pression_thermo", &Pth_); // XD_ADD_P double Initial thermo-dynamic pressure used in the assosciated state law.

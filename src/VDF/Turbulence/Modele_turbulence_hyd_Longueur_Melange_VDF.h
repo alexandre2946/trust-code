@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -30,7 +30,7 @@ class Modele_turbulence_hyd_Longueur_Melange_VDF: public Modele_turbulence_hyd_L
 {
   Declare_instanciable(Modele_turbulence_hyd_Longueur_Melange_VDF);
 public:
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   Champ_Fonc_base& calculer_viscosite_turbulente() override;
   void calculer_Sij2();
   int preparer_calcul() override;

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -60,7 +60,7 @@ public:
   }
 
 protected:
-  void set_param(Param& titi) override;
+  void set_param(Param& titi) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   //! Implemente le calcul effectif de la perte de charge pour un lieu donne
   void coeffs_perte_charge(const DoubleVect& u, const DoubleVect& pos,

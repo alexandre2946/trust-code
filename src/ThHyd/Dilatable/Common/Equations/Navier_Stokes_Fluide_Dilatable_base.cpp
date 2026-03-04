@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -40,7 +40,7 @@ int Navier_Stokes_Fluide_Dilatable_base::impr(Sortie& os) const
   return Navier_Stokes_std::impr(os);
 }
 
-void Navier_Stokes_Fluide_Dilatable_base::set_param(Param& param)
+void Navier_Stokes_Fluide_Dilatable_base::set_param(Param& param) const
 {
   Navier_Stokes_std::set_param(param);
   param.ajouter_non_std("mass_source",(this));

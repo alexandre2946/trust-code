@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -33,7 +33,7 @@ public:
   bool needs_grad_alpha() const override {return needs_grad_alpha_;};
   bool needs_vort() const override {return needs_vort_;};
   void completer() override;
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
 
 protected:
   void evaluate_C0_vg0(const input_t& input) const override;

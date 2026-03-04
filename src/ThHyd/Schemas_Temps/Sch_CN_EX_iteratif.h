@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -43,7 +43,7 @@ class Sch_CN_EX_iteratif : public Sch_CN_iteratif
 
 public :
 
-  void set_param(Param& titi) override;
+  void set_param(Param& titi) const override;
   void mettre_a_jour_dt_stab() override;
 
 protected :

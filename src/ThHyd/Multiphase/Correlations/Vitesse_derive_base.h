@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -31,7 +31,7 @@ class Vitesse_derive_base : public Vitesse_relative_base
   Declare_base(Vitesse_derive_base);
 public:
   void vitesse_relative(const input_t& input, output_t& output) const override;
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
 
 protected:
   virtual void evaluate_C0_vg0(const input_t& input) const = 0;

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -25,7 +25,7 @@ Implemente_instanciable(Vitesse_derive_Forces, "Vitesse_relative_derive_Forces",
 Sortie& Vitesse_derive_Forces::printOn(Sortie& os) const { return Vitesse_derive_base::printOn(os); }
 Entree& Vitesse_derive_Forces::readOn(Entree& is) { return Vitesse_derive_base::readOn(is); }
 
-void Vitesse_derive_Forces::set_param(Param& param)
+void Vitesse_derive_Forces::set_param(Param& param) const
 {
   param.ajouter("alpha_lim", &alpha_lim_);
   Vitesse_derive_base::set_param(param);

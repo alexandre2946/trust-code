@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -50,7 +50,7 @@ public:
   int sauvegarder(Sortie& os) const override { return 0; }
   int reprendre(Entree& is) override { return 1; }
 
-  virtual void set_param(Param& param)=0;
+  virtual void set_param(Param& param) const override=0;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   virtual int  get_dimension() const;
   virtual double  get_time() const; //rend le temps du champ encapsule

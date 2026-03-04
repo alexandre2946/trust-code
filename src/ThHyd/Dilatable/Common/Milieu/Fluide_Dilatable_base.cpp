@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -82,7 +82,7 @@ void Fluide_Dilatable_base::discretiser(const Probleme_base& pb, const  Discreti
   Fluide_base::discretiser(pb,dis);
 }
 
-void Fluide_Dilatable_base::set_param(Param& param)
+void Fluide_Dilatable_base::set_param(Param& param) const
 {
   Fluide_base::set_param(param);
   param.ajouter_non_std("loi_etat",(this),Param::REQUIRED);

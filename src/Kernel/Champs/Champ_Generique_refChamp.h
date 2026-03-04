@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -37,7 +37,7 @@ class Champ_Generique_refChamp : public Champ_Generique_base
 public:
 
   void initialize(const Champ_base& champ);
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   int            get_dimension() const override;
   void              get_property_names(Motcles& list) const override;

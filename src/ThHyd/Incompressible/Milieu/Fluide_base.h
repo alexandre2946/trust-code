@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -38,7 +38,7 @@ class Fluide_base : public Milieu_base
 {
   Declare_instanciable(Fluide_base);
 public :
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   void verifier_coherence_champs(int& err, Nom& message) override;
   bool initTimeStep(double dt) override;
   void mettre_a_jour(double) override;

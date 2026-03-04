@@ -255,7 +255,7 @@ Entree& Equation_base::readOn(Entree& is)
 
 // XD attr convection bloc_convection convection 1 Keyword to alter the convection scheme.
 // XD attr diffusion bloc_diffusion diffusion 1 Keyword to specify the diffusion operator.
-void Equation_base::set_param(Param& param)
+void Equation_base::set_param(Param& param) const
 {
   param.ajouter_non_std("conditions_limites|boundary_conditions",(this),Param::REQUIRED);  // XD attr conditions_limites|boundary_conditions condlims conditions_limites 1 Boundary conditions.
   param.ajouter_non_std("conditions_initiales|initial_conditions",(this),Param::REQUIRED); // XD attr conditions_initiales|initial_conditions condinits conditions_initiales 1 Initial conditions.

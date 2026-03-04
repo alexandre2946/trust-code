@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -36,7 +36,7 @@ Champ_Post_Operateur_Eqn::Champ_Post_Operateur_Eqn()
 {
 }
 
-void Champ_Post_Operateur_Eqn::set_param(Param& param)
+void Champ_Post_Operateur_Eqn::set_param(Param& param) const
 {
   Champ_Generique_Operateur_base::set_param(param);
   param.ajouter("numero_source",&numero_source_); // XD_ADD_P entier the source to be post-processed (its number). If you have only one source term, numero_source will correspond to 0 if you want to post-process that unique source

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -31,7 +31,7 @@ class Schema_Implicite_base : public Schema_Temps_base
 public:
   inline OWN_PTR(Solveur_Implicite_base)& solveur() { return le_solveur; }
   inline const OWN_PTR(Solveur_Implicite_base)& solveur() const { return le_solveur; }
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
 
 protected:
   OWN_PTR(Solveur_Implicite_base) le_solveur;

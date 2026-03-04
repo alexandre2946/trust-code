@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -36,7 +36,7 @@ Entree& Champ_Generique_Champ::readOn( Entree& is )
  *   nom_source : option pour nommer le champ en tant que source (sinon nommer par defaut)
  *
  */
-void Champ_Generique_Champ::set_param(Param& param)
+void Champ_Generique_Champ::set_param(Param& param) const
 {
   param.ajouter_non_std("nom_source",(this));
   param.ajouter_non_std("champ",(this),Param::REQUIRED);

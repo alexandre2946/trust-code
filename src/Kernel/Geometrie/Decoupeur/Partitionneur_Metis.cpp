@@ -63,7 +63,7 @@ Entree& Partitionneur_Metis_32_64<_SIZE_>::readOn(Entree& is)
 }
 
 template <typename _SIZE_>
-void Partitionneur_Metis_32_64<_SIZE_>::set_param(Param& param)
+void Partitionneur_Metis_32_64<_SIZE_>::set_param(Param& param) const
 {
   param.ajouter("nb_parts",&nb_parties_,Param::REQUIRED);
   param.ajouter("nb_essais",&nb_essais_);

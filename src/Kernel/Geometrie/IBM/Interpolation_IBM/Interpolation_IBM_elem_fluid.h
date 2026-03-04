@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -37,7 +37,7 @@ public :
 
 protected :
   virtual void computeFluidElems(Domaine_dis_base&);
-  void set_param(Param&);
+  void set_param(Param&) const override;
 
   OWN_PTR(Champ_Don_base) fluid_points_lu_;
   OWN_PTR(Champ_Don_base) fluid_points_;

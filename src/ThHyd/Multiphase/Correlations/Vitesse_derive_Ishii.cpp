@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -21,7 +21,7 @@ Implemente_instanciable(Vitesse_derive_Ishii, "Vitesse_relative_derive_Ishii", V
 Sortie& Vitesse_derive_Ishii::printOn(Sortie& os) const { return Vitesse_derive_base::printOn(os); }
 Entree& Vitesse_derive_Ishii::readOn(Entree& is) { return Vitesse_derive_base::readOn(is); }
 
-void Vitesse_derive_Ishii::set_param(Param& param)
+void Vitesse_derive_Ishii::set_param(Param& param) const
 {
   param.ajouter("subcooled_boiling", &sb_, Param::REQUIRED);
   Vitesse_derive_base::set_param(param);

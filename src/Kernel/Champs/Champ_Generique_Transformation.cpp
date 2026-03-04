@@ -61,7 +61,7 @@ Entree& Champ_Generique_Transformation::readOn(Entree& s )
 //-numero : numero de la composante a extraire (uniquement pour le cas de la methode composante)
 //-localisation : localisation du champ de stockage
 //-unite : pour specifier l'unite d'un champ pour ameliorer la lisibilite des postraitements
-void Champ_Generique_Transformation::set_param(Param& param)
+void Champ_Generique_Transformation::set_param(Param& param) const
 {
   Champ_Gen_de_Champs_Gen::set_param(param);
   param.ajouter("methode",&methode_,Param::REQUIRED); // XD_ADD_P chaine(into=["produit_scalaire","norme","vecteur","formule","composante"]) methode 0 methode norme : will calculate the norm of a vector given by a source field NL2 methode produit_scalaire : will calculate the dot product of two vectors given by two sources fields NL2 methode composante numero integer : will create a field by extracting the integer component of a field given by a source field NL2 methode formule expression 1 : will create a scalar field located to elements using expressions with x,y,z,t parameters and field names given by a source field or several sources fields. NL2 methode vecteur expression N f1(x,y,z,t) fN(x,y,z,t) : will create a vector field located to elements by defining its N components with N expressions with x,y,z,t parameters and field names given by a source field or several sources fields.

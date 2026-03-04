@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -64,7 +64,7 @@ public:
   const Milieu_base& milieu() const override { return milieu_.valeur(); }
   Milieu_base& milieu() override { return milieu_.valeur(); }
   void discretiser() override;
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   int lire_motcle_non_standard(const Motcle& mot, Entree& is) override;
   virtual const Champ_Don_base& diffusivite_pour_transport() const { return milieu_->mu_lame(); }
   virtual const Champ_base& diffusivite_pour_pas_de_temps() const { return milieu_->mu_lame(); }

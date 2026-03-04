@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -54,7 +54,7 @@ Sortie& Champ_Generique_Interpolation::printOn(Sortie& os) const
 //  localisation : localisation de l interpolation (elem ou som)
 //  domaine          : domaine d interpolation (optionnel)
 //  methode          : type de methode de calcul "calculer_champ_post" (optionnel, une seule methode disponible)
-void Champ_Generique_Interpolation::set_param(Param& param)
+void Champ_Generique_Interpolation::set_param(Param& param) const
 {
 // XD interpolation champ_post_de_champs_post interpolation -1 To create a field which is an interpolation of the field given by the keyword source.
   Champ_Gen_de_Champs_Gen::set_param(param);

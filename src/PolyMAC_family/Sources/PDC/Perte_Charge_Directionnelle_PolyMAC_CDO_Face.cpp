@@ -32,7 +32,7 @@ Entree& Perte_Charge_Directionnelle_PolyMAC_CDO_Face::readOn(Entree& s)
   return s;
 }
 
-void Perte_Charge_Directionnelle_PolyMAC_CDO_Face::set_param(Param& param)
+void Perte_Charge_Directionnelle_PolyMAC_CDO_Face::set_param(Param& param) const
 {
   Perte_Charge_PolyMAC_CDO::set_param(param);
   param.ajouter("direction", &v, Param::REQUIRED);
@@ -62,7 +62,7 @@ Entree& Perte_Charge_Directionnelle_PolyMAC_HFV_Face::readOn(Entree& s)
   return s;
 }
 
-void Perte_Charge_Directionnelle_PolyMAC_HFV_Face::set_param(Param& param)
+void Perte_Charge_Directionnelle_PolyMAC_HFV_Face::set_param(Param& param) const
 {
   Perte_Charge_PolyMAC_HFV::set_param(param);
   param.ajouter("direction", &v, Param::REQUIRED);

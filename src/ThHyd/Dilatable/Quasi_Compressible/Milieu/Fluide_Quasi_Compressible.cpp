@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -48,7 +48,7 @@ Sortie& Fluide_Quasi_Compressible::printOn(Sortie& os) const { return Fluide_Dil
 
 Entree& Fluide_Quasi_Compressible::readOn(Entree& is) { return Fluide_Dilatable_base::readOn(is); }
 
-void Fluide_Quasi_Compressible::set_param(Param& param)
+void Fluide_Quasi_Compressible::set_param(Param& param) const
 {
   Fluide_Dilatable_base::set_param(param);
   param.ajouter("temps_debut_prise_en_compte_drho_dt", &temps_debut_prise_en_compte_drho_dt_);

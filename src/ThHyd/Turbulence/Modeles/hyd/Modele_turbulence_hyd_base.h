@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -52,7 +52,7 @@ public:
   bool utiliser_loi_paroi() const { return loipar_.non_nul() ? loipar_->use_shear() : false; }
   bool has_loi_paroi_hyd() const { return loipar_.non_nul(); }
   virtual bool calcul_tenseur_Re(const DoubleTab& nu_turb, const DoubleTab& grad, DoubleTab& Re) const { return false; }
-  virtual void set_param(Param& param);
+  virtual void set_param(Param& param) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   virtual int preparer_calcul();
   virtual bool initTimeStep(double dt);

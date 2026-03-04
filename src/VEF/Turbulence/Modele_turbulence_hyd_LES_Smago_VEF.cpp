@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -27,7 +27,7 @@ Sortie& Modele_turbulence_hyd_LES_Smago_VEF::printOn(Sortie& s) const { return s
 
 Entree& Modele_turbulence_hyd_LES_Smago_VEF::readOn(Entree& is) { return Modele_turbulence_hyd_LES_VEF_base::readOn(is); }
 
-void Modele_turbulence_hyd_LES_Smago_VEF::set_param(Param& param)
+void Modele_turbulence_hyd_LES_Smago_VEF::set_param(Param& param) const
 {
   Modele_turbulence_hyd_LES_VEF_base::set_param(param);
   param.ajouter("cs", &cs_);

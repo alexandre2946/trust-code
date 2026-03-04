@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -33,7 +33,7 @@ class Masse_Multiphase : public Convection_Diffusion_std
 {
   Declare_instanciable(Masse_Multiphase);
 public :
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   void associer_fluide(const Fluide_base& );
   inline const Champ_Inc_base& inconnue() const override;

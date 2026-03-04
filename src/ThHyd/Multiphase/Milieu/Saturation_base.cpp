@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -23,7 +23,7 @@
 Implemente_base(Saturation_base, "Saturation_base", Interface_base);
 // XD saturation_base Interface_base saturation_base -1 fluide-gas interface with phase change (used in pb_multiphase)
 
-void Saturation_base::set_param(Param& param)
+void Saturation_base::set_param(Param& param) const
 {
   Interface_base::set_param(param);
   param.ajouter("P_ref", &P_ref_); // XD_ADD_P floattant not_set

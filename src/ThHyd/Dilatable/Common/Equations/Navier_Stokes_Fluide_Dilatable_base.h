@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -50,7 +50,7 @@ class Navier_Stokes_Fluide_Dilatable_base : public Navier_Stokes_std, public Nav
 public :
   int lire_motcle_non_standard(const Motcle& mot, Entree& is) override;
   int preparer_calcul() override;
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   void discretiser() override;
   const Champ_Don_base& diffusivite_pour_transport() const override;
   const Champ_base& diffusivite_pour_pas_de_temps() const override;

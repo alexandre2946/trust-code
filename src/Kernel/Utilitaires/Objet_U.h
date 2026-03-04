@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -43,6 +43,8 @@
 class Type_info;
 class Interprete;
 class Motcle;
+class Param; // need this forward for pure virtual set_param
+
 /*! @brief classe Objet_U Cette classe est la classe de base des Objets de TRUST
  *
  *      Dans les classes derivees de Objet_U, on ajoute toujours
@@ -126,6 +128,11 @@ protected:
   Objet_U();
   Objet_U(const Objet_U&);
   const Objet_U& operator=(const Objet_U&);
+
+  // not pure virtual because that would need adapting every derived of Objet_U
+  // and not needed since the macro Declare_xxx_with_param forces to define this anyway
+  // eventually, should only be implemented in derived of Objet_U_With_Params
+  virtual void set_param(Param&) const {}
 
 private:
   // Numero de l'objet (indice de l'objet dans Memoire::data)

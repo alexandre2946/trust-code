@@ -39,7 +39,7 @@ Entree& Convection_Diffusion_Espece_Multi_QC::readOn(Entree& is)
   return Convection_Diffusion_Espece_Multi_base::readOn(is);
 }
 
-void Convection_Diffusion_Espece_Multi_QC::set_param(Param& param)
+void Convection_Diffusion_Espece_Multi_QC::set_param(Param& param) const
 {
   Convection_Diffusion_Espece_Multi_base::set_param(param);
   param.ajouter("espece",&mon_espece_); // XD_ADD_P espece Assosciate a species (with its properties) to the equation

@@ -38,7 +38,7 @@ public :
   }
 
 protected :
-  void set_param(Param& param);
+  void set_param(Param& param) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
 
   int Gmres(const Matrice_Morse&, const DoubleVect&, DoubleVect& );

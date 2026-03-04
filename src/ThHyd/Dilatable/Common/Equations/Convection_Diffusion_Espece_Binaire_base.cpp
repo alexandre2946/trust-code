@@ -49,7 +49,7 @@ Entree& Convection_Diffusion_Espece_Binaire_base::readOn(Entree& is)
   return is;
 }
 
-void Convection_Diffusion_Espece_Binaire_base::set_param(Param& param)
+void Convection_Diffusion_Espece_Binaire_base::set_param(Param& param) const
 {
   Convection_Diffusion_Espece_Fluide_Dilatable_base::set_param(param);
 }

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -30,7 +30,7 @@ Entree& Terme_Source_inc_base::readOn(Entree& is )
   return is;
 }
 
-void Terme_Source_inc_base::set_param(Param& param)
+void Terme_Source_inc_base::set_param(Param& param) const
 {
   param.ajouter_flag("impr",&impr);
 }

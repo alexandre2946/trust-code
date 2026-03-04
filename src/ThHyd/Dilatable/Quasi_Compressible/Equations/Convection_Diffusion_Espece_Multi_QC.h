@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -32,7 +32,7 @@ class Convection_Diffusion_Espece_Multi_QC : public Convection_Diffusion_Espece_
 
 public :
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  void set_param(Param& titi) override;
+  void set_param(Param& titi) const override;
   void completer() override;
   void assembler( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) override ;
   const Champ_base& diffusivite_pour_pas_de_temps() const override;

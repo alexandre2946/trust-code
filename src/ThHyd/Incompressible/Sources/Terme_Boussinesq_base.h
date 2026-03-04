@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -79,7 +79,7 @@ public :
   inline const ArrOfDouble& getScalaire0() const { return Scalaire0_; }
 
 protected :
-  void set_param(Param& param);
+  void set_param(Param& param) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
 
   OBS_PTR(Champ_Don_base) la_gravite_;

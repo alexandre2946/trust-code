@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -48,7 +48,7 @@ class Champ_Generique_Morceau_Equation : public Champ_Gen_de_Champs_Gen
 public:
 
   Champ_Generique_Morceau_Equation();
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   const Noms get_property(const Motcle& query) const override;
   Entity  get_localisation(const int index = -1) const override;
   const   Motcle             get_directive_pour_discr() const override;

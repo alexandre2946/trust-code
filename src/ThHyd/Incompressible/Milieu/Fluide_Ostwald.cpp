@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -47,7 +47,7 @@ Entree& Fluide_Ostwald::readOn(Entree& is)
   return is;
 }
 
-void Fluide_Ostwald::set_param(Param& param)
+void Fluide_Ostwald::set_param(Param& param) const
 {
   Fluide_Incompressible::set_param(param);
   param.ajouter_condition("is_read_rho","Density rho has not been read for a Fluide_Ostwald type medium.");

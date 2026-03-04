@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -75,7 +75,7 @@ public:
   inline double diametre_hydraulique_face(int i) const { return diametre_hydraulique_face_[i]; }
 
   virtual int est_deja_associe();
-  virtual void set_param(Param& param);
+  virtual void set_param(Param& param) const override;
   virtual void preparer_calcul();
   virtual void verifier_coherence_champs(int& err, Nom& message);
   virtual void creer_champs_non_lus();
@@ -155,7 +155,7 @@ protected:
   // Utile pour F5
   void discretiser_porosite(const Probleme_base& pb, const Discretisation_base& dis);
   void discretiser_diametre_hydro(const Probleme_base& pb, const Discretisation_base& dis);
-  virtual void set_additional_params(Param& param);
+  virtual void set_additional_params(Param& param) const;
   virtual void calculate_face_porosity();
   virtual void calculate_face_hydr_diam();
   void mettre_a_jour_porosite(double temps);

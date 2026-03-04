@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -100,7 +100,7 @@ Entree& Milieu_base::readOn(Entree& is)
   return is;
 }
 
-void Milieu_base::set_param(Param& param)
+void Milieu_base::set_param(Param& param) const
 {
   param.ajouter("rho", &ch_rho_);   // XD attr rho field_base rho 1 Density (kg.m-3).
   param.ajouter("lambda", &ch_lambda_); // XD attr lambda field_base lambda_u 1 Conductivity (W.m-1.K-1).
@@ -110,7 +110,7 @@ void Milieu_base::set_param(Param& param)
 }
 
 // methode utile pour F5 ! F5 n'appelle pas Milieu_base::set_param mais Milieu_base::set_additional_params ...
-void Milieu_base::set_additional_params(Param& param)
+void Milieu_base::set_additional_params(Param& param) const
 {
   param.ajouter("diametre_hyd_champ", &ch_diametre_hyd_);
   param.ajouter("porosites_champ", &ch_porosites_);

@@ -40,7 +40,7 @@ class Milieu_Elasticite : public Milieu_base
   Declare_instanciable(Milieu_Elasticite);
 
 public:
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   void creer_champs_non_lus() override;
   void discretiser(const Probleme_base& pb, const Discretisation_base& dis) override;
   int initialiser(const double temps) override;

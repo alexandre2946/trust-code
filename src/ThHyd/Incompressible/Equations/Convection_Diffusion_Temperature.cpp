@@ -58,7 +58,7 @@ Entree& Convection_Diffusion_Temperature::readOn(Entree& is)
   return is;
 }
 
-void Convection_Diffusion_Temperature::set_param(Param& param)
+void Convection_Diffusion_Temperature::set_param(Param& param) const
 {
   Convection_Diffusion_Temperature_base::set_param(param);
   param.ajouter_non_std("penalisation_L2_FTD",(this));

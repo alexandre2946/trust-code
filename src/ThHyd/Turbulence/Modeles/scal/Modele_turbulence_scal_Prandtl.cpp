@@ -57,7 +57,7 @@ Entree& Modele_turbulence_scal_Prandtl::readOn(Entree& is)
   return is;
 }
 
-void Modele_turbulence_scal_Prandtl::set_param(Param& param)
+void Modele_turbulence_scal_Prandtl::set_param(Param& param) const
 {
   param.ajouter("Prdt", &LePrdt_fct_); // XD_ADD_P chaine Keyword to modify the constant (Prdt) of Prandtl model : Alphat=Nut/Prdt Default value is 0.9
   param.ajouter("Prandt_turbulent_fonction_nu_t_alpha", &definition_fonction_); // XD_ADD_P chaine Optional keyword to specify turbulent diffusivity (by default, alpha_t=nu_t/Prt) with another formulae, for example: alpha_t=nu_t2/(0,7*alpha+0,85*nu_tt) with the string nu_t*nu_t/(0,7*alpha+0,85*nu_t) where alpha is the thermal diffusivity.
