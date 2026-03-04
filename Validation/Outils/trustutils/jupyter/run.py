@@ -1784,9 +1784,8 @@ defaultSuite_ = None  # a TRUSTSuite instance
 import sys
 # add imports directory to path and save contained scripts
 import_path=os.path.join(ORIGIN_DIRECTORY, "src", "python_modules")
-if not os.path.exists(import_path):
-    os.makedirs(import_path)
-sys.path.append(import_path)
+if os.path.exists(import_path):
+    sys.path.append(import_path)
 # imports = list(pathlib.Path(import_path).rglob("*.py"))
 # for f in imports:
 #     saveFileAccumulator(str(f))

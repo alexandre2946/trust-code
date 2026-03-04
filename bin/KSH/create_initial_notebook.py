@@ -23,13 +23,18 @@ intro += " Report generated " + datetime.now().strftime("%d/%m/%Y")
 
 description = "### Description\n \n"
 description += "Sketch of a classic jupyter validation form with main example of validation.\n\n"
-description += "For additional information, please consult validation form documentation with <code>Run_fiche -doc</code> and report to the more detailed tutorial in $TRUST_ROOT/Validation/Rapports_automatiques/Verification/SampleFormJupyter."
+description += "For additional information, please consult validation form documentation with <code>Run_fiche -doc</code> and report to the more detailed tutorial in $TRUST_ROOT/Validation/Rapports_automatiques/Verification/SampleFormJupyter.\n\n"
+description += "If you want to import your own python scripts, you can move these scripts to src/python_modules directory"
 
 binary = os.environ.get("exec", "[UNKNOWN]")
 version = os.environ.get("TRUST_VERSION", "[UNKNOWN]")
 
 origin = os.getcwd()
 path = os.path.join(origin, "build")
+
+# Create src/python_modules directory
+import_path = os.path.join(origin, "src", "python_modules")
+os.makedirs(import_path)
 
 parameters = "from trustutils import run\n\n"
 parameters += f"run.TRUST_parameters(\"{version}\")"
