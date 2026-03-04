@@ -24,6 +24,7 @@
 #include <medcoupling++.h>
 #ifdef MEDCOUPLING_
 #include <MEDCouplingFieldDouble.hxx>
+using MEDCoupling::MEDCouplingField;
 #endif
 
 
@@ -36,25 +37,18 @@ class Champ_Fonc_MED: public Champ_Fonc_base
   Declare_instanciable(Champ_Fonc_MED);
 public :
   inline void associer_domaine_dis_base(const Domaine_dis_base&) override;
-  const Domaine_dis_base& domaine_dis_base() const override;
+  const Domaine_dis_base& domaine_dis_base() const override { return domainebidon_inst; }
   const Domaine_VF& domaine_vf() const override { throw; }
 
   void mettre_a_jour(double ) override;
   int creer(const Nom&,const Domaine& dom,const Motcle& localisation,ArrOfDouble& temps_sauv);
-
-#ifdef MEDCOUPLING_
-  MCAuto<MEDCoupling::MEDCouplingField> lire_champ(const std::string& fileName, const std::string& meshName, const std::string& fieldName, const int iteration, const int order);
-  ArrOfDouble lire_temps_champ(const std::string& fileName, const std::string& fieldName);
-  virtual void lire_donnees_champ(const std::string& fileName, const std::string& meshName, const std::string& fieldName,
-                                  ArrOfDouble& temps_sauv, int& size, int& nbcomp, Nom& type_champ);
-#endif
 
   const Domaine& domaine() const override { return mon_dom; }
   virtual void lire(double tps,int given_iteration=-1);
   int nb_pas_temps() { return nb_dt; }
   using Champ_Fonc_base::valeurs;
   inline DoubleTab& valeurs() override;
-  inline  const DoubleTab& valeurs() const override;
+  inline const DoubleTab& valeurs() const override;
 
   inline DoubleTab& valeur_aux_elems(const DoubleTab& positions, const IntVect& les_polys, DoubleTab& valeurs) const override;
   inline DoubleVect& valeur_aux_elems_compo(const DoubleTab& positions, const IntVect& les_polys, DoubleVect& valeurs, int ncomp) const override;
@@ -67,7 +61,14 @@ public :
   inline int remplir_coord_noeuds_et_polys(DoubleTab&, IntVect&) const override;
   inline virtual const Champ_Fonc_base& le_champ() const;
   inline virtual Champ_Fonc_base& le_champ();
-  const ArrOfDouble& get_saved_times() const;
+  const ArrOfDouble& get_saved_times() const { return temps_sauv_; }
+private:
+#ifdef MEDCOUPLING_
+  ArrOfDouble lire_temps_champ(const std::string& fileName, const std::string& fieldName);
+  virtual void lire_donnees_champ(const std::string& fileName, const std::string& meshName, const std::string& fieldName,
+                                  ArrOfDouble& temps_sauv, int& size, int& nbcomp, Nom& type_champ);
+  MCAuto<MEDCoupling::MEDCouplingField> lire_champ(const std::string& fileName, const std::string& meshName, const std::string& fieldName, const int iteration, const int order);
+#endif
 
 protected:
   // Parameters read in the dataset:
@@ -100,6 +101,7 @@ protected:
 
   virtual void set_param(Param& param);
   void readOn_old_syntax(Entree& is, Nom& chaine_lue, bool& nom_decoup_lu);
+  MCAuto<MEDCouplingField> ffield_ = nullptr;
 };
 
 inline void Champ_Fonc_MED::associer_domaine_dis_base(const Domaine_dis_base& le_dom_dis_base)

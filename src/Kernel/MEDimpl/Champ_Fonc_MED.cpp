@@ -407,10 +407,11 @@ void Champ_Fonc_MED::lire(double t, int given_it)
         }
       else
         {
-          // Only one MCAuto below to avoid double deletion:
-          MCAuto<MEDCouplingField> ffield = lire_champ(fileName, meshName, fieldName, iteration, order);
+          MCAuto<MEDCouplingField> ffield;
+          bool has_field = ffield_!=nullptr;
+          if (!has_field) ffield = lire_champ(fileName, meshName, fieldName, iteration, order);
           Cerr << " at time " << t << " ... " << finl;
-          MEDCouplingFieldDouble * field = dynamic_cast<MEDCouplingFieldDouble *>((MEDCouplingField *)ffield);
+          MEDCouplingFieldDouble * field = dynamic_cast<MEDCouplingFieldDouble *>((MEDCouplingField *)(has_field?ffield_:ffield));
           if (field == 0)
             {
               Cerr << "ERROR reading MED field! Not a MEDCouplingFieldDouble!!" << finl;
@@ -438,7 +439,6 @@ int Champ_Fonc_MED::creer(const Nom& nom_fic, const Domaine& un_dom, const Motcl
 #ifdef MED_
   nom_fichier_med_ = nom_fic;
   mon_dom=un_dom;
-  int nbcomp,size;
   const Nom& type_elem=un_dom.type_elem()->que_suis_je();
   Nom type_champ;
   nom_champ_dans_fichier_med_ = le_nom();
@@ -503,6 +503,7 @@ int Champ_Fonc_MED::creer(const Nom& nom_fic, const Domaine& un_dom, const Motcl
     Cerr << "Ok, we find into file " << fileName << " a field named " << nom_champ_dans_fichier_med_ << finl;
 
   std::string fieldName = nom_champ_dans_fichier_med_.getString();
+  int nbcomp,size;
   lire_donnees_champ(fileName,meshName,fieldName,temps_sauv,size,nbcomp,type_champ);
 #endif  // MEDCOUPLING_
   // Definition:
@@ -514,10 +515,7 @@ int Champ_Fonc_MED::creer(const Nom& nom_fic, const Domaine& un_dom, const Motcl
   le_champ().fixer_nb_valeurs_nodales(type_champ == "Champ_Fonc_P0_MED" ? un_dom.nb_elem() : un_dom.nb_som());
   //pour forcer la lecture lors du mettre a jour
   changer_temps(-1e3);
-
-  //corriger_unite_nom_compo();
   le_champ().nommer(le_nom());
-  //le_champ().corriger_unite_nom_compo();
   return size;
 #else    // MED_
   med_non_installe();
@@ -540,28 +538,6 @@ ArrOfDouble Champ_Fonc_MED::lire_temps_champ(const std::string& fileName, const 
   return temps_sauv;
 }
 
-MCAuto<MEDCouplingField> Champ_Fonc_MED::lire_champ(const std::string& fileName, const std::string& meshName,
-                                                    const std::string& fieldName, const int iteration, const int order)
-{
-  // Flag pour lecture plus rapide du field sans lecture du mesh si le maillage MED est deja disponible:
-  bool fast = meshName == domaine().le_nom() && domaine().is_mc_mesh_ready();
-  Cerr << "Reading" << (fast ? " (fast)" : "") << " the field " << fieldName << " on the " << meshName << " mesh into " << fileName << " file";
-  MCAuto<MEDCouplingField> ffield;
-  Cerr << "meshName " << meshName << " " << domaine().le_nom()  << " " << (int)(domaine().is_mc_mesh_ready()) << finl;
-
-  if (fast) // Lecture plus rapide du field sans lecture du mesh associe
-    {
-      MCAuto<MEDFileField1TS> file = MEDFileField1TS::New(fileName, fieldName, iteration, order);
-      ffield = file->getFieldOnMeshAtLevel(field_type, domaine().get_mc_mesh(), 0);
-    }
-  else   // Lecture ~deux fois plus lente du field avec lecture du mesh associe
-    {
-      ffield = ReadField(field_type, fileName, meshName, 0, fieldName, iteration, order);
-    }
-
-  return ffield;
-}
-
 // Lecture du dernier champ dans le fichier juste pour decouvrir et stocker:
 // les temps (temps_sauv)
 // sa taille (size)
@@ -575,14 +551,30 @@ void Champ_Fonc_MED::lire_donnees_champ(const std::string& fileName, const std::
   int last_iter  = time_steps_[nn-1].first;
   int last_order = time_steps_[nn-1].second;
   // Only one MCAuto below to avoid double deletion:
-  MCAuto<MEDFileField1TS> field = MEDFileField1TS::New(fileName, fieldName, last_iter, last_order);
-  nbcomp = (int) field->getNumberOfComponents();
-  if (is_parallel() && use_existing_domain_)
-    size = -1;
+  if (is_parallel()) // don't read the whole file in parallel mode
+    {
+      MCAuto<MEDFileField1TS> field = MEDFileField1TS::New(fileName, fieldName, last_iter, last_order);
+      nbcomp = (int) field->getNumberOfComponents();
+      if (use_existing_domain_)
+        size = -1;
+      else
+        {
+          MCAuto<MEDFileMesh> mesh = MEDFileMesh::New(fileName, meshName, field->getMeshIteration(), field->getMeshOrder());
+          size = field_type == MEDCoupling::ON_NODES ? (int)mesh->getNumberOfNodes() : (int)mesh->getNumberOfCellsAtLevel(0);
+        }
+    }
   else
     {
-      MCAuto<MEDFileMesh> mesh = MEDFileMesh::New(fileName, meshName, field->getMeshIteration(), field->getMeshOrder());
-      size = field_type == MEDCoupling::ON_NODES ? (int)mesh->getNumberOfNodes() : (int)mesh->getNumberOfCellsAtLevel(0);
+      ffield_ = lire_champ(fileName, meshName, fieldName, last_iter, last_order);
+      MEDCouplingFieldDouble * field = dynamic_cast<MEDCouplingFieldDouble *>((MEDCouplingField *)ffield_);
+      if (field == 0)
+        {
+          Cerr << "ERROR reading MED field! Not a MEDCouplingFieldDouble!!" << finl;
+          Process::exit(-1);
+        }
+      size = (int)field->getNumberOfTuplesExpected();
+      nbcomp = (int)field->getNumberOfComponents();
+      if (nn>1) ffield_ = nullptr; // Plusieurs champs donc on ne stocke pas le dernier, il faudra relire le bon
     }
 
   if (field_type == MEDCoupling::ON_CELLS)
@@ -590,14 +582,42 @@ void Champ_Fonc_MED::lire_donnees_champ(const std::string& fileName, const std::
   else if (field_type == MEDCoupling::ON_NODES)
     type_champ = cell_type == INTERP_KERNEL::NORM_QUAD4 || cell_type == INTERP_KERNEL::NORM_HEXA8 ? "Champ_Fonc_Q1_MED" : "Champ_Fonc_P1_MED";
 }
+
+/**
+ * @brief Read a MED field from a MED file and return it as a MEDCoupling field.
+ *
+ * This method reads the field @p fieldName stored in the MED file @p fileName on the mesh
+ * named @p meshName for the given time step (@p iteration, @p order).
+ *
+ * @param[in] fileName  Path to the MED file to read.
+ * @param[in] meshName  Name of the mesh on which the field is defined (as stored in the MED file).
+ * @param[in] fieldName Name of the field to read.
+ * @param[in] iteration Time step / iteration index to read (MEDCoupling convention).
+ * @param[in] order     Order within the iteration to read (MEDCoupling convention).
+ *
+ * @return A smart-pointer-like handle (MCAuto) to the read @c MEDCouplingField.
+ *
+ * @note If @p meshName matches domaine().le_nom(), the method calls domaine().build_mc_mesh()
+ *       before checking whether the MED mesh is ready, enabling fast mode when possible.
+ */
+MCAuto<MEDCouplingField> Champ_Fonc_MED::lire_champ(const std::string& fileName, const std::string& meshName,
+                                                    const std::string& fieldName, const int iteration, const int order)
+{
+  // Pour lecture plus rapide du field sans lecture du mesh si le maillage MED est deja disponible:
+  if (meshName == domaine().le_nom()) domaine().build_mc_mesh();
+  bool fast = domaine().is_mc_mesh_ready();
+  Cerr << "Reading" << (fast ? " (fast)" : "") << " the field " << fieldName << " on the " << meshName << " mesh into " << fileName << " file" << finl;
+  MCAuto<MEDCouplingField> ffield;
+  if (fast) // Lecture plus rapide du field sans lecture du mesh associe
+    {
+      MCAuto<MEDFileField1TS> file = MEDFileField1TS::New(fileName, fieldName, iteration, order);
+      ffield = file->getFieldOnMeshAtLevel(field_type, domaine().get_mc_mesh(), 0);
+    }
+  else   // Lecture ~deux fois plus lente du field avec lecture du mesh associe
+    {
+      ffield = ReadField(field_type, fileName, meshName, 0, fieldName, iteration, order);
+    }
+
+  return ffield;
+}
 #endif // MEDCOUPLING_
-
-const Domaine_dis_base& Champ_Fonc_MED::domaine_dis_base() const
-{
-  return domainebidon_inst;
-}
-
-const ArrOfDouble& Champ_Fonc_MED::get_saved_times() const
-{
-  return temps_sauv_;
-}

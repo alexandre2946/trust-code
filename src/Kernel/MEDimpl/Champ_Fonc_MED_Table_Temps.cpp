@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -27,6 +27,7 @@ using MEDCoupling::MEDCouplingField;
 using MEDCoupling::MEDCouplingFieldDouble;
 using MEDCoupling::MCAuto;
 using MEDCoupling::MEDFileFieldMultiTS;
+using MEDCoupling::MEDFileField1TS;
 #endif
 
 Implemente_instanciable( Champ_Fonc_MED_Table_Temps, "Champ_Fonc_MED_Table_Temps", Champ_Fonc_MED );
@@ -97,10 +98,20 @@ void Champ_Fonc_MED_Table_Temps::lire_donnees_champ(const std::string& fileName,
       Cerr << "last_time not possible. Champ_Fonc_MED_Table_Temps can be used only with the first time " << tps[0] << " in the file." << finl;
       Process::exit();
     }
-
-  // Only one MCAuto below to avoid double deletion:
-  MCAuto<MEDCouplingField> ffield = ReadField(field_type, fileName, meshName, 0, fieldName,
-                                              first_iter, first_order);
+  if (meshName == domaine().le_nom()) domaine().build_mc_mesh();
+  bool fast = domaine().is_mc_mesh_ready();
+  MCAuto<MEDCouplingField> ffield;
+  if (fast)
+    {
+      MCAuto<MEDFileField1TS> file = MEDFileField1TS::New(fileName, fieldName, first_iter, first_order);
+      ffield = file->getFieldOnMeshAtLevel(field_type, domaine().get_mc_mesh(), 0);
+    }
+  else
+    {
+      // Only one MCAuto below to avoid double deletion:
+      ffield = ReadField(field_type, fileName, meshName, 0, fieldName,
+                         first_iter, first_order);
+    }
   MEDCouplingFieldDouble * field = dynamic_cast<MEDCouplingFieldDouble *>((MEDCouplingField *)ffield);
   if (field == 0)
     {
