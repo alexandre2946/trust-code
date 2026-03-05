@@ -132,21 +132,16 @@ static int init_petsc(True_int argc, char **argv, bool with_mpi,bool& trio_began
   // et de "masquer" les messages d'erreur TRUST:
   PetscPopSignalHandler();
 
-  char* theValue = getenv("TRUST_ENABLE_ERROR_HANDLERS");
-  if (theValue != nullptr) error_handlers = true;
-  if (error_handlers)
+#ifndef __CYGWIN__
+  if (error_handlers || getenv("TRUST_ENABLE_ERROR_HANDLERS") != nullptr)
     {
       Cerr << "Enabling error handlers catching SIGFPE and SIGABORT and giving a trace of where the fault happened." << finl;
-#ifndef __CYGWIN__
       install_handlers();
-#endif
     }
+#endif
 #else
-  // MPI_Init pour les machines ou Petsc n'est pas
-  // installe: ex AIX avec MPICH: il faut que argc et argv soit passes
-  // correctement et pas comme dans Comm_Group_MPI::init_group_trio
-  // sinon message: xm_348262:  p4_error: Command-line arguments are missing: 0
 #ifdef MPI_
+  // MPI_Init pour les machines ou Petsc n'est pas installe
   True_int flag;
   MPI_Initialized(&flag);
   if (!flag)
@@ -165,7 +160,6 @@ static int init_parallel_mpi(OWN_PTR(Comm_Group) & groupe_trio)
 #ifdef MPI_
   groupe_trio.typer("Comm_Group_MPI");
   Comm_Group_MPI& mpi = ref_cast(Comm_Group_MPI, groupe_trio.valeur());
-  // Si ca n'a pas ete fait dans Petsc, c'est ici qu'on fait MPI_Init()
   mpi.init_group_trio();
   return 1;
 #else
@@ -223,9 +217,6 @@ void mon_main::init_parallel(const int argc, char **argv, bool with_mpi, bool ch
   Nom arguments_info = "";
   arguments_info += "Kokkos initialized!\n";
 
-#ifdef TRUST_USE_CUDA
-  //init_cuda(); Desactive car crash crash sur topaze ToDo OpenMP
-#endif
   bool must_mpi_initialize = true;
   if (with_petsc)
     {

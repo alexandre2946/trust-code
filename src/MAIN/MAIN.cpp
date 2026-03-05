@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -65,7 +65,7 @@ void usage()
 #define DEFAULT_CHECK_ENABLED 1
 #endif
 
-int main_TRUST(int argc, char** argv,mon_main*& main_process,bool force_mpi, bool ieee)
+int main_TRUST(int argc, char** argv,mon_main*& main_process,bool with_mpi, bool ieee)
 {
 #ifdef VTRACE
   //VT_USER_END("Initialization");
@@ -78,9 +78,8 @@ int main_TRUST(int argc, char** argv,mon_main*& main_process,bool force_mpi, boo
   // Voir <PARALLEL_OK>
 
   // *************** Process command-line arguments ********************
-  bool with_mpi = force_mpi;
   int check_enabled = DEFAULT_CHECK_ENABLED;
-  int with_petsc = -1;       // -1 => use petsc if compiled
+  bool with_petsc = true;
   int nproc = -1;
   int verbose_level = -1;
   bool journal_master = false;
