@@ -57,8 +57,15 @@ namespace
 template <typename _SIZE_>
 void retrieve_connec(const MEDCouplingUMesh* mesh, ArrOfInt_T<_SIZE_>& conn, ArrOfInt_T<_SIZE_>& connIndex)
 {
-  _SIZE_ nb_it = static_cast<_SIZE_>(mesh->getNodalConnectivity()->getNbOfElems()),
-         nb_it2= static_cast<_SIZE_>(mesh->getNodalConnectivityIndex()->getNbOfElems());
+  mcIdType nb_it_init = mesh->getNodalConnectivity()->getNbOfElems(),
+           nb_it2_init = mesh->getNodalConnectivityIndex()->getNbOfElems();
+
+  if (nb_it_init >= std::numeric_limits<_SIZE_>::max() || nb_it2_init >= std::numeric_limits<_SIZE_>::max())
+    Process::exit("ERROR! You are trying to build a 32b domain with a mesh which is too big (too many elements). Use Domaine_64 / Lire_MED_64.");
+
+  _SIZE_ nb_it = static_cast<_SIZE_>(nb_it_init),
+         nb_it2= static_cast<_SIZE_>(nb_it2_init);
+
   const mcIdType *c  = mesh->getNodalConnectivity()->begin(),
                   *cI = mesh->getNodalConnectivityIndex()->begin();
   if (std::is_same<_SIZE_, mcIdType>::value)
