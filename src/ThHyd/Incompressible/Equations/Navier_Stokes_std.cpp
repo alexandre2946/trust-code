@@ -828,7 +828,7 @@ void Navier_Stokes_std::projeter()
       secmem*=(-1./dt);
       secmem.echange_espace_virtuel();
 
-      double bilan=mp_norme_vect(secmem);
+      double bilan=mp_norme_vect(secmem); // TODO DG surcharger cette fonction pour avoir \sum \int_T || \sum_{nfunc_p} secmem*fbase_p ||
       Cout << "-------------  Projection  -----------------" << finl;
       Cout << "--------------------------------------------" << finl;
       Cout << "Bilan de masse avant projection : " << bilan << finl;
