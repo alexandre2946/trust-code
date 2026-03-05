@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,18 +17,21 @@
 #include <Domaine.h>
 #include <Linear_algebra_tools_impl.h>
 
-Implemente_instanciable(Analyse_Angle,"Analyse_Angle",Interprete);
+Implemente_instanciable_32_64(Analyse_Angle_32_64,"Analyse_Angle",Interprete_geometrique_base_32_64<_T_>);
 // XD analyse_angle interprete analyse_angle -1 Keyword Analyse_angle prints the histogram of the largest angle of each mesh elements of the domain named name_domain. nb_histo is the histogram number of bins. It is called by default during the domain discretization with nb_histo set to 18. Useful to check the number of elements with angles above 90 degrees.
 // XD  attr domain_name ref_domaine domain_name 0 Name of domain to resequence.
 // XD  attr nb_histo entier nb_histo 0 not_set
 
+// XD analyse_angle_64 analyse_angle analyse_angle_64 -1 Analyse_angle for big (64b) domain.
 
-Sortie& Analyse_Angle::printOn(Sortie& s ) const
+template <typename _SIZE_>
+Sortie& Analyse_Angle_32_64<_SIZE_>::printOn(Sortie& os) const
 {
-  return s << que_suis_je() << finl;
+  return os;
 }
 
-Entree& Analyse_Angle::readOn(Entree& is )
+template <typename _SIZE_>
+Entree& Analyse_Angle_32_64<_SIZE_>::readOn(Entree& is)
 {
   return is;
 }
@@ -88,40 +91,42 @@ double largest_angle(const DoubleTab& coords)
   return tet;
 }
 
-Entree& Analyse_Angle::interpreter(Entree& is)
+template <typename _SIZE_>
+Entree& Analyse_Angle_32_64<_SIZE_>::interpreter_(Entree& is)
 {
+  this->associer_domaine(is);
   int nb_histo;
-  Nom nom_dom;
-  is >> nom_dom;
   is >> nb_histo;
-  Domaine& dom=ref_cast(Domaine,objet(nom_dom));
-
-  histogramme_angle(dom,Cout,nb_histo);
+  histogramme_angle(this->domaine(), Cout, nb_histo);
   return is;
 }
-void histogramme_angle(const Domaine& dom , Sortie& out,  int nb_histo )
+
+template <typename _SIZE_>
+void histogramme_angle(const Domaine_32_64<_SIZE_>& dom, Sortie& out, int nb_histo)
 {
+  using IntTab_t = IntTab_T<_SIZE_>;
+  using DoubleTab_t = DoubleTab_T<_SIZE_>;
   out<<finl<<"Histogram of the largest angle of each element found into the mesh "<<dom.le_nom()<<" :" << finl;
   Motcle type_elem(dom.type_elem()->que_suis_je());
-  if (((type_elem!="triangle")&& (type_elem!="tetraedre")) || ((type_elem=="triangle") && (Domaine::dimension==3)))
+  if (((type_elem!="triangle")&& (type_elem!="tetraedre")) || ((type_elem=="triangle") && (Domaine_32_64<_SIZE_>::dimension==3)))
     {
-      out<<"Not available for "<<type_elem<<" in dimension "<<Domaine::dimension<<finl;
+      out<<"Not available for "<<type_elem<<" in dimension "<<Domaine_32_64<_SIZE_>::dimension<<finl;
       return;
     }
 
   ArrOfInt histo(nb_histo+1);
-  int nb_elem=dom.nb_elem();
-  const DoubleTab& som=dom.les_sommets();
-  const IntTab& les_elems=dom.les_elems();
-  int dim_space=som.dimension(1);
-  int nb_som_elem=les_elems.dimension(1);
+  _SIZE_ nb_elem=dom.nb_elem();
+  const DoubleTab_t& som=dom.les_sommets();
+  const IntTab_t& les_elems=dom.les_elems();
+  int dim_space=(int)som.dimension(1);
+  int nb_som_elem=(int)les_elems.dimension(1);
   DoubleTab coords(nb_som_elem,3);
   ToDo_Kokkos("critical");
-  for (int elem=0; elem<nb_elem; elem++)
+  for (_SIZE_ elem=0; elem<nb_elem; elem++)
     {
       for (int s=0; s<nb_som_elem; s++)
         {
-          int sommet=les_elems(elem,s);
+          _SIZE_ sommet=les_elems(elem,s);
           for (int dir=0; dir<dim_space; dir++)
             coords(s,dir)=som(sommet,dir);
         }
@@ -134,7 +139,7 @@ void histogramme_angle(const Domaine& dom , Sortie& out,  int nb_histo )
     }
   if (histo[nb_histo]>0)
     Process::exit();
-  trustIdType nb_elem_tot = Process::mp_sum(nb_elem);  // Analyse_angle only provided in 32b!
+  trustIdType nb_elem_tot = Process::mp_sum(nb_elem);
   if (nb_elem_tot>0)
     {
       double obtuse_cells_proportion=0;
@@ -161,3 +166,10 @@ void histogramme_angle(const Domaine& dom , Sortie& out,  int nb_histo )
     }
   out << finl;
 }
+
+template class Analyse_Angle_32_64<int>;
+template void histogramme_angle<int>(const Domaine_32_64<int>&, Sortie&, int);
+#if INT_is_64_ == 2
+template class Analyse_Angle_32_64<trustIdType>;
+template void histogramme_angle<trustIdType>(const Domaine_32_64<trustIdType>&, Sortie&, int);
+#endif

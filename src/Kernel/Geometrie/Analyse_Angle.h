@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,28 +16,23 @@
 #ifndef Analyse_Angle_included
 #define Analyse_Angle_included
 
-#include <Interprete.h>
+#include <Interprete_geometrique_base.h>
 
-//
-// AJOUTER ICI
+template <typename _SIZE_>
+void histogramme_angle(const Domaine_32_64<_SIZE_>&, Sortie&, int nb_histo=18);
 
-#include <Domaine_forward.h>
-
-void histogramme_angle(const Domaine&, Sortie&, int nb_histo=18 );
-
-class Analyse_Angle : public Interprete
+template <typename _SIZE_>
+class Analyse_Angle_32_64 : public Interprete_geometrique_base_32_64<_SIZE_>
 {
+  Declare_instanciable_32_64(Analyse_Angle_32_64);
+public:
+  using int_t = _SIZE_;
+  using Domaine_t = Domaine_32_64<_SIZE_>;
 
-  Declare_instanciable(Analyse_Angle);
-
-public :
-
-  Entree& interpreter(Entree&) override;
-
+  Entree& interpreter_(Entree&) override;
 };
 
+using Analyse_Angle    = Analyse_Angle_32_64<int>;
+using Analyse_Angle_64 = Analyse_Angle_32_64<trustIdType>;
 
 #endif
-
-
-

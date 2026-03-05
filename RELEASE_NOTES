@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.8_beta : Enhancements, modifications and corrected bugs since version 1.9.7 :
 --------------------------------------------------------------------------------------------------
+XX/XX/26 (TRUST) New keyword  : Analyse_angle_64 version of Analyse_angle keyword for large mesh to compute angles histogram especially for tetraedras to detect too much obtuse angles 
 24/02/26 (TRUST) GPU          : Single GPU performance on MI250X (adastra, lumi) and MI300A (adastra) improved by 30% after ROCm update (6.4.x)
 24/02/26 (TRUST) Bug fix      : Replace CG by GMRES in AMG solver for better robustness and speed especially on GPU (may not converge)
 24/02/26 (TRUST) Bug fix      : Add test to check several int64 geometric interpretors and fix some of them (Corriger_Frontiere_Periodique_64, Raffiner_Simplexes_64)
