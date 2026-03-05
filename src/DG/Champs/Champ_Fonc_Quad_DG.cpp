@@ -31,15 +31,18 @@ Champ_base& Champ_Fonc_Quad_DG::affecter_(const Champ_base& ch)
   const DoubleTab& integ_points = quad.get_integ_points();
   int nb_elem = domaine.nb_elem();
 
-  DoubleTab values(integ_points.dimension(0),1);
+  int dim = Objet_U::dimension;
+
+  DoubleTab values(integ_points.dimension(0),dim);
 
   ch.valeur_aux(integ_points, values);
 
+  const int nb_pts_quad_max = quad.nb_pts_integ_max();
+
   for (int num_elem = 0; num_elem < nb_elem; num_elem++)
-    {
-      for (int k = 0; k < quad.nb_pts_integ(num_elem) ; k++)
-        valeurs_(num_elem,k) = values(quad.ind_pts_integ(num_elem)+k);
-    }
+    for (int k = 0; k < quad.nb_pts_integ(num_elem) ; k++)
+      for (int d = 0; d<dim; d++)
+        valeurs_(num_elem,k + nb_pts_quad_max*d) = values(quad.ind_pts_integ(num_elem)+k, d);
 
   return *this;
 }

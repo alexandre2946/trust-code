@@ -19,10 +19,11 @@
 #include <Terme_Source_Qdm.h>
 #include <Source_base.h>
 #include <TRUST_Ref.h>
+#include <Champ_Fonc_Quad_DG.h>
+#include <Probleme_base.h>
 
 class Domaine_Cl_DG;
 class Domaine_DG;
-class Probleme_base;
 
 class Terme_Source_Qdm_Elem_DG : public Source_base, public Terme_Source_Qdm
 {
@@ -37,6 +38,8 @@ protected:
   OBS_PTR(Domaine_DG) le_dom_DG;
   OBS_PTR(Domaine_Cl_DG) le_dom_Cl_DG;
   void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;
+
+  OWN_PTR(Champ_Don_base) la_source_DG;
 };
 
 #endif /* Terme_Source_Qdm_Elem_DG_included */
