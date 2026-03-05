@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -1551,7 +1551,7 @@ void DomaineCutter_32_64<_SIZE_>::ecrire_domaines(const Nom& basename, const Dom
 
                   std::string dname = "/zone_" + std::to_string(i_part);
                   if(domaines_index[i_part] >=0)
-                    dname += "_" + std::to_string(domaines_index[i_part]);
+                    dname += std::string("_") + std::to_string(domaines_index[i_part]);
                   Nom datasetname(dname);
                   if(Process::is_parallel())
                     fic_hdf.fill_dataset(datasetname, os_hdf);

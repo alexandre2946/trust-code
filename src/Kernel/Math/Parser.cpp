@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -27,7 +27,7 @@ Parser::Parser()
   init_parser();
   state=0;
   root=nullptr;
-  str = "0";
+  str = std::string("0");
   impuls_tn = -1.;
   impuls_T = 1.;
   impuls_t0 = 0.;

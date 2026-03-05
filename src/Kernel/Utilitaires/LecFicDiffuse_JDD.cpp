@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -106,7 +106,7 @@ int LecFicDiffuse_JDD::ouvrir(const char* name,
               if (motlu=="#")
                 {
                   // Cerr<<" on passe les commentaires"<<finl;
-                  comments += "[" + std::string(name) + "] : Comments bloc starts at line " + std::to_string(line)+ " ";
+                  comments += std::string("[") + std::string(name) + "] : Comments bloc starts at line " + std::to_string(line)+ " ";
                   int jol = file_.jumpOfLines();
                   for(int jump=0; jump<jol; jump++)
                     prov <<"\n";
@@ -138,7 +138,7 @@ int LecFicDiffuse_JDD::ouvrir(const char* name,
                 {
                   // Cerr<<" on passe le bloc de commentaires"<<finl;
                   int ouvrante=1;
-                  comments += "[" + std::string(name) + "] : Comments bloc starts at line " + std::to_string(line) + " ";
+                  comments += std::string("[") + std::string(name) + "] : Comments bloc starts at line " + std::to_string(line) + " ";
                   while (ouvrante!=0)
                     {
                       int jol = file_.jumpOfLines();
