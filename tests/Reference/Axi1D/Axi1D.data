@@ -1,0 +1,114 @@
+# Conduction 2D Axi #
+# PARALLEL OK 2 #
+Dimension 3
+
+Pb_Conduction pb
+DomaineAxi1d FineMesh
+ModifyDomaineAxi1D FineMesh { origine champ_uniforme 2 0 0 }
+
+# BEGIN MESH #
+Lire_MED {
+    domain FineMesh
+    file fuel_mesh.med
+}
+# END MESH #
+
+# BEGIN PARTITION
+Partition FineMesh
+{
+    Partition_tool tranche { tranches 2 1 1 }
+    Larg_joint 1
+    zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones FineMesh
+END SCATTER #
+
+EF_axi dis
+
+Scheme_euler_implicit sch
+Lire sch
+{
+    tinit 0
+    dt_min 1e-12
+    dt_max 1
+    facsec 1
+    dt_impr 1e-7
+    dt_sauv 100
+    seuil_statio 1e-2
+    Solveur Solveur_lineaire_std
+    {
+        Solveur petsc cholesky {  }
+    }
+}
+
+Associate pb FineMesh
+Associate pb sch
+Discretize pb dis
+
+Read pb
+{
+    Solide
+    {
+        rho Champ_Uniforme 1 8000.0
+        lambda Champ_Uniforme 1 20.
+        Cp Champ_Uniforme 1 1.0
+    }
+    Conduction
+    {
+        diffusion { }
+        initial_conditions {
+            temperature Champ_Uniforme 1 300.
+        }
+        boundary_conditions {
+            center paroi_temperature_imposee Champ_Front_Uniforme 1 300.
+            outside paroi_echange_global_impose h_imp Champ_Front_Uniforme 1 1e4 T_ext champ_front_uniforme 1 500.
+        }
+        sources { Puissance_Thermique Champ_Uniforme 1 1e5 }
+    }
+
+    Post_processing
+    {
+        Probes
+        {
+            sonde1 nodes temperature periode 1e7 radius 11 0. 0. 0. 45.   0.1 0.5
+            sonde2 nodes temperature periode 1e7 radius 11 0. 0. 0. -45.  0.1 0.5
+            sonde3 nodes temperature periode 1e7 radius 11 0. 0. 0. 135.  0.1 0.5
+            sonde4 nodes temperature periode 1e7 radius 11 0. 0. 0. -135. 0.1 0.5
+        }
+        fields dt_post 0.1
+        {
+            Temperature elem
+            Temperature som
+        }
+    }
+
+    liste_de_postraitements 
+    {
+        test1 Post_processing
+        {
+            format cgns
+            fields dt_post 0.1
+            {
+                Temperature elem
+                Temperature som
+            }
+        }
+
+        test2 Post_processing
+        {
+            format single_lata
+            fields dt_post 0.1
+            {
+                Temperature elem
+                Temperature som
+            }
+        }
+    }
+}
+
+Solve pb
+End
