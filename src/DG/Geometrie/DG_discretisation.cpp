@@ -236,9 +236,18 @@ void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
   else nb_comp = nb_comp*default_nb_comp;
   Cout << "champ " << noms[0] << " " << type << " " << " " << nb_comp << " " << default_nb_comp << finl;
   if (champ_fonc)
-    creer_champ(*champ_fonc, z, type, noms[0], unites[0], nb_comp, nb_ddl, temps, directive, que_suis_je());
+    {
+      creer_champ(*champ_fonc, z, type, noms[0], unites[0], nb_comp, nb_ddl, temps, directive, que_suis_je());
+      if (nature==vectoriel) champ_fonc->valeur().fixer_nature_du_champ(vectoriel); //TODO should be considered multiscalar cases for pb_multiphase, maybe nature du champ into creer_champ's options
+    }
   else
-    creer_champ(*champ_don, z, type, noms[0], unites[0], nb_comp, nb_ddl, temps, directive, que_suis_je());
+    {
+      creer_champ(*champ_don, z, type, noms[0], unites[0], nb_comp, nb_ddl, temps, directive, que_suis_je());
+      if (nature==vectoriel) champ_don->valeur().fixer_nature_du_champ(vectoriel);
+    }
+
+
+
   if ((nature == multi_scalaire) && (champ_fonc))
     {
       champ_fonc->valeur().fixer_nature_du_champ(nature);

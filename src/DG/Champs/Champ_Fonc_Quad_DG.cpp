@@ -31,7 +31,8 @@ Champ_base& Champ_Fonc_Quad_DG::affecter_(const Champ_base& ch)
   const DoubleTab& integ_points = quad.get_integ_points();
   int nb_elem = domaine.nb_elem();
 
-  int dim = Objet_U::dimension;
+  int dim = 1;
+  if (nature_du_champ() == Nature_du_champ::vectoriel) dim = Objet_U::dimension;
 
   DoubleTab values(integ_points.dimension(0),dim);
 
