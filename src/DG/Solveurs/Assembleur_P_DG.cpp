@@ -82,7 +82,7 @@ int Assembleur_P_DG::assembler_mat(Matrice& la_matrice, const DoubleVect& diag, 
   const BasisFunction& bfunc = domaine.get_basisFunction(nordre);
   const int nb_basis_func = bfunc.nb_bfunc();
 
-  const IntTab& indices_glob_elem = ch.indices_glob_elem();
+  const IntTab& indices_glob_elem = bfunc.indices_glob_elem();
 
   int nb_elem_tot = le_dom_dg_->nb_elem_tot();
   int size_inc = indices_glob_elem(nb_elem_tot);

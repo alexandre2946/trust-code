@@ -73,14 +73,6 @@ void Champ_Elem_DG::associer_domaine_dis_base(const Domaine_dis_base& z_dis)
   nb_bfunc_ = Option_DG::Nb_col_from_order(order_);
   if (nom_.debute_par("vitesse") || nom_.debute_par("gradient"))
     is_scalar_ = false;
-
-  const int dim = is_scalar_ ? 1 : Objet_U::dimension;
-  int nb_elem_tot = le_dom_VF->nb_elem_tot();
-
-  indices_glob_elem_.resize(dim*nb_elem_tot+1);
-  indices_glob_elem_(0)=0;
-  for (int e = 0; e < nb_elem_tot; e++)
-    indices_glob_elem_(e+1) = indices_glob_elem_(e) +  nb_bfunc_*dim;
 }
 
 

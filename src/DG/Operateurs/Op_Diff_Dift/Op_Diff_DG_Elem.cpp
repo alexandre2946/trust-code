@@ -74,9 +74,7 @@ void Op_Diff_DG_Elem::dimensionner(Matrice_Morse& la_matrice) const // TODO a re
   const BasisFunction& bfunc = domaine.get_basisFunction(nordre);
   const int nb_basis_func = bfunc.nb_bfunc();
 
-
-  const Champ_Elem_DG& ch = ref_cast(Champ_Elem_DG, equation().inconnue());
-  const IntTab& indices_glob_elem = ch.indices_glob_elem();
+  const IntTab& indices_glob_elem =bfunc.indices_glob_elem(dim);
 
   int nb_elem_tot = le_dom_dg_->nb_elem_tot();
   int size_inc = indices_glob_elem(nb_elem_tot);
@@ -178,12 +176,12 @@ void Op_Diff_DG_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, cons
 
   const Champ_Elem_DG& ch = ref_cast(Champ_Elem_DG, equation().inconnue());
   const int dim = ch.get_is_scalar() ? 1 : Objet_U::dimension;
-  const IntTab& indices_glob_elem = ch.indices_glob_elem();
 
   int order = Option_DG::Get_order_for(nom_inco);
 
   const BasisFunction& bfunc = le_dom_dg_->get_basisFunction(order);
   const int nb_bfunc = bfunc.nb_bfunc();
+  const IntTab& indices_glob_elem = bfunc.indices_glob_elem(dim);
 
   const DoubleTab& eta_F = bfunc.get_eta_facet(); // Compute the penalisation coefficient
 

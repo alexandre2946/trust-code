@@ -32,8 +32,33 @@ public:
 
   inline const int& get_order() const { return order_; }
   inline const int& get_default_quadrature_order() const { return default_quad_order_; }
-  inline const IntTab& indices_glob_elem() const { return indices_glob_elem_; }
-  inline const int& indices_glob_elem(int elem) const { return indices_glob_elem_(elem); }
+  inline const IntTab& indices_glob_elem(const int dim = 1) const
+  {
+    switch (dim)
+      {
+      case 1:
+        return indices_glob_elem_;
+      case 2:
+        if (indices_glob_elem_2D_.size() == 0)
+          {
+            indices_glob_elem_2D_ = indices_glob_elem_;
+            indices_glob_elem_2D_ *= 2;
+          }
+        return indices_glob_elem_2D_;
+      case 3:
+        if (indices_glob_elem_3D_.size() == 0)
+          {
+            indices_glob_elem_3D_ = indices_glob_elem_;
+            indices_glob_elem_3D_ *= 2;
+          }
+        return indices_glob_elem_3D_;
+      default:
+        Cerr << "bad dimension indices_glob_elem" << finl;
+        throw;
+      }
+    return indices_glob_elem_;
+  }
+//  inline const int& indices_glob_elem(int elem) const { return indices_glob_elem_(elem); }
   inline const int& nb_bfunc() const { return nb_bfunc_; }
 
   //Evaluation of the basis functions on integration points for elements and facets
@@ -77,6 +102,9 @@ protected:
   int default_quad_order_;
 
   IntTab indices_glob_elem_;
+  mutable IntTab indices_glob_elem_2D_;
+  mutable IntTab indices_glob_elem_3D_;
+
 
   Matrice_Morse transition_matrix_;
 

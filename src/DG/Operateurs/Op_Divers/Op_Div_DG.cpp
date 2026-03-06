@@ -130,10 +130,9 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
   DoubleTab f_base_p(nb_bfunc_p, nb_pts_integ_max);
   DoubleTab scalar_product_dim(nb_pts_integ_max);
 
-  const IntTab& indices_glob_elem_v = bfunc_v.indices_glob_elem();
-  const IntTab& indices_glob_elem_p = bfunc_p.indices_glob_elem();
-
   const int dim = Objet_U::dimension;
+  const IntTab& indices_glob_elem_v = bfunc_v.indices_glob_elem(dim);
+  const IntTab& indices_glob_elem_p = bfunc_p.indices_glob_elem();
 
   // Loop over elements to compute \int q_h div(u_h) dV
   for (int elem = 0; elem < domaine.nb_elem(); elem++)
@@ -151,7 +150,7 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
                 scalar_product_dim(k) += Div_fbase(d, velocity_index, k) * f_base_p(pressure_index, k);
               coeff = quad.compute_integral_on_elem(elem, scalar_product_dim);
               if (mat)
-                (*mat)(ind_elem_p + pressure_index, ind_elem_v*dim + velocity_index + d * nb_bfunc_v) += coeff;
+                (*mat)(ind_elem_p + pressure_index, ind_elem_v + velocity_index + d * nb_bfunc_v) += coeff;
               secmem(elem, pressure_index) -= coeff * vit(elem, velocity_index + d * nb_bfunc_v);
 
               if (elem==10)
@@ -184,10 +183,10 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
       int elem0 = face_voisins(face,0);
       int elem1 = face_voisins(face,1);
       double sur_f = face_surfaces(face);
-      int ind_elem0_v = bfunc_v.indices_glob_elem(elem0);
-      int ind_elem1_v = bfunc_v.indices_glob_elem(elem1);
-      int ind_elem0_p = bfunc_p.indices_glob_elem(elem0);
-      int ind_elem1_p = bfunc_p.indices_glob_elem(elem1);
+      int ind_elem0_v = indices_glob_elem_v(elem0);
+      int ind_elem1_v = indices_glob_elem_v(elem1);
+      int ind_elem0_p = indices_glob_elem_p(elem0);
+      int ind_elem1_p = indices_glob_elem_p(elem1);
       bfunc_v.eval_bfunc_on_facets(quad, elem0, face, f_base_v0);
       bfunc_v.eval_bfunc_on_facets(quad, elem1, face, f_base_v1);
       bfunc_p.eval_bfunc_on_facets(quad, elem0, face, f_base_p0);
@@ -219,10 +218,10 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
 
                   if (mat)
                     {
-                      (*mat)(ind_elem0_p + pressure_index, ind_elem0_v*dim + velocity_index + d * nb_bfunc_v) -= coeff00;
-                      (*mat)(ind_elem0_p + pressure_index, ind_elem1_v*dim + velocity_index + d * nb_bfunc_v) -= coeff01;
-                      (*mat)(ind_elem1_p + pressure_index, ind_elem0_v*dim + velocity_index + d * nb_bfunc_v) -= coeff10;
-                      (*mat)(ind_elem1_p + pressure_index, ind_elem1_v*dim + velocity_index + d * nb_bfunc_v) -= coeff11;
+                      (*mat)(ind_elem0_p + pressure_index, ind_elem0_v + velocity_index + d * nb_bfunc_v) -= coeff00;
+                      (*mat)(ind_elem0_p + pressure_index, ind_elem1_v + velocity_index + d * nb_bfunc_v) -= coeff01;
+                      (*mat)(ind_elem1_p + pressure_index, ind_elem0_v + velocity_index + d * nb_bfunc_v) -= coeff10;
+                      (*mat)(ind_elem1_p + pressure_index, ind_elem1_v + velocity_index + d * nb_bfunc_v) -= coeff11;
                     }
                   secmem(elem0, pressure_index) += coeff00 * vit(elem0, velocity_index + d * nb_bfunc_v);
                   secmem(elem0, pressure_index) += coeff01 * vit(elem1, velocity_index + d * nb_bfunc_v);
@@ -242,8 +241,8 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
       int elem = face_voisins(face, 0); // The cell that have one facet on the boundary
       double sur_f = face_surfaces(face);
 
-      int ind_elem_v = bfunc_v.indices_glob_elem(elem);
-      int ind_elem_p = bfunc_p.indices_glob_elem(elem);
+      int ind_elem_v = indices_glob_elem_v(elem);
+      int ind_elem_p = indices_glob_elem_p(elem);
       bfunc_v.eval_bfunc_on_facets(quad, elem, face, f_base_v0);
       bfunc_p.eval_bfunc_on_facets(quad, elem, face, f_base_p0);
       for (int pressure_index = 0; pressure_index < nb_bfunc_p; pressure_index++)
@@ -260,7 +259,7 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
                     eval_jump_on_facet00(k) -= f_base_v0(velocity_index, k) * face_normales(face, d)  * f_base_p0(pressure_index, k) / sur_f;
                   coeff00 = quad.compute_integral_on_facet(face, eval_jump_on_facet00);
                   if (mat)
-                    (*mat)(ind_elem_p + pressure_index, ind_elem_v*dim + velocity_index + d * nb_bfunc_v) -= coeff00;
+                    (*mat)(ind_elem_p + pressure_index, ind_elem_v + velocity_index + d * nb_bfunc_v) -= coeff00;
                   secmem(elem, pressure_index) += coeff00 * vit(elem, velocity_index + d * nb_bfunc_v);
                 }
             }

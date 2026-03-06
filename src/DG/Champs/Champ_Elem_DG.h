@@ -37,7 +37,6 @@ public:
 
   inline const int& get_order() const { return order_; }
   inline const bool& get_is_scalar() const { return is_scalar_; }
-  inline const IntTab& indices_glob_elem() const { return indices_glob_elem_; }
 
   inline const int& nb_bfunc() const { return nb_bfunc_; }
 
@@ -51,8 +50,6 @@ protected:
   int order_ = -1;
   int nb_bfunc_ = -1;
   bool is_scalar_ = true;
-
-  IntTab indices_glob_elem_;
 };
 
 
