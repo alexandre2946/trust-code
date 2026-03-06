@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,9 +15,11 @@
 
 #include <Champ_Som_PolyMAC_CDO.h>
 #include <Domaine_PolyMAC_CDO.h>
+#include <Synonyme_info.h>
 #include <Domaine.h>
 
 Implemente_instanciable(Champ_Som_PolyMAC_CDO,"Champ_Som_PolyMAC_CDO",Champ_Inc_P1_base);
+Add_synonym(Champ_Som_PolyMAC_CDO, "Champ_Som_PolyMAC_HFV");
 
 Sortie& Champ_Som_PolyMAC_CDO::printOn(Sortie& s) const
 {
