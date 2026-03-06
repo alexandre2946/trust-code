@@ -13,36 +13,46 @@
 *
 *****************************************************************************/
 
-#ifndef Terme_Source_Qdm_Elem_DG_included
-#define Terme_Source_Qdm_Elem_DG_included
+#ifndef Op_Conv_DG_base_included
+#define Op_Conv_DG_base_included
 
-#include <Terme_Source_Qdm.h>
-#include <Source_base.h>
+#include <Operateur_Conv.h>
 #include <TRUST_Ref.h>
-#include <Champ_Fonc_Quad_DG.h>
-#include <Probleme_base.h>
+#include <SFichier.h>
+#include <Domaine_DG.h>
+#include <Domaine_Cl_DG.h>
+#include <Champ_base.h>
 
-class Domaine_Cl_DG;
-class Domaine_DG;
-
-class Terme_Source_Qdm_Elem_DG : public Source_base, public Terme_Source_Qdm
+class Op_Conv_DG_base: public Operateur_Conv_base
 {
-  Declare_instanciable(Terme_Source_Qdm_Elem_DG);
+  Declare_base(Op_Conv_DG_base);
 public:
-  int has_interface_blocs() const override { return 1; }
 
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override { } //rien
-  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
+  void completer() override;
+  double calculer_dt_stab() const override;
+  inline DoubleTab& calculer(const DoubleTab& inco, DoubleTab& resu) const override;
 
-  void associer_pb(const Probleme_base& ) override  { }
-  void mettre_a_jour(double ) override;
+  int impr(Sortie& os) const override;
+
+  void associer_domaine_cl_dis(const Domaine_Cl_dis_base&) override;
+  void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&, const Champ_Inc_base&) override;
+  void associer_vitesse(const Champ_base&) override;
 
 protected:
-  OBS_PTR(Domaine_DG) le_dom_DG;
-  OBS_PTR(Domaine_Cl_DG) le_dom_Cl_DG;
-  void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;
+  OBS_PTR(Domaine_DG) le_dom_dg_;
+  OBS_PTR(Domaine_Cl_DG) la_zcl_dg_;
+  OBS_PTR(Champ_base) vitesse_;
 
-  OWN_PTR(Champ_Don_base) la_source_DG;
+  mutable SFichier Flux, Flux_moment, Flux_sum;
 };
 
-#endif /* Terme_Source_Qdm_Elem_DG_included */
+/*! @brief calcule la contribution de la convection, la range dans resu renvoie resu
+ *
+ */
+inline DoubleTab& Op_Conv_DG_base::calculer(const DoubleTab& inco, DoubleTab& resu) const
+{
+  resu = 0.;
+  return ajouter(inco, resu);
+}
+
+#endif

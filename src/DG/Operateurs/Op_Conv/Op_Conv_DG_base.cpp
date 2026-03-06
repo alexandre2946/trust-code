@@ -13,36 +13,40 @@
 *
 *****************************************************************************/
 
-#ifndef Terme_Source_Qdm_Elem_DG_included
-#define Terme_Source_Qdm_Elem_DG_included
-
-#include <Terme_Source_Qdm.h>
-#include <Source_base.h>
-#include <TRUST_Ref.h>
-#include <Champ_Fonc_Quad_DG.h>
+#include <Op_Conv_DG_base.h>
+#include <Discretisation_base.h>
+#include <Schema_Temps_base.h>
+#include <EcrFicPartage.h>
 #include <Probleme_base.h>
 
-class Domaine_Cl_DG;
-class Domaine_DG;
 
-class Terme_Source_Qdm_Elem_DG : public Source_base, public Terme_Source_Qdm
+Implemente_base(Op_Conv_DG_base, "Op_Conv_DG_base", Operateur_Conv_base);
+
+Sortie& Op_Conv_DG_base::printOn(Sortie& s) const { return s << que_suis_je(); }
+
+Entree& Op_Conv_DG_base::readOn(Entree& s) { return s; }
+
+double Op_Conv_DG_base::calculer_dt_stab() const { return 1e8; }
+
+void Op_Conv_DG_base::completer() { Operateur_base::completer(); }
+
+void Op_Conv_DG_base::associer_domaine_cl_dis(const Domaine_Cl_dis_base& zcl)
 {
-  Declare_instanciable(Terme_Source_Qdm_Elem_DG);
-public:
-  int has_interface_blocs() const override { return 1; }
+  la_zcl_dg_ = ref_cast(Domaine_Cl_DG, zcl);
+}
 
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override { } //rien
-  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
+void Op_Conv_DG_base::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& zcl, const Champ_Inc_base&)
+{
+  le_dom_dg_ = ref_cast(Domaine_DG, domaine_dis);
+  la_zcl_dg_ = ref_cast(Domaine_Cl_DG, zcl);
+}
 
-  void associer_pb(const Probleme_base& ) override  { }
-  void mettre_a_jour(double ) override;
+int Op_Conv_DG_base::impr(Sortie& os) const
+{
+  return 1;
+}
 
-protected:
-  OBS_PTR(Domaine_DG) le_dom_DG;
-  OBS_PTR(Domaine_Cl_DG) le_dom_Cl_DG;
-  void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;
-
-  OWN_PTR(Champ_Don_base) la_source_DG;
-};
-
-#endif /* Terme_Source_Qdm_Elem_DG_included */
+void Op_Conv_DG_base::associer_vitesse(const Champ_base& ch)
+{
+  vitesse_ = ch;
+}

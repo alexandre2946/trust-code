@@ -52,10 +52,8 @@ void Terme_Source_Qdm_Elem_DG::associer_domaines(const Domaine_dis_base& domaine
   le_dom_Cl_DG = ref_cast(Domaine_Cl_DG, domaine_Cl_dis);
 }
 
-DoubleTab& Terme_Source_Qdm_Elem_DG::ajouter(DoubleTab& resu) const
+void Terme_Source_Qdm_Elem_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  if (has_interface_blocs()) return Source_base::ajouter(resu);
-
   const Domaine_DG& dom = ref_cast(Domaine_DG, le_dom_DG.valeur());
 
   int order = Option_DG::Get_order_for("vitesse");
@@ -81,17 +79,9 @@ DoubleTab& Terme_Source_Qdm_Elem_DG::ajouter(DoubleTab& resu) const
             for (int k = 0; k < quad.nb_pts_integ(elem) ; k++)
               product(k) =  la_source_DG->valeurs()(sub_type(Champ_Uniforme,la_source.valeur()) ? 0 : elem, k) * fbase(fb, k);
 
-            resu(elem, fb + d*nb_bfunc) += quad.compute_integral_on_elem(elem, product);
+            secmem(elem, fb + d*nb_bfunc) += quad.compute_integral_on_elem(elem, product);
           }
     }
-
-  return resu;
-}
-
-DoubleTab& Terme_Source_Qdm_Elem_DG::calculer(DoubleTab& resu) const
-{
-  resu = 0.;
-  return ajouter(resu);
 }
 
 void Terme_Source_Qdm_Elem_DG::mettre_a_jour(double temps)

@@ -13,36 +13,38 @@
 *
 *****************************************************************************/
 
-#ifndef Terme_Source_Qdm_Elem_DG_included
-#define Terme_Source_Qdm_Elem_DG_included
+#ifndef Op_Conv_EF_Stab_DG_Elem_included
+#define Op_Conv_EF_Stab_DG_Elem_included
 
-#include <Terme_Source_Qdm.h>
-#include <Source_base.h>
-#include <TRUST_Ref.h>
-#include <Champ_Fonc_Quad_DG.h>
-#include <Probleme_base.h>
+#include <Op_Conv_DG_base.h>
 
-class Domaine_Cl_DG;
-class Domaine_DG;
-
-class Terme_Source_Qdm_Elem_DG : public Source_base, public Terme_Source_Qdm
+class Op_Conv_EF_Stab_DG_Elem: public Op_Conv_DG_base
 {
-  Declare_instanciable(Terme_Source_Qdm_Elem_DG);
+
+  Declare_instanciable( Op_Conv_EF_Stab_DG_Elem );
+
 public:
+  void completer() override;
+
+  double calculer_dt_stab() const override;
+
+  /* interface ajouter_blocs */
   int has_interface_blocs() const override { return 1; }
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = { }) const override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = { }) const override;
 
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override { } //rien
-  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
-
-  void associer_pb(const Probleme_base& ) override  { }
-  void mettre_a_jour(double ) override;
-
-protected:
-  OBS_PTR(Domaine_DG) le_dom_DG;
-  OBS_PTR(Domaine_Cl_DG) le_dom_Cl_DG;
-  void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;
-
-  OWN_PTR(Champ_Don_base) la_source_DG;
+  void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const override { }
+  void set_incompressible(const int flag) override;
 };
 
-#endif /* Terme_Source_Qdm_Elem_DG_included */
+class Op_Conv_Amont_DG_Elem: public Op_Conv_EF_Stab_DG_Elem
+{
+  Declare_instanciable( Op_Conv_Amont_DG_Elem );
+};
+
+class Op_Conv_Centre_DG_Elem: public Op_Conv_EF_Stab_DG_Elem
+{
+  Declare_instanciable( Op_Conv_Centre_DG_Elem );
+};
+
+#endif /* Op_Conv_EF_Stab_DG_Elem_included */
