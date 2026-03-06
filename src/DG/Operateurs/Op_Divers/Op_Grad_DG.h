@@ -37,8 +37,6 @@ public:
 
   void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&, const Champ_Inc_base&) override;
 
-  void dimensionner(Matrice_Morse& mat) const override;
-
   inline int has_interface_blocs() const override { return 1; }
   void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
 

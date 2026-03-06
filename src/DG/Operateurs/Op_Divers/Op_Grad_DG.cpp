@@ -41,61 +41,85 @@ void Op_Grad_DG::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_
 
 void Op_Grad_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  const std::string nom_inco = equation().inconnue().le_nom().getString();
+  for(auto const& imap: matrices)
+    std::cout << "Key: " << imap.first << std::endl;
+
+  if (!matrices.count("pression")) return; //rien a faire
   if (semi_impl.count("pression"))
     return; // semi-implicite -> rien a dimensionner
 
-  int n_ext = 1; //TODO DG what is op_ext in this case ?
-  std::vector<Matrice_Morse *> mat(n_ext);
-  for (int i = 0; i < n_ext; i++)
+  Matrice_Morse *mat = matrices["pression"], mat2;
+
+  const Domaine_DG& domaine = le_dom_DG.valeur();
+
+  int order_v = Option_DG::Get_order_for("vitesse");
+  int order_p = Option_DG::Get_order_for("pression");
+
+  const BasisFunction& bfunc_v = domaine.get_basisFunction(order_v);
+  const int nb_bfunc_v = bfunc_v.nb_bfunc();
+
+  const BasisFunction& bfunc_p = domaine.get_basisFunction(order_p);
+  const int nb_bfunc_p = bfunc_p.nb_bfunc();
+
+  const IntTab& indices_glob_elem_v = bfunc_v.indices_glob_elem();
+  const IntTab& indices_glob_elem_p = bfunc_p.indices_glob_elem();
+
+  int nb_elem_tot = domaine.nb_elem_tot();
+
+  int dim = Objet_U::dimension;
+
+  int size_row = dim*indices_glob_elem_v(nb_elem_tot);
+
+  mat2.dimensionner(size_row, size_row, 0);
+
+  IntVect& tab1 = mat2.get_set_tab1();
+  IntVect& tab2 = mat2.get_set_tab2();
+  DoubleVect& coeff = mat2.get_set_coeff();
+  coeff = 0;
+
+  const IntTab& stencil_sorted = domaine.get_stencil_sorted();
+  const int nb_stencil_max = stencil_sorted.dimension(1);
+
+  int nb_indices_line;
+  int row, col, indice;
+
+  tab1(0) = 1;
+  for (int nelem = 0; nelem < nb_elem_tot; nelem++)
     {
-      std::string nom_mat = i ? nom_inco + "/" + (this)->equation().probleme().le_nom().getString() : nom_inco; //TODO DG is that correspond ?
-      mat[i] = matrices.count(nom_mat) ? matrices.at(nom_mat) : nullptr;
-      if (!mat[i])
-        continue;
-      Matrice_Morse mat2;
-      if (i == 0)
-        dimensionner(mat2);
-      else
-        throw; // TODO DG for dimensionner_terme_croises
-
-      mat[i]->nb_colonnes() ? *mat[i] += mat2 : *mat[i] = mat2;
-    }
-}
-
-void Op_Grad_DG::dimensionner(Matrice_Morse& matrice) const
-{
-  if (has_interface_blocs())
-    {
-      Operateur_base::dimensionner(matrice);
-      return;
-    }
-
-  const Domaine_DG& domaine_DG = le_dom_DG.valeur();
-  int nb_faces = domaine_DG.nb_faces();
-  int nb_faces_tot = domaine_DG.nb_faces_tot();
-  int nb_elem_tot = domaine_DG.nb_elem_tot();
-  IntTab stencil(0, 2);
-
-  const IntTab& face_voisins = domaine_DG.face_voisins();
-
-  int nb_coef = 0;
-  for (int face = 0; face < nb_faces; face++)
-    {
-      for (int dir = 0; dir < 2; dir++)
+      nb_indices_line = 0;
+      for (int k = 0; k < nb_stencil_max; k++)
         {
-          const int elem = face_voisins(face, dir);
-          if (elem != -1)
+          if (stencil_sorted(nelem, k) < 0)
+            break;
+          nb_indices_line += nb_bfunc_p;
+        }
+      for (int k = 0; k < nb_bfunc_v * dim; k++)
+        tab1(indices_glob_elem_v(nelem)*dim + k + 1) = nb_indices_line + tab1(indices_glob_elem_v(nelem)*dim + k);
+    }
+
+  mat2.dimensionner(size_row, tab1(size_row) - 1);
+
+  for (int nelem = 0; nelem < nb_elem_tot; nelem++)
+    {
+      row = tab1[indices_glob_elem_v(nelem)*dim] - 1;
+      nb_indices_line = tab1[indices_glob_elem_v(nelem)*dim + 1] - tab1[indices_glob_elem_v(nelem)*dim];
+      indice = 0;
+      for (int k = 0; k < nb_stencil_max; k++)
+        {
+          if (stencil_sorted(nelem, k) < 0)
+            break;
+          col = indices_glob_elem_p(stencil_sorted(nelem, k)) + 1;
+          for (int d = 0; d < dim; d++)
             {
-              stencil.resize(nb_coef + 1, 2);
-              stencil(nb_coef, 0) = elem;
-              stencil(nb_coef, 1) = face;
-              nb_coef++;
+              for (int i = 0; i < nb_bfunc_v; i++)
+                for (int j = 0; j < nb_bfunc_p; j++)
+                  tab2[row + indice + j + nb_indices_line * i] = col + j + d * nb_bfunc_v;
+              indice += nb_bfunc_p;
             }
         }
     }
-  tableau_trier_retirer_doublons(stencil);
-  Matrix_tools::allocate_morse_matrix(nb_elem_tot, nb_faces_tot, stencil, matrice);
+  mat2.sort_stencil();
+  mat->nb_colonnes() ? *mat += mat2 : *mat = mat2;
 }
 
 void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
