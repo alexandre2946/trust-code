@@ -25,6 +25,7 @@
 #include <Device.h>
 #include <Tetra_VEF.h>
 #include <Tri_VEF.h>
+#include <Comm_Group_MPI.h>
 
 
 
@@ -157,6 +158,7 @@ void Op_Conv_VEF_Face::completer()
 struct FluxTetraKernelData
 {
   // Scalars
+  int nb_elem;
   int nb_elem_tot;
   int nb_faces;
   int nb_faces_bord;
@@ -194,8 +196,8 @@ struct FluxTetraKernelData
   DoubleTabView flux_b_v;
 };
 
-template<int ordre, bool isMuscl>
-void compute_flux_tetra_kernel(const FluxTetraKernelData& data)
+template<int ordre, bool isMuscl, bool virtual_only>
+void compute_flux_tetra_kernel(const FluxTetraKernelData& kernel_data)
 {
 
   //const int dim = Objet_U::dimension;
@@ -206,45 +208,55 @@ void compute_flux_tetra_kernel(const FluxTetraKernelData& data)
   const double twelvth = 1.0/(3+3*3);
 
   // Unpack scalars
-  //int nb_elem_tot                  = data.nb_elem_tot;
-  int nb_faces                     = data.nb_faces;
-  int nb_faces_bord                = data.nb_faces_bord;
-  //int nfa7                         = data.nfa7;
-  int ncomp_ch_transporte          = data.ncomp_ch_transporte;
-  double alpha                     = data.alpha;
-  int marq                          = data.marq;
-  bool option_calcul_flux_en_un_point     = data.option_calcul_flux_en_un_point;
-  bool option_appliquer_cl_dirichlet      = data.option_appliquer_cl_dirichlet;
-  bool isAmont                     = data.isAmont;
+  int nb_faces                     = kernel_data.nb_faces;
+  int nb_faces_bord                = kernel_data.nb_faces_bord;
+  //int nfa7                         = kernel_data.nfa7;
+  int ncomp_ch_transporte          = kernel_data.ncomp_ch_transporte;
+  double alpha                     = kernel_data.alpha;
+  int marq                          = kernel_data.marq;
+  bool option_calcul_flux_en_un_point     = kernel_data.option_calcul_flux_en_un_point;
+  bool option_appliquer_cl_dirichlet      = kernel_data.option_appliquer_cl_dirichlet;
+  bool isAmont                     = kernel_data.isAmont;
 
   // Unpack views
-  CIntArrView rang_elem_non_std_v           = data.rang_elem_non_std_v;
-  CIntTabView elem_faces_v                  = data.elem_faces_v;
-  CDoubleArrView porosite_face_v            = data.porosite_face_v;
-  CDoubleArrView porosite_elem_v            = data.porosite_elem_v;
-  CDoubleTabView coord_sommets_v           = data.coord_sommets_v;
-  CIntTabView les_elems_v                   = data.les_elems_v;
-  CDoubleTabView3 facette_normales_v       = data.facette_normales_v;
-  CIntArrView est_une_face_de_dirichlet_v  = data.est_une_face_de_dirichlet_v;
-  CDoubleTabView xp_v                       = data.xp_v;
-  CDoubleTabView xv_v                       = data.xv_v;
-  CIntArrView type_elem_Cl_v                = data.type_elem_Cl_v;
-  CIntArrView traitement_pres_bord_v       = data.traitement_pres_bord_v;
-  CIntTabView KEL_v                         = data.KEL_v;
-  CDoubleTabView3 normales_facettes_Cl_v   = data.normales_facettes_Cl_v;
-  CDoubleTabView4 vecteur_face_facette_Cl_v= data.vecteur_face_facette_Cl_v;
-  CDoubleTabView vitesse_v                  = data.vitesse_v;
-  CDoubleTabView transporte_face_v         = data.transporte_face_v;
-  CDoubleTabView3 gradient_v               = data.gradient_v;
+  CIntArrView rang_elem_non_std_v           = kernel_data.rang_elem_non_std_v;
+  CIntTabView elem_faces_v                  = kernel_data.elem_faces_v;
+  CDoubleArrView porosite_face_v            = kernel_data.porosite_face_v;
+  CDoubleArrView porosite_elem_v            = kernel_data.porosite_elem_v;
+  CDoubleTabView coord_sommets_v           = kernel_data.coord_sommets_v;
+  CIntTabView les_elems_v                   = kernel_data.les_elems_v;
+  CDoubleTabView3 facette_normales_v       = kernel_data.facette_normales_v;
+  CIntArrView est_une_face_de_dirichlet_v  = kernel_data.est_une_face_de_dirichlet_v;
+  CDoubleTabView xp_v                       = kernel_data.xp_v;
+  CDoubleTabView xv_v                       = kernel_data.xv_v;
+  CIntArrView type_elem_Cl_v                = kernel_data.type_elem_Cl_v;
+  CIntArrView traitement_pres_bord_v       = kernel_data.traitement_pres_bord_v;
+  CIntTabView KEL_v                         = kernel_data.KEL_v;
+  CDoubleTabView3 normales_facettes_Cl_v   = kernel_data.normales_facettes_Cl_v;
+  CDoubleTabView4 vecteur_face_facette_Cl_v= kernel_data.vecteur_face_facette_Cl_v;
+  CDoubleTabView vitesse_v                  = kernel_data.vitesse_v;
+  CDoubleTabView transporte_face_v         = kernel_data.transporte_face_v;
+  CDoubleTabView3 gradient_v               = kernel_data.gradient_v;
 
   // Unpack outputs
-  DoubleTabView resu_v                     = data.resu_v;
-  DoubleTabView flux_b_v                   = data.flux_b_v;
+  DoubleTabView resu_v                     = kernel_data.resu_v;
+  DoubleTabView flux_b_v                   = kernel_data.flux_b_v;
+
+  //Only virtual elements
+  const int nbeg = virtual_only ? kernel_data.nb_elem : 0;
+  const int nend = virtual_only ? kernel_data.nb_elem_tot : kernel_data.nb_elem;
+
+  //The reel kernel does not start the gpu counter because it is manager by the echange_espace_virtuel_async
+  //Only the virtual one does because it is synchronous, after the comms
+  if (virtual_only)
+    {
+      start_gpu_timer(__KERNEL_NAME__);
+    }
 
 #ifdef TRUST_USE_GPU
-  Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), Kokkos::MDRangePolicy<Kokkos::Rank<2>>({0,0}, {data.nb_elem_tot, data.nfa7}), KOKKOS_LAMBDA(const int poly, const int fa7)
+  Kokkos::parallel_for(Kokkos::MDRangePolicy<Kokkos::Rank<2>>({nbeg,0}, {nend, kernel_data.nfa7}), KOKKOS_LAMBDA(const int poly, const int fa7)
 #else
-  Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), Kokkos::RangePolicy<>(0, data.nb_elem_tot), KOKKOS_LAMBDA(const int poly)
+  Kokkos::parallel_for(Kokkos::RangePolicy<>(nbeg, nend), KOKKOS_LAMBDA(const int poly)
 #endif
   {
     int contrib = 0;
@@ -310,7 +322,7 @@ void compute_flux_tetra_kernel(const FluxTetraKernelData& data)
         // calcul de xc (a l'intersection des 3 facettes) necessaire pour muscl3
 
 #ifndef TRUST_USE_GPU
-        for (int fa7 = 0; fa7 < data.nfa7; fa7++)
+        for (int fa7 = 0; fa7 < kernel_data.nfa7; fa7++)
 #endif
           {
             int KEL_v_[4] = {KEL_v(0, fa7), KEL_v(1, fa7),KEL_v(2, fa7),KEL_v(3, fa7)};
@@ -578,7 +590,23 @@ void compute_flux_tetra_kernel(const FluxTetraKernelData& data)
           } // fin de la boucle sur les facettes
       } // fin de la boucle
   });
-  end_gpu_timer(__KERNEL_NAME__);
+  if (virtual_only) end_gpu_timer(__KERNEL_NAME__);
+}
+
+//Wrapper to hide the async logic
+//Same name as the actual kernel function to appear as the same on the profiler
+template<int ordre, bool isMuscl>
+void compute_flux_tetra_kernel(const FluxTetraKernelData& kernel_data, DoubleTab& tab_gradient)
+{
+  //Packing, isend, irecv but no wait and no unpacking
+  //If GPU, the isend/irdc are cudaMemcpyAsync P2P, on a given stream, no blocking !
+  tab_gradient.start_echange_espace_virtuel_async(__KERNEL_NAME__);
+  //Only operate on reel elements
+  compute_flux_tetra_kernel<ordre, /*muscl*/ isMuscl, /* virtual poly only */ false>(kernel_data);
+  //Wait and unpack virtual elements
+  tab_gradient.finish_echange_espace_virtuel_async(__KERNEL_NAME__);
+  //Only operates on virtual elements
+  compute_flux_tetra_kernel<ordre, /*muscl*/ isMuscl, /* virtual poly only */ true>(kernel_data);
 }
 //
 //   Fonctions de la classe Op_Conv_VEF_Face
@@ -616,6 +644,7 @@ DoubleTab& Op_Conv_VEF_Face::ajouter(const DoubleTab& transporte,
   const Domaine& domaine = domaine_VEF.domaine();
   const int nfa7 = domaine_VEF.type_elem().nb_facette();
   const int nb_elem_tot = domaine_VEF.nb_elem_tot();
+  const int nb_elem = domaine_VEF.nb_elem();
   const IntVect& rang_elem_non_std = domaine_VEF.rang_elem_non_std();
   const DoubleTab& normales_facettes_Cl = domaine_Cl_VEF.normales_facettes_Cl();
   int premiere_face_int = domaine_VEF.premiere_face_int();
@@ -865,7 +894,14 @@ DoubleTab& Op_Conv_VEF_Face::ajouter(const DoubleTab& transporte,
               }
           });
           end_gpu_timer(__KERNEL_NAME__);
-          tab_gradient.echange_espace_virtuel(); // Pas possible de supprimer. Garder le Kernel sur le CPU n'apporte pas.
+          if(nom_elem=="Tetra_VEF")
+            {
+              /* no echange espace virtuel here, it will be done later in a async way for tetra kernel*/
+            }
+          else
+            {
+              tab_gradient.echange_espace_virtuel();// Pas possible de supprimer. Garder le Kernel sur le CPU n'apporte pas.
+            }
         }// fin if(type_op==muscl)
     }
 
@@ -909,6 +945,7 @@ DoubleTab& Op_Conv_VEF_Face::ajouter(const DoubleTab& transporte,
           FluxTetraKernelData kernel_data;
 
           // Scalars
+          kernel_data.nb_elem = nb_elem;
           kernel_data.nb_elem_tot = nb_elem_tot;
           kernel_data.nb_faces = nb_faces;
           kernel_data.nb_faces_bord = nb_faces_bord;
@@ -946,20 +983,34 @@ DoubleTab& Op_Conv_VEF_Face::ajouter(const DoubleTab& transporte,
           if (type_op_boucle == muscl)
             {
               if (ordre_==1)
-                compute_flux_tetra_kernel<1, true>(kernel_data);
+                {
+                  //Wrapper to hide the async complexity
+                  compute_flux_tetra_kernel</* ordre */ 1, /*muscl*/ true>(kernel_data, tab_gradient);
+                }
+
               else if (ordre_==2)
-                compute_flux_tetra_kernel<2, true>(kernel_data);
+                {
+                  compute_flux_tetra_kernel</* ordre */ 2, /*muscl*/ true>(kernel_data,  tab_gradient);
+                }
               else if (ordre_==3)
-                compute_flux_tetra_kernel<3, true>(kernel_data);
+                {
+                  compute_flux_tetra_kernel</* ordre */ 3, /*muscl*/ true>(kernel_data, tab_gradient);
+                }
             }
           else
             {
               if (ordre_==1)
-                compute_flux_tetra_kernel<1, false>(kernel_data);
+                {
+                  compute_flux_tetra_kernel</* ordre */ 1, /*muscl*/ false>(kernel_data, tab_gradient);
+                }
               else if (ordre_==2)
-                compute_flux_tetra_kernel<2, false>(kernel_data);
+                {
+                  compute_flux_tetra_kernel</* ordre */ 2, /*muscl*/ false>(kernel_data, tab_gradient);
+                }
               else if (ordre_==3)
-                compute_flux_tetra_kernel<3, false>(kernel_data);
+                {
+                  compute_flux_tetra_kernel</* ordre */ 3, /*muscl*/ false>(kernel_data, tab_gradient);
+                }
             }
         }
       else

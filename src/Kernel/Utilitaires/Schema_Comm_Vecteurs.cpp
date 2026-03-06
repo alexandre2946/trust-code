@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -233,65 +233,79 @@ void Schema_Comm_Vecteurs::begin_comm(bool bufferOnDevice)
   bufferOnDevice_ = bufferOnDevice;
 }
 
-void Schema_Comm_Vecteurs::exchange()
+void Schema_Comm_Vecteurs::exchange(IsExchangeBlocking exchange_type, const std::string kernel_name)
 {
-  char * ptr = sdata_.buffer_base_;
-  // Copy buffer before MPI send
-  if (bufferOnDevice_)
-    {
-      if (!use_gpu_aware_mpi_)
-        copyFromDevice(sdata_.buffer_base_, min_buf_size_); // Copy buffer to host for MPI communication
-      else
-        {
-          // Communication between devices. Use device buffer:
-          ptr = addrOnDevice(sdata_.buffer_base_);
-        }
-    }
 
-  assert(status_ == BEGIN_COMM);
-  // Verifie que tous les buffers sont pleins
-  assert(check_buffers_full());
-  // Echange les donnees
+  char * ptr = sdata_.buffer_base_;
+  const Comm_Group& group = PE_Groups::current_group();
   const int nsend = send_procs_.size_array();
   const int nrecv = recv_procs_.size_array();
-  // On utilise le tableau sdata_.buf_pointers_ pour stocker les adresses
-  //  des buffers a donner a Comm_Group::send_recv_start()
-  // (dimensionne a 2*nproc() donc suffisant)
-  assert(nsend + nrecv <= sdata_.buf_pointers_size_);
-  char ** send_bufs = sdata_.buf_pointers_;
-  char ** recv_bufs = sdata_.buf_pointers_ + nsend;
-  for (int i = 0; i < nsend; i++)
+
+  if ((exchange_type == IsExchangeBlocking::DefaultBlocking)||(exchange_type == IsExchangeBlocking::NonBlockingStart))
     {
-      send_bufs[i] = ptr;
-      ptr += send_buf_sizes_[i];
-    }
-  for (int i = 0; i < nrecv; i++)
-    {
-      recv_bufs[i] = ptr;
-      ptr += recv_buf_sizes_[i];
+
+      // Copy buffer before MPI send
+      if (bufferOnDevice_)
+        {
+          if (!use_gpu_aware_mpi_)
+            copyFromDevice(sdata_.buffer_base_, min_buf_size_); // Copy buffer to host for MPI communication
+          else
+            {
+              // Communication between devices. Use device buffer:
+              ptr = addrOnDevice(sdata_.buffer_base_);
+            }
+        }
+
+      assert(status_ == BEGIN_COMM);
+      // Verifie que tous les buffers sont pleins
+      assert(check_buffers_full());
+      // Echange les donnees
+
+      // On utilise le tableau sdata_.buf_pointers_ pour stocker les adresses
+      //  des buffers a donner a Comm_Group::send_recv_start()
+      // (dimensionne a 2*nproc() donc suffisant)
+      assert(nsend + nrecv <= sdata_.buf_pointers_size_);
+      char ** send_bufs = sdata_.buf_pointers_;
+      char ** recv_bufs = sdata_.buf_pointers_ + nsend;
+      for (int i = 0; i < nsend; i++)
+        {
+          send_bufs[i] = ptr;
+          ptr += send_buf_sizes_[i];
+        }
+      for (int i = 0; i < nrecv; i++)
+        {
+          recv_bufs[i] = ptr;
+          ptr += recv_buf_sizes_[i];
+        }
+
+      // On devrait pouvoir mettre un int64 comme type ici car
+      // les buffers sont de alignes sur 8 octets.
+
+      if (exchange_type == IsExchangeBlocking::NonBlockingStart) start_gpu_timer(kernel_name);
+      group.send_recv_start(send_procs_, send_buf_sizes_, send_bufs,
+                            recv_procs_, recv_buf_sizes_, recv_bufs,
+                            Comm_Group::INT);
     }
 
-  const Comm_Group& group = PE_Groups::current_group();
-  // On devrait pouvoir mettre un int64 comme type ici car
-  // les buffers sont de alignes sur 8 octets.
-  group.send_recv_start(send_procs_, send_buf_sizes_, send_bufs,
-                        recv_procs_, recv_buf_sizes_, recv_bufs,
-                        Comm_Group::INT);
-  group.send_recv_finish();
-  // Fait pointer les buffers sur les donnees recues
-  char * recv_ptr = sdata_.buffer_base_;
-  for (int i = 0; i < nsend; i++)
-    recv_ptr += send_buf_sizes_[i];
-  for (int i = 0; i < nrecv; i++)
+  if ((exchange_type == IsExchangeBlocking::DefaultBlocking)||(exchange_type == IsExchangeBlocking::NonBlockingFinish))
     {
-      const int pe = recv_procs_[i];
-      sdata_.buf_pointers_[pe] = recv_ptr;
-      recv_ptr += recv_buf_sizes_[i];
-    }
-  status_ = EXCHANGED;
+      group.send_recv_finish();
+      if (exchange_type == IsExchangeBlocking::NonBlockingFinish) end_gpu_timer(kernel_name);
+      // Fait pointer les buffers sur les donnees recues
+      char * recv_ptr = sdata_.buffer_base_;
+      for (int i = 0; i < nsend; i++)
+        recv_ptr += send_buf_sizes_[i];
+      for (int i = 0; i < nrecv; i++)
+        {
+          const int pe = recv_procs_[i];
+          sdata_.buf_pointers_[pe] = recv_ptr;
+          recv_ptr += recv_buf_sizes_[i];
+        }
+      status_ = EXCHANGED;
 
-  // Copy buffer to device after MPI recv if GPU-Aware MPI is not enabled:
-  if (bufferOnDevice_ && !use_gpu_aware_mpi_) copyToDevice(sdata_.buffer_base_, min_buf_size_);
+      // Copy buffer to device after MPI recv if GPU-Aware MPI is not enabled:
+      if (bufferOnDevice_ && !use_gpu_aware_mpi_) copyToDevice(sdata_.buffer_base_, min_buf_size_);
+    }
 }
 
 void Schema_Comm_Vecteurs::end_comm()

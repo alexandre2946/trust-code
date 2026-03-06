@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -135,7 +135,7 @@ static void creer_tableau_seq_(const MD_Vector& md, TRUSTVect<_TYPE_,_SIZE_>& v,
  *   La dimension initiale du vecteur doit etre soit 0, soit md.get_nb_items_reels(),
  *    soit md.get_nb_items_tot(). Si besoin, la taille du tableau est modifiee et on
  *    initialise le tableau selon opt.
- *  ATTENTION, echange_espace_virtuel() n'est PAS appele. Les cases virtuelles ne sont pas initialisees...
+ *  ATTENTION, virtual_exchange() n'est PAS appele. Les cases virtuelles ne sont pas initialisees...
  */
 void MD_Vector_tools::creer_tableau_distribue(const MD_Vector& md, Array_base& v, RESIZE_OPTIONS opt)
 {
@@ -205,62 +205,69 @@ void MD_Vector_tools::creer_tableau_distribue(const MD_Vector& md, Array_base& v
 
 
 template <typename _TYPE_>
-void MD_Vector_tools::echange_espace_virtuel_(const MD_Vector& md, TRUSTVect<_TYPE_>& v, const Echange_EV_Options& opt)
+void MD_Vector_tools::perform_virtual_exchange(const MD_Vector& md, TRUSTVect<_TYPE_>& v, const Echange_EV_Options& opt, IsExchangeBlocking is_exchange_blocking, const std::string kernel_name)
 {
   const MD_Vector_base& mdv = md.valeur();
   const std::type_index type_idx(typeid(_TYPE_));
 
-  if (md == last_md && v.line_size() == last_linesize && last_type_idx == type_idx &&  last_opt == opt)
+  if ((is_exchange_blocking == IsExchangeBlocking::DefaultBlocking)||(is_exchange_blocking == IsExchangeBlocking::NonBlockingStart))
     {
-      /* Do nothing if not the first pass, and nothing (including data type) has changed */
+
+      if (md == last_md && v.line_size() == last_linesize && last_type_idx == type_idx &&  last_opt == opt)
+        {
+          /* Do nothing if not the first pass, and nothing (including data type) has changed */
+        }
+      else
+        {
+          last_md = md;
+          last_linesize = v.line_size();
+          last_type_idx = type_idx;
+          last_opt = opt;
+          comm.begin_init();
+          mdv.initialize_comm(opt, comm, v);
+          comm.end_init();
+        }
+      bool bufferOnDevice = Process::is_parallel() && v.isDataOnDevice();
+      comm.begin_comm(bufferOnDevice);     // buffer allocated on device
+      mdv.prepare_send_data(opt, comm, v); // pack buffer on device (read_from_vect_items)
     }
-  else
+  comm.exchange(is_exchange_blocking, kernel_name);                     // buffer d2h + MPI + buffer h2d
+  if ((is_exchange_blocking == IsExchangeBlocking::DefaultBlocking)||(is_exchange_blocking == IsExchangeBlocking::NonBlockingFinish))
     {
-      last_md = md;
-      last_linesize = v.line_size();
-      last_type_idx = type_idx;
-      last_opt = opt;
-      comm.begin_init();
-      mdv.initialize_comm(opt, comm, v);
-      comm.end_init();
+      mdv.process_recv_data(opt, comm, v); // unpack buffer on device (write_to_vect_items + write_to_vect_blocs)
+      comm.end_comm();
     }
-  bool bufferOnDevice = Process::is_parallel() && v.isDataOnDevice();
-  comm.begin_comm(bufferOnDevice);     // buffer allocated on device
-  mdv.prepare_send_data(opt, comm, v); // pack buffer on device (read_from_vect_items)
-  comm.exchange();                     // buffer d2h + MPI + buffer h2d
-  mdv.process_recv_data(opt, comm, v); // unpack buffer on device (write_to_vect_items + write_to_vect_blocs)
-  comm.end_comm();
 }
 
 template<typename _TYPE_>
-void MD_Vector_tools::echange_espace_virtuel1_(const MD_Vector& md, TRUSTVect<_TYPE_>& v, MD_Vector_tools::Operations_echange opt)
+void MD_Vector_tools::select_virtual_exchange_operation(const MD_Vector& md, TRUSTVect<_TYPE_>& v, MD_Vector_tools::Operations_echange opt, IsExchangeBlocking is_exchange_blocking, const std::string kernel_name)
 {
   switch(opt)
     {
     case MD_Vector_tools::ECHANGE_EV:
-      echange_espace_virtuel_(md, v, echange_ev_opt_default);
+      perform_virtual_exchange(md, v, echange_ev_opt_default,is_exchange_blocking, kernel_name);
       break;
     case MD_Vector_tools::EV_SOMME:
-      echange_espace_virtuel_(md, v, Echange_EV_Options(Echange_EV_Options::SUM));
+      perform_virtual_exchange(md, v, Echange_EV_Options(Echange_EV_Options::SUM));
       break;
     case MD_Vector_tools::EV_SOMME_ECHANGE:
-      echange_espace_virtuel_(md, v, Echange_EV_Options(Echange_EV_Options::SUM));
-      echange_espace_virtuel_(md, v, echange_ev_opt_default);
+      perform_virtual_exchange(md, v, Echange_EV_Options(Echange_EV_Options::SUM));
+      perform_virtual_exchange(md, v, echange_ev_opt_default);
       break;
     case MD_Vector_tools::EV_MAX:
-      echange_espace_virtuel_(md, v, Echange_EV_Options(Echange_EV_Options::MAX));
+      perform_virtual_exchange(md, v, Echange_EV_Options(Echange_EV_Options::MAX));
       break;
     case MD_Vector_tools::EV_MINCOL1:
-      echange_espace_virtuel_(md, v, Echange_EV_Options(Echange_EV_Options::MINCOL1));
+      perform_virtual_exchange(md, v, Echange_EV_Options(Echange_EV_Options::MINCOL1));
       break;
     default:
-      Cerr << "echange_espace_virtuel1_ operation not implemented" << finl;
+      Cerr << "select_virtual_exchange_operation operation not implemented" << finl;
       Process::exit();
     }
 }
 
 template<typename _TYPE_>
-inline void MD_Vector_tools::call_echange_espace_virtuel(TRUSTVect<_TYPE_>& v, MD_Vector_tools::Operations_echange opt)
+inline void MD_Vector_tools::call_virtual_exchange(TRUSTVect<_TYPE_>& v, MD_Vector_tools::Operations_echange opt, IsExchangeBlocking is_exchange_blocking, const std::string kernel_name)
 {
   const MD_Vector& md = v.get_md_vector();
   if (md.non_nul() && Process::is_parallel())
@@ -268,20 +275,20 @@ inline void MD_Vector_tools::call_echange_espace_virtuel(TRUSTVect<_TYPE_>& v, M
       // [ABN] in some weird cases (like building a temporary domain when reading a MED file)
       // we might end up calling the current method with a sequential MD_Vector:
       if (sub_type(MD_Vector_seq, md.valeur())) return;
-
-      statistics().begin_count(STD_COUNTERS::virtual_swap);
-      echange_espace_virtuel1_(v.get_md_vector(), v, opt);
-      statistics().end_count(STD_COUNTERS::virtual_swap);
+      //Only time synchronous virtual exchange
+      if (is_exchange_blocking == IsExchangeBlocking::DefaultBlocking) statistics().begin_count(STD_COUNTERS::virtual_swap);
+      select_virtual_exchange_operation(v.get_md_vector(), v, opt,is_exchange_blocking, kernel_name);
+      if (is_exchange_blocking == IsExchangeBlocking::DefaultBlocking) statistics().end_count(STD_COUNTERS::virtual_swap);
     }
-  //else Cerr << "Warning: A call to ::echange_espace_virtuel() is done on a non-distributed vector." << finl; /Process::exit();
+  //else Cerr << "Warning: A call to ::virtual_exchange() is done on a non-distributed vector." << finl; /Process::exit();
 }
 
-void MD_Vector_tools::echange_espace_virtuel(IntVect& v, Operations_echange opt) { call_echange_espace_virtuel<int>(v,opt); }
+void MD_Vector_tools::echange_espace_virtuel(IntVect& v, Operations_echange opt, IsExchangeBlocking is_exchange_blocking, const std::string kernel_name) { call_virtual_exchange<int>(v,opt, is_exchange_blocking, kernel_name); }
 #if INT_is_64_ == 2
-void MD_Vector_tools::echange_espace_virtuel(TIDVect& v, Operations_echange opt) { call_echange_espace_virtuel<trustIdType>(v,opt); }
+void MD_Vector_tools::echange_espace_virtuel(TIDVect& v, Operations_echange opt, IsExchangeBlocking is_exchange_blocking, const std::string kernel_name) { call_virtual_exchange<trustIdType>(v,opt,is_exchange_blocking, kernel_name); }
 #endif
-void MD_Vector_tools::echange_espace_virtuel(DoubleVect& v, Operations_echange opt) { call_echange_espace_virtuel<double>(v,opt); }
-void MD_Vector_tools::echange_espace_virtuel(FloatVect& v, Operations_echange opt) { call_echange_espace_virtuel<float>(v,opt); }
+void MD_Vector_tools::echange_espace_virtuel(DoubleVect& v, Operations_echange opt, IsExchangeBlocking is_exchange_blocking, const std::string kernel_name) { call_virtual_exchange<double>(v,opt,is_exchange_blocking, kernel_name); }
+void MD_Vector_tools::echange_espace_virtuel(FloatVect& v, Operations_echange opt, IsExchangeBlocking is_exchange_blocking, const std::string kernel_name) { call_virtual_exchange<float>(v,opt,is_exchange_blocking, kernel_name); }
 
 void MD_Vector_tools::compute_sequential_items_index(const MD_Vector&, MD_Vector_renumber&, int line_size)
 {

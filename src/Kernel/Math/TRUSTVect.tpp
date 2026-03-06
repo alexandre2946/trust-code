@@ -279,7 +279,7 @@ inline void TRUSTVect<_TYPE_,_SIZE_>::set_md_vector(const MD_Vector& md_vector)
 }
 
 template<typename _TYPE_, typename _SIZE_>
-inline void TRUSTVect<_TYPE_,_SIZE_>::echange_espace_virtuel()
+inline void TRUSTVect<_TYPE_,_SIZE_>::echange_espace_virtuel(IsExchangeBlocking is_exchange_blocking, const std::string kernel_name)
 {
 #ifndef LATATOOLS
   if(Process::is_sequential()) return;
@@ -287,33 +287,89 @@ inline void TRUSTVect<_TYPE_,_SIZE_>::echange_espace_virtuel()
   // echange_espace_virtuel() should not be called on big array (but can be called on small arrays of TIDs, in SolvPetsc for example):
   assert( (!std::is_same<_SIZE_, trustIdType>::value) );
 #endif
-  MD_Vector_tools::echange_espace_virtuel(*this);
+  MD_Vector_tools::echange_espace_virtuel(*this, MD_Vector_tools::Operations_echange::ECHANGE_EV, is_exchange_blocking, kernel_name);
 #endif
+}
+
+template<typename _TYPE_, typename _SIZE_>
+inline void TRUSTVect<_TYPE_,_SIZE_>::start_echange_espace_virtuel_async(const std::string kernel_name)
+{
+  TRUSTVect<_TYPE_,_SIZE_>::echange_espace_virtuel(IsExchangeBlocking::NonBlockingStart, kernel_name);
+}
+
+template<typename _TYPE_, typename _SIZE_>
+inline void TRUSTVect<_TYPE_,_SIZE_>::finish_echange_espace_virtuel_async(const std::string kernel_name)
+{
+  TRUSTVect<_TYPE_,_SIZE_>::echange_espace_virtuel(IsExchangeBlocking::NonBlockingFinish, kernel_name);
 }
 
 #if INT_is_64_ == 2
 // We should never have to do MPI on big arrays:
 // [ABN] do not know why, constexpr test in generic version not working ...
-template<> inline void TRUSTVect<int, trustIdType>::echange_espace_virtuel()
+template<> inline void TRUSTVect<int, trustIdType>::echange_espace_virtuel(IsExchangeBlocking is_exchange_blocking, const std::string kernel_name)
 {
   assert(false);
   Process::exit("echange_espace_virtuel() called on big array or array of int!");
 }
-template<> inline void TRUSTVect<trustIdType, trustIdType>::echange_espace_virtuel()
+template<> inline void TRUSTVect<trustIdType, trustIdType>::echange_espace_virtuel(IsExchangeBlocking is_exchange_blocking, const std::string kernel_name)
 {
   assert(false);
   Process::exit("echange_espace_virtuel() called on big array or array of TID!");
 }
-template<> inline void TRUSTVect<double, trustIdType>::echange_espace_virtuel()
+template<> inline void TRUSTVect<double, trustIdType>::echange_espace_virtuel(IsExchangeBlocking is_exchange_blocking, const std::string kernel_name)
 {
   assert(false);
   Process::exit("echange_espace_virtuel() called on big array or array of double!");
 }
-template<> inline void TRUSTVect<float, trustIdType>::echange_espace_virtuel()
+template<> inline void TRUSTVect<float, trustIdType>::echange_espace_virtuel(IsExchangeBlocking is_exchange_blocking, const std::string kernel_name)
 {
   assert(false);
   Process::exit("echange_espace_virtuel() called on big array or array of float!");
 }
+
+template<> inline void TRUSTVect<int, trustIdType>::start_echange_espace_virtuel_async(const std::string kernel_name)
+{
+  assert(false);
+  Process::exit("start_echange_espace_virtuel_async(const std::string kernel_name) called on big array or array of int!");
+}
+template<> inline void TRUSTVect<trustIdType, trustIdType>::start_echange_espace_virtuel_async(const std::string kernel_name)
+{
+  assert(false);
+  Process::exit("start_echange_espace_virtuel_async(const std::string kernel_name) called on big array or array of TID!");
+}
+template<> inline void TRUSTVect<double, trustIdType>::start_echange_espace_virtuel_async(const std::string kernel_name)
+{
+  assert(false);
+  Process::exit("start_echange_espace_virtuel_async(const std::string kernel_name) called on big array or array of double!");
+}
+template<> inline void TRUSTVect<float, trustIdType>::start_echange_espace_virtuel_async(const std::string kernel_name)
+{
+  assert(false);
+  Process::exit("start_echange_espace_virtuel_async(const std::string kernel_name) called on big array or array of float!");
+}
+
+template<> inline void TRUSTVect<int, trustIdType>::finish_echange_espace_virtuel_async(const std::string kernel_name)
+{
+  assert(false);
+  Process::exit("finish_echange_espace_virtuel_async(const std::string kernel_name) called on big array or array of int!");
+}
+template<> inline void TRUSTVect<trustIdType, trustIdType>::finish_echange_espace_virtuel_async(const std::string kernel_name)
+{
+  assert(false);
+  Process::exit("finish_echange_espace_virtuel_async(const std::string kernel_name) called on big array or array of TID!");
+}
+template<> inline void TRUSTVect<double, trustIdType>::finish_echange_espace_virtuel_async(const std::string kernel_name)
+{
+  assert(false);
+  Process::exit("finish_echange_espace_virtuel_async(const std::string kernel_name) called on big array or array of double!");
+}
+template<> inline void TRUSTVect<float, trustIdType>::finish_echange_espace_virtuel_async(const std::string kernel_name)
+{
+  assert(false);
+  Process::exit("finish_echange_espace_virtuel_async(const std::string kernel_name) called on big array or array of float!");
+}
+
+
 #endif
 
 //  ecriture des valeurs du tableau "raw" sans structure parallele

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,8 +20,10 @@
 #include <Array_base.h>
 #include <MD_Vector.h>
 #include <ArrOfBit.h>
+#include <Schema_Comm_Vecteurs.h>
 #include <array>
 #include <map>
+
 
 class MD_Vector_renumber;
 class Domaine_VF;
@@ -43,12 +45,12 @@ public:
 
   static void creer_tableau_distribue(const MD_Vector&, Array_base&, RESIZE_OPTIONS opt=RESIZE_OPTIONS::COPY_INIT);
 
-  static void echange_espace_virtuel(IntVect&, Operations_echange opt=ECHANGE_EV);
+  static void echange_espace_virtuel(IntVect&, Operations_echange opt=ECHANGE_EV, IsExchangeBlocking is_exchange_blocking = IsExchangeBlocking::DefaultBlocking,  const std::string kernel_name="noname");
 #if INT_is_64_ == 2
-  static void echange_espace_virtuel(TIDVect& v, Operations_echange opt=ECHANGE_EV);
+  static void echange_espace_virtuel(TIDVect& v, Operations_echange opt=ECHANGE_EV,  IsExchangeBlocking is_exchange_blocking = IsExchangeBlocking::DefaultBlocking,  const std::string kernel_name="noname");
 #endif
-  static void echange_espace_virtuel(DoubleVect&, Operations_echange opt=ECHANGE_EV);
-  static void echange_espace_virtuel(FloatVect&, Operations_echange opt=ECHANGE_EV);
+  static void echange_espace_virtuel(DoubleVect&, Operations_echange opt=ECHANGE_EV,  IsExchangeBlocking is_exchange_blocking = IsExchangeBlocking::DefaultBlocking,  const std::string kernel_name="noname");
+  static void echange_espace_virtuel(FloatVect&, Operations_echange opt=ECHANGE_EV,  IsExchangeBlocking is_exchange_blocking = IsExchangeBlocking::DefaultBlocking,  const std::string kernel_name="noname");
 
   // valeur de retour: nombre d'items sequentiels sur ce proc (nombre de flags a un dans le tableau)
   static void compute_sequential_items_index(const MD_Vector&, MD_Vector_renumber&, int line_size = 1);
@@ -62,11 +64,11 @@ public:
 
 private:
   template <typename _TYPE_>
-  static void echange_espace_virtuel_(const MD_Vector& md, TRUSTVect<_TYPE_>& v, const Echange_EV_Options& opt);
+  static void perform_virtual_exchange(const MD_Vector& md, TRUSTVect<_TYPE_>& v, const Echange_EV_Options& opt, IsExchangeBlocking is_exchange_blocking= IsExchangeBlocking::DefaultBlocking, const std::string kernel_name="noname");
   template<typename _TYPE_>
-  static void echange_espace_virtuel1_(const MD_Vector& md, TRUSTVect<_TYPE_>& v, MD_Vector_tools::Operations_echange opt);
+  static void select_virtual_exchange_operation(const MD_Vector& md, TRUSTVect<_TYPE_>& v, MD_Vector_tools::Operations_echange opt, IsExchangeBlocking is_exchange_blocking, const std::string kernel_name);
   template<typename _TYPE_>
-  static void call_echange_espace_virtuel(TRUSTVect<_TYPE_>& v, MD_Vector_tools::Operations_echange opt);
+  static void call_virtual_exchange(TRUSTVect<_TYPE_>& v, MD_Vector_tools::Operations_echange opt, IsExchangeBlocking is_exchange_blocking, const std::string kernel_name);
 
   static Schema_Comm_Vecteurs comm;
   static MD_Vector last_md;

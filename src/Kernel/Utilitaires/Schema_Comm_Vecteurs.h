@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,6 +17,13 @@
 #define Schema_Comm_Vecteurs_included
 
 #include <TRUSTArray.h>
+
+enum IsExchangeBlocking
+{
+  DefaultBlocking,
+  NonBlockingStart,
+  NonBlockingFinish
+};
 
 class Schema_Comm_Vecteurs_Static_Data;
 
@@ -64,7 +71,7 @@ public:
 
   void end_init();
   void begin_comm(bool bufferOnDevice=false);
-  void exchange();
+  void exchange(IsExchangeBlocking exchange_type = IsExchangeBlocking::DefaultBlocking, const std::string kernel_name="noname");
   void end_comm();
 
   static void CleanMyStaticViews();

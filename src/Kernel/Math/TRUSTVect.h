@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -165,7 +165,10 @@ public:
   // methodes virtuelles
 
   inline virtual void ref(const TRUSTVect&);
-  inline virtual void echange_espace_virtuel();
+  inline virtual void echange_espace_virtuel(IsExchangeBlocking exchange_type = IsExchangeBlocking::DefaultBlocking, const std::string kernel_name="noname");
+  inline virtual void start_echange_espace_virtuel_async(const std::string kernel_name);
+  inline virtual void finish_echange_espace_virtuel_async(const std::string kernel_name);
+
   inline virtual void set_md_vector(const MD_Vector&);
   inline virtual void jump(Entree&);
   inline virtual void lit(Entree&, bool resize_and_read=1);
