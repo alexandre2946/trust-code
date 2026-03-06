@@ -57,8 +57,7 @@ Entree& Sous_domaine_VF::readOn(Entree& is)
 
 void Sous_domaine_VF::discretiser()
 {
-  Cerr << "Sous_domaine_VF::discretiser : discretization of the sub-domain "
-       << le_sous_domaine->le_nom() << "... ";
+  //Cerr << "Sous_domaine_VF::discretiser : discretization of the sub-domain " << le_sous_domaine->le_nom() << "... ";
 
   le_dom_VF=ref_cast(Domaine_VF,le_dom_dis.valeur());
 
@@ -153,7 +152,6 @@ void Sous_domaine_VF::discretiser()
     {
       volumes_entrelaces_(nb_faces_bord_0+i)=volumes(le_dom_VF->face_voisins(les_faces_(premiere_face_bord_1_+i),1));
     }
-  Cerr << "OK" << finl;
 
   // Affichage du volume des sous domaines (ca peut etre pratique)
   double volume_sous_domaine=0;

@@ -46,7 +46,6 @@ void Domaine_Cl_VDF::associer(const Domaine_dis_base& dom_dis)
 
 void Domaine_Cl_VDF::completer(const Domaine_dis_base& un_domaine_dis)
 {
-  Cerr << "Domaine_Cl_VDF::completer ..." << finl;
   if (sub_type(Domaine_VDF,un_domaine_dis))
     {
       const Domaine_VDF& le_dom_VDF = ref_cast(Domaine_VDF,un_domaine_dis);
@@ -338,7 +337,6 @@ void Domaine_Cl_VDF::completer(const Domaine_dis_base& un_domaine_dis)
       Cerr << "Domaine_Cl_VDF::completer() attend en argument un Domaine_VDF\n";
       Process::exit();
     }
-  Cerr << "Domaine_Cl_VDF::completer OK" << finl;
 }
 
 /*! @brief Impose les conditions aux limites a la valeur temporelle "temps" du Champ_Inc
