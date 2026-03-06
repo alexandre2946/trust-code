@@ -128,7 +128,8 @@ void Op_Diff_DG_Elem::dimensionner(Matrice_Morse& la_matrice) const // TODO a re
             }
         }
     }
-  la_matrice.sort_stencil();
+  la_matrice.is_sorted_stencil();
+  assert(la_matrice.is_sorted_stencil());
 }
 
 void Op_Diff_DG_Elem::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const

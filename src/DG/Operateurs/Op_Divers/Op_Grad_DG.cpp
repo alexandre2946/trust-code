@@ -65,8 +65,9 @@ void Op_Grad_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl
   int nb_elem_tot = domaine.nb_elem_tot();
 
   int size_row = indices_glob_elem_v(nb_elem_tot);
+  int size_col = indices_glob_elem_p(nb_elem_tot);
 
-  mat2.dimensionner(size_row, size_row, 0);
+  mat2.dimensionner(size_row, size_col, 0);
 
   IntVect& tab1 = mat2.get_set_tab1();
   IntVect& tab2 = mat2.get_set_tab2();
@@ -93,7 +94,7 @@ void Op_Grad_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl
         tab1(indices_glob_elem_v(nelem) + k + 1) = nb_indices_line + tab1(indices_glob_elem_v(nelem) + k);
     }
 
-  mat2.dimensionner(size_row, tab1(size_row) - 1);
+  mat2.dimensionner(size_row, size_col, tab1(size_row) - 1);
 
   for (int nelem = 0; nelem < nb_elem_tot; nelem++)
     {
@@ -114,7 +115,8 @@ void Op_Grad_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl
           indice += nb_indices_line;
         }
     }
-  mat2.sort_stencil();
+  mat2.is_sorted_stencil();
+  assert(mat2.is_sorted_stencil());
   mat->nb_colonnes() ? *mat += mat2 : *mat = mat2;
 }
 

@@ -73,11 +73,12 @@ void Op_Div_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl)
   int nb_elem_tot = domaine.nb_elem_tot();
 
   int size_row = indices_glob_elem_p(nb_elem_tot);
+  int size_col = indices_glob_elem_v(nb_elem_tot);
 
-  matv2.dimensionner(size_row, size_row, 0);
+  matv2.dimensionner(size_row, size_col, 0);
 
-  IntVect& tab1 = matv2.get_set_tab1();
-  IntVect& tab2 = matv2.get_set_tab2();
+  IntVect& tabv1 = matv2.get_set_tab1();
+  IntVect& tabv2 = matv2.get_set_tab2();
   DoubleVect& coeff = matv2.get_set_coeff();
   coeff = 0;
 
@@ -87,7 +88,7 @@ void Op_Div_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl)
   int nb_indices_line;
   int row, col, indice;
 
-  tab1(0) = 1;
+  tabv1(0) = 1;
   for (int nelem = 0; nelem < nb_elem_tot; nelem++)
     {
       nb_indices_line = 0;
@@ -98,15 +99,15 @@ void Op_Div_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl)
           nb_indices_line += nb_bfunc_v*dim;
         }
       for (int k = 0; k < nb_bfunc_p; k++)
-        tab1(indices_glob_elem_p(nelem) + k + 1) = nb_indices_line + tab1(indices_glob_elem_p(nelem) + k);
+        tabv1(indices_glob_elem_p(nelem) + k + 1) = nb_indices_line + tabv1(indices_glob_elem_p(nelem) + k);
     }
 
-  matv2.dimensionner(size_row, tab1(size_row) - 1);
+  matv2.dimensionner(size_row, size_col, tabv1(size_row) - 1);
 
   for (int nelem = 0; nelem < nb_elem_tot; nelem++)
     {
-      row = tab1[indices_glob_elem_p(nelem)] - 1;
-      nb_indices_line = tab1[indices_glob_elem_p(nelem) + 1] - tab1[indices_glob_elem_p(nelem)];
+      row = tabv1[indices_glob_elem_p(nelem)] - 1;
+      nb_indices_line = tabv1[indices_glob_elem_p(nelem) + 1] - tabv1[indices_glob_elem_p(nelem)];
       indice = 0;
 
       for (int i = 0; i < nb_bfunc_p; i++)
@@ -117,12 +118,13 @@ void Op_Div_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl)
                 break;
               col = indices_glob_elem_v(stencil_sorted(nelem, k)) + 1;
               for (int j = 0 ;  j < nb_bfunc_v*dim; j++)
-                tab2[row + indice + j + k*nb_bfunc_v*dim] = col + j;
+                tabv2[row + indice + j + k*nb_bfunc_v*dim] = col + j;
             }
           indice += nb_indices_line;
         }
     }
-  matv2.sort_stencil();
+  matv2.is_sorted_stencil();
+  assert(matv2.is_sorted_stencil());
   matv->nb_colonnes() ? *matv += matv2 : *matv = matv2;
 
   //TODO DG stabilization matrix
@@ -136,7 +138,8 @@ void Op_Div_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl)
   DoubleVect& coeffp = matp2.get_set_coeff();
   coeffp = 0;
 
-  matp2.sort_stencil();
+  matp2.is_sorted_stencil();
+  assert(matp2.is_sorted_stencil());
   matp->nb_colonnes() ? *matp += matp2 : *matp = matp2;
 }
 
@@ -422,5 +425,5 @@ void Op_Div_DG::volumique(DoubleTab& div) const
   const int nb_elem = domaine_DG.domaine().nb_elem_tot();
 
   for (int num_elem = 0; num_elem < nb_elem; num_elem++)
-    div(num_elem) /= vol(num_elem);
+    div(num_elem, 0) /= vol(num_elem); //TODO DFG ici c'est n'importe quoi, trouve comment avoir une valeur coherente !!!
 }

@@ -77,7 +77,7 @@ void Terme_Source_Qdm_Elem_DG::ajouter_blocs(matrices_t matrices, DoubleTab& sec
         for (int fb = 0; fb < nb_bfunc; fb++)
           {
             for (int k = 0; k < quad.nb_pts_integ(elem) ; k++)
-              product(k) =  la_source_DG->valeurs()(sub_type(Champ_Uniforme,la_source.valeur()) ? 0 : elem, k) * fbase(fb, k);
+              product(k) =  la_source_DG->valeurs()(sub_type(Champ_Uniforme,la_source.valeur()) ? 0 : elem, k + d*nb_pts_integ_max) * fbase(fb, k);
 
             secmem(elem, fb + d*nb_bfunc) += quad.compute_integral_on_elem(elem, product);
           }
