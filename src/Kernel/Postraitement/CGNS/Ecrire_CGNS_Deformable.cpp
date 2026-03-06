@@ -20,8 +20,175 @@
 
 #ifdef HAS_CGNS
 
+//void Ecrire_CGNS::cgns_write_iters_lagrangian()
+//{
+//  if (first_time_post_) return;
+//
+//  const int nsteps = static_cast<int>(time_post_.size());
+//  assert(nsteps > 0);
+//
+//  const cgsize_t nuse = static_cast<cgsize_t>(nsteps);
+//
+//  std::vector<int> bases_done;
+//  bases_done.reserve(doms_written_.size());
+//
+//  for (int ind = 0; ind < (int)doms_written_.size(); ind++)
+//    {
+//      const int baseId = baseId_[ind];
+//      const Nom& nom_dom = doms_written_[ind];
+//
+//      // éviter doublons baseId
+//      if (std::find(bases_done.begin(), bases_done.end(), baseId) != bases_done.end())
+//        continue;
+//      bases_done.push_back(baseId);
+//
+//      // BaseIterativeData_t
+//      if (cg_biter_write(fileId_, baseId, "TimeIterValues", nsteps) != CG_OK)
+//        Cerr << "Error Ecrire_CGNS::cgns_write_iters_lagrangian : cg_biter_write !" << finl, TRUST_CGNS_ERROR();
+//
+//      if (cg_goto(fileId_, baseId, "BaseIterativeData_t", 1, "end") != CG_OK)
+//        Cerr << "Error Ecrire_CGNS::cgns_write_iters_lagrangian : cg_goto BaseIterativeData_t !" << finl, TRUST_CGNS_ERROR();
+//
+//      // TimeValues
+//      if (cg_array_write("TimeValues", CGNS_DOUBLE_TYPE, 1, &nuse, time_post_.data()) != CG_OK)
+//        Cerr << "Error Ecrire_CGNS::cgns_write_iters_lagrangian : cg_array_write TimeValues !" << finl, TRUST_CGNS_ERROR();
+//
+//      // NumberOfZones : 1 zone active par pas
+//      std::vector<int> number_of_zones(nsteps, 1);
+//      if (cg_array_write("NumberOfZones", CGNS_ENUMV(Integer), 1, &nuse, number_of_zones.data()) != CG_OK)
+//        Cerr << "Error Ecrire_CGNS::cgns_write_iters_lagrangian : cg_array_write NumberOfZones !" << finl, TRUST_CGNS_ERROR();
+//
+//      // ZonePointers : Character rank=3 : (CGNS_STR_SIZE, MaxNumberOfZones, NumberOfSteps)
+//      // Ici MaxNumberOfZones = 1
+//      cgsize_t zpdims[3] = { CGNS_STR_SIZE, 1, nuse };
+//
+//      std::string zone_ptrs;
+//      zone_ptrs.reserve((size_t)CGNS_STR_SIZE * (size_t)nsteps);
+//
+//      bool first = true;
+//      for (double t : time_post_)
+//        {
+//          std::string zn = nom_dom.getString();
+//          if (!first)
+//            zn += cgns_helper_.convert_double_to_string(t);
+//          first = false;
+//
+//          zn.resize(CGNS_STR_SIZE, ' ');
+//          zone_ptrs += zn;
+//        }
+//
+//      if (zone_ptrs.size() != (size_t)CGNS_STR_SIZE * (size_t)nsteps)
+//        Cerr << "Error: bad ZonePointers buffer size" << finl, TRUST_CGNS_ERROR();
+//
+//      if (cg_array_write("ZonePointers", CGNS_ENUMV(Character), 3, zpdims, zone_ptrs.c_str()) != CG_OK)
+//        Cerr << "Error Ecrire_CGNS::cgns_write_iters_lagrangian : cg_array_write ZonePointers !" << finl, TRUST_CGNS_ERROR();
+//
+//      // SimulationType : peut déjà exister -> on ignore l'erreur "already defined"
+//      (void)cg_simulation_type_write(fileId_, baseId, CGNS_ENUMV(TimeAccurate));
+//    }
+//}
+
 void Ecrire_CGNS::cgns_write_final_link_file_lagrangian()
 {
+////  cgns_write_final_link_file_pb_deformable();
+  if (Process::me()) return; // seul le proc 0 écrit le fichier link
+
+  const int nsteps = static_cast<int>(time_post_.size());
+  const cgsize_t nuse = static_cast<cgsize_t>(nsteps);
+
+  if (nsteps == 0) return;
+
+  cgns_open_solution_link_file(-123., true);
+
+  for (auto &itr : fld_loc_map_)
+    {
+      const std::string& LOC = itr.first;
+      const Nom& nom_dom = itr.second;
+      const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
+
+      int ind_base = index_glob;
+      if (has_elem_som_loc_ && LOC != "FACES")
+        {
+          const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
+          ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
+        }
+
+      if (cg_base_write(fileId_, nom_dom.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
+        Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_base_write !" << finl, TRUST_CGNS_ERROR();
+
+      if (cg_biter_write(fileId_, baseId_[index_glob], "TimeIterValues", nsteps) != CG_OK)
+        Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_biter_write !" << finl, TRUST_CGNS_ERROR();
+
+      if (cg_goto(fileId_, baseId_[index_glob], "BaseIterativeData_t", 1, "end") != CG_OK)
+        Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_goto BaseIterativeData_t !" << finl, TRUST_CGNS_ERROR();
+
+      // TimeValues
+      if (cg_array_write("TimeValues", CGNS_DOUBLE_TYPE, 1, &nuse, time_post_.data()) != CG_OK)
+        Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_array_write TimeValues !" << finl, TRUST_CGNS_ERROR();
+
+      if (cg_simulation_type_write(fileId_, baseId_[index_glob], CGNS_ENUMV(TimeAccurate)) != CG_OK)
+        Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_simulation_type_write !" << finl, TRUST_CGNS_ERROR();
+
+      // NumberOfZones : 1 zone active par step
+      std::vector<int> number_of_zones(nsteps, 1);
+      if (cg_array_write("NumberOfZones", CGNS_ENUMV(Integer), 1, &nuse, number_of_zones.data()) != CG_OK)
+        Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_array_write NumberOfZones !" << finl, TRUST_CGNS_ERROR();
+
+      cgsize_t zpdims[3] = { CGNS_STR_SIZE, 1, nuse };
+      std::string zone_ptrs;
+      zone_ptrs.reserve(static_cast<size_t>(CGNS_STR_SIZE) * nsteps);
+
+      bool first_zone = true;
+      for (double t : time_post_)
+        {
+          std::string zname = nom_dom.getString();
+          if (!first_zone)
+            zname += cgns_helper_.convert_double_to_string(t);
+          first_zone = false;
+
+          zname.resize(CGNS_STR_SIZE, ' ');
+          zone_ptrs += zname;
+        }
+
+      if (cg_array_write("ZonePointers", CGNS_ENUMV(Character), 3, zpdims, zone_ptrs.c_str()) != CG_OK)
+        Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_array_write ZonePointers !" << finl, TRUST_CGNS_ERROR();
+
+      for (int i = 0; i < nsteps; i++)
+        {
+          cgsize_t isize[3] = { sizeId_[i][0] , sizeId_[i][1] , 0 };
+          std::string zn = nom_dom.getString();
+
+          if (i > 0)
+            zn += cgns_helper_.convert_double_to_string(time_post_[i]);
+
+          if (cg_zone_write(fileId_, baseId_[index_glob], zn.c_str(), isize, CGNS_ENUMV(Unstructured), &zoneId_[index_glob]) != CG_OK)
+            Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_zone_write !" << finl, TRUST_CGNS_ERROR();
+
+          std::string linkfile = baseFile_name_ + ".solution." + cgns_helper_.convert_double_to_string(time_post_[i]) + ".cgns";
+          TRUST_2_CGNS::remove_slash_linkfile(linkfile);
+          std::string linkpath = "/" + baseZone_name_[ind_base] + "/" + baseZone_name_[ind_base] + "/GridCoordinates/";
+
+          if (cg_goto(fileId_, baseId_[index_glob], "Zone_t", zoneId_[index_glob], "end") != CG_OK)
+            Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_goto Zone_t !" << finl, TRUST_CGNS_ERROR();
+
+          if (cg_link_write("GridCoordinates", linkfile.c_str(), linkpath.c_str()) != CG_OK)
+            Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_link_write GridCoordinates !" << finl, TRUST_CGNS_ERROR();
+
+          for (auto& itr_conn : connectname_[ind_base])
+            {
+              linkpath = "/" + baseZone_name_[ind_base] + "/" + baseZone_name_[ind_base] + "/" + itr_conn + "/";
+              if (cg_link_write(itr_conn.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
+                Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_link_write connectivity !" << finl, TRUST_CGNS_ERROR();
+            }
+
+          std::string solname = "FlowSolution" + cgns_helper_.convert_double_to_string(time_post_[i]) + "_" + LOC;
+          linkpath = "/" + nom_dom.getString() + "/" + nom_dom.getString() + "/" + solname + "/";
+          if (cg_link_write(solname.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
+            Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_link_write FlowSolution !" << finl, TRUST_CGNS_ERROR();
+        }
+    }
+
+  cgns_close_grid_or_solution_link_file(-123., TYPE_LINK_CGNS::FINAL_LINK, true);
 }
 
 void Ecrire_CGNS::cgns_write_iters_deformable()
@@ -269,7 +436,7 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group_pb_deformable()
       for (auto &itr : fld_loc_map_)
         {
           const std::string& LOC = itr.first;
-          const Nom nom_dom = itr.second;
+          const Nom& nom_dom = itr.second;
           const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
 
           int ind_base = index_glob;
@@ -395,7 +562,7 @@ void Ecrire_CGNS::cgns_write_final_link_file_pb_deformable()
       for (auto& itr : fld_loc_map_)
         {
           const std::string& LOC = itr.first;
-          const Nom nom_dom = itr.second;
+          const Nom& nom_dom = itr.second;
           const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
 
           int ind_base = index_glob;

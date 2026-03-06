@@ -116,7 +116,7 @@ void Ecrire_CGNS::fill_infos_loc()
     }
 
   // j'ajoute ce test pour le moment ...
-  if (Option_CGNS::PARALLEL_OVER_ZONE && is_deformable_ && !postraiter_domaine_)
+  if (Process::is_parallel() && Option_CGNS::PARALLEL_OVER_ZONE && is_deformable_ && !postraiter_domaine_)
     {
       Cerr << "Error in Ecrire_CGNS::" << __func__ << " !!! You can not use the CGNS option PARALLEL_OVER_ZONE with your problem ..." << finl;
       Cerr << "Contact the TRUST team" << finl;
