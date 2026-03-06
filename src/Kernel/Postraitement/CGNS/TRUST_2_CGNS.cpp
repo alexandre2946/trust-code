@@ -543,6 +543,9 @@ int TRUST_2_CGNS::convert_connectivity(const CGNS_TYPE type, std::vector<cgsize_
     case CGNS_ENUMV(BAR_2):
       nodes_per_elem = 2;
       break;
+    case CGNS_ENUMV(NODE):
+      nodes_per_elem = 1;
+      break;
     default:
       Cerr << "Type not yet coded in TRUST_2_CGNS::convert_connectivity ! Call the 911 !" << finl;
       Process::exit();
@@ -581,6 +584,7 @@ int TRUST_2_CGNS::convert_connectivity(const CGNS_TYPE type, std::vector<cgsize_
     case CGNS_ENUMV(TETRA_4):
     case CGNS_ENUMV(TRI_3):
     case CGNS_ENUMV(BAR_2):
+    case CGNS_ENUMV(NODE):
       for (int i = 0; i < nb_elem; i++)
         for (int j = 0; j < nodes_per_elem; j++)
           *data++ = les_elems(i, j) + 1 + decal;
@@ -601,8 +605,10 @@ CGNS_TYPE TRUST_2_CGNS::convert_elem_type(const Motcle& type) const
     return CGNS_ENUMV(QUAD_4);
   else if (type == "TRIANGLE" || type == "TRIANGLE_3D")
     return CGNS_ENUMV(TRI_3);
-  else if (type == "SEGMENT" || type == "SEGMENT_2D")
+  else if (type == "SEGMENT" || type == "SEGMENT_2D" || type == "SEGMENT_AXI")
     return CGNS_ENUMV(BAR_2);
+  else if (type == "POINT")
+    return CGNS_ENUMV(NODE);
   else if (type == "TETRAEDRE")
     return CGNS_ENUMV(TETRA_4);
   else if (type == "POLYEDRE" || type == "POLYGONE" || type == "PRISME" || type == "PRISME_HEXAG" || type == "POLYGONE_3D")
@@ -617,7 +623,7 @@ CGNS_TYPE TRUST_2_CGNS::convert_elem_type(const Motcle& type) const
 
 int TRUST_2_CGNS::topo_dim_from_elem(CGNS_TYPE etype, bool is_polyedre) const
 {
-  if (etype == CGNS_ENUMV(BAR_2))
+  if (etype == CGNS_ENUMV(BAR_2) || etype == CGNS_ENUMV(NODE))
     return 1; // 1D
 
   if (etype == CGNS_ENUMV(TRI_3) || etype == CGNS_ENUMV(QUAD_4))
