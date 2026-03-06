@@ -41,9 +41,6 @@ void Op_Grad_DG::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_
 
 void Op_Grad_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  for(auto const& imap: matrices)
-    std::cout << "Key: " << imap.first << std::endl;
-
   if (!matrices.count("pression")) return; //rien a faire
   if (semi_impl.count("pression"))
     return; // semi-implicite -> rien a dimensionner
@@ -61,14 +58,13 @@ void Op_Grad_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl
   const BasisFunction& bfunc_p = domaine.get_basisFunction(order_p);
   const int nb_bfunc_p = bfunc_p.nb_bfunc();
 
-  const IntTab& indices_glob_elem_v = bfunc_v.indices_glob_elem();
+  int dim = Objet_U::dimension;
+  const IntTab& indices_glob_elem_v = bfunc_v.indices_glob_elem(dim);
   const IntTab& indices_glob_elem_p = bfunc_p.indices_glob_elem();
 
   int nb_elem_tot = domaine.nb_elem_tot();
 
-  int dim = Objet_U::dimension;
-
-  int size_row = dim*indices_glob_elem_v(nb_elem_tot);
+  int size_row = indices_glob_elem_v(nb_elem_tot);
 
   mat2.dimensionner(size_row, size_row, 0);
 
@@ -94,28 +90,28 @@ void Op_Grad_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl
           nb_indices_line += nb_bfunc_p;
         }
       for (int k = 0; k < nb_bfunc_v * dim; k++)
-        tab1(indices_glob_elem_v(nelem)*dim + k + 1) = nb_indices_line + tab1(indices_glob_elem_v(nelem)*dim + k);
+        tab1(indices_glob_elem_v(nelem) + k + 1) = nb_indices_line + tab1(indices_glob_elem_v(nelem) + k);
     }
 
   mat2.dimensionner(size_row, tab1(size_row) - 1);
 
   for (int nelem = 0; nelem < nb_elem_tot; nelem++)
     {
-      row = tab1[indices_glob_elem_v(nelem)*dim] - 1;
-      nb_indices_line = tab1[indices_glob_elem_v(nelem)*dim + 1] - tab1[indices_glob_elem_v(nelem)*dim];
+      row = tab1[indices_glob_elem_v(nelem)] - 1;
+      nb_indices_line = tab1[indices_glob_elem_v(nelem) + 1] - tab1[indices_glob_elem_v(nelem)];
       indice = 0;
-      for (int k = 0; k < nb_stencil_max; k++)
+
+      for (int i = 0; i < nb_bfunc_v*dim; i++)
         {
-          if (stencil_sorted(nelem, k) < 0)
-            break;
-          col = indices_glob_elem_p(stencil_sorted(nelem, k)) + 1;
-          for (int d = 0; d < dim; d++)
+          for (int k = 0; k < nb_stencil_max; k++)
             {
-              for (int i = 0; i < nb_bfunc_v; i++)
-                for (int j = 0; j < nb_bfunc_p; j++)
-                  tab2[row + indice + j + nb_indices_line * i] = col + j + d * nb_bfunc_v;
-              indice += nb_bfunc_p;
+              if (stencil_sorted(nelem, k) < 0)
+                break;
+              col = indices_glob_elem_p(stencil_sorted(nelem, k)) + 1;
+              for (int j = 0 ;  j < nb_bfunc_p; j++)
+                tab2[row + indice + j + k*nb_bfunc_p] = col + j;
             }
+          indice += nb_indices_line;
         }
     }
   mat2.sort_stencil();

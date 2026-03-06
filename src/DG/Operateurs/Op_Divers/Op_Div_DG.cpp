@@ -45,61 +45,99 @@ void Op_Div_DG::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_d
 
 void Op_Div_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  const std::string nom_inco = equation().inconnue().le_nom().getString();
+
+  if (!matrices.count("vitesse")) return; //rien a faire
   if (semi_impl.count("vitesse"))
     return; // semi-implicite -> rien a dimensionner
 
-  int n_ext = 1; //TODO DG what is op_ext in this case ?
-  std::vector<Matrice_Morse *> mat(n_ext);
-  for (int i = 0; i < n_ext; i++)
+  Matrice_Morse *matv = matrices.count("vitesse") ? matrices["vitesse"] : nullptr,
+                 *matp = matrices.count("pression") ? matrices["pression"] : nullptr,
+                  matv2, matp2;
+
+
+  const Domaine_DG& domaine = le_dom_DG.valeur();
+
+  int order_v = Option_DG::Get_order_for("vitesse");
+  int order_p = Option_DG::Get_order_for("pression");
+
+  const BasisFunction& bfunc_v = domaine.get_basisFunction(order_v);
+  const int nb_bfunc_v = bfunc_v.nb_bfunc();
+
+  const BasisFunction& bfunc_p = domaine.get_basisFunction(order_p);
+  const int nb_bfunc_p = bfunc_p.nb_bfunc();
+
+  int dim = Objet_U::dimension;
+  const IntTab& indices_glob_elem_v = bfunc_v.indices_glob_elem(dim);
+  const IntTab& indices_glob_elem_p = bfunc_p.indices_glob_elem();
+
+  int nb_elem_tot = domaine.nb_elem_tot();
+
+  int size_row = indices_glob_elem_p(nb_elem_tot);
+
+  matv2.dimensionner(size_row, size_row, 0);
+
+  IntVect& tab1 = matv2.get_set_tab1();
+  IntVect& tab2 = matv2.get_set_tab2();
+  DoubleVect& coeff = matv2.get_set_coeff();
+  coeff = 0;
+
+  const IntTab& stencil_sorted = domaine.get_stencil_sorted();
+  const int nb_stencil_max = stencil_sorted.dimension(1);
+
+  int nb_indices_line;
+  int row, col, indice;
+
+  tab1(0) = 1;
+  for (int nelem = 0; nelem < nb_elem_tot; nelem++)
     {
-      std::string nom_mat = i ? nom_inco + "/" + (this)->equation().probleme().le_nom().getString() : nom_inco; //TODO DG is that correspond ?
-      mat[i] = matrices.count(nom_mat) ? matrices.at(nom_mat) : nullptr;
-      if (!mat[i])
-        continue;
-      Matrice_Morse mat2;
-      if (i == 0)
-        dimensionner(mat2);
-      else
-        throw; // TODO DG for dimensionner_terme_croises
-
-      mat[i]->nb_colonnes() ? *mat[i] += mat2 : *mat[i] = mat2;
-    }
-}
-
-void Op_Div_DG::dimensionner(Matrice_Morse& matrice) const
-{
-  if (has_interface_blocs())
-    {
-      Operateur_base::dimensionner(matrice);
-      return;
-    }
-
-  const Domaine_DG& domaine_DG = le_dom_DG.valeur();
-  int nb_faces = domaine_DG.nb_faces();
-  int nb_faces_tot = domaine_DG.nb_faces_tot();
-  int nb_elem_tot = domaine_DG.nb_elem_tot();
-  IntTab stencil(0, 2);
-
-  const IntTab& face_voisins = domaine_DG.face_voisins();
-
-  int nb_coef = 0;
-  for (int face = 0; face < nb_faces; face++)
-    {
-      for (int dir = 0; dir < 2; dir++)
+      nb_indices_line = 0;
+      for (int k = 0; k < nb_stencil_max; k++)
         {
-          const int elem = face_voisins(face, dir);
-          if (elem != -1)
+          if (stencil_sorted(nelem, k) < 0)
+            break;
+          nb_indices_line += nb_bfunc_v*dim;
+        }
+      for (int k = 0; k < nb_bfunc_p; k++)
+        tab1(indices_glob_elem_p(nelem) + k + 1) = nb_indices_line + tab1(indices_glob_elem_p(nelem) + k);
+    }
+
+  matv2.dimensionner(size_row, tab1(size_row) - 1);
+
+  for (int nelem = 0; nelem < nb_elem_tot; nelem++)
+    {
+      row = tab1[indices_glob_elem_p(nelem)] - 1;
+      nb_indices_line = tab1[indices_glob_elem_p(nelem) + 1] - tab1[indices_glob_elem_p(nelem)];
+      indice = 0;
+
+      for (int i = 0; i < nb_bfunc_p; i++)
+        {
+          for (int k = 0; k < nb_stencil_max; k++)
             {
-              stencil.resize(nb_coef + 1, 2);
-              stencil(nb_coef, 0) = elem;
-              stencil(nb_coef, 1) = face;
-              nb_coef++;
+              if (stencil_sorted(nelem, k) < 0)
+                break;
+              col = indices_glob_elem_v(stencil_sorted(nelem, k)) + 1;
+              for (int j = 0 ;  j < nb_bfunc_v*dim; j++)
+                tab2[row + indice + j + k*nb_bfunc_v*dim] = col + j;
             }
+          indice += nb_indices_line;
         }
     }
-  tableau_trier_retirer_doublons(stencil);
-  Matrix_tools::allocate_morse_matrix(nb_elem_tot, nb_faces_tot, stencil, matrice);
+  matv2.sort_stencil();
+  matv->nb_colonnes() ? *matv += matv2 : *matv = matv2;
+
+  //TODO DG stabilization matrix
+  matp2.dimensionner(size_row, 1);
+
+  IntVect& tabp1 = matp2.get_set_tab1();
+  tabp1 = 2;
+  tabp1(0) = 1;
+  IntVect& tabp2 = matp2.get_set_tab2();
+  tabp2(0) = 1;
+  DoubleVect& coeffp = matp2.get_set_coeff();
+  coeffp = 0;
+
+  matp2.sort_stencil();
+  matp->nb_colonnes() ? *matp += matp2 : *matp = matp2;
 }
 
 
@@ -152,11 +190,6 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
               if (mat)
                 (*mat)(ind_elem_p + pressure_index, ind_elem_v + velocity_index + d * nb_bfunc_v) += coeff;
               secmem(elem, pressure_index) -= coeff * vit(elem, velocity_index + d * nb_bfunc_v);
-
-              if (elem==10)
-                {
-                  Cout << "index " << pressure_index << " " << velocity_index << " " << d << " coeff " << coeff << " " << vit(elem, velocity_index + d * nb_bfunc_v) << " " << secmem(elem, pressure_index) << finl;
-                }
             }
     }
 
@@ -379,79 +412,6 @@ DoubleTab& Op_Div_DG::calculer(const DoubleTab& vit, DoubleTab& div) const
 
 int Op_Div_DG::impr(Sortie& os) const
 {
-  const int impr_bord = (le_dom_DG->domaine().bords_a_imprimer().est_vide() ? 0 : 1);
-  ouvrir_fichier(Flux_div, "", je_suis_maitre());
-  EcrFicPartage Flux_face;
-  ouvrir_fichier_partage(Flux_face, "", impr_bord);
-  const Schema_Temps_base& sch = equation().probleme().schema_temps();
-  const double temps = sch.temps_courant();
-  if (je_suis_maitre())
-    Flux_div.add_col(temps);
-
-  const int nb_compo = flux_bords_.dimension(1);
-
-  // On parcours les frontieres pour sommer les flux par frontiere dans le tableau flux_bord
-  DoubleVect flux_bord(nb_compo);
-  DoubleVect bilan(nb_compo);
-  bilan = 0.;
-
-  for (int num_cl = 0; num_cl < le_dom_DG->nb_front_Cl(); num_cl++)
-    {
-      flux_bord = 0;
-      const Cond_lim& la_cl = le_dcl_DG->les_conditions_limites(num_cl);
-      const Front_VF& frontiere_dis = ref_cast(Front_VF, la_cl->frontiere_dis());
-      const int ndeb = frontiere_dis.num_premiere_face();
-      const int nfin = ndeb + frontiere_dis.nb_faces();
-      for (int face = ndeb; face < nfin; face++)
-        for (int k = 0; k < nb_compo; k++)
-          flux_bord(k) += flux_bords_(face, k);
-
-      for (int k = 0; k < nb_compo; k++)
-        flux_bord(k) = Process::mp_sum(flux_bord(k));
-
-      if (je_suis_maitre())
-        {
-          for (int k = 0; k < nb_compo; k++)
-            {
-              //Ajout pour impression sur fichiers separes
-              Flux_div.add_col(flux_bord(k));
-              bilan(k) += flux_bord(k);
-            }
-        }
-    }
-
-  if (je_suis_maitre())
-    {
-      for (int k = 0; k < nb_compo; k++)
-        Flux_div.add_col(bilan(k));
-
-      Flux_div << finl;
-    }
-
-  for (int num_cl = 0; num_cl < le_dom_DG->nb_front_Cl(); num_cl++)
-    {
-      const Frontiere_dis_base& la_fr = le_dcl_DG->les_conditions_limites(num_cl)->frontiere_dis();
-      const Cond_lim& la_cl = le_dcl_DG->les_conditions_limites(num_cl);
-      const Front_VF& frontiere_dis = ref_cast(Front_VF, la_cl->frontiere_dis());
-      int ndeb = frontiere_dis.num_premiere_face();
-      int nfin = ndeb + frontiere_dis.nb_faces();
-      if (le_dom_DG->domaine().bords_a_imprimer().contient(la_fr.le_nom()))
-        {
-          Flux_face << "# Flux par face sur " << la_fr.le_nom() << " au temps " << temps << " : " << finl;
-          for (int face = ndeb; face < nfin; face++)
-            {
-              if (dimension == 2)
-                Flux_face << "# Face a x= " << le_dom_DG->xv(face, 0) << " y= " << le_dom_DG->xv(face, 1) << " flux=";
-              else if (dimension == 3)
-                Flux_face << "# Face a x= " << le_dom_DG->xv(face, 0) << " y= " << le_dom_DG->xv(face, 1) << " z= " << le_dom_DG->xv(face, 2) << " flux=";
-              for (int k = 0; k < nb_compo; k++)
-                Flux_face << " " << flux_bords_(face, k);
-              Flux_face << finl;
-            }
-          Flux_face.syncfile();
-        }
-    }
-
   return 1;
 }
 

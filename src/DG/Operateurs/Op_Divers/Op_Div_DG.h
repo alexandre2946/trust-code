@@ -43,7 +43,6 @@ public:
   void volumique(DoubleTab&) const override;
 
   inline int has_interface_blocs() const override { return 1; }
-  void dimensionner(Matrice_Morse& mat) const override;
   void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
   void ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = { }) const override;
 

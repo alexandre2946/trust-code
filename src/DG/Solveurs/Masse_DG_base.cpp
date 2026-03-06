@@ -100,6 +100,7 @@ void Masse_DG_base::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_i
     }
   else
     {
+      int index = 0;
       for (int e = 0; e < nb_elem_tot; e++)
         {
           for (int d = 0; d<dim; d++)
@@ -107,8 +108,9 @@ void Masse_DG_base::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_i
               for (int i = 0; i < nb_bfunc; i++ )
                 for (int j = 0; j < nb_bfunc; j++ )
                   {
-                    indice(((e*dim+d)*nb_bfunc+i)*nb_bfunc+j, 0) = current_indice+i;
-                    indice(((e*dim+d)*nb_bfunc+i)*nb_bfunc+j, 1) = current_indice+j;
+                    indice(index, 0) = current_indice+i;
+                    indice(index, 1) = current_indice+j;
+                    index++;
                   }
               current_indice+=nb_bfunc;
             }
@@ -131,7 +133,7 @@ void Masse_DG_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, double
   const BasisFunction& bfunc = le_dom_dg_->get_basisFunction(order);
   const int nb_bfunc = bfunc.nb_bfunc();
 
-  assert(nb_bfunc == inco.line_size());
+  assert(nb_bfunc*dim == inco.line_size());
 
   const int quad_order = bfunc.get_default_quadrature_order();
   const Quadrature_base& quad = le_dom_dg_->get_quadrature(quad_order);
@@ -184,25 +186,25 @@ void Masse_DG_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, double
               /****************************************************************/
               /* Formule de quadrature : Ern, Finite Elements II, 2021, p 71  */
               /****************************************************************/
-              for (int d = 0; d<dim; d++)
+              for (int i=0; i<nb_bfunc; i++)
                 {
-                  for (int i=0; i<nb_bfunc; i++)
+                  for (int j=0; j<nb_bfunc; j++)
                     {
-                      for (int j=0; j<nb_bfunc; j++)
+                      product = 0.;
+                      for (int k = 0; k < tab_pts_integ(e) ; k++)
+                        product(k) = fbase(i, k) * fbase(j, k);
+
+                      double integral = quad.compute_integral_on_elem(e, product);
+
+                      for (int d = 0; d<dim; d++)
                         {
-                          product = 0.;
-                          for (int k = 0; k < tab_pts_integ(e) ; k++)
-                            product(k) = fbase(i, k) * fbase(j, k);
-
-                          double integral = quad.compute_integral_on_elem(e, product);
-
                           if (mat)
                             (*mat)(current_indice+i+d*nb_bfunc, current_indice+j+d*nb_bfunc) += coef[e]*integral / dt;
-                          secmem(e,i) += coef[e]*integral*passe(e,j) / dt;
+                          secmem(e,i+d*nb_bfunc) += coef[e]*integral*passe(e,j+d*nb_bfunc) / dt;
                         }
                     }
-                  current_indice+=nb_bfunc;
                 }
+              current_indice+=nb_bfunc*dim;
             }
         }
     }

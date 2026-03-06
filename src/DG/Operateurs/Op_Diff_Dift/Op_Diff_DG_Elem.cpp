@@ -112,17 +112,19 @@ void Op_Diff_DG_Elem::dimensionner(Matrice_Morse& la_matrice) const // TODO a re
       auto row = tab1[indices_glob_elem(nelem)]-1 ;
       auto nb_indices_line = tab1[indices_glob_elem(nelem)+1] - tab1[indices_glob_elem(nelem)];
       indice = 0;
-      for (int k = 0; k < nb_stencil_max; k++)
+      for (int d = 0; d < dim; d++)
         {
-          if (stencil_sorted(nelem, k) < 0)
-            break;
-          col = indices_glob_elem(stencil_sorted(nelem, k)) + 1;
-          for (int d = 0; d < dim; d++)
+          for (int i = 0; i < nb_basis_func; i++)
             {
-              for (int j = 0; j < nb_basis_func; j++)
-                for (int i = 0; i < nb_basis_func; i++)
-                  tab2[row + indice + j + nb_indices_line * i] = col + j + d * nb_basis_func;
-              indice += nb_basis_func;
+              for (int k = 0; k < nb_stencil_max; k++)
+                {
+                  if (stencil_sorted(nelem, k) < 0)
+                    break;
+                  col = indices_glob_elem(stencil_sorted(nelem, k)) + 1;
+                  for (int j = 0 ;  j < nb_basis_func; j++)
+                    tab2[row + indice + j + k*nb_basis_func] = col + j + d*nb_basis_func;
+                }
+              indice += nb_indices_line;
             }
         }
     }
