@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -225,7 +225,7 @@ PetscErrorCode destroy_cvctx(void **mctx)
   return err;
 }
 #else
-PetscErrorCode destroy_cvctx(void *mctx)
+PetscErrorCode SETS::destroy_cvctx(void *mctx)
 {
   SETS::cv_test_t *ctx = (SETS::cv_test_t *)mctx;
   if (ctx->v)
@@ -239,7 +239,7 @@ PetscErrorCode destroy_cvctx(void *mctx)
 #endif
 
 /* test de convergence */
-PetscErrorCode convergence_test(KSP ksp, PetscInt it, PetscReal rnorm, KSPConvergedReason *reason,void *mctx)
+PetscErrorCode SETS::convergence_test(KSP ksp, PetscInt it, PetscReal rnorm, KSPConvergedReason *reason,void *mctx)
 {
   SETS::cv_test_t *ctx = (SETS::cv_test_t *)mctx;
   if (ctx->t == nullptr) /* ctx->t, ctx-v non initialises -> on les cree */

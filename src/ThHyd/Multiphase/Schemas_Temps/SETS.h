@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -94,6 +94,8 @@ public:
   ArrOfTID ix; //indices pour recuperer le residu
   cv_test_t *cv_ctx = nullptr;
   void init_cv_ctx(const DoubleTab& secmem, const DoubleVect& norm);
+  static PetscErrorCode destroy_cvctx(void *mctx);
+  static PetscErrorCode convergence_test(KSP ksp, PetscInt it, PetscReal rnorm, KSPConvergedReason *reason,void *mctx);
 #endif
 
   double facsec_diffusion_for_sets() const
