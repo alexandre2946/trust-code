@@ -23,18 +23,17 @@
 #include <Param.h>
 
 Implemente_base(Source_PDF_base,"Source_PDF_base",Source_dep_inco_base);
-// XD source_pdf_base Source_dep_inco_base source_pdf_base 1 Basic class of source_PDF terms introduced in the equation.
 
 Entree& Source_PDF_base::readOn(Entree& s)
 {
   Param param(que_suis_je());
-  param.ajouter("aire", &champ_aire_lu_,Param::REQUIRED); // XD_ADD_P field_base volumic field: a boolean for the cell (0 or 1) indicating if the obstacle is in the cell
-  param.ajouter("rotation", &champ_rotation_lu_,Param::REQUIRED); // XD_ADD_P field_base volumic field with 9 components representing the change of basis on cells (local to global). Used for rotating cases for example.
-  param.ajouter_flag("transpose_rotation", &transpose_rotation_,Param::OPTIONAL); // XD_ADD_P rien  whether to transpose the basis change matrix.
-  param.ajouter("modele",&modele_lu_,Param::REQUIRED);   // XD_ADD_P bloc_pdf_model model used for the Penalized Direct Forcing
+  param.ajouter("aire", &champ_aire_lu_,Param::REQUIRED);
+  param.ajouter("rotation", &champ_rotation_lu_,Param::REQUIRED);
+  param.ajouter_flag("transpose_rotation", &transpose_rotation_,Param::OPTIONAL);
+  param.ajouter("modele",&modele_lu_,Param::REQUIRED);
   temps_relax_ = modele_lu_.temps_relax_;
   echelle_relax_ =  modele_lu_.echelle_relax_;
-  param.ajouter("interpolation",&interpolation_lue_,Param::OPTIONAL); // XD_ADD_P interpolation_ibm_base interpolation method
+  param.ajouter("interpolation",&interpolation_lue_,Param::OPTIONAL);
 
   param.lire_avec_accolades(s);
   if ((&interpolation_lue_)->non_nul())

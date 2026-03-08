@@ -16,7 +16,6 @@
 #include <Vitesse_derive_base.h>
 
 Implemente_base(Vitesse_derive_base, "Vitesse_relative_derive_base", Vitesse_relative_base);
-// XD vitesse_derive_base vitesse_relative_base vitesse_derive_base 0 Source term which corresponds to the drift-velocity between a liquid and a gas phase
 
 Sortie& Vitesse_derive_base::printOn(Sortie& os) const { return Vitesse_relative_base::printOn(os); }
 Entree& Vitesse_derive_base::readOn(Entree& is)

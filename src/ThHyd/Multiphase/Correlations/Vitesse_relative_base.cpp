@@ -17,7 +17,6 @@
 #include <Pb_Multiphase.h>
 
 Implemente_base(Vitesse_relative_base, "Vitesse_relative_base", Correlation_base);
-// XD vitesse_relative_base source_base vitesse_relative_base 0 Basic class for drift-velocity source term between a liquid and a gas phase
 
 Sortie& Vitesse_relative_base::printOn(Sortie& os) const { return os; }
 Entree& Vitesse_relative_base::readOn(Entree& is)

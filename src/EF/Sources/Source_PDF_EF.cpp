@@ -35,7 +35,12 @@
 #include <Op_Conv_EF.h>
 
 Implemente_instanciable(Source_PDF_EF,"Source_PDF_EF",Source_PDF_base);
-// XD source_pdf source_pdf_base source_pdf 1 Source term for Penalised Direct Forcing (PDF) method.
+// XD source_pdf source_base source_pdf 1 Source term for Penalised Direct Forcing (PDF) method.
+// XD attr aire field_base aire 0 volumic field: a boolean for the cell (0 or 1) indicating if the obstacle is in the cell
+// XD attr rotation field_base rotation 0 volumic field with 9 components representing the change of basis on cells (local to global). Used for rotating cases for example.
+// XD attr transpose_rotation rien transpose_rotation 1 whether to transpose the basis change matrix.
+// XD attr modele bloc_pdf_model modele 0 model used for the Penalized Direct Forcing
+// XD attr interpolation interpolation_ibm_base interpolation 1 interpolation method
 
 /*##################################################################################################
 ####################################################################################################
