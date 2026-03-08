@@ -60,9 +60,6 @@ Implemente_base_sans_destructeur(Probleme_base,"Probleme_base",Probleme_U);
 // XD   ref eqn9 eqn_base
 // XD   ref eqn10 eqn_base
 
-// XD constituant milieu_base constituant -1 Constituent.
-// XD attr coefficient_diffusion field_base coefficient_diffusion 1 Constituent diffusion coefficient value (m2.s-1). If a multi-constituent problem is being processed, the diffusivite will be a vectorial and each components will be the diffusion of the constituent.
-// XD attr is_multi_scalar rien is_multi_scalar_diffusion 1 Flag to activate the multi_scalar diffusion operator
 
 // XD format_file_base objet_lecture nul 0 Format of the file
 // XD   attr checkpoint_fname chaine checkpoint_fname 0 Name of file.

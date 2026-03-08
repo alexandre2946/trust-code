@@ -26,14 +26,16 @@ Implemente_instanciable(Pb_Hydraulique_List_Concentration_Turbulent, "Pb_Hydraul
 Sortie& Pb_Hydraulique_List_Concentration_Turbulent::printOn(Sortie& os) const { return Pb_List_Concentration_Gen2::printOn(os); }
 Entree& Pb_Hydraulique_List_Concentration_Turbulent::readOn(Entree& is) { return Pb_List_Concentration_Gen2::readOn(is); }
 
-// XD Pb_Thermohydraulique_List_Concentration_Turbulent pb_avec_liste_conc Pb_Thermohydraulique_List_Concentration_Turbulent -1 Resolution of Navier-Stokes/energy/multiple constituent transport equations, with turbulence modelling.
+// XD Pb_Thermohydraulique_List_Concentration_Turbulent Pb_base Pb_Thermohydraulique_List_Concentration_Turbulent -1 Resolution of Navier-Stokes/energy/multiple constituent transport equations, with turbulence modelling.
 // XD attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem.
 // XD attr constituant constituant constituant 1 Constituents.
 // XD attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
 // XD attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 1 Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
+// XD attr list_equations listeqn list_equations 0 convection_diffusion_concentration equations. The unknown of the concentration equation number N is named concentrationN. This keyword is used to define initial conditions and the post processing fields. This kind of problem is very useful to test in only one data file (and then only one calculation) different schemes or different boundary conditions for the scalar transport equation.
 
-// XD Pb_Hydraulique_List_Concentration_Turbulent pb_avec_liste_conc Pb_Hydraulique_List_Concentration_Turbulent -1 Resolution of Navier-Stokes/multiple constituent transport equations, with turbulence modelling.
+// XD Pb_Hydraulique_List_Concentration_Turbulent Pb_base Pb_Hydraulique_List_Concentration_Turbulent -1 Resolution of Navier-Stokes/multiple constituent transport equations, with turbulence modelling.
 // XD attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem.
 // XD attr constituant constituant constituant 1 Constituents.
 // XD attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
+// XD attr list_equations listeqn list_equations 0 convection_diffusion_concentration equations. The unknown of the concentration equation number N is named concentrationN. This keyword is used to define initial conditions and the post processing fields. This kind of problem is very useful to test in only one data file (and then only one calculation) different schemes or different boundary conditions for the scalar transport equation.
 

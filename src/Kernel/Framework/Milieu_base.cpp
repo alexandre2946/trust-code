@@ -30,10 +30,6 @@
 
 Implemente_base_sans_constructeur(Milieu_base,"Milieu_base",Objet_U);
 // XD milieu_base objet_u milieu_base -1 Basic class for medium (physics properties of medium).
-// XD attr gravite field_base gravite 1 Gravity field (optional).
-// XD attr porosites_champ field_base porosites_champ 1 The porosity is given at each element and the porosity at each face, Psi(face), is calculated by the average of the porosities of the two neighbour elements Psi(elem1), Psi(elem2) : Psi(face)=2/(1/Psi(elem1)+1/Psi(elem2)). This keyword is optional.
-// XD attr diametre_hyd_champ field_base diametre_hyd_champ 1 Hydraulic diameter field (optional).
-// XD attr porosites porosites porosites 1 Porosities.
 
 Milieu_base::Milieu_base()
 {
@@ -102,9 +98,9 @@ Entree& Milieu_base::readOn(Entree& is)
 
 void Milieu_base::set_param(Param& param) const
 {
-  param.ajouter("rho", &ch_rho_);   // XD attr rho field_base rho 1 Density (kg.m-3).
-  param.ajouter("lambda", &ch_lambda_); // XD attr lambda field_base lambda_u 1 Conductivity (W.m-1.K-1).
-  param.ajouter("Cp", &ch_Cp_);  // XD attr cp field_base cp 1 Specific heat (J.kg-1.K-1).
+  param.ajouter("rho", &ch_rho_);   // XD_ADD_P field_base Density (kg.m-3).
+  param.ajouter("lambda", &ch_lambda_); // XD_ADD_P field_base Conductivity (W.m-1.K-1).
+  param.ajouter("Cp", &ch_Cp_);  // XD_ADD_P field_base Specific heat (J.kg-1.K-1).
   param.ajouter("beta_th", &ch_beta_th_);
   set_additional_params(param);
 }
@@ -112,10 +108,11 @@ void Milieu_base::set_param(Param& param) const
 // methode utile pour F5 ! F5 n'appelle pas Milieu_base::set_param mais Milieu_base::set_additional_params ...
 void Milieu_base::set_additional_params(Param& param) const
 {
-  param.ajouter("diametre_hyd_champ", &ch_diametre_hyd_);
-  param.ajouter("porosites_champ", &ch_porosites_);
-  param.ajouter("porosites", &porosites_);
-  param.ajouter("gravite", &ch_g_); // pour F5 je mets la gravite ici ...
+  param.ajouter("diametre_hyd_champ", &ch_diametre_hyd_); // XD_ADD_P field_base Hydraulic diameter field (optional).
+  param.ajouter("porosites_champ", &ch_porosites_); // XD_ADD_P field_base The porosity is given at each element and the porosity at each face, Psi(face), is calculated by the average of the porosities of the two neighbour elements Psi(elem1), Psi(elem2) : Psi(face)=2/(1/Psi(elem1)+1/Psi(elem2)). This keyword is optional.
+  param.ajouter("porosites", &porosites_); // XD_ADD_P porosites Porosities.
+  // pour F5 je mets la gravite ici ...
+  param.ajouter("gravite", &ch_g_); // XD_ADD_P field_base Gravity field (optional).
 }
 
 int Milieu_base::lire_motcle_non_standard(const Motcle& mot_lu, Entree& is)
