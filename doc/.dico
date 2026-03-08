@@ -479,7 +479,6 @@
  ICE ICE SETS.h
  IJK IJK_discretisation IJK_discretisation.h
  IJK_Field_tools IJK_Field_tools IJK_Field_tools.h
- IJK_Grid_Geometry IJK_Grid_Geometry IJK_Grid_Geometry.h
  IJK_Lata_Swap_JK IJK_Lata_Swap_JK IJK_Lata_Swap_JK.h
  IJK_Test_Multigrille IJK_Test_Multigrille IJK_Test_Multigrille.h
  IJK_VDF_converter IJK_VDF_converter IJK_VDF_converter.h

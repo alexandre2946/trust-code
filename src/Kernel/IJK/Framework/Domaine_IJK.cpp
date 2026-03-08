@@ -20,7 +20,7 @@
 #define print_vect(x) (Nom("[") + Nom(x[0]) + Nom(" ") + Nom(x[1]) + Nom(" ") + Nom(x[2]) + Nom("]"))
 
 
-// XD Domaine_IJK Domaine_base domaine_ijk -1 domain for IJK simulation (used in TrioCFD)
+// XD domaine_IJK Domaine_base domaine_ijk -1 domain for IJK simulation (used in TrioCFD)
 Implemente_instanciable_sans_constructeur(Domaine_IJK, "Domaine_IJK", Domaine_base);
 
 // XD attr nbelem listentierf nbelem 0 Number of elements in each direction  (integers, 2 or 3 values depending on dimension)
@@ -300,7 +300,7 @@ void Domaine_IJK::initialize_from_unstructured(const Domaine& domaine,
 {
   if (!sub_type(Hexaedre, domaine.type_elem().valeur()))
     {
-      Cerr << "Error in IJK_Grid_Geometry::initialize_from_unstructured:\n"
+      Cerr << "Error in Domaine_IJK::initialize_from_unstructured:\n"
            << " the provided domaine does not have Hexaedre element type" << finl;
       exit();
     }
@@ -310,7 +310,7 @@ void Domaine_IJK::initialize_from_unstructured(const Domaine& domaine,
   // Find all coordinates in the unstructured mesh
   // swap directions
   const DoubleTab& coord_som = domaine.les_sommets();
-  Cout << "IJK_Grid_Geometry::initialize_from_unstructured maps x->" <<  direction_for_x
+  Cout << "Domaine_IJK::initialize_from_unstructured maps x->" <<  direction_for_x
        << " y->" << direction_for_y << " z->" << direction_for_z << finl;
 
   find_unique_coord(coord_som, 0 /* coordonnees y */, node_coordinates_xyz_[direction_for_x]);
@@ -345,7 +345,7 @@ void Domaine_IJK::initialize_from_unstructured(const Domaine& domaine,
         }
       else
         {
-          Cout << "IJK_Grid_Geometry::initialize_from_unstructured direction " << dir
+          Cout << "Domaine_IJK::initialize_from_unstructured direction " << dir
                << " Not uniform, min delta=" << mindelta
                << " max delta=" << maxdelta << finl;
           uniform_[dir] = false;
