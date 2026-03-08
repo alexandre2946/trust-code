@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -23,13 +23,15 @@ Implemente_instanciable(Pb_Thermohydraulique_Especes_WC,"Pb_Thermohydraulique_Es
 Sortie& Pb_Thermohydraulique_Especes_WC::printOn(Sortie& os) const { return TRUSTProblem_sup_eqns<Pb_Thermohydraulique_WC>::printOn(os); }
 Entree& Pb_Thermohydraulique_Especes_WC::readOn(Entree& is) { return TRUSTProblem_sup_eqns<Pb_Thermohydraulique_WC>::readOn(is); }
 
-// XD pb_thermohydraulique_especes_QC pb_avec_passif pb_thermohydraulique_especes_QC -1 Resolution of thermo-hydraulic problem for a multi-species quasi-compressible fluid.
+// XD pb_thermohydraulique_especes_QC Pb_base pb_thermohydraulique_especes_QC -1 Resolution of thermo-hydraulic problem for a multi-species quasi-compressible fluid.
 // XD attr fluide_quasi_compressible fluide_quasi_compressible fluide_quasi_compressible 0 The fluid medium associated with the problem.
 // XD attr navier_stokes_QC navier_stokes_QC navier_stokes_QC 0 Navier-Stokes equation for a quasi-compressible fluid.
 // XD attr convection_diffusion_chaleur_QC convection_diffusion_chaleur_QC convection_diffusion_chaleur_QC 0 Temperature equation for a quasi-compressible fluid.
+// XD attr equations_scalaires_passifs listeqn equations_scalaires_passifs 0 Passive scalar equations. The unknowns of the passive scalar equation number N are named temperatureN or concentrationN or fraction_massiqueN. This keyword is used to define initial conditions and the post processing fields. This kind of problem is very useful to test in only one data file (and then only one calculation) different schemes or different boundary conditions for the scalar transport equation.
 
-// XD pb_thermohydraulique_especes_WC pb_avec_passif pb_thermohydraulique_especes_WC -1 Resolution of thermo-hydraulic problem for a multi-species weakly-compressible fluid.
+// XD pb_thermohydraulique_especes_WC Pb_base pb_thermohydraulique_especes_WC -1 Resolution of thermo-hydraulic problem for a multi-species weakly-compressible fluid.
 // XD attr fluide_weakly_compressible fluide_weakly_compressible fluide_weakly_compressible 0 The fluid medium associated with the problem.
 // XD attr navier_stokes_WC navier_stokes_WC navier_stokes_WC 0 Navier-Stokes equation for a weakly-compressible fluid.
 // XD attr convection_diffusion_chaleur_WC convection_diffusion_chaleur_WC convection_diffusion_chaleur_WC 0 Temperature equation for a weakly-compressible fluid.
+// XD attr equations_scalaires_passifs listeqn equations_scalaires_passifs 0 Passive scalar equations. The unknowns of the passive scalar equation number N are named temperatureN or concentrationN or fraction_massiqueN. This keyword is used to define initial conditions and the post processing fields. This kind of problem is very useful to test in only one data file (and then only one calculation) different schemes or different boundary conditions for the scalar transport equation.
 
