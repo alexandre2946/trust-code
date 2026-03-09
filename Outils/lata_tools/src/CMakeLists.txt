@@ -70,6 +70,44 @@ if (loadercpp)
    )
 endif(loadercpp)
 
+
+#
+# CGNS dependance
+#
+
+set(cgns_reader off)
+
+if ("${CGNS_ROOT}" STREQUAL "")
+  set(CGNS_ROOT_ENV $ENV{TRUST_CGNS_ROOT})
+  if (NOT "${CGNS_ROOT_ENV}" STREQUAL "")
+    set(cgns_dir "${CGNS_ROOT_ENV}")
+    set(cgns_reader on)
+  endif()
+else()
+  set(cgns_dir ${CGNS_ROOT})
+  set(cgns_reader on)
+endif()
+
+if (cgns_reader)
+  set(cgns_lib_paths
+    ${cgns_dir}/lib
+  )
+
+  find_library(libcgns
+    NAMES libcgns.a cgns
+    PATHS ${cgns_lib_paths}
+    NO_DEFAULT_PATH
+  )
+
+  if (NOT libcgns)
+    message(FATAL_ERROR "CGNS library not found in ${cgns_dir}/lib")
+  endif()
+
+  include_directories(${cgns_dir}/include)
+
+  set(ajout ${ajout} ${libcgns})
+endif()
+
 # 
 # Building common static library 'liblata.a'
 #
