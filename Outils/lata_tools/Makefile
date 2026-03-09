@@ -26,6 +26,7 @@ $(trg): Makefile $(tools_src)/CMakeLists.txt $(tools_src)/tools/CMakeLists.txt $
 	(cd $(tools_src);env TRUST_DEFINES="$(Defines)" EXTRA_SRCS="$(EXTRA_SRCS)" ./build.sh)
 	(cd $(TRUST_ROOT)/exec;ln -sf lata_tools/bin/lata_analyzer .)
 	(cd $(TRUST_ROOT)/exec;ln -sf lata_tools/bin/compare_lata .)
+	(cd $(TRUST_ROOT)/exec;ln -sf lata_tools/bin/compare_lata compare_cgns)
 	(cd $(TRUST_ROOT)/exec/lata_tools/;ln -sf ../../Outils/lata_tools/src/tools/env.sh .)
 
 clean:
