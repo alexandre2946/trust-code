@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -73,6 +73,7 @@ protected:
   Nom type_face_;                ///< Boundary element type
   Noms noms_bords_;              ///< Names of the boundaries
   Noms exclude_grps_;            ///< Names of the (face) groups to skip when reading the file
+  Noms restrict_ssz_;           ///< Names of the subzones to keep only in the .geo file
   Noms internal_face_grps_;      ///< Names of the internals face groups to read in the file
 #ifdef MEDCOUPLING_
   MEDCoupling::MEDCouplingAxisType axis_type_  = MEDCoupling::MEDCouplingAxisType::AX_CART ;

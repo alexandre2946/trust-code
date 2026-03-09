@@ -257,6 +257,7 @@ Entree& LireMED_32_64<_SIZE_>::interpreter_(Entree& is)
       param.ajouter("mesh|maillage", &nom_mesh_);                       // XD_ADD_P chaine Name of the mesh in med file. If not specified, the first mesh will be read.
 
       param.ajouter("exclude_groups|exclure_groupes", &exclude_grps_); // XD_ADD_P listchaine List of face groups to skip in the MED file.
+      param.ajouter("sub_zones|sous_zones", &restrict_ssz_); // XD_ADD_P listchaine List of subzones to keep in the MED file and write directly in the .geo
       param.ajouter("include_additional_face_groups|inclure_groupes_faces_additionnels", &internal_face_grps_); // XD_ADD_P listchaine List of face groups to read and register in the MED file.
 
       EChaine is2(s);
@@ -622,7 +623,17 @@ void LireMED_32_64<_SIZE_>::write_sub_dom_datasets() const
       Nom nom_dom_trio = this->domaine().le_nom();
       SFichier jdd_seq(nom_dom_trio + "_ssz.geo");
       SFichier jdd_par(nom_dom_trio + "_ssz_par.geo");
-      std::vector<std::string> groups = mfumesh_->getGroupsOnSpecifiedLev(0);
+      std::vector<std::string> groups;
+      if (restrict_ssz_.size()>0)
+        {
+          for (const auto& name : restrict_ssz_)
+            groups.push_back(name.getString());
+        }
+      else
+        {
+          Cerr << "Reading groups at level 0:" << finl;
+          groups = mfumesh_->getGroupsOnSpecifiedLev(0);
+        }
 
       for (const auto& gnam: groups)
         {
@@ -647,14 +658,12 @@ void LireMED_32_64<_SIZE_>::write_sub_dom_datasets() const
 
           jdd_seq << "Associer " << nom_sous_domaine << " " << nom_dom_trio << finl;
           jdd_par << "Associer " << nom_sous_domaine << " " << nom_dom_trio << finl;
-          bool flag = false;
-          if (flag)
+          if (restrict_ssz_.size())
             {
-              jdd_seq << "Lire " << nom_sous_domaine << " { liste ";
-              jdd_seq << nb_elems;
+              // Sequential only:
+              jdd_seq << "Lire " << nom_sous_domaine << " { liste " << nb_elems;
               for (int_t j = 0; j < nb_elems; j++) jdd_seq << " " << (int) idP[j];
               jdd_seq << " }" << finl;
-              jdd_par << "Lire " << nom_sous_domaine << " { fichier " << nom_sous_domaine << ".ssz" << " }" << finl;
             }
           else
             {
