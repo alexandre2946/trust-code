@@ -125,15 +125,16 @@ case ${Mpirun} in
             fi
 
             # Attention xterm -e sur Mandriva 2008 n'accepte plus qu'une seule commande derriere -e
+            xterm_opt="-geometry 170x50 -fa 'DejaVu Sans Mono' -fs 12"
             if [[ ${MPI} = "OPENMPI" ]]; then
                 #$Mpirun -np $np -d $Xterm -e $gdb
-                cmd="${Mpirun} -np ${np} $(echo "${Xterm}" | awk '{print $1}') -geometry 150x30 -hold -e ${gdb} -ex run --args"
+                cmd="${Mpirun} -np ${np} $(echo "${Xterm}" | awk '{print $1}') ${xterm_opt} -hold -e ${gdb} -ex run --args"
                 echo "${cmd}"
                 eval "${cmd}"
-                # "${Mpirun}" -np ${np} "$(echo "${Xterm}" | awk '{print $1}')" -geometry 150x30 -hold -e ${gdb} -ex run --args
+                # "${Mpirun}" -np ${np} "$(echo "${Xterm}" | awk '{print $1}')" ${xterm_opt} 150x30 -hold -e ${gdb} -ex run --args
             elif [[ ${MPI} = "MPICH" ]]; then
                 #$Mpirun -np $np `echo $Xterm | awk '{print $1}'` -e $gdb
-                cmd="${Mpirun} -np ${np} $(echo "${Xterm}" | awk '{print $1}') -geometry 150x30 -hold -e ${gdb} -ex run --args"
+                cmd="${Mpirun} -np ${np} $(echo "${Xterm}" | awk '{print $1}') ${xterm_opt} -hold -e ${gdb} -ex run --args"
                 echo "${cmd}"
                 eval "${cmd}"
             fi
