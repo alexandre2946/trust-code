@@ -19,6 +19,7 @@
 class LataDB;
 
 void cgns_reader(const char*, const char*, LataDB&);
+void cgns_to_lata(const char *lmlfilename, const char *latafilename, bool ascii=false, bool fortran_blocs=true, bool fortran_ordering=false, bool fortran_indexing=true);
 
 #endif /* CGNSReader_included */
 

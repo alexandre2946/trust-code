@@ -119,25 +119,21 @@ namespace
     switch(t)
       {
       case NODE:
-        return "NODE";
+        return "POINT";
       case BAR_2:
-        return "BAR_2";
+        return "SEGMENT";
       case TRI_3:
-        return "TRI_3";
+        return "TRIANGLE";
       case QUAD_4:
-        return "QUAD_4";
+        return "RECTANGLE";
       case TETRA_4:
-        return "TETRA_4";
-      case PYRA_5:
-        return "PYRA_5";
-      case PENTA_6:
-        return "PENTA_6";
+        return "TETRAEDRE";
       case HEXA_8:
-        return "HEXA_8";
-      case NGON_n:
-        return "NGON_n";
-      case NFACE_n:
-        return "NFACE_n";
+        return "HEXAEDRE";
+//      case NGON_n:
+//        return "NGON_n";
+//      case NFACE_n:
+//        return "NFACE_n";
       default:
         return "UnknownElementType";
       }
@@ -148,7 +144,7 @@ namespace
     switch(t)
       {
       case NODE:
-        return 0;
+//        return 0;
       case BAR_2:
         return 1;
       case TRI_3:
@@ -173,10 +169,10 @@ namespace
         return "SEGMENT";
       case TRI_3:
         nb_comp = 3;
-        return "TRIANGLE_3D";
+        return "TRIANGLE";
       case QUAD_4:
         nb_comp = 4;
-        return "QUADRANGLE_3D";
+        return "RECTANGLE";
       case TETRA_4:
         nb_comp = 4;
         return "TETRAEDRE";
@@ -531,7 +527,7 @@ void cgns_reader(const char *cgnsfilename, const char *data_filename, LataDB &la
 
   lata_db.header_ = "CGNS";
   lata_db.case_ = cgnsfilename;
-  lata_db.software_id_ = "CGNS";
+  lata_db.software_id_ = "Trio_U verbosity=0";
 
   int nbases = 0;
   cgns_check(cg_nbases(fn, &nbases), "cg_nbases");
@@ -646,4 +642,44 @@ void cgns_reader(const char *cgnsfilename, const char *data_filename, LataDB &la
   cgns_check(cg_close(fn), "cg_close");
 
 #endif /* HAS_CGNS */
+}
+
+void cgns_to_lata(const char *cgns_name, const char *latafilename, bool ascii, bool fortran_blocs, bool fortran_ordering, bool fortran_indexing)
+{
+  std::string lata_name(latafilename);
+
+  Motcle motcle_nom_fic(latafilename);
+
+  if (!motcle_nom_fic.finit_par(".lata"))
+    lata_name += ".lata";
+
+  Journal() << "cgns_to_lata " << cgns_name << " -> " << lata_name << endl;
+  LataDB lata_db;
+  Nom dest_prefix, dest_name;
+  LataOptions::extract_path_basename(lata_name.c_str(), dest_prefix, dest_name);
+
+  // Nom du fichier .data a ecrire (sans le chemin)
+  Nom datafile(dest_name);
+  datafile += ".lata_single";
+  lata_db.set_path_prefix(dest_prefix);
+
+  // Nom complet du fichier cgns a lire
+  LataDBDataType type;
+  if (ascii)
+    type.msb_ = LataDBDataType::ASCII;
+  else
+    type.msb_ = LataDBDataType::machine_msb_;
+
+  type.type_ = LataDBDataType::INT64;
+  type.array_index_ = fortran_indexing ? LataDBDataType::F_INDEXING : LataDBDataType::C_INDEXING;
+  type.data_ordering_ = fortran_ordering ? LataDBDataType::F_ORDERING : LataDBDataType::C_ORDERING;
+  type.fortran_bloc_markers_ = fortran_blocs ? LataDBDataType::BLOC_MARKERS_SINGLE_WRITE : LataDBDataType::NO_BLOC_MARKER;
+  type.bloc_marker_type_ = LataDBDataType::INT64;
+  type.file_offset_ = 0;
+  lata_db.default_type_int_ = type;
+  lata_db.default_float_type_ = LataDBDataType::REAL32;
+
+  cgns_reader(cgns_name, datafile, lata_db);
+  Journal() << "lml_to_lata writing lata master file" << endl;
+  lata_db.write_master_file(lata_name.c_str());
 }

@@ -16,6 +16,7 @@
 #include <Rebuild_virtual_layer.h>
 #include <lata_analyzer.h>
 #include <LataWriter.h>
+#include <CGNSReader.h>
 #include <LmlReader.h>
 #include <LataDB.h>
 #include <stdlib.h>
@@ -913,20 +914,27 @@ int main(int argc,char **argv)
 
   {
     Motcle mot(argv[1]);
-    if (mot.finit_par(".lml"))
+    if (mot.finit_par(".lml") || mot.finit_par(".cgns"))
       {
         if (opt.processing_option != LataAnalyzerOptions::WRITE_LATA_CONVERT)
           {
-            Journal(0) << "Input file " << argv[1] << "is lml format: " << endl;
-            Journal(0) << " lml can only be processed with writelata_convert." << endl;
+            Journal(0) << "Input file : " << argv[1] << "is a non-lata format (lml or cgns) " << endl;
+            Journal(0) << " it can only be processed with writelata_convert." << endl;
             exit(-1);
           }
+
         Journal(0) << "Input file " << argv[1] << " converted to lata format: " << opt.output_filename << endl;
         Journal(0) << " (note: single lata data file, no database filtering)" << endl;
-        lml_to_lata(argv[1], opt.output_filename, !opt.binary_out, opt.fortran_blocs, opt.use_fortran_data_ordering, opt.use_fortran_indexing);
+
+        if (mot.finit_par(".lml"))
+          lml_to_lata(argv[1], opt.output_filename, !opt.binary_out, opt.fortran_blocs, opt.use_fortran_data_ordering, opt.use_fortran_indexing);
+        else
+          cgns_to_lata(argv[1], opt.output_filename, !opt.binary_out, opt.fortran_blocs, opt.use_fortran_data_ordering, opt.use_fortran_indexing);
+
         exit(0);
       }
   }
+
   if (opt.merge_files.size() > 0)
     {
       merge_lata_geometries(opt);
