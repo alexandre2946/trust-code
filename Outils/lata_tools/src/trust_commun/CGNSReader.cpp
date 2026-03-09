@@ -392,18 +392,44 @@ namespace
     BigTIDTab elems;
     elems.resize(nb_elem, nb_comp);
 
+    // XXX On fait l'inverse de TRUST_2_CGNS::convert_connectivity ...
     for (trustIdType i = 0; i < nb_elem; i++)
-      for (int j = 0; j < nb_comp; j++)
-        {
-          const cgsize_t v = connectivity[(size_t) i * (size_t) nb_comp + (size_t) j];
-          const trustIdType vv = (trustIdType) (v - 1);
-          if (vv < 0 || vv >= nb_nodes)
-            {
-              cerr << "cgns_reader: bad node index in connectivity for zone " << geom_name << " elem(" << i << "," << j << ")=" << vv << endl;
-              throw LataDBError(LataDBError::READ_ERROR);
-            }
-          elems(i, j) = vv;
-        }
+      {
+        const cgsize_t *c = &connectivity[(size_t) i * nb_comp];
+
+        if (elem_type == QUAD_4)
+          {
+            elems(i, 0) = c[0] - 1;
+            elems(i, 1) = c[1] - 1;
+            elems(i, 2) = c[3] - 1;   // inverse permutation
+            elems(i, 3) = c[2] - 1;
+          }
+        else if (elem_type == HEXA_8)
+          {
+            elems(i, 0) = c[0] - 1;
+            elems(i, 1) = c[1] - 1;
+            elems(i, 2) = c[3] - 1;
+            elems(i, 3) = c[2] - 1;
+            elems(i, 4) = c[4] - 1;
+            elems(i, 5) = c[5] - 1;
+            elems(i, 6) = c[7] - 1;
+            elems(i, 7) = c[6] - 1;
+          }
+        else
+          {
+            for (int j = 0; j < nb_comp; j++)
+              elems(i, j) = c[j] - 1;
+          }
+
+        for (int j = 0; j < nb_comp; j++)
+          {
+            if (elems(i, j) < 0 || elems(i, j) >= nb_nodes)
+              {
+                cerr << "cgns_reader: bad node index in connectivity for zone " << geom_name << " elem(" << i << "," << j << ")=" << elems(i, j) << endl;
+                throw LataDBError(LataDBError::READ_ERROR);
+              }
+          }
+      }
 
     Journal(2) << "cgns_reader: zone=" << geom_name << " main section name=" << secname << " type=" << elem_type_to_string_dbg(elem_type) << " nb_elem=" << nb_elem << " nb_comp=" << nb_comp << endl;
 
@@ -680,6 +706,6 @@ void cgns_to_lata(const char *cgns_name, const char *latafilename, bool ascii, b
   lata_db.default_float_type_ = LataDBDataType::REAL32;
 
   cgns_reader(cgns_name, datafile, lata_db);
-  Journal() << "lml_to_lata writing lata master file" << endl;
+  Journal() << "cgns_to_lata writing single_lata master file" << endl;
   lata_db.write_master_file(lata_name.c_str());
 }
