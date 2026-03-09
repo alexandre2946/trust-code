@@ -14,12 +14,14 @@
 *****************************************************************************/
 
 #define BUFSZ 1000
-#include <iostream>
+
+#include <LataFilter.h>
+#include <CGNSReader.h>
 #include <EFichier.h>
 #include <LataDB.h>
-#include <LataFilter.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
 
 // lml files contain double precision values that can overflow or underflow
 //  if converted to float. Check for overflow, ignore underflow
@@ -400,17 +402,16 @@ void lml_to_lata(const char *lmlname, const char *latafilename, bool ascii, bool
 //  path_prefix: the path (used to access lata data files)
 // If dest_file_if_lml is not null, puts lml data into this file...
 // In this case, you must set lata_db.default_type* to tell which format to use.
-void read_any_format(const char *file, const Nom& path_prefix, LataDB& lata_db)
+void read_any_format(const char *file, const Nom &path_prefix, LataDB &lata_db)
 {
-  // Is it an lml ?
   Motcle motcle_nom_fic(file);
-  if (motcle_nom_fic.finit_par(".lml"))
+  if (motcle_nom_fic.finit_par(".lml") || motcle_nom_fic.finit_par(".cgns"))
     {
-      Journal(1) << "Detected lml file : " << file << endl;
-      // Nom complet du fichier lml a lire
-      Journal(1) << "Reading lml file to memory buffer" << endl;
-      // data will be put in an internal memory buffer.
-      // choose appropriate data format:
+      Journal(1) << "Detected file : " << file << endl;
+      // Nom complet du fichier lml/cgns a lire
+      Journal(1) << "Reading file to memory buffer" << endl;
+      // data will be put in an internal memory buffer. choose appropriate data format:
+
       LataDBDataType type;
       type.msb_ = LataDBDataType::machine_msb_;
       type.type_ = LataDBDataType::INT32;
@@ -421,7 +422,11 @@ void read_any_format(const char *file, const Nom& path_prefix, LataDB& lata_db)
       type.file_offset_ = 0;
       lata_db.default_type_int_ = type;
       lata_db.default_float_type_ = LataDBDataType::REAL32;
-      lml_reader(file, LataDBField::memory_buffer_file(), lata_db);
+
+      if (motcle_nom_fic.finit_par(".lml"))
+        lml_reader(file, LataDBField::memory_buffer_file(), lata_db);
+      else if (motcle_nom_fic.finit_par(".cgns"))
+        cgns_reader(file, LataDBField::memory_buffer_file(), lata_db);
     }
   else
     {
@@ -431,18 +436,13 @@ void read_any_format(const char *file, const Nom& path_prefix, LataDB& lata_db)
 }
 
 // Description: if the file is a lata file, read the third line and interprets it as options
-//  if lml format, do nothing
-//  otherwise, error.
+//  if lml/med/CGNS format, do nothing. otherwise, error.
 void read_any_format_options(const char *file, LataOptions& opt)
 {
   Motcle nom_fic(file);
-  if (nom_fic.finit_par(".lml"))
+  if (nom_fic.finit_par(".lml") || nom_fic.finit_par(".med") || nom_fic.finit_par(".cgns"))
     {
-      // do nothing
-    }
-  else if (nom_fic.finit_par(".med"))
-    {
-      // do nothing
+      /* Do nothing */
     }
   else if (nom_fic.finit_par(".lata"))
     {
