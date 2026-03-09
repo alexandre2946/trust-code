@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -51,7 +51,6 @@ private:
 
   Nom log_directory_;
   bool trio_began_mpi_;
-  bool apply_verification_;
   bool disable_stop_;
   OWN_PTR(Comm_Group) groupe_trio_;
   OWN_PTR(Comm_Group) node_group_;

@@ -72,7 +72,7 @@ mon_main::mon_main(int verbose_level, bool journal_master, Nom log_directory, bo
   verbose_level_ = verbose_level;
   journal_master_ = journal_master;
   log_directory_ = log_directory;
-  apply_verification_ = apply_verification;
+  LecFicDiffuse_JDD::apply_verif = apply_verification;
   // Creation d'un journal temporaire qui ecrit dans Cerr
   init_journal_file(verbose_level, 0 /* filename = 0 => Cerr */, 0 /* append */);
   trio_began_mpi_=false;
@@ -485,7 +485,7 @@ void mon_main::dowork(const Nom& nom_du_cas)
       {
         Cerr << "MAIN: Checking data file for matching { and }" << finl;
         {
-          LecFicDiffuse_JDD verifie_entree(nomentree, ios::in, apply_verification_);
+          LecFicDiffuse_JDD verifie_entree(nomentree, ios::in);
           interprete_principal_.interpreter_bloc(verifie_entree,
                                                  Interprete_bloc::FIN /* on attend FIN a la fin */,
                                                  1 /* verifie_sans_interpreter */);
@@ -493,7 +493,7 @@ void mon_main::dowork(const Nom& nom_du_cas)
       }
     Cerr << "MAIN: Reading and executing data file" << finl;
     {
-      LecFicDiffuse_JDD lit_entree(nomentree, ios::in, apply_verification_);
+      LecFicDiffuse_JDD lit_entree(nomentree, ios::in);
       lit_entree.set_check_types(1);
       interprete_principal_.interpreter_bloc(lit_entree,
                                              Interprete_bloc::FIN /* on attend FIN a la fin */,

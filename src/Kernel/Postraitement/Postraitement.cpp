@@ -389,7 +389,7 @@ static Nom translate_keyword(const Nom& french_keyword)
 static EChaineJDD read_and_broadcast_file(const Nom& filename)
 {
   // Proc 0 read file and fills its "file_content"
-  LecFicDiffuse_JDD file_stream(filename, ios::in, true);
+  LecFicDiffuse_JDD file_stream(filename, ios::in);
   long unsigned int file_char_number;
   Nom file_content("{ ");
   if (Process::je_suis_maitre())

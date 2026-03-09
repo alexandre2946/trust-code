@@ -21,6 +21,7 @@
 
 Implemente_instanciable_sans_constructeur(LecFicDiffuse_JDD,"LecFicDiffuse_JDD",Lec_Diffuse_base);
 
+bool LecFicDiffuse_JDD::apply_verif = true;
 Entree& LecFicDiffuse_JDD::readOn(Entree& s)
 {
   throw;
@@ -42,9 +43,7 @@ LecFicDiffuse_JDD::LecFicDiffuse_JDD()
  *
  */
 LecFicDiffuse_JDD::LecFicDiffuse_JDD(const char* name,
-                                     IOS_OPEN_MODE mode,
-                                     bool apply_verification) :
-  apply_verif(apply_verification)
+                                     IOS_OPEN_MODE mode)
 {
   int ok = ouvrir(name, mode);
   if (!ok && Process::je_suis_maitre())
