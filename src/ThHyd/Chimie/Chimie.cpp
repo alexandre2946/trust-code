@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -26,7 +26,7 @@
 
 // XD reactions listobj nul 1 reaction 1 list of reactions
 
-Implemente_instanciable(Chimie,"Chimie",Objet_U);
+Implemente_instanciable(Chimie,"Chimie",Objet_U_With_Params);
 // XD chimie objet_u chimie 1 Keyword to describe the chmical reactions
 
 
@@ -37,16 +37,12 @@ Sortie& Chimie::printOn(Sortie& os) const
   return os;
 }
 
-Entree& Chimie::readOn(Entree& is)
+void Chimie::set_param(Param& param) const
 {
-  Param param(que_suis_je());
   param.ajouter("reactions",&reactions_,Param::REQUIRED);                           // XD attr reactions reactions reactions 0 list of reactions
   param.ajouter("modele_micro_melange",&modele_micro_melange_);                     // XD attr modele_micro_melange entier modele_micro_melange 1 modele_micro_melange (0 by default)
   param.ajouter("constante_modele_micro_melange",&constante_modele_micro_melange_); // XD attr constante_modele_micro_melange floattant constante_modele_micro_melange 1 constante of modele (1 by default)
   param.ajouter("espece_en_competition_micro_melange",&espece_en_competition_micro_melange_);  // XD attr espece_en_competition_micro_melange chaine espece_en_competition_micro_melange 1 espece in competition in reactions
-  param.lire_avec_accolades_depuis(is);
-  return is;
-
 }
 
 double Chimie::calculer_pas_de_temps() const

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -30,9 +30,9 @@ class Discretisation_base;
 class Domaine_dis_base;
 class Motcles;
 
-class Chimie : public Objet_U
+class Chimie : public Objet_U_With_Params
 {
-  Declare_instanciable(Chimie);
+  Declare_instanciable_with_param(Chimie);
 public:
   virtual void completer(const Probleme_base& pb);
   virtual int preparer_calcul();
