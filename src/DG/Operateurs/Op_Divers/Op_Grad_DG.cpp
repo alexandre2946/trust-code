@@ -167,8 +167,8 @@ void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tab
                 scalar_product_dim(k) += grad_fbase_elem(pressure_index, k, d) * f_base_v(velocity_index, k);
               coeff = quad.compute_integral_on_elem(elem, scalar_product_dim);
               if (mat)
-                (*mat)(ind_elem_v + velocity_index + d * nb_bfunc_v, ind_elem_p + pressure_index) -= coeff;
-              secmem(elem, velocity_index + d * nb_bfunc_v) += coeff * inco_p(elem, pressure_index);
+                (*mat)(ind_elem_v + velocity_index + d * nb_bfunc_v, ind_elem_p + pressure_index) += coeff;
+              secmem(elem, velocity_index + d * nb_bfunc_v) -= coeff * inco_p(elem, pressure_index);
             }
     }
 
@@ -230,15 +230,15 @@ void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tab
 
                   if (mat)
                     {
-                      (*mat)(ind_elem0_v + velocity_index + d * nb_bfunc_v, ind_elem0_p + pressure_index) += coeff00;
-                      (*mat)(ind_elem0_v + velocity_index + d * nb_bfunc_v, ind_elem1_p + pressure_index) += coeff01;
-                      (*mat)(ind_elem1_v + velocity_index + d * nb_bfunc_v, ind_elem0_p + pressure_index) += coeff10;
-                      (*mat)(ind_elem1_v + velocity_index + d * nb_bfunc_v, ind_elem1_p + pressure_index) += coeff11;
+                      (*mat)(ind_elem0_v + velocity_index + d * nb_bfunc_v, ind_elem0_p + pressure_index) -= coeff00;
+                      (*mat)(ind_elem0_v + velocity_index + d * nb_bfunc_v, ind_elem1_p + pressure_index) -= coeff01;
+                      (*mat)(ind_elem1_v + velocity_index + d * nb_bfunc_v, ind_elem0_p + pressure_index) -= coeff10;
+                      (*mat)(ind_elem1_v + velocity_index + d * nb_bfunc_v, ind_elem1_p + pressure_index) -= coeff11;
                     }
-                  secmem(elem0, velocity_index + d * nb_bfunc_v) -= coeff00 * inco_p(elem0, pressure_index);
-                  secmem(elem0, velocity_index + d * nb_bfunc_v) -= coeff01 * inco_p(elem1, pressure_index);
-                  secmem(elem1, velocity_index + d * nb_bfunc_v) -= coeff10 * inco_p(elem0, pressure_index);
-                  secmem(elem1, velocity_index + d * nb_bfunc_v) -= coeff11 * inco_p(elem1, pressure_index);
+                  secmem(elem0, velocity_index + d * nb_bfunc_v) += coeff00 * inco_p(elem0, pressure_index);
+                  secmem(elem0, velocity_index + d * nb_bfunc_v) += coeff01 * inco_p(elem1, pressure_index);
+                  secmem(elem1, velocity_index + d * nb_bfunc_v) += coeff10 * inco_p(elem0, pressure_index);
+                  secmem(elem1, velocity_index + d * nb_bfunc_v) += coeff11 * inco_p(elem1, pressure_index);
                 }
             }
         }
