@@ -234,7 +234,6 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::ajouter_blocs_gen(matrices_t mats, Double
   const DoubleVect& fs = domaine.face_surfaces(), &pf = equation().milieu().porosite_face();
   const DoubleTab& vcc = semi_impl.count(nom_cc) ? semi_impl.at(nom_cc) : cc.valeurs(), bcc = cc.valeur_aux_bords();
   const int N = vcc.line_size(), Mv = vit.line_size();
-  const Conds_lim& cls_v = ref_cast(Champ_Inc_base, vitesse_.valeur()).domaine_Cl_dis().les_conditions_limites();
 
   std::vector<std::tuple<const DoubleTab*, Matrice_Morse*, int>> d_cc; //liste des derivees de cc a renseigner : couples (derivee de cc, matrice, nb de compos de la variable)
 
@@ -248,8 +247,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::ajouter_blocs_gen(matrices_t mats, Double
   // Convection aux faces internes, Neumann_val_ext ou Dirichlet
   for (int f = 0; f < domaine.nb_faces(); f++)
     {
-      // Verification de la condition pour traiter cette face
-      const bool traiter_face = (fcl(f, 0) == 0 || (fcl(f, 0) > 4 && fcl(f, 0) < 7)) && (cls_v[fcl_v(f, 1)]->que_suis_je() != "Frontiere_ouverte_vitesse_imposee_ALE");
+      const bool traiter_face = (fcl(f, 0) == 0 || (fcl(f, 0) > 4 && fcl(f, 0) < 7));
       if (traiter_face)
         {
           dv_flux = 0.;
@@ -375,6 +373,12 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::creer_champ(const Motcle& motlu)
 
 void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::mettre_a_jour(double temps)
 {
+  const DoubleTab& vit = vitesse_->valeurs();
+  mettre_a_jour_gen(temps, vit);
+}
+
+void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::mettre_a_jour_gen(double temps, const DoubleTab& vit)
+{
   Op_Conv_PolyMAC_CDO_base::mettre_a_jour(temps);
 
   const Domaine_Poly_base& domaine = le_dom_poly_.valeur();
@@ -385,7 +389,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::mettre_a_jour(double temps)
   const DoubleVect& pf = equation().milieu().porosite_face(), &pe = equation().milieu().porosite_elem(),
                     &fs = domaine.face_surfaces(), &ve = domaine.volumes();
 
-  const DoubleTab& vit = vitesse_->valeurs(), &vcc = cc.valeurs(),
+  const DoubleTab& vcc = cc.valeurs(),
                    &bcc = cc.valeur_aux_bords(), &xv = domaine.xv(), &xp = domaine.xp();
 
   DoubleTrav balp;

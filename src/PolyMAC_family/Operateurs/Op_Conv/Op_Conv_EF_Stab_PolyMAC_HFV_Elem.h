@@ -54,6 +54,7 @@ public :
 protected :
   void ajouter_blocs_gen(matrices_t mats, DoubleTab& secmem, const DoubleTab& vit, const tabs_t& semi_impl) const;
   double calculer_dt_stab_gen(const DoubleTab& vit) const;
+  void mettre_a_jour_gen(double temps, const DoubleTab& vit);
   /* si operateur de convection de Masse_Multiphase */
   std::vector<OWN_PTR(Champ_Inc_base)> cc_phases_; //flux massiques (kg/m2/s)
   Motcles noms_cc_phases_; //leurs noms
