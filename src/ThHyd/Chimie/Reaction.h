@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -21,15 +21,16 @@
 #include <TRUSTArray.h>
 #include <TRUST_List.h>
 #include <TRUST_Ref.h>
+#include <Objet_U_With_Params.h>
 
 class Champ_Inc_base;
 class Probleme_base;
 class Champ_base;
 class Motcles;
 
-class Reaction: public Objet_U
+class Reaction: public Objet_U_With_Params
 {
-  Declare_instanciable(Reaction);
+  Declare_instanciable_with_param(Reaction);
 public:
   friend class Chimie;
   void completer(const Motcles& list_var,const ArrOfDouble& masse_molaire);
@@ -49,7 +50,11 @@ public:
     return nb_sous_pas_de_temps_reaction_ ;
   }
 protected:
-  Nom reactifs_,produits_,activite_;
+
+  void validate_params() const override;
+  Nom reactifs_; // REQUIRED
+  Nom produits_; // REQUIRED
+  Nom activite_ = "0"; // not REQUIRED, has default value
 
   double constante_taux_reaction_=1e30;
   double enthalpie_reaction_ = -100.; // en J/mol

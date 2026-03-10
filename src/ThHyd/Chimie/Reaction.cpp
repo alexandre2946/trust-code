@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,7 +20,7 @@
 #include <Probleme_base.h>
 #include <Discretisation_base.h>
 
-Implemente_instanciable(Reaction,"Reaction",Objet_U);
+Implemente_instanciable(Reaction,"Reaction",Objet_U_With_Params);
 // XD reaction objet_lecture nul 1 Keyword to describe reaction: NL2 w =K pow(T,beta) exp(-Ea/( R T)) $\Pi$ pow(Reactif_i,activitivity_i). NL2 If K_inv >0, NL2 w= K pow(T,beta) exp(-Ea/( R T)) ( $\Pi$ pow(Reactif_i,activitivity_i) - Kinv/exp(-c_r_Ea/(R T)) $\Pi$ pow(Produit_i,activitivity_i ))
 
 Sortie& Reaction::printOn(Sortie& os) const
@@ -112,12 +112,8 @@ void Reaction::completer(const Motcles& list_var,const ArrOfDouble& masse_molair
   extract_coef_local(coeff_activite_,activite_,list_var);
 }
 
-Entree& Reaction::readOn(Entree& is)
+void Reaction::set_param(Param& param) const
 {
-  activite_="0";
-  //  nb_iter_impl_contre_reaction_=1;      // pas d'iteration
-  //sous_relax__impl_contre_reaction_=1.; // pas de sous-relaxation
-  Param param(que_suis_je());
   param.ajouter( "reactifs",&reactifs_,Param::REQUIRED);  // XD attr reactifs chaine reactifs 0 LHS of equation (ex CH4+2*O2)
   param.ajouter( "produits",&produits_,Param::REQUIRED);  // XD attr produits chaine produits 0 RHS of equation (ex CO2+2*H20)
   param.ajouter( "constante_taux_reaction",&constante_taux_reaction_);       // XD attr constante_taux_reaction floattant constante_taux_reaction 1 constante of cinetic K
@@ -129,14 +125,14 @@ Entree& Reaction::readOn(Entree& is)
   param.ajouter( "contre_reaction",&contre_reaction_);  // XD attr contre_reaction floattant contre_reaction 1 K_inv
   param.ajouter( "contre_energie_activation",&c_r_Ea_); // XD attr contre_energie_activation floattant contre_energie_activation 1 c_r_Ea
   param.ajouter( "Sc_t",&Sc_t_);
-  param.lire_avec_accolades_depuis(is);
+}
+void Reaction::validate_params() const
+{
   if (Sc_t_==0.)
     {
-      Cerr<<" Une valeur nulle du Schmidt turbulent est impossible ! Essayer plutot 1E30 !"<<finl;
+      Cerr<<"Reaction::validate_params: Turbulent Schmidt number cannot be 0 ! Try 1E30 instead !"<<finl;
       exit();
     }
-
-  return is;
 }
 
 int Reaction::lire_motcle_non_standard(const Motcle& motlu, Entree& is)
