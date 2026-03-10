@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -62,11 +62,13 @@ void Integrale_tps_produit_champs::mettre_a_jour_integrale()
       double dt = t_courant - tps_integrale_;
       if (dt > 0)
         {
-          //DoubleTab& mes_val = valeurs();
           if (premiere_puissance() == 1 && seconde_puissance() == 1)
             {
-              ////ajoute_produit_tensoriel(dt, mon_premier_champ(), mon_second_champ());
-              ToDo_Kokkos("Do as Integrale_tps_champ, mapToDevice?");
+              const DoubleTab& val1 = source.valeurs();
+              const DoubleTab& val2 = source2.valeurs();
+              DoubleTab& mes_val = le_champ_->valeurs();
+              if (val1.isDataOnDevice() && val2.isDataOnDevice())
+                mapToDevice(mes_val); // If sources are on device, integral will be computed on device
               ajoute_produit_tensoriel(dt, source, source2);
             }
           else
