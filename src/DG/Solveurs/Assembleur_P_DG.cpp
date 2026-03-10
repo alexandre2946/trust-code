@@ -418,10 +418,22 @@ int Assembleur_P_DG::modifier_secmem(DoubleTab& secmem)
 
 int Assembleur_P_DG::modifier_solution(DoubleTab& pression)
 {
-  Debog::verifier("pression dans modifier solution in", pression);
-  //on ne considere pas les pressions aux faces dans le min (solveur_U_P ne les met pas a jour)
-  DoubleTab_parts ppart(pression);
-  if (!has_P_ref) pression -= mp_min_vect(ppart[0]);
+  // Projection :
+  double press_0;
+  if(!has_P_ref)
+    {
+      // On prend la pression minimale comme pression de reference
+      // afin d'avoir la meme pression de reference en sequentiel et parallele
+      press_0=DMAXFLOAT;
+      int nb_elem=le_dom_dg_->domaine().nb_elem();
+      for(int n=0; n<nb_elem; n++)
+        if (pression(n,0) < press_0)
+          press_0 = pression(n,0);
+      press_0 = mp_min(press_0);
+      for(int n=0; n<nb_elem; n++)
+        pression(n,0) -=press_0;
+      pression.echange_espace_virtuel();
+    }
   return 1;
 }
 
