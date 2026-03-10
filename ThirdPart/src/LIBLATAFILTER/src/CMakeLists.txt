@@ -10,6 +10,7 @@ set(lib latafilter)
 # Some useful variables
 set(TRUST_ROOT $ENV{TRUST_ROOT})
 set(TRUST_KOKKOS_ROOT $ENV{TRUST_KOKKOS_ROOT})
+set(TRUST_CGNS_ROOT $ENV{TRUST_CGNS_ROOT})
 set(TRUST_ARCH $ENV{TRUST_ARCH})
 set(OPT $ENV{OPT})
 set(CMAKE_INSTALL_LIBDIR $ENV{TRUST_LATAFILTER})
@@ -40,6 +41,7 @@ target_include_directories(${lib} PRIVATE
                            ${TRUST_ROOT}/src/Kernel/Utilitaires/
                            ${TRUST_ROOT}/src/Kernel/Math/
                            ${TRUST_ROOT}/src/Kernel/Geometrie/
+                           ${TRUST_CGNS_ROOT}/include
                            ${TRUST_KOKKOS_ROOT}/$(TRUST_ARCH)$(OPT)/include/ )
 
 
@@ -50,8 +52,3 @@ install(TARGETS  ${lib}
 install(DIRECTORY   ${sourcedir}
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/include
         FILES_MATCHING REGEX "/*.(h)$")
-
-
-
-
-
