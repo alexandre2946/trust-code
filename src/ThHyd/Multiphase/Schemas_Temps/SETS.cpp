@@ -213,7 +213,7 @@ void SETS::init_cv_ctx(const DoubleTab& secmem, const DoubleVect& norme)
 }
 
 #if PETSC_VERSION_GE(3,24,0)
-PetscErrorCode destroy_cvctx(void **mctx)
+PetscErrorCode SETS::destroy_cvctx(void **mctx)
 {
   SETS::cv_test_t *ctx = (SETS::cv_test_t *)*mctx;
   if (ctx->v)

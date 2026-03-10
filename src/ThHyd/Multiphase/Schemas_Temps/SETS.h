@@ -94,7 +94,11 @@ public:
   ArrOfTID ix; //indices pour recuperer le residu
   cv_test_t *cv_ctx = nullptr;
   void init_cv_ctx(const DoubleTab& secmem, const DoubleVect& norm);
+#if PETSC_VERSION_GE(3,24,0)
+  static PetscErrorCode destroy_cvctx(void **mctx);
+#else
   static PetscErrorCode destroy_cvctx(void *mctx);
+#endif
   static PetscErrorCode convergence_test(KSP ksp, PetscInt it, PetscReal rnorm, KSPConvergedReason *reason,void *mctx);
 #endif
 
