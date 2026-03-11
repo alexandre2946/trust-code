@@ -66,7 +66,6 @@ public:
   virtual void creer_tableau_p1bulle(Array_base&, RESIZE_OPTIONS opt = RESIZE_OPTIONS::COPY_INIT) const;
 
   void swap(int, int, int);
-  void reordonner(Faces&) override;
   void modifier_pour_Cl(const Conds_lim&) override;
   void typer_elem(Domaine&) override;
   void calculer_volumes_entrelaces();

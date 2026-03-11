@@ -164,51 +164,6 @@ void Domaine_VEF::swap(int fac1, int fac2, int nb_som_faces)
 
 }
 
-/*! @brief Methode appelee par Domaine_VF::discretiser apres la creation des faces reelles.
- *
- *   On reordonne les faces de sorte a placer les faces "non standard"
- *   au debut de la liste des faces. Les faces non standard sont celles
- *   dont les volumes de controles sont modifies par les conditions aux
- *   limites.
- *
- */
-void Domaine_VEF::reordonner(Faces& les_faces)
-{
-  Cerr << "Domaine_VEF::reordonner les_faces " << finl;
-
-  // Construction de rang_elem_non_std_ :
-  //  C'est un vecteur indexe par les elements du domaine.
-  //  size() = nb_elem()
-  //  size_tot() = nb_elem_tot()
-  //  Valeurs dans le tableau :
-  //   rang_elem_non_std_[i] = -1 si l'element i est standard,
-  //  sinon
-  //   rang_elem_non_std_[i] = j, ou j est l'indice de l'element dans
-  //   les tableaux indexes par les elements non standards (par exemple
-  //   le tableau Domaine_Cl_VEF::type_elem_Cl_).
-  // Un element est non standard s'il est voisin d'une face frontiere.
-  {
-    const int nb_faces_front = domaine().nb_faces_frontiere();
-    domaine().creer_tableau_elements(rang_elem_non_std_, RESIZE_OPTIONS::NOCOPY_NOINIT);
-    rang_elem_non_std_ = -1;
-    // D'abord on marque les elements non standards avec rang_elem_non_std_[i] = 0
-    for (int i_face = 0; i_face < nb_faces_front; i_face++)
-      {
-        const int elem = les_faces.voisin(i_face, 0);
-        rang_elem_non_std_[elem] = 0;
-      }
-    rang_elem_non_std_.echange_espace_virtuel();
-
-    // On construit le md_vector des elements non standards, mais il n'est pas utilise.
-    // L'important, c'est que rang_elem_non_std_ soit rempli correctement pour etre
-    //  utilise par creer_md_vect_renum() dans Domaine_Cl_VEF::associer()
-    MD_Vector md_vect_elems_non_std;
-    MD_Vector_tools::creer_md_vect_renum_auto(rang_elem_non_std_, md_vect_elems_non_std);
-  }
-
-  renumeroter(les_faces);
-}
-
 void Domaine_VEF::discretiser()
 {
   Domaine& domaine_geom = domaine();

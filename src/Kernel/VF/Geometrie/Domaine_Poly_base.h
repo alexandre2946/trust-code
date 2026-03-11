@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -82,7 +82,6 @@ public :
   inline const DoubleVect& longueur_aretes() const { return longueur_aretes_; }
   inline const DoubleTab& ta() const { return ta_; }
 
-  void reordonner(Faces&) override;
   void modifier_pour_Cl(const Conds_lim& ) override;
 
   inline const Elem_poly_base& type_elem() const { return type_elem_.valeur(); }

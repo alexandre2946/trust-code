@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -62,8 +62,6 @@ public :
 
   virtual void remplir_face_voisins_fictifs(const Domaine_Cl_dis_base& ) ;
   virtual Faces* creer_faces();
-  virtual void reordonner(Faces&);
-  void renumeroter(Faces&);
   inline int nb_joints() const { return domaine().nb_joints(); }
   inline int premiere_face_int() const;
   inline int nb_faces() const;
@@ -260,6 +258,11 @@ protected:
 #endif
 
   mutable IntTab face_dual_; ///< For each face f, face_dual_(f, j) returns the element built on the left and right of the face in the dual mesh. Same sorting as face_voisins_
+
+  void order_faces(Faces& les_faces);
+  virtual void renumber_faces(Faces& les_faces, IntTab& sort_key);
+  virtual void prepare_elem_non_std(Faces& les_faces);
+  virtual void compute_sort_key(Faces& les_faces, IntTab& sort_key);
 
   /*
    * XXX Elie Saikali

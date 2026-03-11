@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -69,7 +69,6 @@ public :
 
   void discretiser() override;
   Faces* creer_faces() override;
-  void reordonner(Faces&) override;
   inline int nb_faces_X() const;
   inline int nb_faces_Y() const;
   inline int nb_faces_Z() const;
@@ -138,6 +137,11 @@ public :
   //std::map permettant de retrouver le couple (proc, item local) associe a un item virtuel pour le mdv_elem
   void init_virt_e_map() const;
   mutable std::map<std::array<int, 2>, int> virt_e_map;
+
+protected:
+  void prepare_elem_non_std(Faces&) override;
+  void compute_sort_key(Faces&, IntTab& sort_key) override;
+  void renumber_faces(Faces& les_faces, IntTab& sort_key) override;
 
 private:
 

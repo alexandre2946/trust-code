@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -62,7 +62,6 @@ public:
   void typer_elem(Domaine& domaine_geom) override;
   void discretiser() override;
   void swap(int, int, int);
-  void reordonner(Faces&) override;
   void modifier_pour_Cl(const Conds_lim&) override;
 
   inline const Elem_EF_base& type_elem() const { return type_elem_.valeur(); }
