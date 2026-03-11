@@ -710,26 +710,32 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
         }
       else
         {
-          ToDo_Kokkos("critical parser");
-          for (int i=0; i<nb_pos; i++)
+          Kokkos::Array<CDoubleTabView, max_nb_sources> sources;
+          for (int so=0; so<nb_sources; so++)
+            sources[so] = sources_val[so].view_ro();
+          int dim = dimension;
+          CDoubleTabView pos = positions.view_ro();
+          DoubleTabView valeurs = valeurs_espace.view_wo();
+          for (int j=0; j<nb_comp_; j++)
             {
-              double x = positions(i,0);
-              double y = positions(i,1);
-              double z = (dimension>2 ? positions(i,2) : 0);
-
-              for (int j=0; j<nb_comp_; j++)
-                {
-                  fxyz[j].setVar(0,x);
-                  fxyz[j].setVar(1,y);
-                  fxyz[j].setVar(2,z);
-                  fxyz[j].setVar(3,temps);
-                  for (int so=0; so<nb_sources; so++)
-                    {
-                      const DoubleTab& source_so_val = sources_val[so];
-                      fxyz[j].setVar(so+4,source_so_val(i,0));
-                    }
-                  valeurs_espace(i,j) = fxyz[j].eval();
-                }
+              ParserView fxyzj(fxyz[j]);
+              fxyzj.parseString();
+              Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_pos, KOKKOS_LAMBDA(const int i)
+              {
+                double x = pos(i,0);
+                double y = pos(i,1);
+                double z = (dim>2 ? pos(i,2) : 0);
+                int threadId = fxyzj.acquire();
+                fxyzj.setVar(0,x,threadId);
+                fxyzj.setVar(1,y,threadId);
+                fxyzj.setVar(2,z,threadId);
+                fxyzj.setVar(3,temps,threadId);
+                for (int so=0; so<nb_sources; so++)
+                  fxyzj.setVar(so+4,sources[so](i,0),threadId);
+                valeurs(i,j) = fxyzj.eval(threadId);
+                fxyzj.release(threadId);
+              });
+              end_gpu_timer(__KERNEL_NAME__);
             }
         }
     }
