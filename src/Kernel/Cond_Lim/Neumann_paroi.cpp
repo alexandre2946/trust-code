@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@ Sortie& Neumann_paroi::printOn(Sortie& s) const { return s << que_suis_je() << f
 Entree& Neumann_paroi::readOn(Entree& s)
 {
   if (app_domains.size() == 0) app_domains = { Motcle("Thermique"), Motcle("Thermique_H"), Motcle("diphasique_moyenne"), Motcle("Concentration"), Motcle("fraction_massique"),
-                                                 Motcle("Fraction_volumique"), Motcle("Turbulence"), Motcle("Interfacial_area"), Motcle("indetermine")
+                                                 Motcle("Fraction_volumique"), Motcle("Turbulence"), Motcle("Interfacial_area"), Motcle("indetermine") , Motcle("Cahn_Hilliard")
                                                };
 
   return Neumann::readOn(s);
