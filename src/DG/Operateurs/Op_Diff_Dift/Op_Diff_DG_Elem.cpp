@@ -613,7 +613,7 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
                         {
                           for (int d_base = 0; d_base < dim; d_base++)
                             {
-                              double flux_impose_k = neumann.flux_impose(ind_faceb, 0);
+                              double flux_impose_k = neumann.flux_impose(ind_faceb, d_base);
                               scalar_product_dim(d_base, k) = fbase(i, k) * flux_impose_k;
                             }
                         }
@@ -676,17 +676,14 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
                               if (dimension == 3)
                                 zk = integ_points_facets(ind_face, k, 2);
 
-                              for (int d = 0; d < Objet_U::dimension; d++)
-                                {
-                                  bool ori = is_aniso_ ? d : 0;
-                                  for (int d_base = 0; d_base < dim; d_base++)
-                                    {
-                                      u_bord_k = champ_front.valeur_au_temps_et_au_point(temps, 0, xk, yk, zk, d_base);
-                                      scalar_product_dim(d_base, k) -= nu(elem, ori) * face_normales(ind_face, d) / sur_f * grad_fbase(i, k, d) * u_bord_k;
-                                    }
-                                }
                               for (int d_base = 0; d_base < dim; d_base++)
                                 {
+                                  u_bord_k = champ_front.valeur_au_temps_et_au_point(temps, 0, xk, yk, zk, d_base);
+                                  for (int d = 0; d < Objet_U::dimension; d++)
+                                    {
+                                      bool ori = is_aniso_ ? d : 0;
+                                      scalar_product_dim(d_base, k) -= nu(elem, ori) * face_normales(ind_face, d) / sur_f * grad_fbase(i, k, d) * u_bord_k;
+                                    }
                                   scalar_product_dim(d_base, k) += nu_F * eta_F(ind_face) * invh_T * u_bord_k * fbase(i, k); // \eta/H_F \int g \vvec_h
                                 }
                             }
