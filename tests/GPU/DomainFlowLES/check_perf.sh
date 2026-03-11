@@ -30,7 +30,7 @@ check()
       echo "Performance is OK ($ecart%) $new s < $ref s (reference) for $1 on $2"
       if [ `echo "$ecart<-0.99" | bc -l` = 1 ]
       then
-         echo "Performance is improved so $TU_REF is updated !" && cp $TU $TU_REF
+         echo "$TU_REF is updated !" && cp $TU $TU_REF
       else
          # Non regression faiblement testee sur le nombre d'iterations des solveurs
          its_ref=`TU.sh $TU_REF -its`

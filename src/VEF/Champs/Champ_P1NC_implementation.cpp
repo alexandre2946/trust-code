@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -1390,14 +1390,13 @@ valeur_a_elem_compo(const DoubleVect& position, int le_poly, int ncomp) const
 * @note For each polygon, the value is computed as average of D+1 face values,
         *       where D is the spatial dimension
 */
-DoubleTab& Champ_P1NC_implementation::valeur_aux_centres_de_gravite(const Domaine& dom, DoubleTab& val) const
+DoubleTab& Champ_P1NC_implementation::valeur_aux_centres_de_gravite(const Domaine& dom, DoubleTab& tab_val) const
 {
   const Champ_base& cha = le_champ();
   int nb_compo_ = cha.nb_comp();
-  const DoubleTab& ch = cha.valeurs();
   const Domaine_VEF& domaine_VEF = domaine_vef();
   if (domaine_VEF.domaine() != dom) Process::exit("Error, you must use valeur_aux_centres_de_gravite() on the whole discretized mesh.");
-  if (val.nb_dim() > 2)
+  if (tab_val.nb_dim() > 2)
     {
       Cerr << "Erreur TRUST dans Champ_P1NC_implementation::valeur_aux_elems()\n";
       Cerr << "Le DoubleTab val a plus de 2 entrees\n";
@@ -1406,37 +1405,33 @@ DoubleTab& Champ_P1NC_implementation::valeur_aux_centres_de_gravite(const Domain
 
   // TODO : FIXME
   // For FT the resize should be done in its good position and not here ...
-  if (val.nb_dim() == 1) val.resize(val.dimension_tot(0), 1);
+  if (tab_val.nb_dim() == 1) tab_val.resize(tab_val.dimension_tot(0), 1);
 
   int D = Objet_U::dimension;
-  int nb_elem = val.dimension(0);
-  CDoubleTabView ch_v = ch.view_ro();
-  CIntTabView elem_faces_v = domaine_VEF.elem_faces().view_ro();
-  DoubleTabView val_v = val.view_wo();
-  // Warning collapsing here introduce an overhead if nb_compo_ = 1 si ideally 2 kernels should we written according to nb_compo_!
-  Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_elem, KOKKOS_LAMBDA(const int le_poly)
+  int nb_elem = tab_val.dimension(0);
+  CDoubleTabView ch = cha.valeurs().view_ro();
+  CIntTabView elem_faces = domaine_VEF.elem_faces().view_ro();
+  DoubleTabView val = tab_val.view_wo();
+  Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__),  Kokkos::MDRangePolicy<Kokkos::Rank<2>>({0,0}, {nb_elem,nb_compo_}), KOKKOS_LAMBDA(const int le_poly, const int ncomp)
   {
-    for(int ncomp=0; ncomp<nb_compo_; ncomp++)
+    double sum = 0;
+    for (int i = 0; i < D + 1; i++)
       {
-        double sum = 0;
-        for (int i = 0; i < D + 1; i++)
-          {
-            int face = elem_faces_v(le_poly, i);
-            sum += ch_v(face, ncomp);
-          }
-        val_v(le_poly, ncomp) = sum / (D + 1);
+        int face = elem_faces(le_poly, i);
+        sum += ch(face, ncomp);
       }
+    val(le_poly, ncomp) = sum / (D + 1);
   });
   end_gpu_timer(__KERNEL_NAME__);
-  return val;
+  return tab_val;
 }
 
 DoubleTab& Champ_P1NC_implementation::
 valeur_aux_elems(const DoubleTab& positions,
                  const IntVect& les_polys,
-                 DoubleTab& val) const
+                 DoubleTab& tab_val) const
 {
-  if (les_polys.size() == 0) return val;
+  if (les_polys.size() == 0) return tab_val;
   const Domaine_VEF& domaine_VEF = domaine_vef();
 #ifdef TRUST_USE_GPU
   if (les_polys.size()==domaine_VEF.nb_elem())
@@ -1449,7 +1444,7 @@ valeur_aux_elems(const DoubleTab& positions,
   const Domaine& domaine_geom = get_domaine_geom();
   const DoubleTab& coord = domaine_geom.coord_sommets();
   const IntTab& sommet_poly = domaine_geom.les_elems();
-  if (val.nb_dim() > 2)
+  if (tab_val.nb_dim() > 2)
     {
       Cerr << "Erreur TRUST dans Champ_P1NC_implementation::valeur_aux_elems()\n";
       Cerr << "Le DoubleTab val a plus de 2 entrees\n";
@@ -1458,7 +1453,7 @@ valeur_aux_elems(const DoubleTab& positions,
 
   // TODO : FIXME
   // For FT the resize should be done in its good position and not here ...
-  if (val.nb_dim() == 1 ) val.resize(val.dimension_tot(0),1);
+  if (tab_val.nb_dim() == 1) tab_val.resize(tab_val.dimension_tot(0),1);
 
   int D = Objet_U::dimension;
   CIntTabView sommet_poly_v = sommet_poly.view_ro();
@@ -1467,34 +1462,30 @@ valeur_aux_elems(const DoubleTab& positions,
   CIntTabView elem_faces_v = domaine_VEF.elem_faces().view_ro();
   CDoubleTabView positions_v = positions.view_ro();
   CIntArrView les_polys_v = les_polys.view_ro();
-  DoubleTabView val_v = val.view_wo();
-  // Warning collapsing here introduce an overhead if nb_compo_ = 1 si ideally 2 kernels should we written according to nb_compo_!
-  Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__),les_polys.size(), KOKKOS_LAMBDA(
-                         const int rang_poly)
+  DoubleTabView val = tab_val.view_wo();
+  Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__),Kokkos::MDRangePolicy<Kokkos::Rank<2>>({0,0}, {les_polys.size(),nb_compo_}), KOKKOS_LAMBDA(
+                         const int rang_poly, const int ncomp)
   {
     int le_poly=les_polys_v(rang_poly);
     if (le_poly == -1)
-      for(int ncomp=0; ncomp<nb_compo_; ncomp++)
-        val_v(rang_poly, ncomp) = 0;
+      val(rang_poly, ncomp) = 0;
     else
       {
-        for(int ncomp=0; ncomp<nb_compo_; ncomp++)
+        double xs = positions_v(rang_poly,0);
+        double ys = positions_v(rang_poly,1);
+        double zs = (D == 3) ? positions_v(rang_poly,2) : 0;
+        double sum = 0;
+        for (int i = 0; i < D + 1; i++)
           {
-            val_v(rang_poly, ncomp) = 0;
-            double xs = positions_v(rang_poly,0);
-            double ys = positions_v(rang_poly,1);
-            double zs = (D == 3) ? positions_v(rang_poly,2) : 0;
-            for (int i = 0; i < D + 1; i++)
-              {
-                int face = elem_faces_v(le_poly, i);
-                val_v(rang_poly, ncomp) += ch_v(face, ncomp) *
-                                           ((D == 2) ? fonction_forme_2D_v(xs, ys, le_poly, i, sommet_poly_v, coord_v) : fonction_forme_3D_v(xs, ys, zs, le_poly, i, sommet_poly_v, coord_v));
-              }
+            int face = elem_faces_v(le_poly, i);
+            sum += ch_v(face, ncomp) *
+                   ((D == 2) ? fonction_forme_2D_v(xs, ys, le_poly, i, sommet_poly_v, coord_v) : fonction_forme_3D_v(xs, ys, zs, le_poly, i, sommet_poly_v, coord_v));
           }
+        val(rang_poly, ncomp) = sum;
       }
   });
   end_gpu_timer(__KERNEL_NAME__);
-  return val;
+  return tab_val;
 }
 
 DoubleVect& Champ_P1NC_implementation::
@@ -1516,7 +1507,7 @@ valeur_aux_elems_compo(const DoubleTab& positions,
   int le_poly, D = Objet_U::dimension;
 
   const DoubleTab& ch = cha.valeurs();
-
+  ToDo_Kokkos("critical");
   for(int rang_poly=0; rang_poly<les_polys_size; rang_poly++)
     {
       le_poly=les_polys(rang_poly);
@@ -1591,6 +1582,7 @@ valeur_aux_elems_smooth(const DoubleTab& positions,
   // calcul de la valeur aux elements suivant les coordonnees barycentriques (repris de Champ_P1)
   val = 0.;
   int p;
+  ToDo_Kokkos("critical");
   for(int rang_poly=0; rang_poly<les_polys_size; rang_poly++)
     if ((p = les_polys(rang_poly)) != -1)
       {
@@ -1646,7 +1638,7 @@ valeur_aux_elems_compo_smooth(const DoubleTab& positions,
   int p;
 
   // calcul de la valeur aux elements suivant les coordonnees barycentriques (repris de Champ_P1)
-
+  ToDo_Kokkos("critical");
   for(int rang_poly=0; rang_poly<les_polys_size; rang_poly++)
     if ((p = les_polys(rang_poly)) != -1)
       {
@@ -1874,7 +1866,7 @@ valeur_aux_sommets_compo(const Domaine& dom,
           min_som(j) = 1.e+30 ;
           max_som(j) = 1.e-30 ;
         }
-
+      ToDo_Kokkos("critical");
       for (num_elem=0; num_elem<nb_elem_tot; num_elem++)
         {
           for (j=0; j<nb_som_elem; j++)
@@ -1901,7 +1893,7 @@ valeur_aux_sommets_compo(const Domaine& dom,
                 }
             }
         }
-
+      ToDo_Kokkos("critical");
       for (num_som=0; num_som<nb_som; num_som++)
         {
           champ_som(num_som) /= compteur[num_som];
@@ -1921,6 +1913,7 @@ valeur_aux_sommets_compo(const Domaine& dom,
       int nb_som_face=domaine_VEF.nb_som_face();
       const IntTab& face_sommets=domaine_VEF.face_sommets();
       int face;
+      ToDo_Kokkos("critical");
       for(face=0; face<nb_faces_tot; face++)
         {
 
@@ -1935,7 +1928,7 @@ valeur_aux_sommets_compo(const Domaine& dom,
             }
         }
 
-
+      ToDo_Kokkos("critical");
       for (int num_som=0; num_som<nb_som; num_som++)
         {
           champ_som(num_som) /= compteur[num_som];

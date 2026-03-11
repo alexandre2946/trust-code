@@ -30,7 +30,7 @@ check()
    else
       ecart=`echo $ref $new | awk '// {printf("%2.1f\n",-2*($1-$2)/($1+$2)*100)}'`
       echo "Performance is OK ($ecart%) $new s < $ref s (reference) for $1 on $2"
-      [ `echo "$ecart<-0.5" | bc -l` = 1 ] && echo "Performance is improved so $TU_REF is updated !" && cp $TU $TU_REF
+      [ `echo "$ecart<-0.5" | bc -l` = 1 ] && echo "$TU_REF is updated !" && cp $TU $TU_REF
    fi
    [ "$UPDATE_REFERENCE" = 1 ] && cp -f $TU $TU_REF && echo "Forced update of $TU_REF"
 }

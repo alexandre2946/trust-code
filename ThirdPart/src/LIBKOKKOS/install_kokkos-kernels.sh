@@ -3,7 +3,7 @@
 [ "$TRUST_USE_GPU" != 1 ] && exit 0
 
 # Kokkos-kernels:
-archive=$TRUST_ROOT/externalpackages/kokkos/kokkos-kernels-5.0.0.tar.gz
+archive=$TRUST_ROOT/externalpackages/kokkos/kokkos-kernels-release-candidate-5.1.0.tar.gz
 build_dir=$TRUST_ROOT/build/kokkos-kernels
 KOKKOS_ROOT_DIR=$TRUST_ROOT/lib/src/LIBKOKKOS
 # Log file of the process:

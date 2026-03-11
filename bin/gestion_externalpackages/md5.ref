@@ -272,8 +272,8 @@ ea0931758fc180e3b1950931b9869921  gnuplot/gnuplot-6.0.2.tar.gz
 a51b0a245c34151f42a4c6120d2aceec  kokkos/arborx-2.0.1.tar.gz
 36abe803480d07db87f9ba03cd5a842c  kokkos/kokkos-3.7.02.tgz
 24cd603e2a047fc8d67d814f33769f54  kokkos/kokkos-4.7.00.tar.gz
-15603ce16092352199c8000aca647f08  kokkos/kokkos-5.0.0.tar.gz
-95541834ccbe695a41e2ae834a0ef8ad  kokkos/kokkos-kernels-5.0.0.tar.gz
+7ab1e3728978c5be85d77485eea96aa1  kokkos/kokkos-kernels-release-candidate-5.1.0.tar.gz
+6a1c520d8aa7147fb4067ee7745e2575  kokkos/kokkos-release-candidate-5.1.0.tar.gz
 853a0c5c0747c5943e7ef4bbb793162d  lapack/OpenBLAS-0.3.29.tar.gz
 44c3869c38c8335c2b9c2a8bb276eb55  lapack/lapack-3.4.1.tgz
 b5e558f981326d9ca1bfdb841640721a  make-4.0.tar.gz

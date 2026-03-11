@@ -8,52 +8,52 @@ Time is given in seconds
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                               Context of the computation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Date:     19-11-2025 -- 11:37:03
-OS:       jzxh177__Linux__x86_64__5.14.0-427.76.1.el9_4.x86_64__#1 SMP PREEMPT_DYNAMIC Fri Jun 27 09:53:45 EDT 2025
-CPU:      Model name:  Intel(R) Xeon(R) Platinum 8468 ; Thread(s) per core:  2
-GPU:      | NVIDIA-SMI 570.86.15  Driver Version: 570.86.15  CUDA Version: 12.8  |
-|  0  NVIDIA H100 80GB HBM3  On  |  00000000:
-Nb procs: 1
-TRUST version: 1.9.7_beta
+Date:     20-03-2026 -- 14:40:21
+OS:       jzxh138__Linux__x86_64__5.14.0-570.58.1.el9_6.x86_64__#1 SMP PREEMPT_DYNAMIC Tue Oct 21 04:15:07 EDT 2025
+CPU model : Intel(R) Xeon(R) Platinum 8468
+Total number of threads:192
+GPU model: NVIDIA H100 80GB HBM3
+CUDA runtime version: 12.60
+CUDA drivers version: 13.0
+Nb procs used for the computation: 1
+TRUST version: 1.9.8_beta
+Total number of elements used for the calculation: 2160000
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                            Computation start-up statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Total time of the start-up:                                                51.8401        
-Percent of untracked time during computation start-up:                     6.01851e-09    
+Total time of the start-up:                                                41.6342        
 
 Number of calls to the linear solver per time step:                        2              
-Average time of the resolution of the linear problem per call:             5.47343        
+Average time of the resolution of the linear problem per call:             1.22249        
 Average number of iteration of the linear solver per call:                 0              
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                                  Time loop statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The first time step is not accounted for the computation of the time loop statistics
-Total time of the time loop:                                               2.47298        
+Total time of the time loop:                                               2.15101        
 Number of time steps:                                                      9              
 Skipped time steps:                                                        1              
-Average time per time step:                                                0.274776       
-Standard deviation between time steps:                                     0.0696791      
-Time elapsed in the skipped time steps:                                    2.8857         
+Average time per time step:                                                0.239002       
+Standard deviation between time steps:                                     0.0752637      
+Time elapsed in the skipped time steps:                                    1.33735        
 
 
 Standard counter description             | Time/step       | % loop time | Call(s)/step   
 ------------------------------------------------------------------------------------------
-Linear solver resolutions Ax=B           | 0.0650324       | 23.7        | 2              
-Convection operator                      | 0.05000332      | 18.2        | 10             
-Diffusion operator                       | 0.02626363      |  9.6        | 18             
-Gradient operator                        | 0.01217559      |  4.4        | 5              
-Divergence operator                      | 0.007399726     |  2.7        | 6              
-Source terms                             | 0.0008210494    |  0.3        | 4              
-Update ::mettre_a_jour                   | 0.03623657      | 13.2        | 4              
-Solver for implicit diffusion            | 0.01286771      |  4.7        | 4              
-Computation of the time step dt          | 0.003320143     |  1.2        | 6              
-Post-treatment operations                | 0.032099        | 11.7        | 1              
-Other operations                         | 0.0285567       | 10.4        | 
-
-Untracked time                           | 5.45e-05        | 0.0022      | 
-
+Linear solver resolutions Ax=B           | 0.0633184       | 26.5        | 2              
+Matrix assembly for implicit scheme      | 0.00730553      |  3.1        | 4              
+Convection operator                      | 0.02983982      | 12.5        | 10             
+Diffusion operator                       | 0.01798224      |  7.5        | 18             
+Gradient operator                        | 0.01134969      |  4.7        | 5              
+Divergence operator                      | 0.007520097     |  3.1        | 6              
+Source terms                             | 0.0004215874    |  0.2        | 4              
+Update ::mettre_a_jour                   | 0.0355707       | 14.9        | 4              
+Solver for implicit diffusion            | 0.01342391      |  5.6        | 4              
+Computation of the time step dt          | 0.003379315     |  1.4        | 6              
+Post-treatment operations                | 0.03539885      | 14.8        | 1              
+Other operations                         | 0.01349149      |  5.6        | 
 
 Average number of iteration of the linear solver per call:                 32.7           
 
@@ -63,16 +63,17 @@ Average number of iteration of the linear solver per call:                 32.7
 -----------------------------------------------------------------------------------------------------------
 Counter description                      | Time per step   | % loop time | Call(s)/step    | Bandwidth 
 -----------------------------------------------------------------------------------------------------------
-Libraries:                               | 0.0647731       | 23.6        | 2               | 
-Kernels:                                 | 0.1737          | 63.2        | 1097            | 
-Copy host to device:                     | 0.000672383     |  0.2        | 42              | 3.2 GB/s
-Copy device to host:                     | 0.00375458      |  1.4        | 44              | 10.5 GB/s
-Alloc/Free on device:                    | 0.000344993     |  0.1        | 11              | 
-GPU: 87% Copy H<->D: 1.6% Alloc/free: 0.13% Comm: 0% CPU & I/O: 11%
+Libraries:                               | 0.0630582       | 26.4        | 2               | 
+Kernels:                                 | 0.138231        | 57.8        | 1111            | 
+Copy host to device:                     | 0.000777828     |  0.3        | 42              | 2.8 GB/s
+Copy device to host:                     | 0.00414854      |  1.7        | 44              | 9.5 GB/s
+Alloc/Free on device:                    | 0.000361106     |  0.2        | 11              | 
+GPU: 84% Copy H<->D: 2.1% Alloc/free: 0.15% Comm: 0% CPU & I/O: 14%
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                               Post-resolution statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Time of the post-resolution:                                               1.88497        
+Time of the post-resolution:                                               1.42349        
 
-Total time for the whole computation                                       59.0837        
+Total time for the whole computation                                       46.5461        
 
+[Slurm] Power consumption (54 s):  0.450 kW  0.007 kWh  0.001 € (0.10€/kWh)

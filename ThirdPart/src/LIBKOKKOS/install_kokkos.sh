@@ -3,7 +3,7 @@
 if [ "$TRUST_STDCPP" = c++20 ]
 then
    # Kokkos (C++20):
-   archive=$TRUST_ROOT/externalpackages/kokkos/kokkos-5.0.0.tar.gz
+   archive=$TRUST_ROOT/externalpackages/kokkos/kokkos-release-candidate-5.1.0.tar.gz
 elif [ "$TRUST_STDCPP" = c++17 ]
 then
    # Kokkos (C++17):
