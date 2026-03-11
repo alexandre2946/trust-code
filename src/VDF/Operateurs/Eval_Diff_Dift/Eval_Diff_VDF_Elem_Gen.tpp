@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -106,26 +106,54 @@ inline void Eval_Diff_VDF_Elem_Gen<DERIVED_T>::flux_face(const DoubleTab& inco, 
 template <typename DERIVED_T> template <typename Type_Double>
 inline void Eval_Diff_VDF_Elem_Gen<DERIVED_T>::flux_face(const DoubleTab& , const DoubleTab& val_b, const int face, const Neumann_paroi& la_cl, const int num1, Type_Double& flux) const
 {
-  if (DERIVED_T::IS_MULTI_SCALAR_DIFF) throw;
-
   const int i = elem_(face,0), ncomp = flux.size_array();
-  for (int k=0; k < ncomp; k++) flux[k] = ((i != -1) ? 1 : -1) * la_cl.flux_impose(face-num1,k)*surface(face);
+
+  // XXX LUIS : Note : Pas de distinguo entre MULTISCALAR_DIFF et une diffusion normale pour des CL de Neumann
+  for (int k = 0; k < ncomp; k++)
+    flux[k] = ((i != -1) ? 1 : -1) * la_cl.flux_impose(face - num1, k) * surface(face);
 }
 
 template <typename DERIVED_T> template <typename Type_Double>
 inline void Eval_Diff_VDF_Elem_Gen<DERIVED_T>::flux_face(const DoubleTab& inco, const DoubleTab&, const int face, const Periodique& la_cl, const int , Type_Double& flux) const
 {
-  if (DERIVED_T::IS_MULTI_SCALAR_DIFF) throw;
-
   const int i = elem_(face,0), j = elem_(face,1), ncomp = flux.size_array();
   const double d0 = le_dom->dist_face_elem0_period(face,i,la_cl.distance()), d1 = le_dom->dist_face_elem1_period(face,j,la_cl.distance());
 
   for (int k = 0; k < ncomp; k++)
     {
-      const int ori = DERIVED_T::IS_ANISO ? orientation(face) : k;
-      const double heq = compute_heq(d0,i,d1,j,ori);
+      if (DERIVED_T::IS_MULTI_SCALAR_DIFF)
+        {
 
-      flux[k] = DERIVED_T::IS_QUASI ? heq*(inco(j,k)/dv_mvol(j) - inco(i,k)/dv_mvol(i))*surface(face)*porosite(face) : heq*(inco(j,k) - inco(i,k))*surface(face)*porosite(face);
+          if (DERIVED_T::IS_ANISO) throw; // XXX LUIS : pas d'anisotropie pour l'instant
+
+          flux[k] = 0.0;
+          for (int l = 0; l < ncomp; l++)
+            {
+              const int comp_diff = ncomp * k + l;
+              double heq = 0.;
+
+              if (nu_1(i,comp_diff) == 0.0 || nu_1(j,comp_diff) == 0.0) heq = 0.;
+              else
+                {
+                  assert(nu_1(i,comp_diff) != 0.0 && nu_1(j,comp_diff) != 0.0);
+                  heq = compute_heq(d0, i, d1, j, comp_diff);
+                }
+              flux[k] += DERIVED_T::IS_QUASI ? heq*(inco(j,l)/dv_mvol(j) - inco(i,l)/dv_mvol(i))*surface(face)*porosite(face) : heq*(inco(j,l) - inco(i,l))*surface(face)*porosite(face);
+            }
+
+        }
+      else
+        {
+          double heq = -123.;
+          const int ori = DERIVED_T::IS_ANISO ? orientation(face) : k;
+          if (nu_1(i,ori) == 0.0 || nu_1(j,ori) == 0.0) heq = 0.;
+          else
+            {
+              assert(nu_1(i,ori) != 0.0 && nu_1(j,ori) != 0.0);
+              heq = compute_heq(d0,i, d1,j,ori);
+            }
+          flux[k] = DERIVED_T::IS_QUASI ? heq*(inco(j,k)/dv_mvol(j) - inco(i,k)/dv_mvol(i))*surface(face)*porosite(face) : heq*(inco(j,k) - inco(i,k))*surface(face)*porosite(face);
+        }
     }
 }
 
@@ -337,7 +365,13 @@ inline void Eval_Diff_VDF_Elem_Gen<DERIVED_T>::flux_faces_interne(const DoubleTa
           flux[k] = 0.0;
           for (int l = 0; l < ncomp; l++)
             {
-              heq = compute_heq(d0, i, d1, j, ncomp * k + l);
+              const int comp_diff = ncomp * k + l;
+              if (nu_1(i,comp_diff) == 0.0 || nu_1(j,comp_diff) == 0.0) heq = 0.;
+              else
+                {
+                  assert(nu_1(i,comp_diff) != 0.0 && nu_1(j,comp_diff) != 0.0);
+                  heq = compute_heq(d0, i, d1, j, comp_diff);
+                }
               flux[k] += heq * (inco(j, l) - inco(i, l)) * surface(face) * porosite(face);
             }
         }
@@ -430,13 +464,38 @@ template <typename DERIVED_T> template <typename Type_Double>
 inline void Eval_Diff_VDF_Elem_Gen<DERIVED_T>::coeffs_face(const int face, const int, const Periodique& la_cl, Type_Double& aii, Type_Double& ajj ) const
 {
   assert (aii.size_array() == ajj.size_array());
-  const int i = elem_(face,0), j = elem_(face,1), ncomp = aii.size_array();
+  const int i = elem_(face,0), j = elem_(face,1), ncomp = DERIVED_T::IS_MULTI_SCALAR_DIFF ? int(sqrt(aii.size_array())) : aii.size_array();
   const double d0 = le_dom->dist_face_elem0_period(face,i,la_cl.distance()), d1 = le_dom->dist_face_elem1_period(face,j,la_cl.distance());
   for (int k = 0; k < ncomp; k++)
     {
-      const int ori = DERIVED_T::IS_ANISO ? orientation(face) : k;
-      const double heq = compute_heq(d0,i,d1,j,ori);
-      aii[k] = ajj[k] = heq*surface(face)*porosite(face); // On peut faire ca !
+      if (DERIVED_T::IS_MULTI_SCALAR_DIFF)
+        {
+          for (int l = 0; l < ncomp; l++)
+            {
+              const int ori = ncomp * k + l;
+              double heq;
+              if (nu_1(i,ori) == 0.0 || nu_1(j,ori) == 0.0) heq = 0.;
+              else
+                {
+                  assert(nu_1(i,ori) != 0.0 && nu_1(j,ori) != 0.0);
+                  heq = compute_heq(d0, i, d1, j, ori);
+                }
+              aii[ori] = heq * surface(face) * porosite(face);
+              ajj[ori] = heq * surface(face) * porosite(face);
+            }
+        }
+      else
+        {
+          const int ori = DERIVED_T::IS_ANISO ? orientation(face) : k;
+          double heq;
+          if (nu_1(i,ori) == 0.0 || nu_1(j,ori) == 0.0) heq = 0.;
+          else
+            {
+              assert(nu_1(i,ori) != 0.0 && nu_1(j,ori) != 0.0);
+              heq = compute_heq(d0, i, d1, j, ori);
+            }
+          aii[k] = ajj[k] = heq*surface(face)*porosite(face); // On peut faire ca !
+        }
     }
 }
 
@@ -555,17 +614,23 @@ inline void Eval_Diff_VDF_Elem_Gen<DERIVED_T>::coeffs_faces_interne(const int fa
         {
           for (int l = 0; l < ncomp; l++)
             {
-              heq = compute_heq(d0, i, d1, j, ncomp * k + l);
-              aii[ncomp * k + l] = heq * surface(face) * porosite(face);
-              ajj[ncomp * k + l] = heq * surface(face) * porosite(face);
+              const int comp_diff = ncomp * k + l;
+              if (nu_1(i,comp_diff) == 0.0 || nu_1(j,comp_diff) == 0.0) heq = 0.;
+              else
+                {
+                  assert(nu_1(i,comp_diff) != 0.0 && nu_1(j,comp_diff) != 0.0);
+                  heq = compute_heq(d0,i,d1,j,comp_diff);
+                }
+              aii[comp_diff] = heq * surface(face) * porosite(face);
+              ajj[comp_diff] = heq * surface(face) * porosite(face);
             }
         }
       else
         {
-          if (nu_1(i,ori) == 0.0 || nu_2(j,ori) == 0.0) heq = 0.;
+          if (nu_1(i,ori) == 0.0 || nu_1(j,ori) == 0.0) heq = 0.;
           else
             {
-              assert(nu_1(i,ori) != 0.0 && nu_2(j,ori) != 0.0);
+              assert(nu_1(i,ori) != 0.0 && nu_1(j,ori) != 0.0);
               heq = compute_heq(d0,i,d1,j,ori);
             }
           aii[k] = ajj[k] = heq*surface(face)*porosite(face); // On peut faire ca !

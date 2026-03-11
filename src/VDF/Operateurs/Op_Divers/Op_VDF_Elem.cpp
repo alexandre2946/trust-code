@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -159,13 +159,13 @@ void Op_VDF_Elem::dimensionner_multiscalar(const Domaine_VDF& le_dom, const Doma
 
   IntTab sten(0, 2);
 
-  for (int e = 0; e < ne; e++)
-    for (int i = 0, f, n; i < e_f.dimension(1); i++)
+  for (int e = 0; e < ne; e++) // Boucle sur les elements
+    for (int i = 0, f, n; i < e_f.dimension(1); i++) // Boucle sur les faces de chaque element
       if ((f = e_f(e, i)) >= 0)
-        for (int j = 0; j < 2; j++)
+        for (int j = 0; j < 2; j++) // Chaque cote de l'element hexaedrique ?
           if ((n = f_e(f, j)) >= 0)
             for (int k = 0; k < M; k++)
-              for (int m = (multi_scalar_diff ? 0 : k); m < (multi_scalar_diff ? M : k + 1); m++)
+              for (int m = (multi_scalar_diff ? 0 : k); m < (multi_scalar_diff ? M : k + 1); m++) // Chaque composante
                 sten.append_line(M * e + k, M * n + m);
 
   tableau_trier_retirer_doublons(sten);

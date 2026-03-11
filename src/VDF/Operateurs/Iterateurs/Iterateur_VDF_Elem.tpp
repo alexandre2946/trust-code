@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -264,7 +264,8 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_(const Periodique& cl, cons
     {
       const DoubleTab& donnee = semi_impl.count(nom_ch_inco_) ? semi_impl.at(nom_ch_inco_) : le_champ_convecte_ou_inc->valeurs();
 
-      Type_Double flux(N), aii(N), ajj(N), aef(N);
+      // Luis : je rajoute l'option multiscalar_diff dans les CL périodiques
+      Type_Double flux(N), aii(N * (multiscalar_diff_ ? N : 1)), ajj(N * (multiscalar_diff_ ? N : 1)), aef(N);
       for (int face = ndeb; face < nfin; face++)
         {
           const int e0 = elem(face, 0), e1 = elem(face, 1);
