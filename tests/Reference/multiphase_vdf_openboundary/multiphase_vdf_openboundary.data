@@ -1,0 +1,205 @@
+# PARALLEL OK 8 #
+dimension 2
+Pb_multiphase pb
+Domaine dom
+
+
+# BEGIN MESH #
+Mailler dom
+{
+    Pave Cavite
+    {
+        Origine 0.0 0.0
+        Nombre_de_Noeuds 41 21
+        Longueurs 2.0 1.0
+    }
+    {
+        bord gauche X = 0.0     0.0 <= Y <= 1.0
+        bord haut   Y = 1.0     0.0 <= X <= 2.0
+        bord bas    Y = 0.0     0.0 <= X <= 2.0
+        bord droite X = 2.0     0.0 <= Y <= 1.0
+    }
+}
+# END MESH #
+
+# BEGIN PARTITION
+Decouper dom
+{
+    partitionneur metis { nb_parts 2 }
+    nb_parts_tot 2
+    Larg_joint 2
+    Nom_Zones dom
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter dom.Zones dom
+END SCATTER #
+
+VDF dis option_vdf { all_options }
+
+Schema_euler_implicite sch
+Read sch
+{
+    tinit 0.0
+    dt_start dt_fixe 1e-8
+    dt_max 1e10
+    tmax 1.0
+    
+    facsec 0.8
+    facsec_max 0.8
+    
+    seuil_statio 1e-3
+    
+    dt_impr 5.e-5
+    dt_sauv 100
+    periode_sauvegarde_securite_en_heures 23
+
+    # nb_pas_dt_max 1 #
+    
+    solveur ice
+    {
+        criteres_convergence { alpha 1e-6 } 
+	solveur petsc cli { }
+        seuil_convergence_implicite 1e30
+    }
+}
+Associate  pb dom
+Associate  pb sch
+Discretize pb dis
+
+Read pb
+{
+    Milieu_Composite
+    {
+        liquide_eau	Fluide_Incompressible
+        {
+            rho    Champ_Uniforme 1 1.0
+            mu     Champ_Uniforme 1 1.e-6
+            lambda Champ_Uniforme 1 0
+            Cp     Champ_Uniforme 1 1005
+        }
+
+        gaz_eau Fluide_Incompressible
+        {
+            rho    Champ_Uniforme 1 1.0
+            mu     Champ_Uniforme 1 1.e-6
+            lambda Champ_Uniforme 1 0
+            Cp     Champ_Uniforme 1 1005
+        }
+    }
+
+    QDM_Multiphase
+    {
+	evanescence { homogene { alpha_res 1e-5 alpha_res_min 5e-6 } }
+        solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg }
+        convection { amont }
+        diffusion  { negligeable }
+        initial_conditions
+        {
+            vitesse Champ_composite 2 /* champ par phase */
+            {
+                Champ_Fonc_xyz dom 2 1.0 0.0
+                Champ_Fonc_xyz dom 2 1.0 0.0
+            }
+
+            pression Champ_composite 1
+            {
+                Champ_Fonc_xyz dom 1 0.0
+            }
+        }
+
+        boundary_conditions
+        {
+            bas    symetrie
+            gauche  frontiere_ouverte_vitesse_imposee champ_front_composite 2
+            {
+                champ_front_uniforme 2 1.0 0.0
+                champ_front_uniforme 2 1.0 0.0
+            }
+            droite  frontiere_ouverte_vitesse_imposee_sortie champ_front_composite 2
+            {
+                champ_front_uniforme 2 1.0 0.0
+                champ_front_uniforme 2 1.0 0.0
+            }
+            haut   symetrie
+        }
+    }
+    
+    Masse_Multiphase
+    {
+        initial_conditions
+        {
+            alpha Champ_composite 2 /* champ par phase */
+            {
+                Champ_Fonc_xyz dom 1 1.0-(0.5+(0.5-1e-5)*tanh((0.3-sqrt((x-0.5)^2+(y-0.5)^2))/0.054)) 
+                Champ_Fonc_xyz dom 1 0.5+(0.5-1e-5)*tanh((0.3-sqrt((x-0.5)^2+(y-0.5)^2))/0.054)
+            }
+        }
+        convection { amont }
+        boundary_conditions
+	{ 
+            bas symetrie
+            gauche frontiere_ouverte a_ext Champ_Front_Fonc_xyz 2 1.0 0.0
+            droite frontiere_ouverte a_ext Champ_Front_Fonc_xyz 2 1.0 0.0
+            haut   symetrie
+	}
+    }
+    
+    Energie_Multiphase
+    {
+        diffusion { negligeable }
+        convection { amont }
+        initial_conditions
+        {
+            temperature Champ_composite 2 /* champ par phase */
+            {
+                Champ_Uniforme 1 10.0
+                Champ_Uniforme 1 10.0
+            }
+        }
+        boundary_conditions { 
+            bas     paroi_adiabatique
+            gauche  frontiere_ouverte_temperature_imposee champ_front_composite 2
+            {
+                Champ_Front_Uniforme 1 10.0
+                Champ_Front_Uniforme 1 10.0
+            }
+            droite  frontiere_ouverte T_ext champ_front_composite 2
+            {
+                Champ_Front_Uniforme 1 10.0
+                Champ_Front_Uniforme 1 10.0
+            }
+            haut    paroi_adiabatique
+             }
+
+    }
+    
+    Post_processing
+    {
+		
+		probes
+		{
+			alpha1 alpha_liquide_eau periode 0.01 segment 40 0.0 0.5 2.0 0.5
+			alpha2 alpha_gaz_eau periode 0.01 segment 40 0.0 0.5 2.0 0.5
+			vitesse1 grav vitesse_liquide_eau periode 0.01 segment 40 0.0 0.5 2.0 0.5
+			vitesse2 grav vitesse_gaz_eau periode 0.01 segment 40 0.0 0.5 2.0 0.5
+			pres pression periode 0.01 segment 40 0.0 0.5 2.0 0.5
+		}
+
+        Format lml 
+        fields dt_post 0.001
+        {
+            vitesse_liquide_eau elem
+	    vitesse_gaz_eau elem
+            alpha_liquide_eau elem
+            alpha_gaz_eau elem
+            pression elem
+        }
+
+    }
+
+}
+Solve pb
+End
