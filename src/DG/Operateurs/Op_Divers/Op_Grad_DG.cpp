@@ -127,7 +127,6 @@ void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tab
   Matrice_Morse *mat = matrices.count("pression") ? matrices.at("pression") : nullptr; // pression for the stabilisation term if np==nv
 
   const Domaine_DG& domaine = le_dom_DG.valeur();
-  const IntTab& face_voisins = domaine.face_voisins();
 
   int order_v = Option_DG::Get_order_for("vitesse");
   int order_p = Option_DG::Get_order_for("pression");
@@ -141,7 +140,7 @@ void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tab
   const int quad_order = bfunc_p.get_default_quadrature_order(); //TODO DG should we choose the max or the p order quadrature ?
   const Quadrature_base& quad = domaine.get_quadrature(quad_order);  // Same quadrature for all champs
   int nb_pts_integ_max = quad.nb_pts_integ_max();
-  double coeff, coeff00, coeff10, coeff01, coeff11;
+  double coeff;
 
   DoubleTab grad_fbase_elem(nb_bfunc_p, nb_pts_integ_max, Objet_U::dimension);
   DoubleTab f_base_v(nb_bfunc_v, nb_pts_integ_max);
@@ -164,7 +163,7 @@ void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tab
             {
               scalar_product_dim = 0.;
               for (int k = 0; k < quad.nb_pts_integ(elem); k++)
-                scalar_product_dim(k) += grad_fbase_elem(pressure_index, k, d) * f_base_v(velocity_index, k);
+                scalar_product_dim(k) = grad_fbase_elem(pressure_index, k, d) * f_base_v(velocity_index, k);
               coeff = quad.compute_integral_on_elem(elem, scalar_product_dim);
               if (mat)
                 (*mat)(ind_elem_v + velocity_index + d * nb_bfunc_v, ind_elem_p + pressure_index) += coeff;
@@ -173,8 +172,11 @@ void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tab
     }
 
   const DoubleTab& face_normales = domaine.face_normales();
+  const IntTab& face_voisins = domaine.face_voisins();
   const DoubleVect& face_surfaces = domaine.face_surfaces();
   int nb_pts_int_fac = quad.nb_pts_integ_facets();
+
+  double coeff00, coeff10, coeff01, coeff11;
 
   DoubleTab eval_jump_on_facet00(nb_pts_int_fac);
   DoubleTab eval_jump_on_facet01(nb_pts_int_fac);
@@ -205,12 +207,12 @@ void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tab
       bfunc_p.eval_bfunc_on_facets(quad, elem1, face, f_base_p1);
       for (int velocity_index = 0; velocity_index < nb_bfunc_v; velocity_index++)
         {
-          //for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
-          //  mean_v(k) = 0.5*(f_base_v0(velocity_index, k) + f_base_v1(velocity_index, k));
-
-          for (int pressure_index = 0; pressure_index < nb_bfunc_p; pressure_index++)
+          for (int d = 0; d < Objet_U::dimension; d++)
             {
-              for (int d = 0; d < Objet_U::dimension; d++)
+              //for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
+              //  mean_v(k) = 0.5*(f_base_v0(velocity_index, k) + f_base_v1(velocity_index, k));
+
+              for (int pressure_index = 0; pressure_index < nb_bfunc_p; pressure_index++)
                 {
                   eval_jump_on_facet00 = 0.;
                   eval_jump_on_facet01 = 0.;
@@ -218,10 +220,10 @@ void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tab
                   eval_jump_on_facet11 = 0.;
                   for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
                     {
-                      eval_jump_on_facet00(k) -= f_base_p0(pressure_index, k) * face_normales(face, d)  * 0.5 * f_base_v0(velocity_index, k) / sur_f;
-                      eval_jump_on_facet01(k) += f_base_p1(pressure_index, k) * face_normales(face, d)  * 0.5 * f_base_v0(velocity_index, k) / sur_f;
-                      eval_jump_on_facet10(k) -= f_base_p0(pressure_index, k) * face_normales(face, d)  * 0.5 * f_base_v1(velocity_index, k) / sur_f;
-                      eval_jump_on_facet11(k) += f_base_p1(pressure_index, k) * face_normales(face, d)  * 0.5 * f_base_v1(velocity_index, k) / sur_f;
+                      eval_jump_on_facet00(k) = -f_base_p0(pressure_index, k) * face_normales(face, d)  * 0.5 * f_base_v0(velocity_index, k) / sur_f;
+                      eval_jump_on_facet01(k) = +f_base_p1(pressure_index, k) * face_normales(face, d)  * 0.5 * f_base_v0(velocity_index, k) / sur_f;
+                      eval_jump_on_facet10(k) = -f_base_p0(pressure_index, k) * face_normales(face, d)  * 0.5 * f_base_v1(velocity_index, k) / sur_f;
+                      eval_jump_on_facet11(k) = +f_base_p1(pressure_index, k) * face_normales(face, d)  * 0.5 * f_base_v1(velocity_index, k) / sur_f;
                     }
                   coeff00 = quad.compute_integral_on_facet(face, eval_jump_on_facet00);
                   coeff01 = quad.compute_integral_on_facet(face, eval_jump_on_facet01);
@@ -243,7 +245,6 @@ void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tab
             }
         }
     }
-
 }
 
 DoubleTab& Op_Grad_DG::calculer(const DoubleTab& pressure, DoubleTab& grad) const
