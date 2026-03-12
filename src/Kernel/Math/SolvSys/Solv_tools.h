@@ -13,47 +13,28 @@
 *
 *****************************************************************************/
 
-#ifndef Solv_Externe_included
-#define Solv_Externe_included
+#ifndef Solv_tools_included
+#define Solv_tools_included
 
-#include <SolveurSys_base.h>
-#include <Solv_tools.h>
+#include <ArrOfBit.h>
+#include <TRUSTTab.h>
 
-class Matrice_Morse;
-class Matrice_Morse_Sym;
-
-/*! Common stuff for several external solvers.
- *
- * Note: here we use trustIdType for potentially big identifiers, this maps to PetscInt type in Solv_Petsc class
- * (type equality between the both is checked when creating the solver).
- */
-class Solv_Externe : public SolveurSys_base, public Solv_tools
+class Solv_tools
 {
-  Declare_base_sans_constructeur_ni_destructeur(Solv_Externe);
 public:
-  Solv_Externe() : SolveurSys_base::SolveurSys_base(),
-    matrice_symetrique_(-1)
-  {}
-  ~Solv_Externe() {}
+  void construit_renum(const DoubleVect&);
+  const ArrOfTID& get_ix() const { return ix; }
 
 protected:
-  void construit_matrice_morse_intermediaire(const Matrice_Base&, Matrice_Morse& );
-  void MorseSymToMorse(const Matrice_Morse_Sym& MS, Matrice_Morse& M);
-  void Create_lhs_rhs_onDevice();
-  public_for_cuda
-  template<typename ExecSpace>
-  void Update_lhs_rhs(const DoubleVect& b, DoubleVect& x);
-  template<typename ExecSpace>
-  void Update_solution(DoubleVect& x);
-protected:
-  const ArrOfInt& indice_coeff_to_keep(const Matrice_Morse&);
-
-  int matrice_symetrique_;      // Drapeau sur la symetrie de la matrice
-  ArrOfDouble lhs_;             // Premier membre sans les items communs
-  ArrOfDouble rhs_;             // Second membre sans les items communs
-private:
-  ArrOfInt indice_coeff_to_keep_; // Coefficients de la matrice CSR a garder dans la matrice TRUST
+  TIDTab renum_;                // Tableau de renumerotation globale lignes matrice TRUST -> matrice CSR
+  IntTab index_;                // Tableau de renumerotation locale
+  ArrOfBit items_to_keep_;      // Faut t'il conserver dans la matrice CSR la ligne item de la matrice TRUST ?
+  ArrOfTID ix;                  // Tableau de travail pour remplissage Vec plus rapide
+  int nb_items_to_keep_ = -1;        // Nombre local d'items a conserver
+  int nb_rows_ = -1;                 // Nombre de lignes locales de la matrice TRUST
+  trustIdType nb_rows_tot_ = -1;             // Nombre de lignes globales de la matrice TRUST
+  trustIdType decalage_local_global_ = -1;   // Decalage numerotation local/global pour matrice CSR et vecteur
+  int secmem_sz_ = -1;               // (Local) second member size
 };
 
-
-#endif //TRUST_SOLV_EXTERNE_H
+#endif /* Solv_tools_included */

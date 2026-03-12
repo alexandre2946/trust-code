@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -32,68 +32,6 @@ Entree& Solv_Externe::readOn(Entree& is)
 {
   //create_solver(is);
   return is;
-}
-
-void Solv_Externe::construit_renum(const DoubleVect& b)
-{
-  // Initialisation du tableau items_to_keep_ si ce n'est pas deja fait
-  nb_items_to_keep_ = b.get_md_vector()->get_sequential_items_flags(items_to_keep_, b.line_size());
-
-  // Compute important value:
-  secmem_sz_ = b.size_totale();
-  nb_rows_ = nb_items_to_keep_;
-  nb_rows_tot_ = mp_sum(nb_rows_);
-  decalage_local_global_ = mppartial_sum(nb_rows_);
-  //Journal()<<"nb_rows_=" << nb_rows_ << " nb_rows_tot_=" << nb_rows_tot_ << " decalage_local_global_=" << decalage_local_global_ << finl;
-
-  /**********************/
-  /* Build renum_ array */
-  /**********************/
-  //if (MatricePetsc_==nullptr)
-  {
-    const MD_Vector& md = b.get_md_vector();
-    renum_.reset();
-    renum_.resize(0, b.line_size());
-    MD_Vector_tools::creer_tableau_distribue(md, renum_, RESIZE_OPTIONS::NOCOPY_NOINIT);
-  }
-  int cpt=0;
-  int size=items_to_keep_.size_array();
-  renum_ = INT_MAX; //pour crasher si le MD_Vector est incoherent
-  ArrOfTID& renum_array = renum_;  // tableau vu comme lineaire
-  for(int i=0; i<size; i++)
-    if(items_to_keep_[i])
-      {
-        renum_array[i]=cpt+decalage_local_global_;
-        cpt++;
-      }
-
-  renum_.echange_espace_virtuel();
-  // Construction de index_
-  index_.resize(size);
-  int index = 0;
-  // ToDo OpenMP factoriser avec ix car index_=ix-decalage_local_global_
-  for (int i=0; i<size; i++)
-    {
-      if (items_to_keep_[i])
-        {
-          index_[i] = index;
-          index++;
-        }
-      else
-        index_[i] = -1;
-    }
-  // Construction de ix
-  size=b.size_array();
-  trustIdType colonne_globale=decalage_local_global_;
-  ix.resize(size);
-  for (int i=0; i<size; i++)
-    if (items_to_keep_[i])
-      {
-        ix[i] = colonne_globale;
-        colonne_globale++;
-      }
-    else
-      ix[i] = -1;
 }
 
 void Solv_Externe::MorseSymToMorse(const Matrice_Morse_Sym& MS, Matrice_Morse& M)
