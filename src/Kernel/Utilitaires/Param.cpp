@@ -383,12 +383,21 @@ void Param::ajouter(const char *mot, const double *quoi, Param::Nature nat)
   obj.set_nature(convert_nature(nat));
   obj.set_double(const_cast<double*>(quoi));
 }
+
+void Param::ajouter(const char *mot, const std::string *quoi, Param::Nature nat)
+{
+  Objet_a_lire& obj = create_or_get_objet_a_lire(mot);
+  obj.set_nature(convert_nature(nat));
+  obj.set_string(const_cast<std::string*>(quoi));
+}
+
 void Param::ajouter(const char *mot, const Objet_U *quoi, Param::Nature nat)
 {
   Objet_a_lire& obj = create_or_get_objet_a_lire(mot);
   obj.set_nature(convert_nature(nat));
   obj.set_objet(const_cast<Objet_U*>(quoi));
 }
+
 Param& Param::ajouter_param(const char *mot, Param::Nature nat)
 {
   Objet_a_lire& obj = create_or_get_objet_a_lire(mot);
@@ -398,6 +407,7 @@ Param& Param::ajouter_param(const char *mot, Param::Nature nat)
   name += obj.get_name();
   return obj.create_param(name);
 }
+
 void Param::ajouter_arr_size_predefinie(const char *mot, const ArrOfInt *quoi, Param::Nature nat)
 {
   Objet_a_lire& obj = create_or_get_objet_a_lire(mot);
@@ -412,6 +422,54 @@ void Param::ajouter_arr_size_predefinie(const char *mot, const ArrOfDouble *quoi
 }
 
 
+
+
+void Param::ajouter(const char *mot, const std::vector<int>* quoi,Param::Nature nat, int size)
+{
+
+  Objet_a_lire& obj = create_or_get_objet_a_lire(mot);
+  obj.set_nature(convert_nature(nat));
+  obj.set_vec_expected_size(size);
+  obj.set_vec_int(const_cast<std::vector<int>*>(quoi));
+}
+
+void Param::ajouter(const char *mot, const std::vector<double>* quoi,Param::Nature nat, int size)
+{
+  Objet_a_lire& obj = create_or_get_objet_a_lire(mot);
+  obj.set_nature(convert_nature(nat));
+  obj.set_vec_expected_size(size);
+  obj.set_vec_dbl(const_cast<std::vector<double>*>(quoi));
+}
+
+void Param::ajouter(const char *mot, const std::vector<std::string>* quoi,Param::Nature nat, int size)
+{
+  Objet_a_lire& obj = create_or_get_objet_a_lire(mot);
+  obj.set_nature(convert_nature(nat));
+  obj.set_vec_expected_size(size);
+  obj.set_vec_str(const_cast<std::vector<std::string>*>(quoi));
+}
+
+void Param::ajouter(const char *mot, const std::map<std::string, int>* quoi,Param::Nature nat)
+{
+
+  Objet_a_lire& obj = create_or_get_objet_a_lire(mot);
+  obj.set_nature(convert_nature(nat));
+  obj.set_map_int(const_cast<std::map<std::string, int>*>(quoi));
+}
+
+void Param::ajouter(const char *mot, const std::map<std::string, double>* quoi,Param::Nature nat)
+{
+  Objet_a_lire& obj = create_or_get_objet_a_lire(mot);
+  obj.set_nature(convert_nature(nat));
+  obj.set_map_dbl(const_cast<std::map<std::string, double>*>(quoi));
+}
+
+void Param::ajouter(const char *mot, const std::map<std::string, std::string>* quoi,Param::Nature nat)
+{
+  Objet_a_lire& obj = create_or_get_objet_a_lire(mot);
+  obj.set_nature(convert_nature(nat));
+  obj.set_map_str(const_cast<std::map<std::string, std::string>*>(quoi));
+}
 
 void Param::ajouter_flag(const char *mot, const bool *quoi)
 {

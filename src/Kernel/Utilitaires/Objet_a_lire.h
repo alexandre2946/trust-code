@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -22,14 +22,17 @@
 #include <TRUST_List.h>
 #include <ptrParam.h>
 #include <Objet_U.h>
+#include <map>
+#include <string>
+#include <functional>
 
 class Param;
 class Objet_a_lire :public Objet_U
 {
   Declare_instanciable(Objet_a_lire);
 public:
-  enum Type { INTEGER = 0, TRUSTID, DOUBLE, OBJECT, FLAG, NON_STD, DERIV, ArrOfInt_size_imp,
-              ArrOfDouble_size_imp, PARAM
+  enum Type { INTEGER = 0, TRUSTID, DOUBLE, STRING, OBJECT, FLAG, NON_STD, DERIV, ArrOfInt_size_imp,
+              ArrOfDouble_size_imp, PARAM, MAP_INT, MAP_DOUBLE, MAP_STRING, MAP_OBJET_U, VEC_INT, VEC_DOUBLE, VEC_STRING, VEC_OBJET_U
             };
 
   enum Nature { OPTIONAL = 0, REQUIRED = 1 };
@@ -37,9 +40,24 @@ public:
   void set_entier(int*);
   void set_tid(trustIdType*);
   void set_double(double*);
+  void set_string(std::string*);
   void set_objet(Objet_U*);
   void set_arrofint(ArrOfInt*);
   void set_arrofdouble(ArrOfDouble*);
+
+  void set_vec_expected_size(int s) {expected_vec_size_=s;};
+  void set_vec_int(std::vector<int>*);
+  void set_vec_dbl(std::vector<double>*);
+  void set_vec_str(std::vector<std::string>*);
+
+  void set_map_int(std::map<std::string, int>*);
+  void set_map_dbl(std::map<std::string, double>*);
+  void set_map_str(std::map<std::string, std::string>*);
+
+  using vec_obj_initializer_t = std::function<void(std::vector<DerObjU>&)>;
+  using map_obj_initializer_t = std::function<void(std::map<std::string, DerObjU>&)>;
+  void set_vec_obj_initializer(vec_obj_initializer_t);
+  void set_map_obj_initializer(map_obj_initializer_t);
 
   template<typename _CLASSE_>
   void set_deriv(TRUST_Deriv<_CLASSE_> *quoi, const char *prefixe)
@@ -72,6 +90,7 @@ protected:
   int *int_a_lire;
   trustIdType *tid_a_lire;
   double *double_a_lire;
+  std::string *string_a_lire;
   Objet_U *obj_a_lire, *objet_lu;
   ArrOfInt *arrofint_a_lire;
   ArrOfDouble *arrofdouble_a_lire;
@@ -81,6 +100,19 @@ protected:
   LIST(ptrParam) dictionnaire_params;
   Motcle prefixe_deriv;
   ptrParam param_interne;
+
+
+  int expected_vec_size_ = -1; // -1 means no size restriction.
+  std::vector<int>* vec_int_a_lire = nullptr;
+  std::vector<double>* vec_double_a_lire = nullptr;
+  std::vector<std::string>* vec_str_a_lire = nullptr;
+  vec_obj_initializer_t vec_obj_initializer;
+
+  std::map<std::string, int>* map_int_a_lire = nullptr;
+  std::map<std::string, double>* map_double_a_lire = nullptr;
+  std::map<std::string, std::string>* map_str_a_lire = nullptr;
+  map_obj_initializer_t map_obj_initializer;
+
 };
 
 #endif

@@ -1,6 +1,10 @@
 # Files configured by CMake
 src/Kernel/Utilitaires/arch.h
 
+# TRUST generated files
+#because unit test with interprete_bloc generate ??.stop files
+*.stop 
+
 # Build stuff
 build/
 /MonoDir*/

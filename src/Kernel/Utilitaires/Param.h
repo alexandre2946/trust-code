@@ -45,13 +45,30 @@ public:
   void ajouter(const char *, const trustIdType* ,Param::Nature nat = Param::OPTIONAL);
 #endif
   void ajouter(const char *, const double* ,Param::Nature nat = Param::OPTIONAL);
+  void ajouter(const char *, const std::string* ,Param::Nature nat = Param::OPTIONAL);
+
   void ajouter(const char *, const Objet_U* ,Param::Nature nat = Param::OPTIONAL);
   void ajouter_arr_size_predefinie(const char *, const ArrOfInt* ,Param::Nature nat = Param::OPTIONAL);
   void ajouter_arr_size_predefinie(const char *, const ArrOfDouble* ,Param::Nature nat = Param::OPTIONAL);
 
+  // vectors
+  void ajouter(const char *, const std::vector<int>*, Param::Nature nat = Param::OPTIONAL ,int size = -1);
+  void ajouter(const char *, const std::vector<double>*,Param::Nature nat = Param::OPTIONAL ,int size = -1);
+  void ajouter(const char *, const std::vector<std::string>*, Param::Nature nat = Param::OPTIONAL, int size = -1);
+
+  template<typename T>
+  void ajouter(const char *, const std::vector<TRUST_Deriv<T>>*, Param::Nature nat = Param::OPTIONAL, int size = -1);
+
+  // maps
+  void ajouter(const char *, const std::map<std::string, int>* ,Param::Nature nat = Param::OPTIONAL);
+  void ajouter(const char *, const std::map<std::string, double>* ,Param::Nature nat = Param::OPTIONAL);
+  void ajouter(const char *, const std::map<std::string, std::string>* ,Param::Nature nat = Param::OPTIONAL);
+
+  template<typename T>
+  void ajouter(const char *, const std::map<std::string, TRUST_Deriv<T>>* ,Param::Nature nat = Param::OPTIONAL);
 
 
-  void ajouter_flag(const char *, const bool* );
+  void ajouter_flag(const char *, const bool*);
   Param& ajouter_param(const char *, Param::Nature nat = Param::OPTIONAL);
   void ajouter_non_std(const char *,const Objet_U* ,Param::Nature nat = Param::OPTIONAL);
   void ajouter_condition(const char* condition, const char* message,const char*  name=0);
@@ -85,5 +102,85 @@ protected:
   LIST(Nom) list_parametre_lu_,list_conditions_,list_message_erreur_conditions_, list_nom_conditions_;
 
 };
+
+
+template<typename T>
+void Param::ajouter(const char * mot, const std::vector<TRUST_Deriv<T>>* quoi, Param::Nature nat ,int size)
+{
+
+  Objet_a_lire& obj = create_or_get_objet_a_lire(mot);
+
+  auto natc = nat == Param::REQUIRED ? Objet_a_lire::REQUIRED :  Objet_a_lire::OPTIONAL;
+  obj.set_nature(natc);
+  obj.set_vec_expected_size(size);
+  auto ptr = const_cast<std::vector<TRUST_Deriv<T>>*>(quoi);
+  // captured by copy for error msg
+  std::string attr_name = mot;
+  std::string prop = proprietaire_.getString();
+
+
+  // lambda that will set the values of objects in the map
+  auto vec_initializer = [ptr, attr_name, prop](std::vector<DerObjU>& vec)
+  {
+    for (const auto& ref: vec)
+      {
+
+        if (sub_type(T, ref.valeur()))
+          {
+            const T& cast_obj = ref_cast(T, ref.valeur());
+            ptr->push_back(cast_obj);
+          }
+        else
+          {
+            Cerr <<"When reading '" << prop << "'" << finl;
+            Cerr <<"In keyword '" << attr_name << "', wrong type in vector:" << finl;
+            Cerr <<ref.valeur().le_type() << " is not a subtype of " << T::info_obj.name() << finl;
+            Process::exit();
+          }
+
+      }
+  };
+  obj.set_vec_obj_initializer(vec_initializer);
+}
+
+template<typename T>
+void Param::ajouter(const char * mot, const std::map<std::string, TRUST_Deriv<T>>* quoi ,Param::Nature nat)
+{
+
+  Objet_a_lire& obj = create_or_get_objet_a_lire(mot);
+
+  auto natc = nat == Param::REQUIRED ? Objet_a_lire::REQUIRED :  Objet_a_lire::OPTIONAL;
+  obj.set_nature(natc);
+  auto ptr = const_cast<std::map<std::string, TRUST_Deriv<T>>*>(quoi);
+
+  // captured by copy for error msg
+  std::string attr_name = mot;
+  std::string prop = proprietaire_.getString();
+
+  // lambda that will set the values of objects in the map
+  auto map_initializer = [ptr, attr_name, prop](std::map<std::string, DerObjU>& map)
+  {
+    for (const auto& [key, o]: map)
+      {
+
+        if (sub_type(T, o.valeur()))
+          {
+            const T& cast_obj = ref_cast(T, o.valeur());
+            (*ptr)[key] = cast_obj;
+            // name the object with the map key
+            (*ptr)[key]->nommer(key);
+          }
+        else
+          {
+            Cerr <<"When reading '" << prop << "'" << finl;
+            Cerr <<"In keyword '" << attr_name << "', wrong type at key " <<  key << finl;
+            Cerr <<o.valeur().le_type() << " is not a subtype of " << T::info_obj.name() << finl;
+            Process::exit();
+          }
+
+      }
+  };
+  obj.set_map_obj_initializer(map_initializer);
+}
 
 #endif
