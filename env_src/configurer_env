@@ -1990,10 +1990,9 @@ case $TRUST_ARCH_CC in
    	Defines="-D_COMPILE_AVEC_CLANG"
         if [ "$TRUST_USE_KOKKOS" = 1 ] && [ "$TRUST_USE_ROCM" = 1 ]
         then
-           CppFlags=$CppFlags" --offload-arch=$ROCM_ARCH"
+           CppFlags=$CppFlags" --offload-arch=$ROCM_ARCH -Wno-pass-failed" # -Wno-pass-failed pour eviter une erreur suspecte: 
         fi   
         CppFlags=$CppFlags" -O3 -fPIC -std=$TRUST_STDCPP -fno-common -Wno-long-long -Wall -Wno-inconsistent-missing-override -Wnon-virtual-dtor -Wreorder -Woverloaded-virtual -Wsign-promo -Wsynth -Wshadow -Wextra -Qunused-arguments -Wno-unsequenced -Wno-unused-parameter -Wno-tautological-compare -Wno-undefined-var-template -Wno-gpu-maybe-wrong-side -Wno-deprecated-this-capture -Werror"
-        #CppFlags=$CppFlags" -h list=all" # Genere un fichier listing pour OpenMP-target
         #[ "$TRUST_CC_BASE_EXTP" != "" ] && SYSLIBS="-L$GCC_PREFIX/snos/lib64 -lstdc++ -lgfortran -lrt" # EXTP GNU
         [ "$TRUST_ARCH_CC" = "linux_crayCC" ] && SYSLIBS="-L$GCC_PREFIX/snos/lib64 -lstdc++ -lgfortran -lrt" # EXTP GNU
         # Librairie GTL necessaire pour activer GPU-Direct:
