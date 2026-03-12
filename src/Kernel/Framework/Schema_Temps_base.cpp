@@ -102,6 +102,20 @@ double Schema_Temps_base::computeTimeStep(bool& is_stop) const
   if (temps_courant_ > temps_precedent_)
     dt = std::min(dt, (temps_courant_ - temps_precedent_) * dt_gf_); //pour ne pas remonter dt trop vite (comme facsec)
 
+  // If dt has been reduced after a failed step, enforce dt_min check again.
+  if ((dt - dt_min_) / (dt + DMINFLOAT) < -1.e-6 && !adapt_dt_tmax_)
+    {
+      Cerr << "---------------------------------------------------------" << finl;
+      Cerr << "Problem with the time step " << dt << " which is less than dt_min " << dt_min_ << finl;
+      Cerr << "Lower dt_min value or check why the time step decreases..." << finl;
+      Cerr << "Results are saved to provide help." << finl;
+      Cerr << "---------------------------------------------------------" << finl;
+      Probleme_base& pb = ref_cast_non_const(Probleme_base, mon_probleme.valeur());
+      pb.postraiter(1);
+      pb.sauver();
+      Process::exit();
+    }
+
   // Mise a jour immediate de l'attribut dt_ afin que pas_de_temps()
   // soit a jour tout le temps (en particulier au moment du postraitement)
   // Ce n'etait pas le cas pour les versions <= 1.6.3 et les champs dependant
