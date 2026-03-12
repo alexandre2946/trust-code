@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -80,7 +80,7 @@ int  Assembleur_P_PolyMAC_HFV::assembler_mat(Matrice& la_matrice,const DoubleVec
     {
       mat.get_set_tab1().ref_array(tab1);
       mat.get_set_tab2().ref_array(tab2);
-      mat.get_set_coeff().resize(tab2.size()), mat.get_set_coeff() = 0;
+      mat.get_set_coeff().resize(tab2.size_array()), mat.get_set_coeff() = 0;
       mat.set_nb_columns(ne_tot + nf_tot);
     }
 

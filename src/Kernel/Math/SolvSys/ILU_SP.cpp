@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -119,13 +119,13 @@ int ILU_SP::factoriser(const Matrice_Morse& mat,
   if (precond_!=0)
     {
       int n1 = mat.nb_lignes();
-      int n2 = mat.nb_coeff()+(2*lfil_*n1);        // nombre de termes non nuls dans LU
+      trustIdType n2 = mat.nb_coeff()+(2*lfil_*n1);        // nombre de termes non nuls dans LU
 
       //Cerr<<"Calculation of matrix preconditioning by LU decomposition..."<<finl;
-      int  iw = n2 + 2;
+      trustIdType  iw = n2 + 2;
       ju.resize_array(n1+1);
-      jlu.resize_array(iw);
-      alu.resize_array(iw);
+      jlu.resize_array((int)iw);
+      alu.resize_array((int)iw);
       double to = 1.e-4;                // filtrage des coefficents de L U
       //   ArrOfDouble wu(n1+1);                // tableau de travail pour ilut
       // ArrOfDouble wl(n1);                // tableau de travail pour ilut
@@ -140,9 +140,10 @@ int ILU_SP::factoriser(const Matrice_Morse& mat,
       ArrOfDouble wbis(n1+1);
       ArrOfInt jwbis(2*n1);
 
-      F77NAME(ILUTV2)(&n1, mat.get_coeff().addr(), mat.get_tab2().addr(), mat.get_tab1().addr(), &lfil_,
+      int iw_int = (int)iw;
+      F77NAME(ILUTV2)(&n1, mat.get_coeff().addr(), mat.get_tab2().addr(), reinterpret_cast<const int*>(mat.get_tab1().addr()), &lfil_,
                       &to, alu.addr(), jlu.addr(), ju.addr(),
-                      &iw, wbis.addr(),
+                      &iw_int, wbis.addr(),
                       jwbis.addr(), &ie);
       switch(ie)
         {
@@ -188,19 +189,20 @@ int ILU_SP::factorisation(const Matrice_Morse& mat, const DoubleVect& secmem)
       int n_reel = secmem.size();
       //      int n_tot = secmem.size_array();
       MLOC.dimensionner(n_reel,0);
-      int ii,jj;
+      int ii;
+      trustIdType jj;
       int cpt=0;
-      const IntVect& tab1_tot = mat.get_tab1();
-      const IntVect& tab2_tot = mat.get_tab2();
-      //      const DoubleVect& coeff_tot = mat.get_set_coeff();
-      IntVect& tab1_reel = MLOC.get_set_tab1();
-      IntVect& tab2_reel = MLOC.get_set_tab2();
-      //      DoubleVect& coeff_reel = MLOC.get_set_coeff();
+      const ArrOfTID& tab1_tot = mat.get_tab1();
+      const BigArrOfInt& tab2_tot = mat.get_tab2();
+      //      const BigDoubleVect& coeff_tot = mat.get_set_coeff();
+      ArrOfTID& tab1_reel = MLOC.get_set_tab1();
+      BigArrOfInt& tab2_reel = MLOC.get_set_tab2();
+      //      BigDoubleVect& coeff_reel = MLOC.get_set_coeff();
       tab1_reel(0)=1;
       for(ii=0; ii<n_reel; ii++)
         {
-          int dl = tab1_tot(ii);
-          int fl = tab1_tot(ii+1);
+          trustIdType dl = tab1_tot(ii);
+          trustIdType fl = tab1_tot(ii+1);
           for(jj=dl; jj<fl; jj++)
             {
               if(tab2_tot(jj-1)<=n_reel)
@@ -212,8 +214,8 @@ int ILU_SP::factorisation(const Matrice_Morse& mat, const DoubleVect& secmem)
       cpt=0;
       for(ii=0; ii<n_reel; ii++)
         {
-          int dl = tab1_tot(ii);
-          int fl = tab1_tot(ii+1);
+          trustIdType dl = tab1_tot(ii);
+          trustIdType fl = tab1_tot(ii+1);
           for(jj=dl; jj<fl; jj++)
             {
               if(tab2_tot(jj-1)<=n_reel)
@@ -226,21 +228,22 @@ int ILU_SP::factorisation(const Matrice_Morse& mat, const DoubleVect& secmem)
     }
   // copie des coeffs
   {
-    int ii,jj;
+    int ii;
+    trustIdType jj;
     int cpt=0;
     int n_reel = secmem.size();
 
-    const IntVect& tab1_tot = mat.get_tab1();
-    const IntVect& tab2_tot = mat.get_tab2();
-    const DoubleVect& coeff_tot = mat.get_coeff();
-    //    IntVect& tab1_reel = MLOC.get_set_tab1();
-    //    IntVect& tab2_reel = MLOC.get_set_tab2();
-    DoubleVect& coeff_reel = MLOC.get_set_coeff();
+    const ArrOfTID& tab1_tot = mat.get_tab1();
+    const BigArrOfInt& tab2_tot = mat.get_tab2();
+    const BigDoubleVect& coeff_tot = mat.get_coeff();
+    //    ArrOfTID& tab1_reel = MLOC.get_set_tab1();
+    //    BigArrOfInt& tab2_reel = MLOC.get_set_tab2();
+    BigDoubleVect& coeff_reel = MLOC.get_set_coeff();
 
     for(ii=0; ii<n_reel; ii++)
       {
-        int dl = tab1_tot(ii);
-        int fl = tab1_tot(ii+1);
+        trustIdType dl = tab1_tot(ii);
+        trustIdType fl = tab1_tot(ii+1);
         for(jj=dl; jj<fl; jj++)
           {
             if(tab2_tot(jj-1)<=n_reel)

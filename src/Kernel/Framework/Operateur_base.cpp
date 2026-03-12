@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -578,7 +578,7 @@ void Operateur_base::tester_contribuer_a_avec(const DoubleTab& inco, const Matri
 
   Matrice_Morse mat_contribuer(matrice), mat_DF(matrice);
   DoubleTrav resu(inco);
-  DoubleVect& coeff_contribuer = mat_contribuer.get_set_coeff();
+  auto& coeff_contribuer = mat_contribuer.get_set_coeff();
   // A*Inc(n)=Op(Inc(n))+
   coeff_contribuer = 0;
   calculer(inco, resu); // Calcule l'operateur Op(Inc(n)) avec methode ajouter dans resu
@@ -588,11 +588,12 @@ void Operateur_base::tester_contribuer_a_avec(const DoubleTab& inco, const Matri
   if (inco.dimension(1) == 1)
     {
       const double eps = 1e-6;
-      DoubleVect& coeff_DF = mat_DF.get_set_coeff();
-      const IntVect& tab1 = mat_DF.get_set_tab1(), &tab2 = mat_DF.get_set_tab2();
+      auto& coeff_DF = mat_DF.get_set_coeff();
+      const auto& tab1 = mat_DF.get_set_tab1();
+      const auto& tab2 = mat_DF.get_set_tab2();
       coeff_DF = 0;
       for (int i = 0; i < inco.dimension(0); i++)
-        for (int j = tab1[i] - 1; j < tab1[i + 1] - 1; j++)
+        for (auto j = tab1[i] - 1; j < tab1[i + 1] - 1; j++)
           {
             const int i2 = tab2[j] - 1;
 

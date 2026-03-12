@@ -81,18 +81,17 @@ void Op_Diff_DG_Elem::dimensionner(Matrice_Morse& la_matrice) const //TODO a rem
 
   la_matrice.dimensionner(size_inc, size_inc, 0);
 
-  IntVect& tab1 = la_matrice.get_set_tab1();
-  IntVect& tab2 = la_matrice.get_set_tab2();
-  DoubleVect& coeff = la_matrice.get_set_coeff();
+  auto& tab1 = la_matrice.get_set_tab1();
+  auto& tab2 = la_matrice.get_set_tab2();
+  auto& coeff = la_matrice.get_set_coeff();
   coeff = 0;
 
-  int nb_indices_line;
-  int row, col, indice;
+  int col, indice;
 
   tab1(0) = 1;
   for (int nelem = 0 ; nelem < nb_elem_tot ; nelem++)
     {
-      nb_indices_line = 0;
+      int nb_indices_line = 0;
       for (int k = 0 ; k < nb_stencil_max; k++)
         {
           if ( stencil_sorted(nelem,k) < 0 ) break;
@@ -106,8 +105,8 @@ void Op_Diff_DG_Elem::dimensionner(Matrice_Morse& la_matrice) const //TODO a rem
 
   for (int nelem = 0 ; nelem < nb_elem_tot ; nelem++)
     {
-      row = tab1[indices_glob_elem(nelem)]-1 ;
-      nb_indices_line = tab1[indices_glob_elem(nelem)+1] - tab1[indices_glob_elem(nelem)];
+      auto row = tab1[indices_glob_elem(nelem)]-1 ;
+      auto nb_indices_line = tab1[indices_glob_elem(nelem)+1] - tab1[indices_glob_elem(nelem)];
       indice = 0;
       for (int k = 0 ; k < nb_stencil_max; k++)
         {

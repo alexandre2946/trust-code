@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -221,8 +221,6 @@ void Op_EF_base::dimensionner(const Domaine_EF& le_dom,
       // abort();
     }
 
-  assert(mp_min_vect(la_matrice.get_tab2())>-1);
-
   if (matrice_stocke)
     {
       ref_cast_non_const(Matrice_Morse,matrice_sto_)=la_matrice;
@@ -256,8 +254,8 @@ void Op_EF_base::modifier_pour_Cl(const Domaine_EF& le_dom,
   // Nous commencons par calculer les tailles des tableaux tab1 et tab2.
   const Conds_lim& les_cl = le_dom_cl.les_conditions_limites();
 
-  const IntVect& tab1=la_matrice.get_tab1();
-  DoubleVect& coeff = la_matrice.get_set_coeff();
+  const auto& tab1 = la_matrice.get_tab1();
+  auto& coeff = la_matrice.get_set_coeff();
 
   // determination de la taille du champ inconnue.
   // Cerr << "dans modifier cl " << finl;
@@ -285,9 +283,9 @@ void Op_EF_base::modifier_pour_Cl(const Domaine_EF& le_dom,
                   for (int comp=0; comp<nb_comp; comp++)
                     {
                       int m=som*nb_comp+comp;
-                      int idiag = tab1[som*nb_comp+comp]-1;
-                      int nbvois = tab1[som*nb_comp+1+comp] - tab1[som*nb_comp+comp];
-                      for (int k=0; k < nbvois; k++)
+                      auto idiag = tab1[som*nb_comp+comp]-1;
+                      auto nbvois = tab1[som*nb_comp+1+comp] - tab1[som*nb_comp+comp];
+                      for (auto k=0; k < nbvois; k++)
                         coeff[idiag+k]=0;
                       la_matrice.coef(m,m)=1;
                       assert(la_matrice.coef(som*nb_comp+comp,som*nb_comp+comp)==1);
@@ -311,9 +309,9 @@ void Op_EF_base::modifier_pour_Cl(const Domaine_EF& le_dom,
                 for (int comp=0; comp<nb_comp; comp++)
                   {
                     int m=som*nb_comp+comp;
-                    int idiag = tab1[som*nb_comp+comp]-1;
-                    int nbvois = tab1[som*nb_comp+1+comp] - tab1[som*nb_comp+comp];
-                    for (int k=0; k < nbvois; k++)
+                    auto idiag = tab1[som*nb_comp+comp]-1;
+                    auto nbvois = tab1[som*nb_comp+1+comp] - tab1[som*nb_comp+comp];
+                    for (auto k=0; k < nbvois; k++)
                       coeff[idiag+k]=0;
                     la_matrice.coef(m,m)=1;
                     assert(la_matrice.coef(som*nb_comp+comp,som*nb_comp+comp)==1);

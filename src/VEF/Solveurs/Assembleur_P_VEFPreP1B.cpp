@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -1000,7 +1000,7 @@ void operation11(Matrice_Bloc& A00, Matrice_Bloc& A01, Matrice_Bloc& A11, double
       for (int j_bloc=0; j_bloc<A00.nb_bloc_colonnes(); j_bloc++)
         {
           Matrice_Morse& A00ij=ref_cast(Matrice_Morse, A00.get_bloc(i_bloc,j_bloc).valeur());
-          const int* tab1=A00ij.get_tab1().addr();
+          const auto* tab1=A00ij.get_tab1().addr();
           const int* tab2=A00ij.get_tab2().addr();
           const double* coeff=A00ij.get_coeff().addr();
           nb_lignes=A00ij.nb_lignes();
@@ -1008,7 +1008,7 @@ void operation11(Matrice_Bloc& A00, Matrice_Bloc& A01, Matrice_Bloc& A11, double
           for (int i=0; i<nb_lignes; i++)
             {
               int k1=ligne+i; // Element k1
-              for (int n=tab1[i]-1; n<tab1[i+1]-1; n++)
+              for (auto n=tab1[i]-1; n<tab1[i+1]-1; n++)
                 {
                   int k2=colonne+tab2[n]-1; // Element k2
                   if (k2>=k1)
@@ -1052,7 +1052,7 @@ void operation11(Matrice_Bloc& A00, Matrice_Bloc& A01, Matrice_Bloc& A11, double
       for (int j_bloc=0; j_bloc<A01.nb_bloc_colonnes(); j_bloc++)
         {
           Matrice_Morse& A01ij=ref_cast(Matrice_Morse, A01.get_bloc(i_bloc,j_bloc).valeur());
-          const int* tab1=A01ij.get_tab1().addr();
+          const auto* tab1=A01ij.get_tab1().addr();
           const int* tab2=A01ij.get_tab2().addr();
           const double* coeff=A01ij.get_coeff().addr();
           nb_lignes=A01ij.nb_lignes();
@@ -1060,7 +1060,7 @@ void operation11(Matrice_Bloc& A00, Matrice_Bloc& A01, Matrice_Bloc& A11, double
           for (int i=0; i<nb_lignes; i++)
             {
               int k=ligne+i; // Element k
-              for (int n=tab1[i]-1; n<tab1[i+1]-1; n++)
+              for (auto n=tab1[i]-1; n<tab1[i+1]-1; n++)
                 {
                   int s1 = dom.get_renum_som_perio(colonne+tab2[n]-1); // Sommet s1
                   double prod = -beta * coeff[n];        // Calcul de -beta*Aks
@@ -1099,7 +1099,7 @@ void operation01(Matrice_Bloc& A00, Matrice_Bloc& A01, double alpha, double beta
       for (int j_bloc=0; j_bloc<A00.nb_bloc_colonnes(); j_bloc++)
         {
           Matrice_Morse& A00ij=ref_cast(Matrice_Morse, A00.get_bloc(i_bloc,j_bloc).valeur());
-          const int* tab1=A00ij.get_tab1().addr();
+          const auto* tab1=A00ij.get_tab1().addr();
           const int* tab2=A00ij.get_tab2().addr();
           const double* coeff=A00ij.get_coeff().addr();
           nb_lignes=A00ij.nb_lignes();
@@ -1108,7 +1108,7 @@ void operation01(Matrice_Bloc& A00, Matrice_Bloc& A01, double alpha, double beta
           for (int i=0; i<nb_lignes; i++)
             {
               int k1=ligne+i; // Element k1
-              for (int n=tab1[i]-1; n<tab1[i+1]-1; n++)
+              for (auto n=tab1[i]-1; n<tab1[i+1]-1; n++)
                 {
                   int k2=colonne+tab2[n]-1; // Element k2
                   if (k2>=k1)

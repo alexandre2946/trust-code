@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -959,7 +959,7 @@ calculer_laplacien_som(const DoubleTab& nu_som) const
   testl|=sub_type(Champ_Fonc_base,diffu);
   is_laplacian_filled_=testl;
 
-  DoubleVect& coeff=laplacien_p1_.get_set_coeff();
+  auto& coeff = laplacien_p1_.get_set_coeff();
 
   const DoubleTab& inconnue1=equation().inconnue().valeurs();
   const DoubleVect& porosite_face=equation().milieu().porosite_face();
@@ -1609,8 +1609,8 @@ coeff_matrice_som(const int face,IntVect& liste_som,
 {
   const Domaine_VEF& domaine_VEF=domaine_vef();
 
-  const ArrOfInt& tab1=matrice.get_tab1();
-  const ArrOfInt& tab2=matrice.get_tab2();
+  const auto& tab1=matrice.get_tab1();
+  const auto& tab2=matrice.get_tab2();
 
   const DoubleVect& volume_aux_sommets=domaine_VEF.volume_aux_sommets();
 
@@ -1620,7 +1620,6 @@ coeff_matrice_som(const int face,IntVect& liste_som,
   int face2=0,face2_C=0;
   int som_loc=0,som=0;
   int som_loc0=0,som_loc1=0;
-  int debut=0,size=0;
   int compi=0,compj=0;
   int elem0=0,elem1=0;
   int i=0;
@@ -1682,8 +1681,8 @@ coeff_matrice_som(const int face,IntVect& liste_som,
   /* produit scalaire une seule fois avant de l'affecter aux differentes */
   /* composantes de la matrice */
   face_C=face*dim_ch_;
-  debut=tab1[face_C]-1;
-  size=tab1[face_C+1]-tab1[face_C];
+  auto debut=tab1[face_C]-1;
+  auto size=tab1[face_C+1]-tab1[face_C];
 
   for (i=1; i<size; i++) //i=0 -> face2_C=face_C -> deja rempli
     {
@@ -1746,8 +1745,8 @@ coeff_matrice_som_CL(const int face,IntVect& liste_som,
 {
   const Domaine_VEF& domaine_VEF=domaine_vef();
 
-  const ArrOfInt& tab1=matrice.get_tab1();
-  const ArrOfInt& tab2=matrice.get_tab2();
+  const auto& tab1=matrice.get_tab1();
+  const auto& tab2=matrice.get_tab2();
 
   const DoubleVect& volume_aux_sommets=domaine_VEF.volume_aux_sommets();
 
@@ -1757,7 +1756,6 @@ coeff_matrice_som_CL(const int face,IntVect& liste_som,
   int face2=0,face2_C=0;
   int som_loc=0,som=0;
   int som_loc0=0,som_loc1=0;
-  int debut=0,size=0;
   int compi=0,compj=0;
   int elem0=0,elem1=0;
   int i=0;
@@ -1819,8 +1817,8 @@ coeff_matrice_som_CL(const int face,IntVect& liste_som,
   /* produit scalaire une seule fois avant de l'affecter aux differentes */
   /* composantes de la matrice */
   face_C=face*dim_ch_;
-  debut=tab1[face_C]-1;
-  size=tab1[face_C+1]-tab1[face_C];
+  auto debut=tab1[face_C]-1;
+  auto size=tab1[face_C+1]-tab1[face_C];
 
   for (i=1; i<size; i++) //i=0 -> face2_C=face_C -> deja rempli
     {
@@ -1883,8 +1881,8 @@ coeff_matrice_som_symetrie(const int face,IntVect& liste_som,
 {
   const Domaine_VEF& domaine_VEF=domaine_vef();
 
-  const ArrOfInt& tab1=matrice.get_tab1();
-  const ArrOfInt& tab2=matrice.get_tab2();
+  const auto& tab1=matrice.get_tab1();
+  const auto& tab2=matrice.get_tab2();
 
   const DoubleVect& volume_aux_sommets=domaine_VEF.volume_aux_sommets();
 
@@ -1894,7 +1892,6 @@ coeff_matrice_som_symetrie(const int face,IntVect& liste_som,
   int face2=0,face2_C=0;
   int som_loc=0,som=0;
   int som_loc0=0,som_loc1=0;
-  int debut=0,size=0;
   int compi=0,compj=0;
   int elem0=0,elem1=0;
   int i=0;
@@ -1959,8 +1956,8 @@ coeff_matrice_som_symetrie(const int face,IntVect& liste_som,
   /* symetrie, mais on ne calcule pas les modifications associees -> */
   /* c'est la fonction Op_VEF_Face::modifier_pour_Cl() qui le fera */
   face_C=face*dim_ch_;
-  debut=tab1[face_C]-1;
-  size=tab1[face_C+1]-tab1[face_C];
+  auto debut=tab1[face_C]-1;
+  auto size=tab1[face_C+1]-tab1[face_C];
   size-=(dim_ch_-1);//-> pour ne pas calculer les coefficients inutiles
 
   for (i=1; i<size; i++) //i=0 -> face2_C=face_C -> deja rempli
@@ -2024,8 +2021,8 @@ coeff_matrice_som_perio(const int face,const int faceAss, IntVect& liste_som,
 {
   const Domaine_VEF& domaine_VEF=domaine_vef();
 
-  const ArrOfInt& tab1=matrice.get_tab1();
-  const ArrOfInt& tab2=matrice.get_tab2();
+  const auto& tab1=matrice.get_tab1();
+  const auto& tab2=matrice.get_tab2();
 
   const DoubleVect& volume_aux_sommets=domaine_VEF.volume_aux_sommets();
 
@@ -2035,7 +2032,6 @@ coeff_matrice_som_perio(const int face,const int faceAss, IntVect& liste_som,
   int face2=0,face2_C=0;
   int som_loc=0,som=0;
   int som_loc0=0,som_loc1=0;
-  int debut=0,size=0;
   int compi=0,compj=0;
   int elem0=0,elem1=0;
   int i=0;
@@ -2097,8 +2093,8 @@ coeff_matrice_som_perio(const int face,const int faceAss, IntVect& liste_som,
   /* produit scalaire une seule fois avant de l'affecter aux differentes */
   /* composantes de la matrice */
   face_C=face*dim_ch_;
-  debut=tab1[face_C]-1;
-  size=tab1[face_C+1]-tab1[face_C];
+  auto debut=tab1[face_C]-1;
+  auto size=tab1[face_C+1]-tab1[face_C];
 
   for (i=1; i<size; i++) //i=0 -> face2_C=face_C -> deja rempli
     {
@@ -2996,14 +2992,14 @@ void Op_Diff_VEFP1NCP1B_Face::dimensionner(Matrice_Morse& matrice) const
 
   int face=0;
   int i=0,size=0;
-  int comp=0,nnz=0,debut=0,face_f77=0,face_C=0;
+  int comp=0,nnz=0,face_f77=0,face_C=0;
   int nb_faces_of_symetry=0;
   int next=0;
 
   ArrOfBit is_symetry(nb_faces_tot);
 
-  IntVect& tab1 = matrice.get_set_tab1();
-  IntVect& tab2 = matrice.get_set_tab2();
+  auto& tab1 = matrice.get_set_tab1();
+  auto& tab2 = matrice.get_set_tab2();
 
   IntLists faces_faces;
 
@@ -3070,7 +3066,7 @@ void Op_Diff_VEFP1NCP1B_Face::dimensionner(Matrice_Morse& matrice) const
 
           for (comp=0; comp<nb_comp; comp++)
             {
-              debut=tab1[face*nb_comp+comp]-1;
+              auto debut=tab1[face*nb_comp+comp]-1;
 
               for (i=0; i<size; i++)
                 {
@@ -3090,7 +3086,7 @@ void Op_Diff_VEFP1NCP1B_Face::dimensionner(Matrice_Morse& matrice) const
 
             for (comp=0; comp<nb_comp; comp++)
               {
-                debut=tab1[face*nb_comp+comp]-1;
+                auto debut=tab1[face*nb_comp+comp]-1;
                 debut+=size;
                 for (int voi=0; voi<size; voi++)
                   {

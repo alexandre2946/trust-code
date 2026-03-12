@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -58,7 +58,13 @@ protected:
   DoubleTab les_coeff_pression;
 
   int has_P_ref = 0, stencil_done = 0;
-  IntVect tab1, tab2; //tableaux tab1 / tab2 de la Matrice_Morse (ne changent pas)
+#ifdef TRUST_USE_GPU
+  ArrOfTID tab1; //tableau tab1 de la Matrice_Morse (ne change pas)
+  BigArrOfInt tab2; //tableau tab2 de la Matrice_Morse (ne change pas)
+#else
+  IntVect tab1; //tableau tab1 de la Matrice_Morse (ne change pas)
+  IntVect tab2; //tableau tab2 de la Matrice_Morse (ne change pas)
+#endif
   Matrice_Morse rec; //pour reconstruire les vitesses
 };
 

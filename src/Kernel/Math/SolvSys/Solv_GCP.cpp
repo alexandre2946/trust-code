@@ -144,8 +144,8 @@ void Solv_GCP::prepare_data(const Matrice_Base& matrice, const DoubleVect& secme
         for (i = sz; i < sztot_source; i++)
           renum_[i] = -1;
         renum_.set_md_vector(secmem.get_md_vector());
-        const ArrOfInt& tab2 = mat_virt.get_tab2();
-        const int n = tab2.size_array();
+        const auto& tab2 = mat_virt.get_tab2();
+        const auto n = tab2.size_array();
         for (i = 0; i < n; i++)
           {
             // Attention: tab2 de la partie reele-virtuelle contient des indices
@@ -175,8 +175,9 @@ void Solv_GCP::prepare_data(const Matrice_Base& matrice, const DoubleVect& secme
       mem_size += sz * (int)sizeof(double) * 3; // vecteurs sans espace virtuel
       const int nb_lignes_mat = sz;
       // matrice reel/reel
-      mem_size += (sz + 1) * (int)sizeof(int); // pour tab1_
-      int nnz_reel_reel = 0;
+      auto nnz_reel_reel(mat.get_tab1()(0));
+      nnz_reel_reel = 0;
+      mem_size += (sz + 1) * (int)sizeof(nnz_reel_reel); // pour tab1_
       assert(mat.get_tab1().size_array() == sz + 1);
       assert(mat.get_tab2().size_array() == mat.get_coeff().size_array());
       if (! precond_diag_)
@@ -188,14 +189,14 @@ void Solv_GCP::prepare_data(const Matrice_Base& matrice, const DoubleVect& secme
           // On ne stocke pas les coefficients diagonaux:
           nnz_reel_reel = mat.get_coeff().size_array() - sz;
         }
-      mem_size += nnz_reel_reel * (int)sizeof(double); // pour les coefficients
-      mem_size += nnz_reel_reel * (int)sizeof(int); // pour les indices
+      mem_size += (int)(nnz_reel_reel * (int)sizeof(double)); // pour les coefficients
+      mem_size += (int)(nnz_reel_reel * (int)sizeof(int)); // pour les indices
       // matrice reel/virtuel
-      mem_size += (nb_lignes_mat_virt+1) * (int)sizeof(int); // pour tab1_
-      const int nnz_reel_virtuel = mat_virt.get_coeff().size_array();
+      mem_size += (nb_lignes_mat_virt+1) * (int)sizeof(nnz_reel_reel); // pour tab1_
+      const auto nnz_reel_virtuel = mat_virt.get_coeff().size_array();
       assert(mat_virt.get_tab2().size_array() == nnz_reel_virtuel);
-      mem_size += nnz_reel_virtuel * (int)sizeof(double); // pour les coefficients
-      mem_size += nnz_reel_virtuel * (int)sizeof(int); // pour les indices
+      mem_size += (int)(nnz_reel_virtuel * (int)sizeof(double)); // pour les coefficients
+      mem_size += (int)(nnz_reel_virtuel * (int)sizeof(int)); // pour les indices
       // taille de tmp_mat_virt_.lignes_non_vides_
       mem_size += nb_lignes_mat_virt * (int)sizeof(int);
       // aligner la taille sur un multiple de 8
@@ -227,16 +228,19 @@ void Solv_GCP::prepare_data(const Matrice_Base& matrice, const DoubleVect& secme
       tmp_mat_virt_.get_set_coeff().ref_data(ptr, nnz_reel_virtuel);
       ptr += nnz_reel_virtuel;
       // On a fini les double, on passe aux tableaux d'entiers:
-      int * iptr = (int*)ptr;
-      tmp_mat_.get_set_tab1().ref_data(iptr, nb_lignes_mat + 1);
-      iptr += nb_lignes_mat + 1;
-      tmp_mat_.get_set_tab2().ref_data(iptr, nnz_reel_reel);
+      // tab1_ stores trustIdType values, tab2_ stores int values
+      using tab1_ptr_t = decltype(tmp_mat_.get_set_tab1().addr());
+      auto * tidptr = static_cast<tab1_ptr_t>(static_cast<void*>(ptr));
+      tmp_mat_.get_set_tab1().ref_data(tidptr, nb_lignes_mat + 1);
+      tidptr += nb_lignes_mat + 1;
+      tmp_mat_virt_.get_set_tab1().ref_data(tidptr, nb_lignes_mat_virt + 1);
+      tidptr += nb_lignes_mat_virt + 1;
+      int * iptr = (int*)tidptr;
+      tmp_mat_.get_set_tab2().ref_data(iptr, (int)nnz_reel_reel);
       iptr += nnz_reel_reel;
       tmp_mat_virt_.lignes_non_vides_.ref_data(iptr, nb_lignes_mat_virt);
       iptr += nb_lignes_mat_virt;
-      tmp_mat_virt_.get_set_tab1().ref_data(iptr, nb_lignes_mat_virt + 1);
-      iptr += nb_lignes_mat_virt + 1;
-      tmp_mat_virt_.get_set_tab2().ref_data(iptr, nnz_reel_virtuel);
+      tmp_mat_virt_.get_set_tab2().ref_data(iptr, (int)nnz_reel_virtuel);
       iptr += nnz_reel_virtuel;
       // Allocation terminee.
       assert(((char*)iptr) <= ((char*)tmp_data_block_.addr() + mem_size));
@@ -247,7 +251,7 @@ void Solv_GCP::prepare_data(const Matrice_Base& matrice, const DoubleVect& secme
           tmp_mat_.get_set_tab1().inject_array(mat.get_tab1());
           {
             // remplissage de tab2 (renumerotation eventuelle)
-            for (int i = 0; i < nnz_reel_reel; i++)
+            for (auto i = 0; i < nnz_reel_reel; i++)
               {
                 int j = mat.get_tab2()(i)-1; // fortran->c
                 int rj = renum_[j];
@@ -263,15 +267,15 @@ void Solv_GCP::prepare_data(const Matrice_Base& matrice, const DoubleVect& secme
           // on ne stocke pas les coeffs diagonaux
           // Le remplissage de tab1_ n'est pas trivial, du coup:
           {
-            int src_index = 0; // index dans mat.tab2_ et coeff_
-            int dest_index = 0; // index dans tmp_mat_.tab2_ et coeff_
+            auto src_index = 0; // index dans mat.tab2_ et coeff_
+            auto dest_index = 0; // index dans tmp_mat_.tab2_ et coeff_
             int i_ligne;
             for (i_ligne = 0; i_ligne < nb_lignes_mat; i_ligne++)
               {
                 // A chaque ligne on a un coefficient de moins que dans la matrice d'origine
                 // (on ne met pas le coeff diagonal)
                 tmp_mat_.get_set_tab1()(i_ligne) = dest_index + 1; // indice fortran du debut de ligne
-                const int ncoeff = mat.get_tab1()(i_ligne+1) - mat.get_tab1()(i_ligne) - 1;
+                const int ncoeff = (int)(mat.get_tab1()(i_ligne+1) - mat.get_tab1()(i_ligne) - 1);
                 // Ne pas inserer le coeff diagonal
                 assert(mat.get_tab2()(src_index) == i_ligne + 1); // index fortran
                 src_index++;
@@ -292,13 +296,13 @@ void Solv_GCP::prepare_data(const Matrice_Base& matrice, const DoubleVect& secme
         int dest_index = 0;
         for (int i_ligne = 0; i_ligne < nb_lignes_mat; i_ligne++)
           {
-            const int count = mat_virt.get_tab1()(i_ligne+1) - mat_virt.get_tab1()(i_ligne);
+            const int count = (int)(mat_virt.get_tab1()(i_ligne+1) - mat_virt.get_tab1()(i_ligne));
             if (count > 0)
               {
                 tmp_mat_virt_.lignes_non_vides_[i_ligne_dest] = i_ligne + 1; // indice fortran
                 tmp_mat_virt_.get_set_tab1()[i_ligne_dest] = dest_index + 1; // index fortran
                 i_ligne_dest++;
-                int src_index = mat_virt.get_tab1()(i_ligne) - 1; // fortran->c
+                auto src_index = mat_virt.get_tab1()(i_ligne) - 1; // fortran->c
                 for (int i = 0; i < count; i++, src_index++, dest_index++)
                   {
                     // mat_virt contient des indices fortran relatifs au debut de la partie virtuelle,
@@ -324,8 +328,8 @@ void Solv_GCP::prepare_data(const Matrice_Base& matrice, const DoubleVect& secme
       const Matrice_Morse& mat_virt = ref_cast(Matrice_Morse, mat_bloc.get_bloc(0,1).valeur());
       if (!precond_diag_)
         {
-          tmp_mat_.get_set_coeff().inject_array(mat.get_coeff());
-          tmp_mat_virt_.get_set_coeff().inject_array(mat_virt.get_coeff());
+          tmp_mat_.get_set_coeff() = mat.get_coeff();
+          tmp_mat_virt_.get_set_coeff() = mat_virt.get_coeff();
         }
       else
         {
@@ -403,12 +407,12 @@ int Solv_GCP::resoudre_(const Matrice_Base& matrice,
 {
   const int n_items_reels = solution.size_reelle_ok() ? solution.size_reelle() : solution.size_totale();
   {
-    const trustIdType nb_items_seq = solution.get_md_vector()->nb_items_seq_tot();
+    const auto nb_items_seq = solution.get_md_vector()->nb_items_seq_tot();
     const int ls = secmem.line_size();
-    const trustIdType nb_inco_tot = nb_items_seq * ls;
-    trustIdType nmax0 = std::max(nb_inco_tot, (trustIdType)nmax);
-    trustIdType nmaxmax = 10000000;
-    nmax = static_cast<int>(std::min(nmax0, nmaxmax));
+    const auto nb_inco_tot = nb_items_seq * ls;
+    auto nmax0 = std::max(nb_inco_tot, (trustIdType)nmax);
+    auto nmaxmax = 10000000;
+    nmax = static_cast<int>(std::min<trustIdType>(nmax0, nmaxmax));
   }
 
   const int avec_precond = le_precond_.non_nul();

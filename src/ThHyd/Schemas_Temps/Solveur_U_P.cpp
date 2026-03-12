@@ -134,8 +134,9 @@ void Solveur_U_P::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pre
       if (!has_P_ref && !Process::me()) mat_diag.coeff(0, 0) = 1; //revient a imposer P(0) = 0
 
       //en PolyMAC_CDO, on doit ajouter des lignes vides a grad et des colonnes vides a div
-      int n = matrice.get_tab1().size(), i;
-      for (i = mat_grad.get_tab1().size(), mat_grad.get_set_tab1().resize(n); i < n; i++)
+      int n = matrice.get_tab1().size_array();
+      mat_grad.get_set_tab1().resize(n);
+      for (int i = mat_grad.get_tab1().size_array(); i < n; i++)
         mat_grad.get_set_tab1()(i) = mat_grad.get_tab1()(i - 1);
       mat_div.set_nb_columns(n - 1);
 

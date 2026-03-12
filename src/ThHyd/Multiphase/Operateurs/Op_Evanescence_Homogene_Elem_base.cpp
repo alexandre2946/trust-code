@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -44,7 +44,7 @@ void Op_Evanescence_Homogene_Elem_base::dimensionner_blocs(matrices_t matrices, 
   const DoubleTab& inco = equation().inconnue().valeurs();
 
   /* on doit pouvoir ajouter / soustraire les equations entre composantes */
-  int i, j, e, n, N = inco.line_size();
+  int i, e, n, N = inco.line_size();
   if (N == 1) return; //pas d'evanescence en simple phase!
   for (auto &&n_m : matrices)
     if (n_m.second->nb_colonnes())
@@ -57,7 +57,7 @@ void Op_Evanescence_Homogene_Elem_base::dimensionner_blocs(matrices_t matrices, 
         for (e = 0; e < domaine.nb_elem(); e++, idx.clear())
           {
             for (i = N * e, n = 0; n < N; n++, i++)
-              for (j = mat.get_tab1()(i) - 1; j < mat.get_tab1()(i + 1) - 1; j++)
+              for (auto j = mat.get_tab1()(i) - 1; j < mat.get_tab1()(i + 1) - 1; j++)
                 idx.insert(mat.get_tab2()(j) - 1);
             for (i = N * e, n = 0; n < N; n++, i++)
               for (auto &&c : idx) sten.append_line(i, c);
@@ -78,8 +78,8 @@ void Op_Evanescence_Homogene_Elem_base::ajouter_blocs(matrices_t matrices, Doubl
   const SETS *sch = sub_type(Schema_Implicite_base, pb.equation_qdm().schema_temps()) && sub_type(SETS, ref_cast(Schema_Implicite_base, pb.equation_qdm().schema_temps()).solveur().valeur())
                     ? &ref_cast(SETS, ref_cast(Schema_Implicite_base, pb.equation_qdm().schema_temps()).solveur().valeur()) : nullptr;
 
-  int e, i, j, k, n, N = inco.line_size(), m, M = p.line_size(), is_m = ch.le_nom() == "alpha", cR = (rho.dimension_tot(0) == 1),
-                     iter = sch ? sch->iteration_ : 0, p_degen = is_m && sch ? sch->p_degen_ : 0;
+  int e, k, n, N = inco.line_size(), m, M = p.line_size(), is_m = ch.le_nom() == "alpha", cR = (rho.dimension_tot(0) == 1),
+               iter = sch ? sch->iteration_ : 0, p_degen = is_m && sch ? sch->p_degen_ : 0;
   if (N == 1 || p_degen || (is_m && !iter)) return; //pas d'evanescence en simple phase ou si p est degenere
 
   double a_eps = alpha_res_, a_eps_min = alpha_res_min_, a_m, a_max; //seuil de declenchement du traitement de l'evanescence
@@ -114,6 +114,8 @@ void Op_Evanescence_Homogene_Elem_base::ajouter_blocs(matrices_t matrices, Doubl
       {
         int diag = (n_m.first == ch.le_nom().getString()), press = (n_m.first == "pression"); //est-on sur le bloc diagonal, sur le bloc pression?
         Matrice_Morse& mat = *n_m.second;
+        auto i(mat.get_tab1()(0));
+        auto j(i);
         for (e = 0; e < domaine.nb_elem(); e++)
           for (n = 0, m = 0; n < N; n++, m += (M > 1))
             if (coeff(e, n, 0))

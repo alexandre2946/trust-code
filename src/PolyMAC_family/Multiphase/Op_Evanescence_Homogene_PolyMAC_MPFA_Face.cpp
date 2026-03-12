@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -39,13 +39,12 @@ void Op_Evanescence_Homogene_PolyMAC_MPFA_Face::dimensionner_blocs_aux(std::set<
   const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis());
   const Champ_Face_base& ch = ref_cast(Champ_Face_base, equation().inconnue());
   const int nf_tot = domaine.nb_faces_tot(), D = dimension, N = ch.valeurs().line_size() ;
-  int i, j, l, e, d, n;
-
+  int i, l, e, d, n;
   for (e = 0, l = nf_tot; e < domaine.nb_elem_tot(); e++)
     for (d = 0; d < D; d++, l++, idx.clear())
       {
         for (i = N * l, n = 0; n < N; n++, i++)
-          for (j = mat.get_tab1()(i) - 1; j < mat.get_tab1()(i + 1) - 1; j++)
+          for (auto j = mat.get_tab1()(i) - 1; j < mat.get_tab1()(i + 1) - 1; j++)
             idx.insert(mat.get_tab2()(j) - 1);
         for (i = N * l, n = 0; n < N; n++, i++)
           for (auto &&c : idx)
@@ -70,7 +69,7 @@ void Op_Evanescence_Homogene_PolyMAC_MPFA_Face::ajouter_blocs_aux(IntTrav& maj, 
                          *gravity = (equation().probleme().has_champ("gravite")) ? &equation().probleme().get_champ("gravite").valeurs() : nullptr ;
 
   const DoubleVect& dh_e = milc.diametre_hydraulique_elem();
-  int e, i, j, k, l, n, m, N = inco.line_size(), Nk = (k_turb) ? (*k_turb).line_size() : 0, d, D = dimension, nf_tot = domaine.nb_faces_tot(), cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1), Np = press.line_size();
+  int e, k, l, n, m, N = inco.line_size(), Nk = (k_turb) ? (*k_turb).line_size() : 0, D = dimension, nf_tot = domaine.nb_faces_tot(), cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1), Np = press.line_size();
   double a_eps = alpha_res_, a_eps_min = alpha_res_min_, a_m, a_max; //seuil de declenchement du traitement de l'evanescence
   Matrice_Morse& mat_diag = *matrices.at(ch.le_nom().getString());
 
@@ -108,14 +107,13 @@ void Op_Evanescence_Homogene_PolyMAC_MPFA_Face::ajouter_blocs_aux(IntTrav& maj, 
           ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, equation().operateur(0).l_op_base()).correlation_viscosite_turbulente())).eddy_viscosity(nut); //remplissage par la correlation
         }
     }
-
   for (e = 0; e < domaine.nb_elem_tot(); e++) /* elements : a faire D fois par element */
     {
       /* phase majoritaire : directement dans l'element */
       for (a_max = 0, k = -1, n = 0; n < N; n++)
         if ((a_m = alpha(e, n)) > a_max) k = n, a_max = a_m;
       if (k >= 0)
-        for (i = nf_tot + D * e, d = 0; d < D; d++, i++) maj(i) = k;
+        for (int i = nf_tot + D * e, d = 0; d < D; d++, i++) maj(i) = k;
       else abort();
 
       /* calcul de la vitesse de derive */
@@ -128,7 +126,7 @@ void Op_Evanescence_Homogene_PolyMAC_MPFA_Face::ajouter_blocs_aux(IntTrav& maj, 
               in.rho(n) = rho(!cR * e, n);
               in.mu(n) = mu(!cM * e, n);
               in.d_bulles(n) = (d_bulles) ? (*d_bulles)(e, n) : -1. ;
-              for (d = 0; d < D; d++) in.v(d, n) = inco(nf_tot + D * e + d, n);
+              for (int d = 0; d < D; d++) in.v(d, n) = inco(nf_tot + D * e + d, n);
               for (m = n+1; m < N; m++)
                 if (milc.has_interface(n, m))
                   {
@@ -138,18 +136,19 @@ void Op_Evanescence_Homogene_PolyMAC_MPFA_Face::ajouter_blocs_aux(IntTrav& maj, 
                   }
             }
           for (n = 0; n < Nk; n++) in.k(n) = (k_turb) ? (*k_turb)(e, n) : -1., in.nut(n) = (is_turb) ? nut(e, n) : -1. ;
-          for (d = 0; d < D; d++) in.g(d) = (*gravity)(e,d);
+          for (int d = 0; d < D; d++) in.g(d) = (*gravity)(e,d);
           if (correlation_vd->needs_grad_alpha())
             for (n = 0; n < N; n++)
-              for (d = 0; d < D; d++) in.gradAlpha(d, n) = gradAlpha(e, d, n);
+              for (int d = 0; d < D; d++) in.gradAlpha(d, n) = gradAlpha(e, d, n);
           if (correlation_vd->needs_vort())
             for (n = 0; n < N; n++)
-              for (d = 0; d < D; d++) in.vort(d, n) = vort(e, d, n);
+              for (int d = 0; d < D; d++) in.vort(d, n) = vort(e, d, n);
 
           correlation_vd->vitesse_relative(in, out);
         }
 
       /* coeff d'evanescence */
+      int i,d;
       for (i = nf_tot + D * e, d = 0; d < D; d++, i++)
         for (n = 0; n < N; n++)
           if (n != k && (a_m = alpha(e, n)) < a_eps)
@@ -162,25 +161,38 @@ void Op_Evanescence_Homogene_PolyMAC_MPFA_Face::ajouter_blocs_aux(IntTrav& maj, 
     }
 
   /* lignes de matrices */
-  for (auto &&n_m : matrices)
+  for (auto &&n_m: matrices)
     if (n_m.second->nb_colonnes())
       {
         int diag = (n_m.first == ch.le_nom().getString()); //est-on sur le bloc diagonal?
         Matrice_Morse& mat = *n_m.second;
+        auto type(mat.get_tab1()(0));
         for (e = 0, l = nf_tot; e < domaine.nb_elem_tot(); e++) /* elements : l est l'indice de ligne */
-          for (d = 0; d < D; d++, l++)
+          for (int d = 0; d < D; d++, l++)
             for (n = 0; n < N; n++)
               if (coeff(l, n, 0))
-                for (k = maj(l), i = mat.get_tab1()(N * l + n) - 1, j = mat.get_tab1()(N * l + k) - 1; i < mat.get_tab1()(N * l + n + 1) - 1; i++, j++)
-                  {
-                    assert(mat.get_tab2()(i) == mat.get_tab2()(j));
-                    int c = diag * mat.get_tab2()(i) - 1; //indice de colonne (commun aux deux lignes grace au dimensionner_blocs())
-                    mat.get_set_coeff()(j) += coeff(l, n, 0) * mat.get_set_coeff()(i) - coeff(l, n, 1) * ((c == N * l + n) - (c == N * l + k));
-                    mat.get_set_coeff()(i) += -coeff(l, n, 0) * mat.get_set_coeff()(i) + coeff(l, n, 1) * ((c == N * l + n) - (c == N * l + k));
+                {
+                  auto i(type);
+                  auto j(type);
+                  for (k = maj(l), i = mat.get_tab1()(N * l + n) - 1, j = mat.get_tab1()(N * l + k) - 1;
+                       i < mat.get_tab1()(N * l + n + 1) - 1; i++, j++)
+                    {
+                      assert(mat.get_tab2()(i) == mat.get_tab2()(j));
+                      int c = diag * mat.get_tab2()(i) -
+                              1; //indice de colonne (commun aux deux lignes grace au dimensionner_blocs())
+                      mat.get_set_coeff()(j) += coeff(l, n, 0) * mat.get_set_coeff()(i) -
+                                                coeff(l, n, 1) * ((c == N * l + n) - (c == N * l + k));
+                      mat.get_set_coeff()(i) += -coeff(l, n, 0) * mat.get_set_coeff()(i) +
+                                                coeff(l, n, 1) * ((c == N * l + n) - (c == N * l + k));
 
-                    mat.get_set_coeff()(j) +=  - coeff(l, n, 1) * ( - dvr_elem(D*e+d, n, k, n)*(c == N * l + n) - dvr_elem(D*e+d, n, k, k)*(c == N * l + k));
-                    mat.get_set_coeff()(i) +=  + coeff(l, n, 1) * ( - dvr_elem(D*e+d, n, k, n)*(c == N * l + n) - dvr_elem(D*e+d, n, k, k)*(c == N * l + k));
-                  }
+                      mat.get_set_coeff()(j) += -coeff(l, n, 1) *
+                                                (-dvr_elem(D * e + d, n, k, n) * (c == N * l + n) -
+                                                 dvr_elem(D * e + d, n, k, k) * (c == N * l + k));
+                      mat.get_set_coeff()(i) += +coeff(l, n, 1) *
+                                                (-dvr_elem(D * e + d, n, k, n) * (c == N * l + n) -
+                                                 dvr_elem(D * e + d, n, k, k) * (c == N * l + k));
+                    }
+                }
       }
 }
 

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -680,7 +680,7 @@ void disp_m(const Matrice_Base& M_in)
   Matrix_tools::convert_to_morse_matrix(M_in, M);
   DoubleTab A(M.nb_lignes(), M.nb_colonnes());
   for (int i = 0; i < A.dimension(0); i++)
-    for (int k = M.get_tab1().addr()[i] - 1; k < M.get_tab1().addr()[i + 1] - 1; k++)
+    for (auto k = M.get_tab1().addr()[i] - 1; k < M.get_tab1().addr()[i + 1] - 1; k++)
       A(i, M.get_tab2().addr()[k] - 1) = M.get_coeff().addr()[k];
   disp_dt(A);
 }

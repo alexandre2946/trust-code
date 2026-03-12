@@ -2048,8 +2048,8 @@ void Champ_P1NC_implementation::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice
   int n1 = nb_colonnes_tot();
   int n2 = nb_colonnes();
   int iligne;
-  const IntVect& tab1=la_matrice.get_tab1();
-  const IntVect& tab2=la_matrice.get_tab2();
+  const auto& tab1 = la_matrice.get_tab1();
+  const auto& tab2 = la_matrice.get_tab2();
 
   matrice_tmp.typer("Matrice_Bloc");
   Matrice_Bloc& matrice=ref_cast(Matrice_Bloc,matrice_tmp.valeur());
@@ -2062,10 +2062,10 @@ void Champ_P1NC_implementation::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice
   MBrr.dimensionner(n2,0);
   MBrv.dimensionner(n2,0);
 
-  IntVect& tab1RR=MBrr.get_set_tab1();
-  IntVect& tab2RR=MBrr.get_set_tab2();
-  IntVect& tab1RV=MBrv.get_set_tab1();
-  IntVect& tab2RV=MBrv.get_set_tab2();
+  auto& tab1RR = MBrr.get_set_tab1();
+  auto& tab2RR = MBrr.get_set_tab2();
+  auto& tab1RV = MBrv.get_set_tab1();
+  auto& tab2RV = MBrv.get_set_tab2();
 
   IntVect compteur_MBrr(n2);
   IntVect compteur_MBrv(n2);
@@ -2077,8 +2077,7 @@ void Champ_P1NC_implementation::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice
   int jcolonne;
   for (iligne=0; iligne<n2; iligne++)
     {
-      int k;
-      for ( k=tab1(iligne)-1; k<tab1(iligne+1)-1; k++)
+      for (auto k=tab1(iligne)-1; k<tab1(iligne+1)-1; k++)
         {
           jcolonne = tab2(k)-1;
           if (jcolonne < n2)
@@ -2112,13 +2111,11 @@ void Champ_P1NC_implementation::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice
   MBrv.dimensionner(n2,n1-n2,tab1RV(n2)-1);
 
   // On remplit tab2RR et tab2RV
-  int compteurRR,compteurRV;
   for (iligne=0; iligne<n2; iligne++)
     {
-      int k;
-      compteurRR = tab1RR(iligne)-1;
-      compteurRV = tab1RV(iligne)-1;
-      for ( k=tab1(iligne)-1; k<tab1(iligne+1)-1; k++)
+      auto compteurRR = tab1RR(iligne)-1;
+      auto compteurRV = tab1RV(iligne)-1;
+      for (auto k=tab1(iligne)-1; k<tab1(iligne+1)-1; k++)
         {
           jcolonne = tab2(k)-1;
           if (jcolonne < n2)
@@ -2154,28 +2151,27 @@ void Champ_P1NC_implementation::Mat_Morse_to_Mat_Bloc(Matrice& matrice_tmp)
   Matrice_Morse& MBrr =  ref_cast(Matrice_Morse,matrice.get_bloc(0,0).valeur());
   Matrice_Morse& MBrv =  ref_cast(Matrice_Morse,matrice.get_bloc(0,1).valeur());
 
-  IntVect& tab1RR=MBrr.get_set_tab1();
-  IntVect& tab2RR=MBrr.get_set_tab2();
-  DoubleVect& coeffRR=MBrr.get_set_coeff();
-  IntVect& tab1RV=MBrv.get_set_tab1();
-  IntVect& tab2RV=MBrv.get_set_tab2();
-  DoubleVect& coeffRV=MBrv.get_set_coeff();
+  auto& tab1RR = MBrr.get_set_tab1();
+  auto& tab2RR = MBrr.get_set_tab2();
+  auto& coeffRR = MBrr.get_set_coeff();
+  auto& tab1RV = MBrv.get_set_tab1();
+  auto& tab2RV = MBrv.get_set_tab2();
+  auto& coeffRV = MBrv.get_set_coeff();
 
   DoubleTab ligne_tmp(n1);
   for(int i=0; i<n2; i++)
     {
-      int k;
       // On recopie le premier bloc de la matrice dans un tableau :
       //      ligne_tmp = 0;
-      for ( k=la_matrice.get_tab1()(i)-1; k<la_matrice.get_tab1()(i+1)-1; k++)
+      for (auto k=la_matrice.get_tab1()(i)-1; k<la_matrice.get_tab1()(i+1)-1; k++)
         ligne_tmp(la_matrice.get_tab2()(k) - 1) = la_matrice.get_coeff()(k);
 
       // On complete la partie reelle de la matrice
-      for ( k=tab1RR(i)-1; k<tab1RR(i+1)-1; k++)
+      for (auto k=tab1RR(i)-1; k<tab1RR(i+1)-1; k++)
         coeffRR[k] = ligne_tmp(tab2RR[k] - 1);
 
       // On complete la partie virtuelle
-      for ( k=tab1RV(i)-1; k<tab1RV(i+1)-1; k++)
+      for (auto k=tab1RV(i)-1; k<tab1RV(i+1)-1; k++)
         coeffRV[k] = ligne_tmp(n2 + tab2RV[k] - 1);
     }
 

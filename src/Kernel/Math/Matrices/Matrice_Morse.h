@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -57,10 +57,10 @@ public :
 
   // par defaut le scalaire 0:
   Matrice_Morse() ;
-  Matrice_Morse(int n,int nnz) ;
+  template<typename _SIZE_> Matrice_Morse(int n, _SIZE_ nnz) ;
 
   // Une matrice a n lignes et m colonnes a nnz coefficients non nuls :
-  Matrice_Morse(int n, int m, int nnz) ;
+  template<typename _SIZE_> Matrice_Morse(int n, int m, _SIZE_ nnz) ;
 
   // copie :
   Matrice_Morse(const Matrice_Morse& ) ;
@@ -77,8 +77,8 @@ public :
   void remplir(const IntLists& ,const DoubleLists&);
   void remplir(const int, const int, const int, const int, const Matrice_Morse& ) ;
   //dimensionner
-  void dimensionner(int n, int nnz);
-  void dimensionner(int n, int m, int nnz);
+  template<typename _SIZE_> void dimensionner(int n, _SIZE_ nnz);
+  template<typename _SIZE_> void dimensionner(int n, int m, _SIZE_ nnz);
 
   // place pour d'eventuels nouveaux coefficients non nuls
   // (modif MT)
@@ -87,33 +87,33 @@ public :
   // ordre retourne n si n==m
   int ordre() const override;
 
-  int nb_lignes() const override { return tab1_.size()-1; } // nb_lignes retourne n
+  int nb_lignes() const override { return tab1_.size_array()-1; } // nb_lignes retourne n
   int nb_colonnes() const override { return m_; } // nb_colonnes retourne m
-  int nb_coeff() const { return coeff_.size(); } // nb_coeff retourne nnz
+  auto nb_coeff() const { return coeff_.size(); } // nb_coeff retourne nnz
 
   void set_nb_columns( const int );
   void set_symmetric( const int );
   int get_symmetric( ) const { return symetrique_; }
 
-  IntVect& get_set_tab1()
+  auto& get_set_tab1()
   {
     is_stencil_up_to_date_ = false ;
     return tab1_ ;
   }
-  IntVect& get_set_tab2()
+  auto& get_set_tab2()
   {
     is_stencil_up_to_date_ = false ;
     return tab2_ ;
   }
-  DoubleVect& get_set_coeff() { return coeff_ ; }
+  auto& get_set_coeff() { return coeff_ ; }
 
-  const IntVect& get_tab1() const { return tab1_ ; }
-  const IntVect& get_tab2() const { return tab2_ ; }
-  const DoubleVect& get_coeff() const { return coeff_ ; }
+  const auto& get_tab1() const { return tab1_ ; }
+  const auto& get_tab2() const { return tab2_ ; }
+  const auto& get_coeff() const { return coeff_ ; }
 
   int nb_vois(int i) const
   {
-    return get_tab1()(i+1)-get_tab1()(i); // nb_vois(i) : nombre d'elements non nuls de la ligne i
+    return (int)(get_tab1()(i+1)-get_tab1()(i)); // nb_vois(i) : nombre d'elements non nuls de la ligne i
   }
 
   //methode pour nettoyer la matrice.
@@ -190,11 +190,42 @@ public :
   bool is_diagonal();
 
   mutable int sorted_; //1 si le stencil est classe : obtenu en appellant sort_stencil()
-
+  void set_tab1_int32() const
+  {
+#ifdef TRUST_USE_GPU
+    if (tab1_.size_array()>std::numeric_limits<int>::max()) Process::exit("Can't convert this huge matrix to int32 indices !");
+    int size = tab1_.size_array();
+    if (tab1_int32_.size_array()!=size) tab1_int32_.resize(size);
+    for (int i=0; i<size; i++) tab1_int32_(i) = (int)tab1_(i);
+#endif
+  }
+  const IntVect& get_tab1_int32() const
+  {
+#ifdef TRUST_USE_GPU
+    return tab1_int32_;
+#else
+    return tab1_;
+#endif
+  }
+  void set_tab1(const IntVect& tab1_int32)
+  {
+#ifdef TRUST_USE_GPU
+    int size = tab1_int32.size_array();
+    for (int i = 0; i < size; i++) tab1_(i) = (trustIdType)tab1_int32(i);
+#endif
+  }
 protected :
+  // We need trustIdType indices on GPU (large memory available)
+#ifdef TRUST_USE_GPU
+  ArrOfTID tab1_;
+  BigArrOfInt tab2_;
+  BigDoubleVect coeff_;
+  mutable IntVect tab1_int32_; // Useful for conversion during Fortran calls (soon deprecated)
+#else
   IntVect tab1_;
   IntVect tab2_;
   DoubleVect coeff_;
+#endif
 
   mutable int morse_matrix_structure_has_changed_=-1; // Flag if matrix structure changes
   int m_;          // Number of columns
@@ -216,16 +247,20 @@ inline double Matrice_Morse::operator()(int i, int j) const
           || (symetrique_==1 && que_suis_je()=="Matrice_Morse_Sym")
           || (symetrique_==2 && que_suis_je()=="Matrice_Morse_Diag") );
   if ((symetrique_==1) && ((j-i)<0)) std::swap(i,j);
-  int k1=tab1_[i]-1;
-  int k2=tab1_[i+1]-1;
+  auto k1=tab1_[i]-1;
+  auto k2=tab1_[i+1]-1;
   if (sorted_)
     {
-      int k = (int) (std::lower_bound(tab2_.addr() + k1, tab2_.addr() + k2, j + 1) - tab2_.addr());
+#ifdef TRUST_USE_GPU
+      auto k = std::lower_bound(tab2_.addr() + k1, tab2_.addr() + k2, j + 1) - tab2_.addr();
+#else
+      auto k = (int)(std::lower_bound(tab2_.addr() + k1, tab2_.addr() + k2, j + 1) - tab2_.addr());
+#endif
       if (k < k2 && tab2_[k] == j + 1)
         return coeff_[k];
     }
   else
-    for (int k=k1; k<k2; k++)
+    for (auto k=k1; k<k2; k++)
       if (tab2_[k]-1 == j) return(coeff_[k]);
   // Si coefficient non trouve c'est qu'il est nul:
   return(0);
@@ -238,16 +273,20 @@ inline double& Matrice_Morse::operator()(int i, int j)
           || (symetrique_==2 && que_suis_je()=="Matrice_Morse_Diag") );
   //if (symetrique_==1 && j<i) std::swap(i,j); // Do not use, possible error during compile: "signed overflow does not occur when assuming that (X + c) < X is always false"
   if ((symetrique_==1) && ((j-i)<0)) std::swap(i,j);
-  int k1=tab1_[i]-1;
-  int k2=tab1_[i+1]-1;
+  auto k1=tab1_[i]-1;
+  auto k2=tab1_[i+1]-1;
   if (sorted_)
     {
-      int k = (int) (std::lower_bound(tab2_.addr() + k1, tab2_.addr() + k2, j + 1) - tab2_.addr());
+#ifdef TRUST_USE_GPU
+      auto k = std::lower_bound(tab2_.addr() + k1, tab2_.addr() + k2, j + 1) - tab2_.addr();
+#else
+      auto k = (int)(std::lower_bound(tab2_.addr() + k1, tab2_.addr() + k2, j + 1) - tab2_.addr());
+#endif
       if (k < k2 && tab2_[k] == j + 1)
         return coeff_[k];
     }
   else
-    for (int k=k1; k<k2; k++)
+    for (auto k=k1; k<k2; k++)
       if (tab2_[k]-1 == j) return(coeff_[k]);
   if (symetrique_==2) return zero_; // Pour Matrice_Morse_Diag, on ne verifie pas si la case est definie et l'on renvoie 0
 #ifndef NDEBUG
@@ -272,7 +311,11 @@ inline double& Matrice_Morse::operator()(int i, int j)
 struct Matrice_Morse_View
 {
 private:
+#ifdef TRUST_USE_GPU
+  CTIDArrView tab1_;
+#else
   CIntArrView tab1_;
+#endif
   CIntArrView tab2_;
   mutable DoubleArrView coeff_;
   int symetrique_ = 0;
@@ -311,15 +354,15 @@ public:
         j = i;
         i = k;
       }
-    int k1=tab1_(i)-1;
-    int k2=tab1_(i+1)-1;
+    auto k1=tab1_(i)-1;
+    auto k2=tab1_(i+1)-1;
     /* ToDo Kokkos for faster access:
     if (sorted_)
       {
         XXX
       }
     else */
-    for (int k=k1; k<k2; k++)
+    for (auto k=k1; k<k2; k++)
       if (tab2_(k)-1 == j)
         return coeff_(k);
     printf("Error Matrice_Morse_View(%d, %d) not defined!\n", (True_int)i, (True_int)j);
@@ -338,15 +381,15 @@ public:
         j = i;
         i = k;
       }
-    int k1=tab1_(i)-1;
-    int k2=tab1_(i+1)-1;
+    auto k1=tab1_(i)-1;
+    auto k2=tab1_(i+1)-1;
     /* ToDo Kokkos for faster access:
     if (sorted_)
       {
         XXX
       }
     else */
-    for (int k=k1; k<k2; k++)
+    for (auto k=k1; k<k2; k++)
       if (tab2_(k)-1 == j)
         {
           if (atomic) Kokkos::atomic_store(&coeff_(k), coeff);
@@ -376,17 +419,17 @@ public:
         j = i;
         i = k;
       }
-    int k1=tab1_(i)-1;
-    int k2=tab1_(i+1)-1;
+    auto k1=tab1_(i)-1;
+    auto k2=tab1_(i+1)-1;
     /* ToDo Kokkos for faster access:
     if (sorted_)
       {
-        int k = (int) (std::lower_bound(tab2_.addr() + k1, tab2_.addr() + k2, j + 1) - tab2_.addr());
+        auto k = std::lower_bound(tab2_.addr() + k1, tab2_.addr() + k2, j + 1) - tab2_.addr();
         if (k < k2 && tab2_[k] == j + 1)
           return coeff_[k];
       }
     else */
-    for (int k=k1; k<k2; k++)
+    for (auto k=k1; k<k2; k++)
       if (tab2_(k)-1 == j)
         {
           if (atomic) Kokkos::atomic_add(&coeff_(k), coeff);

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -126,17 +126,18 @@ int SSOR::preconditionner_(const Matrice_Base& la_matrice, const DoubleVect& b, 
   return 1;
 }
 
-void traite_diagonale(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur)
+void traite_diagonale(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur)
 {
   const int nb_lignes_a_traiter = vecteur.size_reelle_ok() ? vecteur.size_reelle() : vecteur.size_totale();
-
+  const auto& tab1 = mat.get_tab1();
+  const auto& coeff = mat.get_coeff();
   const double psi = (2. - omega) / omega;
   const double *coeff_fortran = coeff.addr() - 1; // indexable par index fortran
-  const int *tab1_ptr = tab1.addr();
+  const auto *tab1_ptr = tab1.addr();
   double *vect_ptr = vecteur.addr();
   for (int i = nb_lignes_a_traiter; i; i--, tab1_ptr++, vect_ptr++)
     {
-      const int j = *tab1_ptr;
+      const auto j = *tab1_ptr;
       // Coefficient diagonale de la ligne i:
       const double coeff_i_i = coeff_fortran[j];
       (*vect_ptr) *= psi * coeff_i_i;
@@ -146,24 +147,26 @@ void traite_diagonale(const double omega, const ArrOfInt& tab1, const ArrOfInt& 
 enum class descente_enum { NORMAL , NORMAL_ASSERT , DIAG , DIAG_ASSERT };
 
 template<descente_enum _TYPE_>
-void descente_generique(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur)
+void descente_generique(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur)
 {
   static constexpr bool IS_NORMAL_ASSERT = (_TYPE_ == descente_enum::NORMAL_ASSERT), IS_DIAG_ASSERT = (_TYPE_ == descente_enum::DIAG_ASSERT), NOT_DIAG = (_TYPE_ != descente_enum::DIAG && _TYPE_ != descente_enum::DIAG_ASSERT);
-
+  const auto& tab1 = mat.get_tab1();
+  const auto& tab2 = mat.get_tab2();
+  const auto& coeff = mat.get_coeff();
   const int nb_lignes_a_traiter = vecteur.size_reelle_ok() ? vecteur.size_reelle() : vecteur.size_totale();
   // pointeur "fortran" vers le tableau solution (indexable avec index fortran) le pointeur est constant, pas le tableau pointe.
   double * const sol_fortran = vecteur.addr() - 1;
-  const int *tab1_ptr = tab1.addr();
+  const auto *tab1_ptr = tab1.addr();
   assert(nb_lignes_a_traiter <= tab1.size_array() + 1);
   assert(*tab1_ptr == 1); // sinon 2 lignes ci-dessous fausses.
   const int *tab2_ptr = tab2.addr();
   const double *coeff_ptr = coeff.addr();
-  int last_tab1_de_i = *tab1_ptr;
+  auto last_tab1_de_i = *tab1_ptr;
   tab1_ptr++;
   for (int i = 1; i <= nb_lignes_a_traiter; i++, tab1_ptr++)
     {
-      const int tab1_de_i = *tab1_ptr; // = tab1[i]
-      const int nvois = tab1_de_i - last_tab1_de_i;
+      const auto tab1_de_i = *tab1_ptr; // = tab1[i]
+      const int nvois = (int)(tab1_de_i - last_tab1_de_i);
 
       if (IS_NORMAL_ASSERT || IS_DIAG_ASSERT) assert(nvois >= 0 && (tab1_de_i - 1) <= tab2.size_array());
 
@@ -201,35 +204,38 @@ void descente_generique(const double omega, const ArrOfInt& tab1, const ArrOfInt
     }
 }
 
-void descente(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur)
+void descente(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur)
 {
-  descente_generique<descente_enum::NORMAL>(omega,tab1,tab2,coeff,vecteur);
+  descente_generique<descente_enum::NORMAL>(omega,mat,vecteur);
 }
 
-void descente_assert(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur)
+void descente_assert(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur)
 {
-  descente_generique<descente_enum::NORMAL_ASSERT>(omega,tab1,tab2,coeff,vecteur);
+  descente_generique<descente_enum::NORMAL_ASSERT>(omega,mat,vecteur);
 }
 
-void descente_diag_ok_assert(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur)
+void descente_diag_ok_assert(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur)
 {
-  descente_generique<descente_enum::NORMAL_ASSERT>(omega,tab1,tab2,coeff,vecteur); /* meme qu'avant :D */
+  descente_generique<descente_enum::NORMAL_ASSERT>(omega,mat,vecteur); /* meme qu'avant :D */
 }
 
-void descente_precond_diag(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur)
+void descente_precond_diag(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur)
 {
-  descente_generique<descente_enum::DIAG>(omega,tab1,tab2,coeff,vecteur);
+  descente_generique<descente_enum::DIAG>(omega,mat,vecteur);
 }
 
-void descente_assert_precond_diag(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur)
+void descente_assert_precond_diag(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur)
 {
-  descente_generique<descente_enum::DIAG_ASSERT>(omega,tab1,tab2,coeff,vecteur);
+  descente_generique<descente_enum::DIAG_ASSERT>(omega,mat,vecteur);
 }
 
 // Descente sur un bloc extradiagonal. Methode appelee par SSOR(const Matrice_bloc & ...)
 // vecteur: de taille "nombre de lignes de la matrice", vecteur2: "nombre de colonnes"
-void descente_bloc_extradiag_assert(const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, const DoubleVect& vecteur, DoubleVect& vecteur2)
+void descente_bloc_extradiag_assert(const Matrice_Morse& mat, const DoubleVect& vecteur, DoubleVect& vecteur2)
 {
+  const auto& tab1 = mat.get_tab1();
+  const auto& tab2 = mat.get_tab2();
+  const auto& coeff = mat.get_coeff();
   const int nb_lignes = vecteur.size_reelle_ok() ? vecteur.size_reelle() : vecteur.size_totale();
   const double *vecteur_ptr = vecteur.addr();
   double *vecteur2_fortran_ptr = vecteur2.addr() - 1;
@@ -240,8 +246,8 @@ void descente_bloc_extradiag_assert(const ArrOfInt& tab1, const ArrOfInt& tab2, 
     {
       {
         const double v_i = *vecteur_ptr;
-        int index = tab1[i_ligne];
-        const int index_fin = tab1[i_ligne + 1];
+        auto index = tab1[i_ligne];
+        const auto index_fin = tab1[i_ligne + 1];
         // Il peut n'y avoir aucun coefficient sur la ligne => index_fin == index
         assert(index > 0 && index_fin >= index && index_fin <= tab2.size_array() + 1);
         const int *tab2_ptr = tab2_fortran_ptr + index;
@@ -259,26 +265,28 @@ void descente_bloc_extradiag_assert(const ArrOfInt& tab1, const ArrOfInt& tab2, 
 }
 
 template<descente_enum _TYPE_>
-void descente_generique(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
+void descente_generique(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
 {
   static constexpr bool IS_NORMAL_ASSERT = (_TYPE_ == descente_enum::NORMAL_ASSERT), IS_DIAG_ASSERT = (_TYPE_ == descente_enum::DIAG_ASSERT), NOT_DIAG = (_TYPE_ != descente_enum::DIAG && _TYPE_ != descente_enum::DIAG_ASSERT);
-
+  const auto& tab1 = mat.get_tab1();
+  const auto& tab2 = mat.get_tab2();
+  const auto& coeff = mat.get_coeff();
   const int nb_lignes_a_traiter = vecteur.size_reelle_ok() ? vecteur.size_reelle() : vecteur.size_totale();
   // pointeur "fortran" vers le tableau solution (indexable avec index fortran) le pointeur est constant, pas le tableau pointe.
   double * const sol_fortran = vecteur.addr() - 1;
   const int *flags_ptr = items_a_traiter.addr();
   assert(nb_lignes_a_traiter <= items_a_traiter.size_array());
-  const int *tab1_ptr = tab1.addr();
+  const auto *tab1_ptr = tab1.addr();
   assert(nb_lignes_a_traiter <= tab1.size_array() + 1);
   assert(*tab1_ptr == 1); // sinon 2 lignes ci-dessous fausses.
   const int *tab2_ptr = tab2.addr();
   const double *coeff_ptr = coeff.addr();
-  int last_tab1_de_i = *tab1_ptr;
+  auto last_tab1_de_i = *tab1_ptr;
   tab1_ptr++;
   for (int i = 1; i <= nb_lignes_a_traiter; i++, tab1_ptr++)
     {
-      const int tab1_de_i = *tab1_ptr; // = tab1[i]
-      const int nvois = tab1_de_i - last_tab1_de_i;
+      const auto tab1_de_i = *tab1_ptr; // = tab1[i]
+      const int nvois = (int)(tab1_de_i - last_tab1_de_i);
 
       if (IS_NORMAL_ASSERT || IS_DIAG_ASSERT) assert(nvois >= 0 && (tab1_de_i - 1) <= tab2.size_array());
 
@@ -336,35 +344,38 @@ void descente_generique(const double omega, const ArrOfInt& tab1, const ArrOfInt
   }
 }
 
-void descente(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
+void descente(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
 {
-  descente_generique<descente_enum::NORMAL>(omega,tab1,tab2,coeff,vecteur,items_a_traiter);
+  descente_generique<descente_enum::NORMAL>(omega,mat,vecteur,items_a_traiter);
 }
 
-void descente_assert(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
+void descente_assert(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
 {
-  descente_generique<descente_enum::NORMAL_ASSERT>(omega,tab1,tab2,coeff,vecteur,items_a_traiter);
+  descente_generique<descente_enum::NORMAL_ASSERT>(omega,mat,vecteur,items_a_traiter);
 }
 
-void descente_diag_ok_assert(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
+void descente_diag_ok_assert(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
 {
-  descente_generique<descente_enum::NORMAL_ASSERT>(omega,tab1,tab2,coeff,vecteur,items_a_traiter); /* meme qu'avant :D */
+  descente_generique<descente_enum::NORMAL_ASSERT>(omega,mat,vecteur,items_a_traiter); /* meme qu'avant :D */
 }
 
-void descente_precond_diag(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
+void descente_precond_diag(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
 {
-  descente_generique<descente_enum::DIAG>(omega,tab1,tab2,coeff,vecteur,items_a_traiter);
+  descente_generique<descente_enum::DIAG>(omega,mat,vecteur,items_a_traiter);
 }
 
-void descente_assert_precond_diag(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
+void descente_assert_precond_diag(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
 {
-  descente_generique<descente_enum::DIAG_ASSERT>(omega,tab1,tab2,coeff,vecteur,items_a_traiter);
+  descente_generique<descente_enum::DIAG_ASSERT>(omega,mat,vecteur,items_a_traiter);
 }
 
 // Descente sur un bloc extradiagonal. Methode appelee par SSOR(const Matrice_bloc & ...)
 // vecteur: de taille "nombre de lignes de la matrice", vecteur2: "nombre de colonnes"
-void descente_bloc_extradiag_assert(const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, const DoubleVect& vecteur, DoubleVect& vecteur2, const ArrOfInt& items_a_traiter)
+void descente_bloc_extradiag_assert(const Matrice_Morse& mat, const DoubleVect& vecteur, DoubleVect& vecteur2, const ArrOfInt& items_a_traiter)
 {
+  const auto& tab1 = mat.get_tab1();
+  const auto& tab2 = mat.get_tab2();
+  const auto& coeff = mat.get_coeff();
   const int nb_lignes = vecteur.size_reelle_ok() ? vecteur.size_reelle() : vecteur.size_totale();
   const int *flags_ptr = items_a_traiter.addr();
   const double *vecteur_ptr = vecteur.addr();
@@ -377,8 +388,8 @@ void descente_bloc_extradiag_assert(const ArrOfInt& tab1, const ArrOfInt& tab2, 
       if (*(flags_ptr++))
         {
           const double v_i = *vecteur_ptr;
-          int index = tab1[i_ligne];
-          const int index_fin = tab1[i_ligne + 1];
+          auto index = tab1[i_ligne];
+          const auto index_fin = tab1[i_ligne + 1];
           // Il peut n'y avoir aucun coefficient sur la ligne => index_fin == index
           assert(index > 0 && index_fin >= index && index_fin <= tab2.size_array() + 1);
           const int *tab2_ptr = tab2_fortran_ptr + index;
@@ -398,18 +409,21 @@ void descente_bloc_extradiag_assert(const ArrOfInt& tab1, const ArrOfInt& tab2, 
 enum class remontee_enum { NORMAL , NORMAL_ASSERT , DIAG_OK_ASSERT , DIAG , DIAG_ASSERT };
 
 template<remontee_enum _TYPE_>
-void remontee_generique(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur)
+void remontee_generique(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur)
 {
   static constexpr bool IS_NORMAL_ASSERT = (_TYPE_ == remontee_enum::NORMAL_ASSERT), IS_DIAG_OK_ASSERT = (_TYPE_ == remontee_enum::DIAG_OK_ASSERT), IS_DIAG_ASSERT = (_TYPE_ == remontee_enum::DIAG_ASSERT),
                         NOT_DIAG = (_TYPE_ != remontee_enum::DIAG && _TYPE_ != remontee_enum::DIAG_ASSERT);
+  const auto& tab1 = mat.get_tab1();
+  const auto& tab2 = mat.get_tab2();
+  const auto& coeff = mat.get_coeff();
 
   const int nb_lignes_a_traiter = vecteur.size_reelle_ok() ? vecteur.size_reelle() : vecteur.size_totale();
   const double psi = IS_DIAG_OK_ASSERT ? -1e10 : (2. - omega) / omega;
 
   // pointeur "fortran" vers le tableau solution (indexable avec index fortran)
   const double *const sol_fortran = vecteur.addr() - 1;
-  const int *tab1_ptr = tab1.addr() + nb_lignes_a_traiter;
-  int last_tab1_de_i = *tab1_ptr;
+  const auto *tab1_ptr = tab1.addr() + nb_lignes_a_traiter;
+  auto last_tab1_de_i = *tab1_ptr;
   tab1_ptr--;
   // On ne va pas a la fin de tab2 car on n'est pas sur que nb_lignes_a_traiter = tab1.size_array() :
   // -2 car last_tab1_de_i est l'indice du premier coefficient de la ligne suivante en fortran
@@ -419,8 +433,8 @@ void remontee_generique(const double omega, const ArrOfInt& tab1, const ArrOfInt
   double *soli_ptr = vecteur.addr() + nb_lignes_a_traiter - 1;
   for (int i = nb_lignes_a_traiter; i; i--, tab1_ptr--, soli_ptr--)
     {
-      const int tab1_de_i = *tab1_ptr; // = tab1[i]
-      const int nvois = last_tab1_de_i - tab1_de_i;
+      const auto tab1_de_i = *tab1_ptr; // = tab1[i]
+      const int nvois = (int)(last_tab1_de_i - tab1_de_i);
 
       if (IS_NORMAL_ASSERT || IS_DIAG_OK_ASSERT || IS_DIAG_ASSERT) assert(nvois >= 0 && tab1_de_i > 0);
 
@@ -467,35 +481,38 @@ void remontee_generique(const double omega, const ArrOfInt& tab1, const ArrOfInt
     }
 }
 
-void remontee(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur)
+void remontee(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur)
 {
-  remontee_generique<remontee_enum::NORMAL>(omega,tab1,tab2,coeff,vecteur);
+  remontee_generique<remontee_enum::NORMAL>(omega,mat,vecteur);
 }
 
-void remontee_assert(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur)
+void remontee_assert(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur)
 {
-  remontee_generique<remontee_enum::NORMAL_ASSERT>(omega,tab1,tab2,coeff,vecteur);
+  remontee_generique<remontee_enum::NORMAL_ASSERT>(omega,mat,vecteur);
 }
 
-void remontee_diag_ok_assert(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur)
+void remontee_diag_ok_assert(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur)
 {
-  remontee_generique<remontee_enum::DIAG_OK_ASSERT>(omega,tab1,tab2,coeff,vecteur);
+  remontee_generique<remontee_enum::DIAG_OK_ASSERT>(omega,mat,vecteur);
 }
 
-void remontee_precond_diag(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur)
+void remontee_precond_diag(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur)
 {
-  remontee_generique<remontee_enum::DIAG>(omega,tab1,tab2,coeff,vecteur);
+  remontee_generique<remontee_enum::DIAG>(omega,mat,vecteur);
 }
 
-void remontee_assert_precond_diag(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur)
+void remontee_assert_precond_diag(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur)
 {
-  remontee_generique<remontee_enum::DIAG_ASSERT>(omega,tab1,tab2,coeff,vecteur);
+  remontee_generique<remontee_enum::DIAG_ASSERT>(omega,mat,vecteur);
 }
 
 // Remontee sur un bloc extradiagonal. Methode appelee par SSOR(const Matrice_bloc & ...)
 // vecteur: de taille "nombre de lignes de la matrice", vecteur2: "nombre de colonnes"
-void remontee_bloc_extradiag_assert(const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur, const DoubleVect& vecteur2)
+void remontee_bloc_extradiag_assert(const Matrice_Morse& mat, DoubleVect& vecteur, const DoubleVect& vecteur2)
 {
+  const auto& tab1 = mat.get_tab1();
+  const auto& tab2 = mat.get_tab2();
+  const auto& coeff = mat.get_coeff();
   const int nb_lignes = vecteur.size_reelle_ok() ? vecteur.size_reelle() : vecteur.size_totale();
   double *vecteur_ptr = vecteur.addr();
   const double *vecteur2_fortran_ptr = vecteur2.addr() - 1;
@@ -506,8 +523,8 @@ void remontee_bloc_extradiag_assert(const ArrOfInt& tab1, const ArrOfInt& tab2, 
     {
       {
         double x = *vecteur_ptr;
-        int index = tab1[i_ligne];
-        const int index_fin = tab1[i_ligne + 1];
+        auto index = tab1[i_ligne];
+        const auto index_fin = tab1[i_ligne + 1];
         // Il peut n'y avoir aucun coefficient sur la ligne => index_fin == index
         assert(index > 0 && index_fin >= index && index_fin <= tab2.size_array() + 1);
         const int *tab2_ptr = tab2_fortran_ptr + index;
@@ -527,10 +544,13 @@ void remontee_bloc_extradiag_assert(const ArrOfInt& tab1, const ArrOfInt& tab2, 
 }
 
 template<remontee_enum _TYPE_>
-void remontee_generique(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
+void remontee_generique(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
 {
   static constexpr bool IS_NORMAL_ASSERT = (_TYPE_ == remontee_enum::NORMAL_ASSERT), IS_DIAG_OK_ASSERT = (_TYPE_ == remontee_enum::DIAG_OK_ASSERT), IS_DIAG_ASSERT = (_TYPE_ == remontee_enum::DIAG_ASSERT),
                         NOT_DIAG = (_TYPE_ != remontee_enum::DIAG && _TYPE_ != remontee_enum::DIAG_ASSERT);
+  const auto& tab1 = mat.get_tab1();
+  const auto& tab2 = mat.get_tab2();
+  const auto& coeff = mat.get_coeff();
 
   const int nb_lignes_a_traiter = vecteur.size_reelle_ok() ? vecteur.size_reelle() : vecteur.size_totale();
   const int *flags_ptr = items_a_traiter.addr() + nb_lignes_a_traiter - 1;
@@ -539,8 +559,8 @@ void remontee_generique(const double omega, const ArrOfInt& tab1, const ArrOfInt
 
   // pointeur "fortran" vers le tableau solution (indexable avec index fortran)
   const double * const sol_fortran = vecteur.addr() - 1;
-  const int *tab1_ptr = tab1.addr() + nb_lignes_a_traiter;
-  int last_tab1_de_i = *tab1_ptr;
+  const auto *tab1_ptr = tab1.addr() + nb_lignes_a_traiter;
+  auto last_tab1_de_i = *tab1_ptr;
   tab1_ptr--;
   // On ne va pas a la fin de tab2 car on n'est pas sur que nb_lignes_a_traiter = tab1.size_array() :
   // -2 car last_tab1_de_i est l'indice du premier coefficient de la ligne suivante en fortran
@@ -550,8 +570,8 @@ void remontee_generique(const double omega, const ArrOfInt& tab1, const ArrOfInt
   double * soli_ptr = vecteur.addr() + nb_lignes_a_traiter - 1;
   for (int i = nb_lignes_a_traiter; i; i--, tab1_ptr--, soli_ptr--)
     {
-      const int tab1_de_i = *tab1_ptr; // = tab1[i]
-      const int nvois = last_tab1_de_i - tab1_de_i;
+      const auto tab1_de_i = *tab1_ptr; // = tab1[i]
+      const int nvois = (int)(last_tab1_de_i - tab1_de_i);
       if (IS_NORMAL_ASSERT || IS_DIAG_OK_ASSERT || IS_DIAG_ASSERT) assert(nvois >= 0 && tab1_de_i > 0);
 
       last_tab1_de_i = tab1_de_i;
@@ -596,35 +616,38 @@ void remontee_generique(const double omega, const ArrOfInt& tab1, const ArrOfInt
     }
 }
 
-void remontee(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
+void remontee(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
 {
-  remontee_generique<remontee_enum::NORMAL>(omega,tab1,tab2,coeff,vecteur,items_a_traiter);
+  remontee_generique<remontee_enum::NORMAL>(omega,mat,vecteur,items_a_traiter);
 }
 
-void remontee_assert(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
+void remontee_assert(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
 {
-  remontee_generique<remontee_enum::NORMAL_ASSERT>(omega,tab1,tab2,coeff,vecteur,items_a_traiter);
+  remontee_generique<remontee_enum::NORMAL_ASSERT>(omega,mat,vecteur,items_a_traiter);
 }
 
-void remontee_diag_ok_assert(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
+void remontee_diag_ok_assert(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
 {
-  remontee_generique<remontee_enum::DIAG_OK_ASSERT>(omega,tab1,tab2,coeff,vecteur,items_a_traiter);
+  remontee_generique<remontee_enum::DIAG_OK_ASSERT>(omega,mat,vecteur,items_a_traiter);
 }
 
-void remontee_precond_diag(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
+void remontee_precond_diag(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
 {
-  remontee_generique<remontee_enum::DIAG>(omega,tab1,tab2,coeff,vecteur,items_a_traiter);
+  remontee_generique<remontee_enum::DIAG>(omega,mat,vecteur,items_a_traiter);
 }
 
-void remontee_assert_precond_diag(const double omega, const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
+void remontee_assert_precond_diag(const double omega, const Matrice_Morse& mat, DoubleVect& vecteur, const ArrOfInt& items_a_traiter)
 {
-  remontee_generique<remontee_enum::DIAG_ASSERT>(omega,tab1,tab2,coeff,vecteur,items_a_traiter);
+  remontee_generique<remontee_enum::DIAG_ASSERT>(omega,mat,vecteur,items_a_traiter);
 }
 
 // Remontee sur un bloc extradiagonal. Methode appelee par SSOR(const Matrice_bloc & ...)
 // vecteur: de taille "nombre de lignes de la matrice", vecteur2: "nombre de colonnes"
-void remontee_bloc_extradiag_assert(const ArrOfInt& tab1, const ArrOfInt& tab2, const ArrOfDouble& coeff, DoubleVect& vecteur, const DoubleVect& vecteur2, const ArrOfInt& items_a_traiter)
+void remontee_bloc_extradiag_assert(const Matrice_Morse& mat, DoubleVect& vecteur, const DoubleVect& vecteur2, const ArrOfInt& items_a_traiter)
 {
+  const auto& tab1 = mat.get_tab1();
+  const auto& tab2 = mat.get_tab2();
+  const auto& coeff = mat.get_coeff();
   const int nb_lignes = vecteur.size_reelle_ok() ? vecteur.size_reelle() : vecteur.size_totale();
   const int *flags_ptr = items_a_traiter.addr();
   double *vecteur_ptr = vecteur.addr();
@@ -637,8 +660,8 @@ void remontee_bloc_extradiag_assert(const ArrOfInt& tab1, const ArrOfInt& tab2, 
       if (*(flags_ptr++))
         {
           double x = *vecteur_ptr;
-          int index = tab1[i_ligne];
-          const int index_fin = tab1[i_ligne + 1];
+          auto index = tab1[i_ligne];
+          const auto index_fin = tab1[i_ligne + 1];
           // Il peut n'y avoir aucun coefficient sur la ligne => index_fin == index
           assert(index > 0 && index_fin >= index && index_fin <= tab2.size_array() + 1);
           const int *tab2_ptr = tab2_fortran_ptr + index;
@@ -662,9 +685,7 @@ void remontee_bloc_extradiag_assert(const ArrOfInt& tab1, const ArrOfInt& tab2, 
 //   D :partie diagonale de la matrice, E :partie triangulaire inferieure de la matrice
 void SSOR::ssor(const Matrice_Morse_Sym& matrice, DoubleVect& solution)
 {
-  const ArrOfInt& tab1 = matrice.get_tab1(), &tab2 = matrice.get_tab2();
-  const ArrOfDouble& coeff = matrice.get_coeff();
-
+  const auto& tab2 = matrice.get_tab2();
   if (tab2.size_array() > 0 && tab2[0] == 1)
     {
       // La diagonale est presente dans la matrice
@@ -672,26 +693,26 @@ void SSOR::ssor(const Matrice_Morse_Sym& matrice, DoubleVect& solution)
         {
           if (algo_items_communs_)
             {
-              descente_assert(omega_, tab1, tab2, coeff, solution, items_a_traiter_);
-              remontee_assert(omega_, tab1, tab2, coeff, solution, items_a_traiter_);
+              descente_assert(omega_, matrice, solution, items_a_traiter_);
+              remontee_assert(omega_, matrice, solution, items_a_traiter_);
             }
           else
             {
-              descente_assert(omega_, tab1, tab2, coeff, solution);
-              remontee_assert(omega_, tab1, tab2, coeff, solution);
+              descente_assert(omega_, matrice, solution);
+              remontee_assert(omega_, matrice, solution);
             }
         }
       else
         {
           if (algo_items_communs_)
             {
-              descente(omega_, tab1, tab2, coeff, solution, items_a_traiter_);
-              remontee(omega_, tab1, tab2, coeff, solution, items_a_traiter_);
+              descente(omega_, matrice, solution, items_a_traiter_);
+              remontee(omega_, matrice, solution, items_a_traiter_);
             }
           else
             {
-              descente(omega_, tab1, tab2, coeff, solution);
-              remontee(omega_, tab1, tab2, coeff, solution);
+              descente(omega_, matrice, solution);
+              remontee(omega_, matrice, solution);
             }
         }
     }
@@ -702,26 +723,26 @@ void SSOR::ssor(const Matrice_Morse_Sym& matrice, DoubleVect& solution)
         {
           if (algo_items_communs_)
             {
-              descente_assert_precond_diag(omega_, tab1, tab2, coeff, solution, items_a_traiter_);
-              remontee_assert_precond_diag(omega_, tab1, tab2, coeff, solution, items_a_traiter_);
+              descente_assert_precond_diag(omega_, matrice, solution, items_a_traiter_);
+              remontee_assert_precond_diag(omega_, matrice, solution, items_a_traiter_);
             }
           else
             {
-              descente_assert_precond_diag(omega_, tab1, tab2, coeff, solution);
-              remontee_assert_precond_diag(omega_, tab1, tab2, coeff, solution);
+              descente_assert_precond_diag(omega_, matrice, solution);
+              remontee_assert_precond_diag(omega_, matrice, solution);
             }
         }
       else
         {
           if (algo_items_communs_)
             {
-              descente_precond_diag(omega_, tab1, tab2, coeff, solution, items_a_traiter_);
-              remontee_precond_diag(omega_, tab1, tab2, coeff, solution, items_a_traiter_);
+              descente_precond_diag(omega_, matrice, solution, items_a_traiter_);
+              remontee_precond_diag(omega_, matrice, solution, items_a_traiter_);
             }
           else
             {
-              descente_precond_diag(omega_, tab1, tab2, coeff, solution);
-              remontee_precond_diag(omega_, tab1, tab2, coeff, solution);
+              descente_precond_diag(omega_, matrice, solution);
+              remontee_precond_diag(omega_, matrice, solution);
             }
         }
     }
@@ -746,8 +767,8 @@ void SSOR::ssor(const Matrice_Bloc_Sym& matrice, DoubleVect& solution)
       const Matrice_Morse_Sym& MB00 = ref_cast(Matrice_Morse_Sym, matrice0.get_bloc(0, 0).valeur());
       DoubleVect& partie = s_parts[i_part];
 
-      if (algo_items_communs_) descente_diag_ok_assert(omega_, MB00.get_tab1(), MB00.get_tab2(), MB00.get_coeff(), partie, items_parts[i_part]);
-      else descente_diag_ok_assert(omega_, MB00.get_tab1(), MB00.get_tab2(), MB00.get_coeff(), partie);
+      if (algo_items_communs_) descente_diag_ok_assert(omega_, MB00, partie, items_parts[i_part]);
+      else descente_diag_ok_assert(omega_, MB00, partie);
 
       // blocs extra-diagonaux
       for (int j_part = i_part + 1; j_part < nb_parts; j_part++)
@@ -757,8 +778,8 @@ void SSOR::ssor(const Matrice_Bloc_Sym& matrice, DoubleVect& solution)
           DoubleVect& partie_j = s_parts[j_part];
           // Attention: le test sur les items communs concerne les lignes de la matrice, pas les colonnes (on passe items_parts[i_part], pas j_part)
           // (note BM: je crois que la version precedente etait buggee mais ca ne s'est pas vu parce que la matrice elem-elem arrive en premier et qu'il n'y a pas d'items communs sur les elements)
-          if (algo_items_communs_) descente_bloc_extradiag_assert(MB00bis.get_tab1(), MB00bis.get_tab2(), MB00bis.get_coeff(), partie, partie_j, items_parts[i_part]);
-          else descente_bloc_extradiag_assert(MB00bis.get_tab1(), MB00bis.get_tab2(), MB00bis.get_coeff(), partie, partie_j);
+          if (algo_items_communs_) descente_bloc_extradiag_assert(MB00bis, partie, partie_j, items_parts[i_part]);
+          else descente_bloc_extradiag_assert(MB00bis, partie, partie_j);
         }
     }
   // Traitement de la diagonale
@@ -767,7 +788,7 @@ void SSOR::ssor(const Matrice_Bloc_Sym& matrice, DoubleVect& solution)
       const Matrice_Bloc& matrice0 = ref_cast(Matrice_Bloc, matrice.get_bloc(i_part, i_part).valeur());
       const Matrice_Morse_Sym& MB00 = ref_cast(Matrice_Morse_Sym, matrice0.get_bloc(0, 0).valeur());
       DoubleVect& partie = s_parts[i_part];
-      traite_diagonale(omega_, MB00.get_tab1(), MB00.get_tab2(), MB00.get_coeff(), partie);
+      traite_diagonale(omega_, MB00, partie);
     }
 
   // Remontee
@@ -776,8 +797,8 @@ void SSOR::ssor(const Matrice_Bloc_Sym& matrice, DoubleVect& solution)
       const Matrice_Bloc& matrice0 = ref_cast(Matrice_Bloc, matrice.get_bloc(i_part, i_part).valeur());
       const Matrice_Morse_Sym& MB00bis = ref_cast(Matrice_Morse_Sym, matrice0.get_bloc(0, 0).valeur());
       DoubleVect& partie = s_parts[i_part];
-      if (algo_items_communs_) remontee_diag_ok_assert(omega_, MB00bis.get_tab1(), MB00bis.get_tab2(), MB00bis.get_coeff(), partie, items_parts[i_part]);
-      else remontee_diag_ok_assert(omega_, MB00bis.get_tab1(), MB00bis.get_tab2(), MB00bis.get_coeff(), partie);
+      if (algo_items_communs_) remontee_diag_ok_assert(omega_, MB00bis, partie, items_parts[i_part]);
+      else remontee_diag_ok_assert(omega_, MB00bis, partie);
 
       // Blocs extra-diagonaux (parcours horizontal au lieu de vertical)
       for (int j_part = 0; j_part < i_part; j_part++)
@@ -786,8 +807,8 @@ void SSOR::ssor(const Matrice_Bloc_Sym& matrice, DoubleVect& solution)
           const Matrice_Morse& MB00 = ref_cast(Matrice_Morse, Aij.get_bloc(0, 0).valeur());
           DoubleVect& partie_j = s_parts[j_part];
           // Attention: le test sur les items communs concerne les lignes de la matrice, pas les colonnes (on passe items_parts[i_part], pas j_part)
-          if (algo_items_communs_) remontee_bloc_extradiag_assert(MB00.get_tab1(), MB00.get_tab2(), MB00.get_coeff(), partie_j, partie, items_parts[j_part]);
-          else remontee_bloc_extradiag_assert(MB00.get_tab1(), MB00.get_tab2(), MB00.get_coeff(), partie_j, partie);
+          if (algo_items_communs_) remontee_bloc_extradiag_assert(MB00, partie_j, partie, items_parts[j_part]);
+          else remontee_bloc_extradiag_assert(MB00, partie_j, partie);
         }
     }
 }

@@ -85,7 +85,7 @@ int  Assembleur_P_PolyMAC_MPFA::assembler_mat(Matrice& la_matrice,const DoubleVe
     {
       mat.get_set_tab1().ref_array(tab1);
       mat.get_set_tab2().ref_array(tab2);
-      mat.get_set_coeff().resize(tab2.size());
+      mat.get_set_coeff().resize(tab2.size_array());
       mat.set_nb_columns(ne_tot);
     }
 

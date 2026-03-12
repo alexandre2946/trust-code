@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -32,7 +32,7 @@ double Matrice_SuperMorse::ajouter_mult_vect_et_prodscal(const DoubleVect& x, Do
   // Le premier indice de tab1_ qui va nous interesser est le deuxieme du tableau
   // (le premier du tableau est forcement 1)
   assert(tab1_[0] == 1);
-  const int *tab1_ptr = tab1_.addr() + 1;
+  const auto *tab1_ptr = tab1_.addr() + 1;
   assert(tab1_.size_array() == nb_lignes + 1);
   const int *tab2_ptr = tab2_.addr();
   const double *coeff_ptr = coeff_.addr();
@@ -49,7 +49,7 @@ double Matrice_SuperMorse::ajouter_mult_vect_et_prodscal(const DoubleVect& x, Do
       assert(i_ligne >= 1 && i_ligne <= resu.size_array());
       double r = 0.;
       // Indice de fin des coeffs de cette ligne dans tab2 et coeff
-      const int n_fin = *(tab1_ptr++);
+      const auto n_fin = *(tab1_ptr++);
       for (; n < n_fin; n++)
         {
           const int colonne = *(tab2_ptr++);

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -63,7 +63,7 @@ void Source_Flux_interfacial_base::dimensionner_blocs(matrices_t matrices, const
   const DoubleTab& inco = ch.valeurs();
 
   /* on doit pouvoir ajouter / soustraire les equations entre composantes */
-  int i, j, e, n, N = inco.line_size();
+  int i, e, n, N = inco.line_size();
   if (N == 1) return;
   std::set<int> idx;
   for (auto &&n_m : matrices)
@@ -82,7 +82,7 @@ void Source_Flux_interfacial_base::dimensionner_blocs(matrices_t matrices, const
           for (e = 0; e < domaine.nb_elem(); e++) /* autres variables: on peut melanger les composantes*/
             {
               for (idx.clear(), n = 0, i = N * e; n < N; n++, i++)
-                for (j = mat.get_tab1()(i) - 1; j < mat.get_tab1()(i + 1) - 1; j++)
+                for (auto j = mat.get_tab1()(i) - 1; j < mat.get_tab1()(i + 1) - 1; j++)
                   idx.insert(mat.get_tab2()(j) - 1); //idx : ensemble des colonnes dont depend au moins une ligne des N composantes en e
               for (n = 0, i = N * e; n < N; n++, i++)
                 for (auto &&x : idx) sten.append_line(i, x); //ajout de cette depedance a toutes les lignes
@@ -166,7 +166,7 @@ void Source_Flux_interfacial_base::ajouter_blocs(matrices_t matrices, DoubleTab&
                   *Ma = matrices.count("alpha") ? matrices.at("alpha") : nullptr,
                    *Mai = matrices.count("interfacial_area") ? matrices.at("interfacial_area") : nullptr;
 
-  int i, j, col, e, d, D = dimension, k, l, n, N = inco.line_size(), is_therm;
+  int i, col, e, d, D = dimension, k, l, n, N = inco.line_size(), is_therm;
   const int cL = (lambda.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1), cR = (rho.dimension_tot(0) == 1), cCp = (Cp.dimension_tot(0) == 1);
 
   const Flux_interfacial_base& correlation_fi = ref_cast(Flux_interfacial_base, correlation_.valeur());
@@ -206,7 +206,7 @@ void Source_Flux_interfacial_base::ajouter_blocs(matrices_t matrices, DoubleTab&
       eq_m.sources()(i)->ajouter_blocs(mat_m, sec_m, semi_impl);
   std::vector<std::array<Matrice_Morse *, 2>> vec_m; //vecteur "matrice source, matrice de destination"
   for (auto &&n_m : matrices)
-    if (n_m.first.find("/") == std::string::npos && mat_m[n_m.first]->get_tab1().size() > 1) vec_m.push_back({{ mat_m[n_m.first], n_m.second }});
+    if (n_m.first.find("/") == std::string::npos && mat_m[n_m.first]->get_tab1().size_array() > 1) vec_m.push_back({{ mat_m[n_m.first], n_m.second }});
 
   /* elements */
   //coefficients et plein de derivees...
@@ -332,7 +332,7 @@ void Source_Flux_interfacial_base::ajouter_blocs(matrices_t matrices, DoubleTab&
                           (*Mp)(N * e + (i ? l : k), e) += vol * (i ? -1 : 1) * dP_G;
                     }
                   else for (auto &s_d : vec_m) /* G par evanescence */
-                      for (j = s_d[0]->get_tab1()(N * e + n_lim) - 1; j < s_d[0]->get_tab1()(N * e + n_lim + 1) - 1; j++)
+                      for (auto j = s_d[0]->get_tab1()(N * e + n_lim) - 1; j < s_d[0]->get_tab1()(N * e + n_lim + 1) - 1; j++)
                         for (col = s_d[0]->get_tab2()(j) - 1, x = -s_d[0]->get_coeff()(j), i = 0; i < 2; i++)
                           (*s_d[1])(N * e + (i ? l : k), col) += (i ? -1 : 1) * sgn * x;
                 }
@@ -356,7 +356,7 @@ void Source_Flux_interfacial_base::ajouter_blocs(matrices_t matrices, DoubleTab&
                       (*Mp)(N * e + (i ? l : k), e)           += vol * (i ? -1 : 1) * (s_c * (dP_hi(n_c, n_d)    * (Tc - Ts) - hi(n_c, n_d) * dP_Ts)      + (n_lim < 0) * dP_G * hc + G * dP_hc)                 - (i != c) * dpqi(e, k, l);
                   if (n_lim >= 0)
                     for (auto &s_d : vec_m) /* derivees de G dans le cas evanescent */
-                      for (j = s_d[0]->get_tab1()(N * e + n_lim) - 1; j < s_d[0]->get_tab1()(N * e + n_lim + 1) - 1; j++)
+                      for (auto j = s_d[0]->get_tab1()(N * e + n_lim) - 1; j < s_d[0]->get_tab1()(N * e + n_lim + 1) - 1; j++)
                         for (col = s_d[0]->get_tab2()(j) - 1, x = -s_d[0]->get_coeff()(j), i = 0; i < 2; i++)
                           (*s_d[1])(N * e + (i ? l : k), col) += (i ? -1 : 1) * hc * sgn * x;
                 }
@@ -395,7 +395,7 @@ void Source_Flux_interfacial_base::ajouter_blocs(matrices_t matrices, DoubleTab&
                                 } // dAi_G a ajouter
                             }
                           else for (auto &s_d : vec_m) /* G par evanescence */
-                              for (j = s_d[0]->get_tab1()(N * e + n_lim) - 1; j < s_d[0]->get_tab1()(N * e + n_lim + 1) - 1; j++)
+                              for (auto j = s_d[0]->get_tab1()(N * e + n_lim) - 1; j < s_d[0]->get_tab1()(N * e + n_lim + 1) - 1; j++)
                                 for (col = s_d[0]->get_tab2()(j) - 1, x = -s_d[0]->get_coeff()(j), i = 0; i < 2; i++)
                                   (*s_d[1])(N * e + l , col) -= 2./3. * inco(e, l) / (alpha(e, l) * (pch_rho ? (*pch_rho).valeurs()(e, l) : rho(e, l))) * sgn * x;
                         }

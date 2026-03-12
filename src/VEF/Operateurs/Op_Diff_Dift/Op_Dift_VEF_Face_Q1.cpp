@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -377,8 +377,9 @@ void Op_Dift_VEF_Face_Q1::contribuer_a_avec(const DoubleTab& transporte, Matrice
 
   //DoubleVect n(dimension);
   //DoubleTrav Tgrad(dimension, dimension);
-  IntVect& tab1 = matrice.get_set_tab1(), &tab2 = matrice.get_set_tab2();
-  DoubleVect& coeff = matrice.get_set_coeff();
+  auto& tab1 = matrice.get_set_tab1();
+  auto& tab2 = matrice.get_set_tab2();
+  auto& coeff = matrice.get_set_coeff();
 
   // On traite les faces bord
   for (int n_bord = 0; n_bord < domaine_VEF.nb_front_Cl(); n_bord++)
@@ -402,14 +403,14 @@ void Op_Dift_VEF_Face_Q1::contribuer_a_avec(const DoubleTab& transporte, Matrice
                       const double valA = viscA_Q1(domaine_VEF, num_face0, j, dimension, elem1, d_mu);
                       for (int nc = 0; nc < nb_comp; nc++)
                         {
-                          for (int kk = tab1[num_face0 * nb_comp + nc] - 1; kk < tab1[num_face0 * nb_comp + nc + 1] - 1; kk++)
+                          for (auto kk = tab1[num_face0 * nb_comp + nc] - 1; kk < tab1[num_face0 * nb_comp + nc + 1] - 1; kk++)
                             {
                               if (tab2[kk] - 1 == num_face0 * nb_comp + nc)
                                 coeff(kk) += valA * porosite_face(num_face0 * nb_comp + nc);
                               if (tab2[kk] - 1 == j * nb_comp + nc)
                                 coeff(kk) -= 0.5 * valA * porosite_face(j * nb_comp + nc);
                             }
-                          for (int kk = tab1[j * nb_comp + nc] - 1; kk < tab1[j * nb_comp + nc + 1] - 1; kk++)
+                          for (auto kk = tab1[j * nb_comp + nc] - 1; kk < tab1[j * nb_comp + nc + 1] - 1; kk++)
                             {
                               if (tab2[kk] - 1 == num_face0 * nb_comp + nc)
                                 coeff(kk) -= valA * porosite_face(num_face0 * nb_comp + nc);
@@ -430,14 +431,14 @@ void Op_Dift_VEF_Face_Q1::contribuer_a_avec(const DoubleTab& transporte, Matrice
                       for (int nc = 0; nc < nb_comp; nc++)
                         {
 
-                          for (int kk = tab1[num_face0 * nb_comp + nc] - 1; kk < tab1[num_face0 * nb_comp + nc + 1] - 1; kk++)
+                          for (auto kk = tab1[num_face0 * nb_comp + nc] - 1; kk < tab1[num_face0 * nb_comp + nc + 1] - 1; kk++)
                             {
                               if (tab2[kk] - 1 == num_face0 * nb_comp + nc)
                                 coeff(kk) += valA * porosite_face(num_face0 * nb_comp + nc);
                               if (tab2[kk] - 1 == j * nb_comp + nc)
                                 coeff(kk) -= 0.5 * valA * porosite_face(j * nb_comp + nc);
                             }
-                          for (int kk = tab1[j * nb_comp + nc] - 1; kk < tab1[j * nb_comp + nc + 1] - 1; kk++)
+                          for (auto kk = tab1[j * nb_comp + nc] - 1; kk < tab1[j * nb_comp + nc + 1] - 1; kk++)
                             {
                               if (tab2[kk] - 1 == num_face0 * nb_comp + nc)
                                 coeff(kk) -= valA * porosite_face(num_face0 * nb_comp + nc);
@@ -463,14 +464,14 @@ void Op_Dift_VEF_Face_Q1::contribuer_a_avec(const DoubleTab& transporte, Matrice
                     const double valA = viscA_Q1(domaine_VEF, num_face, j, dimension, elembis, d_mu);
                     for (int nc = 0; nc < nb_comp; nc++)
                       {
-                        for (int kk = tab1[num_face * nb_comp + nc] - 1; kk < tab1[num_face * nb_comp + nc + 1] - 1; kk++)
+                        for (auto kk = tab1[num_face * nb_comp + nc] - 1; kk < tab1[num_face * nb_comp + nc + 1] - 1; kk++)
                           {
                             if (tab2[kk] - 1 == num_face * nb_comp + nc)
                               coeff(kk) += valA * porosite_face(num_face * nb_comp + nc);
                             if (tab2[kk] - 1 == j * nb_comp + nc)
                               coeff(kk) -= valA * porosite_face(j * nb_comp + nc);
                           }
-                        for (int kk = tab1[j * nb_comp + nc] - 1; kk < tab1[j * nb_comp + nc + 1] - 1; kk++)
+                        for (auto kk = tab1[j * nb_comp + nc] - 1; kk < tab1[j * nb_comp + nc + 1] - 1; kk++)
                           {
                             if (tab2[kk] - 1 == num_face * nb_comp + nc)
                               coeff(kk) -= valA * porosite_face(num_face * nb_comp + nc);
@@ -501,14 +502,14 @@ void Op_Dift_VEF_Face_Q1::contribuer_a_avec(const DoubleTab& transporte, Matrice
                     const double valA = viscA_Q1(domaine_VEF, num_face0, j, dimension, elem, d_mu);
                     for (int nc = 0; nc < nb_comp; nc++)
                       {
-                        for (int kk = tab1[num_face0 * nb_comp + nc] - 1; kk < tab1[num_face0 * nb_comp + nc + 1] - 1; kk++)
+                        for (auto kk = tab1[num_face0 * nb_comp + nc] - 1; kk < tab1[num_face0 * nb_comp + nc + 1] - 1; kk++)
                           {
                             if (tab2[kk] - 1 == num_face0 * nb_comp + nc)
                               coeff(kk) += valA * porosite_face(num_face0 * nb_comp + nc);
                             if (tab2[kk] - 1 == j * nb_comp + nc)
                               coeff(kk) -= valA * porosite_face(j * nb_comp + nc);
                           }
-                        for (int kk = tab1[j * nb_comp + nc] - 1; kk < tab1[j * nb_comp + nc + 1] - 1; kk++)
+                        for (auto kk = tab1[j * nb_comp + nc] - 1; kk < tab1[j * nb_comp + nc + 1] - 1; kk++)
                           {
                             if (tab2[kk] - 1 == num_face0 * nb_comp + nc)
                               coeff(kk) -= valA * porosite_face(num_face0 * nb_comp + nc);

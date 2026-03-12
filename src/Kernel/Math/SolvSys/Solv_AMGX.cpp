@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -179,10 +179,10 @@ bool Solv_AMGX::detect_new_stencil(const Matrice_Morse& mat_morse)
   Perf_counters::time_point start = statistics().start_clock();
   // Parcours de la matrice_morse (qui peut contenir des 0 et qui n'est pas triee par colonnes croissantes)
   // si matrice sur le GPU deja construite (qui est sans 0 et qui est triee par colonnes croissantes):
-  const ArrOfInt& tab1 = mat_morse.get_tab1();
-  const ArrOfInt& tab2 = mat_morse.get_tab2();
-  const ArrOfDouble& coeff = mat_morse.get_coeff();
-  const ArrOfTID& renum_array = renum_;
+  const auto& tab1 = mat_morse.get_tab1();
+  const auto& tab2 = mat_morse.get_tab2();
+  const auto& coeff = mat_morse.get_coeff();
+  const auto& renum_array = renum_;
   int new_stencil = 0, RowLocal = 0;
   Journal() << "Provisoire: nb_rows_=" << nb_rows_ << " nb_rows_tot_=" << nb_rows_tot_ << finl;
   for (int i = 0; i < tab1.size_array() - 1; i++)
@@ -190,7 +190,7 @@ bool Solv_AMGX::detect_new_stencil(const Matrice_Morse& mat_morse)
       if (items_to_keep_[i])
         {
           int nnz_row = 0;
-          for (int k = tab1(i) - 1; k < tab1(i + 1) - 1; k++)
+          for (auto k = tab1(i) - 1; k < tab1(i + 1) - 1; k++)
             if (coeff(k) != 0) nnz_row++;
           if (nnz_row != rowOffsets[RowLocal + 1] - rowOffsets[RowLocal])
             {
@@ -200,15 +200,15 @@ bool Solv_AMGX::detect_new_stencil(const Matrice_Morse& mat_morse)
             }
           else
             {
-              for (int k = tab1(i) - 1; k < tab1(i + 1) - 1; k++)
+              for (auto k = tab1(i) - 1; k < tab1(i + 1) - 1; k++)
                 {
                   if (coeff(k) != 0)
                     {
                       bool found = false;
-                      trustIdType col = renum_array[tab2(k) - 1];
+                      auto col = renum_array[tab2(k) - 1];
                       // Boucle pour voir si le coeff est sur le GPU:
-                      trustIdType RowGlobal = decalage_local_global_+RowLocal;
-                      for (trustIdType kk = rowOffsets[RowLocal]; kk < rowOffsets[RowLocal + 1]; kk++)
+                      auto RowGlobal = decalage_local_global_+RowLocal;
+                      for (auto kk = rowOffsets[RowLocal]; kk < rowOffsets[RowLocal + 1]; kk++)
                         {
                           if (colIndices[kk] == col)
                             {

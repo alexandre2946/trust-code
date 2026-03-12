@@ -488,8 +488,8 @@ void  Domaine_Cl_EF::imposer_symetrie_matrice_secmem(Matrice_Morse& la_matrice, 
   const DoubleTab& n_bis =normales_symetrie_bis_->valeurs();
   ArrOfDouble normale(dimension);
 
-  const IntVect& tab1=la_matrice.get_tab1();
-  const IntVect& tab2=la_matrice.get_tab2();
+  const auto& tab1 = la_matrice.get_tab1();
+  const auto& tab2 = la_matrice.get_tab2();
 
   const DoubleTab& champ_inconnue = equation().inconnue().valeurs();
   int dirmax=2;
@@ -502,7 +502,7 @@ void  Domaine_Cl_EF::imposer_symetrie_matrice_secmem(Matrice_Morse& la_matrice, 
             const DoubleTab& nn=(dir==0?n:(dir==1?n_bis:normales_symetrie_ter_->valeurs()));
             for (int d=0; d<dimension; d++) normale[d]=nn(som,d);
             // On commence par recalculer secmem=secmem-A *present pour pouvoir modifier A (on en profite pour projeter)
-            int nb_coeff_ligne=tab1[som*nb_comp+1] - tab1[som*nb_comp];
+            auto nb_coeff_ligne=tab1[som*nb_comp+1] - tab1[som*nb_comp];
             for (int k=0; k<nb_coeff_ligne; k++)
               {
                 for (int comp=0; comp<nb_comp; comp++)
@@ -576,7 +576,7 @@ void  Domaine_Cl_EF::imposer_symetrie_matrice_secmem(Matrice_Morse& la_matrice, 
             {
               // pour les blocs extra diagonaux on assure que Aij.ni=0
 
-              ArrOfDouble somme(nb_coeff_ligne);
+              ArrOfDouble somme((int)nb_coeff_ligne);
               for (int k=0; k<nb_coeff_ligne; k++)
                 {
 

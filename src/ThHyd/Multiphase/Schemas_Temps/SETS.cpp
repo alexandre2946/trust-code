@@ -202,7 +202,7 @@ void SETS::init_cv_ctx(const DoubleTab& secmem, const DoubleVect& norme)
   /* numerotation pour recuperer le residu : on fait comme dans Solv_Petsc */
   ArrOfBit items_to_keep;
   const int size = secmem.size_array();
-  trustIdType idx = mppartial_sum(secmem.get_md_vector()->get_sequential_items_flags(items_to_keep, secmem.line_size()));
+  auto idx = mppartial_sum(secmem.get_md_vector()->get_sequential_items_flags(items_to_keep, secmem.line_size()));
   ix.resize(size);
   for (int i = 0; i < size; i++)
     if (items_to_keep[i])
@@ -751,7 +751,7 @@ int SETS::eliminer(const std::vector<std::set<std::pair<std::string, int>>> ordr
                     {
                       for (int i = 0; i < calc.size_array(); i++)
                         if (calc[i])
-                          for (int j = v_m.second->get_tab1()(oMg + M * i) - 1; j < v_m.second->get_tab1()(oMg + M * (i + 1)) - 1; j++) //dependances de toutes les lignes
+                          for (auto j = v_m.second->get_tab1()(oMg + M * i) - 1; j < v_m.second->get_tab1()(oMg + M * (i + 1)) - 1; j++) //dependances de toutes les lignes
                             stencil[i].insert(v_m.second->get_tab2()(j) - 1);
                     }
                   else if (e_i.count(v_m.first) || i_bloc.count(v_m.first)) //dependance en une variable partiellement / totalement eliminee
@@ -759,7 +759,7 @@ int SETS::eliminer(const std::vector<std::set<std::pair<std::string, int>>> ordr
                       A = A_p.count(v_m.first) ? &A_p.at(v_m.first) : nullptr;
                       for (int i = 0; i < calc.size_array(); i++)
                         if (calc[i])
-                          for (int j = v_m.second->get_tab1()(oMg + M * i) - 1; j < v_m.second->get_tab1()(oMg + M * (i + 1)) - 1; j++)
+                          for (auto j = v_m.second->get_tab1()(oMg + M * i) - 1; j < v_m.second->get_tab1()(oMg + M * (i + 1)) - 1; j++)
                             {
                               const int jb = v_m.second->get_tab2()(j) - 1;
                               int k = 0;
@@ -771,7 +771,7 @@ int SETS::eliminer(const std::vector<std::set<std::pair<std::string, int>>> ordr
                               if (bloc.count( { v_m.first, k }) && n >= 0 && n < N)
                                 continue; //(variable, bloc) en cours d'elimination et coeff bloc-diagonal -> ok
                               else if (e_ib.count( { v_m.first, k }))  //(variable, bloc) elimine -> dependance en inco_p dans A_p
-                                for (int l = A->get_tab1()(jb) - 1; l < A->get_tab1()(jb + 1) - 1; l++)
+                                for (auto l = A->get_tab1()(jb) - 1; l < A->get_tab1()(jb + 1) - 1; l++)
                                   stencil[i].insert(A->get_tab2()(l) - 1);
                               else
                                 {
@@ -855,9 +855,9 @@ int SETS::eliminer(const std::vector<std::set<std::pair<std::string, int>>> ordr
       for (int i = 0; i < calc.size_array(); i++)
         if (calc[i])
           {
-            const int deb = Ap[0]->get_tab1()(off_g[0] + size[0] * i) - 1;
-            const int fin = Ap[0]->get_tab1()(off_g[0] + size[0] * i + 1) - 1;
-            const int ic = fin - deb;
+            const auto deb = Ap[0]->get_tab1()(off_g[0] + size[0] * i) - 1;
+            const auto fin = Ap[0]->get_tab1()(off_g[0] + size[0] * i + 1) - 1;
+            const int ic = (int)(fin - deb);
             const int nc = ic + 1;
             S.resize(nc, nb), S = 0; //second membre : 5(i, .) -> dependance en la i-eme colonne du stencil des Ap du bloc, S(ic, .) -> partie constante
             //partie "second membre des equations"
@@ -884,7 +884,7 @@ int SETS::eliminer(const std::vector<std::set<std::pair<std::string, int>>> ordr
                       const int oNg = off_g[k];
                       const int oNl = off_l[k];
                       for (int m = 0; m < M; m++)
-                        for (int l = mat[j][k]->get_tab1()(oMg + M * i + m) - 1; l < mat[j][k]->get_tab1()(oMg + M * i + m + 1) - 1; l++)
+                        for (auto l = mat[j][k]->get_tab1()(oMg + M * i + m) - 1; l < mat[j][k]->get_tab1()(oMg + M * i + m + 1) - 1; l++)
                           {
                             const int jb = mat[j][k]->get_tab2()(l) - 1;
                             const int n = jb - oNg - N * i;
@@ -894,15 +894,15 @@ int SETS::eliminer(const std::vector<std::set<std::pair<std::string, int>>> ordr
                               {
                                 const double coeff = mat[j][k]->get_coeff()(l);
                                 S(ic, oMl + m) -= coeff * bp[k]->addr()[jb];
-                                int pos = deb - 1;
-                                for (int lb = Ap[k]->get_tab1()(jb) - 1; lb < Ap[k]->get_tab1()(jb + 1) - 1; lb++)
+                                auto pos = deb - 1;
+                                for (auto lb = Ap[k]->get_tab1()(jb) - 1; lb < Ap[k]->get_tab1()(jb + 1) - 1; lb++)
                                   {
                                     const int col = Ap[k]->get_tab2()(lb);
                                     pos++;
                                     while(Ap[0]->get_tab2()(pos) != col && pos < fin)
                                       pos++;
                                     assert(Ap[0]->get_tab2()(pos) == col);
-                                    S(pos - deb, oMl + m) -= coeff * Ap[k]->get_coeff()(lb);
+                                    S((int)(pos - deb), oMl + m) -= coeff * Ap[k]->get_coeff()(lb);
                                   }
                               }
                           }
@@ -917,15 +917,15 @@ int SETS::eliminer(const std::vector<std::set<std::pair<std::string, int>>> ordr
                   const int oMl = off_l[j];
                   for (int m = 0; m < M; m++)
                     {
-                      int pos = deb - 1;
-                      for (int k = pmat[j]->get_tab1()(oMg + M * i + m) - 1; k < pmat[j]->get_tab1()(oMg + M * i + m + 1) - 1; k++)
+                      auto pos = deb - 1;
+                      for (auto k = pmat[j]->get_tab1()(oMg + M * i + m) - 1; k < pmat[j]->get_tab1()(oMg + M * i + m + 1) - 1; k++)
                         {
                           int col = pmat[j]->get_tab2()(k);
                           pos++;
                           while (Ap[0]->get_tab2()(pos) != col && pos < fin)
                             pos++;
                           assert(Ap[0]->get_tab2()(pos) == col);
-                          S(pos - deb, oMl + m) -= pmat[j]->get_coeff()(k);
+                          S((int)(pos - deb), oMl + m) -= pmat[j]->get_coeff()(k);
                         }
                     }
                 }
@@ -938,20 +938,20 @@ int SETS::eliminer(const std::vector<std::set<std::pair<std::string, int>>> ordr
                     oMg = off_g[j];
                     const int oMl = off_l[j];
                     for (int m = 0; m < M; m++)
-                      for (int l = dmat[j][k]->get_tab1()(oMg + M * i + m) - 1; l < dmat[j][k]->get_tab1()(oMg + M * i + m + 1) - 1; l++)
+                      for (auto l = dmat[j][k]->get_tab1()(oMg + M * i + m) - 1; l < dmat[j][k]->get_tab1()(oMg + M * i + m + 1) - 1; l++)
                         {
                           const double coeff = dmat[j][k]->get_coeff()(l);
                           const int jb = dmat[j][k]->get_tab2()(l) - 1;
                           S(ic, oMl + m) -= coeff * dbp[k]->addr()[jb]; //partie "constante"
-                          int pos = deb - 1;
-                          for (int lb = dAp[k]->get_tab1()(jb) - 1; lb < dAp[k]->get_tab1()(jb + 1) - 1; lb++) //partie "dependance en inco_p"
+                          auto pos = deb - 1;
+                          for (auto lb = dAp[k]->get_tab1()(jb) - 1; lb < dAp[k]->get_tab1()(jb + 1) - 1; lb++) //partie "dependance en inco_p"
                             {
                               const int col = dAp[k]->get_tab2()(lb);
                               pos++;
                               while (Ap[0]->get_tab2()(pos) != col && pos < fin)
                                 pos++;
                               assert(Ap[0]->get_tab2()(pos) == col);
-                              S(pos - deb, oMl + m) -= coeff * dAp[k]->get_coeff()(lb);
+                              S((int)(pos - deb), oMl + m) -= coeff * dAp[k]->get_coeff()(lb);
                             }
                         }
                   }
@@ -971,8 +971,11 @@ int SETS::eliminer(const std::vector<std::set<std::pair<std::string, int>>> ordr
                 for (int m = 0; m < M; m++)
                   {
                     bp[j]->addr()[oMg + M * i + m] = S(ic, oMl + m);
-                    for (int k = 0, l = Ap[j]->get_tab1()(oMg + M * i + m) - 1; k < ic; k++, l++)
-                      Ap[j]->get_set_coeff()(l) = S(k, oMl + m);
+                    {
+                      auto l = Ap[j]->get_tab1()(oMg + M * i + m) - 1;
+                      for (int k = 0; k < ic; k++, l++)
+                        Ap[j]->get_set_coeff()(l) = S(k, oMl + m);
+                    }
                   }
               }
           }
@@ -1016,10 +1019,10 @@ void SETS::assembler(const std::string inco_p,
                 {
                   int ib = M * i;
                   for (int m = 0; m < M; m++, ib++)
-                    for (int j = Mp.get_tab1()(ib) - 1; j < Mp.get_tab1()(ib + 1) - 1; j++)
+                    for (auto j = Mp.get_tab1()(ib) - 1; j < Mp.get_tab1()(ib + 1) - 1; j++)
                       {
                         const int k = Mp.get_tab2()(j) - 1;
-                        for (int l = (Ap ? Ap->get_tab1()(k) - 1 : 0); l < (Ap ? Ap->get_tab1()(k + 1) - 1 : 1); l++)
+                        for (auto l = (Ap ? Ap->get_tab1()(k) - 1 : 0); l < (Ap ? Ap->get_tab1()(k + 1) - 1 : 1); l++)
                           stencil.append_line(ib, Ap ? Ap->get_tab2()(l) - 1 : k);
                       }
                 }
@@ -1043,14 +1046,14 @@ void SETS::assembler(const std::string inco_p,
               int ib = M * i;
               for (int m = 0; m < M; m++, ib++)
                 {
-                  const int deb = P.get_tab1()(ib) - 1;
-                  const int fin = P.get_tab1()(ib + 1) - 1;
-                  for (int j = Mp.get_tab1()(ib) - 1; j < Mp.get_tab1()(ib + 1) - 1; j++)
+                  const auto deb = P.get_tab1()(ib) - 1;
+                  const auto fin = P.get_tab1()(ib + 1) - 1;
+                  for (auto j = Mp.get_tab1()(ib) - 1; j < Mp.get_tab1()(ib + 1) - 1; j++)
                     {
                       const int k = Mp.get_tab2()(j) - 1;
                       secmem(i, m) -= Mp.get_coeff()(j) * bp.addr()[k];
-                      int pos = deb - 1;
-                      for (int l = Ap.get_tab1()(k) - 1; l < Ap.get_tab1()(k + 1) - 1; l++)
+                      auto pos = deb - 1;
+                      for (auto l = Ap.get_tab1()(k) - 1; l < Ap.get_tab1()(k + 1) - 1; l++)
                         {
                           const int col = Ap.get_tab2()(l);
                           pos++;
@@ -1065,6 +1068,6 @@ void SETS::assembler(const std::string inco_p,
       }
   const double diag = P.get_coeff()(0);
   if (p_degen && !Process::me())
-    for (int i = 0; i < P.get_tab1()(1) - 1; i++)
+    for (auto i = 0; i < P.get_tab1()(1) - 1; i++)
       P.get_set_coeff()(i) += diag; //de-degeneration de la matrice
 }

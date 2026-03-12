@@ -1,6 +1,7 @@
 -------------------------------------------------------------
 Developer notes version 1.9.8_beta : Changes since version 1.9.7 :
 -------------------------------------------------------------
+XX/XX/26 (TRUST) GPU          : Matrice_Morse now use int64 indices during GPU build for tab1/tab2/coeff arrays to access devices with large memory
 xx/XX/26 (TRUST) GPU          : Update to Kokkos 5.1
 17/03/26 (TRUST) New feature  : Add a new API for asynchronous echange_espace_virtuel
 23/03/26 (TRUST) Param        : Introducing Objet_U_With_Params. All classes inheriting from it must use the set_param() logic, ensuring a consistent usage of the TRUST grammar, and avoiding wild readOn() overrides. validate_params can be overriden for further validation of the read values.

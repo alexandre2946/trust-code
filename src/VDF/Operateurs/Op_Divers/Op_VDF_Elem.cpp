@@ -44,8 +44,9 @@ void Op_VDF_Elem::dimensionner_old(const Domaine_VDF& le_dom, const Domaine_Cl_V
 
   la_matrice.dimensionner(n1*nb_comp, n1*nb_comp, 0);
 
-  IntVect& tab1 = la_matrice.get_set_tab1(), &tab2 = la_matrice.get_set_tab2();
-  DoubleVect& coeff = la_matrice.get_set_coeff();
+  auto& tab1 = la_matrice.get_set_tab1();
+  auto& tab2 = la_matrice.get_set_tab2();
+  auto& coeff = la_matrice.get_set_coeff();
 
   const int ndeb = le_dom.premiere_face_int(), nfin = le_dom.nb_faces();
   coeff = 0;
@@ -99,7 +100,7 @@ void Op_VDF_Elem::dimensionner_old(const Domaine_VDF& le_dom, const Domaine_Cl_V
   for (int i = 0; i < n1*nb_comp; i++)
     {
       tab2[tab1[i]-1] = i+1;
-      rang_voisin[i] = tab1[i];
+      rang_voisin[i] = (int)tab1[i];
     }
 
   // on traite les faces internes pour les voisins

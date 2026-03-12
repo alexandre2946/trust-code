@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -62,22 +62,22 @@ static void convbis(const double psc,const int num1,const int num2,
 }
 static void convbisimplicite(const double psc,const int num1,const int num2,
                              const DoubleTab& transporte,const int ncomp,
-                             DoubleVect& coeff, Matrice_Morse& matrice)
+                             Matrice_Morse& matrice)
 {
-  int comp,k;
-  IntVect& tab1 = matrice.get_set_tab1();
-  IntVect& tab2 = matrice.get_set_tab2();
+  const auto& tab1 = matrice.get_set_tab1();
+  const auto& tab2 = matrice.get_set_tab2();
+  auto& coeff = matrice.get_set_coeff();
 
-  for (comp=0; comp<ncomp; comp++)
+  for (int comp=0; comp<ncomp; comp++)
     {
       if (psc >=0)
         {
-          for (k=tab1[num1*ncomp+comp]-1; k<tab1[num1*ncomp+comp+1]-1; k++)
+          for (auto k=tab1[num1*ncomp+comp]-1; k<tab1[num1*ncomp+comp+1]-1; k++)
             {
               if (tab2[k]-1== num1*ncomp+comp)
                 coeff(k) += psc;
             }
-          for (k=tab1[num2*ncomp+comp]-1; k<tab1[num2*ncomp+comp+1]-1; k++)
+          for (auto k=tab1[num2*ncomp+comp]-1; k<tab1[num2*ncomp+comp+1]-1; k++)
             {
               if (tab2[k]-1== num1*ncomp+comp)
                 coeff(k) -= psc;
@@ -85,12 +85,12 @@ static void convbisimplicite(const double psc,const int num1,const int num2,
         }
       else
         {
-          for (k=tab1[num1*ncomp+comp]-1; k<tab1[num1*ncomp+comp+1]-1; k++)
+          for (auto k=tab1[num1*ncomp+comp]-1; k<tab1[num1*ncomp+comp+1]-1; k++)
             {
               if (tab2[k]-1== num2*ncomp+comp)
                 coeff(k) += psc;
             }
-          for (k=tab1[num2*ncomp+comp]-1; k<tab1[num2*ncomp+comp+1]-1; k++)
+          for (auto k=tab1[num2*ncomp+comp]-1; k<tab1[num2*ncomp+comp+1]-1; k++)
             {
               if (tab2[k]-1== num2*ncomp+comp)
                 coeff(k) -= psc;
@@ -412,7 +412,7 @@ void Op_Conv_Amont_old_VEF_Face::ajouter_contribution(const DoubleTab& transport
 
   double psc;
   //DoubleTab pscl=0;
-  int poly,face_adj,fa7,i,j,k,n_bord, num_face, rang ,itypcl, num10,num20,num_som;
+  int poly,face_adj,fa7,i,j,n_bord, num_face, rang ,itypcl, num10,num20,num_som;
   const int ncomp_ch_transporte = transporte.line_size();
 
   IntVect face(nfac);
@@ -420,9 +420,9 @@ void Op_Conv_Amont_old_VEF_Face::ajouter_contribution(const DoubleTab& transport
   DoubleVect vc(dimension);
   DoubleTab vsom(nsom,dimension);
   DoubleVect cc(dimension);
-  IntVect& tab1 = matrice.get_set_tab1();
-  IntVect& tab2 = matrice.get_set_tab2();
-  DoubleVect& coeff = matrice.get_set_coeff();
+  auto& tab1 = matrice.get_set_tab1();
+  auto& tab2 = matrice.get_set_tab2();
+  auto& coeff = matrice.get_set_coeff();
 
   // Traitement particulier pour les faces de periodicite
   int voisine, nb_faces_perio = 0;
@@ -531,7 +531,7 @@ void Op_Conv_Amont_old_VEF_Face::ajouter_contribution(const DoubleTab& transport
               psc/= nb_som_facette;
               num10 = face[KEL(0,fa7)];
               num20 = face[KEL(1,fa7)];
-              convbisimplicite(psc,num10,num20,transporte,ncomp_ch_transporte,coeff,matrice);
+              convbisimplicite(psc,num10,num20,transporte,ncomp_ch_transporte,matrice);
 
             } // fin de boucle sur les sommets des facettes.
 
@@ -542,7 +542,7 @@ void Op_Conv_Amont_old_VEF_Face::ajouter_contribution(const DoubleTab& transport
           psc /= nb_som_facette;
           num10 = face[KEL(0,fa7)];
           num20 = face[KEL(1,fa7)];
-          convbisimplicite(psc,num10,num20,transporte,ncomp_ch_transporte,coeff,matrice);
+          convbisimplicite(psc,num10,num20,transporte,ncomp_ch_transporte,matrice);
 
         } // fin de boucle sur les facettes.
 
@@ -570,7 +570,7 @@ void Op_Conv_Amont_old_VEF_Face::ajouter_contribution(const DoubleTab& transport
                 {
                   for (j=0; j<ncomp_ch_transporte; j++)
                     {
-                      for (k=tab1[num_face*ncomp_ch_transporte+j]-1; k<tab1[num_face*ncomp_ch_transporte+j+1]-1; k++)
+                      for (auto k=tab1[num_face*ncomp_ch_transporte+j]-1; k<tab1[num_face*ncomp_ch_transporte+j+1]-1; k++)
                         {
                           if (tab2[k]-1==num_face*ncomp_ch_transporte+j)
                             coeff(k) += psc;
@@ -581,7 +581,7 @@ void Op_Conv_Amont_old_VEF_Face::ajouter_contribution(const DoubleTab& transport
                 {
                   for (j=0; j<ncomp_ch_transporte; j++)
                     {
-                      for (k=tab1[num_face*ncomp_ch_transporte+j]-1; k<tab1[num_face*ncomp_ch_transporte+j+1]-1; k++)
+                      for (auto k=tab1[num_face*ncomp_ch_transporte+j]-1; k<tab1[num_face*ncomp_ch_transporte+j+1]-1; k++)
                         {
                           if (tab2[k]-1==num_face*ncomp_ch_transporte+j)
                             coeff(k) += 0;
@@ -608,11 +608,11 @@ void Op_Conv_Amont_old_VEF_Face::ajouter_contribution(const DoubleTab& transport
                       diff1 = -1*tab(nb_faces_perio,comp);
                       diff2 = -1*tab(nb_faces_perio+voisine-num_face,comp);
 
-                      for (k=tab1[num_face*ncomp_ch_transporte+comp]-1; k<tab1[num_face*ncomp_ch_transporte+1+comp]-1; k++)
+                      for (auto k=tab1[num_face*ncomp_ch_transporte+comp]-1; k<tab1[num_face*ncomp_ch_transporte+1+comp]-1; k++)
                         if (tab2[k]-1==num_face*ncomp_ch_transporte+comp)
                           coeff(k) += diff2;
 
-                      for (k=tab1[voisine*ncomp_ch_transporte+comp]-1; k<tab1[voisine*ncomp_ch_transporte+1+comp]-1; k++)
+                      for (auto k=tab1[voisine*ncomp_ch_transporte+comp]-1; k<tab1[voisine*ncomp_ch_transporte+1+comp]-1; k++)
                         if (tab2[k]-1==voisine*ncomp_ch_transporte+comp)
                           coeff(k) += diff1;
                     }

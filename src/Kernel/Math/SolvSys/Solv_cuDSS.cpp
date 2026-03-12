@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -236,8 +236,9 @@ void Solv_cuDSS::Create_objects(const Matrice_Morse& csr)
 
   /* get dimensions and nnz */
   /* check that n does not change between solves */
-  int new_n = csr.get_tab1().size()-1;
-  int new_nnz = csr.get_coeff().size();
+  csr.set_tab1_int32();
+  int new_n = csr.get_tab1_int32().size_array()-1;
+  int new_nnz = (int)(csr.get_coeff().size_array());
 #ifndef NDEBUG
   assert(((new_n==n)||(first_solve))); // n should never change between solves
 #endif
@@ -292,7 +293,7 @@ void Solv_cuDSS::set_pointers_A(const Matrice_Morse& csr)
 {
 #ifdef cuDSS_
   /* get pointers */
-  csr_offsets_d = const_cast<int*>(csr.get_tab1().view_ro<1>().data());
+  csr_offsets_d = const_cast<int*>(reinterpret_cast<const int*>(csr.get_tab1_int32().view_ro<1>().data()));
   csr_columns_d = const_cast<int*>(csr.get_tab2().view_ro<1>().data());
   csr_values_d = const_cast<double*>(csr.get_coeff().view_ro<1>().data());
 

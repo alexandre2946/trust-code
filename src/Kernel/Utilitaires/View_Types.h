@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,7 +17,7 @@
 #define View_Types_included
 
 #include <kokkos++.h>
-
+#include <arch.h>
 #ifdef KOKKOS
 
 template<typename T, int _SHAPE_> struct InnerType { using TYPE = void;  };
@@ -78,13 +78,16 @@ using RandomAccessView = Kokkos::View<typename ConstInnerType<T, _SHAPE_>::TYPE,
 // Handy aliases
 using IntArrView = View<int, 1>;
 using DoubleArrView = View<double, 1>;
+using TIDArrView = View<trustIdType, 1>;
 
 using CIntArrView = ConstView<int, 1>;
 using CDoubleArrView = ConstView<double, 1>;
+using CTIDArrView = ConstView<trustIdType, 1>;
 
 using IntTabView = View<int, 2>;
 using IntTabView3 = View<int, 3>;
 using IntTabView4 = View<int, 4>;
+using CTIDTabView = ConstView<trustIdType, 2>;
 using DoubleTabView = View<double, 2>;
 using DoubleTabView3 = View<double, 3>;
 using DoubleTabView4 = View<double, 4>;

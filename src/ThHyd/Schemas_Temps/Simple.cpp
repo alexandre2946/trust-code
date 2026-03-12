@@ -438,7 +438,7 @@ bool Simple::iterer_eqs(LIST(OBS_PTR(Equation_base)) eqs, int nb_iter, int& ok)
       for (j = 0; j < eqs.size(); j++) //passages suivantes -> il suffit de reallouer les tableaux coeff()
         {
           Matrice_Morse& mat = ref_cast(Matrice_Morse, Mglob.get_bloc(i, j).valeur());
-          mat.get_set_coeff().resize(mat.get_set_tab2().size());
+          mat.get_set_coeff().resize(mat.get_set_tab2().size_array());
         }
 
   //tableaux de travail

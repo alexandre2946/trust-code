@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -33,7 +33,6 @@ extern "C"
 {
 
 #ifdef F77_Majuscule
-#ifndef CRAY
   double F77DECLARE(DASUM)(const integer *n, const double* const dx, const integer *incx);
 
 
@@ -61,7 +60,6 @@ extern "C"
                          const integer *incy);
 
   integer F77DECLARE(IDAMAX)(const integer *n, const double * const dx, const integer *incx);
-#endif
 
   float F77DECLARE(SDOT)(const integer *n, const float *cx,
                          const integer *incx, const float *cy, const integer *incy);
@@ -407,94 +405,6 @@ inline void F77NAME(SROTG)(double * const da,
   F77NAME(srotg)(da,db,c,s);
 }
 #endif
-
-#ifdef CRAY
-inline double F77NAME(DASUM)(const integer *n,
-                             const double* const dx,
-                             const integer *incx)
-{
-  return F77NAME(SASUM)(n , dx , incx);
-}
-
-
-inline void F77NAME(DAXPY)(const integer *n,
-                           const double * const da,
-                           const double * const dx,
-                           const integer *incx,
-                           double * const dy,
-                           const integer *incy)
-{
-  F77NAME(SAXPY)(n,da,dx,incx,dy,incy);
-}
-
-inline void F77NAME(DCOPY)(const integer *n,
-                           const double * const dx,
-                           const integer *incx,
-                           double * const dy,
-                           const integer *incy)
-{
-  F77NAME(SCOPY)(n,dx,incx,dy,incy);
-}
-
-inline double F77NAME(DDOT)(const integer *n,
-                            const double * const dx,
-                            const integer *incx,
-                            const double * const dy,
-                            const integer *incy)
-{
-  return F77NAME(SDOT)(n,dx,incx,dy,incy);
-}
-
-inline double F77NAME(DNRM2)(const integer *n,
-                             const double * const dx,
-                             const integer *incx)
-{
-  return F77NAME(SNRM2)(n,dx,incx);
-}
-
-inline void F77NAME(DROT)(const integer *n,
-                          double * const dx,
-                          const integer *incx,
-                          double * const dy,
-                          const integer *incy,
-                          const double * const c,
-                          const double * const s)
-{
-  F77NAME(SROT)(n,dx,incx,dy,incy,c,s);
-}
-
-inline void F77NAME(DROTG)(double * const da,
-                           double * const db,
-                           double * const c,
-                           double * const s)
-{
-  F77NAME(SROTG)(da,db,c,s);
-}
-
-inline void F77NAME(DSCAL)(const integer *n,
-                           double * const da,
-                           double * const dx,
-                           const integer *incx)
-{
-  F77NAME(SSCAL)(n,da,dx,incx);
-}
-
-inline void F77NAME(DSWAP)(const integer *n,
-                           double * const dx,
-                           const integer *incx,
-                           double * const dy,
-                           const integer *incy)
-{
-  F77NAME(SSWAP)(n,dx,incx,dy,incy);
-}
-
-inline integer F77NAME(IDAMAX)(const integer *n,
-                               const double * const dx,
-                               const integer *incx)
-{
-  return F77NAME(ISAMAX)(n,dx,incx);
-}
-#endif  // CRAY
 
 #else //_NO_BLAS1_
 

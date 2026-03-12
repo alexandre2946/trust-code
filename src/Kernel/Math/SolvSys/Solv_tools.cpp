@@ -66,7 +66,7 @@ void Solv_tools::construit_renum(const DoubleVect& b)
     }
   // Construction de ix
   size=b.size_array();
-  trustIdType colonne_globale=decalage_local_global_;
+  auto colonne_globale=decalage_local_global_;
   ix.resize(size);
   for (int i=0; i<size; i++)
     if (items_to_keep_[i])

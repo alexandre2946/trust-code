@@ -152,8 +152,8 @@ DoubleTab& Convection_Diffusion_Espece_Multi_QC::derivee_en_temps_inco(DoubleTab
 void Convection_Diffusion_Espece_Multi_QC::assembler(Matrice_Morse& matrice, const DoubleTab& inco, DoubleTab& resu)
 {
   resu = 0;
-  const IntVect& tab1 = matrice.get_tab1();
-  DoubleVect& coeff = matrice.get_set_coeff();
+  const auto& tab1 = matrice.get_tab1();
+  auto& coeff = matrice.get_set_coeff();
 
   const DoubleTab& rho = get_champ("masse_volumique").valeurs();
   operateur(0).l_op_base().contribuer_a_avec(inco, matrice);
@@ -177,7 +177,7 @@ void Convection_Diffusion_Espece_Multi_QC::assembler(Matrice_Morse& matrice, con
   for (int som = 0; som < ndl; som++)
     {
       double inv_rho = 1 / rho(som);
-      for (int k = tab1(som) - 1; k < tab1(som + 1) - 1; k++)
+      for (auto k = tab1(som) - 1; k < tab1(som + 1) - 1; k++)
         coeff(k) *= inv_rho;
       resu(som) *= inv_rho;
     }
@@ -226,9 +226,9 @@ void Convection_Diffusion_Espece_Multi_QC::assembler_blocs_avec_inertie(matrices
   Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr;
 
   secmem = 0;
-  const IntVect& tab1 = mat->get_tab1();
+  const auto& tab1 = mat->get_tab1();
 
-  DoubleVect& coeff = mat->get_set_coeff();
+  auto& coeff = mat->get_set_coeff();
 
   const DoubleTab& rho = get_champ("masse_volumique").valeurs();
   operateur(0).l_op_base().ajouter_blocs(matrices, secmem, semi_impl);
@@ -238,7 +238,7 @@ void Convection_Diffusion_Espece_Multi_QC::assembler_blocs_avec_inertie(matrices
   for (int som = 0; som < ndl; som++)
     {
       double inv_rho = 1 / rho(som);
-      for (int k = tab1(som) - 1; k < tab1(som + 1) - 1; k++)
+      for (auto k = tab1(som) - 1; k < tab1(som + 1) - 1; k++)
         coeff(k) *= inv_rho;
       secmem(som) *= inv_rho;
     }

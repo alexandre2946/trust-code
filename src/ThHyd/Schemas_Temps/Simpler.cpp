@@ -51,9 +51,9 @@ Entree& Simpler::readOn(Entree& is )
 // avec D diagonale de la matrice et E = D-matrice =-(matrice-D)
 int inverser_par_diagonale(const Matrice_Morse& matrice,const DoubleTrav& resu,const DoubleTab& current,DoubleTrav& correction_en_vitesse)
 {
-  const IntVect& tab1 = matrice.get_tab1();
-  const IntVect& tab2 = matrice.get_tab2();
-  const DoubleVect& coeff = matrice.get_coeff();
+  const auto& tab1 = matrice.get_tab1();
+  const auto& tab2 = matrice.get_tab2();
+  const auto& coeff = matrice.get_coeff();
 
   int deux_entrees=0;
   int nb_comp=1;
@@ -72,7 +72,7 @@ int inverser_par_diagonale(const Matrice_Morse& matrice,const DoubleTrav& resu,c
           for(int j=0; j<nb_comp; j++)
             {
               double t=resu(i);
-              for (int k=tab1(i*nb_comp+j); k<tab1(i*nb_comp+j+1)-1; k++)
+              for (auto k=tab1(i*nb_comp+j); k<tab1(i*nb_comp+j+1)-1; k++)
                 t -= coeff(k)*current(tab2(k)-1);
 
               correction_en_vitesse(i) = t/matrice(i*nb_comp+j,i*nb_comp+j);
@@ -112,7 +112,7 @@ int inverser_par_diagonale(const Matrice_Morse& matrice,const DoubleTrav& resu,c
           for(int j=0; j<nb_comp; j++)
             {
               double t=resu(i,j);
-              for (int k=tab1(i*nb_comp+j); k<tab1(i*nb_comp+j+1)-1; k++)
+              for (auto k=tab1(i*nb_comp+j); k<tab1(i*nb_comp+j+1)-1; k++)
                 {
                   int i1 = (tab2(k)-1)/nb_comp;
                   int j1 = (tab2(k)-1)-i1*nb_comp;

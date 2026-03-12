@@ -171,13 +171,13 @@ void Navier_Stokes_Fluide_Dilatable_Proto::assembler_avec_inertie_impl(const Nav
   const DoubleTab& tab_rho_face_np1 = fluide_dil.rho_face_np1(), &tab_rho_face_n=fluide_dil.rho_face_n();
   const int nb_compo = present.line_size();
 
-  CIntArrView tab1 = mat_morse.get_tab1().view_ro();
+  auto tab1 = mat_morse.get_tab1().view_ro();
   CIntArrView tab2 = mat_morse.get_tab2().view_ro();
   CDoubleArrView rho_face_np1 = static_cast<const ArrOfDouble&>(tab_rho_face_np1).view_ro();
-  DoubleArrView coeff = static_cast<ArrOfDouble&>(mat_morse.get_set_coeff()).view_rw();
+  DoubleArrView coeff = mat_morse.get_set_coeff().view_rw();
   Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), mat_morse.nb_lignes(), KOKKOS_LAMBDA(const int i)
   {
-    for (int k=tab1(i)-1; k<tab1(i+1)-1; k++)
+    for (auto k=tab1(i)-1; k<tab1(i+1)-1; k++)
       {
         int j = tab2(k)-1;
         double rapport = rho_face_np1(j/nb_compo);
@@ -263,13 +263,13 @@ void Navier_Stokes_Fluide_Dilatable_Proto::assembler_blocs_avec_inertie(const Na
   const DoubleTab& tab_rho_face_np1 = fluide_dil.rho_face_np1(), &tab_rho_face_n=fluide_dil.rho_face_n();
   const int nb_compo = present.line_size();
 
-  CIntArrView tab1 = mat->get_tab1().view_ro();
+  auto tab1 = mat->get_tab1().view_ro();
   CIntArrView tab2 = mat->get_tab2().view_ro();
   CDoubleArrView rho_face_np1 = static_cast<const ArrOfDouble&>(tab_rho_face_np1).view_ro();
-  DoubleArrView coeff = static_cast<ArrOfDouble&>(mat->get_set_coeff()).view_rw();
+  DoubleArrView coeff = mat->get_set_coeff().view_rw();
   Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), mat->nb_lignes(), KOKKOS_LAMBDA(const int i)
   {
-    for (int k=tab1(i)-1; k<tab1(i+1)-1; k++)
+    for (auto k=tab1(i)-1; k<tab1(i+1)-1; k++)
       {
         int j = tab2(k)-1;
         double rapport = rho_face_np1(j/nb_compo);

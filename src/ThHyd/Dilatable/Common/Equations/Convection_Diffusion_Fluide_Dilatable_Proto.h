@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -58,6 +58,11 @@ protected:
   virtual bool is_thermal() const = 0;
   virtual bool is_generic() const = 0;
   mutable OWN_PTR(Champ_Inc_base) ch_unite_;
+#ifdef TRUST_USE_GPU
+  BigDoubleVect tab_coeff_diffusif_; // Tableau de travail
+#else
+  DoubleVect tab_coeff_diffusif_; // Tableau de travail
+#endif
 };
 
 #endif /* Convection_Diffusion_Fluide_Dilatable_Proto_included */

@@ -54,9 +54,9 @@ void Op_VEF_Face::dimensionner(const Domaine_VEF& le_dom, const Domaine_Cl_VEF& 
   const int nb_comp = le_dom_cl.equation().inconnue().valeurs().line_size();
   la_matrice.dimensionner(nfin * nb_comp, nfin * nb_comp, 0);
 
-  IntVect& tab1 = la_matrice.get_set_tab1();
-  IntVect& tab2 = la_matrice.get_set_tab2();
-  DoubleVect& coeff = la_matrice.get_set_coeff();
+  auto& tab1 = la_matrice.get_set_tab1();
+  auto& tab2 = la_matrice.get_set_tab2();
+  auto& coeff = la_matrice.get_set_coeff();
   coeff = 0;
 
   const IntTab& elem_faces = le_dom.elem_faces();
@@ -118,7 +118,7 @@ void Op_VEF_Face::dimensionner(const Domaine_VEF& le_dom, const Domaine_Cl_VEF& 
               int modulo = (k + kk) % nb_comp;
               tab2[tab1[num_face * nb_comp + k] - 1 + kk] = num_face * nb_comp + 1 + modulo;
             }
-          rang_voisin[num_face * nb_comp + k] = tab1[num_face * nb_comp + k] + nb_comp - 1;
+          rang_voisin[num_face * nb_comp + k] = (int)(tab1[num_face * nb_comp + k] + nb_comp - 1);
         }
     }
 
@@ -185,7 +185,7 @@ void Op_VEF_Face::modifier_pour_Cl(const Domaine_VEF& le_dom, const Domaine_Cl_V
           bool has_val_imp = sub_type(Dirichlet, la_cl);
           CDoubleTabView val_imp;
           if (has_val_imp) val_imp = ref_cast(Dirichlet, la_cl).tab_val_imp().view_ro();
-          CIntArrView tab1 = la_matrice.get_tab1().view_ro();
+          auto tab1 = la_matrice.get_tab1().view_ro();
           CIntArrView num_face = la_front_dis.num_face().view_ro();
           DoubleArrView coeff = la_matrice.get_set_coeff().view_wo();
           DoubleTabView secmem = tab_secmem.view_wo();
@@ -194,11 +194,11 @@ void Op_VEF_Face::modifier_pour_Cl(const Domaine_VEF& le_dom, const Domaine_Cl_V
             int face = num_face(ind_face);
             for (int comp = 0; comp < nb_comp; comp++)
               {
-                int idiag = tab1[face * nb_comp + comp] - 1;
+                auto idiag = tab1[face * nb_comp + comp] - 1;
                 coeff[idiag] = 1;
                 // pour les voisins
-                int nbvois = tab1[face * nb_comp + 1 + comp] - tab1[face * nb_comp + comp];
-                for (int k = 1; k < nbvois; k++)
+                auto nbvois = tab1[face * nb_comp + 1 + comp] - tab1[face * nb_comp + comp];
+                for (auto k = 1; k < nbvois; k++)
                   coeff[idiag + k] = 0;
                 // pour le second membre
                 int j = nb_comp == 1 ? 0 : comp;
@@ -209,8 +209,8 @@ void Op_VEF_Face::modifier_pour_Cl(const Domaine_VEF& le_dom, const Domaine_Cl_V
         }
       else if (sub_type(Symetrie, la_cl) && le_dom_cl.equation().inconnue().nature_du_champ() == vectoriel)
         {
-          const IntVect& tab1 = la_matrice.get_tab1();
-          const IntVect& tab2 = la_matrice.get_tab2();
+          const auto& tab1 = la_matrice.get_tab1();
+          const auto& tab2 = la_matrice.get_tab2();
           const DoubleTab& face_normales = le_dom.face_normales();
           ArrOfDouble somme(la_matrice.nb_colonnes()); // On dimensionne au plus grand
           ToDo_Kokkos("critical");
@@ -234,8 +234,8 @@ void Op_VEF_Face::modifier_pour_Cl(const Domaine_VEF& le_dom, const Domaine_Cl_V
               max_coef = normale[ind_max];
 
               // On commence par recalculer secmem=secmem-A *present pour pouvoir modifier A (on en profite pour projeter)
-              int nb_coeff_ligne = tab1[face * nb_comp + 1] - tab1[face * nb_comp];
-              for (int k = 0; k < nb_coeff_ligne; k++)
+              auto nb_coeff_ligne = tab1[face * nb_comp + 1] - tab1[face * nb_comp];
+              for (auto k = 0; k < nb_coeff_ligne; k++)
                 {
                   for (int comp = 0; comp < nb_comp; comp++)
                     {
@@ -270,7 +270,7 @@ void Op_VEF_Face::modifier_pour_Cl(const Domaine_VEF& le_dom, const Domaine_Cl_V
                 {
                   int j0 = face * nb_comp + comp;
                   double rap = ref / la_matrice(j0, j0);
-                  for (int k = 0; k < nb_coeff_ligne; k++)
+                  for (auto k = 0; k < nb_coeff_ligne; k++)
                     {
                       int j = tab2[tab1[j0] - 1 + k] - 1;
                       la_matrice(j0, j) *= rap;
@@ -279,7 +279,7 @@ void Op_VEF_Face::modifier_pour_Cl(const Domaine_VEF& le_dom, const Domaine_Cl_V
                 }
               // on annule tous les coef extra diagonaux du bloc
               //
-              for (int k = 1; k < nb_coeff_ligne; k++)
+              for (auto k = 1; k < nb_coeff_ligne; k++)
                 {
                   for (int comp = 0; comp < nb_comp; comp++)
                     {
@@ -292,9 +292,9 @@ void Op_VEF_Face::modifier_pour_Cl(const Domaine_VEF& le_dom, const Domaine_Cl_V
 
               // pour les blocs extra diagonaux on assure que Aij.ni=0
               //ArrOfDouble somme(nb_coeff_ligne);
-              for (int k = 0; k < nb_coeff_ligne; k++)
+              for (auto k = 0; k < nb_coeff_ligne; k++)
                 {
-                  somme[k] = 0;
+                  somme[(int)k] = 0;
                   int j = tab2[tab1[face * nb_comp] - 1 + k] - 1;
 
                   // le coeff j doit exister sur les nb_comp lignes
@@ -310,7 +310,7 @@ void Op_VEF_Face::modifier_pour_Cl(const Domaine_VEF& le_dom, const Domaine_Cl_V
                       la_matrice(face * nb_comp + comp, j) -= (dsomme) * normale[comp];
                 }
               // Finalement on recalcule secmem=secmem+A*champ_inconnue (A a ete beaucoup modiife)
-              for (int k = 0; k < nb_coeff_ligne; k++)
+              for (auto k = 0; k < nb_coeff_ligne; k++)
                 {
                   for (int comp = 0; comp < nb_comp; comp++)
                     {
@@ -752,8 +752,8 @@ void Op_VEF_Face::modifier_matrice_pour_periodique_apres_contribuer(Matrice_Mors
   const Domaine_VF& domaine_VEF = ref_cast(Domaine_VF, eqn.domaine_dis());
   int nb_bords = domaine_VEF.nb_front_Cl();
 
-  const IntVect& tab1 = matrice.get_tab1();
-  const IntVect& tab2 = matrice.get_tab2();
+  const auto& tab1 = matrice.get_tab1();
+  const auto& tab2 = matrice.get_tab2();
 
   for (int n_bord = 0; n_bord < nb_bords; n_bord++)
     {
@@ -776,7 +776,7 @@ void Op_VEF_Face::modifier_matrice_pour_periodique_apres_contribuer(Matrice_Mors
                 int n0 = num_face * nb_comp + nc;
                 int n0perio = fac_asso * nb_comp + nc;
                 // on verifie que les 2 lignes sont identiques ( sauf la case diagonale qui n'est pas au meme endroit)
-                for (int j = tab1[n0] - 1; j < tab1[n0 + 1] - 1; j++)
+                for (auto j = tab1[n0] - 1; j < tab1[n0 + 1] - 1; j++)
                   {
                     int c = tab2[j] - 1;
                     if ((c != n0) && (c != n0perio))

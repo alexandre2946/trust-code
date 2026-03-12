@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -274,19 +274,17 @@ DoubleTab& Op_Dift_EF_Q1::calculer(const DoubleTab& tab_inconnue, DoubleTab& res
 // essai
 inline double& coeff_opt(Matrice_Morse& matrice,int i, int j)
 {
-  const IntVect& tab1_=matrice.get_tab1();
-  const IntVect& tab2_=matrice.get_tab2();
-  int k1=tab1_[i]-1;
-  int k2=tab1_[i+1]-1;
-  int k;
-  for (k=k1; k<k2; k++)
+  const auto& tab1_ = matrice.get_tab1();
+  const auto& tab2_ = matrice.get_tab2();
+  auto k1=tab1_[i]-1;
+  auto k2=tab1_[i+1]-1;
+  for (auto k=k1; k<k2; k++)
     if (tab2_[k]-1 == j) return(matrice.get_set_coeff()(k));
   Cerr << "i ou j ne conviennent pas " << finl;
   Cerr << "i=" << i << finl;
   Cerr << "j=" << j << finl;
   Cerr << "n_lignes=" << matrice.nb_lignes() << finl;
   Cerr << "n_colonnes=" << matrice.nb_colonnes() << finl;
-  assert( k<tab1_[i]-1);
   Process::exit();
   return coeff_opt(matrice,i,j);
 }

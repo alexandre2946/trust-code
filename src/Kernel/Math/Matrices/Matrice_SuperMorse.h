@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -25,20 +25,20 @@
 class Matrice_SuperMorse
 {
 public :
-  const int& tab1(int i) const { return tab1_[i]; } // i de 0 a n
-  int& tab1(int i) { return tab1_[i]; }
+  const auto& tab1(int i) const { return tab1_[i]; }  // i de 0 a n
+  auto& tab1(int i) { return tab1_[i]; }
   const int& tab2(int i) const { return tab2_[i]; } // i de 0 a nnz-1
   int& tab2(int i) { return tab2_[i]; }
   const double& coeff(int i) const { return coeff_[i]; } // i de 0 a nnz-1
   double& coeff(int i) { return coeff_[i]; }
 
-  ArrOfInt& get_set_tab1() { return tab1_ ; }
-  ArrOfInt& get_set_tab2() { return tab2_ ; }
-  ArrOfDouble& get_set_coeff() { return coeff_ ; }
+  auto& get_set_tab1() { return tab1_ ; }
+  auto& get_set_tab2() { return tab2_ ; }
+  auto& get_set_coeff() { return coeff_ ; }
 
-  const ArrOfInt& get_tab1() const { return tab1_ ; }
-  const ArrOfInt& get_tab2() const { return tab2_ ; }
-  const ArrOfDouble& get_coeff() const { return coeff_ ; }
+  const auto& get_tab1() const { return tab1_ ; }
+  const auto& get_tab2() const { return tab2_ ; }
+  const auto& get_coeff() const { return coeff_ ; }
 
   double ajouter_mult_vect_et_prodscal(const DoubleVect& x, DoubleVect& resu) const;
   // Tableau contenant les indices des lignes non vides (indices fortran)
@@ -47,8 +47,15 @@ public :
 
 
 protected :
-  ArrOfInt tab1_, tab2_;
-  ArrOfDouble coeff_;
+#ifdef TRUST_USE_GPU
+  ArrOfTID tab1_;
+  BigArrOfInt tab2_;
+  BigDoubleVect coeff_;
+#else
+  IntVect tab1_;
+  IntVect tab2_;
+  DoubleVect coeff_;
+#endif
 };
 
 #endif

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -35,8 +35,9 @@ void Op_VDF_Face::dimensionner(const Domaine_VDF& le_dom, const Domaine_Cl_VDF& 
 
   la_matrice.dimensionner(nfin*nb_comp,nfin*nb_comp,0);
 
-  IntVect& tab1 = la_matrice.get_set_tab1(), &tab2 = la_matrice.get_set_tab2();
-  DoubleVect& coeff = la_matrice.get_set_coeff();
+  auto& tab1 = la_matrice.get_set_tab1();
+  auto& tab2 = la_matrice.get_set_tab2();
+  auto& coeff = la_matrice.get_set_coeff();
   coeff = 0;
   IntVect rang_voisin(nfin);
   rang_voisin = 1;
@@ -71,20 +72,20 @@ void Op_VDF_Face::dimensionner(const Domaine_VDF& le_dom, const Domaine_Cl_VDF& 
       const int ori = orientation(num_face), face1 = le_dom.face_amont_princ(num_face,0), face2 = le_dom.face_amont_princ(num_face,1),
                 face3 = le_dom.face_bord_amont(num_face,(ori+1)%dimension,0), face4 = le_dom.face_bord_amont(num_face,(ori+1)%dimension,1);
 
-      int cpt = tab1[num_face]-1;
+      auto cpt = tab1[num_face]-1;
       tab2[cpt] = num_face+1;
       cpt++;
 
-      dimensionner_(face1,cpt,tab2);
-      dimensionner_(face2,cpt,tab2);
-      dimensionner_(face3,cpt,tab2);
-      dimensionner_(face4,cpt,tab2);
+      if (face1 > -1) { tab2[cpt] = face1+1; cpt++; }
+      if (face2 > -1) { tab2[cpt] = face2+1; cpt++; }
+      if (face3 > -1) { tab2[cpt] = face3+1; cpt++; }
+      if (face4 > -1) { tab2[cpt] = face4+1; cpt++; }
 
       if (dimension == 3)
         {
           const int face5 = le_dom.face_bord_amont(num_face,(ori+2)%dimension,0), face6 = le_dom.face_bord_amont(num_face,(ori+2)%dimension,1);
-          dimensionner_(face5,cpt,tab2);
-          dimensionner_(face6,cpt,tab2);
+          if (face5 > -1) { tab2[cpt] = face5+1; cpt++; }
+          if (face6 > -1) { tab2[cpt] = face6+1; cpt++; }
         }
     }
 
@@ -110,22 +111,22 @@ void Op_VDF_Face::dimensionner(const Domaine_VDF& le_dom, const Domaine_Cl_VDF& 
                 const int face3 = le_dom.face_bord_amont(num_face,(ori+1)%dimension,0), face4 = le_dom.face_bord_amont(num_face,(ori+1)%dimension,1);
                 const int face1b = elem_faces(faces_voisins(num_face,1),ori);
 
-                int cpt = tab1[num_face]-1;
+                auto cpt = tab1[num_face]-1;
                 cpt += 3;
                 if (face1b != num_face)
                   {
                     // on recalcule fac3 fac4
                     const int face3n = face_bord_amont2(le_dom,num_face,(ori+1)%dimension,0), face4n = face_bord_amont2(le_dom,num_face,(ori+1)%dimension,1);
-                    dimensionner_(face3,face3n,cpt,tab2);
-                    dimensionner_(face4,face4n,cpt,tab2);
+                    if (face3 != -1) { assert(tab2[cpt] == face3+1); tab2[cpt] = face3n+1; cpt++; }
+                    if (face4 != -1) { assert(tab2[cpt] == face4+1); tab2[cpt] = face4n+1; cpt++; }
 
                     if (dimension == 3)
                       {
                         const int face5 = le_dom.face_bord_amont(num_face,(ori+2)%dimension,0), face6 = le_dom.face_bord_amont(num_face,(ori+2)%dimension,1),
                                   face5n = face_bord_amont2(le_dom,num_face,(ori+2)%dimension,0), face6n = face_bord_amont2(le_dom,num_face,(ori+2)%dimension,1);
 
-                        dimensionner_(face5,face5n,cpt,tab2);
-                        dimensionner_(face6,face6n,cpt,tab2);
+                        if (face5 != -1) { assert(tab2[cpt] == face5+1); tab2[cpt] = face5n+1; cpt++; }
+                        if (face6 != -1) { assert(tab2[cpt] == face6+1); tab2[cpt] = face6n+1; cpt++; }
                       }
                   }
               }
@@ -136,14 +137,14 @@ void Op_VDF_Face::dimensionner(const Domaine_VDF& le_dom, const Domaine_Cl_VDF& 
 
 void Op_VDF_Face::modifier_pour_Cl_(const int face, const int comp, const int nb_comp, Matrice_Morse& la_matrice) const
 {
-  IntVect& tab1 = la_matrice.get_set_tab1();
-  DoubleVect& coeff = la_matrice.get_set_coeff();
+  auto& tab1 = la_matrice.get_set_tab1();
+  auto& coeff = la_matrice.get_set_coeff();
 
-  const int idiag = tab1[face * nb_comp + comp] - 1;
+  const auto idiag = tab1[face * nb_comp + comp] - 1;
   coeff[idiag] = 1.;
 
   // pour les voisins
-  const int nbvois = tab1[face * nb_comp + 1 + comp] - tab1[face * nb_comp + comp];
+  const int nbvois = (int)(tab1[face * nb_comp + 1 + comp] - tab1[face * nb_comp + comp]);
   for (int k = 1; k < nbvois; k++) coeff[idiag + k] = 0.;
 }
 

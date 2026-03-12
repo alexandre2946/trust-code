@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -641,26 +641,27 @@ void Iterateur_VDF_Face<_TYPE_>::corriger_fa7_elem_periodicite(const int ncomp, 
                 corriger_fa7_elem_periodicite__(face, num_elem, signe, fac1, fac2);
 
                 flux_evaluateur.template coeffs_fa7 < Type_Flux_Fa7::ELEM > (nullptr, num_elem, fac1, fac2, aii, ajj);
-                const IntVect& tab1 = (*matrice).get_set_tab1(), &tab2 = (*matrice).get_set_tab2();
-                DoubleVect& coeff = (*matrice).get_set_coeff();
+                const auto& tab1 = (*matrice).get_set_tab1();
+                const auto& tab2 = (*matrice).get_set_tab2();
+                auto& coeff = (*matrice).get_set_coeff();
                 if (signe > 0) /* on a oublie a droite  la contribution de la gauche */
                   {
                     for (int i = 0; i < ncomp; i++)
-                      for (int k = tab1[face * ncomp + i] - 1; k < tab1[face * ncomp + 1 + i] - 1; k++)
+                      for (auto k = tab1[face * ncomp + i] - 1; k < tab1[face * ncomp + 1 + i] - 1; k++)
                         if (tab2[k] - 1 == face * ncomp + i) coeff[k] += aii[i];
 
                     for (int i = 0; i < ncomp; i++)
-                      for (int k = tab1[face * ncomp + i] - 1; k < tab1[face * ncomp + 1 + i] - 1; k++)
+                      for (auto k = tab1[face * ncomp + i] - 1; k < tab1[face * ncomp + 1 + i] - 1; k++)
                         if (tab2[k] - 1 == fac2 * ncomp + i) coeff[k] -= ajj[i];
                   }
                 else /* on a oublie a gauche  la contribution de la droite */
                   {
                     for (int i = 0; i < ncomp; i++)
-                      for (int k = tab1[face * ncomp + i] - 1; k < tab1[face * ncomp + 1 + i] - 1; k++)
+                      for (auto k = tab1[face * ncomp + i] - 1; k < tab1[face * ncomp + 1 + i] - 1; k++)
                         if (tab2[k] - 1 == fac1 * ncomp + i) coeff[k] -= aii[i];
 
                     for (int i = 0; i < ncomp; i++)
-                      for (int k = tab1[face * ncomp + i] - 1; k < tab1[face * ncomp + 1 + i] - 1; k++)
+                      for (auto k = tab1[face * ncomp + i] - 1; k < tab1[face * ncomp + 1 + i] - 1; k++)
                         if (tab2[k] - 1 == face * ncomp + i) coeff[k] += ajj[i];
                   }
               }
@@ -733,23 +734,25 @@ inline void Iterateur_VDF_Face<_TYPE_>::fill_resu_tab(const int fac1, const int 
 template<class _TYPE_> template<typename Type_Double>
 void Iterateur_VDF_Face<_TYPE_>::fill_coeff_matrice_morse(const int face, const int i, const int ncomp, const int signe, const Type_Double& A, Matrice_Morse& matrice) const
 {
-  const IntVect& tab1 = matrice.get_set_tab1(), &tab2 = matrice.get_set_tab2();
-  DoubleVect& coeff = matrice.get_set_coeff();
-  for (int k = tab1[face * ncomp + i] - 1; k < tab1[face * ncomp + 1 + i] - 1; k++)
+  const auto& tab1 = matrice.get_set_tab1();
+  const auto& tab2 = matrice.get_set_tab2();
+  auto& coeff = matrice.get_set_coeff();
+  for (auto k = tab1[face * ncomp + i] - 1; k < tab1[face * ncomp + 1 + i] - 1; k++)
     if (tab2[k] - 1 == face * ncomp + i) coeff[k] += signe * A[i]; // equivalent a matrice(face,face) += signe*A(i)
 }
 
 template<class _TYPE_> template<typename Type_Double>
 void Iterateur_VDF_Face<_TYPE_>::fill_coeff_matrice_morse(const int fac1, const int fac2, const int i, const int ncomp, const Type_Double& A, const Type_Double& B, Matrice_Morse& matrice) const
 {
-  const IntVect& tab1 = matrice.get_set_tab1(), &tab2 = matrice.get_set_tab2();
-  DoubleVect& coeff = matrice.get_set_coeff();
-  for (int k = tab1[fac1 * ncomp + i] - 1; k < tab1[fac1 * ncomp + 1 + i] - 1; k++)
+  const auto& tab1 = matrice.get_set_tab1();
+  const auto& tab2 = matrice.get_set_tab2();
+  auto& coeff = matrice.get_set_coeff();
+  for (auto k = tab1[fac1 * ncomp + i] - 1; k < tab1[fac1 * ncomp + 1 + i] - 1; k++)
     {
       if (tab2[k] - 1 == fac1 * ncomp + i) coeff[k] += A[i]; // equivalent a matrice(fac1,fac1) += A(i)
       if (tab2[k] - 1 == fac2 * ncomp + i) coeff[k] -= B[i]; // equivalent a matrice(fac1,fac2) -= B(i)
     }
-  for (int k = tab1[fac2 * ncomp + i] - 1; k < tab1[fac2 * ncomp + 1 + i] - 1; k++)
+  for (auto k = tab1[fac2 * ncomp + i] - 1; k < tab1[fac2 * ncomp + 1 + i] - 1; k++)
     {
       if (tab2[k] - 1 == fac1 * ncomp + i) coeff[k] -= A[i]; // equivalent a matrice(fac2,fac1) -= A(i)
       if (tab2[k] - 1 == fac2 * ncomp + i) coeff[k] += B[i]; // equivalent a matrice(fac2,fac2) += B(i)

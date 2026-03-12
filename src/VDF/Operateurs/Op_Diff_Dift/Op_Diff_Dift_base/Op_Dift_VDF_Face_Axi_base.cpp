@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -325,14 +325,15 @@ DoubleTab& Op_Dift_VDF_Face_Axi_base::calculer(const DoubleTab& inco, DoubleTab&
 
 void Op_Dift_VDF_Face_Axi_base::fill_coeff_matrice_morse(const int fac1, const int fac2, const double flux, Matrice_Morse& matrice) const
 {
-  const IntVect& tab1 = matrice.get_set_tab1(), &tab2 = matrice.get_set_tab2();
-  DoubleVect& coeff = matrice.get_set_coeff();
-  for (int k = tab1[fac1]-1; k < tab1[fac1+1]-1; k++)
+  const auto& tab1 = matrice.get_set_tab1();
+  const auto& tab2 = matrice.get_set_tab2();
+  auto& coeff = matrice.get_set_coeff();
+  for (auto k = tab1[fac1]-1; k < tab1[fac1+1]-1; k++)
     {
       if (tab2[k]-1 == fac1) coeff[k] += flux;
       if (tab2[k]-1 == fac2) coeff[k] -= flux;
     }
-  for (int k = tab1[fac2]-1; k < tab1[fac2+1]-1; k++)
+  for (auto k = tab1[fac2]-1; k < tab1[fac2+1]-1; k++)
     {
       if (tab2[k]-1 == fac1) coeff[k] -= flux;
       if (tab2[k]-1 == fac2) coeff[k] += flux;
@@ -341,8 +342,9 @@ void Op_Dift_VDF_Face_Axi_base::fill_coeff_matrice_morse(const int fac1, const i
 
 void Op_Dift_VDF_Face_Axi_base::ajouter_contribution_elem(const DoubleVect& visco_turb, const DoubleTab& tau_diag, Matrice_Morse& matrice) const
 {
-  IntVect& tab1 = matrice.get_set_tab1(), &tab2 = matrice.get_set_tab2();
-  DoubleVect& coeff = matrice.get_set_coeff();
+  auto& tab1 = matrice.get_set_tab1();
+  auto& tab2 = matrice.get_set_tab2();
+  auto& coeff = matrice.get_set_coeff();
   for (int num_elem = 0; num_elem < le_dom_vdf->nb_elem(); num_elem++)
     {
       const int fx0 = elem_faces(num_elem,0), fx1 = elem_faces(num_elem,dimension), fy0 = elem_faces(num_elem,1), fy1 = elem_faces(num_elem,1+dimension);
@@ -368,10 +370,10 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_contribution_elem(const DoubleVect& visc
       if (is_var()) coef_laplacien_axi = -0.5*(tau_diag(num_elem,1)*visc_elem);
       else coef_laplacien_axi = -0.5*visc_elem; // XXX : comprends rien la
 
-      for (int l = tab1[fx0]-1; l < tab1[fx0+1]-1; l++)
+      for (auto l = tab1[fx0]-1; l < tab1[fx0+1]-1; l++)
         if (tab2[l]-1 == fx0) coeff[l] += coef_laplacien_axi*volumes_entrelaces(fx0)*porosite(fx0)/xv(fx0,0);
 
-      for (int l = tab1[fx1]-1; l < tab1[fx1+1]-1; l++)
+      for (auto l = tab1[fx1]-1; l < tab1[fx1+1]-1; l++)
         if (tab2[l]-1 == fx1) coeff[l] += coef_laplacien_axi*volumes_entrelaces(fx1)*porosite(fx1)/xv(fx1,0);
     }
 }
@@ -393,8 +395,9 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_contribution_elem_3D(const DoubleVect& v
 
 void Op_Dift_VDF_Face_Axi_base::ajouter_contribution_aretes_bords(const DoubleVect& visco_turb, const DoubleTab& tau_diag, Matrice_Morse& matrice) const
 {
-  IntVect& tab1 = matrice.get_set_tab1(), &tab2 = matrice.get_set_tab2();
-  DoubleVect& coeff = matrice.get_set_coeff();
+  auto& tab1 = matrice.get_set_tab1();
+  auto& tab2 = matrice.get_set_tab2();
+  auto& coeff = matrice.get_set_coeff();
   int ndeb = le_dom_vdf->premiere_arete_bord(), nfin = ndeb + le_dom_vdf->nb_aretes_bord();
   for (int n_arete = ndeb; n_arete < nfin; n_arete++)
     {
@@ -414,7 +417,7 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_contribution_aretes_bords(const DoubleVe
               {
                 // XXX j'ai supprime le if
                 const double flux1 = (d_visco_lam+ d_visco_turb)*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
-                for (int l = tab1[fac3]-1; l < tab1[fac3+1]-1; l++)
+                for (auto l = tab1[fac3]-1; l < tab1[fac3+1]-1; l++)
                   if (tab2[l]-1 == fac3) coeff[l] += signe*flux1;
               }
             else if (ori1b == 1) // bord d'equation teta = cte
@@ -422,29 +425,29 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_contribution_aretes_bords(const DoubleVe
                 if (ori3b == 0)
                   {
                     const double flux2 = (d_visco_lam + d_visco_turb)*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
-                    for (int l = tab1[fac3]-1; l < tab1[fac3+1]-1; l++)
+                    for (auto l = tab1[fac3]-1; l < tab1[fac3+1]-1; l++)
                       if (tab2[l]-1 == fac3) coeff[l] += signe*flux2;
 
                     // Termes supplementaires dans le laplacien en axi : Ils sont integres comme des termes sources
                     const double coef_laplacien_axi = 0.5*(d_visco_lam + d_visco_turb);
 
-                    for (int l = tab1[fac1]-1; l < tab1[fac1+1]-1; l++)
+                    for (auto l = tab1[fac1]-1; l < tab1[fac1+1]-1; l++)
                       if (tab2[l]-1 == fac1) coeff[l] += coef_laplacien_axi*volumes_entrelaces(fac1)*porosite(fac1)/xv(fac1,0);
 
-                    for (int l = tab1[fac2]-1; l < tab1[fac2+1]-1; l++)
+                    for (auto l = tab1[fac2]-1; l < tab1[fac2+1]-1; l++)
                       if (tab2[l]-1 == fac2) coeff[l] += coef_laplacien_axi*volumes_entrelaces(fac2)*porosite(fac2)/xv(fac2,0);
                   }
                 else if (ori3b == 2) // flux de tau23 a travers le bord
                   {
                     const double flux3 = (d_visco_lam + d_visco_turb)*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
-                    for (int l = tab1[fac3]-1; l < tab1[fac3+1]-1; l++)
+                    for (auto l = tab1[fac3]-1; l < tab1[fac3+1]-1; l++)
                       if (tab2[l]-1 == fac3) coeff[l] += signe*flux3;
                   }
               }
             else // (ori1 == 2) bord d'equation Z = cte
               {
                 const double flux4 = (d_visco_lam + d_visco_turb)*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
-                for (int l = tab1[fac3]-1; l < tab1[fac3+1]-1; l++)
+                for (auto l = tab1[fac3]-1; l < tab1[fac3+1]-1; l++)
                   if (tab2[l]-1 == fac3) coeff[l] += signe*flux4;
               }
             break;
@@ -463,8 +466,9 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_contribution_aretes_bords(const DoubleVe
 
 void Op_Dift_VDF_Face_Axi_base::ajouter_contribution_aretes_mixtes(Matrice_Morse& matrice) const
 {
-  IntVect& tab1 = matrice.get_set_tab1(), &tab2 = matrice.get_set_tab2();
-  DoubleVect& coeff = matrice.get_set_coeff();
+  auto& tab1 = matrice.get_set_tab1();
+  auto& tab2 = matrice.get_set_tab2();
+  auto& coeff = matrice.get_set_coeff();
   // Sur les aretes mixtes les termes croises du tenseur de Reynolds sont nuls: il ne reste donc que la diffusion laminaire
   const int ndeb = le_dom_vdf->premiere_arete_mixte(), nfin = le_dom_vdf->premiere_arete_interne();
   for (int n_arete = ndeb; n_arete < nfin; n_arete++)
@@ -482,10 +486,10 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_contribution_aretes_mixtes(Matrice_Morse
           // Termes supplementaires dans le laplacien en axi : Ils sont integres comme des termes sources
           const double coef_laplacien_axi = 0.5*d_visco_lam;
 
-          for (int l = tab1[fac1]-1; l < tab1[fac1+1]-1; l++)
+          for (auto l = tab1[fac1]-1; l < tab1[fac1+1]-1; l++)
             if (tab2[l]-1 == fac1) coeff[l] += coef_laplacien_axi*volumes_entrelaces(fac1)*porosite(fac1)/xv(fac1,0);
 
-          for (int l = tab1[fac2]-1; l < tab1[fac2+1]-1; l++)
+          for (auto l = tab1[fac2]-1; l < tab1[fac2+1]-1; l++)
             if (tab2[l]-1 == fac2) coeff[l] += coef_laplacien_axi*volumes_entrelaces(fac2)*porosite(fac2)/xv(fac2,0);
 
           // flux de mu_lam*tau12 sur la facette a cheval sur les faces fac3 et fac4
@@ -511,8 +515,9 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_contribution_aretes_mixtes(Matrice_Morse
 
 void Op_Dift_VDF_Face_Axi_base::ajouter_contribution_aretes_internes(const DoubleVect& visco_turb, Matrice_Morse& matrice) const
 {
-  IntVect& tab1 = matrice.get_set_tab1(), &tab2 = matrice.get_set_tab2();
-  DoubleVect& coeff = matrice.get_set_coeff();
+  auto& tab1 = matrice.get_set_tab1();
+  auto& tab2 = matrice.get_set_tab2();
+  auto& coeff = matrice.get_set_coeff();
   const int ndeb = le_dom_vdf->premiere_arete_interne(), nfin = le_dom_vdf->nb_aretes();
   for (int n_arete = ndeb; n_arete < nfin; n_arete++)
     {
@@ -531,10 +536,10 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_contribution_aretes_internes(const Doubl
           // Termes supplementaires dans le laplacien en axi : Ils sont integres comme des termes sources
           const double coef_laplacien_axi = 0.5*(d_visco_lam + d_visco_turb);
 
-          for (int l = tab1[fac1]-1; l < tab1[fac1+1]-1; l++)
+          for (auto l = tab1[fac1]-1; l < tab1[fac1+1]-1; l++)
             if (tab2[l]-1 == fac1) coeff[l] += coef_laplacien_axi*volumes_entrelaces(fac1)*porosite(fac1)/xv(fac1,0);
 
-          for (int l = tab1[fac2]-1; l < tab1[fac2+1]-1; l++)
+          for (auto l = tab1[fac2]-1; l < tab1[fac2+1]-1; l++)
             if (tab2[l]-1 == fac2) coeff[l] += coef_laplacien_axi*volumes_entrelaces(fac2)*porosite(fac2)/xv(fac2,0);
 
           // flux de mu_lam*tau12 + mu_turb*(tau21+tau12) sur la facette a cheval sur les faces fac3 et fac4

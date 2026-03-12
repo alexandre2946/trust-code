@@ -1692,7 +1692,7 @@ void Solv_Petsc::SaveObjectsToFile(const DoubleVect& secmem, DoubleVect& solutio
     {
       MatInfo Info;
       MatGetInfo(MatricePetsc_,MAT_GLOBAL_SUM,&Info);
-      trustIdType nnz = (trustIdType)Info.nz_allocated;
+      auto nnz = (trustIdType)Info.nz_allocated;
 
       Nom filename("Matrix_");
       filename+=(Nom)nb_rows_tot_;
@@ -1715,7 +1715,7 @@ void Solv_Petsc::SaveObjectsToFile(const DoubleVect& secmem, DoubleVect& solutio
       PetscViewerFileSetMode(viewer, FILE_MODE_WRITE);
       PetscViewerFileSetName(viewer, filename);
       statistics().begin_count(STD_COUNTERS::backup_file,statistics().get_last_opened_counter_level()+1);
-      trustIdType bytes = 8 * nnz + 4 * nnz + 4 * nb_rows_tot_;
+      auto bytes = 8 * nnz + 4 * nnz + 4 * nb_rows_tot_;
       MatView(MatricePetsc_, viewer);
       Cerr << "[IO] " << statistics().get_time_since_last_open(STD_COUNTERS::backup_file) << " s to write matrix file." << finl;
       statistics().end_count(STD_COUNTERS::backup_file, 1, static_cast<int>(bytes));
@@ -1843,8 +1843,8 @@ void Solv_Petsc::RestoreMatrixFromFile()
   MatLoad(MatricePetsc_, viewer);
   MatInfo Info;
   MatGetInfo(MatricePetsc_,MAT_GLOBAL_SUM,&Info);
-  trustIdType nnz = (trustIdType)Info.nz_allocated;
-  trustIdType bytes = 8 * nnz + 4 * nnz + 4 * nb_rows_tot_;
+  auto nnz = (trustIdType)Info.nz_allocated;
+  auto bytes = 8 * nnz + 4 * nnz + 4 * nb_rows_tot_;
   Cerr << "[IO] " << statistics().get_time_since_last_open(STD_COUNTERS::backup_file) << " s to read matrix file." << finl;
   statistics().end_count(STD_COUNTERS::backup_file, 1, static_cast<int>(bytes));
 
@@ -3070,8 +3070,8 @@ void Solv_Petsc::Create_MatricePetsc(Mat& MatricePetsc, int mataij, const Matric
       // We preallocate on host (should be done once during the first time-step)
       // Is it possible to preallocate on device ? ToDo: view on ArrOfTID
       // MatSetPreallocationCOOLocal seems to fail (several test cases crash in //)
-      const ArrOfInt& tab1 = mat_morse.get_tab1();
-      const ArrOfInt& tab2 = mat_morse.get_tab2();
+      const auto& tab1 = mat_morse.get_tab1();
+      const auto& tab2 = mat_morse.get_tab2();
       const int n = tab1.size_array() - 1;
       const ArrOfInt& tab_indice = indice_coeff_to_keep(mat_morse);
       PetscInt nnz = tab_indice.size_array();
@@ -3086,9 +3086,9 @@ void Solv_Petsc::Create_MatricePetsc(Mat& MatricePetsc, int mataij, const Matric
         {
           if (items_to_keep_[i])
             {
-              const int k0 = tab1[i] - 1;
-              const int k1 = tab1[i + 1] - 1;
-              for (int k = k0; k < k1; k++)
+              const auto k0 = tab1[i] - 1;
+              const auto k1 = tab1[i + 1] - 1;
+              for (auto k = k0; k < k1; k++)
                 {
                   const int colonne_locale = tab2[k] - 1;
                   const PetscInt ligne_globale = ligne_locale + decalage_local_global_;
@@ -3111,18 +3111,18 @@ void Solv_Petsc::Create_MatricePetsc(Mat& MatricePetsc, int mataij, const Matric
       ArrOfTID& renum_array = renum_;  // tableau vu comme lineaire
       const PetscInt premiere_colonne_globale = decalage_local_global_;
       const PetscInt derniere_colonne_globale = nb_rows_ + decalage_local_global_;
-      const ArrOfInt& tab1 = mat_morse.get_tab1();
-      const ArrOfInt& tab2 = mat_morse.get_tab2();
+      const auto& tab1 = mat_morse.get_tab1();
+      const auto& tab2 = mat_morse.get_tab2();
       int cpt = 0;
       const int n = tab1.size_array() - 1;
       for (int i = 0; i < n; i++)
         {
           if (items_to_keep_[i])
             {
-              const int k0 = tab1[i] - 1;
-              const int k1 = tab1[i + 1] - 1;
+              const auto k0 = tab1[i] - 1;
+              const auto k1 = tab1[i + 1] - 1;
               nnz[cpt] = k1 - k0; // Nombre d'elements non nuls sur la ligne i
-              for (int k = k0; k < k1; k++)
+              for (auto k = k0; k < k1; k++)
                 {
                   const int colonne_locale = tab2[k] - 1;
                   const PetscInt colonne_globale = renum_array[colonne_locale];
@@ -3193,7 +3193,7 @@ void Solv_Petsc::Create_MatricePetsc(Mat& MatricePetsc, int mataij, const Matric
             {
               ArrOfDouble nonzeros(2); // Pas ArrOfInt car nonzeros peut depasser 2^32 facilement - on n'a pas besoin d'un compte exact
               nonzeros[0] = 0;
-              nonzeros[1] = mat_morse.nb_coeff();
+              nonzeros[1] = (double)mat_morse.nb_coeff();
               for (int i = 0; i < nonzeros[1]; i++)
                 if (mat_morse.get_coeff()(i) != 0)
                   nonzeros[0] += 1;
@@ -3252,7 +3252,7 @@ void Solv_Petsc::Update_matrix(Mat& MatricePetsc, const Matrice_Morse& mat_morse
     {
       if (verbose) Cout << "[Petsc] Using COO to fill the matrix on the device." << finl;
       const ArrOfInt& tab_indice = indice_coeff_to_keep(mat_morse);
-      const ArrOfDouble& tab_coeff = mat_morse.get_coeff();
+      const auto& tab_coeff = mat_morse.get_coeff();
       int nnz = tab_indice.size_array();
       DoubleTrav tab_v(nnz);
       CDoubleArrView coeff = tab_coeff.view_ro();
@@ -3274,20 +3274,20 @@ void Solv_Petsc::Update_matrix(Mat& MatricePetsc, const Matrice_Morse& mat_morse
       ArrOfInt nnz(nb_rows_);
       nnz = 0;
       ArrOfTID& renum_array = renum_;  // tab seen as a flat array (can't use ArrOfPetscInt& because of C++ ref cast...)
-      const ArrOfInt& tab1 = mat_morse.get_tab1();
-      const ArrOfInt& tab2 = mat_morse.get_tab2();
+      const auto& tab1 = mat_morse.get_tab1();
+      const auto& tab2 = mat_morse.get_tab2();
       int cpt = 0;
       for (int i = 0; i < tab1.size_array() - 1; i++)
         if (items_to_keep_[i])
           {
-            nnz[cpt] = tab1[i + 1] - tab1[i]; // Nombre d'elements non nuls sur la ligne i
+            nnz[cpt] = (int)(tab1[i + 1] - tab1[i]); // Nombre d'elements non nuls sur la ligne i
             cpt++;
           }
       // Test sur nb_rows si nul (cas proc vide) car sinon max_array plante:
       int size = (nb_rows_ == 0 ? 0 : max_array(nnz));
       ArrOfDouble coeff_tmp(size);
       ArrOfPetscInt tab2_tmp(size);
-      const ArrOfDouble& coeff = mat_morse.get_coeff();
+      const auto& coeff = mat_morse.get_coeff();
       cpt = 0;
       const int n = tab1.size_array() - 1;
       for (int i = 0; i < n; i++)
@@ -3296,9 +3296,9 @@ void Solv_Petsc::Update_matrix(Mat& MatricePetsc, const Matrice_Morse& mat_morse
             {
               PetscInt ligne_globale = cpt + decalage_local_global_;
               int ncol = 0;
-              const int k0 = tab1[i] - 1;
-              const int k1 = tab1[i + 1] - 1;
-              for (int k = k0; k < k1; k++)
+              const auto k0 = tab1[i] - 1;
+              const auto k1 = tab1[i + 1] - 1;
+              for (auto k = k0; k < k1; k++)
                 {
                   if (coeff[k] == 0 and reorder_matrix_ ) continue;
                   coeff_tmp[ncol] = coeff[k];
@@ -3409,9 +3409,9 @@ bool Solv_Petsc::detect_new_stencil(const Matrice_Morse& mat_morse)
         }
       MatGetRowIJ(localA, 0, PETSC_FALSE, PETSC_FALSE, &nRowsLocal, &rowOffsets, &colIndices, &done);
 
-      const ArrOfInt& tab1 = mat_morse.get_tab1();
-      const ArrOfInt& tab2 = mat_morse.get_tab2();
-      const ArrOfDouble& coeff = mat_morse.get_coeff();
+      const auto& tab1 = mat_morse.get_tab1();
+      const auto& tab2 = mat_morse.get_tab2();
+      const auto& coeff = mat_morse.get_coeff();
       const ArrOfTID& renum_array = renum_;
       int RowLocal = 0;
       //Journal() << "Provisoire: nb_rows_=" << nb_rows_ << " nb_rows_tot_=" << nb_rows_tot_ << finl;
@@ -3421,15 +3421,15 @@ bool Solv_Petsc::detect_new_stencil(const Matrice_Morse& mat_morse)
           if (items_to_keep_[i])
             {
               int nnz_row = 0;
-              const int k0 = tab1[i] - 1;
-              const int k1 = tab1[i + 1] - 1;
+              const auto k0 = tab1[i] - 1;
+              const auto k1 = tab1[i + 1] - 1;
               if (mat_ignore_zero_entries_)
                 {
-                  for (int k = k0; k < k1; k++)
+                  for (auto k = k0; k < k1; k++)
                     if (coeff[k] != 0) nnz_row++;
                 }
               else
-                nnz_row += k1 - k0;
+                nnz_row += (int)(k1 - k0);
               const PetscInt kk0 = rowOffsets[RowLocal];
               const PetscInt kk1 = rowOffsets[RowLocal + 1];
               if (nnz_row != (int)(kk1 - kk0))
@@ -3440,7 +3440,7 @@ bool Solv_Petsc::detect_new_stencil(const Matrice_Morse& mat_morse)
                 }
               else
                 {
-                  for (int k = k0; k < k1; k++)
+                  for (auto k = k0; k < k1; k++)
                     {
                       if (coeff[k] != 0)
                         {

@@ -73,6 +73,7 @@ int Solv_Cholesky::resoudre_systeme(const Matrice_Base& la_matrice,
                                     const DoubleVect& secmem,
                                     DoubleVect& solution)
 {
+  Cerr << "Warning, Sparskit based Cholesky solver will be deprecated soon. Consider using PETSc Cholesky solver. Contact trust@cea.fr if you can't for some specific reason." << finl;
   if(sub_type(Matrice_Morse_Sym,la_matrice))
     {
       const Matrice_Morse_Sym& matrice = ref_cast(Matrice_Morse_Sym,la_matrice);
@@ -112,7 +113,10 @@ int Solv_Cholesky::Cholesky(const Matrice_Morse_Sym& matrice,
                             const DoubleVect& secmem,
                             DoubleVect& solution)
 {
-  int avec_renumerotation=1;
+  auto nzmax = matrice.get_tab1().size_array();
+  if (nzmax>std::numeric_limits<int>::max())
+    Process::exit("Cholesky can't solve this system.");
+
   if (nouvelle_matrice())
     {
       fixer_nouvelle_matrice(0);
@@ -129,49 +133,28 @@ int Solv_Cholesky::Cholesky(const Matrice_Morse_Sym& matrice,
           Matrice_Morse_Sym& mat = ref_cast_non_const(Matrice_Morse_Sym,matrice);
           mat(0,0)*=1E+6;
         }
-      if (avec_renumerotation)
-        {
-          matrice.renumerote();
-          Fact_Cholesky(matrice.matrice_renumerotee(),sz);
-        }
-      else
-        Fact_Cholesky(matrice, sz);
+      matrice.renumerote();
+      Fact_Cholesky(matrice.matrice_renumerotee(),sz);
     }
 
 
-  //int ordre = la_matrice.ordre();
   DoubleVect vecteur(secmem);
-  double* vect_data = vecteur.addr();
-  //solution = 0.0;
   const int n = secmem.size_totale();//ordre;
-  int N=n;
 
   // permutation du second membre
   // subroutine dvperm (n, x, perm)
   // SPARSKIT2/FORMATS/unary.f
-  if (avec_renumerotation) F77NAME(DVPERM)(&n, vect_data, matrice.permutation().addr());
-
+  F77NAME(DVPERM)(&n, vecteur.addr(), matrice.permutation().addr());
 
   char UPLO = 'U';                          // A est triangulaire superieure
   int KD   = largeur_de_bande_-1;           // largeur de bande sup
-  //int N    = n;                             //m_ // ordre de A (=nb col de abd_)
   int LDAB = largeur_de_bande_;             //n_;// nb de lg de abd_
   int LDB  = n;                             //m_;// nb de lg de b
   int NRHS = 1;                             // nb de col de b (=vecteur)
   int INFO = 0;
 
-
   // resolution du systeme
-#ifdef CRAY
-  Nom UPLOCpp(UPLO);
-  _fcd UPLOF90;
-  nomCtonomF90(UPLOCpp,UPLOF90);
-  F77NAME(SPBTRS)(UPLOF90, &N, &KD, &NRHS,
-                  matrice_bande_factorisee_fortran_.addr() ,
-                  &LDAB, vecteur.addr(), &LDB, &INFO);
-#else
-  F77NAME(DPBTRS)(&UPLO, &N, &KD, &NRHS, matrice_bande_factorisee_fortran_.addr() , &LDAB, vecteur.addr(), &LDB, &INFO);
-#endif
+  F77NAME(DPBTRS)(&UPLO, &n, &KD, &NRHS, matrice_bande_factorisee_fortran_.addr() , &LDAB, vecteur.addr(), &LDB, &INFO);
 
   if(INFO)
     {
@@ -180,12 +163,10 @@ int Solv_Cholesky::Cholesky(const Matrice_Morse_Sym& matrice,
       if(INFO>0) Cerr << "singular matrix ! resolution impossible" << finl;
       exit();
     };
-
-
   // permutation inverse du resultat
   // subroutine dvperm (n, x, perm)
   // SPARSKIT2/FORMATS/unary.f
-  if (avec_renumerotation) F77NAME(DVPERM)(&n, vect_data, matrice.permutation_inverse().addr());
+  F77NAME(DVPERM)(&n, vecteur.addr(), matrice.permutation_inverse().addr());
 
   solution = vecteur;
   solution.echange_espace_virtuel();
@@ -238,16 +219,8 @@ int Solv_Cholesky::Fact_Cholesky(const Matrice_Morse_Sym& mat1, const int size_r
 
 
   Cerr << "Starting factorisation ..." << finl;
-#ifdef CRAY
-  Nom UPLOCpp(UPLO);
-  _fcd UPLOF90;
-  nomCtonomF90(UPLOCpp,UPLOF90);
-  SPBTRF(UPLOF90, &N, &KD,
-         matrice_bande_factorisee_fortran_.addr() , &LDAB, &INFO);
-#else
   F77NAME(DPBTRF)(&UPLO, &N, &KD,
                   matrice_bande_factorisee_fortran_.addr() , &LDAB, &INFO);
-#endif
   Cerr << "End factorization." << finl;
 
   //   {

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -52,7 +52,7 @@ void Op_Evanescence_Homogene_Face_base::dimensionner_blocs(matrices_t matrices, 
   const IntTab& fcl = ch.fcl();
 
   /* on doit pouvoir ajouter / soustraire les equations entre composantes */
-  int i, j, f, n, N = inco.line_size();
+  int i, f, n, N = inco.line_size();
   if (N == 1) return; //pas d'evanescence en simple phase!
   for (auto &&n_m : matrices)
     if (n_m.second->nb_colonnes())
@@ -67,7 +67,7 @@ void Op_Evanescence_Homogene_Face_base::dimensionner_blocs(matrices_t matrices, 
           if (fcl(f, 0) < 2)
             {
               for (i = N * f, n = 0; n < N; n++, i++)
-                for (j = mat.get_tab1()(i) - 1; j < mat.get_tab1()(i + 1) - 1; j++)
+                for (auto j = mat.get_tab1()(i) - 1; j < mat.get_tab1()(i + 1) - 1; j++)
                   idx.insert(mat.get_tab2()(j) - 1);
               for (i = N * f, n = 0; n < N; n++, i++)
                 for (auto &&c : idx)
@@ -105,8 +105,9 @@ void Op_Evanescence_Homogene_Face_base::ajouter_blocs(matrices_t matrices, Doubl
                           *gravity = (equation().probleme().has_champ("gravite")) ? &equation().probleme().get_champ("gravite").valeurs() : nullptr ;
 
   const DoubleVect& vf = domaine.volumes_entrelaces(), &dh_e = milc.diametre_hydraulique_elem();
-  int e, f, i, j, k, l, n, m, N = inco.line_size(), Nk = (k_turb) ? (*k_turb).line_size() : 0, d, D = dimension, cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1), Np = press.line_size(),
-                              iter = sub_type(SETS, equation().schema_temps()) ? 0 * ref_cast(SETS, equation().schema_temps()).iteration_ : 0;
+  int e, f, k, l, n, m, N = inco.line_size(), Nk = (k_turb) ? (*k_turb).line_size() : 0, d, D = dimension, cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1), Np = press.line_size(),
+                        iter = sub_type(SETS, equation().schema_temps()) ? 0 * ref_cast(SETS, equation().schema_temps()).iteration_ : 0;
+
   if (N == 1) return; //pas d'evanescence en simple phase!
 
   double a_eps = alpha_res_, a_eps_min = alpha_res_min_, a_m, a_max; //seuil de declenchement du traitement de l'evanescence
@@ -157,6 +158,7 @@ void Op_Evanescence_Homogene_Face_base::ajouter_blocs(matrices_t matrices, Doubl
             if (iter) a_m = alpha(f_e(f, f_e(f, 1) >= 0 && inco(f, n) < 0), n);
             else
               {
+                int i;
                 for (a_m = 0, i = 0; i < 2; i++)
                   if ((e = f_e(f, i)) >= 0)
                     a_m += vfd(f, i) / vf(f) * alpha(e, n);
@@ -170,6 +172,7 @@ void Op_Evanescence_Homogene_Face_base::ajouter_blocs(matrices_t matrices, Doubl
           {
             for (n = 0; n < N; n++)
               for (d = 0; d < D; d++) in.v(d, n) = inco(f, n) * domaine.face_normales(f, d) / domaine.face_surfaces(f);
+            int i;
             for (in.alpha = 0, in.rho = 0, in.mu = 0, in.d_bulles = 0, in.k = 0, in.nut = 0, in.dh = 0, in.g = 0, i = 0; i < 2 && (e = f_e(f, i)) >= 0; i++)
               {
                 in.dh += vfd(f, i) / vf(f) * dh_e(e); // should not be in the loop on N below.
@@ -205,6 +208,7 @@ void Op_Evanescence_Homogene_Face_base::ajouter_blocs(matrices_t matrices, Doubl
             if (iter) a_m = alpha(f_e(f, f_e(f, 1) >= 0 && inco(f, n) < 0), n);
             else
               {
+                int i;
                 for (a_m = 0, i = 0; i < 2; i++)
                   if ((e = f_e(f, i)) >= 0)
                     a_m += vfd(f, i) / vf(f) * alpha(e, n);
@@ -237,7 +241,7 @@ void Op_Evanescence_Homogene_Face_base::ajouter_blocs(matrices_t matrices, Doubl
               if (coeff(f, n, 0))
                 {
                   k = maj(f);
-                  for (i = mat.get_tab1()(N * f + n) - 1, j = mat.get_tab1()(N * f + k) - 1; i < mat.get_tab1()(N * f + n + 1) - 1; i++, j++)
+                  for (auto i = mat.get_tab1()(N * f + n) - 1, j = mat.get_tab1()(N * f + k) - 1; i < mat.get_tab1()(N * f + n + 1) - 1; i++, j++)
                     {
                       assert(mat.get_tab2()(i) == mat.get_tab2()(j));
                       int c = diag * mat.get_tab2()(i) - 1; //indice de colonne (commun aux deux lignes grace au dimensionner_blocs())

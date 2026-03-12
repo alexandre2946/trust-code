@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -727,10 +727,14 @@ void Matrice_Bloc::remplir(const IntLists& voisins, const DoubleLists& valeurs, 
   Matrice_Morse& VV=ref_cast(Matrice_Morse,get_bloc(1,1).valeur());
 
   // Premiere passe pour le dimensionnement
-  int RR_compteur, RR_rang=0;
-  int RV_compteur, RV_rang=0;
-  int VR_compteur, VR_rang=0;
-  int VV_compteur, VV_rang=0;
+  int RR_compteur;
+  auto RR_rang=0;
+  int RV_compteur;
+  auto RV_rang=0;
+  int VR_compteur;
+  auto VR_rang=0;
+  int VV_compteur;
+  auto VV_rang=0;
 
   int num_elem;
   for (num_elem=0; num_elem<n; num_elem++)
@@ -790,25 +794,25 @@ void Matrice_Bloc::remplir(const IntLists& voisins, const DoubleLists& valeurs, 
 
   // Deuxieme passe pour le remplissage
   // Tableaux tab1, tab2 et coeff_ pour le bloc RR
-  int* RR_tab1 = RR.get_set_tab1().addr();
+  auto* RR_tab1 = RR.get_set_tab1().addr();
   int* RR_tab2 = RR.get_set_tab2().addr();
   double* RR_coeff = RR.get_set_coeff().addr();
   int* RR_tab2_ptr = RR_tab2;
 
   // Tableaux tab1, tab2 et coeff_ pour le bloc RV
-  int* RV_tab1 = RV.get_set_tab1().addr();
+  auto* RV_tab1 = RV.get_set_tab1().addr();
   int* RV_tab2 = RV.get_set_tab2().addr();
   double* RV_coeff = RV.get_set_coeff().addr();
   int* RV_tab2_ptr = RV_tab2;
 
   // Tableaux tab1, tab2 et coeff_ pour le bloc VR
-  int* VR_tab1 = VR.get_set_tab1().addr();
+  auto* VR_tab1 = VR.get_set_tab1().addr();
   int* VR_tab2 = VR.get_set_tab2().addr();
   double* VR_coeff = VR.get_set_coeff().addr();
   int* VR_tab2_ptr = VR_tab2;
 
   // Tableaux tab1, tab2 et coeff_ pour le bloc VV
-  int* VV_tab1 = VV.get_set_tab1().addr();
+  auto* VV_tab1 = VV.get_set_tab1().addr();
   int* VV_tab2 = VV.get_set_tab2().addr();
   double* VV_coeff = VV.get_set_coeff().addr();
   int* VV_tab2_ptr = VV_tab2;

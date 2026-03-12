@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -177,23 +177,29 @@ int Assembleur_P_VEF::remplir(Matrice& la_matrice, const DoubleTab& inverse_quan
   MBvr.dimensionner(n1-n2,n2,0);
   MBvr.get_set_tab1() = 1;
 
-  IntVect& tab1RR=MBrr.get_set_tab1();
-  IntVect& tab2RR=MBrr.get_set_tab2();
-  DoubleVect& coeffRR=MBrr.get_set_coeff();
-  IntVect& tab1RV=MBrv.get_set_tab1();
-  IntVect& tab2RV=MBrv.get_set_tab2();
-  DoubleVect& coeffRV=MBrv.get_set_coeff();
-  IntVect& tab1VV=MBvv.get_set_tab1();
-  IntVect& tab2VV=MBvv.get_set_tab2();
-  DoubleVect& coeffVV=MBvv.get_set_coeff();
+  auto& tab1RR = MBrr.get_set_tab1();
+  auto& tab2RR = MBrr.get_set_tab2();
+  auto& coeffRR = MBrr.get_set_coeff();
+  auto& tab1RV = MBrv.get_set_tab1();
+  auto& tab2RV = MBrv.get_set_tab2();
+  auto& coeffRV = MBrv.get_set_coeff();
+  auto& tab1VV = MBvv.get_set_tab1();
+  auto& tab2VV = MBvv.get_set_tab2();
+  auto& coeffVV = MBvv.get_set_coeff();
 
   // On traite les faces internes:
 
   int ndeb = le_dom_VEF->premiere_face_int();
   int nfin = le_dom_VEF->nb_faces_tot();
-  IntVect rang_voisinRR(n2);
-  IntVect rang_voisinRV(n2);
-  IntVect rang_voisinVV(n1-n2);
+#ifdef TRUST_USE_GPU
+  ArrOfTID rang_voisinRR(n2);
+  ArrOfTID rang_voisinRV(n2);
+  ArrOfTID rang_voisinVV(n1-n2);
+#else
+  ArrOfInt rang_voisinRR(n2);
+  ArrOfInt rang_voisinRV(n2);
+  ArrOfInt rang_voisinVV(n1-n2);
+#endif
   rang_voisinRR=1; // Diagonale
   rang_voisinRV=0; // Pas de diagonale
   rang_voisinVV=1; // Diagonale

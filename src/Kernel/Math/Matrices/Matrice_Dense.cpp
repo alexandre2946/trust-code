@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -165,7 +165,7 @@ void Matrice_Dense::convert_to_morse_matrix( Matrice_Morse& morse_matrix ) const
     {
       morse_matrix.get_set_tab1()( i ) =  /*already registred*/i*nb_cols + /*fortran index*/ 1 ;
     }
-  int count = 0;
+  auto count = 0;
   for(int i=0 ; i<nb_lines ; i++)
     {
       for(int j=0; j<nb_cols; j++)

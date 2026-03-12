@@ -684,6 +684,7 @@ template int local_extrema_vect_generic<int, int, int, TYPE_OPERATION_VECT::MAX_
 template int local_extrema_vect_generic<int, int, int, TYPE_OPERATION_VECT::MIN_ABS_>(const TRUSTVect<int, int>& vx, Mp_vect_options opt);
 
 #if INT_is_64_ == 2
+template double local_extrema_vect_generic<double, trustIdType, double, TYPE_OPERATION_VECT::MAX_ABS_>(const TRUSTVect<double, trustIdType>& vx, Mp_vect_options opt);
 template int local_extrema_vect_generic<int, trustIdType, int, TYPE_OPERATION_VECT::MAX_>(const TRUSTVect<int, trustIdType>& vx, Mp_vect_options opt);
 template trustIdType local_extrema_vect_generic<trustIdType, trustIdType, trustIdType, TYPE_OPERATION_VECT::MAX_>(const TRUSTVect<trustIdType, trustIdType>& vx, Mp_vect_options opt);
 #endif

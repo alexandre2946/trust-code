@@ -105,7 +105,7 @@ void Op_Grad_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const ta
                   {
                     dpb_v[M * f + m].insert(N * i + n);
 
-                    for (int j = mat_v->get_tab1()(N * i + n) - 1; j < mat_v->get_tab1()(N * i + n + 1) - 1; j++)
+                    for (auto j = mat_v->get_tab1()(N * i + n) - 1; j < mat_v->get_tab1()(N * i + n + 1) - 1; j++)
                       dpb_v[M * f + m].insert(mat_v->get_tab2()(j) - 1);
                   }
             }
@@ -254,7 +254,7 @@ void Op_Grad_PolyMAC_MPFA_Face::ajouter_blocs(matrices_t matrices, DoubleTab& se
                   gb(f, m) += fac * nf(f, d) * secmem(i, n); //partie constante -> directement dans pfb
 
                   if (dv)
-                    for (int j = mat_v->get_tab1()(N * i + n) - 1; j < mat_v->get_tab1()(N * i + n + 1) - 1; j++) //partie lineaire -> dans dgb_v
+                    for (auto j = mat_v->get_tab1()(N * i + n) - 1; j < mat_v->get_tab1()(N * i + n + 1) - 1; j++) //partie lineaire -> dans dgb_v
                       if (mat_v->get_coeff()(j))
                         (*dv)[mat_v->get_tab2()(j) - 1] -= fac * nf(f, d) * mat_v->get_coeff()(j);
                 }

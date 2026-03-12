@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -172,7 +172,22 @@ void Matrix_tools::allocate_morse_matrix( const int nb_lines,
 
   const int nb_coefficients = stencil.dimension( 0 );
   matrix.dimensionner( nb_lines, nb_columns, nb_coefficients );
-  fill_csr_arrays<int>(nb_lines, nb_columns, stencil, matrix.get_set_tab1(), matrix.get_set_tab2());
+  {
+    auto& tab1 = matrix.get_set_tab1();
+    auto& tab2 = matrix.get_set_tab2();
+    if ( nb_coefficients > 0 )
+      {
+        tab1 = 0;
+        tab1[0] = 1;
+        for ( int i=0; i<nb_coefficients; ++i )
+          {
+            tab1[stencil(i, 0) + 1] += 1;
+            tab2[i] = stencil(i, 1) + 1;
+          }
+        for ( int i=0; i<nb_lines; ++i )
+          tab1[i + 1] += tab1[i];
+      }
+  }
   if( attach_stencil_to_matrix )
     matrix.set_stencil( stencil );
 }
@@ -412,10 +427,10 @@ void Matrix_tools::add_scaled_matrices( const Matrice& A,
   const int nb_lines = C_.nb_lignes( );
   for ( int i=0; i<nb_lines; ++i )
     {
-      int k0   = C_.get_tab1()( i ) - 1;
-      int k1   = C_.get_tab1()( i + 1 ) - 1;
+      auto k0   = C_.get_tab1()( i ) - 1;
+      auto k1   = C_.get_tab1()( i + 1 ) - 1;
 
-      for ( int k=k0; k<k1; ++k )
+      for ( auto k=k0; k<k1; ++k )
         {
           int j = C_.get_tab2()( k ) - 1;
 
@@ -466,10 +481,10 @@ void Matrix_tools::add_symmetric_scaled_matrices( const Matrice& A,
   const int nb_lines = C_.nb_lignes( );
   for ( int i=0; i<nb_lines; ++i )
     {
-      int k0   = C_.get_tab1()( i ) - 1;
-      int k1   = C_.get_tab1()( i + 1 ) - 1;
+      auto k0   = C_.get_tab1()( i ) - 1;
+      auto k1   = C_.get_tab1()( i + 1 ) - 1;
 
-      for ( int k=k0; k<k1; ++k )
+      for ( auto k=k0; k<k1; ++k )
         {
           int j = C_.get_tab2()( k ) - 1;
 
@@ -612,12 +627,12 @@ void Matrix_tools::matdiag_mult_matmorse( const DoubleTab& diag,
                                           const bool& inverse )
 {
   const int nb_lignes = mat.nb_lignes( );
-  const IntVect& tab1 = mat.get_tab1( );
-  const IntVect& tab2 = mat.get_tab2( );
-  int nnz_tot = 0;
+  const auto& tab1 = mat.get_tab1( );
+  const auto& tab2 = mat.get_tab2( );
+  auto nnz_tot = 0;
   for( int i=0; i<nb_lignes; i++ )
     {
-      const int nnz_i = tab1[ i+1 ] - tab1[ i ]; // nnz sur la ligne i
+      const int nnz_i = (int)(tab1[ i+1 ] - tab1[ i ]); // nnz sur la ligne i
       for(int k=0; k<nnz_i; k++)
         {
           const int j = tab2[nnz_tot + k] - 1 ; // indice de la colonne
@@ -636,12 +651,12 @@ void Matrix_tools::matmorse_mult_matdiag( const DoubleTab& diag,
                                           const bool& inverse )
 {
   const int nb_lignes = mat.nb_lignes( );
-  const IntVect& tab1 = mat.get_tab1( );
-  const IntVect& tab2 = mat.get_tab2( );
-  int nnz_tot = 0;
+  const auto& tab1 = mat.get_tab1( );
+  const auto& tab2 = mat.get_tab2( );
+  auto nnz_tot = 0;
   for( int i=0; i<nb_lignes; i++ )
     {
-      const int nnz_i = tab1[ i+1 ] - tab1[ i ]; // nnz sur la ligne i
+      const int nnz_i = (int)(tab1[ i+1 ] - tab1[ i ]); // nnz sur la ligne i
       for(int k=0; k<nnz_i; k++)
         {
           const int j = tab2[nnz_tot + k] - 1 ; // indice de la colonne
@@ -661,12 +676,12 @@ void Matrix_tools::uniform_matdiag_mult_matmorse( const double diag,
                                                   const bool& inverse )
 {
   const int nb_lignes = mat.nb_lignes( );
-  const IntVect& tab1 = mat.get_tab1( );
-  const IntVect& tab2 = mat.get_tab2( );
-  int nnz_tot = 0;
+  const auto& tab1 = mat.get_tab1( );
+  const auto& tab2 = mat.get_tab2( );
+  auto nnz_tot = 0;
   for( int i=0; i<nb_lignes; i++ )
     {
-      const int nnz_i = tab1[ i+1 ] - tab1[ i ]; // nnz sur la ligne i
+      const int nnz_i = (int)(tab1[ i+1 ] - tab1[ i ]); // nnz sur la ligne i
       for(int k=0; k<nnz_i; k++)
         {
           const int j = tab2[nnz_tot + k] - 1 ; // indice de la colonne
@@ -690,9 +705,10 @@ void Matrix_tools::matmorse_mult_uniform_matdiag( const double diag,
 void Matrix_tools::extend_matrix(Matrice_Morse& mat, int nl, int nc)
 {
 
-  IntVect& tab1 = mat.get_set_tab1(), old_tab1 = tab1;
+  auto& tab1 = mat.get_set_tab1();
+  auto old_tab1 = tab1;
   tab1.reset(), tab1.resize(nl + 1);
-  for (int i = 0; i <= nl; i++) tab1(i) = old_tab1(std::min(i, old_tab1.size() - 1));
+  for (int i = 0; i <= nl; i++) tab1(i) = old_tab1(std::min(i, old_tab1.size_array() - 1));
   mat.set_nb_columns(nc); //plus facile
 }
 

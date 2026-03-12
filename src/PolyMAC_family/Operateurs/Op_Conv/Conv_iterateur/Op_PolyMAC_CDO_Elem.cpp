@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -47,12 +47,12 @@ void Op_PolyMAC_CDO_Elem::dimensionner(const Domaine_PolyMAC_CDO& le_domaine, co
 
   la_matrice.dimensionner((n1 + n2) * nb_comp, (n1 + n2) * nb_comp, 0);
 
-  IntVect& tab1 = la_matrice.get_set_tab1();
-  IntVect& tab2 = la_matrice.get_set_tab2();
+  auto& tab1 = la_matrice.get_set_tab1();
+  auto& tab2 = la_matrice.get_set_tab2();
 
   int ndeb = le_domaine.premiere_face_int();
   int nfin = le_domaine.nb_faces();
-  DoubleVect& coeff = la_matrice.get_set_coeff();
+  auto& coeff = la_matrice.get_set_coeff();
   coeff = 0;
 
   IntVect rang_voisin(n1 * nb_comp);
@@ -116,7 +116,7 @@ void Op_PolyMAC_CDO_Elem::dimensionner(const Domaine_PolyMAC_CDO& le_domaine, co
   for (i = 0; i < n1 * nb_comp; i++)
     {
       tab2[tab1[i] - 1] = i + 1;
-      rang_voisin[i] = tab1[i];
+      rang_voisin[i] = (int)tab1[i];
     }
 
   // on traite les faces internes pour les voisins

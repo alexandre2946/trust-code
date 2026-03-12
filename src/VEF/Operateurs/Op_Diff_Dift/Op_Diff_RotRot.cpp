@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -158,7 +158,6 @@ int Op_Diff_RotRot::assembler_matrice(Matrice& matrice)
   const Domaine& domaine = domaine_vef().domaine();
 
   int colonne_a_remplir_tab2, colonne_a_remplir_coeff;
-  int nombre_coeff_non_nuls;
 
   Cerr << "Assemblage de la matrice de vorticite en cours..." << finl;
   matrice.typer("Matrice_Morse_Sym");
@@ -175,7 +174,7 @@ int Op_Diff_RotRot::assembler_matrice(Matrice& matrice)
   // Par defaut, on enleve la derniere fonction chapeau pour
   // former notre base.
   // Cf. Papier dans Latex/Vorticity
-  nombre_coeff_non_nuls = (2 * dimension + 3) * domaine.nb_elem() + (domaine.nb_som() - 1) * (domaine.nb_som() - 1);
+  int nombre_coeff_non_nuls = (2 * dimension + 3) * domaine.nb_elem() + (domaine.nb_som() - 1) * (domaine.nb_som() - 1);
   //la_matrice.dimensionner(domaine.nb_elem()+domaine.nb_som()-1,nombre_coeff_non_nuls);
   Matrice_Morse la_matrice(domaine.nb_elem() + domaine.nb_som() - 1, nombre_coeff_non_nuls);
 

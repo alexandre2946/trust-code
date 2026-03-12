@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -275,13 +275,13 @@ void Op_Diff_VEF_Face_Q1::ajouter_contribution(const DoubleTab& transporte, Matr
   int n1 = domaine_VEF.nb_faces();
   const int nb_comp = transporte.line_size();
 
-  int i,j,k,num_face,elem1,elem2;
+  int i,j,num_face,elem1,elem2;
   int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
   // DoubleTab val= 0;
   double val;
-  IntVect& tab1 = matrice.get_set_tab1();
-  IntVect& tab2 = matrice.get_set_tab2();
-  DoubleVect& coeff = matrice.get_set_coeff();
+  auto& tab1 = matrice.get_set_tab1();
+  auto& tab2 = matrice.get_set_tab2();
+  auto& coeff = matrice.get_set_coeff();
 
   // On traite les faces bord
   for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
@@ -307,14 +307,14 @@ void Op_Diff_VEF_Face_Q1::ajouter_contribution(const DoubleTab& transporte, Matr
                       val = visc_Q1(domaine_VEF,domaine_Cl_VEF,num_face,j,elem1,dimension,nu_);
                       for (int nc=0; nc<nb_comp; nc++)
                         {
-                          for (k=tab1[num_face*nb_comp+nc]-1; k<tab1[num_face*nb_comp+nc+1]-1; k++)
+                          for (auto k=tab1[num_face*nb_comp+nc]-1; k<tab1[num_face*nb_comp+nc+1]-1; k++)
                             {
                               if (tab2[k]-1==num_face*nb_comp+nc)
                                 coeff(k)+=val;
                               if (tab2[k]-1==j*nb_comp+nc)
                                 coeff(k)-=0.5;
                             }
-                          for (k=tab1[j*nb_comp+nc]-1; k<tab1[j*nb_comp+nc+1]-1; k++)
+                          for (auto k=tab1[j*nb_comp+nc]-1; k<tab1[j*nb_comp+nc+1]-1; k++)
                             {
                               if (tab2[k]-1==num_face*nb_comp+nc)
                                 coeff(k)-=val;
@@ -332,14 +332,14 @@ void Op_Diff_VEF_Face_Q1::ajouter_contribution(const DoubleTab& transporte, Matr
                       val = visc_Q1(domaine_VEF,domaine_Cl_VEF,num_face,j,elem2,dimension,nu_);
                       for (int nc=0; nc<nb_comp; nc++)
                         {
-                          for (k=tab1[num_face*nb_comp+nc]-1; k<tab1[num_face*nb_comp+nc+1]-1; k++)
+                          for (auto k=tab1[num_face*nb_comp+nc]-1; k<tab1[num_face*nb_comp+nc+1]-1; k++)
                             {
                               if (tab2[k]-1==num_face*nb_comp+nc)
                                 coeff(k)+=val;
                               if (tab2[k]-1==j*nb_comp+nc)
                                 coeff(k)-=0.5*val;
                             }
-                          for (k=tab1[j*nb_comp+nc]-1; k<tab1[j*nb_comp+nc+1]-1; k++)
+                          for (auto k=tab1[j*nb_comp+nc]-1; k<tab1[j*nb_comp+nc+1]-1; k++)
                             {
                               if (tab2[k]-1==num_face*nb_comp+nc)
                                 coeff(k)-=val;
@@ -363,14 +363,14 @@ void Op_Diff_VEF_Face_Q1::ajouter_contribution(const DoubleTab& transporte, Matr
                       val = visc_Q1(domaine_VEF,domaine_Cl_VEF,num_face,j,elem1,dimension,nu_);
                       for (int nc=0; nc<nb_comp; nc++)
                         {
-                          for (k=tab1[num_face*nb_comp+nc]-1; k<tab1[num_face*nb_comp+nc+1]-1; k++)
+                          for (auto k=tab1[num_face*nb_comp+nc]-1; k<tab1[num_face*nb_comp+nc+1]-1; k++)
                             {
                               if (tab2[k]-1==num_face*nb_comp+nc)
                                 coeff(k)+=val;
                               if (tab2[k]-1==j*nb_comp+nc)
                                 coeff(k)-=val;
                             }
-                          for (k=tab1[j*nb_comp+nc]-1; k<tab1[j*nb_comp+nc+1]-1; k++)
+                          for (auto k=tab1[j*nb_comp+nc]-1; k<tab1[j*nb_comp+nc+1]-1; k++)
                             {
                               if (tab2[k]-1==num_face*nb_comp+nc)
                                 coeff(k)-=val;
@@ -398,14 +398,14 @@ void Op_Diff_VEF_Face_Q1::ajouter_contribution(const DoubleTab& transporte, Matr
               val = visc_Q1(domaine_VEF,domaine_Cl_VEF,num_face,j,elem1,dimension,nu_);
               for (int nc=0; nc<nb_comp; nc++)
                 {
-                  for (k=tab1[num_face*nb_comp+nc]-1; k<tab1[num_face*nb_comp+nc+1]-1; k++)
+                  for (auto k=tab1[num_face*nb_comp+nc]-1; k<tab1[num_face*nb_comp+nc+1]-1; k++)
                     {
                       if (tab2[k]-1==num_face*nb_comp+nc)
                         coeff(k) += val;
                       if (tab2[k]-1==j*nb_comp+nc)
                         coeff(k) -= val;
                     }
-                  for (k=tab1[j*nb_comp+nc]-1; k<tab1[j*nb_comp+nc+1]-1; k++)
+                  for (auto k=tab1[j*nb_comp+nc]-1; k<tab1[j*nb_comp+nc+1]-1; k++)
                     {
                       if (tab2[k]-1==num_face*nb_comp+nc)
                         coeff(k) -= val;
@@ -422,14 +422,14 @@ void Op_Diff_VEF_Face_Q1::ajouter_contribution(const DoubleTab& transporte, Matr
                   for (int nc=0; nc<nb_comp; nc++)
                     {
                       val = visc_Q1(domaine_VEF,domaine_Cl_VEF,num_face,j,elem2,dimension,nu_);
-                      for (k=tab1[num_face*nb_comp+nc]-1; k<tab1[num_face*nb_comp+nc+1]-1; k++)
+                      for (auto k=tab1[num_face*nb_comp+nc]-1; k<tab1[num_face*nb_comp+nc+1]-1; k++)
                         {
                           if (tab2[k]-1==num_face*nb_comp+nc)
                             coeff(k)+=val;
                           if (tab2[k]-1==j*nb_comp+nc)
                             coeff(k)-=val;
                         }
-                      for (k=tab1[j]-1; k<tab1[j+1]-1; k++)
+                      for (auto k=tab1[j]-1; k<tab1[j+1]-1; k++)
                         {
                           if (tab2[k]-1==num_face*nb_comp+nc)
                             coeff(k)-=val;
@@ -443,14 +443,14 @@ void Op_Diff_VEF_Face_Q1::ajouter_contribution(const DoubleTab& transporte, Matr
                   val= visc_Q1(domaine_VEF,domaine_Cl_VEF,num_face,j,elem1,dimension,nu_);
                   for (int nc=0; nc<nb_comp; nc++)
                     {
-                      for (k=tab1[num_face*nb_comp+nc]-1; k<tab1[num_face*nb_comp+nc+1]-1; k++)
+                      for (auto k=tab1[num_face*nb_comp+nc]-1; k<tab1[num_face*nb_comp+nc+1]-1; k++)
                         {
                           if (tab2[k]-1==num_face*nb_comp+nc)
                             coeff(k)+=val;
                           if (tab2[k]-1==j*nb_comp+nc)
                             coeff(k)-=val;
                         }
-                      for (k=tab1[j*nb_comp+nc]-1; k<tab1[j*nb_comp+nc+1]-1; k++)
+                      for (auto k=tab1[j*nb_comp+nc]-1; k<tab1[j*nb_comp+nc+1]-1; k++)
                         {
                           if (tab2[k]-1==num_face*nb_comp+nc)
                             coeff(k)-=val;

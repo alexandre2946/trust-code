@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -147,7 +147,7 @@ DoubleTab& Matrice_Morse_Sym::ajouter_multTab_(const DoubleTab& x, DoubleTab& re
     }
 
   assert_check_symmetric_morse_matrix_structure( );
-  int i,k,j;
+  int i,j;
   double aij;
   int comp;
   int nb_com=x.dimension(1);
@@ -158,7 +158,7 @@ DoubleTab& Matrice_Morse_Sym::ajouter_multTab_(const DoubleTab& x, DoubleTab& re
     {
       for(comp=0; comp<nb_com; comp++)
         t[comp] = coeff_(tab1_(i)-1)*x(i,comp);
-      for (k=tab1_(i); k<tab1_(i+1)-1; k++)
+      for (auto k=tab1_(i); k<tab1_(i+1)-1; k++)
         {
           j = tab2_(k)-1;
           aij = coeff_(k);
@@ -191,7 +191,7 @@ double Matrice_Morse_Sym::multvect_et_prodscal(const DoubleVect& x, DoubleVect& 
     const double * thecoef = get_coeff().addr() - 1;
     const double * xx = x.addr() - 1;
     double * res = resu.addr() - 1;
-    const int * index1 = get_tab1().addr() - 1;
+    const auto * index1 = get_tab1().addr() - 1;
     const int * index2 = get_tab2().addr() - 1;
 #ifdef COMPILER_BLRTS_XLC
 #pragma disjoint (*coef, *xx, *res)
@@ -199,8 +199,8 @@ double Matrice_Morse_Sym::multvect_et_prodscal(const DoubleVect& x, DoubleVect& 
     int i;
     for (i = 1; i < fin; i++)
       {
-        int j = index1[i];
-        int j_next= index1[i+1];
+        auto j = index1[i];
+        auto j_next= index1[i+1];
         //int ncoeffs = j_next - j;
         assert(i==index2[j]); // La diagonale meme nulle doit etre stockee dans une Mat_Morse_Sym
         double xi = xx[i];
@@ -245,7 +245,7 @@ DoubleVect& Matrice_Morse_Sym::ajouter_multvect_(const DoubleVect& x, DoubleVect
     const double * thecoef = get_coeff().addr() - 1;
     const double * xx = x.addr() - 1;
     double * res = resu.addr() - 1;
-    const int * index1 = get_tab1().addr() - 1;
+    const auto * index1 = get_tab1().addr() - 1;
     const int * index2 = get_tab2().addr() - 1;
 #ifdef COMPILER_BLRTS_XLC
 #pragma disjoint (*coef, *xx, *res)
@@ -253,8 +253,8 @@ DoubleVect& Matrice_Morse_Sym::ajouter_multvect_(const DoubleVect& x, DoubleVect
     int i;
     for (i = 1; i < fin; i++)
       {
-        int j = index1[i];
-        int j_next= index1[i+1];
+        auto j = index1[i];
+        auto j_next= index1[i+1];
         assert(i==index2[j]); // La diagonale meme nulle doit etre stockee dans une Mat_Morse_Sym
 #if 0
         // Note B.M.: sur les procs intel ce deroulage n'a aucun effet benefique.
@@ -357,14 +357,14 @@ Matrice_Morse_Sym operator+(const Matrice_Morse_Sym& A,const Matrice_Morse_Sym& 
       Process::exit();
     }
 
-  Matrice_Morse_Sym somme(A.nb_lignes(),A.nb_coeff()+B.nb_coeff());
+  Matrice_Morse_Sym somme(A.nb_lignes(),(int)(A.nb_coeff()+B.nb_coeff()));
   IntList colonnes_A_ligne_i,colonnes_B_ligne_i;
   int min_colonnes_A,min_colonnes_B,non_nuls_ligne_i;
   DoubleList coeffs_A_ligne_i,coeffs_B_ligne_i;
   double coeff_A,coeff_B;
 
   //Pour s'assurer que compacte() va marcher
-  for (int i=0; i<somme.get_coeff().size(); i++)
+  for (auto i=0; i<somme.get_coeff().size(); i++)
     somme.get_set_coeff()(i) = 0.;
 
   //On va remplir tab2_ par ordre croissant de colonnes
@@ -377,13 +377,13 @@ Matrice_Morse_Sym operator+(const Matrice_Morse_Sym& A,const Matrice_Morse_Sym& 
 
       //Initialisation des colonnes_A et colonnes_B
       //ATTENTION a la numerotation C++
-      for (int j=0; j<A.get_tab1()(i+1)-A.get_tab1()(i); j++)
+      for (auto j=0; j<A.get_tab1()(i+1)-A.get_tab1()(i); j++)
         {
           colonnes_A_ligne_i.add_if_not(A.get_tab2()(A.get_tab1()(i)+j-1));
           coeffs_A_ligne_i.add(A.get_coeff()(A.get_tab1()(i)+j-1));
         }//fin for
 
-      for (int j=0; j<B.get_tab1()(i+1)-B.get_tab1()(i); j++)
+      for (auto j=0; j<B.get_tab1()(i+1)-B.get_tab1()(i); j++)
         {
           colonnes_B_ligne_i.add_if_not(B.get_tab2()(B.get_tab1()(i)+j-1));
           coeffs_B_ligne_i.add(B.get_coeff()(B.get_tab1()(i)+j-1));
@@ -541,9 +541,9 @@ void Matrice_Morse_Sym::get_symmetric_stencil( IntTab& stencil ) const
   const int nb_lines = nb_lignes( );
   for ( int i=0; i<nb_lines; ++i )
     {
-      int k0 = tab1_( i ) - 1;
-      int k1 = tab1_( i + 1 ) - 1;
-      int size = k1 - k0;
+      auto k0 = tab1_( i ) - 1;
+      auto k1 = tab1_( i + 1 ) - 1;
+      int size = (int)(k1 - k0);
 
       tmp.resize_array( 0 );
       tmp.resize_array( size );
@@ -606,9 +606,9 @@ void Matrice_Morse_Sym::get_symmetric_stencil_and_coefficients( IntTab&      ste
   const int nb_lines = nb_lignes( );
   for ( int i=0; i<nb_lines; ++i )
     {
-      int k0   = tab1_( i ) - 1;
-      int k1   = tab1_( i + 1 ) - 1;
-      int size = k1 - k0;
+      auto k0   = tab1_( i ) - 1;
+      auto k1   = tab1_( i + 1 ) - 1;
+      int size = (int)(k1 - k0);
 
       index.resize_array( 0 );
 
@@ -740,10 +740,10 @@ void Matrice_Morse_Sym::compacte(int elim_coeff_nul)
   // Verification si tous les elements de la diagonale sont bien stockes
   int n=nb_lignes();
   int elements_diagonaux_non_stockes=0;
-  int size_tab2_ = tab2_.size_array();
+  auto size_tab2_ = tab2_.size_array();
   for (int i=0; i<n; i++)
     {
-      int k=tab1_(i)-1;
+      auto k=tab1_(i)-1;
       if (k>=size_tab2_ || i!=tab2_(k)-1)
         {
           elements_diagonaux_non_stockes++;
@@ -755,16 +755,16 @@ void Matrice_Morse_Sym::compacte(int elim_coeff_nul)
   if (elements_diagonaux_non_stockes)
     {
       // On resize
-      int nnz=size_tab2_+elements_diagonaux_non_stockes;
+      auto nnz=size_tab2_+elements_diagonaux_non_stockes;
       tab2_.resize(nnz);
       coeff_.resize(nnz);
       // On change la matrice en partant de la fin
       for (int i=n-1; i>=0; i--)
         {
           // On copie en decalant
-          int k1=tab1_(i)-1;
-          int k2=tab1_(i+1)-1;
-          for (int j=k2-1; j>=k1; j--)
+          auto k1=tab1_(i)-1;
+          auto k2=tab1_(i+1)-1;
+          for (auto j=k2-1; j>=k1; j--)
             {
               tab2_(j+elements_diagonaux_non_stockes)=tab2_(j);
               coeff_(j+elements_diagonaux_non_stockes)=coeff_(j);
@@ -791,49 +791,33 @@ void Matrice_Morse_Sym::renumerote() const
 {
   Cerr << "Bandwidth of the matrix : " << largeur_de_bande() << finl;
   Cerr << "Renumbering the matrix ..." << finl;
-  // rovisoire chercher a reecrire
   const Matrice_Morse_Sym& matrice_initial = *this;
   ArrOfInt& tab_iperm = matrice_initial.permutation_inverse();
 
   // transformation d une matrice morse symetrique en matrice morse
-
   Matrice_Morse matrice2(matrice_initial);
   Matrice_Morse matrice(matrice_initial);
 
   int mon_ordre = matrice.ordre();
-  //int i;
-
   matrice2.transpose(matrice);
   for (int i=0; i<mon_ordre; i++) matrice2(i, i) = 0.;
   matrice2 += matrice ;
 
-
-  // Matrice_Bande_Sym matrice_tmp;
-  // matrice_tmp.charger_coeff(matrice);
-  //Cout<<"avant renumerotation largeur de bande:"<<matrice_tmp.dim(0)<<finl;
-
-
   // calcul de la permutation a effectuer
-
-  //  int nnz = matrice2.coeff_.size();
   const int n = mon_ordre;
-  const int* tab1tmp = matrice2.get_tab1().addr();
+  matrice2.set_tab1_int32();
+  const int* tab1tmp = matrice2.get_tab1_int32().addr();
   const int* tab2tmp = matrice2.get_tab2().addr();
-  // const int nfirst=1;
-
-
   int init = 1;
-
-
   tab_iperm.resize_array(n);
   tab_iperm[0] = 1;
 
-  int* masktmp  = new int[n];
-  for (int i=0 ; i<n; i++ ) masktmp[i] = 1;
+  int* masktmp = new int[n];
+  for (int i=0 ; i<n; i++) masktmp[i] = 1;
   const int* mask = (const int*) masktmp;
   const int maskval = 1;
   // GF passage a n+1 pour permettre de faire du Cholesky sur 1 maillage 1xN
-  int*  level = new int[n+1];
+  int* level = new int[n+1];
   int nlev;
 
   // renumerotation des noeuds
@@ -841,7 +825,6 @@ void Matrice_Morse_Sym::renumerote() const
   // SPARSKIT2/ORDERINGS/levset.f
   F77NAME(PERPHN)(&n, tab2tmp, tab1tmp, &init,  mask, &maskval,
                   &nlev, tab_iperm.addr(), level);
-
 
   delete []masktmp;
   delete []level;
@@ -853,29 +836,31 @@ void Matrice_Morse_Sym::renumerote() const
 
   const double* a = matrice.get_coeff().addr();
   const int* ja = matrice.get_tab2().addr();
-  const int* ia = matrice.get_tab1().addr();
+  matrice.set_tab1_int32();
+  const int* ia = matrice.get_tab1_int32().addr();
   const double* tao = matrice2.get_coeff().addr();
   double* ao = (double*)tao;
-  const  int* tjao = matrice2.get_tab2().addr();
+  const int* tjao = matrice2.get_tab2().addr();
   int* jao = (int*)tjao;
-  const  int* tiao = matrice2.get_tab1().addr();
+  matrice2.set_tab1_int32();
+  const int* tiao = matrice2.get_tab1_int32().addr();
   int* iao = (int*)tiao;
 
   const int* perm = tab_perm.addr();
   const int* perm_inv = tab_iperm.addr();//normalement inutile
   const int job = 1;
 
-
-  // permutation de la matrice i.e. calcul de P A tP
-  // ici on ne permute que la partie supeieure
+  // permutation de la matrice2 i.e. calcul de P A tP
+  // ici on ne permute que la partie superieure
 
   // subroutine dperm (nrow,a,ja,ia,ao,jao,iao,perm,qperm,job)
   // SPARSKIT2/FORMATS/unary.f
   F77NAME(DPERM) (&n, a, ja, ia, ao, jao, iao, perm, perm_inv, &job);
+  matrice2.set_tab1(matrice2.get_tab1_int32());
 
   matrice.transpose(matrice2);
   for (int i=0; i<mon_ordre; i++) matrice2(i, i) = 0.;
-  matrice2 += matrice ;
+  matrice2 += matrice;
   matrice.partie_sup(matrice2);
   matrice_renumerotee_.typer("Matrice_Morse_Sym");
   ref_cast(Matrice_Morse_Sym,matrice_renumerotee_.valeur()) = matrice;
@@ -900,10 +885,10 @@ bool Matrice_Morse_Sym::check_symmetric_morse_matrix_structure() const
   const int nb_lines = nb_lignes( );
   for ( int i=0; i<nb_lines; ++i )
     {
-      int k0 = tab1_( i ) - 1;
-      int k1 = tab1_( i + 1 ) - 1;
+      auto k0 = tab1_( i ) - 1;
+      auto k1 = tab1_( i + 1 ) - 1;
 
-      for ( int k=k0; k<k1; ++k )
+      for ( auto k=k0; k<k1; ++k )
         {
           int j = tab2_( k ) - 1;
           if  ( j < i )
@@ -926,10 +911,10 @@ bool Matrice_Morse_Sym::check_sorted_symmetric_morse_matrix_structure() const
   const int nb_lines = nb_lignes( );
   for ( int i=0; i<nb_lines; ++i )
     {
-      int k0 = tab1_( i ) - 1;
-      int k1 = tab1_( i + 1 ) - 1;
+      auto k0 = tab1_( i ) - 1;
+      auto k1 = tab1_( i + 1 ) - 1;
 
-      for ( int k=k0; k<k1; ++k )
+      for ( auto k=k0; k<k1; ++k )
         {
           int j = tab2_( k ) - 1;
           if  ( j < i )

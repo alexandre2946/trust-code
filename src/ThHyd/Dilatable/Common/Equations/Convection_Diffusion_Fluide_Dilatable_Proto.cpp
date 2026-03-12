@@ -247,8 +247,8 @@ void Convection_Diffusion_Fluide_Dilatable_Proto::assembler_impl
   // Add source term (if any)
   eqn.sources().contribuer_a_avec(inco,matrice_morse);
 
-  DoubleTrav tab_coeff_diffusif(matrice_morse.get_set_coeff());
-  tab_coeff_diffusif = matrice_morse.get_set_coeff();
+  // Really we need to copy ?
+  tab_coeff_diffusif_ = matrice_morse.get_set_coeff();
 
   // on calcule les coefficients de l'op de convection on obtient les coeff de div (rho*u*Y)
   // ou div(rho*u*T). dans le cas thermique, il faudrait multiplier par cp puis divisier par rho cp
@@ -263,13 +263,13 @@ void Convection_Diffusion_Fluide_Dilatable_Proto::assembler_impl
   if (!is_thermal()) //espece
     {
       ToDo_Kokkos("critical");
-      const IntVect& tab1= matrice_morse.get_tab1();
-      DoubleVect& coeff=matrice_morse.get_set_coeff();
+      const auto& tab1 = matrice_morse.get_tab1();
+      auto& coeff = matrice_morse.get_set_coeff();
       for (int som=0 ; som<n ; som++)
         {
           double inv_rho = 1. / tab_rho(som);
-          for (int k=tab1(som)-1; k<tab1(som+1)-1; k++)
-            coeff(k)= (coeff(k)*inv_rho+tab_coeff_diffusif(k)*inv_rho);
+          for (auto k=tab1(som)-1; k<tab1(som+1)-1; k++)
+            coeff(k)= (coeff(k)*inv_rho+tab_coeff_diffusif_(k)*inv_rho);
 
           matrice_morse(som,som)+=tab_derivee2(som)*inv_rho;
         }
@@ -281,8 +281,8 @@ void Convection_Diffusion_Fluide_Dilatable_Proto::assembler_impl
       CDoubleArrView rhoCp = static_cast<const ArrOfDouble&>(eqn.get_champ("rho_cp_comme_T").valeurs()).view_ro();
       CDoubleArrView rho = static_cast<const ArrOfDouble&>(tab_rho).view_ro();
       CDoubleArrView derivee2 = static_cast<const ArrOfDouble&>(tab_derivee2).view_ro();
-      CIntArrView tab1 = matrice_morse.get_tab1().view_ro();
-      CDoubleArrView coeff_diffusif = static_cast<const ArrOfDouble&>(tab_coeff_diffusif).view_ro();
+      auto tab1 = matrice_morse.get_tab1().view_ro();
+      CDoubleArrView coeff_diffusif = tab_coeff_diffusif_.view_ro();
       DoubleArrView coeff = matrice_morse.get_set_coeff().view_wo();
       bool is_not_generic = !is_generic();
       Matrice_Morse_View matrice;
@@ -294,7 +294,7 @@ void Convection_Diffusion_Fluide_Dilatable_Proto::assembler_impl
         double rapport = 1. / rhoCp(som);
 
         // il faut multiplier toute la ligne de la matrice par rapport
-        for (int k=tab1(som)-1; k<tab1(som+1)-1; k++)
+        for (auto k=tab1(som)-1; k<tab1(som+1)-1; k++)
           coeff(k)= (coeff(k)*inv_rho+coeff_diffusif(k)*rapport);
 
         // ajout de Tdiv(rhou )/rho
@@ -372,10 +372,10 @@ void Convection_Diffusion_Fluide_Dilatable_Proto::assembler_blocs(Convection_Dif
   statistics().end_count(STD_COUNTERS::source_terms);
 
   statistics().begin_count(STD_COUNTERS::ajouter_blocs,statistics().get_last_opened_counter_level()+1);
-  DoubleVect& coeff_diffusif=mat_diff.get_set_coeff();
+  auto& coeff_diffusif = mat_diff.get_set_coeff();
 
-  const IntVect& tab1= mat->get_tab1();
-  DoubleVect& coeff=mat->get_set_coeff();
+  const auto& tab1 = mat->get_tab1();
+  auto& coeff = mat->get_set_coeff();
   coeff = 0;
   eqn.operateur(1).l_op_base().ajouter_blocs(matrices, secmem_tmp, semi_impl);
 
@@ -387,7 +387,7 @@ void Convection_Diffusion_Fluide_Dilatable_Proto::assembler_blocs(Convection_Dif
       for (int som=0 ; som<n ; som++)
         {
           double inv_rho = 1. / tab_rho(som);
-          for (int k=tab1(som)-1; k<tab1(som+1)-1; k++) coeff(k)= (coeff(k)*inv_rho+coeff_diffusif(k)*inv_rho);
+          for (auto k=tab1(som)-1; k<tab1(som+1)-1; k++) coeff(k)= (coeff(k)*inv_rho+coeff_diffusif(k)*inv_rho);
 
           if(mat) (*mat)(som,som)+=secmem(som)*inv_rho;
         }
@@ -404,7 +404,7 @@ void Convection_Diffusion_Fluide_Dilatable_Proto::assembler_blocs(Convection_Dif
           double rapport = 1. / rhoCp(som);
 
           // il faut multiplier toute la ligne de la matrice par rapport
-          for (int k=tab1(som)-1; k<tab1(som+1)-1; k++) coeff(k)= (coeff(k)*inv_rho+coeff_diffusif(k)*rapport);
+          for (auto k=tab1(som)-1; k<tab1(som+1)-1; k++) coeff(k)= (coeff(k)*inv_rho+coeff_diffusif(k)*rapport);
 
           // ajout de Tdiv(rhou )/rho
           if(mat) (*mat)(som,som) += secmem(som)*inv_rho;

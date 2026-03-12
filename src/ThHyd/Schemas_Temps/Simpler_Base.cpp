@@ -58,8 +58,8 @@ Entree& Simpler_Base::lire(const Motcle& motlu, Entree& is)
 void Simpler_Base::assembler_matrice_pression_implicite(Equation_base& eqn_NS,const Matrice_Morse& matrice,Matrice& matrice_en_pression_2)
 {
   Navier_Stokes_std& eqnNS = ref_cast(Navier_Stokes_std,eqn_NS);
-  const IntVect& tab1 = matrice.get_tab1();
-  const DoubleVect& coeff = matrice.get_coeff();
+  const auto& tab1 = matrice.get_tab1();
+  const auto& coeff = matrice.get_coeff();
   const DoubleTab& present = eqn_NS.inconnue().valeurs();
   int nb_comp = 1;
   int deux_entrees = 0;
@@ -77,7 +77,7 @@ void Simpler_Base::assembler_matrice_pression_implicite(Equation_base& eqn_NS,co
       int ns = vol2.size();
       for (int i=0; i<ns; i++)
         {
-          int idiag = tab1[i*nb_comp]-1;
+          auto idiag = tab1[i*nb_comp]-1;
           double ref = coeff[idiag];
           for (int c=1; c<nb_comp; c++)
             if (!est_egal(ref,coeff[tab1[i*nb_comp+c]-1]))

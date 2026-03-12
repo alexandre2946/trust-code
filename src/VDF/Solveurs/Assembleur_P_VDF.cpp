@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -183,8 +183,8 @@ int Assembleur_P_VDF::construire(Matrice& la_matrice)
     const int nb_faces_bord = domaine_vdf.nb_faces_bord();
     les_coeff_pression.resize_array(nb_faces_bord);
   }
-  ArrOfInt& carre_tab1 = carre.get_set_tab1();
-  ArrOfInt& rect_tab1 = rect.get_set_tab1();
+  auto& carre_tab1 = carre.get_set_tab1();
+  auto& rect_tab1 = rect.get_set_tab1();
 
   // Matrice creuse, stockage morse avec des indices fortran:
   // lignes numerotees 1..n, colonnes 1..m
@@ -217,8 +217,8 @@ int Assembleur_P_VDF::construire(Matrice& la_matrice)
 
   // Deuxieme etape : remplissage de tab2_ = numero de la colonne de chaque
   // terme non nul de la matrice
-  ArrOfInt& carre_tab2 = carre.get_set_tab2();
-  ArrOfInt& rect_tab2 = rect.get_set_tab2();
+  auto& carre_tab2 = carre.get_set_tab2();
+  auto& rect_tab2 = rect.get_set_tab2();
 
   carre_tab2 = -1;
   rect_tab2 = -1;
@@ -255,14 +255,14 @@ int Assembleur_P_VDF::construire(Matrice& la_matrice)
             {
               const int colonne = elem1 + 1;             // Indice fortran
               const int n = carre_nb_non_zero[ligne-1]++;
-              const int index = carre_tab1[ligne-1] + n; // Indice fortran dans tab2
+              const auto index = carre_tab1[ligne-1] + n; // Indice fortran dans tab2
               carre_tab2[index - 1] = colonne;
             }
           else                                           // elem1 est virtuel
             {
               const int colonne = elem1 - nb_elem + 1;  // Indice fortran
               const int n = rect_nb_non_zero[ligne-1]++;
-              const int index = rect_tab1[ligne-1] + n; // Indice fortran dans tab2
+              const auto index = rect_tab1[ligne-1] + n; // Indice fortran dans tab2
               rect_tab2[index - 1] = colonne;
             }
         }
@@ -306,10 +306,10 @@ int Assembleur_P_VDF::remplir(Matrice& la_matrice, const DoubleVect& volumes_ent
   carre_nb_non_zero = 1;
   rect_nb_non_zero = 0;
 
-  ArrOfInt& carre_tab1 = carre.get_set_tab1();
-  ArrOfInt& rect_tab1 = rect.get_set_tab1();
-  ArrOfDouble& carre_coeff = carre.get_set_coeff();
-  ArrOfDouble& rect_coeff = rect.get_set_coeff();
+  auto& carre_tab1 = carre.get_set_tab1();
+  auto& rect_tab1 = rect.get_set_tab1();
+  auto& carre_coeff = carre.get_set_coeff();
+  auto& rect_coeff = rect.get_set_coeff();
 
   carre_coeff = 0.;
   rect_coeff = 0.;
@@ -354,16 +354,16 @@ int Assembleur_P_VDF::remplir(Matrice& la_matrice, const DoubleVect& volumes_ent
           // elem0 est reel
           const int ligne = elem0 + 1;   // Indice fortran
           // Indice fortran de l'element diagonal (elem0, elem0)
-          const int index_diag = carre_tab1[ligne-1];
+          const auto index_diag = carre_tab1[ligne-1];
           carre_coeff[index_diag - 1] += coefficient;
           if (elem1 < nb_elem)
             {
               // elem1 est reel aussi
               // Indice fortran de l'element diagonal (elem1, elem1)
-              const int index_diag1 = carre_tab1[elem1]; // a la ligne elem1+1
+              const auto index_diag1 = carre_tab1[elem1]; // a la ligne elem1+1
               // Indice fortran de l'element extradiagonal (elem0, elem1)
               const int n = carre_nb_non_zero[ligne-1]++;
-              const int index = index_diag + n;
+              const auto index = index_diag + n;
               // Coefficient diagonal
               carre_coeff[index_diag1 - 1] += coefficient;
               // Coefficient extra-diagonal
@@ -374,7 +374,7 @@ int Assembleur_P_VDF::remplir(Matrice& la_matrice, const DoubleVect& volumes_ent
             {
               // elem1 est virtuel
               const int n = rect_nb_non_zero[ligne-1]++;
-              const int index = rect_tab1[ligne-1] + n; // Indice fortran dans tab2
+              const auto index = rect_tab1[ligne-1] + n; // Indice fortran dans tab2
               // Coefficient extra-diagonal
               rect_coeff[index - 1] = - coefficient;
               assert(rect.get_tab2()(index - 1) == elem1 - nb_elem + 1);
@@ -434,7 +434,7 @@ int Assembleur_P_VDF::remplir(Matrice& la_matrice, const DoubleVect& volumes_ent
               const int elem = elem0 + elem1 + 1;
               // Ajout du coefficient a la matrice
               assert(elem < nb_elem);
-              const int index = carre_tab1[elem]; // Indice fortran
+              const auto index = carre_tab1[elem]; // Indice fortran
               carre_coeff[index - 1] += coefficient;
               les_coeff_pression[num_face] = coefficient;
             }
@@ -451,7 +451,7 @@ int Assembleur_P_VDF::remplir(Matrice& la_matrice, const DoubleVect& volumes_ent
   // Verification sanitaire: pas d'element nul sur la diagonale
   for (int i = 0; i < nb_elem; i++)
     {
-      const int index = carre_tab1[i];
+      const auto index = carre_tab1[i];
       const double coeff_diagonal = carre_coeff[index - 1];
       if (coeff_diagonal == 0.)
         {
