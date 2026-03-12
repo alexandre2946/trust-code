@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -229,6 +229,9 @@ int Entree::get(long * ob, std::streamsize n) { return get_template<long>(ob,n);
 
 Entree& Entree::operator>>(long long& ob) { return operator_template<long long>(ob); }
 int Entree::get(long long * ob, std::streamsize n) { return get_template<long long>(ob,n); }
+
+// Yes this is awful. We will get rid of this along with Nom.
+Entree& Entree::operator>>(std::string& ob) { Nom tmp; *this >> tmp; ob = tmp.getString(); return *this;}
 
 Entree& Entree::operator >>(Objet_U& ob) { return ob.readOn(*this); }
 

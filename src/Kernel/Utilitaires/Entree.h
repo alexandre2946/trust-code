@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -71,6 +71,7 @@ public:
   virtual Entree& operator>>(long long& ob);
   virtual Entree& operator>>(float& ob);
   virtual Entree& operator>>(double& ob);
+  virtual Entree& operator>>(std::string& ob);
 
   // final
   virtual Entree& operator>>(Objet_U& ob) final;
