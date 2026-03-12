@@ -21,9 +21,7 @@
 #include <Interprete.h>
 
 Implemente_instanciable(Partitionneur_Union,"Partitionneur_Union",Partitionneur_base);
-// XD partitionneur_union partitionneur_deriv union 0 Let several local domains be generated from a bigger one using the keyword create_domain_from_sub_domain, and let their partitions be generated in the usual way. Provided the list of partition files for each small domain, the keyword 'union' will partition the global domain in a conform fashion with the smaller domains.
-
-
+// XD partitionneur_union partitionneur_deriv union 1 Let several local domains be generated from a bigger one using the keyword create_domain_from_sub_domain, and let their partitions be generated in the usual way. Provided the list of partition files for each small domain, the keyword 'union' will partition the global domain in a conform fashion with the smaller domains.
 
 
 Sortie& Partitionneur_Union::printOn(Sortie& os) const
