@@ -918,7 +918,7 @@ int main(int argc,char **argv)
       {
         if (opt.processing_option != LataAnalyzerOptions::WRITE_LATA_CONVERT)
           {
-            Journal(0) << "Input file : " << argv[1] << "is a non-lata format (lml or cgns) " << endl;
+            Journal(0) << "Input file : " << argv[1] << " is a non-lata format (lml or cgns) " << endl;
             Journal(0) << " it can only be processed with writelata_convert." << endl;
             exit(-1);
           }
@@ -930,6 +930,8 @@ int main(int argc,char **argv)
           lml_to_lata(argv[1], opt.output_filename, !opt.binary_out, opt.fortran_blocs, opt.use_fortran_data_ordering, opt.use_fortran_indexing);
         else
           cgns_to_lata(argv[1], opt.output_filename, !opt.binary_out, opt.fortran_blocs, opt.use_fortran_data_ordering, opt.use_fortran_indexing);
+
+        Journal(0) << "Done ! " << endl;
 
         exit(0);
       }
