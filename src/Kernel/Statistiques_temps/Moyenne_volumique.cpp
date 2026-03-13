@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -44,7 +44,7 @@ Sortie& Moyenne_volumique::printOn(Sortie& s ) const
 Entree& Moyenne_volumique::readOn(Entree& is )
 {
   expression_parser_ = "??";
-  int type;
+  int type = -1;
   Param param(que_suis_je());
   param.ajouter("type", & type, Param::REQUIRED /* obligatoire */);
   param.dictionnaire("BOITE", BOITE);

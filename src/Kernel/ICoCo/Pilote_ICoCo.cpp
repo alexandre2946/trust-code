@@ -441,9 +441,9 @@ Entree& Pilote_ICoCo::interpreter(Entree& is)
 {
   Param param(que_suis_je());
   Nom nom1;
-  int nb_pas_dt_reset;
+  int nb_pas_dt_reset = -1;
   param.ajouter("pb_name",&nom1,Param::REQUIRED);
-  int methode=-1;
+  int methode = -1;
   param.ajouter("main",&methode,Param::REQUIRED);
   param.dictionnaire("abort_time_step",0);
   param.dictionnaire("Pilote_ICoCo_1",1);
@@ -464,6 +464,7 @@ Entree& Pilote_ICoCo::interpreter(Entree& is)
       main_pilote_icoco_2(pb_to_solve);
       break;
     case 3:
+      assert (nb_pas_dt_reset != -1);
       main_pilote_icoco_3(pb_to_solve, nb_pas_dt_reset);
       break;
     default:

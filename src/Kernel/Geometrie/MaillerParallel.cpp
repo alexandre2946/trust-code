@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -539,7 +539,7 @@ Entree& MaillerParallel::interpreter(Entree& is)
   Nom      nom_domaine;
   ArrOfInt nb_noeuds;
   ArrOfInt decoupage;
-  int   epaisseur_joint;
+  int   epaisseur_joint = -1;
   bool perio[3] = {false, false, false};
   Noms fonctions_coord(3);
   Noms nom_bords_min(3);

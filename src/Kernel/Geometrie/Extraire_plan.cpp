@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -43,7 +43,7 @@ Entree& Extraire_plan::interpreter_(Entree& is)
   Nom nom_dom;
   ArrOfDouble origine,point1,point2,point3;
   bool triangle = false;
-  double epaisseur;
+  double epaisseur = -123.;
   Param param(que_suis_je());
   param.ajouter("domaine",&nom_dom,Param::REQUIRED); // XD_ADD_P ref_domaine domain name
   param.ajouter("probleme",&nom_pb,Param::REQUIRED); // XD_ADD_P  ref_Pb_base pb_name
