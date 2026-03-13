@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -147,8 +147,6 @@ void generate_defaut(const Matrice_Base& matrice, const double seuil, Sortie& so
     {
       if((!sub_type(Matrice_Morse_Sym,matrice))&&(!sub_type(Matrice_Bloc,matrice)))
         {
-          sortie <<" solveur gen { seuil "<<seuil <<" "<<impr<< " solv_elem bicgstab precond ilu { type 2 filling 10 } }" <<finl;
-          sortie <<" solveur gen { seuil "<<seuil <<" "<<impr<< " solv_elem bicgstab precond ilu { type 2 filling 20 } }" <<finl;
           sortie <<" solveur gmres { diag seuil "<<seuil <<" "<<impr<<"}"<<finl;
 #ifdef __PETSCKSP_H
           sortie <<" solveur petsc bicgstab { precond diag { }                  seuil "<<seuil <<" "<<impr<<"}"<<finl;

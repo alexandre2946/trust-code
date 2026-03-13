@@ -49,7 +49,7 @@ Read sch
     facsec 500.
     solveur implicite
     {
-        solveur gen { seuil 1e-8 impr solv_elem bicgstab precond ilu { type 2 filling 10 } }
+        solveur petsc bicgstab { atol 1e-8 precond block_jacobi_ilu { } impr }
     }
     no_check_disk_space
 }

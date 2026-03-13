@@ -38,8 +38,6 @@ let i=$i+1;solver[$i]="Petsc IBICGSTAB { seuil $seuil precond BLOCK_JACOBI_ICC {
 
 # Reference TRUST GMRES+DIAG
 let i=$i+1;solver[$i]="Gmres          { seuil $seuil diag controle_residu 1 impr }"				;sym[$i]=0	;rank[$i]=5;
-# Reference TRUST BICGSTAB+DIAG
-let i=$i+1;solver[$i]="Gen            { seuil $seuil solv_elem bicgstab precond ilu { type 0 filling 10 } impr }" ;sym[$i]=0	;rank[$i]=0;
 
 ################################
 # Solveurs matrices symetriques:
