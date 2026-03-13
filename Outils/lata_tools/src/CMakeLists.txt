@@ -89,15 +89,16 @@ else()
 endif()
 
 if (cgns_reader)
+  add_definitions(-DWITH_CGNSLOADER)
   set(cgns_lib_paths
     ${cgns_dir}/lib
-  )
+  	)
 
   find_library(libcgns
     NAMES libcgns.a cgns
     PATHS ${cgns_lib_paths}
     NO_DEFAULT_PATH
-  )
+  	)
 
   if (NOT libcgns)
     message(FATAL_ERROR "CGNS library not found in ${cgns_dir}/lib")

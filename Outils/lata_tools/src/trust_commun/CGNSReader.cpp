@@ -16,8 +16,23 @@
 #include <CGNSReader.h>
 #include <LataFilter.h>
 #include <LataDB.h>
-#include <cgns++.h>
 
+#ifndef WITH_CGNSLOADER
+
+void cgns_reader(const char*, const char*, LataDB&)
+{
+  Journal() << "CGNS PLUGIN not compiled!" << endl;
+  throw;
+}
+void cgns_to_lata(const char *, const char *, bool , bool , bool , bool )
+{
+  Journal() << "CGNS PLUGIN not compiled!" << endl;
+  throw;
+}
+
+#else
+
+#include <cgns++.h>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -709,3 +724,5 @@ void cgns_to_lata(const char *cgns_name, const char *latafilename, bool ascii, b
   Journal() << "cgns_to_lata writing single_lata master file" << endl;
   lata_db.write_master_file(lata_name.c_str());
 }
+
+#endif /* WITH_CGNSLOADER */
