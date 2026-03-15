@@ -77,7 +77,11 @@ if (loadercpp)
         swig_add_library(LataLoader LANGUAGE python SOURCES LataLoader.i)
     endif()
 
-	include_directories(${PYTHON_INCLUDE_DIRS})
+	if (Python3_INCLUDE_DIRS)
+		include_directories(${Python3_INCLUDE_DIRS})
+	else()
+		include_directories(${PYTHON_INCLUDE_DIRS})
+	endif()
 
     if (CYGWIN)
       swig_link_libraries(LataLoader ${PYTHON_LIBRARIES} ${tgt_ll}.st  ${lib}  ${ajout})
