@@ -50,10 +50,19 @@ if (loadercpp)
   # Swig
   #
   if (loaderpython)
-    find_package(PythonLibs REQUIRED)
-    find_package(PythonInterp REQUIRED)
-    find_package(SWIG REQUIRED)
-    include(${SWIG_USE_FILE})
+	if(APPLE) # comme cmake icoco ...
+		# Pour mac : on force le meme python que celui de TRUST
+		find_package(PythonInterp 3 REQUIRED)
+		find_package(PythonLibs 3 REQUIRED)
+		set(Python3_EXECUTABLE "${PYTHON_EXECUTABLE}" CACHE FILEPATH "Python 3 interpreter" FORCE)
+		find_package(Python3 COMPONENTS Interpreter Development.Module REQUIRED)
+	else()
+		find_package(PythonLibs REQUIRED)
+		find_package(PythonInterp REQUIRED)
+	endif()
+
+	find_package(SWIG REQUIRED)
+	include(${SWIG_USE_FILE})
 
     set_source_files_properties(LataLoader.i PROPERTIES CPLUSPLUS ON)
     set_source_files_properties(LataLoader.i PROPERTIES SWIG_FLAGS "-shadow")
@@ -68,15 +77,16 @@ if (loadercpp)
         swig_add_library(LataLoader LANGUAGE python SOURCES LataLoader.i)
     endif()
 
-    include_directories(${PYTHON_INCLUDE_DIRS})
+	include_directories(${PYTHON_INCLUDE_DIRS})
+
     if (CYGWIN)
       swig_link_libraries(LataLoader ${PYTHON_LIBRARIES} ${tgt_ll}.st  ${lib}  ${ajout})
     elseif(APPLE)
       swig_link_libraries(LataLoader ${PYTHON_LIBRARIES} ${tgt_ll})
-      set_target_properties(_LataLoader PROPERTIES INSTALL_RPATH "@loader_path")
     else()
       swig_link_libraries(LataLoader ${tgt_ll})  # Do not add PYTHON_LIBRARIES as in MC
     endif()
+
     install(TARGETS _LataLoader  DESTINATION lib)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/LataLoader.py   DESTINATION lib)
   else()

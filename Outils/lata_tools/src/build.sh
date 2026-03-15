@@ -41,7 +41,7 @@ if [[ $(uname -s) == "Darwin" ]]
 then
    PYTHON_VERSION=`python -c "import sys; print(str(sys.version_info.major)+'.'+str(sys.version_info.minor))"`
    export CXXFLAGS="$CXXFLAGS -I${TRUST_ROOT}/exec/python/include/python${PYTHON_VERSION}"
-   export LDFLAGS="$LDFLAGS -Wl,-flat_namespace -Wl,-w -L${TRUST_ROOT}/exec/python/lib -lpython${PYTHON_VERSION}"
+   export LDFLAGS="$LDFLAGS -Wl,-flat_namespace -Wl,-w"
 fi
 
 # CMake option + implicit use of TRUST_DEFINES and EXTRA_SRCS env var:
