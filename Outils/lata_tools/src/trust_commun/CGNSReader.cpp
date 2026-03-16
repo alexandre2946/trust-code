@@ -349,16 +349,33 @@ namespace
 
   static bool split_parallel_zone_name(const std::string &basename, const std::string &zonename, int &rank)
   {
-    const std::string prefix = basename + "_";
-    if (zonename.rfind(prefix, 0) != 0)
-      return false;
+    {
+      const std::string prefix = basename + "_";
+      if (zonename.rfind(prefix, 0) == 0)
+        {
+          const std::string suffix = zonename.substr(prefix.size());
+          if (is_all_digits(suffix))
+            {
+              rank = std::atoi(suffix.c_str());
+              return true;
+            }
+        }
+    }
 
-    const std::string suffix = zonename.substr(prefix.size());
-    if (!is_all_digits(suffix))
-      return false;
+    {
+      const std::string generic_prefix = "Zone_";
+      if (zonename.rfind(generic_prefix, 0) == 0)
+        {
+          const std::string suffix = zonename.substr(generic_prefix.size());
+          if (is_all_digits(suffix))
+            {
+              rank = std::atoi(suffix.c_str());
+              return true;
+            }
+        }
+    }
 
-    rank = std::atoi(suffix.c_str());
-    return true;
+    return false;
   }
 
   static std::vector<ZonePartInfo> collect_parallel_zone_parts(int fn, int ibase, const std::string &basename)
@@ -398,6 +415,16 @@ namespace
       {
         return a.rank < b.rank;
       });
+
+    // XXX juste pour etre sur ...
+    for (size_t i = 1; i < parts.size(); i++)
+      {
+        if (parts[i].rank == parts[i - 1].rank)
+          {
+            cerr << "cgns_reader: duplicate parallel rank " << parts[i].rank << " in base " << basename << endl;
+            throw LataDBError(LataDBError::READ_ERROR);
+          }
+      }
 
     return parts;
   }
