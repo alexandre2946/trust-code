@@ -100,15 +100,46 @@ if [ "$TRUST_CGNS_ROOT" != "" ]; then
 	echo "###  with CGNS files converted to single_lata ..."
 	$TRUST_ROOT/exec/lata_tools/bin/lata_analyzer upwind.cgns writelata_convert=cgns2lata || exit -1
 	echo ""
-fi 
+fi
+
+echo "###  with LML files converted to single_lata ..."
+$TRUST_ROOT/exec/lata_tools/bin/lata_analyzer upwind.lml writelata_convert=test_upwind || exit -1
+echo ""
+
+echo "###  with LATA files 32b converted to single_lata ..."
+$TRUST_ROOT/exec/lata_tools/bin/lata_analyzer vdf32/vdf.lata write_singlelata=test_vdf32 || exit -1
+echo ""
+
+echo "###  with LATA files 64b converted to single_lata ..."
+$TRUST_ROOT/exec/lata_tools/bin/lata_analyzer upwind64/upwind.lata write_singlelata=test_upwind64 || exit -1
+echo ""
 
 echo "###  with FORT21 files converted to single_lata ..."
 $TRUST_ROOT/exec/lata_tools/bin/lata_analyzer FORT21 write_singlelata=testf21 || exit -1
-echo ""
-
 nc=$(grep CHAMP testf21.lata | wc| awk '{print $1}')
 ref=62
 [ $nc -ne $ref ] && echo invalid number of CHAMP $nc != $ref&& exit -2
+
+echo ""
+echo "------------------------------------"
+echo "Check if TRUST_Post_Loader works ..."
+echo "------------------------------------"
+
+if [ "$TRUST_CGNS_ROOT" != "" ]; then
+	echo ""
+	echo "###  with CGNS files ..."
+	$TRUST_ROOT/exec/lata_tools/bin/test_TRUST_Post_Loader upwind.cgns PRESSION_ELEM_dom_ELEM || exit -1
+	echo ""
+fi 
+
+echo "###  with LML files ..."
+$TRUST_ROOT/exec/lata_tools/bin/test_TRUST_Post_Loader upwind.lml PRESSION_ELEM_dom || exit -1
+echo ""
+
+echo "###  with LATA files 64b ..."
+$TRUST_ROOT/exec/lata_tools/bin/test_TRUST_Post_Loader upwind64/upwind.lata PRESSION_ELEM_dom || exit -1
+echo ""
+
 cd ..
 rm -rf $Build
 echo ""
