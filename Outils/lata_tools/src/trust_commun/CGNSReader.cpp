@@ -278,6 +278,56 @@ namespace
     return max_nsols;
   }
 
+  static std::vector<double> read_cgns_time_values(int fn, int ibase)
+  {
+    std::vector<double> times;
+
+    int nsteps = 0;
+    char bitername[33] = "";
+    if (cg_biter_read(fn, ibase, bitername, &nsteps) != CG_OK || nsteps <= 0)
+      return times; // pas de BaseIterativeData_t
+
+    // XXX : Aller sous BaseIterativeData_t puis lire TimeValues
+    cgns_check(cg_goto(fn, ibase, "BaseIterativeData_t", 1, "end"), "cg_goto(BaseIterativeData_t)");
+
+    int narrays = 0;
+    cgns_check(cg_narrays(&narrays), "cg_narrays");
+
+    for (int ia = 1; ia <= narrays; ia++)
+      {
+        char array_name[33];
+        DataType_t dtype;
+        int dim;
+        cgsize_t dims[12] = { 0 };
+
+        cgns_check(cg_array_info(ia, array_name, &dtype, &dim, dims), "cg_array_info");
+
+        if (std::string(array_name) == "TimeValues")
+          {
+            times.resize((size_t) nsteps);
+
+            if (dtype == RealDouble)
+              cgns_check(cg_array_read_as(ia, RealDouble, times.data()), "cg_array_read_as(TimeValues)");
+            else if (dtype == RealSingle)
+              {
+                std::vector<float> tmp((size_t) nsteps);
+                cgns_check(cg_array_read_as(ia, RealSingle, tmp.data()), "cg_array_read_as(TimeValues)");
+                for (int i = 0; i < nsteps; i++)
+                  times[i] = tmp[i];
+              }
+            else
+              {
+                cerr << "cgns_reader: TimeValues has unsupported type" << endl;
+                throw LataDBError(LataDBError::READ_ERROR);
+              }
+
+            return times;
+          }
+      }
+
+    return times; // NumberOfSteps existe mais pas TimeValues
+  }
+
   static void read_zone_coordinates(int fn, int ibase, int izone, int phys_dim, trustIdType nb_nodes, BigFloatTab &nodes)
   {
     nodes.resize(nb_nodes, phys_dim);
@@ -606,21 +656,35 @@ void cgns_reader(const char *cgnsfilename, const char *data_filename, LataDB &la
         }
     }
 
-  // Nombre de temps physiques = nombre max de FlowSolution_t rencontre
-  int nb_phys_steps = get_max_number_of_solutions(fn);
-  if (nb_phys_steps <= 0)
-    nb_phys_steps = 1;
-
-  Journal(2) << "cgns_reader: nb_physical_timesteps=" << nb_phys_steps << endl;
   Journal(2) << "cgns_reader: timestep[0] = global definitions" << endl;
-
   lata_db.add_timestep(-1.); // timestep 0 = defs globales
 
-  for (int it = 0; it < nb_phys_steps; it++)
+  std::vector<double> time_values;
+  if (nbases >= 1)
+    time_values = read_cgns_time_values(fn, 1);
+
+  if (!time_values.empty())
     {
-      const double time_value = (double) it; // XXX temps = iter ici !! 1 solution = 1 temps
-      lata_db.add_timestep(time_value);
-      Journal(2) << "cgns_reader: timestep[" << (it + 1) << "] = " << time_value << " (synthetic value from FlowSolution index)" << endl;
+      Journal(2) << "cgns_reader: nb_physical_timesteps=" << (int)time_values.size() << " (read from CGNS TimeValues)" << endl;
+      for (int it = 0; it < (int)time_values.size(); it++)
+        {
+          lata_db.add_timestep(time_values[(size_t)it]);
+          Journal(2) << "cgns_reader: timestep[" << (it + 1) << "] = " << time_values[(size_t)it] << " (from CGNS TimeValues)" << endl;
+        }
+    }
+  else
+    {
+      int nb_phys_steps = get_max_number_of_solutions(fn);
+      if (nb_phys_steps <= 0)
+        nb_phys_steps = 1;
+
+      Journal(2) << "cgns_reader: nb_physical_timesteps=" << nb_phys_steps << " (fallback from FlowSolution count)" << endl;
+      for (int it = 0; it < nb_phys_steps; it++)
+        {
+          const double time_value = (double) it;
+          lata_db.add_timestep(time_value);
+          Journal(2) << "cgns_reader: timestep[" << (it + 1) << "] = " << time_value << " (synthetic fallback)" << endl;
+        }
     }
 
   Journal(2) << "cgns_reader: lata_db.nb_timesteps()=" << lata_db.nb_timesteps() << endl;
