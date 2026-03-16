@@ -2,7 +2,7 @@
 # Creation d'un MEDFileData puis utilisation de CaseWriter ($MED_COUPLING_ROOT/bin/)
 #
 
-import LataLoader
+import TRUST_Post_Loader as tpl
 import Lata_to_med
 import medcoupling as mc
 from CaseWriter import CaseWriter
@@ -11,7 +11,7 @@ import os
 
 def buildMEDFileData(latafile,lasttime):
 
-    a=LataLoader.LataLoader(latafile)
+    a=tpl.TRUST_Post_Loader(latafile)
 
     write_med = 0 # we not want to write meshes in med format
     medfile="no_medfile" # no medfile !

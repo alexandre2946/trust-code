@@ -13,14 +13,14 @@
 *
 *****************************************************************************/
 
-#include <LataLoader.h>
+#include <TRUST_Post_Loader.h>
 #include <LataJournal.h>
 #include <LmlReader.h>
 #include <TRUSTList.h>
 #include <iostream>
 #include <fstream>
-#include <string>
 #include <numeric>
+#include <string>
 
 #include <MEDCouplingRefCountObject.hxx>
 #include <MEDCouplingFieldDouble.hxx>
@@ -30,14 +30,31 @@
 
 using namespace MEDCoupling;
 
-LataLoader::LataLoader(const char *file)
+const char* TRUST_Post_Loader::GetType()
+{
+  if (filename.finit_par(".lata"))
+    return "LATA";
+  else if (filename.finit_par(".cgns"))
+    return "CGNS";
+  else if (filename.finit_par(".lml"))
+    return "LML";
+  else if (filename.finit_par(".med"))
+    return "MED";
+  else
+    {
+      cerr << "Error in TRUST_Post_Loader::GetType(). Undefined file extension for file : " << filename << endl;
+      throw;
+    }
+}
+
+TRUST_Post_Loader::TRUST_Post_Loader(const char *file)
 {
   filename = Nom(file);
-  cerr << "LataLoader constructor " << filename << endl;
+  cerr << "TRUST_Post_Loader constructor for file : " << filename << endl;
+
   try
     {
       set_Journal_level(0);
-
       LataOptions opt;
       LataOptions::extract_path_basename(filename, opt.path_prefix, opt.basename);
       opt.dual_mesh = true;
@@ -46,24 +63,23 @@ LataLoader::LataLoader(const char *file)
       opt.regularize_tolerance = 1e-7f;
       opt.user_fields_ = true;
       read_any_format_options(filename, opt);
-      cerr << "LataLoader: initializing filter" << endl;
+      cerr << "Initializing filter ..." << endl;
+
       // Read the source file to the lata database
       read_any_format(filename, opt.path_prefix, lata_db_);
       filter_.initialize(opt, lata_db_);
     }
-  catch (LataDBError& err)
+  catch (LataDBError &err)
     {
-      cerr << "Error in LataFilter::initialize " << filename << " " << err.describe() << endl;
+      cerr << "Error in TRUST_Post_Loader::TRUST_Post_Loader : " << filename << " " << err.describe() << endl;
       throw err;
     }
   PopulateDatabaseMetaData(0);
 }
 
-LataLoader::~LataLoader() { }
-
-int LataLoader::GetNTimesteps(void)
+int TRUST_Post_Loader::GetNTimesteps()
 {
-  int n;
+  int n = -123;
   try
     {
       n = filter_.get_nb_timesteps();
@@ -72,17 +88,17 @@ int LataLoader::GetNTimesteps(void)
       if (n > 1)
         n--;
     }
-  catch (LataDBError& err)
+  catch (LataDBError &err)
     {
-      cerr << "Error in getntimesteps " << filename << " " << err.describe() << endl;
+      cerr << "Error in TRUST_Post_Loader::GetNTimesteps() : " << filename << " " << err.describe() << endl;
       throw;
     }
   return n;
 }
 
-void LataLoader::GetTimes(std::vector<double>& times)
+void TRUST_Post_Loader::GetTimes(std::vector<double> &times)
 {
-  int n;
+  int n = -123;
   try
     {
       n = filter_.get_nb_timesteps();
@@ -92,40 +108,34 @@ void LataLoader::GetTimes(std::vector<double>& times)
         for (int i = 1; i < n; i++)
           times.push_back(filter_.get_timestep(i));
     }
-  catch (LataDBError& err)
+  catch (LataDBError &err)
     {
-      cerr << "Error in gettimes " << filename << " " << err.describe() << endl;
+      cerr << "Error in TRUST_Post_Loader::GetTimes : " << filename << " " << err.describe() << endl;
       throw;
     }
   return;
 }
 
-void LataLoader::FreeUpResources(void)
-{
-}
-
-void LataLoader::PopulateDatabaseMetaData(int timeState)
+void TRUST_Post_Loader::PopulateDatabaseMetaData(int timeState)
 {
   try
     {
-      cerr << "LataLoader::PopulateDatabaseMetaData : " << filename << " " << timeState << endl;
+      cerr << "-----------------------------------------------" << endl ;
+      cerr << "TRUST_Post_Loader::PopulateDatabaseMetaData : " << filename << " " << timeState << endl << endl;
 
       const Noms geoms = filter_.get_exportable_geometry_names();
 
       for (int i_geom = 0; i_geom < geoms.size(); i_geom++)
         {
-          cerr << " Domain : " << geoms[i_geom] << endl;
+          cerr << "Domain : " << geoms[i_geom] << endl;
           const LataGeometryMetaData data = filter_.get_geometry_metadata(geoms[i_geom]);
 
           bool mesh_faces = false;
           if (data.internal_name_.finit_par("_centerfaces"))
-            {
-              //cerr<<"la "<<data.internal_name_<<endl;
               mesh_faces = true;
-            }
 
           const std::string geom_name(data.displayed_name_);
-          //  AddMeshToMetaData(md, geom_name, mt, extents, data.nblocks_, block_origin,                      data.dimension_, topo_dim);
+          //  AddMeshToMetaData(md, geom_name, mt, extents, data.nblocks_, block_origin, data.dimension_, topo_dim);
           mesh_username_.add(data.displayed_name_);
           mesh_latafilter_name_.add(data.internal_name_);
 
@@ -147,7 +157,7 @@ void LataLoader::PopulateDatabaseMetaData(int timeState)
                   // Scalar field
                   // We append the geometry name to the component name:
                   register_fieldname(varname.c_str(), fields[i_field], 0);
-                  //      if (mesh_faces==0)           AddScalarVarToMetaData(md, varname, geom_name, cent);
+                  //      if (mesh_faces==0) AddScalarVarToMetaData(md, varname, geom_name, cent);
                 }
               else if (data2.is_vector_ && data2.nb_components_ == data.dimension_)
                 {
@@ -185,21 +195,22 @@ void LataLoader::PopulateDatabaseMetaData(int timeState)
                 }
             }
         }
-      cerr << "End LataLoader::PopulateDatabaseMetaData" << endl;
+      cerr << endl << "End TRUST_Post_Loader::PopulateDatabaseMetaData" << endl;
+      cerr << "-----------------------------------------------" << endl ;
     }
-  catch (LataDBError& err)
+  catch (LataDBError &err)
     {
-      cerr << "Error in PopulateDatabaseMetaData " << err.describe() << endl;
+      cerr << "Error in TRUST_Post_Loader::PopulateDatabaseMetaData " << err.describe() << endl;
       throw;
     }
 }
 
-void LataLoader::register_fieldname(const char *visit_name, const Field_UName& uname, int component)
+void TRUST_Post_Loader::register_fieldname(const char *visit_name, const Field_UName &uname, int component)
 {
   if (field_username_.rang(visit_name) >= 0)
     {
-      cerr << "Error in LataLoader::register_fieldname: duplicate field name " << visit_name << endl;
-      cerr << "Ignoring field" << endl;
+      cerr << "Error in TRUST_Post_Loader::register_fieldname : duplicate field name " << visit_name << endl;
+      cerr << "Ignoring field ..." << endl;
       return;
     }
   field_username_.add(visit_name);
@@ -207,24 +218,24 @@ void LataLoader::register_fieldname(const char *visit_name, const Field_UName& u
   field_component_.add(component);
 }
 
-void LataLoader::register_meshname(const char *visit_name, const char *latafilter_name)
+void TRUST_Post_Loader::register_meshname(const char *visit_name, const char *latafilter_name)
 {
   if (mesh_username_.rang(visit_name) >= 0)
     {
-      cerr << "Error in LataLoader::register_meshname: duplicate name " << visit_name << endl;
-      cerr << "Ignoring mesh" << endl;
+      cerr << "Error TRUST_Post_Loader::register_meshname: duplicate name " << visit_name << endl;
+      cerr << "Ignoring mesh ..." << endl;
       return;
     }
   mesh_username_.add(visit_name);
   mesh_latafilter_name_.add(latafilter_name);
 }
 
-MEDCouplingMesh* LataLoader::GetMesh(const char *meshname, int timestate, int block)
+MEDCouplingMesh* TRUST_Post_Loader::GetMesh(const char *meshname, int timestate, int block)
 {
-  MEDCouplingMesh *return_value = 0;
+  MEDCouplingMesh *return_value = nullptr;
   try
     {
-      cerr << " LataLoader::GetMesh ts=" << timestate << " block=" << block << " meshname=" << meshname << endl;
+      cerr << "TRUST_Post_Loader::GetMesh ts = " << timestate << ", block = " << block << ", meshname = " << meshname << endl;
 
       // We have real timesteps in the database, add one to timestep index:
       if (filter_.get_nb_timesteps() > 1)
@@ -240,24 +251,24 @@ MEDCouplingMesh* LataLoader::GetMesh(const char *meshname, int timestate, int bl
         }
       if (index < 0)
         {
-          cerr << "internal error in LataLoader::GetMesh: name " << meshname << " not found" << endl;
+          cerr << "internal error in TRUST_Post_Loader::GetMesh : name " << meshname << " not found" << endl;
           throw;
         }
       Domain_Id id(mesh_latafilter_name_[index], timestate, block);
-      const Domain& geometry = filter_.get_geometry(id);
+      const Domain &geometry = filter_.get_geometry(id);
 
       const DomainUnstructured *geom_ptr = dynamic_cast<const DomainUnstructured*>(&geometry);
       const DomainIJK *ijk_ptr = dynamic_cast<const DomainIJK*>(&geometry);
 
       if (geom_ptr)
         {
-          const DomainUnstructured& geom = *geom_ptr;
+          const DomainUnstructured &geom = *geom_ptr;
 
-          const BigFloatTab& pos = geom.nodes_;
+          const BigFloatTab &pos = geom.nodes_;
           const trustIdType nnodes = pos.dimension(0);
           assert(nnodes < std::numeric_limits<trustIdType>::max());
           //   const int dim3 = pos.dimension(1) == 3;
-          const int dim = (int)pos.dimension(1);
+          const int dim = (int) pos.dimension(1);
           //ugrid->setMeshDimension(dim);
           MEDCouplingUMesh *ugrid = MEDCouplingUMesh::New(meshname, dim);
           DataArrayDouble *points = DataArrayDouble::New();
@@ -267,10 +278,10 @@ MEDCouplingMesh* LataLoader::GetMesh(const char *meshname, int timestate, int bl
           ugrid->setCoords(points);
           points->decrRef();
 
-          const BigTIDTab& conn = geom.elements_;
+          const BigTIDTab &conn = geom.elements_;
           assert(conn.dimension(0) < std::numeric_limits<trustIdType>::max());
-          const mcIdType ncells = (mcIdType)conn.dimension(0);
-          int nverts = (int)conn.dimension(1);
+          const mcIdType ncells = (mcIdType) conn.dimension(0);
+          int nverts = (int) conn.dimension(1);
 
           INTERP_KERNEL::NormalizedCellType type_cell;
           switch(geom.elt_type_)
@@ -309,7 +320,7 @@ MEDCouplingMesh* LataLoader::GetMesh(const char *meshname, int timestate, int bl
               break;
             default:
               type_cell = INTERP_KERNEL::NORM_POLYHED;
-              cerr << "LataLoader::GetMesh unknown elt type " << endl;
+              cerr << "GetMesh unknown elem type " << endl;
               throw;
               break;
             }
@@ -630,7 +641,7 @@ MEDCouplingMesh* LataLoader::GetMesh(const char *meshname, int timestate, int bl
       else if (ijk_ptr)
         {
           //  throw "KKKK";
-          const DomainIJK& geom = *ijk_ptr;
+          const DomainIJK &geom = *ijk_ptr;
 
           // Maillage regulier : on transmet la grille ijk
 
@@ -659,7 +670,7 @@ MEDCouplingMesh* LataLoader::GetMesh(const char *meshname, int timestate, int bl
 
               if (i < dim)
                 {
-                  const ArrOfFloat& coord = geom.coord_[i];
+                  const ArrOfFloat &coord = geom.coord_[i];
                   for (int j = 0; j < n; j++)
                     data[j] = coord[j];
                 }
@@ -672,32 +683,31 @@ MEDCouplingMesh* LataLoader::GetMesh(const char *meshname, int timestate, int bl
               c->decrRef();
             }
 
-
           return_value = sgrid;
         }
       else
         {
-          cerr << "Error in LataLoader::GetMesh: unknown geometry type" << endl;
+          cerr << "Error in TRUST_Post_Loader::GetMesh : unknown geometry type" << endl;
           throw;
         }
 
       filter_.release_geometry(geometry);
     }
-  catch (LataDBError& err)
+  catch (LataDBError &err)
     {
-      cerr << "Error in getmesh " << timestate << " " << block << " " << meshname << " " << err.describe() << endl;
+      cerr << "Error in TRUST_Post_Loader::GetMesh " << timestate << " " << block << " " << meshname << " " << err.describe() << endl;
       throw;
     }
 
   return return_value;
 }
 
-DataArray* LataLoader::GetVectorVar(int timestate, int block, const char *varname)
+DataArray* TRUST_Post_Loader::GetVectorVar(int timestate, int block, const char *varname)
 {
   DataArray *return_value = 0;
   try
     {
-      cerr << "Getvectorvar time:" << timestate << "/" << filter_.get_nb_timesteps() - 1 << " block:" << block << " varname:" << varname << endl;
+      cerr << "TRUST_Post_Loader::Getvectorvar time : " << timestate << "/" << filter_.get_nb_timesteps() - 1 << ", block : " << block << ", varname : " << varname << endl;
 
       if (filter_.get_nb_timesteps() > 1)
         timestate++;
@@ -707,13 +717,13 @@ DataArray* LataLoader::GetVectorVar(int timestate, int block, const char *varnam
       get_field_info_from_visitname(varname, field_uname, component);
       /*
        if (component >= 0) {
-       cerr << "Error: LataLoader::GetVectorVar called for scalar field" << endl;
+       cerr << "Error: TRUST_Post_Loader::GetVectorVar called for scalar field" << endl;
        throw;
        }
        */
       Field_Id id(field_uname, timestate, block);
 
-      const LataField_base& field = filter_.get_field(id);
+      const LataField_base &field = filter_.get_field(id);
 
       const Field<BigFloatTab> *float_field_ptr = dynamic_cast<const Field<BigFloatTab>*>(&field);
       const Field<BigTIDTab> *tid_field_ptr = dynamic_cast<const Field<BigTIDTab>*>(&field);
@@ -722,10 +732,10 @@ DataArray* LataLoader::GetVectorVar(int timestate, int block, const char *varnam
       if (float_field_ptr)
         {
           DataArrayDouble *rv = DataArrayDouble::New();
-          const Field<BigFloatTab>& fld = *float_field_ptr;
-          const BigFloatTab& values = fld.data_;
+          const Field<BigFloatTab> &fld = *float_field_ptr;
+          const BigFloatTab &values = fld.data_;
           trustIdType ntuples = values.dimension(0);
-          int dim = (int)values.dimension(1);
+          int dim = (int) values.dimension(1);
           rv->alloc(ntuples, dim);
           double *data = rv->getPointer();
           for (trustIdType i = 0; i < ntuples; i++)
@@ -736,29 +746,28 @@ DataArray* LataLoader::GetVectorVar(int timestate, int block, const char *varnam
       else if (int_field_ptr)
         {
           throw;
-
         }
       else
         {
-          cerr << "Error in LataLoader::GetVectorVar: unknown data type" << endl;
+          cerr << "Error in TRUST_Post_Loader::GetVectorVar: unknown data type" << endl;
           throw;
         }
       filter_.release_field(field);
     }
-  catch (LataDBError& err)
+  catch (LataDBError &err)
     {
-      cerr << "Error in getvectorvar " << timestate << " " << block << " " << varname << " " << err.describe() << endl;
+      cerr << "Error in TRUST_Post_Loader::GetVectorVar " << timestate << " " << block << " " << varname << " " << err.describe() << endl;
       throw;
     }
   return return_value;
 }
 
-void LataLoader::get_field_info_from_visitname(const char *varname, Field_UName& uname, int& component) const
+void TRUST_Post_Loader::get_field_info_from_visitname(const char *varname, Field_UName &uname, int &component) const
 {
   const int k = field_username_.rang(varname);
   if (k < 0)
     {
-      cerr << "Error in LataLoader::get_field_info_from_visitname: field " << varname << " not found" << endl;
+      cerr << "Error in TRUST_Post_Loader::get_field_info_from_visitname: field " << varname << " not found" << endl;
       for (int i = 0; i < field_username_.size(); i++)
         cerr << field_username_[i] << " ";
       throw;
@@ -767,7 +776,7 @@ void LataLoader::get_field_info_from_visitname(const char *varname, Field_UName&
   component = field_component_[k];
 }
 
-MEDCouplingFieldDouble* LataLoader::GetFieldDouble(const char *varname, int timestate, int block)
+MEDCouplingFieldDouble* TRUST_Post_Loader::GetFieldDouble(const char *varname, int timestate, int block)
 {
   if (timestate == -1)
     timestate = filter_.get_nb_timesteps() - 2;
@@ -777,23 +786,23 @@ MEDCouplingFieldDouble* LataLoader::GetFieldDouble(const char *varname, int time
   int component;
   get_field_info_from_visitname(varname, field_uname, component);
 
-  {
-    const LataGeometryMetaData data = filter_.get_geometry_metadata(field_uname.get_geometry());
+    {
+      const LataGeometryMetaData data = filter_.get_geometry_metadata(field_uname.get_geometry());
 
-    const LataFieldMetaData data2 = filter_.get_field_metadata(field_uname);
+      const LataFieldMetaData data2 = filter_.get_field_metadata(field_uname);
 
-    switch(data2.localisation_)
-      {
-      case LataField_base::ELEM:
-        cent = ON_CELLS;
-        break;
-      case LataField_base::SOM:
-        cent = ON_NODES;
-        break;
-      default:
-        throw;
-      }
-  }
+      switch(data2.localisation_)
+        {
+        case LataField_base::ELEM:
+          cent = ON_CELLS;
+          break;
+        case LataField_base::SOM:
+          cent = ON_NODES;
+          break;
+        default:
+          throw;
+        }
+    }
 
   double time = filter_.get_timestep(timestate + 1);
   MEDCouplingFieldDouble *ret = MEDCouplingFieldDouble::New(cent, ONE_TIME);
@@ -810,27 +819,28 @@ MEDCouplingFieldDouble* LataLoader::GetFieldDouble(const char *varname, int time
   return ret;
 }
 
-std::vector<std::string> LataLoader::GetMeshNames()
+std::vector<std::string> TRUST_Post_Loader::GetMeshNames()
 {
   std::vector<std::string> names;
-  const Noms& geoms = mesh_username_;
+  const Noms &geoms = mesh_username_;
   for (int i = 0; i < geoms.size(); i++)
     names.push_back(geoms[i].getString());
   return names;
-
 }
-std::vector<std::string> LataLoader::GetFieldNames()
+
+std::vector<std::string> TRUST_Post_Loader::GetFieldNames()
 {
   std::vector<std::string> names;
   for (int i = 0; i < field_username_.size(); i++)
     {
-      const Nom& name = field_username_[i];
+      const Nom &name = field_username_[i];
       if ((!name.debute_par("mesh_quality/")) && (!name.debute_par("normals/")))
         names.push_back(name.getString());
     }
   return names;
 }
-std::vector<std::string> LataLoader::GetFieldNamesOnMesh(const std::string& domain_name)
+
+std::vector<std::string> TRUST_Post_Loader::GetFieldNamesOnMesh(const std::string &domain_name)
 {
   std::vector<std::string> names;
   std::vector<std::string> names_tot = GetFieldNames();
@@ -838,7 +848,7 @@ std::vector<std::string> LataLoader::GetFieldNamesOnMesh(const std::string& doma
   test += domain_name.c_str();
   for (int i = 0; i < names_tot.size(); i++)
     {
-      const Nom& name = names_tot[i];
+      const Nom &name = names_tot[i];
       if (name.finit_par(test))
         names.push_back(name.getString());
     }

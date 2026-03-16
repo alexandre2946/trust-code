@@ -1,10 +1,10 @@
-%module LataLoader
+%module TRUST_Post_Loader
 
 %include std_vector.i
 %include std_string.i
 
 %{
-#include "LataLoader.h"
+#include "TRUST_Post_Loader.h"
 using namespace MEDCoupling;
 
 %}
@@ -151,4 +151,4 @@ def MEDCouplingDenseMatrixIsub(self,*args):
 
 #endif
 
-%include "LataLoader.h"
+%include "TRUST_Post_Loader.h"

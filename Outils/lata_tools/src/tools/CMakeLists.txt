@@ -25,24 +25,24 @@ IF(APPLE)
 ENDIF()
 
 #
-# Build lataloader if requested
+# Build TRUST_Post_Loader if requested
 #
 if (loadercpp)
   #
   # Library
   #
-  set(tgt_ll LataLoader)
-  add_library(${tgt_ll} STATIC LataLoader.cpp)
+  set(tgt_ll TRUST_Post_Loader)
+  add_library(${tgt_ll} STATIC TRUST_Post_Loader.cpp)
   if (CYGWIN)
-    add_library(${tgt_ll}.st STATIC LataLoader.cpp)
+    add_library(${tgt_ll}.st STATIC TRUST_Post_Loader.cpp)
   endif()
   target_link_libraries(${tgt_ll} ${lib} ${ajout} )
   install(TARGETS ${tgt_ll} DESTINATION lib)
   #
   # Test executable
   #
-  set(tgt_tst test_LataLoader)
-  add_executable (${tgt_tst} test_LataLoader.cpp )
+  set(tgt_tst test_TRUST_Post_Loader)
+  add_executable (${tgt_tst} test_TRUST_Post_Loader.cpp )
   install(TARGETS ${tgt_tst} DESTINATION bin)
   target_link_libraries(${tgt_tst} ${tgt_ll} ${lib} ${ajout})
 
@@ -64,17 +64,17 @@ if (loadercpp)
 	find_package(SWIG REQUIRED)
 	include(${SWIG_USE_FILE})
 
-    set_source_files_properties(LataLoader.i PROPERTIES CPLUSPLUS ON)
-    set_source_files_properties(LataLoader.i PROPERTIES SWIG_FLAGS "-shadow")
+    set_source_files_properties(TRUST_Post_Loader.i PROPERTIES CPLUSPLUS ON)
+    set_source_files_properties(TRUST_Post_Loader.i PROPERTIES SWIG_FLAGS "-shadow")
 
    IF(APPLE)
-     SET_PROPERTY(SOURCE LataLoader.i PROPERTY COMPILE_DEFINITIONS WIN32)
+     SET_PROPERTY(SOURCE TRUST_Post_Loader.i PROPERTY COMPILE_DEFINITIONS WIN32)
    ENDIF()
 
     if(${CMAKE_VERSION} VERSION_LESS "3.8.0")
-        swig_add_module(LataLoader python LataLoader.i)
+        swig_add_module(TRUST_Post_Loader python TRUST_Post_Loader.i)
     else()
-        swig_add_library(LataLoader LANGUAGE python SOURCES LataLoader.i)
+        swig_add_library(TRUST_Post_Loader LANGUAGE python SOURCES TRUST_Post_Loader.i)
     endif()
 
 	if (Python3_INCLUDE_DIRS)
@@ -84,19 +84,19 @@ if (loadercpp)
 	endif()
 
     if (CYGWIN)
-      swig_link_libraries(LataLoader ${PYTHON_LIBRARIES} ${tgt_ll}.st  ${lib}  ${ajout})
+      swig_link_libraries(TRUST_Post_Loader ${PYTHON_LIBRARIES} ${tgt_ll}.st  ${lib}  ${ajout})
     elseif(APPLE)
-      swig_link_libraries(LataLoader ${PYTHON_LIBRARIES} ${tgt_ll})
+      swig_link_libraries(TRUST_Post_Loader ${PYTHON_LIBRARIES} ${tgt_ll})
     else()
-      swig_link_libraries(LataLoader ${tgt_ll})  # Do not add PYTHON_LIBRARIES as in MC
+      swig_link_libraries(TRUST_Post_Loader ${tgt_ll})  # Do not add PYTHON_LIBRARIES as in MC
     endif()
 
-    install(TARGETS _LataLoader  DESTINATION lib)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/LataLoader.py   DESTINATION lib)
+    install(TARGETS _TRUST_Post_Loader  DESTINATION lib)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/TRUST_Post_Loader.py   DESTINATION lib)
   else()
-    message ("LataLoader.py not compiled, env var TRUST_INT64=1, and not -Dloaderpython=ON ?")
+    message ("TRUST_Post_Loader.py not compiled, env var TRUST_INT64=1, and not -Dloaderpython=ON ?")
   endif()
 
 else()
-  message ("LataLoader not compiled, MED_COUPLING_ROOT not set ?")
+  message ("TRUST_Post_Loader not compiled, MED_COUPLING_ROOT not set ?")
 endif(loadercpp)

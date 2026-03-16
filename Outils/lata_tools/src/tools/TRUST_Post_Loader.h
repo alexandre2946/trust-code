@@ -13,34 +13,34 @@
 *
 *****************************************************************************/
 
-#ifndef LataLoader_H
-#define LataLoader_H
+#ifndef TRUST_Post_Loader_included
+#define TRUST_Post_Loader_included
 
 #include <medcoupling++.h>
+#include <LataFilter.h>
 #include <vector>
-#include "LataFilter.h"
+
 namespace MEDCoupling
 {
-class MEDCouplingMesh;
-class DataArray;
-class  MEDCouplingFieldDouble;
+  class MEDCouplingMesh;
+  class DataArray;
+  class MEDCouplingFieldDouble;
 }
 
-class LataLoader
+class TRUST_Post_Loader
 {
 public:
-  LataLoader(const char*);
-  ~LataLoader();
+  TRUST_Post_Loader(const char*);
+  ~TRUST_Post_Loader() { /* Do nothing */ }
 
-  int GetNTimesteps(void);
+  void FreeUpResources() { /* Do nothing */ }
+  int GetNTimesteps();
 
-  const char* GetType(void) { return "lata"; }
-
-  void FreeUpResources(void);
+  const char* GetType();
 
   MEDCoupling::MEDCouplingMesh* GetMesh(const char *varname, int timestate, int block = -1);
   MEDCoupling::DataArray* GetVectorVar(int, int, const char*);
-  void GetTimes(std::vector<double>& times);
+  void GetTimes(std::vector<double> &times);
   inline std::vector<double> getTimes()
   {
     std::vector<double> a;
@@ -57,7 +57,7 @@ protected:
   void PopulateDatabaseMetaData(int);
   void register_fieldname(const char *visit_name, const Field_UName&, int component);
   void register_meshname(const char *visit_name, const char *latafilter_name);
-  void get_field_info_from_visitname(const char *varname, Field_UName&, int& component) const;
+  void get_field_info_from_visitname(const char *varname, Field_UName&, int &component) const;
 
   LataDB lata_db_; // Source database
   LataFilter filter_; // Data processor and cache
@@ -70,4 +70,4 @@ protected:
   LataVector<int> field_component_;
 };
 
-#endif
+#endif /* TRUST_Post_Loader_included */

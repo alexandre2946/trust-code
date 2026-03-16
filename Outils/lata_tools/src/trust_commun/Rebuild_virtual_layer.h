@@ -14,7 +14,7 @@
 *****************************************************************************/
 
 #ifndef Rebuild_virtual_layer_H
-#define LataLoader_H
+#define Rebuild_virtual_layer_H
 
 #include <TRUSTTab.h>
 
@@ -25,4 +25,4 @@ class LataDB;
 void find_virtual_layer(DomainUnstructured& domain, BigTIDTab& virtual_elements, BigTIDTab& joints_virtual_elements, double tolerance);
 int rebuild_virtual_layer(LataDB& lataDB, Domain_Id id, double reconnect_tolerance);
 
-#endif /* LataLoader_H */
+#endif /* Rebuild_virtual_layer_H */

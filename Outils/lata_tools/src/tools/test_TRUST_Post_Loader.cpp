@@ -13,8 +13,8 @@
 *
 *****************************************************************************/
 
+#include <TRUST_Post_Loader.h>
 #include <LataJournal.h>
-#include <LataLoader.h>
 #include <LmlReader.h>
 #include <iostream>
 #include <fstream>
@@ -27,16 +27,18 @@
 
 using namespace MEDCoupling;
 
-int main(int argc,char ** argv)
+int main(int argc, char **argv)
 {
-  cerr<<"Usage : "<<argv[0]<<": file.lata field_name [ numero_temps ] [ numero_bock ] "<<endl;
-  LataLoader toto(argv[1]);
-  int numero_temps=-1;
-  int nblock=-1;
-  if (argc>=4) numero_temps=atoi(argv[3]);
-  if (argc==5) nblock=atoi(argv[4]);
-  MCAuto<MEDCouplingFieldDouble> field= toto.GetFieldDouble(argv[2],numero_temps,nblock);
-  cerr<< field->getNumberOfValues()<< " "<<field->getArray()->getPointer()[0]<<endl;
+  cerr << "Usage : " << argv[0] << ": post_file field_name [ numero_temps ] [ numero_bock ] " << endl;
+  TRUST_Post_Loader toto(argv[1]);
+  int numero_temps = -1;
+  int nblock = -1;
+  if (argc >= 4)
+    numero_temps = atoi(argv[3]);
+  if (argc == 5)
+    nblock = atoi(argv[4]);
+  MCAuto<MEDCouplingFieldDouble> field = toto.GetFieldDouble(argv[2], numero_temps, nblock);
+  cerr << field->getNumberOfValues() << " " << field->getArray()->getPointer()[0] << endl;
 
   return 0;
 }

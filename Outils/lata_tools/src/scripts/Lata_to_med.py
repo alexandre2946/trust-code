@@ -1,4 +1,4 @@
-import LataLoader
+import TRUST_Post_Loader as tpl
 import medcoupling as mc
 
 EPS=1e-5       # used for merging nodes
@@ -21,7 +21,7 @@ def BuildMergedMesh( latafile , write_med, medfile, domain_name ):
     @return newNbnodes new nb of nodes if renumbering was done. -1 otherwise
     @return meshType string indicating mesh type (UMesh or CMesh)
     """
-    a=LataLoader.LataLoader(latafile)
+    a=tpl.TRUST_Post_Loader(latafile)
     meshes=a.GetMeshNames()
 
     meshname=short_name(meshes[0])
@@ -65,7 +65,7 @@ def BuildMergedMesh( latafile , write_med, medfile, domain_name ):
 
 def convert(latafile,medfile,domain_name,mesh_only,lasttime=0):
 
-    a=LataLoader.LataLoader(latafile)
+    a=tpl.TRUST_Post_Loader(latafile)
 
     write_med = 1 # we want to write meshes in med format
     mesh , indices, newNbNodes, meshType = BuildMergedMesh( latafile, write_med, medfile, domain_name )
