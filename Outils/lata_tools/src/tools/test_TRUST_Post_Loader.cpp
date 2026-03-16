@@ -37,7 +37,7 @@ int main(int argc, char **argv)
     numero_temps = atoi(argv[3]);
   if (argc == 5)
     nblock = atoi(argv[4]);
-  MCAuto<MEDCouplingFieldDouble> field = toto.GetFieldDouble(argv[2], numero_temps, nblock);
+  MCAuto<MEDCouplingFieldDouble> field = toto.getFieldDouble(argv[2], numero_temps, nblock);
   cerr << field->getNumberOfValues() << " " << field->getArray()->getPointer()[0] << endl;
 
   return 0;

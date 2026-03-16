@@ -22,7 +22,7 @@ def BuildMergedMesh( latafile , write_med, medfile, domain_name ):
     @return meshType string indicating mesh type (UMesh or CMesh)
     """
     a=tpl.TRUST_Post_Loader(latafile)
-    meshes=a.GetMeshNames()
+    meshes=a.getMeshNames()
 
     meshname=short_name(meshes[0])
     for m in meshes:
@@ -30,7 +30,7 @@ def BuildMergedMesh( latafile , write_med, medfile, domain_name ):
             raise Exception( "not implemented for differents meshes ('"+meshname +"' and '"+ short_name(m) + "') if you don't specify a domain name explicitly")
     if not domain_name is None:
         meshname = domain_name
-    mesh=a.GetMesh(meshname,0)
+    mesh=a.getMesh(meshname,0)
 
     typ_nam = type( mesh ).__name__
     if typ_nam not in ["MEDCouplingUMesh", "MEDCouplingCMesh"]:
@@ -52,7 +52,7 @@ def BuildMergedMesh( latafile , write_med, medfile, domain_name ):
     meshnamedual=meshname+"_dual"
     if meshnamedual in meshes:
         print("A dual mesh '%s' has been found." % meshnamedual)
-        mesh_dual=a.GetMesh(meshnamedual,0)
+        mesh_dual=a.getMesh(meshnamedual,0)
         if typ_nam == "MEDCouplingUMesh":
             indices_dual, areMerged_dual, newNbNodes_dual = mesh_dual.mergeNodes( EPS_DUAL )
             if areMerged_dual:
@@ -73,16 +73,16 @@ def convert(latafile,medfile,domain_name,mesh_only,lasttime=0):
     if mesh_only:
         return
 
-    liste_ite=range(a.GetNTimesteps())
+    liste_ite=range(a.getNumberOfTimeSteps())
 
     # liste_fields=('VITESSE_ELEM_dom', 'VITESSE_SOM_dom', 'TEMPERATURE_ELEM_dom', 'TEMPERATURE_SOM_dom', 'DIVERGENCE_U_ELEM_dom', 'VITESSE_FACES_dom_dual',  'TEMPERATURE_FACES_dom_dual')
     # Ligne suivante a commenter si besoin. Voir si la methode fonctionne
 
-    liste_fields=a.GetFieldNames()
+    liste_fields=a.getFieldNames()
 
     # on prend que le dernier temps
     if lasttime:
-        liste_ite=[a.GetNTimesteps()-1]
+        liste_ite=[a.getNumberOfTimeSteps()-1]
 
     if meshType == "MEDCouplingUMesh":
         for ite in liste_ite:
@@ -91,7 +91,7 @@ def convert(latafile,medfile,domain_name,mesh_only,lasttime=0):
                 if name.find('_centerfaces')>0:
                     continue
 
-                f=a.GetFieldDouble(name,ite)
+                f=a.getFieldDouble(name,ite)
                 if name.find('_SOM_')>0:
                     f2 = f.deepCopy()
                     if not indices is None: # some renumbering has to be performed (nodes have been merged)

@@ -22,8 +22,8 @@ def buildMEDFileData(latafile,lasttime):
     if ( type( mesh ).__name__ != "MEDCouplingUMesh"  ) :
         raise Exception( "Only implemented for meshes of type MEDCouplingUMesh ( not "+ type( mesh ).__name__ +" )" )
 
-    liste_ite=range(a.GetNTimesteps())
-    liste_fields=a.GetFieldNames()
+    liste_ite=range(a.getNumberOfTimeSteps())
+    liste_fields=a.getFieldNames()
 
 
     mfd = mc.MEDFileData()
@@ -42,7 +42,7 @@ def buildMEDFileData(latafile,lasttime):
 
         #a chaque field est associe un MEDFileField1TS ou MEDFileFieldMultiTS
         if lasttime:
-            liste_ite=[a.GetNTimesteps()-1]
+            liste_ite=[a.getNumberOfTimeSteps()-1]
             mf1ts = mc.MEDFileField1TS()
 
         mfmultits = mc.MEDFileFieldMultiTS()
@@ -52,7 +52,7 @@ def buildMEDFileData(latafile,lasttime):
 
             if name.find('_centerfaces')>0:
                 continue
-            f=a.GetFieldDouble(name,ite)
+            f=a.getFieldDouble(name,ite)
 
             #traitement des sommets
             if name.find('_SOM_')>0:

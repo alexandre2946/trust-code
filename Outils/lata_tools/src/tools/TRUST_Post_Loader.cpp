@@ -30,54 +30,54 @@
 
 using namespace MEDCoupling;
 
-const char* TRUST_Post_Loader::GetType()
+const char* TRUST_Post_Loader::getPostExtension()
 {
-  if (filename.finit_par(".lata"))
+  if (filename_.finit_par(".lata"))
     return "LATA";
-  else if (filename.finit_par(".cgns"))
+  else if (filename_.finit_par(".cgns"))
     return "CGNS";
-  else if (filename.finit_par(".lml"))
+  else if (filename_.finit_par(".lml"))
     return "LML";
-  else if (filename.finit_par(".med"))
+  else if (filename_.finit_par(".med"))
     return "MED";
   else
     {
-      cerr << "Error in TRUST_Post_Loader::GetType(). Undefined file extension for file : " << filename << endl;
+      cerr << "Error in TRUST_Post_Loader::getPostExtension(). Undefined file extension for file : " << filename_ << endl;
       throw;
     }
 }
 
 TRUST_Post_Loader::TRUST_Post_Loader(const char *file)
 {
-  filename = Nom(file);
-  cerr << "TRUST_Post_Loader constructor for file : " << filename << endl;
+  filename_ = Nom(file);
+  cerr << "TRUST_Post_Loader constructor for file : " << filename_ << endl;
 
   try
     {
       set_Journal_level(0);
       LataOptions opt;
-      LataOptions::extract_path_basename(filename, opt.path_prefix, opt.basename);
+      LataOptions::extract_path_basename(filename_, opt.path_prefix, opt.basename);
       opt.dual_mesh = true;
       opt.faces_mesh = true;
       opt.regularize = 2;
       opt.regularize_tolerance = 1e-7f;
       opt.user_fields_ = true;
-      read_any_format_options(filename, opt);
+      read_any_format_options(filename_, opt);
       cerr << "Initializing filter ..." << endl;
 
       // Read the source file to the lata database
-      read_any_format(filename, opt.path_prefix, lata_db_);
+      read_any_format(filename_, opt.path_prefix, lata_db_);
       filter_.initialize(opt, lata_db_);
     }
   catch (LataDBError &err)
     {
-      cerr << "Error in TRUST_Post_Loader::TRUST_Post_Loader : " << filename << " " << err.describe() << endl;
+      cerr << "Error in TRUST_Post_Loader::TRUST_Post_Loader : " << filename_ << " " << err.describe() << endl;
       throw err;
     }
-  PopulateDatabaseMetaData(0);
+  populateDatabaseMetaData_(0);
 }
 
-int TRUST_Post_Loader::GetNTimesteps()
+int TRUST_Post_Loader::getNumberOfTimeSteps()
 {
   int n = -123;
   try
@@ -90,13 +90,13 @@ int TRUST_Post_Loader::GetNTimesteps()
     }
   catch (LataDBError &err)
     {
-      cerr << "Error in TRUST_Post_Loader::GetNTimesteps() : " << filename << " " << err.describe() << endl;
+      cerr << "Error in TRUST_Post_Loader::getNumberOfTimeSteps() : " << filename_ << " " << err.describe() << endl;
       throw;
     }
   return n;
 }
 
-void TRUST_Post_Loader::GetTimes(std::vector<double> &times)
+void TRUST_Post_Loader::getTimes_(std::vector<double> &times)
 {
   int n = -123;
   try
@@ -110,18 +110,18 @@ void TRUST_Post_Loader::GetTimes(std::vector<double> &times)
     }
   catch (LataDBError &err)
     {
-      cerr << "Error in TRUST_Post_Loader::GetTimes : " << filename << " " << err.describe() << endl;
+      cerr << "Error in TRUST_Post_Loader::getTimes : " << filename_ << " " << err.describe() << endl;
       throw;
     }
   return;
 }
 
-void TRUST_Post_Loader::PopulateDatabaseMetaData(int timeState)
+void TRUST_Post_Loader::populateDatabaseMetaData_(int timeState)
 {
   try
     {
       cerr << "-----------------------------------------------" << endl ;
-      cerr << "TRUST_Post_Loader::PopulateDatabaseMetaData : " << filename << " " << timeState << endl << endl;
+      cerr << "TRUST_Post_Loader::populateDatabaseMetaData : " << filename_ << " " << timeState << endl << endl;
 
       const Noms geoms = filter_.get_exportable_geometry_names();
 
@@ -156,13 +156,13 @@ void TRUST_Post_Loader::PopulateDatabaseMetaData(int timeState)
                 {
                   // Scalar field
                   // We append the geometry name to the component name:
-                  register_fieldname(varname.c_str(), fields[i_field], 0);
+                  register_fieldname_(varname.c_str(), fields[i_field], 0);
                   //      if (mesh_faces==0) AddScalarVarToMetaData(md, varname, geom_name, cent);
                 }
               else if (data2.is_vector_ && data2.nb_components_ == data.dimension_)
                 {
                   // Vector field
-                  register_fieldname(varname.c_str(), fields[i_field], -1);
+                  register_fieldname_(varname.c_str(), fields[i_field], -1);
                   //AddVectorVarToMetaData(md, varname, geom_name, cent, data2.nb_components_);
                 }
               else
@@ -188,24 +188,24 @@ void TRUST_Post_Loader::PopulateDatabaseMetaData(int timeState)
                           varname2 += loc;
                           varname2 += "_";
                           varname2 += geom_name;
-                          register_fieldname(varname2.c_str(), fields[i_field], i_compo);
+                          register_fieldname_(varname2.c_str(), fields[i_field], i_compo);
                           //   AddScalarVarToMetaData(md, varname2, geom_name, cent);
                         }
                     }
                 }
             }
         }
-      cerr << endl << "End TRUST_Post_Loader::PopulateDatabaseMetaData" << endl;
+      cerr << endl << "End TRUST_Post_Loader::populateDatabaseMetaData" << endl;
       cerr << "-----------------------------------------------" << endl ;
     }
   catch (LataDBError &err)
     {
-      cerr << "Error in TRUST_Post_Loader::PopulateDatabaseMetaData " << err.describe() << endl;
+      cerr << "Error in TRUST_Post_Loader::populateDatabaseMetaData " << err.describe() << endl;
       throw;
     }
 }
 
-void TRUST_Post_Loader::register_fieldname(const char *visit_name, const Field_UName &uname, int component)
+void TRUST_Post_Loader::register_fieldname_(const char *visit_name, const Field_UName &uname, int component)
 {
   if (field_username_.rang(visit_name) >= 0)
     {
@@ -218,7 +218,7 @@ void TRUST_Post_Loader::register_fieldname(const char *visit_name, const Field_U
   field_component_.add(component);
 }
 
-void TRUST_Post_Loader::register_meshname(const char *visit_name, const char *latafilter_name)
+void TRUST_Post_Loader::register_meshname_(const char *visit_name, const char *latafilter_name)
 {
   if (mesh_username_.rang(visit_name) >= 0)
     {
@@ -230,12 +230,12 @@ void TRUST_Post_Loader::register_meshname(const char *visit_name, const char *la
   mesh_latafilter_name_.add(latafilter_name);
 }
 
-MEDCouplingMesh* TRUST_Post_Loader::GetMesh(const char *meshname, int timestate, int block)
+MEDCouplingMesh* TRUST_Post_Loader::getMesh(const char *meshname, int timestate, int block)
 {
   MEDCouplingMesh *return_value = nullptr;
   try
     {
-      cerr << "TRUST_Post_Loader::GetMesh ts = " << timestate << ", block = " << block << ", meshname = " << meshname << endl;
+      cerr << "TRUST_Post_Loader::getMesh ts = " << timestate << ", block = " << block << ", meshname = " << meshname << endl;
 
       // We have real timesteps in the database, add one to timestep index:
       if (filter_.get_nb_timesteps() > 1)
@@ -251,7 +251,7 @@ MEDCouplingMesh* TRUST_Post_Loader::GetMesh(const char *meshname, int timestate,
         }
       if (index < 0)
         {
-          cerr << "internal error in TRUST_Post_Loader::GetMesh : name " << meshname << " not found" << endl;
+          cerr << "internal error in TRUST_Post_Loader::getMesh : name " << meshname << " not found" << endl;
           throw;
         }
       Domain_Id id(mesh_latafilter_name_[index], timestate, block);
@@ -320,7 +320,7 @@ MEDCouplingMesh* TRUST_Post_Loader::GetMesh(const char *meshname, int timestate,
               break;
             default:
               type_cell = INTERP_KERNEL::NORM_POLYHED;
-              cerr << "GetMesh unknown elem type " << endl;
+              cerr << "TRUST_Post_Loader::getMesh unknown elem type " << endl;
               throw;
               break;
             }
@@ -687,7 +687,7 @@ MEDCouplingMesh* TRUST_Post_Loader::GetMesh(const char *meshname, int timestate,
         }
       else
         {
-          cerr << "Error in TRUST_Post_Loader::GetMesh : unknown geometry type" << endl;
+          cerr << "Error in TRUST_Post_Loader::getMesh : unknown geometry type" << endl;
           throw;
         }
 
@@ -695,32 +695,26 @@ MEDCouplingMesh* TRUST_Post_Loader::GetMesh(const char *meshname, int timestate,
     }
   catch (LataDBError &err)
     {
-      cerr << "Error in TRUST_Post_Loader::GetMesh " << timestate << " " << block << " " << meshname << " " << err.describe() << endl;
+      cerr << "Error in TRUST_Post_Loader::getMesh " << timestate << " " << block << " " << meshname << " " << err.describe() << endl;
       throw;
     }
 
   return return_value;
 }
 
-DataArray* TRUST_Post_Loader::GetVectorVar(int timestate, int block, const char *varname)
+DataArray* TRUST_Post_Loader::getVectorVar_(int timestate, int block, const char *varname)
 {
   DataArray *return_value = 0;
   try
     {
-      cerr << "TRUST_Post_Loader::Getvectorvar time : " << timestate << "/" << filter_.get_nb_timesteps() - 1 << ", block : " << block << ", varname : " << varname << endl;
+      cerr << "TRUST_Post_Loader::getvectorvar time : " << timestate << "/" << filter_.get_nb_timesteps() - 1 << ", block : " << block << ", varname : " << varname << endl;
 
       if (filter_.get_nb_timesteps() > 1)
         timestate++;
 
       Field_UName field_uname;
       int component;
-      get_field_info_from_visitname(varname, field_uname, component);
-      /*
-       if (component >= 0) {
-       cerr << "Error: TRUST_Post_Loader::GetVectorVar called for scalar field" << endl;
-       throw;
-       }
-       */
+      get_field_info_from_visitname_(varname, field_uname, component);
       Field_Id id(field_uname, timestate, block);
 
       const LataField_base &field = filter_.get_field(id);
@@ -749,20 +743,20 @@ DataArray* TRUST_Post_Loader::GetVectorVar(int timestate, int block, const char 
         }
       else
         {
-          cerr << "Error in TRUST_Post_Loader::GetVectorVar: unknown data type" << endl;
+          cerr << "Error in TRUST_Post_Loader::getVectorVar: unknown data type" << endl;
           throw;
         }
       filter_.release_field(field);
     }
   catch (LataDBError &err)
     {
-      cerr << "Error in TRUST_Post_Loader::GetVectorVar " << timestate << " " << block << " " << varname << " " << err.describe() << endl;
+      cerr << "Error in TRUST_Post_Loader::getVectorVar " << timestate << " " << block << " " << varname << " " << err.describe() << endl;
       throw;
     }
   return return_value;
 }
 
-void TRUST_Post_Loader::get_field_info_from_visitname(const char *varname, Field_UName &uname, int &component) const
+void TRUST_Post_Loader::get_field_info_from_visitname_(const char *varname, Field_UName &uname, int &component) const
 {
   const int k = field_username_.rang(varname);
   if (k < 0)
@@ -776,7 +770,7 @@ void TRUST_Post_Loader::get_field_info_from_visitname(const char *varname, Field
   component = field_component_[k];
 }
 
-MEDCouplingFieldDouble* TRUST_Post_Loader::GetFieldDouble(const char *varname, int timestate, int block)
+MEDCouplingFieldDouble* TRUST_Post_Loader::getFieldDouble(const char *varname, int timestate, int block)
 {
   if (timestate == -1)
     timestate = filter_.get_nb_timesteps() - 2;
@@ -784,7 +778,7 @@ MEDCouplingFieldDouble* TRUST_Post_Loader::GetFieldDouble(const char *varname, i
   TypeOfField cent;
   Field_UName field_uname;
   int component;
-  get_field_info_from_visitname(varname, field_uname, component);
+  get_field_info_from_visitname_(varname, field_uname, component);
 
     {
       const LataGeometryMetaData data = filter_.get_geometry_metadata(field_uname.get_geometry());
@@ -806,8 +800,8 @@ MEDCouplingFieldDouble* TRUST_Post_Loader::GetFieldDouble(const char *varname, i
 
   double time = filter_.get_timestep(timestate + 1);
   MEDCouplingFieldDouble *ret = MEDCouplingFieldDouble::New(cent, ONE_TIME);
-  MEDCouplingMesh *mesh = GetMesh(field_uname.get_geometry(), timestate, block);
-  DataArray *array = GetVectorVar(timestate, block, varname);
+  MEDCouplingMesh *mesh = getMesh(field_uname.get_geometry(), timestate, block);
+  DataArray *array = getVectorVar_(timestate, block, varname);
   ret->setMesh(mesh);
   ret->setArray((DataArrayDouble*) array);
   mesh->decrRef();
@@ -819,7 +813,7 @@ MEDCouplingFieldDouble* TRUST_Post_Loader::GetFieldDouble(const char *varname, i
   return ret;
 }
 
-std::vector<std::string> TRUST_Post_Loader::GetMeshNames()
+std::vector<std::string> TRUST_Post_Loader::getMeshNames()
 {
   std::vector<std::string> names;
   const Noms &geoms = mesh_username_;
@@ -828,7 +822,7 @@ std::vector<std::string> TRUST_Post_Loader::GetMeshNames()
   return names;
 }
 
-std::vector<std::string> TRUST_Post_Loader::GetFieldNames()
+std::vector<std::string> TRUST_Post_Loader::getFieldNames()
 {
   std::vector<std::string> names;
   for (int i = 0; i < field_username_.size(); i++)
@@ -840,10 +834,10 @@ std::vector<std::string> TRUST_Post_Loader::GetFieldNames()
   return names;
 }
 
-std::vector<std::string> TRUST_Post_Loader::GetFieldNamesOnMesh(const std::string &domain_name)
+std::vector<std::string> TRUST_Post_Loader::getFieldNamesOnMesh(const std::string &domain_name)
 {
   std::vector<std::string> names;
-  std::vector<std::string> names_tot = GetFieldNames();
+  std::vector<std::string> names_tot = getFieldNames();
   Nom test("_");
   test += domain_name.c_str();
   for (int i = 0; i < names_tot.size(); i++)
