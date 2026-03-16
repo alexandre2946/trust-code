@@ -120,25 +120,42 @@ nc=$(grep CHAMP testf21.lata | wc| awk '{print $1}')
 ref=62
 [ $nc -ne $ref ] && echo invalid number of CHAMP $nc != $ref&& exit -2
 
-echo ""
-echo "------------------------------------"
-echo "Check if TRUST_Post_Loader works ..."
-echo "------------------------------------"
+if [ "$TRUST_MEDCOUPLING_ROOT" != "" ]; then
 
-if [ "$TRUST_CGNS_ROOT" != "" ]; then
 	echo ""
-	echo "###  with CGNS files ..."
-	$TRUST_ROOT/exec/lata_tools/bin/test_TRUST_Post_Loader upwind.cgns PRESSION_ELEM_dom_ELEM || exit -1
+	echo "------------------------------------"
+	echo "Check if TRUST_Post_Loader works ..."
+	echo "------------------------------------"
+
+	if [ "$TRUST_CGNS_ROOT" != "" ]; then
+		echo ""
+		echo "###  with CGNS files ..."
+		$TRUST_ROOT/exec/lata_tools/bin/test_TRUST_Post_Loader upwind.cgns PRESSION_ELEM_dom_ELEM || exit -1
+		echo ""
+	fi
+
+	echo "###  with LML files ..."
+	$TRUST_ROOT/exec/lata_tools/bin/test_TRUST_Post_Loader upwind.lml PRESSION_ELEM_dom || exit -1
 	echo ""
-fi 
 
-echo "###  with LML files ..."
-$TRUST_ROOT/exec/lata_tools/bin/test_TRUST_Post_Loader upwind.lml PRESSION_ELEM_dom || exit -1
-echo ""
+	echo "###  with LATA files 64b ..."
+	$TRUST_ROOT/exec/lata_tools/bin/test_TRUST_Post_Loader upwind64/upwind.lata PRESSION_ELEM_dom || exit -1
+	echo ""
 
-echo "###  with LATA files 64b ..."
-$TRUST_ROOT/exec/lata_tools/bin/test_TRUST_Post_Loader upwind64/upwind.lata PRESSION_ELEM_dom || exit -1
-echo ""
+	if [ "$TRUST_CGNS_ROOT" != "" ]; then
+		echo ""
+		echo "------------------------------------"
+		echo "Check if TRUST_Post_Loader works in python ..."
+		echo "------------------------------------"
+
+		echo ""
+		echo "###  with CGNS files ..."
+		source $TRUST_ROOT/env_for_python.sh
+		cp $TRUST_ROOT/Outils/lata_tools/src/tests/script_loader.py .
+		python script_loader.py || exit -1
+		echo ""
+	fi
+fi
 
 cd ..
 rm -rf $Build
