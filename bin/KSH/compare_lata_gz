@@ -1,10 +1,13 @@
 #!/bin/bash
 
 # Elie Saikali
-# Simple bash script to compare TRUST results available in gz files
-# Usage : compare_lata_gz results1 results2
-# results1 et/ou results2 peuvent etre des fichiers .gz
-# le script est generique; si med ou lml => un fichier, sinon c'est un dossier avec des latas ... 
+# Compare TRUST results, with support for:
+# - direct files: .cgns .lata .med .lml
+# - .gz
+# - .tar.gz
+#
+# Usage:
+#   compare_lata_gz <file1> <file2>
 
 ends_with() 
 {
@@ -14,12 +17,30 @@ ends_with()
 # usage : copy_and_unzip file folder
 copy_and_unzip()
 {
-	cp "$1" "$2/$1" || exit -1
+	cp "$1" "$2/$(basename "$1")" || exit -1
 	if ends_with "$1" ".tar.gz"; then
 		(cd "$2" && tar -xzf "$1") || exit -1
 	else
 		(cd "$2" && gunzip "$1") || exit -1
 	fi
+}
+
+# usage : find_real_file folder base_name
+# cherche base_name/base_name.{cgns,lata,med,lml}
+find_real_file()
+{
+	base_name="$1"
+	root_dir="$2"
+
+	for ext in cgns lata med lml; do
+		candidate="${root_dir}/${base_name}/${base_name}.${ext}"
+		if [ -f "$candidate" ]; then
+			echo "$candidate"
+			return 0
+		fi
+	done
+
+	return 1
 }
 
 if [ "$#" -ne 2 ]; then
@@ -82,14 +103,14 @@ else
 		file2_lata=false
    	fi
 
-	if [ "$is_file1_gz" = true ] && [ "$file1_lata" = true ]; then
+	if [ "$is_file1_gz" = true ] && [ "$file1_lata" = true ] && ends_with "$file1" ".tar.gz"; then
 		base_name1=$(basename "$file1" .tar.gz)
-		file1_new=${dir_lata1_}/${base_name1}/${base_name1}.lata
+		file1_new=$(find_real_file "$base_name1" "$dir_lata1_") || exit -1
 	fi
 
-	if [ "$is_file2_gz" = true ] && [ "$file2_lata" = true ]; then
+	if [ "$is_file2_gz" = true ] && [ "$file2_lata" = true ] && ends_with "$file2" ".tar.gz"; then
 		base_name2=$(basename "$file2" .tar.gz)
-		file2_new=${dir_lata2_}/${base_name2}/${base_name2}.lata
+		file2_new=$(find_real_file "$base_name2" "$dir_lata2_") || exit -1
 	fi
 
 	# et la normalement c'est bon
