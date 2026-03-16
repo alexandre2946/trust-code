@@ -468,8 +468,8 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group_pb_deformable()
               std::string zone_name = Nom("Zone").nom_me(proc_grp).getString();
 
               cgsize_t isize[3];
-              isize[0] = sizeId_som_local_comm_[0][gid];
-              isize[1] = sizeId_elem_local_comm_[0][gid];
+              isize[0] = sizeId_som_local_comm_[ind_base][gid];
+              isize[1] = sizeId_elem_local_comm_[ind_base][gid];
               isize[2] = 0;
 
               int zoneId_tmp = -1;
@@ -548,7 +548,7 @@ void Ecrire_CGNS::cgns_write_final_link_file_pb_deformable()
     {
 #ifdef MPI_
       if (vec_proc_maitre_local_comm_.empty())
-        cgns_write_final_link_file_comm_group();
+        gather_local_sizeId_for_comm_group();
 
       cgns_write_final_link_file_comm_group_pb_deformable();
 #endif

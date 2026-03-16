@@ -231,101 +231,62 @@ void Ecrire_CGNS::add_new_linked_base(const std::string& LOC, const Nom& nom_dom
     }
 }
 
-// Attention : ind 0 => ELEM et SOM, ind 1 => FACES (si besoin pour faces) !
-void Ecrire_CGNS::gather_local_sizeId_multi_loc(std::vector<std::vector<cgsize_t>>& sizeId_som_local_comm_tmp, std::vector<std::vector<cgsize_t>>& sizeId_elem_local_comm_tmp) const
+void Ecrire_CGNS::gather_local_sizeId_for_comm_group()
 {
 #ifdef MPI_
-  sizeId_som_local_comm_tmp.push_back(std::vector<cgsize_t>());
-  sizeId_elem_local_comm_tmp.push_back(std::vector<cgsize_t>());
+  if (!vec_proc_maitre_local_comm_.empty()) return; /* rien a faire */
 
-  if (has_elem_field_ || has_som_field_)
+  unique_vec_proc_maitre_local_comm_.clear();
+  sizeId_som_local_comm_.clear();
+  sizeId_elem_local_comm_.clear();
+
+  vec_proc_maitre_local_comm_.assign(Process::nproc(), -123 /* default */);
+  MPI_Allgather(&proc_maitre_local_comm_, 1, MPI_ENTIER, vec_proc_maitre_local_comm_.data(), 1, MPI_ENTIER, Comm_Group_MPI::get_trio_u_world());
+
+  std::unordered_set<int> seen;
+
+  for (int val : vec_proc_maitre_local_comm_)
+    if (seen.insert(val).second)
+      unique_vec_proc_maitre_local_comm_.push_back(val); // si val pas dedans
+
+  std::vector<std::vector<cgsize_t>> sizeId_som_local_comm_tmp, sizeId_elem_local_comm_tmp;
+
+  MPI_Datatype CGNS_MPI_SIZE;
+  MPI_Type_match_size(MPI_TYPECLASS_INTEGER, sizeof(cgsize_t), &CGNS_MPI_SIZE);
+
+  for (int i = 0; i < static_cast<int>(sizeId_.size()); i++)
     {
-      sizeId_som_local_comm_tmp.back().assign(Process::nproc(), -123 /* default */);
-      sizeId_elem_local_comm_tmp.back().assign(Process::nproc(), -123 /* default */);
+      assert(sizeId_[i].size() == 2);
 
-      Nom nom_dom;
+      sizeId_som_local_comm_tmp.emplace_back(Process::nproc(), static_cast<cgsize_t>(-123));
+      sizeId_elem_local_comm_tmp.emplace_back(Process::nproc(), static_cast<cgsize_t>(-123));
 
-      if (has_elem_field_)
-        nom_dom = TRUST_2_CGNS::modify_domaine_name_for_link(fld_loc_map_.at("ELEM"), "ELEM");
-      else
-        nom_dom = TRUST_2_CGNS::modify_domaine_name_for_link(fld_loc_map_.at("SOM"), "SOM");
-
-      const int ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
-      MPI_Datatype CGNS_MPI_SIZE;
-      MPI_Type_match_size(MPI_TYPECLASS_INTEGER, sizeof(cgsize_t), &CGNS_MPI_SIZE);
-      MPI_Allgather(&sizeId_[ind_base][0], 1, CGNS_MPI_SIZE, sizeId_som_local_comm_tmp[0].data(), 1, CGNS_MPI_SIZE, Comm_Group_MPI::get_trio_u_world());
-      MPI_Allgather(&sizeId_[ind_base][1], 1, CGNS_MPI_SIZE, sizeId_elem_local_comm_tmp[0].data(), 1, CGNS_MPI_SIZE, Comm_Group_MPI::get_trio_u_world());
+      MPI_Allgather(&sizeId_[i][0], 1, CGNS_MPI_SIZE, sizeId_som_local_comm_tmp[i].data(), 1, CGNS_MPI_SIZE, Comm_Group_MPI::get_trio_u_world());
+      MPI_Allgather(&sizeId_[i][1], 1, CGNS_MPI_SIZE, sizeId_elem_local_comm_tmp[i].data(), 1, CGNS_MPI_SIZE, Comm_Group_MPI::get_trio_u_world());
     }
 
-  if (has_faces_field_)
-    {
-      sizeId_som_local_comm_tmp.push_back(std::vector<cgsize_t>(Process::nproc(), -123 /* default */));
-      sizeId_elem_local_comm_tmp.push_back(std::vector<cgsize_t>(Process::nproc(), -123 /* default */));
+  const int nb_grps = static_cast<int>(unique_vec_proc_maitre_local_comm_.size());
 
-      const int ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, fld_loc_map_.at("FACES"));
-      MPI_Datatype CGNS_MPI_SIZE;
-      MPI_Type_match_size(MPI_TYPECLASS_INTEGER, sizeof(cgsize_t), &CGNS_MPI_SIZE);
-      MPI_Allgather(&sizeId_[ind_base][0], 1, CGNS_MPI_SIZE, sizeId_som_local_comm_tmp[1].data(), 1, CGNS_MPI_SIZE, Comm_Group_MPI::get_trio_u_world());
-      MPI_Allgather(&sizeId_[ind_base][1], 1, CGNS_MPI_SIZE, sizeId_elem_local_comm_tmp[1].data(), 1, CGNS_MPI_SIZE, Comm_Group_MPI::get_trio_u_world());
+  for (int i = 0; i < static_cast<int>(sizeId_.size()); i++)
+    {
+      sizeId_som_local_comm_.emplace_back(nb_grps, static_cast<cgsize_t>(-123));
+      sizeId_elem_local_comm_.emplace_back(nb_grps, static_cast<cgsize_t>(-123));
+
+      for (int j = 0; j < nb_grps; j++)
+        {
+          int proc_grp = unique_vec_proc_maitre_local_comm_[j];
+          sizeId_som_local_comm_[i][j] = sizeId_som_local_comm_tmp[i][proc_grp];
+          sizeId_elem_local_comm_[i][j] = sizeId_elem_local_comm_tmp[i][proc_grp];
+        }
     }
-#endif /* MPI_ */
+#endif
 }
 
 void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
 {
 #ifdef MPI_
   if (vec_proc_maitre_local_comm_.empty())
-    {
-      vec_proc_maitre_local_comm_.assign(Process::nproc(), -123 /* default */);
-      MPI_Allgather(&proc_maitre_local_comm_, 1, MPI_ENTIER, vec_proc_maitre_local_comm_.data(), 1, MPI_ENTIER, Comm_Group_MPI::get_trio_u_world());
-
-      std::unordered_set<int> seen;
-
-      for (int val : vec_proc_maitre_local_comm_)
-        if (seen.insert(val).second)
-          unique_vec_proc_maitre_local_comm_.push_back(val); // si val pas dedans
-
-      // Attention : ind 0 => ELEM et SOM, ind 1 => FACES (si besoin pour faces) !
-      std::vector<std::vector<cgsize_t>> sizeId_som_local_comm_tmp, sizeId_elem_local_comm_tmp;
-      gather_local_sizeId_multi_loc(sizeId_som_local_comm_tmp, sizeId_elem_local_comm_tmp);
-
-      const int nb_grps = static_cast<int>(unique_vec_proc_maitre_local_comm_.size());
-
-      // pour elem/som => ind 0
-      sizeId_som_local_comm_.push_back(std::vector<cgsize_t>());
-      sizeId_elem_local_comm_.push_back(std::vector<cgsize_t>());
-
-      if (has_elem_field_ || has_som_field_)
-        {
-          sizeId_som_local_comm_.back().assign(nb_grps, -123 /* default */);
-          sizeId_elem_local_comm_.back().assign(nb_grps, -123 /* default */);
-
-          for (int i = 0; i < nb_grps; i++)
-            {
-              int proc_grp = unique_vec_proc_maitre_local_comm_[i];
-              sizeId_som_local_comm_[0][i] = sizeId_som_local_comm_tmp[0][proc_grp];
-              sizeId_elem_local_comm_[0][i] = sizeId_elem_local_comm_tmp[0][proc_grp];
-            }
-        }
-
-      if (is_deformable_) // TODO FIXME si faut postraiter aux faces un jour ...
-        return; /* Stop here si deformable */
-
-      // pour faces et si ca existe => ind 1
-      if (has_faces_field_)
-        {
-          sizeId_som_local_comm_.push_back(std::vector<cgsize_t>(Process::nproc(), -123 /* default */));
-          sizeId_elem_local_comm_.push_back(std::vector<cgsize_t>(Process::nproc(), -123 /* default */));
-
-          for (int i = 0; i < nb_grps; i++)
-            {
-              int proc_grp = unique_vec_proc_maitre_local_comm_[i];
-              sizeId_som_local_comm_[1][i] = sizeId_som_local_comm_tmp[1][proc_grp];
-              sizeId_elem_local_comm_[1][i] = sizeId_elem_local_comm_tmp[1][proc_grp];
-            }
-        }
-    }
-
+    gather_local_sizeId_for_comm_group();
 
   if (!Process::me())
     {
@@ -334,9 +295,9 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
       unlink(fn.c_str());
       cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::SEQ>(fn, fileId_, true);
 
-
       const int nb_grps = static_cast<int>(unique_vec_proc_maitre_local_comm_.size());
 
+      /* 1 : on iter juste sur le map fld_loc_map_; ie: pas domaine dis ... */
       for (auto& itr : fld_loc_map_)
         {
           const std::string& LOC = itr.first;
@@ -379,9 +340,8 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
               std::string linkfile = file_group_id + ".grid.cgns";
 
               cgsize_t isize[3];
-              const int ind_som_elem_local_comm = (LOC == "FACES") ? 1 : 0;
-              isize[0] = sizeId_som_local_comm_[ind_som_elem_local_comm][gid];
-              isize[1] = sizeId_elem_local_comm_[ind_som_elem_local_comm][gid];
+              isize[0] = sizeId_som_local_comm_[ind_base][gid];
+              isize[1] = sizeId_elem_local_comm_[ind_base][gid];
               isize[2] = 0;
 
               int zoneId_tmp = -1;
@@ -542,6 +502,7 @@ void Ecrire_CGNS::cgns_write_final_link_file()
 
       std::vector<int> ind_doms_dumped;
 
+      /* 1 : on iter juste sur le map fld_loc_map_; ie: pas domaine dis ... */
       for (auto& itr : fld_loc_map_)
         {
           const std::string& LOC = itr.first;

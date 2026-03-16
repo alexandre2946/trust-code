@@ -78,9 +78,10 @@ private:
   std::vector<std::vector<int>> zoneId_par_; /* par ordre d'ecriture du domaine */
 
   // specifique FILE_PER_COMM_GROUP
+  void gather_local_sizeId_for_comm_group();
   int proc_maitre_local_comm_ = -123;
   std::vector<int> vec_proc_maitre_local_comm_, unique_vec_proc_maitre_local_comm_;
-  std::vector<std::vector<cgsize_t>> sizeId_som_local_comm_, sizeId_elem_local_comm_; // Attention : ind 0 => ELEM et SOM, ind 1 => FACES !
+  std::vector<std::vector<cgsize_t>> sizeId_som_local_comm_, sizeId_elem_local_comm_; // meme dim que sizeId_
 
   // specifique maillage dual pour faces
   IntTab fs_dual_, ef_dual_;
@@ -114,7 +115,6 @@ private:
   void cgns_write_final_link_file();
   void cgns_write_final_link_file_comm_group();
   void cgns_close_grid_or_solution_link_file(const double, const TYPE_LINK_CGNS,  bool is_cerr = true);
-  void gather_local_sizeId_multi_loc(std::vector<std::vector<cgsize_t>>& , std::vector<std::vector<cgsize_t>>& ) const ;
   void add_new_linked_base(const std::string&, const Nom&);
   void add_new_linked_base_par_over_zone(const std::string&, const Nom&, const Nom&, const int);
 
