@@ -47,10 +47,13 @@ const char* TRUST_Post_Loader::getPostExtension()
     }
 }
 
-TRUST_Post_Loader::TRUST_Post_Loader(const char *file)
+TRUST_Post_Loader::TRUST_Post_Loader(const char *file, bool print)
 {
   filename_ = Nom(file);
-  cerr << "TRUST_Post_Loader constructor for file : " << filename_ << endl;
+  print_ = print;
+
+  if (print_)
+    cerr << "TRUST_Post_Loader constructor for file : " << filename_ << endl;
 
   try
     {
@@ -63,8 +66,6 @@ TRUST_Post_Loader::TRUST_Post_Loader(const char *file)
       opt.regularize_tolerance = 1e-7f;
       opt.user_fields_ = true;
       read_any_format_options(filename_, opt);
-      cerr << "Initializing filter ..." << endl;
-
       // Read the source file to the lata database
       read_any_format(filename_, opt.path_prefix, lata_db_);
       filter_.initialize(opt, lata_db_);
@@ -120,14 +121,19 @@ void TRUST_Post_Loader::populateDatabaseMetaData_(int timeState)
 {
   try
     {
-      cerr << "-----------------------------------------------" << endl ;
-      cerr << "TRUST_Post_Loader::populateDatabaseMetaData : " << filename_ << " " << timeState << endl << endl;
+      if (print_)
+        {
+          cerr << "-----------------------------------------------" << endl;
+          cerr << "TRUST_Post_Loader::populateDatabaseMetaData : " << filename_ << " " << timeState << endl << endl;
+        }
 
       const Noms geoms = filter_.get_exportable_geometry_names();
 
       for (int i_geom = 0; i_geom < geoms.size(); i_geom++)
         {
-          cerr << "Domain : " << geoms[i_geom] << endl;
+          if (print_)
+            cerr << "Domain : " << geoms[i_geom] << endl;
+
           const LataGeometryMetaData data = filter_.get_geometry_metadata(geoms[i_geom]);
 
           bool mesh_faces = false;
@@ -195,8 +201,12 @@ void TRUST_Post_Loader::populateDatabaseMetaData_(int timeState)
                 }
             }
         }
-      cerr << endl << "End TRUST_Post_Loader::populateDatabaseMetaData" << endl;
-      cerr << "-----------------------------------------------" << endl ;
+
+      if (print_)
+        {
+          cerr << endl << "End TRUST_Post_Loader::populateDatabaseMetaData" << endl;
+          cerr << "-----------------------------------------------" << endl;
+        }
     }
   catch (LataDBError &err)
     {
@@ -235,7 +245,8 @@ MEDCouplingMesh* TRUST_Post_Loader::getMesh(const char *meshname, int timestate,
   MEDCouplingMesh *return_value = nullptr;
   try
     {
-      cerr << "TRUST_Post_Loader::getMesh ts = " << timestate << ", block = " << block << ", meshname = " << meshname << endl;
+      if (print_)
+        cerr << "TRUST_Post_Loader::getMesh ts = " << timestate << ", block = " << block << ", meshname = " << meshname << endl;
 
       // We have real timesteps in the database, add one to timestep index:
       if (filter_.get_nb_timesteps() > 1)
@@ -443,7 +454,10 @@ MEDCouplingMesh* TRUST_Post_Loader::getMesh(const char *meshname, int timestate,
                   if (nbsom > nb_som_elem_max_)
                     nb_som_elem_max_ = nbsom;
                 }
-              Cerr << " Polyhedron information nb_som_elem_max " << nb_som_elem_max_ << " nb_som_face_max " << nb_som_face_max_ << " nb_face_elem_max " << nb_face_elem_max_ << finl;
+
+              if (print_)
+                cerr << " Polyhedron information nb_som_elem_max " << nb_som_elem_max_ << " nb_som_face_max " << nb_som_face_max_ << " nb_face_elem_max " << nb_face_elem_max_ << endl;
+
               IntTab_T<trustIdType> les_elems;
               les_elems.resize(nelem, nb_som_elem_max_);
               les_elems = -1;
@@ -707,7 +721,8 @@ DataArray* TRUST_Post_Loader::getVectorVar_(int timestate, int block, const char
   DataArray *return_value = 0;
   try
     {
-      cerr << "TRUST_Post_Loader::getvectorvar time : " << timestate << "/" << filter_.get_nb_timesteps() - 1 << ", block : " << block << ", varname : " << varname << endl;
+      if (print_)
+        cerr << "TRUST_Post_Loader::getvectorvar time : " << timestate << "/" << filter_.get_nb_timesteps() - 1 << ", block : " << block << ", varname : " << varname << endl;
 
       if (filter_.get_nb_timesteps() > 1)
         timestate++;
@@ -761,7 +776,8 @@ void TRUST_Post_Loader::get_field_info_from_visitname_(const char *varname, Fiel
   const int k = field_username_.rang(varname);
   if (k < 0)
     {
-      cerr << "Error in TRUST_Post_Loader::get_field_info_from_visitname: field " << varname << " not found" << endl;
+      if (print_)
+        cerr << "Error in TRUST_Post_Loader::get_field_info_from_visitname: field " << varname << " not found" << endl;
       for (int i = 0; i < field_username_.size(); i++)
         cerr << field_username_[i] << " ";
       throw;

@@ -30,7 +30,7 @@ namespace MEDCoupling
 class TRUST_Post_Loader
 {
 public:
-  TRUST_Post_Loader(const char*);
+  TRUST_Post_Loader(const char*, bool print = true);
   ~TRUST_Post_Loader() { /* Do nothing */ }
 
   int getNumberOfTimeSteps();
@@ -69,6 +69,7 @@ private:
   Nom filename_;
   // For each name, which component is it in the source field:
   LataVector<int> field_component_;
+  bool print_ = false;
 };
 
 #endif /* TRUST_Post_Loader_included */

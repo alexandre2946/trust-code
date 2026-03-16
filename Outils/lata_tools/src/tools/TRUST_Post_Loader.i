@@ -11,12 +11,57 @@ using namespace MEDCoupling;
 
 #if SWIG_VERSION >= 0x010329
 %template()  std::vector<std::string>;
+%template() std::vector<double>;
 #endif
 
 %include "medcoupling++.h"
 #ifndef __CYGWIN__
 
 %include "MEDCouplingCommon.i"
+
+%inline %{
+int GetNumberOfTimeSteps(const char* file)
+{
+  TRUST_Post_Loader tpl(file, false);
+  return tpl.getNumberOfTimeSteps();
+}
+
+std::vector<double> GetTimes(const char* file)
+{
+  TRUST_Post_Loader tpl(file, false);
+  return tpl.getTimes();
+}
+
+MEDCoupling::MEDCouplingMesh* GetMesh(const char* file, const char *varname, int timestate, int block = -1)
+{
+   TRUST_Post_Loader tpl(file, false);
+  return tpl.getMesh(varname, timestate, block);
+}
+
+MEDCoupling::MEDCouplingFieldDouble* GetFieldDouble(const char* file, const char *varname, int timestate, int block = -1)
+{
+  TRUST_Post_Loader tpl(file, false);
+  return tpl.getFieldDouble(varname, timestate, block);
+}
+
+std::vector<std::string> GetFieldNames(const char* file)
+{
+  TRUST_Post_Loader tpl(file, false);
+  return tpl.getFieldNames();
+}
+
+std::vector<std::string> GetMeshNames(const char* file)
+{
+  TRUST_Post_Loader tpl(file, false);
+  return tpl.getMeshNames();
+}
+
+std::vector<std::string> GetFieldNamesOnMesh(const char* file, const char* mesh)
+{
+  TRUST_Post_Loader tpl(file, false);
+  return tpl.getFieldNamesOnMesh(mesh);
+}
+%}
 
 %pythoncode %{
 def MEDCouplingDataArrayDoubleIadd(self,*args):
