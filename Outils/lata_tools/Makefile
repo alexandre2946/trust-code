@@ -27,10 +27,11 @@ $(trg): Makefile $(tools_src)/CMakeLists.txt $(tools_src)/tools/CMakeLists.txt $
 	(cd $(TRUST_ROOT)/exec;ln -sf lata_tools/bin/lata_analyzer .)
 	(cd $(TRUST_ROOT)/exec;ln -sf lata_tools/bin/compare_lata .)
 	(cd $(TRUST_ROOT)/exec;ln -sf lata_tools/bin/compare_lata compare_cgns)
+	(cd $(TRUST_ROOT)/exec;ln -sf $(TRUST_ROOT)/bin/KSH/compare_lata_gz compare_cgns_gz)
 	(cd $(TRUST_ROOT)/exec/lata_tools/;ln -sf ../../Outils/lata_tools/src/tools/env.sh .)
 
 clean:
-	rm -rf $(TRUST_ROOT)/build/Outils/lata_tools $(TRUST_ROOT)/exec/lata_tools $(TRUST_ROOT)/exec/lata_analyzer $(TRUST_ROOT)/exec/compare_lata
+	rm -rf $(TRUST_ROOT)/build/Outils/lata_tools $(TRUST_ROOT)/exec/lata_tools $(TRUST_ROOT)/exec/lata_analyzer $(TRUST_ROOT)/exec/compare_cgns_gz $(TRUST_ROOT)/exec/compare_cgns $(TRUST_ROOT)/exec/compare_lata
 
 write_extra_src:   # Used by LATA Plugin build in Outils/VisIt/plugin/lata
 	@echo $(EXTRA_SRCS) > $(OUTFILE)
