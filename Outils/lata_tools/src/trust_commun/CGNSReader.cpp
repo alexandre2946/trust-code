@@ -328,6 +328,80 @@ namespace
     return times; // NumberOfSteps existe mais pas TimeValues
   }
 
+  struct ZonePartInfo
+  {
+    int izone = -1;
+    int rank = -1;
+    std::string zonename;
+    trustIdType nb_nodes = 0;
+    trustIdType nb_cells = 0;
+  };
+
+  static bool is_all_digits(const std::string &s)
+  {
+    if (s.empty())
+      return false;
+    for (char c : s)
+      if (c < '0' || c > '9')
+        return false;
+    return true;
+  }
+
+  static bool split_parallel_zone_name(const std::string &basename, const std::string &zonename, int &rank)
+  {
+    const std::string prefix = basename + "_";
+    if (zonename.rfind(prefix, 0) != 0)
+      return false;
+
+    const std::string suffix = zonename.substr(prefix.size());
+    if (!is_all_digits(suffix))
+      return false;
+
+    rank = std::atoi(suffix.c_str());
+    return true;
+  }
+
+  static std::vector<ZonePartInfo> collect_parallel_zone_parts(int fn, int ibase, const std::string &basename)
+  {
+    int nzones = 0;
+    cgns_check(cg_nzones(fn, ibase, &nzones), "cg_nzones(collect_parallel_zone_parts)");
+
+    std::vector<ZonePartInfo> parts;
+    parts.reserve((size_t) nzones);
+
+    for (int izone = 1; izone <= nzones; izone++)
+      {
+        char zonename_c[33];
+        cgsize_t size[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        cgns_check(cg_zone_read(fn, ibase, izone, zonename_c, size), "cg_zone_read(collect_parallel_zone_parts)");
+
+        ZoneType_t ztype;
+        cgns_check(cg_zone_type(fn, ibase, izone, &ztype), "cg_zone_type(collect_parallel_zone_parts)");
+        if (ztype != Unstructured)
+          continue;
+
+        const std::string zonename(zonename_c);
+        int rank = -1;
+        if (!split_parallel_zone_name(basename, zonename, rank))
+          continue;
+
+        ZonePartInfo p;
+        p.izone = izone;
+        p.rank = rank;
+        p.zonename = zonename;
+        p.nb_nodes = (trustIdType) size[0];
+        p.nb_cells = (trustIdType) size[1];
+        parts.push_back(p);
+      }
+
+    std::sort(parts.begin(), parts.end(), [](const ZonePartInfo &a, const ZonePartInfo &b)
+      {
+        return a.rank < b.rank;
+      });
+
+    return parts;
+  }
+
   static void read_zone_coordinates(int fn, int ibase, int izone, int phys_dim, trustIdType nb_nodes, BigFloatTab &nodes)
   {
     nodes.resize(nb_nodes, phys_dim);
@@ -379,6 +453,53 @@ namespace
       lata_db.write_data(tstep, sommets.uname_, nodes);
   }
 
+  static void add_elements_field(const Nom &filename_in_master_file, const Nom &geom_name, int tstep, Size_t &file_offset,
+                                 const Nom &lata_elem_type, trustIdType nb_elem, int nb_comp, const BigTIDTab &elems,
+                                 const char *data_filename, LataDB &lata_db)
+  {
+    lata_db.set_elemtype(tstep, geom_name, lata_elem_type);
+
+    LataDBField elements;
+    elements.name_ = "ELEMENTS";
+    elements.timestep_ = tstep;
+    elements.filename_ = filename_in_master_file;
+    elements.geometry_ = geom_name;
+    elements.uname_ = Field_UName(geom_name, "ELEMENTS", "");
+    elements.nb_comp_ = nb_comp;
+    elements.size_ = nb_elem;
+    elements.nature_ = LataDBField::SCALAR;
+    elements.datatype_ = lata_db.default_type_int_;
+    elements.datatype_.array_index_ = LataDBDataType::C_INDEXING;
+    elements.datatype_.file_offset_ = file_offset++;
+
+    lata_db.add_field(elements);
+    if (data_filename)
+      lata_db.write_data(tstep, elements.uname_, elems);
+  }
+
+  static void add_scalar_field_to_lata(const Nom &filename_in_master_file, const Nom &geom_name, const Nom &field_name,
+                                       const Nom &lata_loc, int tstep_field, Size_t &file_offset,
+                                       trustIdType field_size, const BigFloatTab &tab,
+                                       const char *data_filename, LataDB &lata_db)
+  {
+    LataDBField field;
+    field.name_ = field_name;
+    field.timestep_ = tstep_field;
+    field.filename_ = filename_in_master_file;
+    field.geometry_ = geom_name;
+    field.localisation_ = lata_loc;
+    field.uname_ = Field_UName(geom_name, field.name_, lata_loc);
+    field.nb_comp_ = 1;
+    field.size_ = field_size;
+    field.nature_ = LataDBField::SCALAR;
+    field.datatype_ = lata_db.default_type_float();
+    field.datatype_.file_offset_ = file_offset++;
+
+    lata_db.add_field(field);
+    if (data_filename)
+      lata_db.write_data(tstep_field, field.uname_, tab);
+  }
+
   static int choose_main_section(int fn, int ibase, int izone, int cell_dim, const Nom &geom_name)
   {
     int nsections = 0;
@@ -428,8 +549,8 @@ namespace
     return best_sec;
   }
 
-  static trustIdType read_zone_elements_and_add(int fn, int ibase, int izone, int cell_dim, const Nom &filename_in_master_file, const Nom &geom_name, int tstep, Size_t &file_offset,
-                                                trustIdType nb_nodes, const char *data_filename, LataDB &lata_db)
+  static trustIdType read_zone_elements(int fn, int ibase, int izone, int cell_dim, const Nom &geom_name,
+                                        trustIdType nb_nodes, BigTIDTab &elems, Nom &lata_elem_type_out)
   {
     const int isec = choose_main_section(fn, ibase, izone, cell_dim, geom_name);
 
@@ -449,12 +570,13 @@ namespace
         throw LataDBError(LataDBError::READ_ERROR);
       }
 
+    lata_elem_type_out = lata_elem_type;
+
     const trustIdType nb_elem = (trustIdType) (end - start + 1);
     std::vector<cgsize_t> connectivity((size_t) nb_elem * (size_t) nb_comp);
 
     cgns_check(cg_elements_read(fn, ibase, izone, isec, connectivity.data(), nullptr), "cg_elements_read");
 
-    BigTIDTab elems;
     elems.resize(nb_elem, nb_comp);
 
     // XXX On fait l'inverse de TRUST_2_CGNS::convert_connectivity ...
@@ -496,26 +618,8 @@ namespace
           }
       }
 
-    Journal(2) << "cgns_reader: zone=" << geom_name << " main section name=" << secname << " type=" << elem_type_to_string_dbg(elem_type) << " nb_elem=" << nb_elem << " nb_comp=" << nb_comp << endl;
-
-    lata_db.set_elemtype(tstep, geom_name, lata_elem_type);
-
-    LataDBField elements;
-    elements.name_ = "ELEMENTS";
-    elements.timestep_ = tstep;
-    elements.filename_ = filename_in_master_file;
-    elements.geometry_ = geom_name;
-    elements.uname_ = Field_UName(geom_name, "ELEMENTS", "");
-    elements.nb_comp_ = nb_comp;
-    elements.size_ = nb_elem;
-    elements.nature_ = LataDBField::SCALAR;
-    elements.datatype_ = lata_db.default_type_int_;
-    elements.datatype_.array_index_ = LataDBDataType::C_INDEXING;
-    elements.datatype_.file_offset_ = file_offset++;
-
-    lata_db.add_field(elements);
-    if (data_filename)
-      lata_db.write_data(tstep, elements.uname_, elems);
+    Journal(2) << "cgns_reader: zone = " << geom_name << " main section name = " << secname << " type = " << elem_type_to_string_dbg(elem_type)
+            << " nb_elem = " << nb_elem << " nb_comp = " << nb_comp << endl;
 
     return nb_elem;
   }
@@ -596,6 +700,126 @@ namespace
         lata_db.add_field(field);
         if (data_filename)
           lata_db.write_data(tstep_field, field.uname_, tab);
+      }
+  }
+
+  static void read_merged_zone_solution_fields_and_add(int fn, int ibase,
+                                                       const std::vector<ZonePartInfo> &parts,
+                                                       const Nom &filename_in_master_file,
+                                                       const Nom &geom_name,
+                                                       int tstep_field,
+                                                       Size_t &file_offset,
+                                                       const std::vector<trustIdType> &node_offsets,
+                                                       const std::vector<trustIdType> &elem_offsets,
+                                                       trustIdType total_nb_nodes,
+                                                       trustIdType total_nb_elem,
+                                                       const char *data_filename,
+                                                       LataDB &lata_db)
+  {
+    if (parts.empty())
+      return;
+
+    int nsols0 = 0;
+    cgns_check(cg_nsols(fn, ibase, parts[0].izone, &nsols0), "cg_nsols(merged)");
+
+    if (tstep_field < 1 || tstep_field > nsols0)
+      return;
+
+    char solname0[33];
+    GridLocation_t location0 = Vertex;
+    cgns_check(cg_sol_info(fn, ibase, parts[0].izone, tstep_field, solname0, &location0), "cg_sol_info(merged)");
+
+    Nom lata_loc;
+    trustIdType merged_size = -1;
+    bool on_nodes = false;
+
+    if (location0 == Vertex)
+      {
+        lata_loc = "SOM";
+        merged_size = total_nb_nodes;
+        on_nodes = true;
+      }
+    else if (location0 == CellCenter)
+      {
+        lata_loc = "ELEM";
+        merged_size = total_nb_elem;
+        on_nodes = false;
+      }
+    else
+      {
+        cerr << "cgns_reader: skipping merged solution " << solname0
+             << " in geom " << geom_name
+             << " unsupported GridLocation=" << grid_location_to_string(location0) << endl;
+        return;
+      }
+
+    int nfields0 = 0;
+    cgns_check(cg_nfields(fn, ibase, parts[0].izone, tstep_field, &nfields0), "cg_nfields(merged)");
+
+    for (int ifield = 1; ifield <= nfields0; ifield++)
+      {
+        DataType_t dtype0;
+        char field_name0[33];
+        cgns_check(cg_field_info(fn, ibase, parts[0].izone, tstep_field, ifield, &dtype0, field_name0), "cg_field_info(merged)");
+
+        BigFloatTab merged_tab;
+        merged_tab.resize(merged_size, 1);
+
+        for (size_t ip = 0; ip < parts.size(); ip++)
+          {
+            const int izone = parts[ip].izone;
+
+            int nsols = 0;
+            cgns_check(cg_nsols(fn, ibase, izone, &nsols), "cg_nsols(merged.part)");
+            if (tstep_field > nsols)
+              {
+                cerr << "cgns_reader: zone " << parts[ip].zonename
+                     << " has fewer solutions than expected for merged geometry " << geom_name << endl;
+                throw LataDBError(LataDBError::READ_ERROR);
+              }
+
+            char solname[33];
+            GridLocation_t location = Vertex;
+            cgns_check(cg_sol_info(fn, ibase, izone, tstep_field, solname, &location), "cg_sol_info(merged.part)");
+            if (location != location0)
+              {
+                cerr << "cgns_reader: inconsistent GridLocation for merged geometry " << geom_name
+                     << " field " << field_name0 << endl;
+                throw LataDBError(LataDBError::READ_ERROR);
+              }
+
+            int nfields = 0;
+            cgns_check(cg_nfields(fn, ibase, izone, tstep_field, &nfields), "cg_nfields(merged.part)");
+            if (ifield > nfields)
+              {
+                cerr << "cgns_reader: inconsistent number of fields for merged geometry " << geom_name << endl;
+                throw LataDBError(LataDBError::READ_ERROR);
+              }
+
+            DataType_t dtype;
+            char field_name[33];
+            cgns_check(cg_field_info(fn, ibase, izone, tstep_field, ifield, &dtype, field_name), "cg_field_info(merged.part)");
+
+            if (std::string(field_name) != std::string(field_name0))
+              {
+                cerr << "cgns_reader: inconsistent field ordering while merging geometry " << geom_name
+                     << " expected=" << field_name0 << " got=" << field_name << endl;
+                throw LataDBError(LataDBError::READ_ERROR);
+              }
+
+            const trustIdType local_size = on_nodes ? parts[ip].nb_nodes : parts[ip].nb_cells;
+            const trustIdType offset = on_nodes ? node_offsets[ip] : elem_offsets[ip];
+
+            BigFloatTab local_tab;
+            read_scalar_field(fn, ibase, izone, tstep_field, field_name0, local_size, local_tab);
+
+            for (trustIdType i = 0; i < local_size; i++)
+              merged_tab(offset + i, 0) = local_tab(i, 0);
+          }
+
+        add_scalar_field_to_lata(filename_in_master_file, geom_name, field_name0, lata_loc,
+                                 tstep_field, file_offset, merged_size, merged_tab,
+                                 data_filename, lata_db);
       }
   }
 
@@ -695,54 +919,179 @@ void cgns_reader(const char *cgnsfilename, const char *data_filename, LataDB &la
   // Remplissage LataDB
   for (int ibase = 1; ibase <= nbases; ibase++)
     {
-      char basename[33];
+      char basename_c[33];
       int cell_dim = 0, phys_dim = 0;
-      cgns_check(cg_base_read(fn, ibase, basename, &cell_dim, &phys_dim), "cg_base_read");
+      cgns_check(cg_base_read(fn, ibase, basename_c, &cell_dim, &phys_dim), "cg_base_read");
+
+      const std::string basename_str(basename_c);
+      const Nom geom_name(basename_c);
+
+      std::vector<ZonePartInfo> parts = collect_parallel_zone_parts(fn, ibase, basename_str);
 
       int nzones = 0;
       cgns_check(cg_nzones(fn, ibase, &nzones), "cg_nzones");
 
-      for (int izone = 1; izone <= nzones; izone++)
+      const bool merge_parallel_over_zone = (!parts.empty() && (int)parts.size() == nzones);
+
+      if (!merge_parallel_over_zone)
         {
-          char zonename[33];
-          cgsize_t size[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-          cgns_check(cg_zone_read(fn, ibase, izone, zonename, size), "cg_zone_read");
-
-          ZoneType_t ztype;
-          cgns_check(cg_zone_type(fn, ibase, izone, &ztype), "cg_zone_type");
-
-          if (ztype != Unstructured)
+          for (int izone = 1; izone <= nzones; izone++)
             {
-              cerr << "cgns_reader: skipping structured zone " << zonename << " for now" << endl;
-              continue;
+              char zonename[33];
+              cgsize_t size[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+              cgns_check(cg_zone_read(fn, ibase, izone, zonename, size), "cg_zone_read");
+
+              ZoneType_t ztype;
+              cgns_check(cg_zone_type(fn, ibase, izone, &ztype), "cg_zone_type");
+
+              if (ztype != Unstructured)
+                {
+                  cerr << "cgns_reader: skipping structured zone " << zonename << " for now" << endl;
+                  continue;
+                }
+
+              const trustIdType nb_nodes = (trustIdType) size[0];
+              const trustIdType nb_cells = (trustIdType) size[1];
+
+              Journal(2) << "cgns_reader: filling zone=" << zonename
+                         << " nb_nodes=" << nb_nodes
+                         << " nb_cells=" << nb_cells
+                         << " phys_dim=" << phys_dim << endl;
+
+              LataDBGeometry geom;
+              geom.name_ = zonename;
+              geom.timestep_ = tstep_geom;
+              lata_db.add_geometry(geom);
+
+              BigFloatTab nodes;
+              read_zone_coordinates(fn, ibase, izone, phys_dim, nb_nodes, nodes);
+              add_sommets_field(filename_in_master_file, geom.name_, tstep_geom, file_offset,
+                                nb_nodes, phys_dim, nodes, data_filename, lata_db);
+
+              BigTIDTab elems;
+              Nom lata_elem_type;
+              const trustIdType nb_elem = read_zone_elements(fn, ibase, izone, cell_dim, geom.name_,
+                                                             nb_nodes, elems, lata_elem_type);
+
+              add_elements_field(filename_in_master_file, geom.name_, tstep_geom, file_offset,
+                                 lata_elem_type, nb_elem, (int)elems.dimension(1), elems,
+                                 data_filename, lata_db);
+
+              int nsols = 0;
+              cgns_check(cg_nsols(fn, ibase, izone, &nsols), "cg_nsols");
+
+              for (int isol = 1; isol <= nsols; isol++)
+                {
+                  const int tstep_field = isol;
+                  read_zone_solution_fields_and_add(fn, ibase, izone, isol,
+                                                    filename_in_master_file, geom.name_,
+                                                    tstep_field, file_offset,
+                                                    nb_nodes, nb_elem, data_filename, lata_db);
+                }
             }
 
-          const trustIdType nb_nodes = (trustIdType) size[0];
-          const trustIdType nb_cells = (trustIdType) size[1];
+          continue;
+        }
 
-          Journal(2) << "cgns_reader: filling zone=" << zonename << " nb_nodes=" << nb_nodes << " nb_cells=" << nb_cells << " phys_dim=" << phys_dim << endl;
+      Journal(2) << "cgns_reader: base " << basename_c
+                << " detected as parallel-over-zone, merging " << (int)parts.size()
+                << " zones into one geometry" << endl;
 
-          LataDBGeometry geom;
-          geom.name_ = zonename;
-          geom.timestep_ = tstep_geom;
-          lata_db.add_geometry(geom);
+      for (size_t ip = 0; ip < parts.size(); ip++)
+        Journal(2) << "cgns_reader:   part[" << ip << "] zone=" << parts[ip].zonename
+                   << " rank=" << parts[ip].rank
+                   << " nb_nodes=" << parts[ip].nb_nodes
+                   << " nb_cells=" << parts[ip].nb_cells << endl;
 
-          BigFloatTab nodes;
-          read_zone_coordinates(fn, ibase, izone, phys_dim, nb_nodes, nodes);
-          add_sommets_field(filename_in_master_file, geom.name_, tstep_geom, file_offset, nb_nodes, phys_dim, nodes, data_filename, lata_db);
+      std::vector<trustIdType> node_offsets(parts.size(), 0);
+      std::vector<trustIdType> elem_offsets(parts.size(), 0);
 
-          const trustIdType nb_elem = read_zone_elements_and_add(fn, ibase, izone, cell_dim, filename_in_master_file, geom.name_, tstep_geom, file_offset, nb_nodes, data_filename, lata_db);
+      trustIdType total_nb_nodes = 0;
+      trustIdType total_nb_elem = 0;
 
-          int nsols = 0;
-          cgns_check(cg_nsols(fn, ibase, izone, &nsols), "cg_nsols");
+      for (size_t ip = 0; ip < parts.size(); ip++)
+        {
+          node_offsets[ip] = total_nb_nodes;
+          elem_offsets[ip] = total_nb_elem;
+          total_nb_nodes += parts[ip].nb_nodes;
+          total_nb_elem += parts[ip].nb_cells;
+        }
 
-          for (int isol = 1; isol <= nsols; isol++)
+      LataDBGeometry geom;
+      geom.name_ = geom_name;
+      geom.timestep_ = tstep_geom;
+      lata_db.add_geometry(geom);
+
+      BigFloatTab merged_nodes;
+      merged_nodes.resize(total_nb_nodes, phys_dim);
+
+      Nom merged_elem_type;
+      int merged_nb_comp = -1;
+      BigTIDTab merged_elems;
+      merged_elems.resize(total_nb_elem, 1); // redimensionne apres lecture du 1er morceau
+
+      trustIdType elem_write_pos = 0;
+
+      for (size_t ip = 0; ip < parts.size(); ip++)
+        {
+          const ZonePartInfo& p = parts[ip];
+
+          BigFloatTab local_nodes;
+          read_zone_coordinates(fn, ibase, p.izone, phys_dim, p.nb_nodes, local_nodes);
+
+          for (trustIdType i = 0; i < p.nb_nodes; i++)
+            for (int j = 0; j < phys_dim; j++)
+              merged_nodes(node_offsets[ip] + i, j) = local_nodes(i, j);
+
+          BigTIDTab local_elems;
+          Nom local_elem_type;
+          const trustIdType local_nb_elem = read_zone_elements(fn, ibase, p.izone, cell_dim, p.zonename.c_str(),
+                                                               p.nb_nodes, local_elems, local_elem_type);
+
+          if (ip == 0)
             {
-              const int tstep_field = isol; // dt post !
-              read_zone_solution_fields_and_add(fn, ibase, izone, isol, filename_in_master_file, geom.name_, tstep_field, file_offset, nb_nodes, nb_elem, data_filename, lata_db);
+              merged_elem_type = local_elem_type;
+              merged_nb_comp = (int) local_elems.dimension(1);
+              merged_elems.resize(total_nb_elem, merged_nb_comp);
             }
+          else
+            {
+              if (local_elem_type != merged_elem_type || local_elems.dimension(1) != merged_nb_comp)
+                {
+                  cerr << "cgns_reader: inconsistent element type while merging base " << basename_c << endl;
+                  throw LataDBError(LataDBError::READ_ERROR);
+                }
+            }
+
+          for (trustIdType i = 0; i < local_nb_elem; i++)
+            for (int j = 0; j < merged_nb_comp; j++)
+              merged_elems(elem_write_pos + i, j) = local_elems(i, j) + node_offsets[ip];
+
+          elem_write_pos += local_nb_elem;
+        }
+
+      add_sommets_field(filename_in_master_file, geom.name_, tstep_geom, file_offset,
+                        total_nb_nodes, phys_dim, merged_nodes, data_filename, lata_db);
+
+      add_elements_field(filename_in_master_file, geom.name_, tstep_geom, file_offset,
+                         merged_elem_type, total_nb_elem, merged_nb_comp, merged_elems,
+                         data_filename, lata_db);
+
+      int nsols = 0;
+      cgns_check(cg_nsols(fn, ibase, parts[0].izone, &nsols), "cg_nsols(merged.first_zone)");
+
+      for (int isol = 1; isol <= nsols; isol++)
+        {
+          const int tstep_field = isol;
+          read_merged_zone_solution_fields_and_add(fn, ibase, parts,
+                                                   filename_in_master_file, geom.name_,
+                                                   tstep_field, file_offset,
+                                                   node_offsets, elem_offsets,
+                                                   total_nb_nodes, total_nb_elem,
+                                                   data_filename, lata_db);
         }
     }
+
 
   cgns_check(cg_close(fn), "cg_close");
 
