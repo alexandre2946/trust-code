@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -33,9 +33,9 @@ public:
   Domaine& domaine();
 
   static int Chercher_Correspondance(const DoubleTab& sommets1, const DoubleTab& sommets2, ArrOfInt& correspondance, const double epsilon);
-  static void construire_correspondance_sommets_par_coordonnees(Domaine& dom);
+  static void construire_correspondance_sommets_par_coordonnees(Domaine& dom, bool allow_resize=false);
   static void construire_correspondance_aretes_par_coordonnees(Domaine_VF& zvf);
-  static void construire_correspondance_items_par_coordonnees(Joints& joints, const JOINT_ITEM type_item, const DoubleTab& coord_items);
+  static void construire_correspondance_items_par_coordonnees(Joints& joints, const JOINT_ITEM type_item, const DoubleTab& coord_items, bool allow_resize=false);
 
   static void construire_structures_paralleles(Domaine& dom, const Noms& liste_bords_perio);
 

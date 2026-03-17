@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -37,6 +37,8 @@
 #include <EFichierBin.h>
 #include <Array_tools.h>
 #include <Perf_counters.h>
+#include <vector>
+#include <numeric>
 
 Implemente_instanciable(Scatter,"Scatter",Interprete);
 // XD scatter interprete scatter 0 Class to read a partionned mesh from the files during a parallel calculation. The files are in binary format.
@@ -259,12 +261,11 @@ Entree& Scatter::interpreter(Entree& is)
   return is;
 }
 
-/*! @brief Merged domaines receive joints information from their neighbours to ensure that their common items (vertices) appear in the same order
+/*! @brief Merged domains receive joint information from their neighbours to ensure that their common items (vertices) appear in the same order
  *
- *  If it's not the case, the merged domaine reorders its common items so that it matches the neighbour's order
- *  When 2 neighbouring domaines have each been merged,
+ *  If it's not the case, the merged domain reorders its common items so that it matches the neighbour's order
+ *  When 2 neighbouring domains have each been merged,
  *  only the processor with the lowest rank proceeds to reordering
- *
  */
 void Scatter::check_consistancy_remote_items(Domaine& dom, const ArrOfInt& mergedDomaines)
 {
@@ -633,7 +634,7 @@ void Scatter::lire_domaine(Nom& nomentree, Noms& liste_bords_periodiques)
 
   init_sequential_domain(dom);
 
-  // merged domaines need to reorder faces of periodic borders
+  // merged domains need to reorder faces of periodic borders
   const int myDomaineWasMerged = mergedDomaines[Process::me()];
   if(myDomaineWasMerged)
     {
@@ -1204,9 +1205,7 @@ void Scatter::calculer_espace_distant_aretes(Domaine& domaine,
                                tableau_vide);
 }
 
-/*! @brief On suppose que chaque joint[i].
- *
- * joint_item(type_item).items_communs() contient les indices locaux des items de joint communs dans le meme
+/*! @brief On suppose que chaque joint[i].joint_item(type_item).items_communs() contient les indices locaux des items de joint communs dans le meme
  *   ordre sur les deux processeurs (local et voisin)
  *   On remplit renum_items_communs :
  *    colonne 0=contenu du tableau items_communs sur le PE voisin
@@ -2470,19 +2469,20 @@ int Scatter::Chercher_Correspondance(const DoubleTab& sommets1, const DoubleTab&
   return nb_sommets_non_trouves;
 }
 
-/*! @brief Methode obsolete (utilisee avec l'ancien decoupeur).
+/*! @brief Generic method to build geometrical item correspondance between the local and the remote processor
+ * around a joint.
+ *
+ * See also construire_correspondance_sommets_par_coordonnees() for the very specific usage of allow_resize.
  *
  */
-
-void Scatter::construire_correspondance_items_par_coordonnees(Joints& joints, const JOINT_ITEM type_item, const DoubleTab& coord_items)
+void Scatter::construire_correspondance_items_par_coordonnees(Joints& joints, const JOINT_ITEM type_item,
+                                                              const DoubleTab& coord_items, bool allow_resize)
 {
   switch(type_item)
     {
     case JOINT_ITEM::SOMMET:
-      ;
       break;
     case JOINT_ITEM::ARETE:
-      ;
       break;
     default:
       Cerr << "Scatter::construire_correspondance_items_par_coordonnees unusable for item "
@@ -2503,25 +2503,21 @@ void Scatter::construire_correspondance_items_par_coordonnees(Joints& joints, co
 
   // Remplissage des tableaux indices_items_locaux
   // et coord_items_locaux
-  {
-    int i_joint;
-    for (i_joint = 0; i_joint < nb_joints; i_joint++)
-      {
-        const Joint& joint = joints[i_joint];
-        ArrOfInt& items = indices_items_locaux[i_joint];
-        // Remarque: **LISTE_TRI** les indices_items_locaux sont
-        //  tries dans l'ordre croissant:
-        calculer_liste_complete_items_joint(joint, type_item, items);
+  for (int i_joint = 0; i_joint < nb_joints; i_joint++)
+    {
+      const Joint& joint = joints[i_joint];
+      ArrOfInt& items = indices_items_locaux[i_joint];
+      // Remarque: **LISTE_TRI** les indices_items_locaux sont
+      //  tries dans l'ordre croissant:
+      calculer_liste_complete_items_joint(joint, type_item, items);
 
-        const int n       = items.size_array();
-        DoubleTab&   coord   = coord_items_locaux[i_joint];
-        int i, j;
-        coord.resize(n, dim);
-        for (i = 0; i < n; i++)
-          for (j = 0; j < dim; j++)
-            coord(i,j) = coord_items(items[i], j);
-      }
-  }
+      const int n       = items.size_array();
+      DoubleTab&   coord   = coord_items_locaux[i_joint];
+      coord.resize(n, dim);
+      for (int i = 0; i < n; i++)
+        for (int j = 0; j < dim; j++)
+          coord(i,j) = coord_items(items[i], j);
+    }
 
   // Envoi des indices et coordonnees locaux au processeur voisin
   {
@@ -2551,128 +2547,141 @@ void Scatter::construire_correspondance_items_par_coordonnees(Joints& joints, co
   }
 
   // Boucle sur les joints
-  {
-    // Cette fois, on modifie les joints (remplissage de renum_virt_loc)
-    const int moi = Process::me();
-    for (int i_joint = 0; i_joint < nb_joints; i_joint++)
-      {
-        Joint&           joint           = joints[i_joint];
-        const int     PEvoisin        = joint.PEvoisin();
-        const ArrOfInt& indices_locaux  = indices_items_locaux[i_joint];
-        //ArrOfInt &       indices_distants= indices_items_distants[i_joint];
-        const DoubleTab& coord_locaux    = coord_items_locaux[i_joint];
-        const DoubleTab& coord_distants  = coord_items_distants[i_joint];
-        const int n = indices_locaux.size_array();
-        /*
-          if (n != indices_distants.size_array()) {
-          Cerr << "Error in Scatter::remplir_renum_virt_loc on PE "
-          << Process::me();
-          Cerr << "\n Joint with PE " << joint.PEvoisin()
-          << "\n Number of items " << type_item << " on my joint : " << n;
-          Cerr << "\n Number of items " << type_item << " on the remote joint : "
-          << indices_distants.size_array()
-          << finl;
-          exit();
-          } */
-        // Recherche des correspondances entre items
-        ArrOfInt corresp(n);
-        const double epsilon = Objet_U::precision_geom;
-        Chercher_Correspondance(coord_distants, coord_locaux, corresp, epsilon);
+  // Cette fois, on modifie les joints (remplissage de renum_virt_loc)
+  const int moi = Process::me();
+  for (int i_joint = 0; i_joint < nb_joints; i_joint++)
+    {
+      Joint&           joint           = joints[i_joint];
+      const int     PEvoisin        = joint.PEvoisin();
+      const ArrOfInt& indices_locaux  = indices_items_locaux[i_joint];
+      const DoubleTab& coord_locaux    = coord_items_locaux[i_joint];
+      const DoubleTab& coord_distants  = coord_items_distants[i_joint];
+      const int n = indices_locaux.size_array();
 
-        int nb_items_communs_trouves=0;
-        for (int k = 0; k < n; k++)
-          if (corresp[k]>=0) nb_items_communs_trouves++;
+      // Recherche des correspondances entre items
+      ArrOfInt corresp(n);
+      const double epsilon = Objet_U::precision_geom;
+      Chercher_Correspondance(coord_distants, coord_locaux, corresp, epsilon);
 
-        ArrOfInt& items_communs = joint.set_joint_item(type_item).set_items_communs();
+      int nb_items_communs_trouves=0;
+      for (int k = 0; k < n; k++)
+        if (corresp[k]>=0) nb_items_communs_trouves++;
+
+      ArrOfInt& items_communs = joint.set_joint_item(type_item).set_items_communs();
+      if (allow_resize)
         items_communs.resize_array(nb_items_communs_trouves);
-        items_communs = -1;
-        int i=0;
-        for (int k = 0; k < n; k++)
-          {
-            const int i_local = indices_locaux[k];
-            // Le j-ieme item distant est identique au k-ieme item local
-            const int j = corresp[k];
+      else
+        // If a resisze is not expected, everthing in items_communs should have been found:
+        assert(items_communs.size_array() == nb_items_communs_trouves);
+      items_communs = -1;
 
-            // Pas trouve ? Erreur possible
-            if (j < 0)
-              {
-                Cerr << "Error in Scatter::remplir_renum_virt_loc on PE " << moi << finl
-                     << "The item of type " << (int)type_item << " number " << i_local << " with coordinates ";
-                for (int k2 = 0; k2 < dim; k2++)
-                  Cerr << coord_locaux(i, k2) << " ";
-                Cerr << finl << "was not found in the joint with the PE " << PEvoisin << finl;
-                if (type_item==JOINT_ITEM::ARETE)
-                  {
-                    Cerr << "The searching algorithm of the isolated edges on a joint" << finl;
-                    Cerr << "does not work yet in some cases. Two isolated nodes of a joint (example below" << finl;
-                    Cerr << "joint between 0 and 2) can be those of an edge not belonging to this joint (below" << finl;
-                    Cerr << "the edge belongs to the joint 0-1 but not 0-2):" << finl;
-                    //Cerr << "  ________    " << finl;
-                    //Cerr << "1\ 2/1\2 /1\  " << finl;
-                    //Cerr << "__\/___\/___\ " << finl;
-                    //Cerr << " 0/\ 0 /\ 0   " << finl;
-                    //Cerr << " / 0\ / 0\    " << finl;
-                    Cerr << "  ________      " << finl;
-                    Cerr << "1\\ 2/1\\2 /1\\ " << finl;
-                    Cerr << "__\\/___\\/___\\" << finl;
-                    Cerr << " 0/\\ 0 /\\ 0   " << finl;
-                    Cerr << " / 0\\ / 0\\    " << finl;
-                    Cerr << finl;
-                    Cerr << "One way to by-pass this problem is to split again your domain with" << finl;
-                    Cerr << "different options of splitting or with another splitter to do not fall" << finl;
-                    Cerr << "on the same configuration." << finl;
-                  }
-                exit();
-              }
-            else
-              {
-                if (moi < PEvoisin)
-                  {
-                    // items communs dans l'ordre des items de joint locaux:
-                    items_communs[i] = i_local;
-                    // On verifie que c'est bien l'ordre croissant de l'indice local
-                    // (voir **LISTE_TRI**)
-                    assert(i==0 || items_communs[i] > items_communs[i-1]);
-                  }
-                else
-                  {
-                    // items communs dans l'ordre des items sur le voisin:
-                    assert(items_communs[j] < 0);
-                    items_communs[j] = i_local;
-                  }
-                i++;
-              }
-          }
-        assert(i==nb_items_communs_trouves);
-      }
-    // Remplissage de renum_items_communs:
-    calculer_renum_items_communs(joints, type_item);
-  }
+      // If a resize is expected, we need to shift the indices in 'corresp' to fit into
+      // a (smaller) array of size 'nb_items_communs_trouves', avoiding the non-matching indices
+      int n_dist = coord_distants.dimension(0);
+      std::vector<bool> corres_ok(n_dist, false);
+      std::vector<int> offset(n_dist, 0);
+      if(allow_resize)
+        {
+          // corres_ok[j] is true iif the (remote) item 'j' was matched with a local one
+          for(int k = 0; k < n; k++)
+            if (corresp[k] >= 0)
+              corres_ok[corresp[k]] = true;
+          // offset[k] is the shift to be substracted to the remote item index once the invalid (=non
+          // matched) remote items have been removed:
+          int nb_holes = 0;  // nb of holes seen so far in corres_ok
+          for(int k = 0; k < n_dist; k++)
+            offset[k] = corres_ok[k] ? nb_holes : nb_holes++;
+        }
+
+      int i=0;
+      for (int k = 0; k < n; k++)
+        {
+          const int i_local = indices_locaux[k];
+          // Le j-ieme item distant est identique au k-ieme item local
+          const int j = corresp[k];
+
+          // Pas trouve ? Erreur possible
+          if (j < 0)
+            {
+              if (!allow_resize)
+                {
+                  Cerr << "Error in Scatter::remplir_renum_virt_loc on PE " << moi << finl
+                       << "The item of type " << (int)type_item << " number " << i_local << " with coordinates ";
+                  for (int k2 = 0; k2 < dim; k2++)
+                    Cerr << coord_locaux(i, k2) << " ";
+                  Cerr << finl << "was not found in the joint with the PE " << PEvoisin << finl;
+                  if (type_item==JOINT_ITEM::ARETE)
+                    {
+                      Cerr << "The searching algorithm of the isolated edges on a joint" << finl;
+                      Cerr << "does not work yet in some cases. Two isolated nodes of a joint (example below" << finl;
+                      Cerr << "joint between 0 and 2) can be those of an edge not belonging to this joint (below" << finl;
+                      Cerr << "the edge belongs to the joint 0-1 but not 0-2):" << finl;
+                      //Cerr << "  ________    " << finl;
+                      //Cerr << "1\ 2/1\2 /1\  " << finl;
+                      //Cerr << "__\/___\/___\ " << finl;
+                      //Cerr << " 0/\ 0 /\ 0   " << finl;
+                      //Cerr << " / 0\ / 0\    " << finl;
+                      Cerr << "  ________      " << finl;
+                      Cerr << "1\\ 2/1\\2 /1\\ " << finl;
+                      Cerr << "__\\/___\\/___\\" << finl;
+                      Cerr << " 0/\\ 0 /\\ 0   " << finl;
+                      Cerr << " / 0\\ / 0\\    " << finl;
+                      Cerr << finl;
+                      Cerr << "One way to by-pass this problem is to split again your domain with" << finl;
+                      Cerr << "different options of splitting or with another splitter to do not fall" << finl;
+                      Cerr << "on the same configuration." << finl;
+                    }
+                  exit();
+                }
+            }
+          else
+            {
+              if (moi < PEvoisin)
+                {
+                  // items communs dans l'ordre des items de joint locaux:
+                  items_communs[i] = i_local;
+                  // On verifie que c'est bien l'ordre croissant de l'indice local
+                  // (voir **LISTE_TRI**)
+                  assert(i==0 || items_communs[i] > items_communs[i-1]);
+                }
+              else
+                {
+                  int j2 = j - offset[j];
+                  // items communs dans l'ordre des items sur le voisin:
+                  assert(items_communs[j2] < 0);
+                  items_communs[j2] = i_local;
+                }
+              i++;
+            }
+        }
+      assert(i==nb_items_communs_trouves);
+    }
+  // Remplissage de renum_items_communs:
+  calculer_renum_items_communs(joints, type_item);
 }
 
-/*! @brief Construction des tableaux joint_item(JOINT_ITEM::SOMMET).
+/*! @brief Construction des tableaux joint_item(JOINT_ITEM::SOMMET).items_communs de
+ * tous les joints du domaine(0) du domaine dom.
  *
- * items_communs de tous les joints du domaine(0) du domaine dom
- *
+ * @param allow_resize may be set to True in some rare case (see Raffiner_isotrope_parallele)
+ * when we know that the current size of 'items_communs' is wrong because part of the domain
+ * was reszed / changed.
  */
-
-void Scatter::construire_correspondance_sommets_par_coordonnees(Domaine& dom)
+void Scatter::construire_correspondance_sommets_par_coordonnees(Domaine& dom, bool allow_resize)
 {
-  construire_correspondance_items_par_coordonnees(dom.faces_joint(), JOINT_ITEM::SOMMET, dom.coord_sommets());
+  construire_correspondance_items_par_coordonnees(dom.faces_joint(), JOINT_ITEM::SOMMET, dom.coord_sommets(), allow_resize);
 }
 
-/*! @brief Construction des tableaux joint_item(JOINT_ITEM::ARETE).
- *
- * items_communs de tous les joints du domaine
+/*! @brief Construction des tableaux joint_item(JOINT_ITEM::ARETE).items_communs de tous les joints du domaine
  *
  */
-
 void Scatter::construire_correspondance_aretes_par_coordonnees(Domaine_VF& zvf)
 {
   construire_correspondance_items_par_coordonnees(zvf.domaine().faces_joint(), JOINT_ITEM::ARETE, zvf.xa());
 }
 
-/*! @brief Pour un item geometrique "type_item", remplit le champ nb_items_virtuels_ des joints en fonction du nombre d'items distants :
+/*! @brief Pour un item geometrique "type_item", remplit le champ nb_items_virtuels_ des joints en fonction
+ *  du nombre d'items distants :
  *
  *   Le nombre d'items virtuels sur un joint i du processeur j est le
  *   nombre d'items distants du joint j sur le processeur i.

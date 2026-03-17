@@ -414,7 +414,7 @@ protected:
   // Groupes_Faces representent les groupes de faces lues dans les fichiers d'entrees
   Groupes_Faces_t mes_groupes_faces_;
   // Les faces de joint sont les faces communes avec les autres processeurs (bords
-  //  du domaine locale a ce processeur qui se raccordent a un processeur voisin)
+  //  du domaine locaux a ce processeur qui se raccordent a un processeur voisin)
   Joints_t mes_faces_joint_;
 
   LIST(OBS_PTR(Domaine_32_64)) domaines_frontieres_;

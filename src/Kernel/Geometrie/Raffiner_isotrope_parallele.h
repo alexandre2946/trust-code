@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,23 +18,17 @@
 
 #include <Raffiner_Simplexes.h>
 
-/*! @brief : class Raffiner_isotrope_parallele
+/*! @brief Refine the mesh once it has been partitionned, in a parallel fashion
  *
- *  <Description of class Raffiner_isotrope_parallele>
- *
- *
+ * This interprete is to be called in a parallel context, after a Scatter instruction.
  *
  */
-
 class Raffiner_isotrope_parallele : public Raffiner_Simplexes
 {
-
   Declare_instanciable( Raffiner_isotrope_parallele ) ;
-  Entree& interpreter(Entree& is) override;
+
 public :
-
-protected :
-
+  Entree& interpreter(Entree& is) override;
 };
 
 #endif /* Raffiner_isotrope_parallele_included */

@@ -19,12 +19,10 @@
 #include <TRUSTTab.h>
 
 /*! @brief Joint_Items contient les informations de distribution parallele d'un item geometrique particulier avec un domaine
- *     voisin particulier (item = sommet, element, face, etc..)
+ *  voisin particulier (item = sommet, element, face, etc..)
  *
- *     Ces structures sont initialisees dans Scatter.
- *     Elles sont ensuite utilisees par exemple pour creer
- *     un tableau distribue indexe par les indices des items
- *     geometriques.
+ * Ces structures sont initialisees dans Scatter. Elles sont ensuite utilisees par exemple pour creer un
+ * tableau distribue indexe par les indices des items geometriques.
  *
  * @sa class Joint
  */
@@ -60,26 +58,26 @@ private:
   // uniquement avec les infos du joint.
   int nb_items_reels_;
 
-  // Liste des items communs avec le domaine voisine (la liste est
-  // classee dans le meme ordre sur le domaine locale et sur le domaine
-  // voisine => items_communs[i] sur joint_j de domaine_k represente la meme
+  // Liste des items communs avec le domaine voisin (la liste est
+  // classee dans le meme ordre sur le domaine local et sur le domaine
+  // voisin => items_communs[i] sur joint_j de domaine_k represente la meme
   // entite geometrique que items_communs[i] sur joint_k de domaine_j)
   ArrOfInt_t items_communs_;
 
-  // Liste des items distants a envoyer au domaine voisine
+  // Liste des items distants a envoyer au domaine voisin
   // (l'ordre des items dans cette liste determine l'ordre d'apparition
   // de ces items dans l'espace virtuel du voisin)
   ArrOfInt_t items_distants_;
 
-  // Nombre d'items virtuels recus du domaine voisine.
+  // Nombre d'items virtuels recus du domaine voisin.
   //  on a "nb_items_virtuels_ sur joint_j de domaine_k"
   //     = "items_distants.size_array() sur joint_k de domaine_j"
   int nb_items_virtuels_;
 
   // Correspondance entre l'indice local d'un item commun et l'indice
-  // du meme item sur le domaine voisine:
-  // colonne 0 = indice sur le domaine voisine,
-  // colonne 1 = indice sur le domaine locale
+  // du meme item sur le domaine voisin:
+  // colonne 0 = indice sur le domaine voisin,
+  // colonne 1 = indice sur le domaine local
   // dimension(0) est egal a items_communs.size_array()
   // L'ordre des items dans le tableau n'est pas specifie
   IntTab_t renum_items_communs_;

@@ -24,10 +24,8 @@ enum class JOINT_ITEM { SOMMET, ELEMENT, FACE, ARETE, FACE_FRONT };
 /*! @brief La classe Joint est une Frontiere qui contient les faces et les sommets de joint avec le
  *  domaine PEvoisin() (pour les maillages distribues en parallele).
  *
- *     Elle porte en plus dans les Joint_Items les informations
- *     permettant de construire les tableaux distribues indexes
- *     par les items geometriques (sommets, faces, elements, aretes,
- *     faces_frontieres)
+ * Elle porte en plus dans les Joint_Items les informations permettant de construire les tableaux
+ * distribues indexes par les items geometriques (sommets, faces, elements, aretes, faces_frontieres)
  *
  * @sa Scatter Joint_Item
  */

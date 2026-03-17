@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -41,152 +41,6 @@ Entree& Raffiner_isotrope_parallele::readOn( Entree& is )
   Raffiner_Simplexes::readOn( is );
   return is;
 }
-
-
-void mon_construire_correspondance_items_par_coordonnees(Joints& joints, const JOINT_ITEM type_item, const DoubleTab& coord_items)
-{
-  switch(type_item)
-    {
-    case JOINT_ITEM::SOMMET:
-      ;
-      break;
-    case JOINT_ITEM::ARETE:
-      ;
-      break;
-    default:
-      Cerr << "Scatter::construire_correspondance_items_par_coordonnees unusable for item "
-           << (int)type_item
-           << finl;
-      Process::exit();
-    }
-  const int dim = Objet_U::dimension;
-  const int nb_joints = joints.size();
-
-  // Indices des items de joints dans le domaine sur mon processeur
-  ArrsOfInt  indices_items_locaux(nb_joints);
-  // Indices des items de joints dans le domaine sur le processeur voisin
-  ArrsOfInt  indices_items_distants(nb_joints);
-  // Coordonnees des items correspondants (dans le meme ordre que indices_items_xxx)
-  DoubleTabs coord_items_locaux(nb_joints);
-  DoubleTabs coord_items_distants(nb_joints);
-
-  // Remplissage des tableaux indices_items_locaux
-  // et coord_items_locaux
-  {
-    int i_joint;
-    for (i_joint = 0; i_joint < nb_joints; i_joint++)
-      {
-        const Joint& joint = joints[i_joint];
-        ArrOfInt& items = indices_items_locaux[i_joint];
-        // Remarque: **LISTE_TRI** les indices_items_locaux sont
-        //  tries dans l'ordre croissant:
-        //Scatter::calculer_liste_complete_items_joint(joint, type_item, items);
-        items = joint.joint_item(JOINT_ITEM::SOMMET).items_communs();
-        const int n       = items.size_array();
-        DoubleTab&   coord   = coord_items_locaux[i_joint];
-        int i, j;
-        coord.resize(n, dim);
-        for (i = 0; i < n; i++)
-          for (j = 0; j < dim; j++)
-            coord(i,j) = coord_items(items[i], j);
-      }
-  }
-
-  // Envoi des indices et coordonnees locaux au processeur voisin
-  {
-    Schema_Comm schema_comm;
-    ArrOfInt liste_pe_voisins(nb_joints);
-    int i;
-    for (i = 0; i < nb_joints; i++)
-      liste_pe_voisins[i] = joints[i].PEvoisin();
-    schema_comm.set_send_recv_pe_list(liste_pe_voisins, liste_pe_voisins);
-    schema_comm.begin_comm();
-    for (i = 0; i < nb_joints; i++)
-      {
-        const int pe = liste_pe_voisins[i];
-        Sortie& buffer = schema_comm.send_buffer(pe);
-        buffer << indices_items_locaux[i];
-        buffer << coord_items_locaux[i];
-      }
-    schema_comm.echange_taille_et_messages();
-    for (i = 0; i < nb_joints; i++)
-      {
-        const int pe = liste_pe_voisins[i];
-        Entree& buffer = schema_comm.recv_buffer(pe);
-        buffer >> indices_items_distants[i];
-        buffer >> coord_items_distants[i];
-      }
-    schema_comm.end_comm();
-  }
-
-  // Boucle sur les joints
-  {
-    // Cette fois, on modifie les joints (remplissage de renum_virt_loc)
-    //    const int moi = Process::me();
-    for (int i_joint = 0; i_joint < nb_joints; i_joint++)
-      {
-        Joint&           joint           = joints[i_joint];
-        const int     PEvoisin        = joint.PEvoisin();
-        const ArrOfInt& indices_locaux  = indices_items_locaux[i_joint];
-        //ArrOfInt &       indices_distants= indices_items_distants[i_joint];
-        const DoubleTab& coord_locaux    = coord_items_locaux[i_joint];
-        const DoubleTab& coord_distants  = coord_items_distants[i_joint];
-        const int n = indices_locaux.size_array();
-        /*
-          if (n != indices_distants.size_array()) {
-          Cerr << "Error in Scatter::remplir_renum_virt_loc on PE "
-          << Process::me();
-          Cerr << "\n Joint with PE " << joint.PEvoisin()
-          << "\n Number of items " << type_item << " on my joint : " << n;
-          Cerr << "\n Number of items " << type_item << " on the remote joint : "
-          << indices_distants.size_array()
-          << finl;
-          exit();
-          } */
-        // Recherche des correspondances entre items
-        ArrOfInt corresp(n);
-        const double epsilon = Objet_U::precision_geom;
-        int nbsomr=Scatter::Chercher_Correspondance(coord_distants, coord_locaux, corresp, epsilon);
-        if (nbsomr)
-          {
-            Cerr<<"iiiiiiiiiiii"<<finl;
-            //	    abort();
-          }
-        ArrOfInt& items_communs = joint.set_joint_item(type_item).set_items_communs();
-        int nb_items_communs_trouves=0;
-        for (int k = 0; k < n; k++)
-          if (corresp[k]>=0)
-            nb_items_communs_trouves++;
-          else
-            Cerr<<items_communs[k] << " not found in joint voisin "<<PEvoisin<<finl;
-
-
-        ArrOfInt items_communs_sa(items_communs);
-        items_communs.resize_array(nb_items_communs_trouves);
-
-        int l=0;
-
-        for (int k = 0; k < n; k++ )
-          {
-            if  (corresp[k]>=0)
-              items_communs[l++]=items_communs_sa[k];
-          }
-      }
-  }
-}
-
-
-/*! @brief Construction des tableaux joint_item(JOINT_ITEM::SOMMET).
- *
- * items_communs de tous les joints du domaine(0) du domaine dom
- *
- */
-
-void mon_construire_correspondance_sommets_par_coordonnees(Domaine& dom)
-{
-  mon_construire_correspondance_items_par_coordonnees(dom.faces_joint(), JOINT_ITEM::SOMMET, dom.coord_sommets());
-}
-
 
 
 Entree&  Raffiner_isotrope_parallele::interpreter(Entree& is)
@@ -265,89 +119,68 @@ Entree&  Raffiner_isotrope_parallele::interpreter(Entree& is)
       Scatter::uninit_sequential_domain(dom_new);
       int nb_sommet_avant_completion=dom_new.nb_som();
       Scatter::trier_les_joints(dom_new.faces_joint());
+
+      // Rebuild the correspondance between vertices, knowing that the number of common items
+      // has potentially changed.
       statistics().begin_count(STD_COUNTERS::parallel_meshing,statistics().get_last_opened_counter_level()+1);
+      Scatter::construire_correspondance_sommets_par_coordonnees(dom_new, true /* allow resize of items_communs */);
+#ifndef NDEBUG
+      // In debug mode, we ensure exact matching of the updated items_communs by running the exchange a second time
+      // without expecting a resize of items_communs:
+      Scatter::construire_correspondance_sommets_par_coordonnees(dom_new, false);
+#endif
+      double maxtime = mp_max(statistics().get_time_since_last_open(STD_COUNTERS::parallel_meshing));
+      statistics().end_count(STD_COUNTERS::parallel_meshing);
+      Cerr << "Scatter::construire_correspondance_sommets_par_coordonnees fin, time:"
+           << maxtime
+           << finl;
 
-      mon_construire_correspondance_sommets_par_coordonnees(dom_new);
+      statistics().begin_count(STD_COUNTERS::parallel_meshing,statistics().get_last_opened_counter_level()+1);
+      Scatter::construire_structures_paralleles(dom_new, liste_bords_periodiques);
+      maxtime = mp_max(statistics().get_time_since_last_open(STD_COUNTERS::parallel_meshing));
+      statistics().end_count(STD_COUNTERS::parallel_meshing);
+      Cerr << "Scatter::construire_structures_paralleles, time:" << maxtime << finl;
 
-      if (0)
+      int ecrit=1;
+      if (ecrit)
         {
-          Nom debug(newd);
-          debug+="_debug.Zones";
-          EcrFicCollecte os;
-          os.set_bin(binaire);
+          int nb_elem_reel=dom_new.nb_elem();
+          Scatter::uninit_sequential_domain(dom_new);
+          dom_new.les_elems().resize( nb_elem_reel,dom_new.les_elems().dimension(1));
+          dom_new.les_sommets().resize(nb_sommet_avant_completion,dimension);
 
-          os.ouvrir(debug);
-          if (!binaire)
+
+          Scatter::uninit_sequential_domain(dom_new);
+          newd+=".Zones";
+
+          if( !format_hdf )
             {
-              os.setf(ios::scientific);
-              os.precision(Objet_U::format_precision_geom);
+              EcrFicCollecte os;
+              os.set_bin(binaire);
+              os.ouvrir(newd);
+              if (!binaire)
+                {
+                  os.setf(ios::scientific);
+                  os.precision(Objet_U::format_precision_geom);
+                }
+              os << dom_new;
+              os << liste_bords_periodiques;
             }
-
-          os << dom_new;
-
-          os << liste_bords_periodiques;
-
+          else
+            {
+              Sortie_Brute os_hdf;
+              os_hdf << dom_new;
+              os_hdf << liste_bords_periodiques;
+              FichierHDFPar fic_hdf;
+              newd = newd.nom_me(Process::nproc(), "p", 1);
+              fic_hdf.create(newd);
+              fic_hdf.create_and_fill_dataset_MW("/zone", os_hdf);
+              fic_hdf.close();
+            }
         }
-      // else
-      {
-
-        Scatter::construire_correspondance_sommets_par_coordonnees(dom_new);
-        Scatter::calculer_renum_items_communs(dom_new.faces_joint(), JOINT_ITEM::SOMMET);
-
-        double maxtime = mp_max(statistics().get_time_since_last_open(STD_COUNTERS::parallel_meshing));
-        statistics().end_count(STD_COUNTERS::parallel_meshing);
-        Cerr << "Scatter::construire_correspondance_sommets_par_coordonnees fin, time:"
-             << maxtime
-             << finl;
-        statistics().begin_count(STD_COUNTERS::parallel_meshing,statistics().get_last_opened_counter_level()+1);
-        Scatter::construire_structures_paralleles(dom_new, liste_bords_periodiques);
-        maxtime = mp_max(statistics().get_time_since_last_open(STD_COUNTERS::parallel_meshing));
-        statistics().end_count(STD_COUNTERS::parallel_meshing);
-        Cerr << "Scatter::construire_structures_paralleles, time:" << maxtime << finl;
-
-
-        int ecrit=1;
-        if (ecrit)
-          {
-            int nb_elem_reel=dom_new.nb_elem();
-            Scatter::uninit_sequential_domain(dom_new);
-            dom_new.les_elems().resize( nb_elem_reel,dom_new.les_elems().dimension(1));
-            dom_new.les_sommets().resize(nb_sommet_avant_completion,dimension);
-
-
-            Scatter::uninit_sequential_domain(dom_new);
-            newd+=".Zones";
-
-            if( !format_hdf )
-              {
-                EcrFicCollecte os;
-                os.set_bin(binaire);
-                os.ouvrir(newd);
-                if (!binaire)
-                  {
-                    os.setf(ios::scientific);
-                    os.precision(Objet_U::format_precision_geom);
-                  }
-                os << dom_new;
-                os << liste_bords_periodiques;
-              }
-            else
-              {
-                Sortie_Brute os_hdf;
-                os_hdf << dom_new;
-                os_hdf << liste_bords_periodiques;
-                FichierHDFPar fic_hdf;
-                newd = newd.nom_me(Process::nproc(), "p", 1);
-                fic_hdf.create(newd);
-                fic_hdf.create_and_fill_dataset_MW("/zone", os_hdf);
-                fic_hdf.close();
-              }
-          }
-      }
     }
   else
-    {
-      Scatter::init_sequential_domain(dom_new);
-    }
+    Scatter::init_sequential_domain(dom_new);
+
   return is;
 }
