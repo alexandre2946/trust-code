@@ -293,7 +293,7 @@ with_gpu=""
 # Et les performances de kokkos-kernels est moindre (x4 slowdown on A6000) par rapport aux kernels PETSc CUDA
 # Mais utilise avec GAMG de PETSc cela permet d'avoir une alternative a AmgX (int64?) et Hypre
 # Build error on HIP also and orcus: on active ponctuellement
-ENABLE_KOKKOS=1 # && [ "$HOST" = topaze ] && ENABLE_KOKKOS=1
+ENABLE_KOKKOS=0 # && [ "$HOST" = topaze ] && ENABLE_KOKKOS=1
 if [ "$ENABLE_KOKKOS" = 1 ] && [ -f $TRUST_ROOT/lib/src/LIBKOKKOS/$TRUST_ARCH"_opt"/lib64/libkokkoskernels.a ]
 then
    with_gpu=$with_gpu" --with-kokkos=1 --with-kokkos-dir=$TRUST_ROOT/lib/src/LIBKOKKOS/$TRUST_ARCH"_opt
