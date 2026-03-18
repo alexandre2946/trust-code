@@ -881,7 +881,8 @@ then
    #See https://dci.dci-gitlab.cines.fr/webextranet/software_stack/tools/index.html#adastra-software-stack-tools-profiling-rocprof
    #export AMD_SERIALIZE_COPY=3 AMD_SERIALIZE_KERNEL=3 GPU_MAX_HW_QUEUES=1
    #profiler="rocprofv3 -o $NOM --output-format=pftrace --hip-trace --"
-   exec="\"rocprofv3 -o $NOM --output-format=pftrace --hip-trace --hip-runtime-trace -- $exec\""
+   #exec="\"rocprofv3 -o $NOM --output-format=pftrace --hip-trace --hip-runtime-trace -- $exec\""
+   exec="\"rocprofv3 -o $NOM --output-format=pftrace --memory-allocation-trace --hip-trace --kernel-trace --kokkos-trace -- $exec\""
 elif [ "$NSYS" = 1 ]
 then
    rm -f $NOM.qdrep
@@ -1431,8 +1432,7 @@ then
 elif [ "$ROCPROF" = 1 ]
 then
    echo "Use -g flag for source stack"
-   echo "Open $NOM"_results".fptrace file under /tmp"
-   mv -f $NOM"_results".pftrace /tmp && firefox https://ui.perfetto.dev
+   echo "Open $NOM"_results".fptrace file with: firefox https://ui.perfetto.dev"
 elif [ "$NSYS" = 1 ]
 then
    [ -f $NOM.nsys-rep ] && nsys-ui $NOM.nsys-rep

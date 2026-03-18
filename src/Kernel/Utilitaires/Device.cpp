@@ -521,6 +521,9 @@ std::string start_gpu_timer(std::string str, int bytes)
 #ifdef TRUST_USE_CUDA
   if (!str.empty()) nvtxRangePush(str.c_str());
 #endif
+#ifdef TRUST_USE_ROCM
+  if (!str.empty()) roctxRangePush(str.c_str());
+#endif
 #endif
   return str;
 }
@@ -573,6 +576,9 @@ void end_gpu_timer(const std::string& str, int onDevice, int bytes) // Return in
 
 #ifdef TRUST_USE_CUDA
   if (!str.empty()) nvtxRangePop();
+#endif
+#ifdef TRUST_USE_ROCM
+  if (!str.empty()) roctxRangePop();
 #endif
 #endif
 }

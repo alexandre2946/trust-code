@@ -52,6 +52,7 @@
 #define GPU_SUCCESS cudaSuccess
 #endif
 #ifdef TRUST_USE_ROCM
+#include <rocprofiler-sdk-roctx/roctx.h>
 #include <hip/hip_runtime.h>
 #define gpuDeviceProp_t hipDeviceProp_t
 #define gpuGetDevice hipGetDevice
@@ -174,7 +175,10 @@ void Counter::begin_count_(int counter_level, time_point t)
   if (!is_comm_)
     nvtxRangePush(description_.c_str());
 #endif
-
+#ifdef TRUST_USE_ROCM
+  if (!is_comm_)
+    roctxRangePush(description_.c_str());
+#endif
 }
 
 void Counter::end_count_(int count_increment, long int quantity_increment, time_point t_stop)
@@ -198,6 +202,9 @@ void Counter::end_count_(int count_increment, long int quantity_increment, time_
   open_time_ts_ = time_point();
 #ifdef TRUST_USE_CUDA
   if (!is_comm_) nvtxRangePop();
+#endif
+#ifdef TRUST_USE_ROCM
+  if (!is_comm_) roctxRangePop();
 #endif
 }
 

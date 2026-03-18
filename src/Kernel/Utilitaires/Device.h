@@ -29,6 +29,11 @@
 // See https://stackoverflow.com/questions/23230003/something-between-func-and-pretty-function/29856690#29856690
 #include <nvtx3/nvToolsExt.h>
 #endif
+#ifdef TRUST_USE_ROCM
+// See https://nvidia.github.io/NVTX/
+// See https://stackoverflow.com/questions/23230003/something-between-func-and-pretty-function/29856690#29856690
+#include <rocprofiler-sdk-roctx/roctx.h>
+#endif
 
 /*
 extern bool init_device_, clock_on, timer;
