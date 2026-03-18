@@ -1,6 +1,8 @@
 -------------------------------------------------------------
 Developer notes version 1.9.8_beta : Changes since version 1.9.7 :
 -------------------------------------------------------------
+22/04/26 (TRUST) Param        : param.ajouter now accepts maps and vectors from stdlib, containint values of following types: int/double/std::string/OWN_PTR(...).
+22/04/26 (TRUST) Param        : param.ajouter_flag no longer accepts argument `nat` (from enum Param::Nature).
 20/04/26 (TRUST) Matrix       : Introduce Stencil structure to deal with possible nnz larger than 2^31 (possible on future GPU device)
 20/04/26 (TRUST) VEF          : Elem_VEF_base::normale replaced by Elem_VEF_base::creer_face_normales
 20/04/26 (TRUST) Build        : Add a new target profiling to build a -O3 -g (+specific options) binary to ease the profiler tools (perf, nsys, rocprof,...)
