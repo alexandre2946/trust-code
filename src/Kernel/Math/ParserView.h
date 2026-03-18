@@ -73,7 +73,9 @@ public:
   /**
   * Token: get a unic threadId to fill safely les_var_view
   */
+#pragma clang optimize off
   KOKKOS_INLINE_FUNCTION int acquire() const { return token.acquire(); }
+#pragma clang optimize on
   KOKKOS_INLINE_FUNCTION void release(int threadId) const { token.release(threadId); }
 private:
   Kokkos::Experimental::UniqueToken<Kokkos::DefaultExecutionSpace> token;
