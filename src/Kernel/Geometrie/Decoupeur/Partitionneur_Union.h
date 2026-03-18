@@ -48,7 +48,6 @@ public:
 protected:
   // Parametres du partitionneur
   OBS_PTR(Domaine) ref_domaine_;
-  VECT(Nom) sous_domaines_ ;
-  VECT(Nom) fichiers_decoupage_;
+  std::map<std::string, std::string> fic_ssz; //fic_ssz[nom de la sous domaine] = { fichier de decoupage }
 };
 #endif

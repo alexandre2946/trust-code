@@ -23,6 +23,8 @@
 Implemente_instanciable(Partitionneur_Union,"Partitionneur_Union",Partitionneur_base);
 // XD partitionneur_union partitionneur_deriv union 1 Let several local domains be generated from a bigger one using the keyword create_domain_from_sub_domain, and let their partitions be generated in the usual way. Provided the list of partition files for each small domain, the keyword 'union' will partition the global domain in a conform fashion with the smaller domains.
 
+// XD attr sous_domaines bloc_lecture sous_domaines 0 List of the partition files with the following syntaxe: {sous_domaine1 decoupage1  ... sous_domaineim decoupageim } where sous_domaine1 ... sous_zomeim are small domains names and decoupage1 ... decoupageim are partition files.
+
 
 Sortie& Partitionneur_Union::printOn(Sortie& os) const
 {
@@ -44,26 +46,23 @@ Sortie& Partitionneur_Union::printOn(Sortie& os) const
 void Partitionneur_Union::set_param(Param& param) const
 {
 
-  param.ajouter("sous_domaines", &sous_domaines_, Param::REQUIRED); // XD_ADD_P listchaine list of sous_domaines names. They must be valid Sous_Domaine that have been declared earlier in the dataset
-  param.ajouter("fichiers_decoupage", &fichiers_decoupage_, Param::REQUIRED); // XD_ADD_P listchaine list of files which contain the partittion for the corresponding subdomain
+  param.ajouter("sous_domaines", &fic_ssz, Param::REQUIRED);
 }
 void Partitionneur_Union::validate_params() const
 {
   Cerr << que_suis_je() << "::validate_params" << finl;
-  if (sous_domaines_.size() != fichiers_decoupage_.size())
-    {
-      Process::exit("Expected same number of elements in sous_domaines and fichiers_decoupage");
-    }
 
-  for (int i = 0; i< sous_domaines_.size(); i++)
+  for (const auto& p: fic_ssz)
     {
-      if (Interprete::objet_existant(sous_domaines_[i]) == 0)
+      // p.first is name of subdomain and p.second is file name
+      // waiting for c++20 for syntax: for (const auto& [subdomain, filename]: fic_ssz)
+      if (Interprete::objet_existant(p.first) == 0)
         {
-          Process::exit(sous_domaines_[i] + "is not an existing TRUST object");
+          Process::exit(p.first + "is not an existing TRUST object");
         }
-      if (not sub_type(Sous_Domaine, Interprete::objet(sous_domaines_[i])))
+      if (not sub_type(Sous_Domaine, Interprete::objet(p.first)))
         {
-          Process::exit(sous_domaines_[i] + " is not a Sous_Domaine object");
+          Process::exit(p.first + " is not a Sous_Domaine object");
         }
     }
 
@@ -83,19 +82,22 @@ void Partitionneur_Union::construire_partition(IntVect& elem_part, int& nb_parts
   elem_part.resize(ref_domaine_->nb_elem());
   elem_part = -1;
 
-  for (int i_dom = 0; i_dom< sous_domaines_.size(); i_dom++)
+  for (const auto& p: fic_ssz)
     {
+      Nom subdomain = Nom(p.first);
+      const std::string& filename = p.second;
       //on recupere le sous-domaine par son nom et le decoupage en ouvrant le fichier...
-      const Sous_Domaine& ssz = ref_cast(Sous_Domaine, Interprete::objet(sous_domaines_[i_dom]));
+      const Objet_U& ref = Interprete::objet(subdomain); // need this or compiler complains of 'possibly' dangling ref
+      const Sous_Domaine& ssz = ref_cast(Sous_Domaine, ref);
       EFichier file;
-      file.ouvrir(fichiers_decoupage_[i_dom].getString().c_str());
+      file.ouvrir(filename.c_str());
       IntVect dec_ssz;
       file >> dec_ssz;
       file.close();
       //... et on remplit un morceau de elem_part avec
       if (dec_ssz.size_array() != ssz.nb_elem_tot())
         {
-          Cerr << "Partitionneur_Union : incoherent element number for sub-domaine " << sous_domaines_[i_dom] << finl;
+          Cerr << "Partitionneur_Union : incoherent element number for sub-domaine " <<subdomain << finl;
           Process::exit();
         }
       for (int i = 0; i < ssz.nb_elem_tot(); i++)
