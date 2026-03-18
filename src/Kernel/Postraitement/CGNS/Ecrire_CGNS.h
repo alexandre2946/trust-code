@@ -57,7 +57,7 @@ private:
   std::vector<double> time_post_;
   std::vector<int> baseId_, zoneId_;
 
-  bool has_elem_field_ = false, has_faces_field_ = false, has_som_field_ = false, has_elem_som_loc_ = false;
+  bool has_elem_field_ = false, has_faces_field_ = false, has_som_field_ = false;
   bool solname_elem_written_ = false, solname_som_written_ = false, solname_faces_written_ = false;
   bool postraiter_domaine_ = false;
   bool first_time_post_ = true;

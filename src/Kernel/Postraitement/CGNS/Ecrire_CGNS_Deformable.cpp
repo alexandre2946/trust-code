@@ -107,7 +107,7 @@ void Ecrire_CGNS::cgns_write_final_link_file_lagrangian()
       const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
 
       int ind_base = index_glob;
-      if (has_elem_som_loc_ && LOC != "FACES")
+      if (LOC != "FACES")
         {
           const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
           ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
@@ -269,7 +269,7 @@ void Ecrire_CGNS::cgns_write_iters_deformable()
       ind_doms_dumped.push_back(index_glob);
 
       int ind_base = index_glob;
-      if (has_elem_som_loc_ && LOC != "FACES")
+      if (LOC != "FACES")
         {
           const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
           ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
@@ -297,11 +297,10 @@ void Ecrire_CGNS::link_multi_loc_support_lagrangian()
   for (auto &itr : fld_loc_map_)
     {
       const std::string& LOC = itr.first;
-      assert(LOC != "FACES" && has_elem_som_loc_);
+      const Nom& nom_dom = itr.second;
+      assert(LOC != "FACES");
 
-      const Nom& nom_dom = fld_loc_map_.at(LOC);
       const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
-
       const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
       const int ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
       assert (ind_base == 0);
@@ -354,11 +353,10 @@ void Ecrire_CGNS::link_multi_loc_support_pb_deformable()
       for (auto &itr : fld_loc_map_)
         {
           const std::string& LOC = itr.first;
-          assert(LOC != "FACES" && has_elem_som_loc_);
+          const Nom& nom_dom = itr.second;
+          assert(LOC != "FACES");
 
-          const Nom& nom_dom = fld_loc_map_.at(LOC);
           const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
-
           const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
           const int ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
 
@@ -400,11 +398,10 @@ void Ecrire_CGNS::link_multi_loc_support_pb_deformable()
       for (auto &itr : fld_loc_map_)
         {
           const std::string& LOC = itr.first;
-          assert(LOC != "FACES" && has_elem_som_loc_);
+          const Nom& nom_dom = itr.second;
+          assert(LOC != "FACES");
 
-          const Nom& nom_dom = fld_loc_map_.at(LOC);
           const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
-
           const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
           const int ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
 
@@ -440,7 +437,7 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group_pb_deformable()
           const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
 
           int ind_base = index_glob;
-          if (has_elem_som_loc_ && LOC != "FACES")
+          if (LOC != "FACES")
             {
               const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
               ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
@@ -566,7 +563,7 @@ void Ecrire_CGNS::cgns_write_final_link_file_pb_deformable()
           const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
 
           int ind_base = index_glob;
-          if (has_elem_som_loc_ && LOC != "FACES")
+          if (LOC != "FACES")
             {
               const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
               ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);

@@ -87,7 +87,6 @@ void Ecrire_CGNS::fill_infos_loc()
 {
   if (postraiter_domaine_)
     {
-      has_elem_som_loc_ = true;
       has_som_field_ = true;
       has_elem_field_ = true;
       return;
@@ -104,9 +103,6 @@ void Ecrire_CGNS::fill_infos_loc()
       else
         throw std::runtime_error("Ecrire_CGNS::fill_infos_loc => Unsupported LOC : " + itr);
     }
-
-  if (has_som_field_ && has_elem_field_)
-    has_elem_som_loc_ = true;
 
   if (has_faces_field_ && is_deformable_)
     {
@@ -307,7 +303,7 @@ void Ecrire_CGNS::cgns_write_field(const Domaine& domaine, const Noms& noms_comp
     cgns_fill_field_loc_map(domaine, LOC);
 
   /* si link et deformable et multi-loc ... */
-  if (is_deformable_ && has_elem_som_loc_ && !multi_loc_deformable_support_linked_)
+  if (is_deformable_ && !multi_loc_deformable_support_linked_)
     link_multi_loc_support_pb_deformable();
 
   /* 2 : on ecrit */
@@ -373,50 +369,47 @@ void Ecrire_CGNS::cgns_fill_field_loc_map(const Domaine& domaine, const std::str
       if (multi_loc_deformable_support_linked_)
         return; /* on sort */
 
-      Nom nom_dom = domaine.le_nom();;
+      Nom nom_dom;
       std::string loc_link;
 
-      if (has_elem_som_loc_)
+      if (has_elem_field_)
         {
           loc_link = "ELEM";
-          assert (!fld_loc_map_.count(loc_link));
-          nom_dom += "_ELEM";
-          fld_loc_map_.insert( { loc_link, nom_dom } );
-          cgns_init_solution_link_file(loc_link, nom_dom);
-
-          loc_link = "SOM";
-          assert (!fld_loc_map_.count(loc_link));
+          assert(!fld_loc_map_.count(loc_link));
           nom_dom = domaine.le_nom();
-          nom_dom += "_SOM";
-          fld_loc_map_.insert( { loc_link, nom_dom } );
+          nom_dom += "_ELEM";
+          fld_loc_map_.insert( { loc_link, nom_dom });
           cgns_init_solution_link_file(loc_link, nom_dom);
         }
-      else
+
+      if (has_som_field_)
         {
-          if (!fld_loc_map_.count(LOC))
-            fld_loc_map_.insert( { LOC, nom_dom } );
+
+          loc_link = "SOM";
+          assert(!fld_loc_map_.count(loc_link));
+          nom_dom = domaine.le_nom();
+          nom_dom += "_SOM";
+          fld_loc_map_.insert( { loc_link, nom_dom });
+          cgns_init_solution_link_file(loc_link, nom_dom);
         }
     }
   else if (!Option_CGNS::USE_LINKS || postraiter_domaine_)
     {
       Nom nom_dom = domaine.le_nom();
-      if (LOC == "FACES" || has_elem_som_loc_)
-        {
-          nom_dom += "_";
-          nom_dom += LOC;
-        }
+      nom_dom += "_";
+      nom_dom += LOC;
 
       if (!fld_loc_map_.count(LOC))
         {
-          fld_loc_map_.insert( { LOC, nom_dom } );
+          fld_loc_map_.insert( { LOC, nom_dom });
 
-          if (LOC != "FACES" && has_elem_som_loc_)
+          if (LOC != "FACES")
             add_new_linked_base(LOC, nom_dom);
         }
     }
   else // Option_CGNS::USE_LINKS
     {
-      assert (Option_CGNS::USE_LINKS);
+      assert(Option_CGNS::USE_LINKS);
       if (grid_file_opened_ && !is_deformable_)
         cgns_close_grid_or_solution_link_file(0. /* inutile */, TYPE_LINK_CGNS::GRID, false);
 
@@ -428,36 +421,30 @@ void Ecrire_CGNS::cgns_fill_field_loc_map(const Domaine& domaine, const std::str
           if (has_elem_field_)
             {
               loc_link = "ELEM";
-              assert (!fld_loc_map_.count(loc_link));
+              assert(!fld_loc_map_.count(loc_link));
               nom_dom = domaine.le_nom();
-              if (has_elem_som_loc_)
-                nom_dom += "_ELEM";
-              fld_loc_map_.insert( { loc_link, nom_dom } );
-
-              if (has_elem_som_loc_)
-                cgns_init_solution_link_file(loc_link, nom_dom);
+              nom_dom += "_ELEM";
+              fld_loc_map_.insert( { loc_link, nom_dom });
+              cgns_init_solution_link_file(loc_link, nom_dom);
             }
 
           if (has_som_field_)
             {
               loc_link = "SOM";
-              assert (!fld_loc_map_.count(loc_link));
+              assert(!fld_loc_map_.count(loc_link));
               nom_dom = domaine.le_nom();
-              if (has_elem_som_loc_)
-                nom_dom += "_SOM";
-              fld_loc_map_.insert( { loc_link, nom_dom } );
-
-              if (has_elem_som_loc_)
-                cgns_init_solution_link_file(loc_link, nom_dom);
+              nom_dom += "_SOM";
+              fld_loc_map_.insert( { loc_link, nom_dom });
+              cgns_init_solution_link_file(loc_link, nom_dom);
             }
 
           if (has_faces_field_)
             {
               loc_link = "FACES";
-              assert (!fld_loc_map_.count(loc_link));
+              assert(!fld_loc_map_.count(loc_link));
               nom_dom = domaine.le_nom();
               nom_dom += "_FACES";
-              fld_loc_map_.insert( { loc_link, nom_dom } );
+              fld_loc_map_.insert( { loc_link, nom_dom });
             }
 
           if (!is_deformable_)

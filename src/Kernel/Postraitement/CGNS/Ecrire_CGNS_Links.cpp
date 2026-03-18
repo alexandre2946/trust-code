@@ -303,11 +303,12 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
         {
           const std::string& LOC = itr.first;
           const Nom& nom_dom = itr.second;
+
           const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
           ind_doms_dumped.push_back(index_glob);
           int ind_base = index_glob;
 
-          if (has_elem_som_loc_ && LOC != "FACES")
+          if (LOC != "FACES")
             {
               const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
               ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
@@ -509,18 +510,16 @@ void Ecrire_CGNS::cgns_open_solution_link_file(const double t, bool is_link)
   for (auto &itr : fld_loc_map_)
     {
       const std::string& LOC = itr.first;
-      int ind_base = -123;
+      const Nom& nom_dom = itr.second;
 
-      const Nom& nom_dom = fld_loc_map_.at(LOC);
       const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
+      int ind_base = index_glob;
 
-      if (has_elem_som_loc_ && LOC != "FACES")
+      if (LOC != "FACES")
         {
           const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
           ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
         }
-      else
-        ind_base = index_glob;
 
       if (cg_base_write(fileId_, nom_dom.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
         Cerr << "Error Ecrire_CGNS::cgns_open_solution_link_file : cg_base_write !" << finl, TRUST_CGNS_ERROR();
