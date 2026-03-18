@@ -333,9 +333,16 @@ namespace
     int izone = -1;
     int rank = -1;
     std::string zonename;
-    trustIdType nb_nodes = 0;
-    trustIdType nb_cells = 0;
+
+    bool has_main_section = false;
+
+    trustIdType nb_nodes = 0;   // taille effective pour le merge
+    trustIdType nb_cells = 0;   // taille effective pour le merge
   };
+
+  // XXX just declare here ;)
+  static bool try_choose_main_section(int fn, int ibase, int izone, int cell_dim,
+                                      const Nom &geom_name, int &best_sec_out);
 
   static bool is_all_digits(const std::string &s)
   {
@@ -378,7 +385,7 @@ namespace
     return false;
   }
 
-  static std::vector<ZonePartInfo> collect_parallel_zone_parts(int fn, int ibase, const std::string &basename)
+  static std::vector<ZonePartInfo> collect_parallel_zone_parts(int fn, int ibase, const std::string &basename, int cell_dim)
   {
     int nzones = 0;
     cgns_check(cg_nzones(fn, ibase, &nzones), "cg_nzones(collect_parallel_zone_parts)");
@@ -406,8 +413,21 @@ namespace
         p.izone = izone;
         p.rank = rank;
         p.zonename = zonename;
-        p.nb_nodes = (trustIdType) size[0];
-        p.nb_cells = (trustIdType) size[1];
+
+        int isec = -1;
+        p.has_main_section = try_choose_main_section(fn, ibase, izone, cell_dim, zonename.c_str(), isec);
+
+        if (p.has_main_section)
+          {
+            p.nb_nodes = (trustIdType) size[0];
+            p.nb_cells = (trustIdType) size[1];
+          }
+        else
+          {
+            p.nb_nodes = 0;
+            p.nb_cells = 0;
+          }
+
         parts.push_back(p);
       }
 
@@ -416,7 +436,6 @@ namespace
         return a.rank < b.rank;
       });
 
-    // XXX juste pour etre sur ...
     for (size_t i = 1; i < parts.size(); i++)
       {
         if (parts[i].rank == parts[i - 1].rank)
@@ -527,15 +546,16 @@ namespace
       lata_db.write_data(tstep_field, field.uname_, tab);
   }
 
-  static int choose_main_section(int fn, int ibase, int izone, int cell_dim, const Nom &geom_name)
+  static bool try_choose_main_section(int fn, int ibase, int izone, int cell_dim, const Nom &geom_name, int &best_sec_out)
   {
     int nsections = 0;
     cgns_check(cg_nsections(fn, ibase, izone, &nsections), "cg_nsections");
 
     if (nsections <= 0)
       {
-        cerr << "cgns_reader: no Elements_t section found in zone " << geom_name << endl;
-        throw LataDBError(LataDBError::READ_ERROR);
+        Journal(2) << "cgns_reader: zone " << geom_name << " has no Elements_t section -> treated as empty" << endl;
+        best_sec_out = -1;
+        return false;
       }
 
     int best_sec = -1;
@@ -549,7 +569,7 @@ namespace
         int nbndry = 0;
         int parent_flag = 0;
 
-        cgns_check(cg_section_read(fn, ibase, izone, isec, secname, &elem_type, &start, &end, &nbndry, &parent_flag), "cg_section_read(choose_main_section)");
+        cgns_check(cg_section_read(fn, ibase, izone, isec, secname, &elem_type, &start, &end, &nbndry, &parent_flag), "cg_section_read(try_choose_main_section)");
 
         int nb_comp = 0;
         const char *lata_elem_type = map_cgns_elemtype_to_lata(elem_type, nb_comp);
@@ -568,18 +588,27 @@ namespace
 
     if (best_sec < 0)
       {
-        cerr << "cgns_reader: could not find a supported main section in zone " << geom_name << endl;
-        throw LataDBError(LataDBError::READ_ERROR);
+        Journal(2) << "cgns_reader: zone " << geom_name << " has no supported main section -> treated as empty" << endl;
+        best_sec_out = -1;
+        return false;
       }
 
     Journal(2) << "cgns_reader: zone=" << geom_name << " selected main section=" << best_sec << endl;
-    return best_sec;
+
+    best_sec_out = best_sec;
+    return true;
   }
 
   static trustIdType read_zone_elements(int fn, int ibase, int izone, int cell_dim, const Nom &geom_name,
                                         trustIdType nb_nodes, BigTIDTab &elems, Nom &lata_elem_type_out)
   {
-    const int isec = choose_main_section(fn, ibase, izone, cell_dim, geom_name);
+    int isec = -1;
+    if (!try_choose_main_section(fn, ibase, izone, cell_dim, geom_name, isec))
+      {
+        elems.resize(0, 0);
+        lata_elem_type_out = "";
+        return 0;
+      }
 
     char secname[33];
     ElementType_t elem_type;
@@ -746,15 +775,27 @@ namespace
     if (parts.empty())
       return;
 
+    // XXX Premiere zone non vide ==> reference
+    int iref = -1;
+    for (int ip = 0; ip < (int)parts.size(); ip++)
+      if (parts[ip].has_main_section)
+        {
+          iref = ip;
+          break;
+        }
+
+    if (iref < 0)
+      return;
+
     int nsols0 = 0;
-    cgns_check(cg_nsols(fn, ibase, parts[0].izone, &nsols0), "cg_nsols(merged)");
+    cgns_check(cg_nsols(fn, ibase, parts[iref].izone, &nsols0), "cg_nsols(merged)");
 
     if (tstep_field < 1 || tstep_field > nsols0)
       return;
 
     char solname0[33];
     GridLocation_t location0 = Vertex;
-    cgns_check(cg_sol_info(fn, ibase, parts[0].izone, tstep_field, solname0, &location0), "cg_sol_info(merged)");
+    cgns_check(cg_sol_info(fn, ibase, parts[iref].izone, tstep_field, solname0, &location0), "cg_sol_info(merged)");
 
     Nom lata_loc;
     trustIdType merged_size = -1;
@@ -780,14 +821,17 @@ namespace
         return;
       }
 
+    if (merged_size <= 0)
+      return;
+
     int nfields0 = 0;
-    cgns_check(cg_nfields(fn, ibase, parts[0].izone, tstep_field, &nfields0), "cg_nfields(merged)");
+    cgns_check(cg_nfields(fn, ibase, parts[iref].izone, tstep_field, &nfields0), "cg_nfields(merged)");
 
     for (int ifield = 1; ifield <= nfields0; ifield++)
       {
         DataType_t dtype0;
         char field_name0[33];
-        cgns_check(cg_field_info(fn, ibase, parts[0].izone, tstep_field, ifield, &dtype0, field_name0), "cg_field_info(merged)");
+        cgns_check(cg_field_info(fn, ibase, parts[iref].izone, tstep_field, ifield, &dtype0, field_name0), "cg_field_info(merged)");
 
         BigFloatTab merged_tab;
         merged_tab.resize(merged_size, 1);
@@ -836,6 +880,9 @@ namespace
 
             const trustIdType local_size = on_nodes ? parts[ip].nb_nodes : parts[ip].nb_cells;
             const trustIdType offset = on_nodes ? node_offsets[ip] : elem_offsets[ip];
+
+            if (local_size <= 0)
+              continue;
 
             BigFloatTab local_tab;
             read_scalar_field(fn, ibase, izone, tstep_field, field_name0, local_size, local_tab);
@@ -953,7 +1000,7 @@ void cgns_reader(const char *cgnsfilename, const char *data_filename, LataDB &la
       const std::string basename_str(basename_c);
       const Nom geom_name(basename_c);
 
-      std::vector<ZonePartInfo> parts = collect_parallel_zone_parts(fn, ibase, basename_str);
+      std::vector<ZonePartInfo> parts = collect_parallel_zone_parts(fn, ibase, basename_str, cell_dim);
 
       int nzones = 0;
       cgns_check(cg_nzones(fn, ibase, &nzones), "cg_nzones");
@@ -1044,6 +1091,12 @@ void cgns_reader(const char *cgnsfilename, const char *data_filename, LataDB &la
           total_nb_elem += parts[ip].nb_cells;
         }
 
+      if (total_nb_nodes == 0)
+        {
+          Journal() << "cgns_reader: base " << basename_c << " is empty after filtering zones ... skipping geometry" << endl;
+          continue;
+        }
+
       LataDBGeometry geom;
       geom.name_ = geom_name;
       geom.timestep_ = tstep_geom;
@@ -1055,13 +1108,16 @@ void cgns_reader(const char *cgnsfilename, const char *data_filename, LataDB &la
       Nom merged_elem_type;
       int merged_nb_comp = -1;
       BigTIDTab merged_elems;
-      merged_elems.resize(total_nb_elem, 1); // redimensionne apres lecture du 1er morceau
 
       trustIdType elem_write_pos = 0;
+      bool first_non_empty_part = true;
 
       for (size_t ip = 0; ip < parts.size(); ip++)
         {
           const ZonePartInfo& p = parts[ip];
+
+          if (!p.has_main_section || p.nb_nodes == 0)
+            continue;
 
           BigFloatTab local_nodes;
           read_zone_coordinates(fn, ibase, p.izone, phys_dim, p.nb_nodes, local_nodes);
@@ -1075,15 +1131,21 @@ void cgns_reader(const char *cgnsfilename, const char *data_filename, LataDB &la
           const trustIdType local_nb_elem = read_zone_elements(fn, ibase, p.izone, cell_dim, p.zonename.c_str(),
                                                                p.nb_nodes, local_elems, local_elem_type);
 
-          if (ip == 0)
+          if (local_nb_elem == 0)
+            continue;
+
+          const int local_nb_comp = (int)local_elems.dimension(1);
+
+          if (first_non_empty_part)
             {
               merged_elem_type = local_elem_type;
-              merged_nb_comp = (int) local_elems.dimension(1);
+              merged_nb_comp = local_nb_comp;
               merged_elems.resize(total_nb_elem, merged_nb_comp);
+              first_non_empty_part = false;
             }
           else
             {
-              if (local_elem_type != merged_elem_type || local_elems.dimension(1) != merged_nb_comp)
+              if (local_elem_type != merged_elem_type || local_nb_comp != merged_nb_comp)
                 {
                   cerr << "cgns_reader: inconsistent element type while merging base " << basename_c << endl;
                   throw LataDBError(LataDBError::READ_ERROR);
@@ -1104,18 +1166,29 @@ void cgns_reader(const char *cgnsfilename, const char *data_filename, LataDB &la
                          merged_elem_type, total_nb_elem, merged_nb_comp, merged_elems,
                          data_filename, lata_db);
 
-      int nsols = 0;
-      cgns_check(cg_nsols(fn, ibase, parts[0].izone, &nsols), "cg_nsols(merged.first_zone)");
+      int iref = -1;
+      for (size_t ip = 0; ip < parts.size(); ip++)
+        if (parts[ip].has_main_section)
+          {
+            iref = (int)ip;
+            break;
+          }
 
-      for (int isol = 1; isol <= nsols; isol++)
+      if (iref >= 0)
         {
-          const int tstep_field = isol;
-          read_merged_zone_solution_fields_and_add(fn, ibase, parts,
-                                                   filename_in_master_file, geom.name_,
-                                                   tstep_field, file_offset,
-                                                   node_offsets, elem_offsets,
-                                                   total_nb_nodes, total_nb_elem,
-                                                   data_filename, lata_db);
+          int nsols = 0;
+          cgns_check(cg_nsols(fn, ibase, parts[iref].izone, &nsols), "cg_nsols(merged.first_zone)");
+
+          for (int isol = 1; isol <= nsols; isol++)
+            {
+              const int tstep_field = isol;
+              read_merged_zone_solution_fields_and_add(fn, ibase, parts,
+                                                       filename_in_master_file, geom.name_,
+                                                       tstep_field, file_offset,
+                                                       node_offsets, elem_offsets,
+                                                       total_nb_nodes, total_nb_elem,
+                                                       data_filename, lata_db);
+            }
         }
     }
 
