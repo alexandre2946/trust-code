@@ -838,6 +838,9 @@ namespace
 
         for (size_t ip = 0; ip < parts.size(); ip++)
           {
+            if (!parts[ip].has_main_section)
+              continue;
+
             const int izone = parts[ip].izone;
 
             int nsols = 0;
