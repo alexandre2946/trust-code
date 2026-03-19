@@ -347,8 +347,17 @@ namespace
 
     bool has_main_section = false;
 
-    trustIdType nb_nodes = 0;   // taille effective pour le merge
-    trustIdType nb_cells = 0;   // taille effective pour le merge
+    trustIdType nb_nodes = 0;
+    trustIdType nb_cells = 0;
+    trustIdType nb_cells_effective = 0;
+  };
+
+  struct ZoneConnectivityData
+  {
+    Nom lata_elem_type;
+    BigTIDTab elements; // elem -> som
+    BigTIDTab faces; // face -> som
+    BigTIDTab elem_faces; // elem -> faces
   };
 
   // XXX just declare here ;)
@@ -396,6 +405,9 @@ namespace
     return false;
   }
 
+  // XXX just declare
+  static trustIdType read_zone_connectivity(int fn, int ibase, int izone, int cell_dim, const Nom &geom_name, trustIdType nb_nodes, ZoneConnectivityData &zc);
+
   static std::vector<ZonePartInfo> collect_parallel_zone_parts(int fn, int ibase, const std::string &basename, int cell_dim)
   {
     int nzones = 0;
@@ -432,11 +444,15 @@ namespace
           {
             p.nb_nodes = (trustIdType) size[0];
             p.nb_cells = (trustIdType) size[1];
+
+            ZoneConnectivityData zc_tmp;
+            p.nb_cells_effective = read_zone_connectivity(fn, ibase, izone, cell_dim, zonename.c_str(), p.nb_nodes, zc_tmp);
           }
         else
           {
             p.nb_nodes = 0;
             p.nb_cells = 0;
+            p.nb_cells_effective = 0;
           }
 
         parts.push_back(p);
@@ -857,7 +873,7 @@ namespace
                 throw LataDBError(LataDBError::READ_ERROR);
               }
 
-            const trustIdType local_size = on_nodes ? parts[ip].nb_nodes : parts[ip].nb_cells;
+            const trustIdType local_size = on_nodes ? parts[ip].nb_nodes : parts[ip].nb_cells_effective;
             const trustIdType offset = on_nodes ? node_offsets[ip] : elem_offsets[ip];
 
             if (local_size <= 0)
@@ -879,14 +895,6 @@ namespace
   // *******************
   // *** Pour polys ...
   // *******************
-  struct ZoneConnectivityData
-  {
-    Nom lata_elem_type;
-    BigTIDTab elements; // elem -> som
-    BigTIDTab faces; // face -> som
-    BigTIDTab elem_faces; // elem -> faces
-  };
-
   static bool zone_has_section_type(int fn, int ibase, int izone, ElementType_t wanted_type, int *section_id = nullptr)
   {
     int nsections = 0;
@@ -1270,22 +1278,7 @@ void cgns_reader(const char *cgnsfilename, const char *data_filename, LataDB &la
       int nzones = 0;
       cgns_check(cg_nzones(fn, ibase, &nzones), "cg_nzones");
 
-      const bool merge_parallel_over_zone = (!parts.empty() && (int)parts.size() == nzones);
-
-      bool has_poly_zone_in_base = false;
-      for (int izone = 1; izone <= nzones; izone++)
-        if (zone_is_poly(fn, ibase, izone))
-          {
-            has_poly_zone_in_base = true;
-            break;
-          }
-
-      if (merge_parallel_over_zone && has_poly_zone_in_base)
-        {
-          cerr << "cgns_reader: merged NGON/NFACE zones are not implemented yet for base "
-               << basename_c << endl;
-          throw LataDBError(LataDBError::READ_ERROR);
-        }
+      const bool merge_parallel_over_zone = ((int)parts.size() >= 2);
 
       if (!merge_parallel_over_zone)
         {
@@ -1371,15 +1364,15 @@ void cgns_reader(const char *cgnsfilename, const char *data_filename, LataDB &la
         Journal(2) << "cgns_reader:   part[" << ip << "] zone=" << parts[ip].zonename
                    << " rank=" << parts[ip].rank
                    << " nb_nodes=" << parts[ip].nb_nodes
-                   << " nb_cells=" << parts[ip].nb_cells << endl;
+                   << " nb_cells=" << parts[ip].nb_cells
+                   << " nb_cells_effective=" << parts[ip].nb_cells_effective << endl;
 
       std::vector<trustIdType> node_offsets(parts.size(), 0);
       std::vector<trustIdType> elem_offsets(parts.size(), 0);
+      std::vector<trustIdType> face_offsets(parts.size(), 0);
 
       trustIdType total_nb_nodes = 0;
       trustIdType total_nb_elem = 0;
-
-      std::vector<trustIdType> face_offsets(parts.size(), 0);
       trustIdType total_nb_faces = 0;
 
       for (size_t ip = 0; ip < parts.size(); ip++)
@@ -1387,8 +1380,16 @@ void cgns_reader(const char *cgnsfilename, const char *data_filename, LataDB &la
           node_offsets[ip] = total_nb_nodes;
           elem_offsets[ip] = total_nb_elem;
           face_offsets[ip] = total_nb_faces;
+
           total_nb_nodes += parts[ip].nb_nodes;
-          total_nb_elem += parts[ip].nb_cells;
+          total_nb_elem += parts[ip].nb_cells_effective;
+
+          ZoneConnectivityData tmp_zc;
+          const trustIdType tmp_nb_elem = read_zone_connectivity(fn, ibase, parts[ip].izone, cell_dim,
+              parts[ip].zonename.c_str(), parts[ip].nb_nodes, tmp_zc);
+
+          if (tmp_nb_elem > 0 && tmp_zc.faces.dimension(0) > 0)
+            total_nb_faces += tmp_zc.faces.dimension(0);
         }
 
       if (total_nb_nodes == 0)
@@ -1407,10 +1408,71 @@ void cgns_reader(const char *cgnsfilename, const char *data_filename, LataDB &la
 
       BigTIDTab merged_elems, merged_faces, merged_elem_faces;
       trustIdType elem_write_pos = 0, face_write_pos = 0;
-      int merged_nb_comp = -1, merged_faces_nb_comp = -1, merged_elem_faces_nb_comp = -1;
+      int merged_nb_comp = 0, merged_faces_nb_comp = 0, merged_elem_faces_nb_comp = 0;
       Nom merged_elem_type;
-      bool first_non_empty_part = true;
+      bool found_first_part = false;
 
+      /* 1) Pre-scan : trouver le type et les largeurs max */
+      for (size_t ip = 0; ip < parts.size(); ip++)
+        {
+          const ZonePartInfo& p = parts[ip];
+          if (!p.has_main_section || p.nb_nodes == 0)
+            continue;
+
+          ZoneConnectivityData local_zc;
+          const trustIdType local_nb_elem = read_zone_connectivity(fn, ibase, p.izone, cell_dim,
+                                                                   p.zonename.c_str(), p.nb_nodes, local_zc);
+          if (local_nb_elem == 0)
+            continue;
+
+          if (!found_first_part)
+            {
+              merged_elem_type = local_zc.lata_elem_type;
+              found_first_part = true;
+            }
+          else if (local_zc.lata_elem_type != merged_elem_type)
+            {
+              cerr << "cgns_reader: inconsistent element type while merging base " << basename_c << endl;
+              throw LataDBError(LataDBError::READ_ERROR);
+            }
+
+          merged_nb_comp = std::max(merged_nb_comp, (int)local_zc.elements.dimension(1));
+          merged_faces_nb_comp = std::max(merged_faces_nb_comp, (int)local_zc.faces.dimension(1));
+          merged_elem_faces_nb_comp = std::max(merged_elem_faces_nb_comp, (int)local_zc.elem_faces.dimension(1));
+
+         /* Journal() << "merge poly part " << p.zonename
+                    << " type=" << local_zc.lata_elem_type
+                    << " elem_w=" << local_zc.elements.dimension(1)
+                    << " faces_w=" << local_zc.faces.dimension(1)
+                    << " elem_faces_w=" << local_zc.elem_faces.dimension(1)
+                    << endl; */
+        }
+
+      if (!found_first_part || merged_nb_comp <= 0)
+        {
+          Journal() << "cgns_reader: merged base " << basename_c
+                    << " has no supported element section, skipping" << endl;
+          continue;
+        }
+
+
+      /* 2) Allocation avec les largeurs max */
+      merged_elems.resize(total_nb_elem, merged_nb_comp);
+      merged_elems = -1;
+
+      if (total_nb_faces > 0 && merged_faces_nb_comp > 0)
+        {
+          merged_faces.resize(total_nb_faces, merged_faces_nb_comp);
+          merged_faces = -1;
+        }
+
+      if (total_nb_elem > 0 && merged_elem_faces_nb_comp > 0)
+        {
+          merged_elem_faces.resize(total_nb_elem, merged_elem_faces_nb_comp);
+          merged_elem_faces = -1;
+        }
+
+      /* 3) Merge effectif */
       for (size_t ip = 0; ip < parts.size(); ip++)
         {
           const ZonePartInfo& p = parts[ip];
@@ -1426,43 +1488,45 @@ void cgns_reader(const char *cgnsfilename, const char *data_filename, LataDB &la
               merged_nodes(node_offsets[ip] + i, j) = local_nodes(i, j);
 
           ZoneConnectivityData local_zc;
-          const trustIdType local_nb_elem = read_zone_connectivity(fn, ibase, p.izone, cell_dim, p.zonename.c_str(),
-                                                                   p.nb_nodes, local_zc);
+          const trustIdType local_nb_elem = read_zone_connectivity(fn, ibase, p.izone, cell_dim,
+                                                                   p.zonename.c_str(), p.nb_nodes, local_zc);
 
           if (local_nb_elem == 0)
             continue;
 
-          const int local_nb_comp = (int)local_zc.elements.dimension(1);
-
-          if (first_non_empty_part)
+          if (local_zc.lata_elem_type != merged_elem_type)
             {
-              merged_elem_type = local_zc.lata_elem_type;
-              merged_nb_comp = local_nb_comp;
-              merged_elems.resize(total_nb_elem, merged_nb_comp);
-
-              if (local_zc.faces.dimension(0) > 0)
-                {
-                  merged_faces_nb_comp = (int)local_zc.faces.dimension(1);
-                  // total_nb_faces sera calcule plus bas si besoin
-                }
-
-              if (local_zc.elem_faces.dimension(0) > 0)
-                merged_elem_faces_nb_comp = (int)local_zc.elem_faces.dimension(1);
-
-              first_non_empty_part = false;
-            }
-          else
-            {
-              if (local_zc.lata_elem_type != merged_elem_type || local_nb_comp != merged_nb_comp)
-                {
-                  cerr << "cgns_reader: inconsistent element type while merging base " << basename_c << endl;
-                  throw LataDBError(LataDBError::READ_ERROR);
-                }
+              cerr << "cgns_reader: inconsistent element type while merging base " << basename_c << endl;
+              throw LataDBError(LataDBError::READ_ERROR);
             }
 
           for (trustIdType i = 0; i < local_nb_elem; i++)
-            for (int j = 0; j < merged_nb_comp; j++)
-              merged_elems(elem_write_pos + i, j) = local_zc.elements(i, j) + node_offsets[ip];
+            for (int j = 0; j < (int)local_zc.elements.dimension(1); j++)
+              {
+                const trustIdType v = local_zc.elements(i, j);
+                merged_elems(elem_write_pos + i, j) = (v >= 0) ? (v + node_offsets[ip]) : -1;
+              }
+
+          if (local_zc.faces.dimension(0) > 0)
+            {
+              const trustIdType local_nb_faces = local_zc.faces.dimension(0);
+
+              for (trustIdType i = 0; i < local_nb_faces; i++)
+                for (int j = 0; j < (int)local_zc.faces.dimension(1); j++)
+                  {
+                    const trustIdType v = local_zc.faces(i, j);
+                    merged_faces(face_write_pos + i, j) = (v >= 0) ? (v + node_offsets[ip]) : -1;
+                  }
+
+              for (trustIdType i = 0; i < local_nb_elem; i++)
+                for (int j = 0; j < (int)local_zc.elem_faces.dimension(1); j++)
+                  {
+                    const trustIdType f = local_zc.elem_faces(i, j);
+                    merged_elem_faces(elem_write_pos + i, j) = (f >= 0) ? (f + face_offsets[ip]) : -1;
+                  }
+
+              face_write_pos += local_nb_faces;
+            }
 
           elem_write_pos += local_nb_elem;
         }
@@ -1470,9 +1534,25 @@ void cgns_reader(const char *cgnsfilename, const char *data_filename, LataDB &la
       add_sommets_field(filename_in_master_file, geom.name_, tstep_geom, file_offset,
                         total_nb_nodes, phys_dim, merged_nodes, data_filename, lata_db);
 
+      if (merged_nb_comp <= 0 || merged_elem_type == "" || total_nb_elem <= 0)
+        {
+          Journal() << "cgns_reader: merged base " << basename_c << " has no supported element section, skipping" << endl;
+          continue;
+        }
+
       add_elements_field(filename_in_master_file, geom.name_, tstep_geom, file_offset,
                          merged_elem_type, total_nb_elem, merged_nb_comp, merged_elems,
                          data_filename, lata_db);
+
+      if (merged_faces.dimension(0) > 0 && merged_faces.dimension(1) > 0)
+        add_faces_field(filename_in_master_file, geom.name_, tstep_geom, file_offset,
+                        merged_faces.dimension(0), (int)merged_faces.dimension(1), merged_faces,
+                        data_filename, lata_db);
+
+      if (merged_elem_faces.dimension(0) > 0 && merged_elem_faces.dimension(1) > 0)
+        add_elem_faces_field(filename_in_master_file, geom.name_, tstep_geom, file_offset,
+                             merged_elem_faces.dimension(0), (int)merged_elem_faces.dimension(1), merged_elem_faces,
+                             data_filename, lata_db);
 
       int iref = -1;
       for (size_t ip = 0; ip < parts.size(); ip++)
