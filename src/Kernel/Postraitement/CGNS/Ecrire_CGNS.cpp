@@ -40,7 +40,7 @@ void Ecrire_CGNS::cgns_associer_domaine_dis(const Domaine_dis_base& domaine_dis_
 void Ecrire_CGNS::cgns_init_MPI()
 {
 #ifdef MPI_
-  if (Option_CGNS::FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group() && !postraiter_domaine_)
+  if (Option_CGNS::LINKED_FILES_PER_COMM_GROUP && PE_Groups::has_user_defined_group() && !postraiter_domaine_)
     {
       const Comm_Group_MPI& comm_loc = ref_cast(Comm_Group_MPI, PE_Groups::get_user_defined_group());
       if (cgp_mpi_comm(comm_loc.get_mpi_comm()) != CG_OK)
@@ -73,7 +73,7 @@ void Ecrire_CGNS::cgns_open_file()
   if (is_lagrangian_) return; /* for FT post and since we have a change of topology => one file per dt post */
 
   if (Option_CGNS::USE_LINKS && !postraiter_domaine_)
-    return; /* rien a faire si USE_LINKS ou FILE_PER_COMM_GROUP */
+    return; /* rien a faire si USE_LINKS ou LINKED_FILES_PER_COMM_GROUP */
 
   const std::string fn = baseFile_name_ + ".cgns"; // file name
 
@@ -989,7 +989,7 @@ void Ecrire_CGNS::cgns_write_domaine_par_in_zone(const Domaine * domaine,const N
 
   TRUST2CGNS.fill_global_infos(); // XXX
 
-  const bool enter_group_comm = Option_CGNS::FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group() && !postraiter_domaine_;
+  const bool enter_group_comm = Option_CGNS::LINKED_FILES_PER_COMM_GROUP && PE_Groups::has_user_defined_group() && !postraiter_domaine_;
   const int proc_me = enter_group_comm ? TRUST2CGNS.get_proc_me_local_comm() : Process::me();
 
   if (cgns_type_elem == CGNS_ENUMV(NGON_n)) /*cas polygone/polyedre */
@@ -1016,7 +1016,7 @@ void Ecrire_CGNS::cgns_write_domaine_par_in_zone(const Domaine * domaine,const N
   cgns_helper_.cgns_write_zone_grid_coord<TYPE_ECRITURE_CGNS::PAR_IN>(icelldim, fileId_, baseId_.back(), basename /* Dom name */, isize,
                                                                       zoneId_.back(), xCoords, yCoords, zCoords, coordsIdx, coordsIdy, coordsIdz);
 
-  if (ne_tot == 0 && ns_tot == 0) return; // XXX Elie Saikali : zone vide creer, rien a faire de plus ... (cas FILE_PER_COMM_GROUP !!!)
+  if (ne_tot == 0 && ns_tot == 0) return; // XXX Elie Saikali : zone vide creer, rien a faire de plus ... (cas LINKED_FILES_PER_COMM_GROUP !!!)
 
   /* 4.2 : Construct the sections to host connectivity later */
   cgsize_t start = -123, end = -123;
@@ -1182,7 +1182,7 @@ void Ecrire_CGNS::cgns_write_field_par_in_zone(const int comp, const double temp
         }
 
       const TRUST_2_CGNS& TRUST2CGNS = T2CGNS_[ind_new];
-      const bool enter_group_comm = Option_CGNS::FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group() && !postraiter_domaine_;
+      const bool enter_group_comm = Option_CGNS::LINKED_FILES_PER_COMM_GROUP && PE_Groups::has_user_defined_group() && !postraiter_domaine_;
       const int proc_me = enter_group_comm ? TRUST2CGNS.get_proc_me_local_comm() : Process::me();
 
       cgsize_t min = -123, max = -123;

@@ -30,7 +30,7 @@
 
 void Ecrire_CGNS::init_proc_maitre_local_comm()
 {
-  assert(is_deformable_ && Process::is_parallel() && Option_CGNS::FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group());
+  assert(is_deformable_ && Process::is_parallel() && Option_CGNS::LINKED_FILES_PER_COMM_GROUP && PE_Groups::has_user_defined_group());
   const auto& grp = PE_Groups::get_user_defined_group();
   if (PE_Groups::enter_group(grp))
     {
@@ -45,7 +45,7 @@ void Ecrire_CGNS::cgns_open_grid_base_link_file()
   assert(Option_CGNS::USE_LINKS && !postraiter_domaine_);
   std::string fn;
 
-  if (Process::is_parallel() && Option_CGNS::FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
+  if (Process::is_parallel() && Option_CGNS::LINKED_FILES_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
     {
       const auto& grp = PE_Groups::get_user_defined_group();
       if (PE_Groups::enter_group(grp))
@@ -84,14 +84,14 @@ void Ecrire_CGNS::cgns_close_grid_or_solution_link_file(const double t, const TY
 
   if (type == TYPE_LINK_CGNS::GRID)
     {
-      if (Process::is_parallel() && Option_CGNS::FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
+      if (Process::is_parallel() && Option_CGNS::LINKED_FILES_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
         fn =  baseFile_name_ + "_XXXX.grid.cgns";
       else
         fn = baseFile_name_ + ".grid.cgns";
     }
   else if (type == TYPE_LINK_CGNS::SOLUTION)
     {
-      if (Process::is_parallel() && Option_CGNS::FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
+      if (Process::is_parallel() && Option_CGNS::LINKED_FILES_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
         fn = baseFile_name_ + "_XXXX_" + ".solution." + cgns_helper_.convert_double_to_string(t) + ".cgns";
       else
         fn = baseFile_name_ + ".solution." + cgns_helper_.convert_double_to_string(t) + ".cgns";
@@ -103,7 +103,7 @@ void Ecrire_CGNS::cgns_close_grid_or_solution_link_file(const double t, const TY
 
   if (Process::is_parallel() && (type != TYPE_LINK_CGNS::FINAL_LINK))
     {
-      if ( Option_CGNS::FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
+      if ( Option_CGNS::LINKED_FILES_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
         {
           cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::PAR>(fn /* inutile */, fileId_, false);
           Cerr << "**** Multiple parallel CGNS files " << fn << " closed !" << finl;
@@ -475,7 +475,7 @@ void Ecrire_CGNS::cgns_open_solution_link_file(const double t, bool is_link)
 {
   assert((Option_CGNS::USE_LINKS && !postraiter_domaine_) || is_lagrangian_);
 
-  const bool enter_group_comm = Process::is_parallel() && Option_CGNS::FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group();
+  const bool enter_group_comm = Process::is_parallel() && Option_CGNS::LINKED_FILES_PER_COMM_GROUP && PE_Groups::has_user_defined_group();
 
   std::string fn;
 
@@ -556,7 +556,7 @@ void Ecrire_CGNS::cgns_open_solution_link_file(const double t, bool is_link)
 
 void Ecrire_CGNS::cgns_write_final_link_file()
 {
-  if (Process::is_parallel() && Option_CGNS::FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
+  if (Process::is_parallel() && Option_CGNS::LINKED_FILES_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
     {
       cgns_write_final_link_file_comm_group();
       return;

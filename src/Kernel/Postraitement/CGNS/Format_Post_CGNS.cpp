@@ -29,7 +29,7 @@ static void init_my_com_group()
       const int nb_nodes = PE_Groups::get_node_group().get_number_of_nodes();
       if (nb_nodes > 1)
         {
-          Option_CGNS::FILE_PER_COMM_GROUP = true;
+          Option_CGNS::LINKED_FILES_PER_COMM_GROUP = true;
           Option_CGNS::USE_LINKS = true;
           Option_CGNS::PARALLEL_OVER_ZONE = false;
           Nom ech = "{ Group_nb ";

@@ -344,7 +344,7 @@ void Ecrire_CGNS::link_multi_loc_support_pb_deformable()
       return;
     }
 
-  const bool enter_group_comm = Process::is_parallel() && Option_CGNS::FILE_PER_COMM_GROUP &&
+  const bool enter_group_comm = Process::is_parallel() && Option_CGNS::LINKED_FILES_PER_COMM_GROUP &&
                                 PE_Groups::has_user_defined_group() && !postraiter_domaine_;
 
   // loop and write linked supports !
@@ -541,7 +541,7 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group_pb_deformable()
 
 void Ecrire_CGNS::cgns_write_final_link_file_pb_deformable()
 {
-  if (Process::is_parallel() && Option_CGNS::FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
+  if (Process::is_parallel() && Option_CGNS::LINKED_FILES_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
     {
 #ifdef MPI_
       if (vec_proc_maitre_local_comm_.empty())
@@ -786,7 +786,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
     TRUST2CGNS.fill_global_infos_poly(is_polyedre);
 
   const int ns_tot = TRUST2CGNS.get_ns_tot(), ne_tot = TRUST2CGNS.get_ne_tot();
-  const bool enter_group_comm = Option_CGNS::FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group() && !postraiter_domaine_;
+  const bool enter_group_comm = Option_CGNS::LINKED_FILES_PER_COMM_GROUP && PE_Groups::has_user_defined_group() && !postraiter_domaine_;
   const int proc_me = enter_group_comm ? TRUST2CGNS.get_proc_me_local_comm() : Process::me();
 
   int coordsIdx = -123, coordsIdy = -123, coordsIdz = -123;
@@ -851,7 +851,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
         {
           sizeId_.push_back( { isize[0], isize[1] } ); // XXX required for links later !
 
-          if (ne_tot == 0 && ns_tot == 0) return; // XXX Elie Saikali : zone vide creer, rien a faire de plus ... (cas FILE_PER_COMM_GROUP !!!)
+          if (ne_tot == 0 && ns_tot == 0) return; // XXX Elie Saikali : zone vide creer, rien a faire de plus ... (cas LINKED_FILES_PER_COMM_GROUP !!!)
 
           /* Construct the sections to host connectivity later */
           cgsize_t start = 1, end = ne_tot;
@@ -867,7 +867,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
         }
       else
         {
-          if (ne_tot == 0 && ns_tot == 0) return; // XXX Elie Saikali : zone vide creer, rien a faire de plus ... (cas FILE_PER_COMM_GROUP !!!)
+          if (ne_tot == 0 && ns_tot == 0) return; // XXX Elie Saikali : zone vide creer, rien a faire de plus ... (cas LINKED_FILES_PER_COMM_GROUP !!!)
         }
 
       if (nb_elem > 0) // seulement si le proc a qlq chose a ecrire

@@ -4,7 +4,7 @@ dimension 2
 Pb_hydraulique pb
 Domaine dom
 
-option_cgns { FILE_PER_COMM_GROUP }
+option_cgns { LINKED_FILES_PER_COMM_GROUP }
 
 My_Comm_Group
 {

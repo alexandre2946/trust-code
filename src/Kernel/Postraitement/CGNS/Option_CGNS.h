@@ -26,7 +26,8 @@ class Option_CGNS: public Interprete
 public:
   Entree& interpreter(Entree&) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  static bool PARALLEL_OVER_ZONE, USE_LINKS, FILE_PER_COMM_GROUP; /* NOT BY DEFAULT */
+  static bool PARALLEL_OVER_ZONE; /* NOT BY DEFAULT */
+  static bool USE_LINKS, LINKED_FILES_PER_COMM_GROUP; /* NOT BY DEFAULT */
   static int CLOSE_EVERY_N, FLUSH_EVERY_N;
 };
 
