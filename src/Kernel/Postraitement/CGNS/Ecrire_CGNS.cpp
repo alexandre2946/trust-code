@@ -40,14 +40,14 @@ void Ecrire_CGNS::cgns_associer_domaine_dis(const Domaine_dis_base& domaine_dis_
 void Ecrire_CGNS::cgns_init_MPI()
 {
 #ifdef MPI_
-  if (Option_CGNS::LINKED_FILES_PER_COMM_GROUP && PE_Groups::has_user_defined_group() && !postraiter_domaine_)
+  if ((Option_CGNS::LINKED_FILES_PER_COMM_GROUP || Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)
+      && PE_Groups::has_user_defined_group() && !postraiter_domaine_)
     {
       const Comm_Group_MPI& comm_loc = ref_cast(Comm_Group_MPI, PE_Groups::get_user_defined_group());
       if (cgp_mpi_comm(comm_loc.get_mpi_comm()) != CG_OK)
         Cerr << "Error Ecrire_CGNS::cgns_init_MPI : cgp_mpi_comm -- Comm_Group_MPI !" << finl, TRUST_CGNS_ERROR();
 
-      if (is_deformable_)
-        init_proc_maitre_local_comm();
+      init_proc_maitre_local_comm();
     }
   else
     {
@@ -75,10 +75,27 @@ void Ecrire_CGNS::cgns_open_file()
   if (Option_CGNS::USE_LINKS && !postraiter_domaine_)
     return; /* rien a faire si USE_LINKS ou LINKED_FILES_PER_COMM_GROUP */
 
-  const std::string fn = baseFile_name_ + ".cgns"; // file name
+  std::string fn = baseFile_name_ + ".cgns"; // file name
 
   if (Process::is_parallel())
-    cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR>(fn, fileId_);
+    {
+      if (Option_CGNS::SINGLE_FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
+        {
+          const auto& grp = PE_Groups::get_user_defined_group();
+          if (PE_Groups::enter_group(grp))
+            {
+              fn = (Nom(baseFile_name_)).nom_me(proc_maitre_local_comm_).getString() + ".cgns"; // file name
+
+              unlink(fn.c_str());
+
+              cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR>(fn, fileId_, false);
+              PE_Groups::exit_group();
+            }
+          Cerr << "**** Multiple parallel CGNS files " << baseFile_name_ << "_XXXX.cgns opened !" << finl;
+        }
+      else
+        cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR>(fn, fileId_);
+    }
   else
     cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::SEQ>(fn, fileId_);
 }
@@ -123,6 +140,8 @@ void Ecrire_CGNS::fill_infos_loc()
 void Ecrire_CGNS::finir_ecriture(double temps)
 {
   if (postraiter_domaine_) return; /* rien a faire */
+
+  if (Option_CGNS::SINGLE_FILE_PER_COMM_GROUP) return; // FIXME
 
   if (Option_CGNS::USE_LINKS || is_lagrangian_)
     {
@@ -182,18 +201,27 @@ void Ecrire_CGNS::cgns_finir()
   if (Option_CGNS::USE_LINKS && !postraiter_domaine_ && !singlefile_open_)
     return; /* All done */
 
-  if (!postraiter_domaine_ && !first_time_post_)
-    {
-      if (is_deformable_)
-        cgns_write_iters_deformable();
-      else
-        cgns_write_iters();
-    }
+  if (!Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)  // FIXME
+    if (!postraiter_domaine_ && !first_time_post_)
+      {
+        if (is_deformable_)
+          cgns_write_iters_deformable();
+        else
+          cgns_write_iters();
+      }
 
-  const std::string fn = baseFile_name_ + ".cgns"; // file name
+  std::string fn = baseFile_name_ + ".cgns"; // file name
 
   if (Process::is_parallel())
-    cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::PAR>(fn, fileId_);
+    {
+      if ( Option_CGNS::SINGLE_FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
+        {
+          cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::PAR>(fn /* inutile */, fileId_, false);
+          Cerr << "**** Multiple parallel CGNS files " << baseFile_name_ << "_XXXX.cgns closed !" << finl;
+        }
+      else
+        cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::PAR>(fn, fileId_);
+    }
   else
     cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::SEQ>(fn, fileId_);
 }
@@ -219,10 +247,23 @@ void Ecrire_CGNS::cgns_add_time(const double t)
         {
           if (!first_time_post_)
             {
-              const std::string fn = baseFile_name_ + ".cgns";
+              std::string fn = baseFile_name_ + ".cgns";
 
               if (Process::is_parallel())
-                cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR, TYPE_MODE_CGNS::MODIFY>(fn, fileId_, /*print*/false);
+                {
+                  if (Option_CGNS::SINGLE_FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
+                    {
+                      const auto& grp = PE_Groups::get_user_defined_group();
+                      if (PE_Groups::enter_group(grp))
+                        {
+                          fn = (Nom(baseFile_name_)).nom_me(proc_maitre_local_comm_).getString() + ".cgns"; // file name
+                          cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR, TYPE_MODE_CGNS::MODIFY>(fn, fileId_, false);
+                          PE_Groups::exit_group();
+                        }
+                    }
+                  else
+                    cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR, TYPE_MODE_CGNS::MODIFY>(fn, fileId_, /*print*/false);
+                }
               else
                 cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::SEQ, TYPE_MODE_CGNS::MODIFY>(fn, fileId_, /*print*/false);
             }
@@ -255,17 +296,30 @@ void Ecrire_CGNS::ensure_modify_open_singlefile()
   if (ensure_modify_done_ || Option_CGNS::USE_LINKS || postraiter_domaine_ || is_lagrangian_)
     return; /* Do nothing */
 
-  const std::string fn = baseFile_name_ + ".cgns";
+  std::string fn = baseFile_name_ + ".cgns";
 
   /* Close file for first time */
   if (Process::is_parallel())
-    cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::PAR>(fn, fileId_, /*print*/ false);
+    cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::PAR>(fn /* inutile */, fileId_, /*print*/ false);
   else
-    cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::SEQ>(fn, fileId_, /*print*/ false);
+    cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::SEQ>(fn /* inutile */, fileId_, /*print*/ false);
 
   /* Reopen file for first time with MODIFY mode */
   if (Process::is_parallel())
-    cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR, TYPE_MODE_CGNS::MODIFY>(fn, fileId_, /*print*/ false);
+    {
+      if (Option_CGNS::SINGLE_FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
+        {
+          const auto& grp = PE_Groups::get_user_defined_group();
+          if (PE_Groups::enter_group(grp))
+            {
+              fn = (Nom(baseFile_name_)).nom_me(proc_maitre_local_comm_).getString() + ".cgns"; // file name
+              cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR, TYPE_MODE_CGNS::MODIFY>(fn, fileId_, false);
+              PE_Groups::exit_group();
+            }
+        }
+      else
+        cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR, TYPE_MODE_CGNS::MODIFY>(fn, fileId_, /*print*/ false);
+    }
   else
     cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::SEQ, TYPE_MODE_CGNS::MODIFY>(fn, fileId_, /*print*/ false);
 
@@ -989,7 +1043,9 @@ void Ecrire_CGNS::cgns_write_domaine_par_in_zone(const Domaine * domaine,const N
 
   TRUST2CGNS.fill_global_infos(); // XXX
 
-  const bool enter_group_comm = Option_CGNS::LINKED_FILES_PER_COMM_GROUP && PE_Groups::has_user_defined_group() && !postraiter_domaine_;
+  const bool enter_group_comm = (Option_CGNS::LINKED_FILES_PER_COMM_GROUP || Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)
+                                && PE_Groups::has_user_defined_group() && !postraiter_domaine_;
+
   const int proc_me = enter_group_comm ? TRUST2CGNS.get_proc_me_local_comm() : Process::me();
 
   if (cgns_type_elem == CGNS_ENUMV(NGON_n)) /*cas polygone/polyedre */
@@ -1182,7 +1238,9 @@ void Ecrire_CGNS::cgns_write_field_par_in_zone(const int comp, const double temp
         }
 
       const TRUST_2_CGNS& TRUST2CGNS = T2CGNS_[ind_new];
-      const bool enter_group_comm = Option_CGNS::LINKED_FILES_PER_COMM_GROUP && PE_Groups::has_user_defined_group() && !postraiter_domaine_;
+      const bool enter_group_comm = (Option_CGNS::LINKED_FILES_PER_COMM_GROUP || Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)
+                                    && PE_Groups::has_user_defined_group() && !postraiter_domaine_;
+
       const int proc_me = enter_group_comm ? TRUST2CGNS.get_proc_me_local_comm() : Process::me();
 
       cgsize_t min = -123, max = -123;

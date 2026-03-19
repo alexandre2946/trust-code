@@ -229,8 +229,11 @@ void TRUST_2_CGNS::fill_global_infos()
 #ifdef MPI_
   assert (sommets_.non_nul() && elems_.non_nul());
 
-  const bool by_comm_grp = (Process::is_parallel() && Option_CGNS::LINKED_FILES_PER_COMM_GROUP
-                            && PE_Groups::has_user_defined_group() && !postraiter_domaine_ );
+  const bool by_comm_grp = (Process::is_parallel()
+                            && (Option_CGNS::LINKED_FILES_PER_COMM_GROUP ||
+                                Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)
+                            && PE_Groups::has_user_defined_group()
+                            && !postraiter_domaine_ );
 
   if (by_comm_grp)
     {
@@ -329,8 +332,11 @@ void TRUST_2_CGNS::fill_global_infos_poly(const bool is_polyedre)
 #ifdef MPI_
   assert(dom_trust_.non_nul());
 
-  const bool by_comm_grp = (Process::is_parallel() && Option_CGNS::LINKED_FILES_PER_COMM_GROUP
-                            && PE_Groups::has_user_defined_group() && !postraiter_domaine_ );
+  const bool by_comm_grp = (Process::is_parallel()
+                            && (Option_CGNS::LINKED_FILES_PER_COMM_GROUP ||
+                                Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)
+                            && PE_Groups::has_user_defined_group()
+                            && !postraiter_domaine_ );
 
   int decal = 0; // a modifier plus tard !!!
   const int nb_procs = by_comm_grp ? nb_proc_local_comm_ : Process::nproc();
@@ -491,8 +497,11 @@ int TRUST_2_CGNS::compute_shift(const std::vector<int>& vect_incr_max) const
 #ifdef MPI_
   assert(par_in_zone_);
 
-  const bool by_comm_grp = (Process::is_parallel() && Option_CGNS::LINKED_FILES_PER_COMM_GROUP
-                            && PE_Groups::has_user_defined_group() && !postraiter_domaine_ );
+  const bool by_comm_grp = (Process::is_parallel()
+                            && (Option_CGNS::LINKED_FILES_PER_COMM_GROUP ||
+                                Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)
+                            && PE_Groups::has_user_defined_group()
+                            && !postraiter_domaine_ );
 
   int proc_me = by_comm_grp ? proc_me_local_comm_ : Process::me();
 

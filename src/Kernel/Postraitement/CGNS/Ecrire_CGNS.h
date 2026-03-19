@@ -77,7 +77,7 @@ private:
   // specifique par in zone
   std::vector<std::vector<int>> zoneId_par_; /* par ordre d'ecriture du domaine */
 
-  // specifique LINKED_FILES_PER_COMM_GROUP
+  // specifique LINKED_FILES_PER_COMM_GROUP / SINGLE_FILE_PER_COMM_GROUP
   void gather_local_sizeId_for_comm_group();
   int proc_maitre_local_comm_ = -123;
   std::vector<int> vec_proc_maitre_local_comm_, unique_vec_proc_maitre_local_comm_;

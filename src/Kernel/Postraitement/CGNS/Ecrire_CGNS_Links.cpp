@@ -30,7 +30,10 @@
 
 void Ecrire_CGNS::init_proc_maitre_local_comm()
 {
-  assert(is_deformable_ && Process::is_parallel() && Option_CGNS::LINKED_FILES_PER_COMM_GROUP && PE_Groups::has_user_defined_group());
+  assert(Process::is_parallel()
+         && (Option_CGNS::LINKED_FILES_PER_COMM_GROUP || Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)
+         && PE_Groups::has_user_defined_group());
+
   const auto& grp = PE_Groups::get_user_defined_group();
   if (PE_Groups::enter_group(grp))
     {
@@ -50,8 +53,6 @@ void Ecrire_CGNS::cgns_open_grid_base_link_file()
       const auto& grp = PE_Groups::get_user_defined_group();
       if (PE_Groups::enter_group(grp))
         {
-          proc_maitre_local_comm_ = PE_Groups::groupe_TRUST().rank();
-          envoyer_broadcast(proc_maitre_local_comm_, 0); // XXX should do this !
           fn = (Nom(baseFile_name_)).nom_me(proc_maitre_local_comm_).getString() + ".grid.cgns"; // file name
 
           unlink(fn.c_str());
