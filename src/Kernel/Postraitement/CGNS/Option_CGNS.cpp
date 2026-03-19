@@ -14,7 +14,6 @@
 *****************************************************************************/
 
 #include <Option_CGNS.h>
-#include <Motcle.h>
 #include <Param.h>
 
 Implemente_instanciable(Option_CGNS, "Option_CGNS", Interprete);
@@ -23,6 +22,7 @@ Implemente_instanciable(Option_CGNS, "Option_CGNS", Interprete);
 bool Option_CGNS::PARALLEL_OVER_ZONE = false; /* NOT BY DEFAULT */
 bool Option_CGNS::USE_LINKS = false; /* NOT BY DEFAULT */
 bool Option_CGNS::LINKED_FILES_PER_COMM_GROUP = false; /* NOT BY DEFAULT */
+bool Option_CGNS::SINGLE_FILE_PER_COMM_GROUP = false; /* NOT BY DEFAULT */
 int Option_CGNS::CLOSE_EVERY_N = -1; /* -1 BY DEFAULT => never opened/closed */
 int Option_CGNS::FLUSH_EVERY_N = 1; /* 1 BY DEFAULT => flush each dt post */
 
@@ -32,46 +32,59 @@ Entree& Option_CGNS::readOn(Entree& is) { return Interprete::readOn(is); }
 Entree& Option_CGNS::interpreter(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter_non_std("PARALLEL_OVER_ZONE", (this)); // XD_ADD_P rien If used, data will be written in separate zones (ie: one zone per processor). This is not so performant but easier to read later ...
-  param.ajouter_non_std("USE_LINKS", (this)); // XD_ADD_P rien If used, data will be written in separate files; one file for mesh, and then one file for solution time. Links will be used.
-  param.ajouter_non_std("LINKED_FILES_PER_COMM_GROUP", (this)); // XD_ADD_P rien If used, data will be written (at each comm group) in separate files; one file for mesh, and then one file for solution time. Links will be used.
+  param.ajouter_flag("PARALLEL_OVER_ZONE", &PARALLEL_OVER_ZONE); // XD_ADD_P rien If used, data will be written in separate zones (ie: one zone per processor). This is not so performant but easier to read later ...
+  param.ajouter_flag("USE_LINKS", &USE_LINKS); // XD_ADD_P rien If used, data will be written in separate files; one file for mesh, and then one file for solution time. Links will be used.
+  param.ajouter_flag("LINKED_FILES_PER_COMM_GROUP", &LINKED_FILES_PER_COMM_GROUP); // XD_ADD_P rien If used, data will be written (at each comm group) in separate files; one file for mesh, and then one file for solution time. Links will be used.
+  param.ajouter_flag("SINGLE_FILE_PER_COMM_GROUP", &SINGLE_FILE_PER_COMM_GROUP); // XD_ADD_P rien If used, data will be written (at each comm group) in a single file.
   param.ajouter("CLOSE_EVERY_N", &CLOSE_EVERY_N); // XD_ADD_P entier Used to fix the opening/closing frequency when writing in a single CGNS file (choice by defaut).
   param.ajouter("FLUSH_EVERY_N", &FLUSH_EVERY_N); // XD_ADD_P entier Used to fix the flush-to-disc frequency when writing in a single CGNS file (choice by defaut).
   param.lire_avec_accolades_depuis(is);
 
-  if (PARALLEL_OVER_ZONE && (USE_LINKS || LINKED_FILES_PER_COMM_GROUP))
+  const bool single_file = (!USE_LINKS && !LINKED_FILES_PER_COMM_GROUP);
+
+  if ((PARALLEL_OVER_ZONE || SINGLE_FILE_PER_COMM_GROUP) && !single_file)
     {
-      Cerr << "Error in Option_CGNS :" << finl;
-      Cerr << "       - You can not activate the option 'PARALLEL_OVER_ZONE' with 'USE_LINKS' and/or 'LINKED_FILES_PER_COMM_GROUP' !!!" << finl;
+      Cerr << finl << "Error in Option_CGNS :" << finl;
+      Cerr << "   You can not activate the option 'PARALLEL_OVER_ZONE' and/or 'SINGLE_FILE_PER_COMM_GROUP' with 'USE_LINKS' and/or 'LINKED_FILES_PER_COMM_GROUP' !!!" << finl;
+      Cerr << "   The default CGNS post behavior is a single file for all times/fields." << finl;
+      Cerr << "   PARALLEL_OVER_ZONE and/or SINGLE_FILE_PER_COMM_GROUP options remain in this context; ie: single file." << finl;
+      Cerr << "   USE_LINKS and/or LINKED_FILES_PER_COMM_GROUP options require several linked files." << finl;
+      Cerr << "   See the doc for more details or contact the TRUST support ... " << finl << finl;
       Process::exit();
     }
 
-  return is;
-}
+  Cerr << finl << "*********************************" << finl;
+  Cerr << "********** Option_CGNS **********" << finl;
+  Cerr << "*********************************" << finl << finl;
 
-int Option_CGNS::lire_motcle_non_standard(const Motcle& mot_cle, Entree& is)
-{
-  int retval = 1;
+  if (single_file)
+    {
+      if (FLUSH_EVERY_N > 0)
+        Cerr << " Data will be flushed into a single CGNS file each " << FLUSH_EVERY_N << " time post ..." << finl;
 
-  if (mot_cle == "PARALLEL_OVER_ZONE")
-    {
-      Cerr << mot_cle << " => CGNS data will be written in separate zones ..." << finl;
-      PARALLEL_OVER_ZONE = true;
-    }
-  else if (mot_cle == "USE_LINKS")
-    {
-      Cerr << mot_cle << " => CGNS data will be written in separate files (mesh, solution ...)" << finl;
-      USE_LINKS = true;
-    }
-  else if (mot_cle == "LINKED_FILES_PER_COMM_GROUP")
-    {
-      Cerr << mot_cle << " => A CGNS file will be written in each COMM group ..." << finl;
-      LINKED_FILES_PER_COMM_GROUP = true;
-      Cerr << "USE_LINKS => CGNS data will be written in separate files (mesh, solution ...)" << finl;
-      USE_LINKS = true;
+      if (CLOSE_EVERY_N > 0)
+        Cerr << " A single CGNS file will be closed and opened each " << CLOSE_EVERY_N << " time post ..." << finl;
+
+      if (PARALLEL_OVER_ZONE)
+        Cerr << " PARALLEL_OVER_ZONE => CGNS data will be written in separate zones ..." << finl;
+
+      if (SINGLE_FILE_PER_COMM_GROUP)
+        Cerr << " SINGLE_FILE_PER_COMM_GROUP => A single CGNS file will be written in each COMM group ... ..." << finl;
     }
   else
-    retval = -1;
+    {
+      if (LINKED_FILES_PER_COMM_GROUP)
+        {
+          USE_LINKS = true;
+          Cerr << " LINKED_FILES_PER_COMM_GROUP => Several linked CGNS files will be written in each COMM group ..." << finl;
+          Cerr << " This will activate also the option USE_LINKS ..." << finl;
+        }
 
-  return retval;
+      if (USE_LINKS)
+        Cerr << " USE_LINKS => CGNS data will be written in separate files (mesh, solution ...)" << finl;
+    }
+
+  Cerr << finl << "*********************************" << finl << finl;
+
+  return is;
 }

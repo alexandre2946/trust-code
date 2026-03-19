@@ -25,10 +25,13 @@ class Option_CGNS: public Interprete
   Declare_instanciable(Option_CGNS);
 public:
   Entree& interpreter(Entree&) override;
-  int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  static bool PARALLEL_OVER_ZONE; /* NOT BY DEFAULT */
-  static bool USE_LINKS, LINKED_FILES_PER_COMM_GROUP; /* NOT BY DEFAULT */
+
+  /* Single file options : NOT BY DEFAULT */
+  static bool PARALLEL_OVER_ZONE, SINGLE_FILE_PER_COMM_GROUP;
   static int CLOSE_EVERY_N, FLUSH_EVERY_N;
+
+  /* Multiple linked files options : NOT BY DEFAULT */
+  static bool USE_LINKS, LINKED_FILES_PER_COMM_GROUP;
 };
 
 #endif /* Option_CGNS_included */
