@@ -405,6 +405,19 @@ namespace
     return false;
   }
 
+  static std::string strip_parallel_suffix_if_any(const std::string& name)
+  {
+    const size_t p = name.rfind('_');
+    if (p == std::string::npos || p + 1 >= name.size())
+      return name;
+
+    for (size_t i = p + 1; i < name.size(); i++)
+      if (name[i] < '0' || name[i] > '9')
+        return name;
+
+    return name.substr(0, p);
+  }
+
   // XXX just declare
   static trustIdType read_zone_connectivity(int fn, int ibase, int izone, int cell_dim, const Nom &geom_name, trustIdType nb_nodes, ZoneConnectivityData &zc);
 
@@ -1271,7 +1284,8 @@ void cgns_reader(const char *cgnsfilename, const char *data_filename, LataDB &la
       cgns_check(cg_base_read(fn, ibase, basename_c, &cell_dim, &phys_dim), "cg_base_read");
 
       const std::string basename_str(basename_c);
-      const Nom geom_name(basename_c);
+      const std::string basename_str_mod = strip_parallel_suffix_if_any(basename_str);
+      const Nom geom_name(basename_str_mod.c_str());
 
       std::vector<ZonePartInfo> parts = collect_parallel_zone_parts(fn, ibase, basename_str, cell_dim);
 
@@ -1306,7 +1320,7 @@ void cgns_reader(const char *cgnsfilename, const char *data_filename, LataDB &la
                          << " phys_dim=" << phys_dim << endl;
 
               LataDBGeometry geom;
-              geom.name_ = zonename;
+              geom.name_ = strip_parallel_suffix_if_any(std::string(zonename)).c_str();;
               geom.timestep_ = tstep_geom;
               lata_db.add_geometry(geom);
 
