@@ -38,7 +38,8 @@
 #pragma GCC diagnostic pop
 
 #define CGNS_STR_SIZE 32
-#define CGNS_DOUBLE_TYPE Option_CGNS::SINGLE_PRECISION>0?CGNS_ENUMV(RealSingle):CGNS_ENUMV(RealDouble)
+/* #define CGNS_DOUBLE_TYPE CGNS_ENUMV(RealSingle) */
+#define CGNS_DOUBLE_TYPE CGNS_ENUMV(RealDouble)
 
 enum class TYPE_ECRITURE_CGNS { SEQ , PAR_IN, PAR_OVER };
 enum class TYPE_LINK_CGNS { GRID , SOLUTION, FINAL_LINK };

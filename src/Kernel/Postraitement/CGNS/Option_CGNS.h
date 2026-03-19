@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -26,7 +26,7 @@ class Option_CGNS: public Interprete
 public:
   Entree& interpreter(Entree&) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  static bool SINGLE_PRECISION, PARALLEL_OVER_ZONE, USE_LINKS, FILE_PER_COMM_GROUP; /* NOT BY DEFAULT */
+  static bool PARALLEL_OVER_ZONE, USE_LINKS, FILE_PER_COMM_GROUP; /* NOT BY DEFAULT */
   static bool SINGLE_SAFE_FILE;
   static int CLOSE_EVERY_N, FLUSH_EVERY_N;
 };

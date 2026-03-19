@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,7 +20,6 @@
 Implemente_instanciable(Option_CGNS, "Option_CGNS", Interprete);
 // XD Option_CGNS interprete Option_CGNS 1 Class for CGNS options.
 
-bool Option_CGNS::SINGLE_PRECISION = false; /* NOT BY DEFAULT */
 bool Option_CGNS::PARALLEL_OVER_ZONE = false; /* NOT BY DEFAULT */
 bool Option_CGNS::USE_LINKS = false; /* NOT BY DEFAULT */
 bool Option_CGNS::FILE_PER_COMM_GROUP = false; /* NOT BY DEFAULT */
@@ -34,7 +33,6 @@ Entree& Option_CGNS::readOn(Entree& is) { return Interprete::readOn(is); }
 Entree& Option_CGNS::interpreter(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter_non_std("SINGLE_PRECISION", (this)); // XD_ADD_P rien If used, data will be written with a single_precision format inside the CGNS file (it concerns both mesh coordinates and field values).
   param.ajouter_non_std("PARALLEL_OVER_ZONE", (this)); // XD_ADD_P rien If used, data will be written in separate zones (ie: one zone per processor). This is not so performant but easier to read later ...
   param.ajouter_non_std("USE_LINKS", (this)); // XD_ADD_P rien If used, data will be written in separate files; one file for mesh, and then one file for solution time. Links will be used.
   param.ajouter_non_std("FILE_PER_COMM_GROUP", (this)); // XD_ADD_P rien If used, data will be written (at each comm group) in separate files; one file for mesh, and then one file for solution time. Links will be used.
@@ -64,12 +62,7 @@ int Option_CGNS::lire_motcle_non_standard(const Motcle& mot_cle, Entree& is)
 {
   int retval = 1;
 
-  if (mot_cle == "SINGLE_PRECISION")
-    {
-      Cerr << mot_cle << " => CGNS data will be written in a single precision format ..." << finl;
-      SINGLE_PRECISION = true;
-    }
-  else if (mot_cle == "PARALLEL_OVER_ZONE")
+  if (mot_cle == "PARALLEL_OVER_ZONE")
     {
       Cerr << mot_cle << " => CGNS data will be written in separate zones ..." << finl;
       PARALLEL_OVER_ZONE = true;
