@@ -50,22 +50,14 @@ void Ecrire_CGNS::cgns_open_grid_base_link_file()
 
   if (Process::is_parallel() && Option_CGNS::LINKED_FILES_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
     {
-      const auto& grp = PE_Groups::get_user_defined_group();
-      if (PE_Groups::enter_group(grp))
-        {
-          fn = (Nom(baseFile_name_)).nom_me(proc_maitre_local_comm_).getString() + ".grid.cgns"; // file name
-
-          unlink(fn.c_str());
-
-          cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR>(fn, fileId_, false);
-          PE_Groups::exit_group();
-        }
+      fn = (Nom(baseFile_name_)).nom_me(proc_maitre_local_comm_).getString() + ".grid.cgns"; // file name
+      unlink(fn.c_str());
+      cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR>(fn, fileId_, false);
       Cerr << "**** Multiple parallel CGNS files " << baseFile_name_ << "_XXXX.grid.cgns opened !" << finl;
     }
   else
     {
       fn = baseFile_name_ + ".grid.cgns"; // file name
-
       unlink(fn.c_str());
 
       if (Process::is_parallel())

@@ -81,16 +81,9 @@ void Ecrire_CGNS::cgns_open_file()
     {
       if (Option_CGNS::SINGLE_FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
         {
-          const auto& grp = PE_Groups::get_user_defined_group();
-          if (PE_Groups::enter_group(grp))
-            {
-              fn = (Nom(baseFile_name_)).nom_me(proc_maitre_local_comm_).getString() + ".cgns"; // file name
-
-              unlink(fn.c_str());
-
-              cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR>(fn, fileId_, false);
-              PE_Groups::exit_group();
-            }
+          fn = (Nom(baseFile_name_)).nom_me(proc_maitre_local_comm_).getString() + ".cgns"; // file name
+          unlink(fn.c_str());
+          cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR>(fn, fileId_, false);
           Cerr << "**** Multiple parallel CGNS files " << baseFile_name_ << "_XXXX.cgns opened !" << finl;
         }
       else
@@ -253,13 +246,8 @@ void Ecrire_CGNS::cgns_add_time(const double t)
                 {
                   if (Option_CGNS::SINGLE_FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
                     {
-                      const auto& grp = PE_Groups::get_user_defined_group();
-                      if (PE_Groups::enter_group(grp))
-                        {
-                          fn = (Nom(baseFile_name_)).nom_me(proc_maitre_local_comm_).getString() + ".cgns"; // file name
-                          cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR, TYPE_MODE_CGNS::MODIFY>(fn, fileId_, false);
-                          PE_Groups::exit_group();
-                        }
+                      fn = (Nom(baseFile_name_)).nom_me(proc_maitre_local_comm_).getString() + ".cgns"; // file name
+                      cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR, TYPE_MODE_CGNS::MODIFY>(fn, fileId_, false);
                     }
                   else
                     cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR, TYPE_MODE_CGNS::MODIFY>(fn, fileId_, /*print*/false);
@@ -309,13 +297,8 @@ void Ecrire_CGNS::ensure_modify_open_singlefile()
     {
       if (Option_CGNS::SINGLE_FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
         {
-          const auto& grp = PE_Groups::get_user_defined_group();
-          if (PE_Groups::enter_group(grp))
-            {
-              fn = (Nom(baseFile_name_)).nom_me(proc_maitre_local_comm_).getString() + ".cgns"; // file name
-              cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR, TYPE_MODE_CGNS::MODIFY>(fn, fileId_, false);
-              PE_Groups::exit_group();
-            }
+          fn = (Nom(baseFile_name_)).nom_me(proc_maitre_local_comm_).getString() + ".cgns"; // file name
+          cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR, TYPE_MODE_CGNS::MODIFY>(fn, fileId_, false);
         }
       else
         cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR, TYPE_MODE_CGNS::MODIFY>(fn, fileId_, /*print*/ false);
