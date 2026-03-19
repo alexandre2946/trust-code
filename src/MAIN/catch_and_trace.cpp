@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -45,15 +45,46 @@ void crit_err_hdlr(True_int sig_num, siginfo_t * info, void * ucontext)
 {
   if (crit_err_hdlr_done) return;
   crit_err_hdlr_done = true;
-  std::cerr << "Error handler triggered!! See Journal - process ID: " << Process::me() << std::endl;
-  Process::Journal() << "signal " << (int)sig_num
-                     << " (" << strsignal(sig_num) << "), address is "
-                     << long(info->si_addr) << finl; //" from "
+  Cerr << "======================================================================" << finl;
+  Cerr << "Error handler triggered!! See Journal - process ID: " << Process::me() << finl;
+  Cerr << "signal " << (int)sig_num  << " (" << strsignal(sig_num) << ") " << finl;
+  if (sig_num == SIGFPE)
+    {
+      const char* fpe_type = "unknown FPE";
+      switch (info->si_code)
+        {
+        case FPE_INTDIV:
+          fpe_type = "FPE_INTDIV: integer divide by zero";
+          break;
+        case FPE_INTOVF:
+          fpe_type = "FPE_INTOVF: integer overflow";
+          break;
+        case FPE_FLTDIV:
+          fpe_type = "FPE_FLTDIV: floating-point divide by zero";
+          break;
+        case FPE_FLTOVF:
+          fpe_type = "FPE_FLTOVF: floating-point overflow";
+          break;
+        case FPE_FLTUND:
+          fpe_type = "FPE_FLTUND: floating-point underflow";
+          break;
+        case FPE_FLTRES:
+          fpe_type = "FPE_FLTRES: floating-point inexact result";
+          break;
+        case FPE_FLTINV:
+          fpe_type = "FPE_FLTINV: invalid floating-point operation (NaN, sqrt(-1)...)";
+          break;
+        case FPE_FLTSUB:
+          fpe_type = "FPE_FLTSUB: subscript out of range";
+          break;
+        }
+      Cerr << "FPE subtype: " << fpe_type << finl;
+    }
 
   void * array[100];
   int size = backtrace(array, 100);
 
-  Process::Journal() << __FUNCTION__ << " backtrace returned " << size << " frames\n" << finl;
+  //Cerr << __FUNCTION__ << " backtrace returned " << size << " frames\n" << finl;
 
   // Extract symbols from backtrace
   char ** messages = backtrace_symbols(array, size);
@@ -61,13 +92,11 @@ void crit_err_hdlr(True_int sig_num, siginfo_t * info, void * ucontext)
   // Skip first stack frame (points here) and print out backtrace
   for (int i = 1; i < size && messages != nullptr; ++i)
     {
-      Process::Journal() << "[proc " << Process::me() << "]: (" << i << ") " << messages[i] << finl;
+      // Cerr << "[proc " << Process::me() << "]: (" << i << ") " << messages[i] << finl;
       // Find first occurence of '(' or ' ' in message[i] and assume
       // everything before that is the file name (don't go beyond 0 though, string terminator)
       size_t p = 0;
-      while(messages[i][p] != '(' && messages[i][p] != ' '
-            && messages[i][p] != 0)
-        ++p;
+      while(messages[i][p] != '(' && messages[i][p] != ' ' && messages[i][p] != 0) ++p;
 
       // Call 'addr2line' system utility to extract line number in the source code:
       char syscom[256];
@@ -75,12 +104,11 @@ void crit_err_hdlr(True_int sig_num, siginfo_t * info, void * ucontext)
       std::string output;
       int ret = exec_cmd_and_get_output(syscom, output);
       if(!ret)
-        Process::Journal() << "(Unable to execute 'addr2line' to get line number in source ...)" << finl;
+        Cerr << "(Unable to execute 'addr2line' to get line number in source ...)" << finl;
       else
-        Process::Journal() << "[proc " << Process::me() << "]: (" << i << ") ----> "
-                           << output << finl;
+        Cerr << "[proc " << Process::me() << "]: " << output << finl;
     }
-  Process::Journal() << finl;
+  Cerr << finl;
   free(messages);
 
   Process::exit();

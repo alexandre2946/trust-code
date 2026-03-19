@@ -80,12 +80,6 @@ mon_main::mon_main(int verbose_level, bool journal_master, Nom log_directory, bo
   change_disable_stop(disable_stop);
 }
 
-// Catching exception signal only in debug mode:
-#ifndef NDEBUG
-bool error_handlers = true;
-#else
-bool error_handlers = false;
-#endif
 static int init_petsc(True_int argc, char **argv, bool with_mpi,bool& trio_began_mpi_)
 {
 #ifdef PETSCKSP_H
@@ -133,11 +127,8 @@ static int init_petsc(True_int argc, char **argv, bool with_mpi,bool& trio_began
   PetscPopSignalHandler();
 
 #ifndef __CYGWIN__
-  if (error_handlers || getenv("TRUST_ENABLE_ERROR_HANDLERS") != nullptr)
-    {
-      Cerr << "Enabling error handlers catching SIGFPE and SIGABORT and giving a trace of where the fault happened." << finl;
-      install_handlers();
-    }
+  Cerr << "Enabling error handlers catching SIGFPE and SIGABORT and giving a trace of where the fault happened." << finl;
+  install_handlers();
 #endif
 #else
 #ifdef MPI_
