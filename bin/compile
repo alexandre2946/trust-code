@@ -119,9 +119,7 @@ depend=0
 [ $# = 2 ] && [ $2 = "depend" ] && depend=1
 monodir=0 && [ $# -gt 0 ] && [ $1 = "monodir" ] && monodir=2
 [ $# -gt 0 ] && [ $1 = "monodir_cmake" ] && monodir=2
-# OPT="_semi_opt" if using an SCM <=> Developer version
 COMPIL_DYN=OFF
-# [ $monodir = 0 ] && [ "$TRUST_SCM" = 1 ] && OPT="_semi_opt" &&  COMPIL_DYN=ON
 [ $monodir = 0 ] && [ "$TRUST_SCM" = 1 ] && COMPIL_DYN=ON
 monodir=2
 
@@ -327,7 +325,7 @@ then
    # On fait le mklibs
    mklibs=`ls $TRUST_ROOT/bin/mklibs* 2>/dev/null` && $mklibs
    [ ${#MonoDir} = 0 ] && MonoDir=$TRUST_ROOT/MonoDir$COMM$OPT
-   echo "Build with COMM=\"$COMM\" and OPT=\"$OPT\" under the directory $MonoDir"
+   #echo "Build with COMM=\"$COMM\" and OPT=\"$OPT\" under the directory $MonoDir"
    [ ${#TRUST_ROOT} = 0 ] && echo "TRUST_ROOT variable is not defined !" && echo "BUILD_EXEC=KO" | tee -a $COMPILE && exit
 
    # Creation de ce qui n'existe peut etre pas :
@@ -374,6 +372,7 @@ then
           _prof) build_type="Profil" ;;
           _gcov)  build_type="Coverage" ;;
           _semi_opt) build_type="semi_opt";;
+          _profiling) build_type="profiling";;
           _custom) build_type="custom";;
           _opt_avx)  build_type="Release_avx";;
           *) echo $opt not for cmake in $0; echo "BUILD_EXEC=KO" | tee -a $COMPILE; exit -1 ;;

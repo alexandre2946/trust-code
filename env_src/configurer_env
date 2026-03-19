@@ -2505,9 +2505,9 @@ LINK_MALIB = $LINK_MALIB" > $tmp
    ### sur Adastra-gpu avec crayftn, il faut passer -O0 sinon make debug passe pas( _dger_ undefined reference dans dlsode.f)
    [ "$TRUST_ARCH_CC" = "linux_crayCC" ] && F77Flags=`echo $F77Flags | sed "1,$ s?-g?-g -O0?g"`
    [ "$TRUST_ARCH_CC" = "linux_crayCC" ] && F77Flags_64b=`echo $F77Flags_64b | sed "1,$ s?-g?-g -O0?g"`
-   #############################
-   # Creation du fichier profile
-   #############################
+   ##########################
+   # Creation make.XXX_opt_pg
+   ##########################
    tmp=`mktemp_`
    cp -f make.$suffixe $tmp
    # 30/08/04: Pour les makefile avec profile, rajout de -a (profile par ligne avec gprof -l) : non gcc 3.2 n'accepte pas...
@@ -2533,9 +2533,9 @@ LINK_MALIB = $LINK_MALIB" > $tmp
    suffixe2=$TRUST_ARCH_CC${suffixe#$TRUST_ARCH_CC}"_pg"
    update_file $tmp make.$suffixe2
    #O="-g"
-   ##############################
-   # Creation du fichier coverage
-   ##############################
+   ############################
+   # Creation make.XXX_opt_gcov
+   ############################
    if [ ${TRUST_CC_BASE%g++} != $TRUST_CC_BASE ]
    then
       tmp=`mktemp_`
@@ -2567,7 +2567,9 @@ sed -i "s?-DNDEBUG??g" $tmp
 suffixe4=$TRUST_ARCH_CC"_semi_opt"
 update_file $tmp make.$suffixe4
 
+#########################################################################
 # Creation d'une version make.$ARCH_opt_avx pour tester le support de AVX
+#########################################################################
 if [ "$AVX_SUPPORTED" = 0 ]
 then
    tmp=`mktemp_`
@@ -2577,6 +2579,17 @@ then
    suffixe5=$TRUST_ARCH_CC"_opt_avx"
    update_file $tmp make.$suffixe5
 fi
+
+######################################
+# Creation d'un make.XXX_opt_profiling
+######################################
+tmp=`mktemp_`
+cp -f make.$TRUST_ARCH_CC"_opt" $tmp
+sed -i "s?-O3?-O3 -g?g" $tmp							# Line
+sed -i "s?-O3?-O3 -fno-omit-frame-pointer?g" $tmp 				# For perf
+[ "$TRUST_USE_CUDA" = 1 ] && sed -i "s?gpu=?gpu=lineinfo,ptxinfo,?g" $tmp 	# For Cuda build
+suffixe6=$TRUST_ARCH_CC"_opt_profiling"
+update_file $tmp make.$suffixe6
 
 # Options de compilation sur native
 if [ "$TRUST_ADD_NATIVE_FLAGS" = 1 ]
@@ -2620,7 +2633,7 @@ find_flags()
 }
 defines_base=`grep "Defines ="  make.${TRUST_ARCH_CC}| sed "s/Defines =//"`
 echo "SET(ADD_CPPFLAGS \""`grep "Defines ="  make.${TRUST_ARCH_CC} | sed "s/Defines =//" | awk -F\$ '{print $1}'` "-D$TRUST_ARCH \")"| sed "s/-D //" > Cmake.env
-for mode in Debug Release Profil Coverage semi_opt Release_avx
+for mode in Debug Release Profil Coverage semi_opt profiling Release_avx
 do
   case $mode in
       Debug) suf="" ;;
@@ -2629,6 +2642,7 @@ do
       Profil) suf="_opt_pg";;
       Coverage) suf="_opt_gcov";;
       semi_opt) suf="_semi_opt";;
+      profiling) suf="_opt_profiling";;
       *) echo $mode inconnue ;
          [ -f $TRUST_ROOT/NON_INSTALLED ] && Display_Missing_packages ;
          exit -1 ;;
@@ -2643,7 +2657,7 @@ do
       find_flags EXE_LINKER SYSLIBS
   fi
 done
-echo "SET( CMAKE_BUILD_TYPE \"\${CMAKE_BUILD_TYPE}\" CACHE STRING \"Choose the type of build, options are: Debug Release Profil Coverage semi_opt. \"    FORCE )" >> Cmake.env
+echo "SET( CMAKE_BUILD_TYPE \"\${CMAKE_BUILD_TYPE}\" CACHE STRING \"Choose the type of build, options are: Debug Release Profil Coverage semi_opt profiling. \"    FORCE )" >> Cmake.env
 echo "File Cmake.env created."
 
 cd $TRUST_ROOT/bin
@@ -2678,7 +2692,7 @@ $TRUST_ROOT/lib/src/LIBVC/include/Vc/Vc
 $TRUST_ROOT/lib/src/LIBCGNS/include/cgns++.h
 $TRUST_ROOT/lib/src/LIBPDI/include/pdi++.h
 "
-for petsc_option in _ _opt _opt_pg _opt_gcov _semi_opt _opt_avx _custom
+for petsc_option in _ _opt _opt_pg _opt_gcov _semi_opt _opt_profiling _opt_avx _custom
 do
    [ $petsc_option = "_" ] && petsc_option=""
    includes=$includes" "$TRUST_ROOT/lib/src/LIBPETSC/petsc/$TRUST_ARCH$petsc_option/include/petsc_for_kernel.h" "$TRUST_ROOT/lib/src/LIBPETSC/petsc/$TRUST_ARCH$petsc_option/include/metis.h" "$TRUST_ROOT/lib/src/LIBPETSC/petsc/$TRUST_ARCH$petsc_option/include/ptscotch++.h" "$TRUST_ROOT/lib/src/LIBPETSC/petsc/$TRUST_ARCH$petsc_option/include/parmetis++.h

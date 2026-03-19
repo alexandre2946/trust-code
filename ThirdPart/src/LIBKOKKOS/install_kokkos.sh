@@ -145,7 +145,7 @@ if [ ! -f $KOKKOS_ROOT_DIR/lib64/libkokkos.a ]; then
       done
       # Cree liens pour autres builds
       (cd $KOKKOS_ROOT_DIR;
-      for build in _opt_gcov _opt_pg
+      for build in _opt_gcov _opt_pg _opt_profiling
       do
          ln -s -f $TRUST_ARCH"_opt" $TRUST_ARCH$build
       done

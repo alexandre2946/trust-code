@@ -18,6 +18,7 @@ then
    echo $ECHO_OPTS "2- produce the optimized executable in \$rep_dev/exec_opt directory"
    echo $ECHO_OPTS "3- produce the optimized profile executable in \$rep_dev/exec_opt_pg directory"
    echo $ECHO_OPTS "4- produce the semi-optimized executable in \$rep_dev/exec_semi_opt directory"
+   echo $ECHO_OPTS "5- produce the profiling executable in \$rep_dev/exec_profiling directory"
    echo $ECHO_OPTS "-------------------------------------------------------------------------------------------------"
    read choix
 fi
@@ -66,6 +67,7 @@ case $choix in
     2) liste_rep_exec=$rep_dev/exec_opt;;
     3) liste_rep_exec=$rep_dev/exec_opt_pg;;
     4) liste_rep_exec=$rep_dev/exec_semi_opt;;
+    5) liste_rep_exec=$rep_dev/exec_profiling;;
     *) echo $ECHO_OPTS "Erreur dans le choix $choix.";exit;;
 esac
 
@@ -315,8 +317,9 @@ do
          _opt_avx) build_type="Release_avx" ;;
             debug) build_type="Debug" ;;
           _opt_pg) build_type="Profil" ;;
-        _opt_gcov)  build_type=Coverage ;;
+        _opt_gcov) build_type=Coverage ;;
         _semi_opt) build_type="semi_opt";;
+   _opt_profiling) build_type="profiling";;
           _custom) build_type="custom";;
                 *) echo $opt not for cmake in $0;  exit -1 ;;
       esac;
@@ -352,6 +355,7 @@ then
       2) echo $ECHO_OPTS $$ > $rep_dev/exec_opt/.pcs_compile;;
       3) echo $ECHO_OPTS $$ > $rep_dev/exec_opt_pg/.pcs_compile;;
       4) echo $ECHO_OPTS $$ > $rep_dev/exec_semi_opt/.pcs_compile;;
+      5) echo $ECHO_OPTS $$ > $rep_dev/exec_opt_profiling/.pcs_compile;;
       *) echo $ECHO_OPTS "Error $choix is not correct.";exit;;
    esac
    read bidon
@@ -362,6 +366,7 @@ then
       2) rm -f $rep_dev/exec_opt/.pcs_compile;;
       3) rm -f $rep_dev/exec_opt_pg/.pcs_compile;;
       4) rm -f $rep_dev/exec_semi_opt/.pcs_compile;;
+      5) rm -f $rep_dev/exec_opt_profiling/.pcs_compile;;
       *) echo $ECHO_OPTS "Error $choix is not correct.";exit;;
    esac
 fi

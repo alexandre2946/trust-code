@@ -902,6 +902,7 @@ export Rapports_auto_root=\${project_directory}/build/tests/share/all/
 export exec_opt=\${project_directory}/${project_executable_name}_opt
 export exec=\${project_directory}/${project_executable_name}_opt
 export exec_semi_opt=\${project_directory}/${project_executable_name}_semi_opt
+export exec_profiling=\${project_directory}/${project_executable_name}_opt_profiling
 export exec_pg=\${project_directory}/${project_executable_name}_opt_pg
 export exec_gcov=\${project_directory}/${project_executable_name}_opt_gcov
 export exec_debug=\${project_directory}/${project_executable_name}" >> $env_file
