@@ -138,7 +138,7 @@ void Ecrire_CGNS::finir_ecriture(double temps)
     }
   else
     {
-      if (Option_CGNS::SINGLE_SAFE_FILE && singlefile_open_)
+      if (singlefile_open_)
         {
           const bool will_flush = (Option_CGNS::FLUSH_EVERY_N > 0) &&
                                   (step_single_file_counter_ % Option_CGNS::FLUSH_EVERY_N == 0);
@@ -176,13 +176,11 @@ void Ecrire_CGNS::finir_ecriture(double temps)
 
 void Ecrire_CGNS::cgns_finir()
 {
-  if (Option_CGNS::USE_LINKS && !postraiter_domaine_)
+  if (is_lagrangian_)
     return; /* All done */
 
-  if (Option_CGNS::SINGLE_SAFE_FILE && !singlefile_open_)
+  if (Option_CGNS::USE_LINKS && !postraiter_domaine_ && !singlefile_open_)
     return; /* All done */
-
-  if (is_lagrangian_) return; /* All done */
 
   if (!postraiter_domaine_ && !first_time_post_)
     {
@@ -213,7 +211,7 @@ void Ecrire_CGNS::cgns_add_time(const double t)
         cgns_open_solution_link_file(t);
     }
 
-  if (Option_CGNS::SINGLE_SAFE_FILE && !postraiter_domaine_ && !is_lagrangian_)
+  if (!Option_CGNS::USE_LINKS && !postraiter_domaine_ && !is_lagrangian_)
     {
       step_single_file_counter_++; // XXX
 
@@ -254,7 +252,8 @@ void Ecrire_CGNS::cgns_flush_to_disk() const
 
 void Ecrire_CGNS::ensure_modify_open_singlefile()
 {
-  if (ensure_modify_done_ || Option_CGNS::USE_LINKS || postraiter_domaine_ || is_lagrangian_) return;
+  if (ensure_modify_done_ || Option_CGNS::USE_LINKS || postraiter_domaine_ || is_lagrangian_)
+    return; /* Do nothing */
 
   const std::string fn = baseFile_name_ + ".cgns";
 
@@ -457,7 +456,7 @@ void Ecrire_CGNS::cgns_write_iters()
 {
   if (is_lagrangian_) return;
 
-  if (Option_CGNS::SINGLE_SAFE_FILE && !ensure_modify_done_)
+  if (!Option_CGNS::USE_LINKS && !ensure_modify_done_)
     ensure_modify_open_singlefile(); /* to make sure we can modify !! */
 
   std::vector<int> ind_doms_dumped;

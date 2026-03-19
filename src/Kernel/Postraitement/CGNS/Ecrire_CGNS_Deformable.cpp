@@ -195,7 +195,7 @@ void Ecrire_CGNS::cgns_write_iters_deformable()
 {
   if (first_time_post_ || is_lagrangian_) return;
 
-  if (Option_CGNS::SINGLE_SAFE_FILE && !ensure_modify_done_)
+  if (!Option_CGNS::USE_LINKS && !ensure_modify_done_)
     ensure_modify_open_singlefile(); /* to make sure we can modify !! */
 
   const int nsteps = static_cast<int>(time_post_.size());

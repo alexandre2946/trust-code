@@ -134,7 +134,7 @@ private:
   void cgns_write_domaine_deformable_par_in_zone(const Domaine * ,const Nom& , const DoubleTab& , const IntTab& , const Motcle& );
   void cgns_write_field_par_in_zone(const int, const double, const Nom&, const Nom&, const Nom&, const Nom&, const DoubleTab&);
 
-  // Version fichier-unique via SINGLE_SAFE_FILE
+  // Version fichier CGNS unique (safe !)
   void ensure_modify_open_singlefile();
   void cgns_flush_to_disk() const;
   bool ensure_modify_done_ = false;
