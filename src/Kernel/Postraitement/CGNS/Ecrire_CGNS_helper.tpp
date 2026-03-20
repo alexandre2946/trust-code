@@ -412,7 +412,7 @@ inline void Ecrire_CGNS_helper::cgns_write_iters_deformable(const bool is_deform
   const bool is_comm_group = (Option_CGNS::LINKED_FILES_PER_COMM_GROUP || Option_CGNS::SINGLE_FILE_PER_COMM_GROUP);
 
   for (int ii = 0; ii != nb_zones_to_write; ii++)
-    if (zoneId[ind] != -123)
+    if (zoneId[is_PAR_OVER || is_comm_group ? ii : ind] != -123)
       {
         /* create ZoneIterativeData */
         if (cg_ziter_write(fileId, baseId, zoneId[is_PAR_OVER || is_comm_group ? ii : ind], "ZoneIterativeData") != CG_OK)
