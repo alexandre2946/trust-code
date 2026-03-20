@@ -265,7 +265,7 @@ void Ecrire_CGNS::cgns_add_time(const double t)
   flowId_elem_++, flowId_som_++, flowId_faces_++; // increment
   fieldId_elem_ = 0, fieldId_som_ = 0, fieldId_faces_ = 0; // reset
   solname_elem_written_ = false, solname_som_written_ = false, solname_faces_written_ = false; // reset
-  multi_loc_deformable_support_linked_ = false; // reset
+  multi_loc_deformable_support_linked_ = false, grid_name_written_ = false; // reset
 }
 
 void Ecrire_CGNS::cgns_flush_to_disk() const
@@ -309,8 +309,25 @@ void Ecrire_CGNS::ensure_modify_open_singlefile()
   ensure_modify_done_ = true;
 }
 
+void Ecrire_CGNS::update_grid_name()
+{
+  grid_name_loc_ = "GridCoordinates";
+
+  if (!first_time_post_) // Pas la premiere fois
+    grid_name_loc_ += cgns_helper_.convert_double_to_string(time_post_.back());
+
+  std::string c = grid_name_loc_;
+  c.resize(CGNS_STR_SIZE, ' ');
+  grid_name_ += c;
+
+  grid_name_written_ = true;
+}
+
 void Ecrire_CGNS::cgns_write_domaine(const Domaine * dom,const Nom& nom_dom, const DoubleTab& som, const IntTab& elem, const Motcle& type_e)
 {
+  if (!grid_name_written_ && (first_time_post_ || is_deformable_))
+    update_grid_name();
+
   std::string nom_dom_modifie = TRUST_2_CGNS::modify_domaine_name_for_post(nom_dom);
 
   if (Option_CGNS::USE_LINKS && !postraiter_domaine_ && !is_deformable_)

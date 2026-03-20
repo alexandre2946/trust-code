@@ -45,6 +45,7 @@ public:
 private:
 
   void fill_infos_loc();
+  void update_grid_name();
   Ecrire_CGNS_helper cgns_helper_;
   OBS_PTR(Domaine_dis_base) domaine_dis_;
   OBS_PTR(std::vector<std::string>) loc_vect_;
@@ -54,11 +55,12 @@ private:
   std::vector<Nom> doms_written_;
   std::vector<Nom> fieldName_dumped_; /* filled just once to see what fields are already written ! */
   std::string solname_elem_ = "", solname_som_ = "", solname_faces_ = "", baseFile_name_ = "";
+  std::string grid_name_ = "", grid_name_loc_ = "";
   std::vector<double> time_post_;
   std::vector<int> baseId_, zoneId_;
 
   bool has_elem_field_ = false, has_faces_field_ = false, has_som_field_ = false;
-  bool solname_elem_written_ = false, solname_som_written_ = false, solname_faces_written_ = false;
+  bool solname_elem_written_ = false, solname_som_written_ = false, solname_faces_written_ = false, grid_name_written_ = false;
   bool postraiter_domaine_ = false;
   bool first_time_post_ = true;
 
