@@ -20,77 +20,8 @@
 
 #ifdef HAS_CGNS
 
-//void Ecrire_CGNS::cgns_write_iters_lagrangian()
-//{
-//  if (first_time_post_) return;
-//
-//  const int nsteps = static_cast<int>(time_post_.size());
-//  assert(nsteps > 0);
-//
-//  const cgsize_t nuse = static_cast<cgsize_t>(nsteps);
-//
-//  std::vector<int> bases_done;
-//  bases_done.reserve(doms_written_.size());
-//
-//  for (int ind = 0; ind < (int)doms_written_.size(); ind++)
-//    {
-//      const int baseId = baseId_[ind];
-//      const Nom& nom_dom = doms_written_[ind];
-//
-//      // éviter doublons baseId
-//      if (std::find(bases_done.begin(), bases_done.end(), baseId) != bases_done.end())
-//        continue;
-//      bases_done.push_back(baseId);
-//
-//      // BaseIterativeData_t
-//      if (cg_biter_write(fileId_, baseId, "TimeIterValues", nsteps) != CG_OK)
-//        Cerr << "Error Ecrire_CGNS::cgns_write_iters_lagrangian : cg_biter_write !" << finl, TRUST_CGNS_ERROR();
-//
-//      if (cg_goto(fileId_, baseId, "BaseIterativeData_t", 1, "end") != CG_OK)
-//        Cerr << "Error Ecrire_CGNS::cgns_write_iters_lagrangian : cg_goto BaseIterativeData_t !" << finl, TRUST_CGNS_ERROR();
-//
-//      // TimeValues
-//      if (cg_array_write("TimeValues", CGNS_DOUBLE_TYPE, 1, &nuse, time_post_.data()) != CG_OK)
-//        Cerr << "Error Ecrire_CGNS::cgns_write_iters_lagrangian : cg_array_write TimeValues !" << finl, TRUST_CGNS_ERROR();
-//
-//      // NumberOfZones : 1 zone active par pas
-//      std::vector<int> number_of_zones(nsteps, 1);
-//      if (cg_array_write("NumberOfZones", CGNS_ENUMV(Integer), 1, &nuse, number_of_zones.data()) != CG_OK)
-//        Cerr << "Error Ecrire_CGNS::cgns_write_iters_lagrangian : cg_array_write NumberOfZones !" << finl, TRUST_CGNS_ERROR();
-//
-//      // ZonePointers : Character rank=3 : (CGNS_STR_SIZE, MaxNumberOfZones, NumberOfSteps)
-//      // Ici MaxNumberOfZones = 1
-//      cgsize_t zpdims[3] = { CGNS_STR_SIZE, 1, nuse };
-//
-//      std::string zone_ptrs;
-//      zone_ptrs.reserve((size_t)CGNS_STR_SIZE * (size_t)nsteps);
-//
-//      bool first = true;
-//      for (double t : time_post_)
-//        {
-//          std::string zn = nom_dom.getString();
-//          if (!first)
-//            zn += cgns_helper_.convert_double_to_string(t);
-//          first = false;
-//
-//          zn.resize(CGNS_STR_SIZE, ' ');
-//          zone_ptrs += zn;
-//        }
-//
-//      if (zone_ptrs.size() != (size_t)CGNS_STR_SIZE * (size_t)nsteps)
-//        Cerr << "Error: bad ZonePointers buffer size" << finl, TRUST_CGNS_ERROR();
-//
-//      if (cg_array_write("ZonePointers", CGNS_ENUMV(Character), 3, zpdims, zone_ptrs.c_str()) != CG_OK)
-//        Cerr << "Error Ecrire_CGNS::cgns_write_iters_lagrangian : cg_array_write ZonePointers !" << finl, TRUST_CGNS_ERROR();
-//
-//      // SimulationType : peut déjà exister -> on ignore l'erreur "already defined"
-//      (void)cg_simulation_type_write(fileId_, baseId, CGNS_ENUMV(TimeAccurate));
-//    }
-//}
-
 void Ecrire_CGNS::cgns_write_final_link_file_lagrangian()
 {
-////  cgns_write_final_link_file_pb_deformable();
   if (Process::me()) return; // seul le proc 0 écrit le fichier link
 
   const int nsteps = static_cast<int>(time_post_.size());
