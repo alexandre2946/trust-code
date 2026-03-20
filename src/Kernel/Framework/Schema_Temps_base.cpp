@@ -102,6 +102,9 @@ double Schema_Temps_base::computeTimeStep(bool& is_stop) const
   if (temps_courant_ > temps_precedent_)
     dt = std::min(dt, (temps_courant_ - temps_precedent_) * dt_gf_); //pour ne pas remonter dt trop vite (comme facsec)
 
+  if (limpr() || (nb_pas_dt_ == 0))
+    Cout << "Time step finally used to solve the next time step (taking into account facsec) : " << dt << " s." << finl;
+
   // If dt has been reduced after a failed step, enforce dt_min check again.
   if ((dt - dt_min_) / (dt + DMINFLOAT) < -1.e-6 && !adapt_dt_tmax_)
     {
@@ -802,9 +805,6 @@ bool Schema_Temps_base::corriger_dt_calcule(double& dt_calc) const
           adapt_dt_tmax = true;
         }
     }
-
-  if (limpr() || (nb_pas_dt_ == 0))
-    Cout << "Time step finally used to solve the next time step (taking into account facsec) : " << dt << " s." << finl;
 
   dt_calc = dt;
 

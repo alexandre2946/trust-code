@@ -131,6 +131,7 @@ public :
   void update_critere_statio(const DoubleTab& tab_critere, Equation_base& equation);
   inline double facteur_securite_pas() const;
   inline double& facteur_securite_pas();
+  inline void notify_failed_timestep();
   virtual int stop() const;
   int lsauv() const;
   inline int temps_final_atteint() const;
@@ -324,6 +325,11 @@ inline void Schema_Temps_base::nommer(const Nom& name)
 inline const Nom& Schema_Temps_base::le_nom() const
 {
   return nom_;
+}
+
+inline void Schema_Temps_base::notify_failed_timestep()
+{
+  dt_failed_ = dt_;
 }
 
 /*! @brief Renvoie une reference sur le nombre de pas maxi

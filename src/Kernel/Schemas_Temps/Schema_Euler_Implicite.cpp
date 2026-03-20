@@ -333,7 +333,7 @@ bool Schema_Euler_Implicite::iterateTimeStep(bool& converged)
         {
           Cout<<"!!! Schema_Euler_Implicite has not converged at t="<< temps_courant_ << " with dt =" << dt_<< " !!!" << finl;
           converged = false;
-          dt_failed_ = dt_; //pour proposer un pas de temps plus bas au prochain essai
+          notify_failed_timestep(); // pour proposer un pas de temps plus bas au prochain essai
           return false;
         }
       else
@@ -481,7 +481,7 @@ int Schema_Euler_Implicite::faire_un_pas_de_temps_pb_couple(Probleme_Couple& pbc
       if (!ok || (!convergence_pbc && compteur==nb_ite_max))
         {
           Cout << pbc.le_nom() << (ok ? " : failure" : " : non-convergence") << " at t = "<< temps_courant_ << " with dt = " << dt_<< " !!!" << finl;
-          dt_failed_ = dt_; //pour proposer un pas de temps plus bas au prochain essai
+          notify_failed_timestep(); // pour proposer un pas de temps plus bas au prochain essai
           return 0;
         }
       else

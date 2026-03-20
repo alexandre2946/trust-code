@@ -170,11 +170,14 @@ bool Probleme_Couple_Point_Fixe::solveTimeStep()
 
   if (!ok || !converged)
     {
+      for (int i = 0; i < nb_problemes(); i++)
+        per_pb_schemas[i]->notify_failed_timestep();
       if (limpr())
         Cerr << le_nom() << " : Failure in Probleme_Couple_Point_Fixe::solveTimeStep after " << compteur << " iterations." << finl;
       return false;
     }
 
+  Cout << "Convergence du point fixe a t = " << schema_temps().temps_courant() << " en " << compteur << " iterations." << finl;
   for (int i = 0; i < nb_problemes(); i++)
     per_pb_schemas[i]->test_stationnaire(ref_cast(Probleme_base, probleme(i)));
 
@@ -182,7 +185,7 @@ bool Probleme_Couple_Point_Fixe::solveTimeStep()
   for (int i = 1; i < nb_problemes(); i++)
     residu_max = std::max(residu_max, ref_cast(Probleme_base, probleme(i)).schema_temps().residu());
 
-  return true;
+  return ok;
 }
 
 bool Probleme_Couple::iterateTimeStep(bool& converged)
@@ -477,4 +480,3 @@ void Probleme_Couple::sauver() const
     ref_cast(Probleme_base,probleme(i)).sauver();
 
 }
-
