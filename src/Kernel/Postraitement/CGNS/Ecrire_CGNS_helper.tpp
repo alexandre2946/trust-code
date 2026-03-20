@@ -364,6 +364,15 @@ template<TYPE_ECRITURE_CGNS _TYPE_>
 inline void Ecrire_CGNS_helper::cgns_write_iters(const bool has_field, const int nb_zones_to_write, const int fileId, const int baseId, const int ind, const std::vector<int>& zoneId,
                                                  const std::string& LOC, const std::string& solname_som, const std::string& solname_elem, const std::string& solname_faces,const std::vector<double>& time_post)
 {
+  cgns_write_iters_deformable<_TYPE_>(false /* not deformable */, has_field, nb_zones_to_write, fileId, baseId, ind, zoneId,
+                                      LOC, solname_som, solname_elem, solname_faces, solname_elem /* inutile */, time_post);
+}
+
+template<TYPE_ECRITURE_CGNS _TYPE_>
+inline void Ecrire_CGNS_helper::cgns_write_iters_deformable(const bool is_deformable, const bool has_field, const int nb_zones_to_write, const int fileId, const int baseId, const int ind, const std::vector<int>& zoneId,
+                                                            const std::string& LOC, const std::string& solname_som, const std::string& solname_elem, const std::string& solname_faces, const std::string& grid_name,
+                                                            const std::vector<double>& time_post)
+{
   const int nsteps = static_cast<int>(time_post.size());
   const cgsize_t nuse = static_cast<cgsize_t>(nsteps);
   assert (nsteps > 0);
@@ -409,14 +418,22 @@ inline void Ecrire_CGNS_helper::cgns_write_iters(const bool has_field, const int
         if (cg_ziter_write(fileId, baseId, zoneId[is_PAR_OVER || is_comm_group ? ii : ind], "ZoneIterativeData") != CG_OK)
           Cerr << "Error Ecrire_CGNS_helper::cgns_write_iters : cg_ziter_write !" << finl, cg_error_exit();
 
+        if (cg_goto(fileId, baseId, "Zone_t", zoneId[is_PAR_OVER || is_comm_group ? ii : ind], "ZoneIterativeData_t", 1, "end") != CG_OK)
+          Cerr << "Error Ecrire_CGNS_helper::cgns_write_iters : cg_goto !" << finl, TRUST_CGNS_ERROR();
+
+        if (is_deformable)
+          {
+            delete_all_arrays_named("GridCoordinatesPointers");
+            assert(grid_name.size() == static_cast<size_t>(CGNS_STR_SIZE) * nuse);
+            if (cg_array_write("GridCoordinatesPointers", CGNS_ENUMV(Character), 2, idata, grid_name.c_str()) != CG_OK)
+              Cerr << "Error Ecrire_CGNS_helper::cgns_write_iters : cg_array_write GridCoordinatesPointers !" << finl, TRUST_CGNS_ERROR();
+          }
+
         if (has_field)
           {
-            if (cg_goto(fileId, baseId, "Zone_t", zoneId[is_PAR_OVER || is_comm_group? ii : ind], "ZoneIterativeData_t", 1, "end") != CG_OK)
-              Cerr << "Error Ecrire_CGNS_helper::cgns_write_iters : cg_goto !" << finl, TRUST_CGNS_ERROR();
-
             delete_all_arrays_named("FlowSolutionPointers");
             if (cg_array_write("FlowSolutionPointers", CGNS_ENUMV(Character), 2, idata, solname) != CG_OK)
-              Cerr << "Error Ecrire_CGNS_helper::cgns_write_iters : cg_array_write !" << finl, TRUST_CGNS_ERROR();
+              Cerr << "Error Ecrire_CGNS_helper::cgns_write_iters : cg_array_write FlowSolutionPointers !" << finl, TRUST_CGNS_ERROR();
           }
       }
 }

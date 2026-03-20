@@ -102,7 +102,13 @@ struct Ecrire_CGNS_helper
 
   template<TYPE_ECRITURE_CGNS _TYPE_>
   inline void cgns_write_iters(const bool, const int, const int , const int, const int, const std::vector<int>&,
-                               const std::string&, const std::string&, const std::string&, const std::string&, const std::vector<double>&);
+                               const std::string&, const std::string&, const std::string&, const std::string&,
+                               const std::vector<double>&);
+
+  template<TYPE_ECRITURE_CGNS _TYPE_>
+  inline void cgns_write_iters_deformable(const bool, const bool, const int, const int , const int, const int, const std::vector<int>&,
+                                          const std::string&, const std::string&, const std::string&, const std::string&, const std::string&,
+                                          const std::vector<double>&);
 
   std::string convert_double_to_string(const double t)
   {
