@@ -387,6 +387,7 @@ void Ecrire_CGNS::cgns_write_field(const Domaine& domaine, const Noms& noms_comp
  * METHODES PRIVEES CLASSE Ecrire_CGNS *
  * *********************************** *
  */
+// TODO FIXME : DO BETTER
 void Ecrire_CGNS::cgns_fill_field_loc_map(const Domaine& domaine, const std::string& LOC)
 {
   assert (static_cast<int>(time_post_.size()) == 1 && first_time_post_);

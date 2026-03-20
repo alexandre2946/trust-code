@@ -365,10 +365,8 @@ inline void Ecrire_CGNS_helper::cgns_write_iters(const bool has_field, const int
                                                  const std::string& LOC, const std::string& solname_som, const std::string& solname_elem, const std::string& solname_faces,const std::vector<double>& time_post)
 {
   const int nsteps = static_cast<int>(time_post.size());
-  assert (nsteps > 0);
-
   const cgsize_t nuse = static_cast<cgsize_t>(nsteps);
-  constexpr bool is_PAR_OVER = (_TYPE_ == TYPE_ECRITURE_CGNS::PAR_OVER);
+  assert (nsteps > 0);
 
   // helper local : supprimer TOUTES les occurrences d'un DataArray_t <name> sous le noeud courant
   auto delete_all_arrays_named = [](const char *arrname)
@@ -400,18 +398,22 @@ inline void Ecrire_CGNS_helper::cgns_write_iters(const bool has_field, const int
   const char* solname = (LOC == "SOM") ? solname_som.c_str() : (LOC == "FACES") ? solname_faces.c_str() : solname_elem.c_str();
 
   cgsize_t idata[2] = { CGNS_STR_SIZE , nuse};
+
+  constexpr bool is_PAR_OVER = (_TYPE_ == TYPE_ECRITURE_CGNS::PAR_OVER);
+  const bool is_comm_group = (Option_CGNS::LINKED_FILES_PER_COMM_GROUP || Option_CGNS::SINGLE_FILE_PER_COMM_GROUP);
+
   for (int ii = 0; ii != nb_zones_to_write; ii++)
     if (zoneId[ind] != -123)
       {
         /* create ZoneIterativeData */
-        if (cg_ziter_write(fileId, baseId, zoneId[is_PAR_OVER ? ii : ind], "ZoneIterativeData") != CG_OK)
+        if (cg_ziter_write(fileId, baseId, zoneId[is_PAR_OVER || is_comm_group ? ii : ind], "ZoneIterativeData") != CG_OK)
           Cerr << "Error Ecrire_CGNS_helper::cgns_write_iters : cg_ziter_write !" << finl, cg_error_exit();
-
-        if (cg_goto(fileId, baseId, "Zone_t", zoneId[is_PAR_OVER ? ii : ind], "ZoneIterativeData_t", 1, "end") != CG_OK)
-          Cerr << "Error Ecrire_CGNS_helper::cgns_write_iters : cg_goto !" << finl, TRUST_CGNS_ERROR();
 
         if (has_field)
           {
+            if (cg_goto(fileId, baseId, "Zone_t", zoneId[is_PAR_OVER || is_comm_group? ii : ind], "ZoneIterativeData_t", 1, "end") != CG_OK)
+              Cerr << "Error Ecrire_CGNS_helper::cgns_write_iters : cg_goto !" << finl, TRUST_CGNS_ERROR();
+
             delete_all_arrays_named("FlowSolutionPointers");
             if (cg_array_write("FlowSolutionPointers", CGNS_ENUMV(Character), 2, idata, solname) != CG_OK)
               Cerr << "Error Ecrire_CGNS_helper::cgns_write_iters : cg_array_write !" << finl, TRUST_CGNS_ERROR();
