@@ -122,50 +122,6 @@ void Ecrire_CGNS::cgns_write_final_link_file_lagrangian()
   cgns_close_grid_or_solution_link_file(-123., TYPE_LINK_CGNS::FINAL_LINK, true);
 }
 
-void Ecrire_CGNS::cgns_write_iters_deformable()
-{
-  if (first_time_post_ || is_lagrangian_) return;
-
-  if (!Option_CGNS::USE_LINKS && !ensure_modify_done_)
-    ensure_modify_open_singlefile(); /* to make sure we can modify !! */
-
-  std::vector<int> ind_doms_dumped;
-
-  for (auto &itr : fld_loc_map_)
-    {
-      const std::string& LOC = itr.first;
-      const Nom& nom_dom = itr.second;
-
-      const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
-      assert(index_glob > -1);
-      ind_doms_dumped.push_back(index_glob);
-
-      int ind_base = index_glob;
-      if (LOC != "FACES")
-        {
-          const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
-          ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
-          if(ind_base < 0) throw;
-        }
-
-      cgns_helper_.cgns_write_iters_deformable<TYPE_ECRITURE_CGNS::SEQ>(true /* deformable */, true /* has_field */, 1 /* 1 zone per base */, fileId_, baseId_[index_glob], index_glob /* 1st Zone */,
-                                                                        zoneId_, LOC, solname_som_, solname_elem_, solname_faces_, grid_name_, time_post_);
-    }
-
-  for (int i = 0; i < static_cast<int>(doms_written_.size()); i++)
-    {
-      if (std::find(ind_doms_dumped.begin(), ind_doms_dumped.end(), i) != ind_doms_dumped.end())
-        continue;
-
-      const Nom& nom_dom = doms_written_[i];
-      const int ind = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
-      assert(ind > -1);
-
-      cgns_helper_.cgns_write_iters_deformable<TYPE_ECRITURE_CGNS::SEQ>(true /* deformable */, false /* has_field */, 1 /* 1 zone per base */, fileId_, baseId_[ind], ind /* 1st Zone */,
-                                                                        zoneId_, "rien", solname_som_, solname_elem_, solname_faces_, grid_name_, time_post_);
-    }
-}
-
 void Ecrire_CGNS::link_multi_loc_support_lagrangian()
 {
   for (auto &itr : fld_loc_map_)

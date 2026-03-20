@@ -153,7 +153,7 @@ inline void Ecrire_CGNS_helper::cgns_sol_write(const int nb_zones_to_write, cons
                                                bool& solname_som_written, bool& solname_elem_written, bool& solname_faces_written,
                                                int& flowId_som, int& flowId_elem, int& flowId_faces)
 {
-  // uen fois par dt !!
+  // une fois par dt !!
   constexpr bool is_SEQ = (_TYPE_ == TYPE_ECRITURE_CGNS::SEQ), is_PAR_OVER = (_TYPE_ == TYPE_ECRITURE_CGNS::PAR_OVER);
 
   if (!solname_som_written && LOC == "SOM")

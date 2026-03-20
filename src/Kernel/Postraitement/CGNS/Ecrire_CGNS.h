@@ -106,7 +106,6 @@ private:
   void cgns_write_final_link_file_comm_group_pb_deformable();
   void link_multi_loc_support_pb_deformable();
   void init_proc_maitre_local_comm();
-  void cgns_write_iters_deformable();
   bool is_deformable_ = false, multi_loc_deformable_support_linked_ = false;
 
   // Methodes pour LINK

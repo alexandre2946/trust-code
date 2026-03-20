@@ -162,12 +162,7 @@ void Ecrire_CGNS::finir_ecriture(double temps)
           if (will_flush || will_close)
             {
               if (!first_time_post_) /* write iters */
-                {
-                  if (is_deformable_)
-                    cgns_write_iters_deformable();
-                  else
-                    cgns_write_iters();
-                }
+                cgns_write_iters();
 
               if (!will_close)
                 cgns_flush_to_disk();
@@ -196,12 +191,7 @@ void Ecrire_CGNS::cgns_finir()
 
   if (!Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)  // FIXME
     if (!postraiter_domaine_ && !first_time_post_)
-      {
-        if (is_deformable_)
-          cgns_write_iters_deformable();
-        else
-          cgns_write_iters();
-      }
+      cgns_write_iters();
 
   std::string fn = baseFile_name_ + ".cgns"; // file name
 
@@ -509,7 +499,7 @@ void Ecrire_CGNS::cgns_fill_field_loc_map(const Domaine& domaine, const std::str
 
 void Ecrire_CGNS::cgns_write_iters()
 {
-  if (is_lagrangian_) return;
+  if (first_time_post_ || is_lagrangian_) return;
 
   if (!Option_CGNS::USE_LINKS && !ensure_modify_done_)
     ensure_modify_open_singlefile(); /* to make sure we can modify !! */
@@ -521,15 +511,18 @@ void Ecrire_CGNS::cgns_write_iters()
     {
       const std::string& LOC = itr.first;
       const Nom& nom_dom = itr.second;
-      const int ind = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
-      ind_doms_dumped.push_back(ind);
-      assert(ind > -1);
+      const int ind_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
+      ind_doms_dumped.push_back(ind_glob);
+      assert(ind_glob > -1);
 
-      if (Process::is_parallel() && Option_CGNS::PARALLEL_OVER_ZONE)
+      if (is_deformable_)
+        cgns_helper_.cgns_write_iters_deformable<TYPE_ECRITURE_CGNS::SEQ>(true /* deformable */, true /* has_field */, 1 /* 1 zone per base */, fileId_, baseId_[ind_glob], ind_glob /* 1st Zone */,
+                                                                          zoneId_, LOC, solname_som_, solname_elem_, solname_faces_, grid_name_, time_post_);
+      else if (Process::is_parallel() && Option_CGNS::PARALLEL_OVER_ZONE)
         {
 #ifdef MPI_
-          int ind_new = ind;
-          if (ind > (static_cast<int>(T2CGNS_.size()) -1) )
+          int ind_new = ind_glob;
+          if (ind_glob > (static_cast<int>(T2CGNS_.size()) -1) )
             {
               const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
               ind_new = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
@@ -538,12 +531,12 @@ void Ecrire_CGNS::cgns_write_iters()
           const TRUST_2_CGNS& TRUST2CGNS = T2CGNS_[ind_new];
           const int nb_zones_to_write = TRUST2CGNS.nb_procs_writing();
 
-          cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::PAR_OVER>(true /* has_field */, nb_zones_to_write, fileId_, baseId_[ind], ind, zoneId_par_[ind], LOC,
+          cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::PAR_OVER>(true /* has_field */, nb_zones_to_write, fileId_, baseId_[ind_glob], ind_glob, zoneId_par_[ind_glob], LOC,
                                                                       solname_som_, solname_elem_, solname_faces_, time_post_);
 #endif /* MPI_ */
         }
       else
-        cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::SEQ>(true /* has_field */, 1 /* nb_zones_to_write */, fileId_, baseId_[ind], ind, zoneId_, LOC,
+        cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::SEQ>(true /* has_field */, 1 /* nb_zones_to_write */, fileId_, baseId_[ind_glob], ind_glob, zoneId_, LOC,
                                                                solname_som_, solname_elem_, solname_faces_, time_post_);
     }
 
@@ -556,7 +549,10 @@ void Ecrire_CGNS::cgns_write_iters()
           const int ind = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
           assert(ind > -1);
 
-          if (Process::is_parallel() && Option_CGNS::PARALLEL_OVER_ZONE)
+          if (is_deformable_)
+            cgns_helper_.cgns_write_iters_deformable<TYPE_ECRITURE_CGNS::SEQ>(true /* deformable */, false /* has_field */, 1 /* 1 zone per base */, fileId_, baseId_[ind], ind /* 1st Zone */,
+                                                                              zoneId_, "rien", solname_som_, solname_elem_, solname_faces_, grid_name_, time_post_);
+          else if (Process::is_parallel() && Option_CGNS::PARALLEL_OVER_ZONE)
             {
 #ifdef MPI_
               int ind_new = ind;
