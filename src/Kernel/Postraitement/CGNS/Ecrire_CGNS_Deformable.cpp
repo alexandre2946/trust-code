@@ -303,7 +303,7 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group_pb_deformable()
 
                   linkpath = "/" + baseZone_name_[ind_base] + "/" + baseZone_name_[ind_base] + "/GridCoordinates/";
 
-                  if (cg_goto(fileId_, baseId_[index_glob], "Zone_t", gid + 1, "end") != CG_OK)
+                  if (cg_goto(fileId_, baseId_[index_glob], "Zone_t", zoneId_tmp[gid], "end") != CG_OK)
                     Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_pb_deformable : cg_goto Zone_t !" << finl, TRUST_CGNS_ERROR();
 
                   grid_name_loc = "GridCoordinates";
