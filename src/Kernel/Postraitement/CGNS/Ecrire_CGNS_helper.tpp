@@ -438,4 +438,80 @@ inline void Ecrire_CGNS_helper::cgns_write_iters_deformable(const bool is_deform
       }
 }
 
+inline void Ecrire_CGNS_helper::cgns_write_zone_and_classic_links(const bool write_zone, const int fileId, const int baseId, const std::string& zone_name_to_write,
+                                                                  const cgsize_t *isize, int& zoneId, const int zone_goto_id,
+                                                                  const std::string& linkfile, const std::string& target_base_name, const std::string& target_zone_name,
+                                                                  const std::vector<std::string>& connect_names, const char *where, const bool write_connectivity)
+{
+  if (write_zone)
+    if (cg_zone_write(fileId, baseId, zone_name_to_write.c_str(), isize, CGNS_ENUMV(Unstructured), &zoneId) != CG_OK)
+      Cerr << "Error " << where << " : cg_zone_write !" << finl, TRUST_CGNS_ERROR();
+
+  if (cg_goto(fileId, baseId, "Zone_t", zone_goto_id, "end") != CG_OK)
+    Cerr << "Error " << where << " : cg_goto Zone_t !" << finl, TRUST_CGNS_ERROR();
+
+  std::string linkpath = "/" + target_base_name + "/" + target_zone_name + "/GridCoordinates/";
+
+  if (cg_link_write("GridCoordinates", linkfile.c_str(), linkpath.c_str()) != CG_OK)
+    Cerr << "Error " << where << " : cg_link_write GridCoordinates !" << finl, TRUST_CGNS_ERROR();
+
+  if (write_connectivity)
+    for (const auto &itr_conn : connect_names)
+      {
+        linkpath = "/" + target_base_name + "/" + target_zone_name + "/" + itr_conn + "/";
+
+        if (cg_link_write(itr_conn.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
+          Cerr << "Error " << where << " : cg_link_write connectivity " << itr_conn << " !" << finl, TRUST_CGNS_ERROR();
+      }
+}
+
+inline void Ecrire_CGNS_helper::cgns_write_zone_and_deformable_links(const bool write_zone, const int fileId, const int baseId, const std::string& zone_name_to_write,
+                                                                     const cgsize_t *isize, int& zoneId, const int zone_goto_id,
+                                                                     const std::string& file_prefix, const std::string& target_base_name, const std::string& target_zone_name,
+                                                                     const std::vector<std::string>& connect_names, const Nom& nom_dom, const std::string& LOC,
+                                                                     const std::vector<double>& time_post, const char *where)
+{
+  if (write_zone)
+    if (cg_zone_write(fileId, baseId, zone_name_to_write.c_str(), isize, CGNS_ENUMV(Unstructured), &zoneId) != CG_OK)
+      Cerr << "Error " << where << " : cg_zone_write !" << finl, TRUST_CGNS_ERROR();
+
+  if (cg_goto(fileId, baseId, "Zone_t", zone_goto_id, "end") != CG_OK)
+    Cerr << "Error " << where << " : cg_goto Zone_t !" << finl, TRUST_CGNS_ERROR();
+
+  std::string linkfile, linkpath, grid_name_loc;
+  bool conn_written = false;
+
+  for (const auto &itr_t : time_post)
+    {
+      linkfile = file_prefix + ".solution." + convert_double_to_string(itr_t) + ".cgns";
+
+      linkpath = "/" + target_base_name + "/" + target_zone_name + "/GridCoordinates/";
+
+      grid_name_loc = "GridCoordinates";
+      if (conn_written)
+        grid_name_loc += convert_double_to_string(itr_t);
+
+      if (cg_link_write(grid_name_loc.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
+        Cerr << "Error " << where << " : cg_link_write GridCoordinates !" << finl, TRUST_CGNS_ERROR();
+
+      if (!conn_written)
+        {
+          for (const auto &itr_conn : connect_names)
+            {
+              linkpath = "/" + target_base_name + "/" + target_zone_name + "/" + itr_conn + "/";
+
+              if (cg_link_write(itr_conn.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
+                Cerr << "Error " << where << " : cg_link_write connectivity !" << finl, TRUST_CGNS_ERROR();
+            }
+          conn_written = true;
+        }
+
+      const std::string solname = "FlowSolution" + convert_double_to_string(itr_t) + "_" + LOC;
+      linkpath = "/" + nom_dom.getString() + "/" + nom_dom.getString() + "/" + solname + "/";
+
+      if (cg_link_write(solname.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
+        Cerr << "Error " << where << " : cg_link_write FlowSolution " << solname << " !" << finl, TRUST_CGNS_ERROR();
+    }
+}
+
 #endif /* Ecrire_CGNS_helper_tpp_included */

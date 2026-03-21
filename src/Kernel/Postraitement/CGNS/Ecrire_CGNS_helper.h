@@ -16,7 +16,6 @@
 #ifndef Ecrire_CGNS_helper_included
 #define Ecrire_CGNS_helper_included
 
-#include <TRUST_2_CGNS.h>
 #include <Option_CGNS.h>
 #include <TRUSTTab.h>
 #include <cgns++.h>
@@ -109,6 +108,15 @@ struct Ecrire_CGNS_helper
   inline void cgns_write_iters_deformable(const bool, const bool, const int, const int , const int, const int, const std::vector<int>&,
                                           const std::string&, const std::string&, const std::string&, const std::string&, const std::string&,
                                           const std::vector<double>&);
+
+  /* helplers utiles pour les links ! */
+  inline void cgns_write_zone_and_classic_links(const bool write_zone, const int fileId, const int baseId, const std::string& zone_name_to_write, const cgsize_t *isize, int& zoneId,
+                                                const int zone_goto_id, const std::string& linkfile, const std::string& target_base_name, const std::string& target_zone_name,
+                                                const std::vector<std::string>& connect_names, const char *where, const bool write_connectivity = true);
+
+  inline void cgns_write_zone_and_deformable_links(const bool write_zone, const int fileId, const int baseId, const std::string& zone_name_to_write, const cgsize_t *isize, int& zoneId,
+                                                   const int zone_goto_id, const std::string& file_prefix, const std::string& target_base_name, const std::string& target_zone_name,
+                                                   const std::vector<std::string>& connect_names, const Nom& nom_dom, const std::string& LOC, const std::vector<double>& time_post, const char *where);
 
   std::string convert_double_to_string(const double t)
   {
