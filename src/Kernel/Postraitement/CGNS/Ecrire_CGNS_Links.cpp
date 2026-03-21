@@ -494,8 +494,6 @@ void Ecrire_CGNS::cgns_write_final_link_file()
 //              std::string linkpath = "/" + baseZone_name_[ind_base] + "/" + baseZone_name_[ind_base] + "/" + solname + "/";
               std::string linkpath = "/" + nom_dom.getString() + "/" + nom_dom.getString() + "/" + solname + "/";
 
-              if (cg_goto(fileId_, baseId_[index_glob], "Zone_t", 1, "end") != CG_OK)
-                Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file : cg_goto Zone_t !" << finl, TRUST_CGNS_ERROR();
 
               if (cg_link_write(solname.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
                 Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file : cg_link_write !" << finl, TRUST_CGNS_ERROR();
