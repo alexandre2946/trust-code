@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -131,7 +131,7 @@ void Tetra_VEF::creer_facette_normales(const Domaine& domaine_geom,
 {
   const DoubleTab& les_coords = domaine_geom.coord_sommets();
   const IntTab& les_Polys = domaine_geom.les_elems();
-  int nb_elem = domaine_geom.nb_elem();
+  int nb_elem_tot = domaine_geom.nb_elem_tot();
 
   int i,fa7;
   int num_som[4];
@@ -143,21 +143,10 @@ void Tetra_VEF::creer_facette_normales(const Domaine& domaine_geom,
   double psc;
   double pv[3];
 
-  //Original:
-  // facette_normales.resize(0,6,3);
-  // // valgrind with MPICH says a unitialised here so we initialize:
-  // // domaine_geom.creer_tableau_elements(facette_normales, RESIZE_OPTIONS::NOCOPY_NOINIT);
-  // domaine_geom.creer_tableau_elements(facette_normales);
+  if (facette_normales.dimension(0) != nb_elem_tot)
+    facette_normales.resize(nb_elem_tot,6,3);
 
-  //New similar as in Tri_VEF.cpp
-  if (facette_normales.get_md_vector() != domaine_geom.md_vector_elements())
-    {
-      facette_normales.reset();
-      facette_normales.resize(0,6,3);
-      domaine_geom.creer_tableau_elements(facette_normales);
-    }
-
-  for(i=0; i<nb_elem; i++)
+  for(i=0; i<nb_elem_tot; i++)
     {
       if (rang_elem_non_std(i)==-1)
         {
@@ -210,7 +199,6 @@ void Tetra_VEF::creer_facette_normales(const Domaine& domaine_geom,
             }
         }
     }
-  facette_normales.echange_espace_virtuel();
 }
 
 

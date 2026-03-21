@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -143,7 +143,7 @@ void Quadri_VEF::creer_facette_normales(const Domaine& domaine_geom,
 {
   const DoubleTab& les_coords = domaine_geom.coord_sommets();
   const IntTab& les_Polys = domaine_geom.les_elems();
-  int nb_elem = domaine_geom.nb_elem();
+  int nb_elem_tot = domaine_geom.nb_elem_tot();
 
   int i, fa7;
   int i0=-1,i1=-1;
@@ -155,10 +155,10 @@ void Quadri_VEF::creer_facette_normales(const Domaine& domaine_geom,
   double v[2];
   double psc;
 
-  facette_normales.resize(0, nb_facette(), 2);
-  domaine_geom.creer_tableau_elements(facette_normales);
+  if (facette_normales.dimension(0) != nb_elem_tot)
+    facette_normales.resize(nb_elem_tot,nb_facette(),2);
 
-  for(i=0; i<nb_elem; i++)
+  for(i=0; i<nb_elem_tot; i++)
     {
       if (rang_elem_non_std(i)==-1)
         {
@@ -240,7 +240,6 @@ void Quadri_VEF::creer_facette_normales(const Domaine& domaine_geom,
             }
         }
     }
-  facette_normales.echange_espace_virtuel();
 
   //  Cerr << "facette_normales internes (Quadri_VEF::creer_normales_facettes) : " << facette_normales << finl;
 }

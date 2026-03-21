@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -193,7 +193,7 @@ void Hexa_VEF::creer_facette_normales(const Domaine& domaine_geom,
 {
   const DoubleTab& les_coords = domaine_geom.coord_sommets();
   const IntTab& les_Polys = domaine_geom.les_elems();
-  int nb_elem = domaine_geom.nb_elem();
+  int nb_elem_tot = domaine_geom.nb_elem_tot();
   int i, fa7;
   int num_som[8];
   double x[8][3];
@@ -206,11 +206,11 @@ void Hexa_VEF::creer_facette_normales(const Domaine& domaine_geom,
   double v[3];
   double psc;
   double pv[3];
-  facette_normales.reset();
-  facette_normales.resize(0, nb_facette(), 3);
-  domaine_geom.creer_tableau_elements(facette_normales);
 
-  for(i=0; i<nb_elem; i++)
+  if (facette_normales.dimension(0) != nb_elem_tot)
+    facette_normales.resize(nb_elem_tot,nb_facette(),3);
+
+  for(i=0; i<nb_elem_tot; i++)
     {
       if (rang_elem_non_std(i)==-1)
         {
@@ -431,7 +431,6 @@ void Hexa_VEF::creer_facette_normales(const Domaine& domaine_geom,
             }
         }
     }
-  facette_normales.echange_espace_virtuel();
 }
 
 void Hexa_VEF::creer_normales_facettes_Cl(DoubleTab& normales_facettes_Cl,
