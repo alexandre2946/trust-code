@@ -29,7 +29,9 @@ void Ecrire_CGNS::cgns_write_final_link_file_lagrangian()
 
   if (nsteps == 0) return;
 
-  cgns_open_solution_link_file(-123., true);
+  std::string fn = baseFile_name_ + ".cgns"; // file name
+  unlink(fn.c_str());
+  cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::SEQ>(fn, fileId_, true);
 
   for (auto &itr : fld_loc_map_)
     {
@@ -306,7 +308,10 @@ void Ecrire_CGNS::cgns_write_final_link_file_pb_deformable()
 
   if (!Process::me()) // seul le proc 0 ecrit le fichier link
     {
-      cgns_open_solution_link_file(-123., true);
+      std::string fn = baseFile_name_ + ".cgns"; // file name
+      unlink(fn.c_str());
+      cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::SEQ>(fn, fileId_, true);
+
 
       for (auto& itr : fld_loc_map_)
         {
