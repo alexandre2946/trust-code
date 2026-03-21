@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -29,7 +29,7 @@ class Elem_VEF_base: public Objet_U
 public:
   virtual int nb_facette() const =0;
   inline const IntTab& KEL() const { return KEL_; }
-  virtual void creer_facette_normales(const Domaine&, DoubleTab&, const IntVect&) const =0;
+  virtual void creer_facette_normales(const Domaine_VEF&, const IntVect&) const =0;
   virtual void creer_normales_facettes_Cl(DoubleTab&, int, int, const DoubleTab&, const DoubleVect&, const Domaine&) const =0;
   virtual void modif_volumes_entrelaces(int, int, const Domaine_VEF&, DoubleVect&, int) const =0;
   virtual void modif_volumes_entrelaces_faces_joints(int, int, const Domaine_VEF&, DoubleVect&, int) const =0;

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -82,8 +82,8 @@ public:
   inline int nb_faces_non_std() const { return nb_faces() - nb_faces_std_; }
   inline double carre_pas_du_maillage() const { return h_carre; }
   inline const DoubleVect& carre_pas_maille() const { return h_carre_; }
-  inline DoubleTab& facette_normales() { return facette_normales_; }
-  inline const DoubleTab& facette_normales() const { return facette_normales_; }
+  inline auto& facette_normales() { return facette_normales_; }
+  inline const auto& facette_normales() const { return facette_normales_; }
   inline IntVect& rang_elem_non_std() { return rang_elem_non_std_; }
   inline const IntVect& rang_elem_non_std() const { return rang_elem_non_std_; }
 
@@ -113,7 +113,12 @@ private:
   double h_carre = 1.e30;                         // carre du pas du maillage
   DoubleVect h_carre_;                        // carre du pas d'une maille
   OWN_PTR(Elem_VEF_base) type_elem_;                  // type de l'element de discretisation
-  DoubleTab facette_normales_;          // normales aux faces des volumes entrelaces
+  // normales aux faces des volumes entrelaces:
+#ifdef TRUST_USE_GPU
+  BigDoubleTab facette_normales_; // Cause size=nb_elem*6*dim may be > 2^31
+#else
+  DoubleTab facette_normales_;
+#endif
   DoubleTab vecteur_face_facette_;                // vecteur centre face->centre facette
   IntVect orientation_;
 

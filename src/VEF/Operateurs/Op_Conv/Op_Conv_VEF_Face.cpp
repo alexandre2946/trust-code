@@ -644,7 +644,7 @@ DoubleTab& Op_Conv_VEF_Face::ajouter_gen(const DoubleTab& transporte, const Cham
   const DoubleTab& vitesse_face    = modif_par_porosite_si_flag(la_vitesse.valeurs(),vitesse_face_,marq,porosite_face);
 
   const IntTab& elem_faces = domaine_VEF.elem_faces();
-  const DoubleTab& facette_normales = domaine_VEF.facette_normales();
+  const auto& facette_normales = domaine_VEF.facette_normales();
   const Domaine& domaine = domaine_VEF.domaine();
   const int nfa7 = domaine_VEF.type_elem().nb_facette();
   const int nb_elem_tot = domaine_VEF.nb_elem_tot();
@@ -1792,7 +1792,7 @@ void Op_Conv_VEF_Face::remplir_fluent() const
       const IntTab& KEL = type_elemvef.KEL();
       const DoubleVect& porosite_face = equation().milieu().porosite_face();
       const IntTab& elem_faces = domaine_VEF.elem_faces();
-      const DoubleTab& facette_normales = domaine_VEF.facette_normales();
+      const auto& facette_normales = domaine_VEF.facette_normales();
       const IntTab& les_elems = domaine.les_elems();
       const IntVect& rang_elem_non_std = domaine_VEF.rang_elem_non_std();
       const DoubleTab& normales_facettes_Cl = domaine_Cl_VEF.normales_facettes_Cl();

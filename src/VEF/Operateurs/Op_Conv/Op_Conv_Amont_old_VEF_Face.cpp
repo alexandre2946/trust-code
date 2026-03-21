@@ -109,7 +109,7 @@ DoubleTab& Op_Conv_Amont_old_VEF_Face::ajouter(const DoubleTab& transporte,
   const Champ_Inc_base& la_vitesse=vitesse_.valeur();
   const IntTab& elem_faces = domaine_VEF.elem_faces();
   const DoubleTab& face_normales = domaine_VEF.face_normales();
-  const DoubleTab& facette_normales = domaine_VEF.facette_normales();
+  const auto& facette_normales = domaine_VEF.facette_normales();
   const DoubleVect& porosite_face = equation().milieu().porosite_face();
   const Domaine& domaine = domaine_VEF.domaine();
   const Elem_VEF_base& type_elem=domaine_VEF.type_elem();
@@ -390,7 +390,7 @@ void Op_Conv_Amont_old_VEF_Face::ajouter_contribution(const DoubleTab& transport
   const Champ_Inc_base& la_vitesse=vitesse_.valeur();
   const IntTab& elem_faces = domaine_VEF.elem_faces();
   const DoubleTab& face_normales = domaine_VEF.face_normales();
-  const DoubleTab& facette_normales = domaine_VEF.facette_normales();
+  const auto& facette_normales = domaine_VEF.facette_normales();
   const Domaine& domaine = domaine_VEF.domaine();
   const Elem_VEF_base& type_elem = domaine_VEF.type_elem();
   const int nfa7 = type_elem.nb_facette();

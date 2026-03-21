@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -77,7 +77,7 @@ DoubleTab& Op_Conv_AmontNew_VEF_Face::ajouter(const DoubleTab& transporte, Doubl
   const IntTab& elem_faces=domaine_VEF.elem_faces();
   const IntTab& face_voisins = domaine_VEF.face_voisins();
   const DoubleTab& face_normales = domaine_VEF.face_normales();
-  const DoubleTab& facette_normales = domaine_VEF.facette_normales();
+  const auto& facette_normales = domaine_VEF.facette_normales();
   const DoubleVect& porosite_face = equation().milieu().porosite_face();
   const Domaine& domaine = domaine_VEF.domaine();
   const Elem_VEF_base& type_elem=domaine_VEF.type_elem();

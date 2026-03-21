@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -29,8 +29,7 @@ public:
   {
     return 6;
   };
-  void creer_facette_normales(const Domaine&  ,DoubleTab&,
-                              const IntVect& ) const override;
+  void creer_facette_normales(const Domaine_VEF&, const IntVect& ) const override;
   void creer_normales_facettes_Cl(DoubleTab&, int ,int ,
                                   const DoubleTab& ,const DoubleVect& , const Domaine&) const override ;
   void modif_volumes_entrelaces(int ,int ,const Domaine_VEF& ,DoubleVect& ,int ) const override ;

@@ -15,6 +15,7 @@
 
 #include <Quadri_VEF.h>
 #include <Domaine.h>
+#include <Domaine_VEF.h>
 
 Implemente_instanciable_sans_constructeur(Quadri_VEF,"Quadri_VEF",Elem_VEF_base);
 
@@ -137,10 +138,11 @@ void Quadri_VEF::normale(int num_Face,DoubleTab& Face_normales,
 /*! @brief calcule les normales des facettes pour des elem standards
  *
  */
-void Quadri_VEF::creer_facette_normales(const Domaine& domaine_geom,
-                                        DoubleTab& facette_normales,
+void Quadri_VEF::creer_facette_normales(const Domaine_VEF& dom_VEF,
                                         const IntVect& rang_elem_non_std) const
 {
+  const Domaine& domaine_geom = dom_VEF.domaine();
+  auto& facette_normales = const_cast<Domaine_VEF&>(dom_VEF).facette_normales();
   const DoubleTab& les_coords = domaine_geom.coord_sommets();
   const IntTab& les_Polys = domaine_geom.les_elems();
   int nb_elem_tot = domaine_geom.nb_elem_tot();

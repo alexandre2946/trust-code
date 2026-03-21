@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -47,7 +47,7 @@ DoubleTab& Op_Conv_Vort_VEF_Face::ajouter(const DoubleTab& transporte,
 
   const IntTab& elem_faces = domaine_VEF.elem_faces();
   const IntTab& face_voisins = domaine_VEF.face_voisins();
-  const DoubleTab& facette_normales = domaine_VEF.facette_normales();
+  const auto& facette_normales = domaine_VEF.facette_normales();
   const Domaine& domaine = domaine_VEF.domaine();
   const int nb_faces = domaine_VEF.nb_faces();
   const int nfa7 = domaine_VEF.type_elem().nb_facette();

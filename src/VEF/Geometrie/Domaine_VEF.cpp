@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -306,7 +306,7 @@ void Domaine_VEF::discretiser()
   }
 
   // Calcul de facette_normales_
-  type_elem_->creer_facette_normales(domaine_geom, facette_normales(), rang_elem_non_std());
+  type_elem_->creer_facette_normales(*this, rang_elem_non_std());
 
   calculer_volumes_entrelaces();
   Cerr << "Informations of the Domaine VEF of the domain " << domaine().le_nom() << " : " << finl;
