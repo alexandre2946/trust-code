@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -126,7 +126,7 @@ void Op_Diff_PolyMAC_HFV_Elem::dimensionner_blocs_ext(int aux_only, matrices_t m
   std::vector<std::reference_wrapper<const IntTab>> fcl, e_f, f_e; //tableaux "fcl", "elem_faces", "faces_voisins"
   std::vector<std::reference_wrapper<const DoubleTab>> diffu, inco; //inconnues, normales aux faces, positions elems / faces / sommets
   std::deque<ConstDoubleTab_parts> v_part; //blocs de chaque inconnue
-  std::vector<IntTab> stencil(n_ext); //stencils par matrice
+  std::vector<Stencil> stencil(n_ext); //stencils par matrice
   for (i = 0, M = 0; i < n_ext; M = std::max(M, N[i]), i++)
     {
       std::string nom_mat = i ? nom_inco + "/" + op_ext[i]->equation().probleme().le_nom().getString() : nom_inco;

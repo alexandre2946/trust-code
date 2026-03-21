@@ -73,7 +73,7 @@ DoubleTab& Masse_PolyMAC_MPFA_Face::appliquer_impl(DoubleTab& sm) const
 
 void Masse_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  IntTab sten(0, 2);
+  Stencil sten(0, 2);
 
   // faces
   Solveur_Masse_Face_proto::dimensionner_blocs_proto(matrices, semi_impl, false /* dont allocate */, sten);

@@ -82,7 +82,7 @@ void Op_Grad_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const ta
 
   update_grad(domaine.domaine().deformable() || sub_type(Pb_Multiphase, equation().probleme())); //provoque le calcul du gradient
 
-  IntTab sten_p(0, 2), sten_v(0, 2); //stencils (NS, pression), (NS, vitesse)
+  Stencil sten_p(0, 2), sten_v(0, 2); //stencils (NS, pression), (NS, vitesse)
 
   const std::string& nom_inc = ch.le_nom().getString();
   Matrice_Morse *mat_p = matrices["pression"],

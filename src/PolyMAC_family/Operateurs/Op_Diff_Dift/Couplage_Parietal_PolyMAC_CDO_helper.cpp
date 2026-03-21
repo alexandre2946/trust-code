@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,7 @@
 #include <Array_tools.h>
 #include <functional>
 #include <cmath>
+#include <Matrix_tools.h>
 
 void Couplage_Parietal_PolyMAC_CDO_helper::associer(const Op_Diff_PolyMAC_MPFA_Elem& op)
 {
@@ -270,7 +271,7 @@ void Couplage_Parietal_PolyMAC_CDO_helper::dimensionner_blocs(matrices_t matrice
 
   std::vector<int> N(op_elem_->op_ext.size()); //nombre de composantes par probleme de op_ext
 
-  std::vector<IntTab> stencil(op_elem_->op_ext.size()); //stencils par matrice
+  std::vector<Stencil> stencil(op_elem_->op_ext.size()); //stencils par matrice
 
   for (int i = 0; i < (int) op_elem_->op_ext.size(); i++)
     {

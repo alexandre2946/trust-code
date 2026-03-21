@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -60,7 +60,7 @@ int Matrice_Base::get_stencil_size() const
   return stencil_.dimension( 0 );
 }
 
-void Matrice_Base::get_stencil( IntTab& stencil ) const
+void Matrice_Base::get_stencil( Stencil& stencil ) const
 {
   Cerr << "Error in 'Matrice_Base::get_stencil( )':" << finl;
   Cerr << "  This method should be implemented in derived class." << finl;
@@ -68,7 +68,7 @@ void Matrice_Base::get_stencil( IntTab& stencil ) const
   Process::exit( );
 }
 
-void Matrice_Base::get_symmetric_stencil( IntTab& stencil ) const
+void Matrice_Base::get_symmetric_stencil( Stencil& stencil ) const
 {
   Matrice_Morse tmp1;
   Matrix_tools::convert_to_morse_matrix( *this, tmp1 );
@@ -77,8 +77,8 @@ void Matrice_Base::get_symmetric_stencil( IntTab& stencil ) const
   tmp2.get_symmetric_stencil( stencil );
 }
 
-void Matrice_Base::get_stencil_and_coefficients( IntTab&      stencil,
-                                                 ArrOfDouble& coefficients ) const
+void Matrice_Base::get_stencil_and_coefficients( Stencil&       stencil,
+                                                 StencilCoeffs& coefficients ) const
 {
   Cerr << "Error in 'Matrice_Base::get_stencill_and_coefficients( )':" << finl;
   Cerr << "  This method should be implemented in derived class" << finl;
@@ -86,7 +86,7 @@ void Matrice_Base::get_stencil_and_coefficients( IntTab&      stencil,
   Process::exit( );
 }
 
-void Matrice_Base::get_stencil_and_coeff_ptrs(IntTab& stencil, std::vector<const double *>& coeff_ptr) const
+void Matrice_Base::get_stencil_and_coeff_ptrs(Stencil& stencil, std::vector<const double *>& coeff_ptr) const
 {
   Cerr << "Error in 'Matrice_Base::get_stencil_and_coeff_ptrs( )':" << finl;
   Cerr << "  This method should be implemented in derived class" << finl;
@@ -95,8 +95,8 @@ void Matrice_Base::get_stencil_and_coeff_ptrs(IntTab& stencil, std::vector<const
 }
 
 
-void Matrice_Base::get_symmetric_stencil_and_coefficients( IntTab&      stencil,
-                                                           ArrOfDouble& coefficients ) const
+void Matrice_Base::get_symmetric_stencil_and_coefficients( Stencil&       stencil,
+                                                           StencilCoeffs& coefficients ) const
 {
   Matrice_Morse tmp1;
   Matrix_tools::convert_to_morse_matrix( *this, tmp1 );
@@ -105,7 +105,7 @@ void Matrice_Base::get_symmetric_stencil_and_coefficients( IntTab&      stencil,
   tmp2.get_symmetric_stencil_and_coefficients( stencil, coefficients );
 }
 
-void Matrice_Base::set_stencil( const IntTab& stencil )
+void Matrice_Base::set_stencil( const Stencil& stencil )
 {
   stencil_ = stencil ;
   tableau_trier_retirer_doublons( stencil_ );

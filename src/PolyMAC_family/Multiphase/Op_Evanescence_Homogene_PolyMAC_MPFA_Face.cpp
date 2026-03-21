@@ -34,7 +34,7 @@ Implemente_instanciable(Op_Evanescence_Homogene_PolyMAC_MPFA_Face, "Op_Evanescen
 Sortie& Op_Evanescence_Homogene_PolyMAC_MPFA_Face::printOn(Sortie& os) const { return os; }
 Entree& Op_Evanescence_Homogene_PolyMAC_MPFA_Face::readOn(Entree& is) { return Op_Evanescence_Homogene_Face_base::readOn(is); }
 
-void Op_Evanescence_Homogene_PolyMAC_MPFA_Face::dimensionner_blocs_aux(std::set<int>& idx, IntTab& sten,  Matrice_Morse& mat ) const
+void Op_Evanescence_Homogene_PolyMAC_MPFA_Face::dimensionner_blocs_aux(std::set<int>& idx, Stencil& sten,  Matrice_Morse& mat ) const
 {
   const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis());
   const Champ_Face_base& ch = ref_cast(Champ_Face_base, equation().inconnue());

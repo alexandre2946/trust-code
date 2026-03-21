@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -145,7 +145,7 @@ void Op_Diff_PolyMAC_CDO_Elem::dimensionner(Matrice_Morse& mat) const
 
   domaine.init_m2();
 
-  IntTab stencil(0, 2);
+  Stencil stencil(0, 2);
 
   for (e = 0; e < domaine.nb_elem_tot(); e++)
     {
@@ -182,7 +182,7 @@ void Op_Diff_PolyMAC_CDO_Elem::dimensionner_termes_croises(Matrice_Morse& matric
   const Conds_lim& cls = la_zcl_poly_->les_conditions_limites();
   int i, j, k, l, f, n, N = ch.valeurs().line_size(), ne_tot = domaine.nb_elem_tot();
 
-  IntTab stencil(0, 2);
+  Stencil stencil(0, 2);
 
   for (i = 0; i < cls.size(); i++)
     if (sub_type(Echange_contact_PolyMAC_CDO, cls[i].valeur()))

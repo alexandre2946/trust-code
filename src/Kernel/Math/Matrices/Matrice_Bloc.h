@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -66,9 +66,9 @@ public :
   // mise a zero des valeurs de la matrice
   void clean() override;
 
-  void get_stencil( IntTab& stencil ) const override;
-  void get_stencil_and_coefficients(IntTab& stencil, ArrOfDouble& coefficients) const override;
-  void get_stencil_and_coeff_ptrs(IntTab& stencil, std::vector<const double *>& coeff_ptr) const override;
+  void get_stencil( Stencil& stencil ) const override;
+  void get_stencil_and_coefficients(Stencil& stencil, StencilCoeffs& coefficients) const override;
+  void get_stencil_and_coeff_ptrs(Stencil& stencil, std::vector<const double *>& coeff_ptr) const override;
 
 
   // Impression
@@ -127,7 +127,7 @@ protected :
   std::vector<int> column_offsets_;
 
   template<typename _TAB_T_, typename _VAL_T_>
-  void get_stencil_coeff_templ( IntTab& stencil, _TAB_T_& coeff_sp) const;
+  void get_stencil_coeff_templ( Stencil& stencil, _TAB_T_& coeff_sp) const;
 };
 
 #endif

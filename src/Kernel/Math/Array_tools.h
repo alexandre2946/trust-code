@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -57,6 +57,11 @@ int tri_lexicographique_tableau_indirect(const TRUSTTab<_TYPE_,_SIZE_>& tab, Arr
  */
 template <typename _SIZE_>
 void tableau_trier_retirer_doublons(IntTab_T<_SIZE_>& tab);
+
+#if INT_is_64_ == 2
+// BigIntTab = TRUSTTab<int, trustIdType>: doesn't match IntTab_T<_SIZE_> since value/size types differ
+void tableau_trier_retirer_doublons(BigIntTab& tab);
+#endif
 
 /*! @brief Methode outil pour trouver les doublons (permet de retirer les doublons sans changer l'ordre des elements)
  *

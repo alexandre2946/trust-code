@@ -789,7 +789,7 @@ int SETS::eliminer(const std::vector<std::set<std::pair<std::string, int>>> ordr
 
           for (auto &&i_bl : bloc) //stencil par inconnue -> en demultipliant
             {
-              IntTab sten(0, 2);
+              Stencil sten(0, 2);
 
               oMg = offs[i_bl];
               M = dims[i_bl][1];
@@ -1008,7 +1008,7 @@ void SETS::assembler(const std::string inco_p,
 
   if (!P.nb_colonnes()) //dimensionnement au premier passage
     {
-      IntTab stencil(0, 2);
+      Stencil stencil(0, 2);
 
       for (auto &&n_m : mats.at(inco_p))
         if (n_m.second && n_m.second->nb_colonnes())

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -66,7 +66,7 @@ void Terme_Source_Decroissance_Radioactive_Elem_PolyMAC_CDO::dimensionner_blocs(
     if (n_m.first == nom_inco)
       {
         Matrice_Morse& mat = *n_m.second, mat2;
-        IntTab sten(0, 2);
+        Stencil sten(0, 2);
 
         for (int e = 0; e < ne; e++)
           for (int n = 0; n < N; n++)

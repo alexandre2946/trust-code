@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -93,12 +93,12 @@ void Matrice_Nulle::clean()
   // nothing to do
 }
 
-void Matrice_Nulle::get_stencil( IntTab& stencil ) const
+void Matrice_Nulle::get_stencil( Stencil& stencil ) const
 {
   stencil.resize( 0, 2 );
 }
 
-void Matrice_Nulle::get_symmetric_stencil( IntTab& stencil ) const
+void Matrice_Nulle::get_symmetric_stencil( Stencil& stencil ) const
 {
   if ( nb_lines_ != nb_columns_ )
     {
@@ -112,15 +112,15 @@ void Matrice_Nulle::get_symmetric_stencil( IntTab& stencil ) const
   get_stencil( stencil );
 }
 
-void Matrice_Nulle::get_stencil_and_coefficients( IntTab&      stencil,
-                                                  ArrOfDouble& coefficients ) const
+void Matrice_Nulle::get_stencil_and_coefficients( Stencil&      stencil,
+                                                  StencilCoeffs& coefficients ) const
 {
   stencil.resize( 0, 2 );
   coefficients.resize( 0 );
 }
 
-void Matrice_Nulle::get_symmetric_stencil_and_coefficients( IntTab&      stencil,
-                                                            ArrOfDouble& coefficients ) const
+void Matrice_Nulle::get_symmetric_stencil_and_coefficients( Stencil&      stencil,
+                                                            StencilCoeffs& coefficients ) const
 {
   if ( nb_lines_ != nb_columns_ )
     {

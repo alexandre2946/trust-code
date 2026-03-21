@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -846,7 +846,7 @@ void Domaine_PolyMAC_CDO::init_m2solv() const
   if (is_init["m2solv"]) return;
   /* stencil et allocation */
   const IntTab& e_f = elem_faces(), &f_e = face_voisins();
-  IntTab stencil(0, 2);
+  Stencil stencil(0, 2);
   int e, i, j, k, f, fb;
   for (e = 0; e < nb_elem_tot(); e++)
     for (i = 0, j = m2d(e); j < m2d(e + 1); i++, j++)

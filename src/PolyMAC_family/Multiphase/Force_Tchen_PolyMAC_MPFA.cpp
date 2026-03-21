@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -22,7 +22,7 @@ Implemente_instanciable(Force_Tchen_PolyMAC_MPFA, "Force_Tchen_Face_PolyMAC_MPFA
 Sortie& Force_Tchen_PolyMAC_MPFA::printOn(Sortie& os) const { return os; }
 Entree& Force_Tchen_PolyMAC_MPFA::readOn(Entree& is) { return Source_Force_Tchen_base::readOn(is); }
 
-void Force_Tchen_PolyMAC_MPFA::dimensionner_blocs_aux(IntTab& stencil) const
+void Force_Tchen_PolyMAC_MPFA::dimensionner_blocs_aux(Stencil& stencil) const
 {
   const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis());
   const DoubleTab& inco = ref_cast(Champ_Face_base, equation().inconnue()).valeurs();

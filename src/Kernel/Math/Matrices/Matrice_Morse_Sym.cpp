@@ -516,11 +516,11 @@ void Matrice_Morse_Sym::scale( const double x )
   coeff_ *= x;
 }
 
-void Matrice_Morse_Sym::get_stencil( IntTab& stencil ) const
+void Matrice_Morse_Sym::get_stencil( Stencil& stencil ) const
 {
   assert_check_symmetric_morse_matrix_structure( );
 
-  IntTab symmetric_stencil;
+  Stencil symmetric_stencil;
   get_symmetric_stencil( symmetric_stencil );
 
   Matrice_Sym::unsymmetrize_stencil( nb_lignes( ),
@@ -528,7 +528,7 @@ void Matrice_Morse_Sym::get_stencil( IntTab& stencil ) const
                                      stencil );
 }
 
-void Matrice_Morse_Sym::get_symmetric_stencil( IntTab& stencil ) const
+void Matrice_Morse_Sym::get_symmetric_stencil( Stencil& stencil ) const
 {
   assert_check_symmetric_morse_matrix_structure( );
 
@@ -566,13 +566,13 @@ void Matrice_Morse_Sym::get_symmetric_stencil( IntTab& stencil ) const
   stencil.resize( new_size, 2 );
 }
 
-void Matrice_Morse_Sym::get_stencil_and_coefficients( IntTab&      stencil,
-                                                      ArrOfDouble& coefficients ) const
+void Matrice_Morse_Sym::get_stencil_and_coefficients( Stencil&      stencil,
+                                                      StencilCoeffs& coefficients ) const
 {
   assert_check_symmetric_morse_matrix_structure( );
 
-  IntTab symmetric_stencil;
-  ArrOfDouble symmetric_coefficients;
+  Stencil symmetric_stencil;
+  StencilCoeffs symmetric_coefficients;
   get_symmetric_stencil_and_coefficients( symmetric_stencil, symmetric_coefficients );
 
   Matrice_Sym::unsymmetrize_stencil_and_coefficients( nb_lignes( ),
@@ -583,8 +583,8 @@ void Matrice_Morse_Sym::get_stencil_and_coefficients( IntTab&      stencil,
 }
 
 
-void Matrice_Morse_Sym::get_symmetric_stencil_and_coefficients( IntTab&      stencil,
-                                                                ArrOfDouble& coefficients ) const
+void Matrice_Morse_Sym::get_symmetric_stencil_and_coefficients( Stencil&      stencil,
+                                                                StencilCoeffs& coefficients ) const
 {
   assert_check_symmetric_morse_matrix_structure( );
 

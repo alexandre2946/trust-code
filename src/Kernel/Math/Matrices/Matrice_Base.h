@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,6 +17,7 @@
 #define Matrice_Base_included
 
 #include <TRUSTTab.h>
+#include <Matrix_tools.h>
 
 /*! @brief Classe Matrice_Base Classe de base de la hierarchie des matrices.
  *
@@ -68,25 +69,25 @@ public :
   // Mise a zero des valeurs de la matrice
   virtual void clean() { Process::exit("Matrice_base::clean() not implemented.");};
 
-  virtual void get_stencil(IntTab& stencil) const;
+  virtual void get_stencil(Stencil& stencil) const;
 
-  virtual void get_symmetric_stencil(IntTab& stencil) const;
+  virtual void get_symmetric_stencil(Stencil& stencil) const;
 
-  virtual void get_stencil_and_coefficients(IntTab& stencil, ArrOfDouble& coefficients) const;
-  virtual void get_stencil_and_coeff_ptrs(IntTab& stencil, std::vector<const double *>& coeff_ptr) const;
+  virtual void get_stencil_and_coefficients(Stencil& stencil, StencilCoeffs& coefficients) const;
+  virtual void get_stencil_and_coeff_ptrs(Stencil& stencil, std::vector<const double *>& coeff_ptr) const;
 
-  virtual void get_symmetric_stencil_and_coefficients(IntTab& stencil, ArrOfDouble& coefficients) const;
+  virtual void get_symmetric_stencil_and_coefficients(Stencil& stencil, StencilCoeffs& coefficients) const;
 
   int get_stencil_size() const ;
   virtual void build_stencil();
 
-  void set_stencil( const IntTab& stencil );
+  void set_stencil( const Stencil& stencil );
 
   bool is_stencil_up_to_date() const ;
 
 protected:
   bool is_stencil_up_to_date_ = false;
-  IntTab stencil_ ;
+  Stencil stencil_ ;
 };
 
 

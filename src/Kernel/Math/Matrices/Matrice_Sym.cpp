@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -28,8 +28,8 @@ void Matrice_Sym::set_est_definie(int val)
 }
 
 void Matrice_Sym::unsymmetrize_stencil( const int nb_lines,
-                                        const IntTab& symmetric_stencil,
-                                        IntTab&       stencil ) const
+                                        const Stencil& symmetric_stencil,
+                                        Stencil&       stencil ) const
 {
 
   ArrOfInt offsets( nb_lines + 1 );
@@ -88,11 +88,11 @@ void Matrice_Sym::unsymmetrize_stencil( const int nb_lines,
     }
 }
 
-void Matrice_Sym::unsymmetrize_stencil_and_coefficients( const int     nb_lines,
-                                                         const IntTab&      symmetric_stencil,
-                                                         const ArrOfDouble& symmetric_coefficients,
-                                                         IntTab&            stencil,
-                                                         ArrOfDouble&       coefficients ) const
+void Matrice_Sym::unsymmetrize_stencil_and_coefficients( const int          nb_lines,
+                                                         const Stencil&      symmetric_stencil,
+                                                         const StencilCoeffs& symmetric_coefficients,
+                                                         Stencil&            stencil,
+                                                         StencilCoeffs&       coefficients ) const
 {
   ArrOfInt offsets( nb_lines + 1 );
   offsets[ 0 ] = 0;

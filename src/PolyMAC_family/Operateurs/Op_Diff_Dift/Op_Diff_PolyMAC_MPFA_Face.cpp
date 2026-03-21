@@ -123,7 +123,7 @@ void Op_Diff_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const ta
 
   const int N = ch.valeurs().line_size(), ne_tot = domaine.nb_elem_tot(), nf_tot = domaine.nb_faces_tot(), D = dimension;
 
-  IntTab stencil(0, 2), tpfa(0, N);
+  Stencil stencil(0, 2), tpfa(0, N);
 
   domaine.creer_tableau_faces(tpfa);
 
@@ -216,8 +216,10 @@ void Op_Diff_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const ta
   const double face_t = static_cast<double>(domaine.md_vector_faces()->nb_items_seq_tot()),
                elem_t = static_cast<double>(domaine.domaine().md_vector_elements()->nb_items_seq_tot());
   const double width = mp_sum_as_double(stencil.dimension(0)) / (N * (face_t + D * elem_t));
+#ifndef TRUST_USE_GPU
   const double perc = mp_somme_vect_as_double(tpfa) * 100. / (N * face_t);
   Cerr << "width " << width << " " << perc  << "% TPFA " << finl;
+#endif
   Matrix_tools::allocate_morse_matrix(N * (nf_tot + ne_tot * D), N * (nf_tot + ne_tot * D), stencil, mat2);
 
   if (mat.nb_colonnes())

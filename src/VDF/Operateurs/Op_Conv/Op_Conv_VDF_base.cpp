@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -103,7 +103,7 @@ void Op_Conv_VDF_base::dimensionner_blocs_elem(matrices_t mats, const tabs_t& se
     if (i_m.first == "vitesse" || (!hcc && i_m.first == cc.le_nom()) || (cc.derivees().count(i_m.first) && !semi_impl.count(cc.le_nom().getString())))
       {
         Matrice_Morse mat;
-        IntTab stencil(0, 2);
+        Stencil stencil(0, 2);
 
         int m, M = equation().probleme().get_champ(i_m.first.c_str()).valeurs().line_size();
         if (i_m.first == "vitesse") /* vitesse */
@@ -147,7 +147,7 @@ void Op_Conv_VDF_base::dimensionner_blocs_face(matrices_t matrices, const tabs_t
   //int e, eb, fb,  N = equation().inconnue().valeurs().line_size();
   // eb never used ? Warning Error on clang...
   int e, fb,  N = equation().inconnue().valeurs().line_size();
-  IntTab stencil(0, 2);
+  Stencil stencil(0, 2);
 
 
   /* agit uniquement aux elements; diagonale omise */

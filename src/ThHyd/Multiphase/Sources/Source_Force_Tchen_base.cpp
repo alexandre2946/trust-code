@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -49,7 +49,7 @@ void Source_Force_Tchen_base::dimensionner_blocs(matrices_t matrices, const tabs
   const IntTab& fcl = ch.fcl();
 
   /* stencil : diagonal par bloc pour les vitesses aux faces, puis chaque composante des vitesses aux elems */
-  IntTab stencil(0, 2);
+  Stencil stencil(0, 2);
 
   int N = inco.line_size(), nf = domaine.nb_faces();
 

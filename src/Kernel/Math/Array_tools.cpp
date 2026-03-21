@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -297,6 +297,62 @@ template void array_calculer_intersection(TRUSTArray<int,trustIdType>& liste1, c
 template void array_trier_retirer_doublons(TRUSTArray<int,trustIdType>& array);
 template void array_trier_retirer_doublons(TRUSTArray<trustIdType,trustIdType>& array);
 template void array_trier_retirer_doublons(TRUSTArray<double,trustIdType>& array);
+
+// BigIntTab = TRUSTTab<int, trustIdType>: value type int, size type trustIdType - doesn't fit IntTab_T<_SIZE_>
+static inline int same_line_big(const BigIntTab& v, trustIdType i, trustIdType j)
+{
+  const int ls = v.line_size();
+  for (int k = 0; k < ls; k++)
+    if (v(i,k) != v(j,k))
+      return 0;
+  return 1;
+}
+
+void tableau_trier_retirer_doublons(BigIntTab& tab)
+{
+  const trustIdType nb_lignes = tab.dimension(0);
+  if (nb_lignes == 0) return;
+  int nb_colonnes = tab.line_size();
+
+  if (nb_colonnes == 1)
+    array_trier_retirer_doublons(tab);
+  else
+    {
+      nb_colonnes = tri_lexicographique_tableau(tab);
+      if (nb_colonnes == 2)
+        {
+          trustIdType j = 1;
+          int last_x = tab(0, 0);
+          int last_y = tab(0, 1);
+          for (trustIdType i = 1; i < nb_lignes; i++)
+            {
+              const int x = tab(i, 0);
+              const int y = tab(i, 1);
+              if (x != last_x || y != last_y)
+                {
+                  tab(j, 0) = last_x = x;
+                  tab(j, 1) = last_y = y;
+                  j++;
+                }
+            }
+          tab.resize_dim0(j);
+        }
+      else
+        {
+          trustIdType j = 0;
+          for (trustIdType i = 1; i < nb_lignes; i++)
+            {
+              if (!same_line_big(tab, i, j))
+                {
+                  j++;
+                  for (int k = 0; k < nb_colonnes; k++)
+                    tab(j, k) = tab(i, k);
+                }
+            }
+          tab.resize_dim0(j+1);
+        }
+    }
+}
 #endif
 
 

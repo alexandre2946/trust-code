@@ -196,7 +196,7 @@ void Matrice_Bloc::clean()
     }
 }
 
-void Matrice_Bloc::get_stencil( IntTab& stencil ) const
+void Matrice_Bloc::get_stencil( Stencil& stencil ) const
 {
   assert_check_block_matrix_structure( );
   if(  is_stencil_up_to_date_ )
@@ -209,7 +209,7 @@ void Matrice_Bloc::get_stencil( IntTab& stencil ) const
   const int nb_column_blocks = nb_bloc_colonnes( );
   const int nb_stencils      =  nb_line_blocks * nb_column_blocks;
 
-  VECT( IntTab ) local_stencils;
+  VECT( Stencil ) local_stencils;
   local_stencils.dimensionner( nb_stencils );
 
   int imin = 0;
@@ -226,7 +226,7 @@ void Matrice_Bloc::get_stencil( IntTab& stencil ) const
           imax = imin + local_matrix.nb_lignes( );
           jmax = jmin + local_matrix.nb_colonnes( );
 
-          IntTab& local_stencil = local_stencils[ i * nb_column_blocks + j ];
+          Stencil& local_stencil = local_stencils[ i * nb_column_blocks + j ];
           local_matrix.get_stencil( local_stencil );
 
           const int size = local_stencil.dimension( 0 );
@@ -247,7 +247,7 @@ void Matrice_Bloc::get_stencil( IntTab& stencil ) const
 
   for ( int i=0; i<nb_stencils; ++i )
     {
-      const IntTab& local_stencil = local_stencils[ i ];
+      const Stencil& local_stencil = local_stencils[ i ];
       const int size = local_stencil.dimension( 0 );
 
       for ( int k=0; k<size; ++k )
@@ -269,7 +269,7 @@ void Matrice_Bloc::get_stencil( IntTab& stencil ) const
 
   for ( int i=0; i<nb_stencils; ++i )
     {
-      const IntTab& local_stencil = local_stencils[ i ];
+      const Stencil& local_stencil = local_stencils[ i ];
       const int size = local_stencil.dimension( 0 );
 
       for ( int k=0; k<size; ++k )
@@ -302,7 +302,7 @@ void Matrice_Bloc::build_stencil()
   const int nb_stencils      = nb_line_blocks * nb_column_blocks;
 
 
-  VECT( IntTab ) local_stencils;
+  VECT( Stencil ) local_stencils;
   local_stencils.dimensionner( nb_stencils );
 
   int imin = 0;
@@ -325,7 +325,7 @@ void Matrice_Bloc::build_stencil()
           imax = imin + local_matrix.nb_lignes( );
           jmax = jmin + local_matrix.nb_colonnes( );
 
-          IntTab& local_stencil = local_stencils[ i * nb_column_blocks + j ];
+          Stencil& local_stencil = local_stencils[ i * nb_column_blocks + j ];
           local_matrix.get_stencil( local_stencil );
 
           const int size = local_stencil.dimension( 0 );
@@ -346,7 +346,7 @@ void Matrice_Bloc::build_stencil()
 
   for ( int i=0; i<nb_stencils; ++i )
     {
-      const IntTab& local_stencil = local_stencils[ i ];
+      const Stencil& local_stencil = local_stencils[ i ];
       const int size = local_stencil.dimension( 0 );
 
       for ( int k=0; k<size; ++k )
@@ -370,7 +370,7 @@ void Matrice_Bloc::build_stencil()
 
   for ( int i=0; i<nb_stencils; ++i )
     {
-      const IntTab& local_stencil = local_stencils[ i ];
+      const Stencil& local_stencil = local_stencils[ i ];
       const int size = local_stencil.dimension( 0 );
 
       for ( int k=0; k<size; ++k )
@@ -395,21 +395,21 @@ void Matrice_Bloc::build_stencil()
 // Local template method: copy either values or ptrs to value!
 namespace
 {
-template<typename _TAB_T_> static inline void _get_sub_stencil_coeff(const Matrice_Base& mat, IntTab& sten, _TAB_T_& coeff);
+template<typename _TAB_T_> static inline void _get_sub_stencil_coeff(const Matrice_Base& mat, Stencil& sten, _TAB_T_& coeff);
 
-template<> inline void _get_sub_stencil_coeff<ArrOfDouble>(const Matrice_Base& mat, IntTab& sten, ArrOfDouble& coeff)
+template<> inline void _get_sub_stencil_coeff<StencilCoeffs>(const Matrice_Base& mat, Stencil& sten, StencilCoeffs& coeff)
 {
   mat.get_stencil_and_coefficients( sten, coeff );
 }
 
-template<> inline void _get_sub_stencil_coeff<std::vector<const double*>>(const Matrice_Base& mat, IntTab& sten, std::vector<const double*>& coeff)
+template<> inline void _get_sub_stencil_coeff<std::vector<const double*>>(const Matrice_Base& mat, Stencil& sten, std::vector<const double*>& coeff)
 {
   mat.get_stencil_and_coeff_ptrs( sten, coeff );
 }
 }
 
 template<typename _TAB_T_, typename _VAL_T_>
-void Matrice_Bloc::get_stencil_coeff_templ( IntTab& stencil, _TAB_T_& coeff_sp) const
+void Matrice_Bloc::get_stencil_coeff_templ( Stencil& stencil, _TAB_T_& coeff_sp) const
 {
   assert_check_block_matrix_structure( );
   const int nb_line_blocks   = nb_bloc_lignes( );
@@ -425,7 +425,7 @@ void Matrice_Bloc::get_stencil_coeff_templ( IntTab& stencil, _TAB_T_& coeff_sp) 
       stencil = stencil_;
       ArrOfInt offsets = offsets_;
 
-      IntTab      local_stencil;
+      Stencil      local_stencil;
       _TAB_T_     local_coeff;
 
 
@@ -456,7 +456,7 @@ void Matrice_Bloc::get_stencil_coeff_templ( IntTab& stencil, _TAB_T_& coeff_sp) 
     }
   const int nb_stencils      =  nb_line_blocks * nb_column_blocks;
 
-  std::vector<IntTab> vect_local_stencils(nb_stencils);
+  std::vector<Stencil> vect_local_stencils(nb_stencils);
   std::vector<_TAB_T_> vect_local_coefficients(nb_stencils);
 
   for ( int i=0; i<nb_line_blocks; ++i )
@@ -468,7 +468,7 @@ void Matrice_Bloc::get_stencil_coeff_templ( IntTab& stencil, _TAB_T_& coeff_sp) 
           imax = imin + local_matrix.nb_lignes( );
           jmax = jmin + local_matrix.nb_colonnes( );
 
-          IntTab&      local_stencil = vect_local_stencils[ i * nb_column_blocks + j ];
+          Stencil&      local_stencil = vect_local_stencils[ i * nb_column_blocks + j ];
           _TAB_T_& local_coefficients = vect_local_coefficients[i * nb_column_blocks + j ];
 
           _get_sub_stencil_coeff<_TAB_T_>(local_matrix, local_stencil, local_coefficients);
@@ -491,7 +491,7 @@ void Matrice_Bloc::get_stencil_coeff_templ( IntTab& stencil, _TAB_T_& coeff_sp) 
 
   for ( int i=0; i<nb_stencils; ++i )
     {
-      const IntTab& local_stencil = vect_local_stencils[ i ];
+      const Stencil& local_stencil = vect_local_stencils[ i ];
       const int size = local_stencil.dimension( 0 );
 
       for ( int k=0; k<size; ++k )
@@ -514,7 +514,7 @@ void Matrice_Bloc::get_stencil_coeff_templ( IntTab& stencil, _TAB_T_& coeff_sp) 
 
   for ( int i=0; i<nb_stencils; ++i )
     {
-      const IntTab&      local_stencil= vect_local_stencils[ i ];
+      const Stencil&      local_stencil= vect_local_stencils[ i ];
       const _TAB_T_& local_coefficients = vect_local_coefficients[ i ];
 
       const int size = local_stencil.dimension( 0 );
@@ -539,7 +539,7 @@ void Matrice_Bloc::get_stencil_coeff_templ( IntTab& stencil, _TAB_T_& coeff_sp) 
     }
 }
 
-void Matrice_Bloc::get_stencil_and_coeff_ptrs(IntTab& stencil, std::vector<const double *>& coeff_ptr) const
+void Matrice_Bloc::get_stencil_and_coeff_ptrs(Stencil& stencil, std::vector<const double *>& coeff_ptr) const
 {
   if( is_stencil_up_to_date_ )
     {
@@ -553,7 +553,7 @@ void Matrice_Bloc::get_stencil_and_coeff_ptrs(IntTab& stencil, std::vector<const
   get_stencil_coeff_templ<std::vector<const double *>, const double *>(stencil, coeff_ptr);
 }
 
-void Matrice_Bloc::get_stencil_and_coefficients(IntTab& stencil, ArrOfDouble& coefficients) const
+void Matrice_Bloc::get_stencil_and_coefficients(Stencil& stencil, StencilCoeffs& coefficients) const
 {
   if( is_stencil_up_to_date_ )
     {
@@ -561,7 +561,7 @@ void Matrice_Bloc::get_stencil_and_coefficients(IntTab& stencil, ArrOfDouble& co
       coefficients.resize_array( stencil_size );
     }
 
-  get_stencil_coeff_templ<ArrOfDouble, double>(stencil, coefficients);
+  get_stencil_coeff_templ<StencilCoeffs, double>(stencil, coefficients);
 }
 
 Sortie& Matrice_Bloc::imprimer( Sortie& os ) const

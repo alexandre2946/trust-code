@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -78,7 +78,7 @@ void Masse_PolyMAC_CDO_Elem::dimensionner(Matrice_Morse& matrix) const
   const bool only_ne = (matrix.nb_lignes() == ne_tot);
 
   domaine.init_m2(), ch.fcl();
-  IntTab indice(0, 2);
+  Stencil indice(0, 2);
 
   //partie superieure : diagonale
   for (e = 0; e < domaine.nb_elem(); e++)

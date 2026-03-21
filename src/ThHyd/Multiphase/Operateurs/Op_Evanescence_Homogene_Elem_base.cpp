@@ -50,7 +50,7 @@ void Op_Evanescence_Homogene_Elem_base::dimensionner_blocs(matrices_t matrices, 
     if (n_m.second->nb_colonnes())
       {
         Matrice_Morse& mat = *n_m.second, mat2;
-        IntTab sten(0, 2);
+        Stencil sten(0, 2);
 
 
         std::set<int> idx;

@@ -19,6 +19,7 @@
 
 #include <Domaine_Poly_base.h>
 #include <Option_DG.h>
+#include <Matrice_Base.h>
 
 class Quadrature_base;
 
@@ -40,7 +41,7 @@ public :
   inline const Quadrature_base& get_quadrature(int order) const;
   inline const Quadrature_base& get_quadrature() const;
 
-  inline const IntTab& get_stencil_sorted() const { return stencil_sorted_;}
+  inline const Stencil& get_stencil_sorted() const { return stencil_sorted_;}
 
 
   void set_default_order(int order);
@@ -70,7 +71,7 @@ protected:
   bool gram_schmidt_ = true; // init from Option_DG::GRAM_SCHMIDT which is 1 by default
 // DoubleVect h_, sigma;
 
-  IntTab stencil_sorted_; //table of stencil sorted for each elements
+  Stencil stencil_sorted_; //table of stencil sorted for each elements
 
   void compute_mesh_param(); // Compute the stabilization parameters
   bool build_nfaces_elem_();

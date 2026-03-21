@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -110,7 +110,7 @@ void Op_Diff_PolyMAC_HFV_Face::dimensionner_blocs_ext(int aux_only, matrices_t m
   const int N = ch.valeurs().line_size(), nf_tot = domaine.nb_faces_tot(), D = dimension,
             N_nu = nu_.line_size(), semi = (int) semi_impl.count(nom_inco);
 
-  IntTab stencil(0, 2);
+  Stencil stencil(0, 2);
 
   Cerr << "Op_Diff_PolyMAC_HFV_Face::dimensionner() : ";
 

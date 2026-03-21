@@ -158,7 +158,7 @@ void Op_VDF_Elem::dimensionner_multiscalar(const Domaine_VDF& le_dom, const Doma
   const int ne = le_dom.nb_elem_tot(), M = inco.line_size();
   const IntTab& f_e = le_dom.face_voisins(), &e_f = le_dom.elem_faces();
 
-  IntTab sten(0, 2);
+  Stencil sten(0, 2);
 
   for (int e = 0; e < ne; e++) // Boucle sur les elements
     for (int i = 0, f, n; i < e_f.dimension(1); i++) // Boucle sur les faces de chaque element

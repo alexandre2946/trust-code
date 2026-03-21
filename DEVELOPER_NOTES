@@ -1,3 +1,5 @@
+XX/XX/26 (TRUST) Matrix       : Introduce Stencil structure to deal with possible nnz larger than 2^31 (possible on future GPU device)
+XX/XX/26 (TRUST) VEF          : Elem_VEF_base::normale replaced by Elem_VEF_base::creer_face_normales
 XX/XX/26 (TRUST) Build        : Add a new target profiling to build a -O3 -g (+specific options) binary to ease the profiler tools (perf, nsys, rocprof,...)
 -------------------------------------------------------------
 Developer notes version 1.9.8_beta : Changes since version 1.9.7 :

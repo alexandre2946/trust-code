@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -23,7 +23,7 @@ class Dispersion_bulles_PolyMAC_MPFA: public Source_Dispersion_bulles_base
   Declare_instanciable(Dispersion_bulles_PolyMAC_MPFA);
 protected:
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
-  void dimensionner_blocs_aux(IntTab&) const override;
+  void dimensionner_blocs_aux(Stencil&) const override;
 };
 
 #endif /* Dispersion_bulles_PolyMAC_MPFA_included */

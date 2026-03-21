@@ -78,7 +78,7 @@ int Assembleur_P_PolyMAC_CDO::assembler_mat(Matrice& la_matrice, const DoubleVec
   /* 1. stencils de la matrice en pression et de rec : seulement au premier passage */
   if (!stencil_done)
     {
-      IntTab stencil_M(0, 2), stencil_R(0, 2);
+      Stencil stencil_M(0, 2), stencil_R(0, 2);
 
       for (e = 0; e < ne_tot; e++)
         {

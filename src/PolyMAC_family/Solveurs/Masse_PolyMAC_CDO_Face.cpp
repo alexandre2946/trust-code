@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -68,7 +68,7 @@ void Masse_PolyMAC_CDO_Face::dimensionner(Matrice_Morse& matrix) const
   const bool only_m2 = (matrix.nb_lignes() == nf_tot);
 
   domaine.init_m1(), domaine.init_m2(), ch.init_ra();
-  IntTab indice(0, 2);
+  Stencil indice(0, 2);
 
   //partie vitesses : matrice de masse des vitesses si la face n'est pas a vitesse imposee, diagonale sinon
   for (e = 0; e < domaine.nb_elem_tot(); e++)

@@ -59,7 +59,7 @@ int  Assembleur_P_PolyMAC_HFV::assembler_mat(Matrice& la_matrice,const DoubleVec
   /* 1. stencil de la matrice en pression : seulement au premier passage */
   if (!stencil_done) /* premier passage: calcul */
     {
-      IntTab stencil(0, 2);
+      Stencil stencil(0, 2);
 
       for (e = 0; e < ne; e++)
         for (stencil.append_line(e, e), i = 0; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++) /* blocs "elem-elem" et "elem-face" */
@@ -124,7 +124,7 @@ void Assembleur_P_PolyMAC_HFV::dimensionner_continuite(matrices_t matrices, int 
   int i, j, e, f, fb, n, N = equation().inconnue().valeurs().line_size(), m, M = equation().get_champ("pression").valeurs().line_size(),
                          ne_tot = domaine.nb_elem_tot(), nf_tot = domaine.nb_faces_tot();
   const IntTab& fcl = ref_cast(Champ_Face_PolyMAC_HFV, mon_equation->inconnue()).fcl(), &e_f = domaine.elem_faces();
-  IntTab sten_a(0, 2), sten_p(0, 2), sten_v(0, 2);
+  Stencil sten_a(0, 2), sten_p(0, 2), sten_v(0, 2);
   DoubleTrav w2;
 
   /* equations sum alpha_k = 1 */

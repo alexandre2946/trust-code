@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -113,7 +113,7 @@ void Matrice_Diagonale::clean()
   coefficients_ = 0.;
 }
 
-void Matrice_Diagonale::get_stencil( IntTab& stencil ) const
+void Matrice_Diagonale::get_stencil( Stencil& stencil ) const
 {
   if( is_stencil_up_to_date_ )
     {
@@ -132,13 +132,13 @@ void Matrice_Diagonale::get_stencil( IntTab& stencil ) const
     }
 }
 
-void Matrice_Diagonale::get_symmetric_stencil( IntTab& stencil ) const
+void Matrice_Diagonale::get_symmetric_stencil( Stencil& stencil ) const
 {
   get_stencil( stencil );
 }
 
-void Matrice_Diagonale::get_stencil_and_coefficients( IntTab&      stencil,
-                                                      ArrOfDouble& coefficients ) const
+void Matrice_Diagonale::get_stencil_and_coefficients( Stencil&      stencil,
+                                                      StencilCoeffs& coefficients ) const
 {
   if( is_stencil_up_to_date_ )
     {
@@ -150,7 +150,9 @@ void Matrice_Diagonale::get_stencil_and_coefficients( IntTab&      stencil,
           Process::abort( );
         }
       stencil = stencil_;
-      coefficients  = coefficients_;
+      const int n = coefficients_.size_array();
+      coefficients.resize_array( n );
+      for ( int i=0; i<n; ++i ) coefficients[ i ] = coefficients_( i );
       return;
     }
   const int size = ordre( );
@@ -166,8 +168,8 @@ void Matrice_Diagonale::get_stencil_and_coefficients( IntTab&      stencil,
     }
 }
 
-void Matrice_Diagonale::get_symmetric_stencil_and_coefficients( IntTab&      stencil,
-                                                                ArrOfDouble& coefficients ) const
+void Matrice_Diagonale::get_symmetric_stencil_and_coefficients( Stencil&      stencil,
+                                                                StencilCoeffs& coefficients ) const
 {
   get_stencil_and_coefficients( stencil,
                                 coefficients );

@@ -156,7 +156,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::dimensionner_blocs(matrices_t mats, const
       if (i_m.first == "vitesse" || (cc.derivees().count(i_m.first) && !semi_impl.count(cc.le_nom().getString())))
         {
           Matrice_Morse mat;
-          IntTab stencil(0, 2);
+          Stencil stencil(0, 2);
 
           int M = equation().probleme().get_champ(i_m.first.c_str()).valeurs().line_size();
 

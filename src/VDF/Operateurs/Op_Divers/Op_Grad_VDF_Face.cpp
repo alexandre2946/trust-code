@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -220,7 +220,7 @@ void Op_Grad_VDF_Face::dimensionner_blocs(matrices_t matrices, const tabs_t& sem
   if (!matrices.count("pression")) return; //rien a faire
 
   const Domaine_VDF& zvdf = le_dom_vdf.valeur();
-  IntTab sten(0, 2);
+  Stencil sten(0, 2);
 
   const Champ_Face_VDF& ch = ref_cast(Champ_Face_VDF, equation().inconnue());
   const DoubleTab& vit = ch.valeurs(), &press = le_champ_inco.non_nul() ? le_champ_inco->valeurs() : ref_cast(Navier_Stokes_std, equation()).pression().valeurs();

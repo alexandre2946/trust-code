@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -34,7 +34,7 @@ Entree& Dispersion_bulles_PolyMAC_MPFA::readOn(Entree& is)
   return is;
 }
 
-void Dispersion_bulles_PolyMAC_MPFA::dimensionner_blocs_aux(IntTab& stencil) const
+void Dispersion_bulles_PolyMAC_MPFA::dimensionner_blocs_aux(Stencil& stencil) const
 {
   const Champ_Face_PolyMAC_MPFA& ch = ref_cast(Champ_Face_PolyMAC_MPFA, equation().inconnue());
   const Domaine_PolyMAC_MPFA& domaine = ref_cast(Domaine_PolyMAC_MPFA, equation().domaine_dis());

@@ -67,7 +67,7 @@ int  Assembleur_P_PolyMAC_MPFA::assembler_mat(Matrice& la_matrice,const DoubleVe
   /* 1. stencil de la matrice en pression : seulement au premier passage */
   if (!stencil_done)
     {
-      IntTab stencil(0, 2);
+      Stencil stencil(0, 2);
 
       for (f = 0; f < domaine.nb_faces(); f++)
         for (i = 0; i < 2 && (e = f_e(f, i)) >= 0; i++)
@@ -108,7 +108,7 @@ void Assembleur_P_PolyMAC_MPFA::dimensionner_continuite(matrices_t matrices, int
 {
   if (aux_only) return; //rien a faire
   int e, n, N = ref_cast(Pb_Multiphase, equation().probleme()).nb_phases(), ne_tot = le_dom_PolyMAC_CDO->nb_elem_tot();
-  IntTab stencil(0, 2);
+  Stencil stencil(0, 2);
 
   for (e = 0; e < le_dom_PolyMAC_CDO->nb_elem(); e++)
     for (n = 0; n < N; n++) stencil.append_line(e, N * e + n);

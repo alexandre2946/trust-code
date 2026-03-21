@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -40,7 +40,7 @@ void Champ_Elem_DG::allocate_mass_matrix()
 
   int nb_elem_tot = le_dom_VF->nb_elem_tot();
 
-  IntTab indice(0, 2);
+  Stencil indice(0, 2);
 
   int current_indice = 0;
   indices_glob_elem_.resize(nb_elem_tot+1);
@@ -67,7 +67,7 @@ void Champ_Elem_DG::allocate_transition_matrix()
 
   int nb_elem_tot = le_dom_VF->nb_elem_tot();
 
-  IntTab indice(0, 2);
+  Stencil indice(0, 2);
 
   int current_indice = 0;
   indices_glob_elem_.resize(nb_elem_tot+1);

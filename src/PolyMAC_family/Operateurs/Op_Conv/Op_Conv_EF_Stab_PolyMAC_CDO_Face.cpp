@@ -129,7 +129,7 @@ void Op_Conv_EF_Stab_PolyMAC_CDO_Face::dimensionner(Matrice_Morse& mat) const
 
   ch.fcl();
 
-  IntTab stencil(0, 2);
+  Stencil stencil(0, 2);
 
   for (f = 0; f < domaine.nb_faces_tot(); f++)
     if (f_e(f, 0) >= 0 && (f_e(f, 1) >= 0 ||  ch.fcl()(f, 0) == 1 ||  ch.fcl()(f, 0) == 3))

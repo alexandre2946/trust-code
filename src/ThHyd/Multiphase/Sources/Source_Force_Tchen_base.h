@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,6 +17,7 @@
 #define Source_Force_Tchen_base_included
 
 #include <Sources_Multiphase_base.h>
+#include <Matrix_tools.h>
 
 /*! @brief classe Force_Tchen Force de Tchen dans un ecoulement multiphase
  *
@@ -33,7 +34,7 @@ public :
 protected:
   int n_l = -1; //phase liquide
 
-  virtual void dimensionner_blocs_aux(IntTab&) const = 0;
+  virtual void dimensionner_blocs_aux(Stencil&) const = 0;
   virtual void ajouter_blocs_aux(matrices_t , DoubleTab& ) const = 0;
 };
 

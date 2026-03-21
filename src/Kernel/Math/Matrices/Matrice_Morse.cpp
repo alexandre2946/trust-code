@@ -1350,7 +1350,7 @@ void Matrice_Morse::scale( const double x )
   coeff_ *= x;
 }
 
-void Matrice_Morse::get_stencil( IntTab& stencil ) const
+void Matrice_Morse::get_stencil( Stencil& stencil ) const
 {
   assert_check_morse_matrix_structure( );
 
@@ -1362,32 +1362,34 @@ void Matrice_Morse::get_stencil( IntTab& stencil ) const
 
 
   stencil.resize( 0, 2 );
-  stencil.resize((int)tab2_.size_array(), 2);
+  auto nnz = tab2_.size_array();
+  stencil.resize(nnz, 2);
 
 
   ArrOfInt tmp;
 
 
-  int compteur = 0;
+  decltype(nnz) compteur = 0;
 
   const int nb_lines = nb_lignes( );
   for ( int i=0; i<nb_lines; ++i )
     {
       auto k0   = tab1_( i ) - 1;
       auto k1   = tab1_( i + 1 ) - 1;
-      int size = (int)(k1 - k0);
+      const auto size = k1 - k0;
+      const int  size_int = (int)size;
 
       tmp.resize_array( 0 );
-      tmp.resize_array( size );
+      tmp.resize_array( size_int );
 
-      for ( int k=0; k<size; ++k )
+      for ( int k=0; k<size_int; ++k )
         {
           tmp[ k ] = tab2_( k + k0 ) - 1;
         }
 
       tmp.ordonne_array( );
 
-      for ( int k=0; k<size; ++k )
+      for ( int k=0; k<size_int; ++k )
         {
           stencil( k+compteur , 0 ) = i;
           stencil( k+compteur , 1 ) =  tmp[ k ];
@@ -1414,31 +1416,32 @@ template<> inline void _fill_slot<const double *>(const double*& dest, const dou
 
 
 template<typename _TAB_T_, typename _VALUE_T_>
-inline void Matrice_Morse::get_stencil_coeff_templ( IntTab& stencil, _TAB_T_& coeffs_span) const
+inline void Matrice_Morse::get_stencil_coeff_templ( Stencil& stencil, _TAB_T_& coeffs_span) const
 {
-  coeffs_span.resize((int)tab2_.size_array());
-  stencil.resize((int)tab2_.size_array(), 2);
-  int compteur = 0;
+  auto nnz = tab2_.size_array();
+  coeffs_span.resize(nnz);
+  stencil.resize(nnz, 2);
+  decltype(nnz) compteur = 0;
   const int nb_lines = nb_lignes( );
   for ( int i=0; i<nb_lines; ++i )
     {
-      const auto k0 = tab1_( i ) - 1;
-      const auto k1 = tab1_( i + 1 ) - 1;
-      const int size = (int)(k1 - k0);
-      for ( int k=0; k<size; ++k )
+      const auto k0      = tab1_( i ) - 1;
+      const auto k1      = tab1_( i + 1 ) - 1;
+      const int  size_int = (int)(k1 - k0);
+      for ( int k=0; k<size_int; ++k )
         {
           stencil( compteur + k , 0 ) = i;
           stencil( compteur + k , 1 ) = tab2_( k + k0 ) - 1;
           ::_fill_slot<_VALUE_T_>(coeffs_span[ compteur + k ], coeff_(k+k0));
         }
-      compteur += size;
+      compteur += size_int;
     }
 
 
 }
 
 
-void Matrice_Morse::get_stencil_and_coeff_ptrs(IntTab& stencil,
+void Matrice_Morse::get_stencil_and_coeff_ptrs(Stencil& stencil,
                                                std::vector<const double *>& coeff_ptr) const
 {
   assert_check_morse_matrix_structure( );
@@ -1453,12 +1456,12 @@ void Matrice_Morse::get_stencil_and_coeff_ptrs(IntTab& stencil,
     }
 
   get_stencil_coeff_templ< std::vector<const double *>, const double *>(stencil, coeff_ptr);
-  assert( (int)coeff_ptr.size( ) == stencil.dimension( 0 ));
+  assert( (trustIdType)coeff_ptr.size( ) == stencil.dimension( 0 ));
 }
 
 
-void Matrice_Morse::get_stencil_and_coefficients( IntTab&      stencil,
-                                                  ArrOfDouble& coefficients ) const
+void Matrice_Morse::get_stencil_and_coefficients( Stencil&       stencil,
+                                                  StencilCoeffs& coefficients ) const
 {
   if( is_stencil_up_to_date_ )
     {
@@ -1470,13 +1473,13 @@ void Matrice_Morse::get_stencil_and_coefficients( IntTab&      stencil,
           Process::abort( );
         }
       stencil = stencil_ ;
-      { const auto sz = coeff_.size_array(); coefficients.resize((int)sz); for (auto k=0; k<sz; k++) coefficients[(int)k] = coeff_[k]; }
+      { const auto sz = coeff_.size_array(); coefficients.resize(sz); for (auto k=sz-sz; k<sz; k++) coefficients[k] = coeff_[k]; }
       return;
     }
 
 
 
-  get_stencil_coeff_templ<ArrOfDouble, double>(stencil, coefficients);
+  get_stencil_coeff_templ<StencilCoeffs, double>(stencil, coefficients);
   assert( coefficients.size_array( ) == stencil.dimension( 0 ));
 }
 
@@ -1922,7 +1925,7 @@ bool Matrice_Morse::is_sorted_stencil() const
 
 // Check the matrix is diagonal:
 // Faster than using:
-// IntTab stencil;
+// Stencil stencil;
 // A.get_stencil(stencil);
 // Matrix_tools::is_diagonal_stencil(A.nb_lignes(), A.nb_colonnes(), stencil);
 bool Matrice_Morse::is_diagonal()

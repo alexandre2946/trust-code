@@ -182,7 +182,7 @@ void Op_PolyMAC_CDO_Elem::dimensionner_bloc_vitesse(const Domaine_PolyMAC_CDO& l
   int nb_faces = le_domaine.nb_faces();
   int nb_faces_tot = le_domaine.nb_faces_tot();
   int nb_elem_tot = le_domaine.nb_elem_tot();
-  IntTab stencyl(0, 2);
+  Stencil stencyl(0, 2);
 
   const IntTab& face_voisins = le_domaine.face_voisins();
 

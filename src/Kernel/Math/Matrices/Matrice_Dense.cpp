@@ -349,7 +349,7 @@ void Matrice_Dense::clean()
     }
 }
 
-void Matrice_Dense::get_stencil( IntTab& stencil ) const
+void Matrice_Dense::get_stencil( Stencil& stencil ) const
 {
 
   const int nb_lines = nb_lignes( );

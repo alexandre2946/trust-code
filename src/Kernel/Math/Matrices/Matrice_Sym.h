@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,6 +20,7 @@
 #define _SEUIL_GCP_ 1e-12
 
 #include <TRUSTTabs_forward.h>
+#include <Matrice_Base.h>
 
 /*! @brief Classe Matrice_Sym Cette classe est la classe de base pour la representantion des
  *
@@ -44,8 +45,8 @@ public :
 
   int get_est_definie() const;
   void set_est_definie(int);
-  void unsymmetrize_stencil(const int nb_lines, const IntTab& symmetric_stencil, IntTab& stencil) const;
-  void unsymmetrize_stencil_and_coefficients(const int nb_lines, const IntTab& symmetric_stencil, const ArrOfDouble& symmetric_coefficients, IntTab& stencil, ArrOfDouble& coefficients) const;
+  void unsymmetrize_stencil(const int nb_lines, const Stencil& symmetric_stencil, Stencil& stencil) const;
+  void unsymmetrize_stencil_and_coefficients(const int nb_lines, const Stencil& symmetric_stencil, const StencilCoeffs& symmetric_coefficients, Stencil& stencil, StencilCoeffs& coefficients) const;
 
 protected :
   virtual DoubleTab& ajouter_multTab_(const DoubleTab&, DoubleTab& ) const=0 ;

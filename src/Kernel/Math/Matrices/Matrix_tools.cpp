@@ -29,8 +29,8 @@
 void Matrix_tools::convert_to_morse_matrix( const Matrice_Base& in,
                                             Matrice_Morse&      out )
 {
-  IntTab stencil;
-  ArrOfDouble coefficients;
+  Stencil stencil;
+  StencilCoeffs coefficients;
 
   in.get_stencil_and_coefficients( stencil, coefficients );
 
@@ -46,12 +46,12 @@ void Matrix_tools::convert_to_morse_matrix_with_ptrs( const Matrice_Base& in,
                                                       Matrice_Morse&      out,
                                                       std::vector<const double *>& coeffs)
 {
-  IntTab stencil;
-  ArrOfDouble coefficients;
+  Stencil stencil;
+  StencilCoeffs coefficients;
 
   in.get_stencil_and_coeff_ptrs( stencil, coeffs);
 
-  // Copy coefficients into ArrOfDouble
+  // Copy coefficients into StencilCoeffs
   coefficients.resize_array((int)coeffs.size());
   auto deref_fun = [](const double* src) { return *src; };
 
@@ -71,8 +71,8 @@ void Matrix_tools::convert_to_symmetric_morse_matrix( const Matrice_Base& in,
 {
   assert( in.nb_lignes( ) == in.nb_colonnes( ) );
 
-  IntTab stencil;
-  ArrOfDouble coefficients;
+  Stencil stencil;
+  StencilCoeffs coefficients;
 
   in.get_symmetric_stencil_and_coefficients( stencil, coefficients );
 
@@ -83,16 +83,15 @@ void Matrix_tools::convert_to_symmetric_morse_matrix( const Matrice_Base& in,
 }
 
 // checking stencil
-template <typename _SIZE_>
-bool Matrix_tools::is_normalized_stencil( const IntTab_T<_SIZE_>& stencil )
+template <typename _TYPE_, typename _SIZE_>
+bool Matrix_tools::is_normalized_stencil( const TRUSTTab<_TYPE_, _SIZE_>& stencil )
 {
-  using int_t = _SIZE_;
-  const int_t size = stencil.dimension( 0 );
-  for ( int_t i=1; i<size; ++i )
+  const _SIZE_ size = stencil.dimension( 0 );
+  for ( _SIZE_ i=1; i<size; ++i )
     {
-      int_t delta1 = stencil( i-1, 0 ) - stencil( i, 0 );
-      int_t delta2 = stencil( i-1, 1 ) - stencil( i, 1 );
-      int_t delta  = ( delta1 == 0 ) ? delta2 : delta1;
+      _TYPE_ delta1 = stencil( i-1, 0 ) - stencil( i, 0 );
+      _TYPE_ delta2 = stencil( i-1, 1 ) - stencil( i, 1 );
+      _TYPE_ delta  = ( delta1 == 0 ) ? delta2 : delta1;
 
       if ( delta >= 0 )
         return false;
@@ -101,7 +100,7 @@ bool Matrix_tools::is_normalized_stencil( const IntTab_T<_SIZE_>& stencil )
 }
 
 // checking symmetric stencil
-bool Matrix_tools::is_normalized_symmetric_stencil( const IntTab& stencil )
+bool Matrix_tools::is_normalized_symmetric_stencil( const Stencil& stencil )
 {
   if ( ! ( is_normalized_stencil( stencil ) ) )
     {
@@ -164,7 +163,7 @@ template void Matrix_tools::fill_csr_arrays(const trustIdType nb_lines, const tr
 // building morse matrices
 void Matrix_tools::allocate_morse_matrix( const int nb_lines,
                                           const int nb_columns,
-                                          const IntTab&  stencil,
+                                          const Stencil& stencil,
                                           Matrice_Morse& matrix ,
                                           const bool& attach_stencil_to_matrix )
 {
@@ -194,8 +193,8 @@ void Matrix_tools::allocate_morse_matrix( const int nb_lines,
 
 void Matrix_tools::build_morse_matrix( const int     nb_lines,
                                        const int     nb_columns,
-                                       const IntTab&      stencil,
-                                       const ArrOfDouble& coefficients,
+                                       const Stencil&      stencil,
+                                       const StencilCoeffs& coefficients,
                                        Matrice_Morse&     matrix )
 {
   // No : stencil do not rely on sorted columns
@@ -234,7 +233,7 @@ void Matrix_tools::build_morse_matrix( const int     nb_lines,
 
 // building symmetric morse matrices
 void Matrix_tools::allocate_symmetric_morse_matrix( const int     order,
-                                                    const IntTab&      stencil,
+                                                    const Stencil&      stencil,
                                                     Matrice_Morse_Sym& matrix )
 {
   assert( is_normalized_symmetric_stencil( stencil ) );
@@ -270,8 +269,8 @@ void Matrix_tools::allocate_symmetric_morse_matrix( const int     order,
 
 
 void Matrix_tools::build_symmetric_morse_matrix( const int     order,
-                                                 const IntTab&      stencil,
-                                                 const ArrOfDouble& coefficients,
+                                                 const Stencil&      stencil,
+                                                 const StencilCoeffs& coefficients,
                                                  Matrice_Morse_Sym& matrix )
 {
   // No : stencil do not rely on sorted columns
@@ -317,16 +316,16 @@ void Matrix_tools::allocate_for_scaled_addition( const Matrice& A,
   assert( A.valeur( ).nb_lignes( )   == B.valeur( ).nb_lignes( )   );
   assert( A.valeur( ).nb_colonnes( ) == B.valeur( ).nb_colonnes( ) );
 
-  IntTab A_stencil;
+  Stencil A_stencil;
   A.valeur( ).get_stencil( A_stencil );
-  const int A_size = A_stencil.dimension( 0 );
+  const int A_size = (int)A_stencil.dimension( 0 );
 
-  IntTab B_stencil;
+  Stencil B_stencil;
   B.valeur( ).get_stencil( B_stencil );
-  const int B_size = B_stencil.dimension( 0 );
+  const int B_size = (int)B_stencil.dimension( 0 );
 
   int size = A_size + B_size;
-  IntTab stencil;
+  Stencil stencil;
 
   stencil.resize( size, 2 );
 
@@ -361,16 +360,16 @@ void Matrix_tools::allocate_for_symmetric_scaled_addition( const Matrice& A,
   assert( A.valeur( ).nb_lignes( )   == B.valeur( ).nb_lignes( )   );
   assert( A.valeur( ).nb_colonnes( ) == B.valeur( ).nb_colonnes( ) );
 
-  IntTab A_stencil;
+  Stencil A_stencil;
   A.valeur( ).get_symmetric_stencil( A_stencil );
-  const int A_size = A_stencil.dimension( 0 );
+  const int A_size = (int)A_stencil.dimension( 0 );
 
-  IntTab B_stencil;
+  Stencil B_stencil;
   B.valeur( ).get_symmetric_stencil( B_stencil );
-  const int B_size = B_stencil.dimension( 0 );
+  const int B_size = (int)B_stencil.dimension( 0 );
 
   int size = A_size + B_size;
-  IntTab stencil;
+  Stencil stencil;
 
   stencil.resize( size, 2 );
 
@@ -409,13 +408,13 @@ void Matrix_tools::add_scaled_matrices( const Matrice& A,
 
   assert( C_.check_sorted_morse_matrix_structure( ) );
 
-  IntTab A_stencil;
-  ArrOfDouble A_coefficients;
+  Stencil A_stencil;
+  StencilCoeffs A_coefficients;
   A.valeur( ).get_stencil_and_coefficients( A_stencil,
                                             A_coefficients );
 
-  IntTab B_stencil;
-  ArrOfDouble B_coefficients;
+  Stencil B_stencil;
+  StencilCoeffs B_coefficients;
   B.valeur( ).get_stencil_and_coefficients( B_stencil,
                                             B_coefficients );
 
@@ -463,13 +462,13 @@ void Matrix_tools::add_symmetric_scaled_matrices( const Matrice& A,
 
   assert( C_.check_sorted_symmetric_morse_matrix_structure( ) );
 
-  IntTab A_stencil;
-  ArrOfDouble A_coefficients;
+  Stencil A_stencil;
+  StencilCoeffs A_coefficients;
   A.valeur( ).get_symmetric_stencil_and_coefficients( A_stencil,
                                                       A_coefficients );
 
-  IntTab B_stencil;
-  ArrOfDouble B_coefficients;
+  Stencil B_stencil;
+  StencilCoeffs B_coefficients;
   B.valeur( ).get_symmetric_stencil_and_coefficients( B_stencil,
                                                       B_coefficients );
 
@@ -507,14 +506,14 @@ void Matrix_tools::add_symmetric_scaled_matrices( const Matrice& A,
 }
 
 // stencil analysis
-bool Matrix_tools::is_null_stencil( const IntTab& stencil )
+bool Matrix_tools::is_null_stencil( const Stencil& stencil )
 {
   return ( stencil.dimension( 0 ) == 0 );
 }
 
 bool Matrix_tools::is_diagonal_stencil( const int nb_lines,
                                         const int nb_columns,
-                                        const IntTab& stencil )
+                                        const Stencil& stencil )
 {
   if ( nb_lines != nb_columns )
     {
@@ -551,7 +550,7 @@ bool Matrix_tools::is_diagonal_stencil( const int nb_lines,
 
 void Matrix_tools::allocate_from_stencil( const int nb_lines,
                                           const int nb_columns,
-                                          const IntTab& stencil,
+                                          const Stencil& stencil,
                                           Matrice&      matrix ,
                                           const bool&   attach_stencil_to_matrix)
 {
@@ -586,7 +585,7 @@ void Matrix_tools::allocate_from_stencil( const int nb_lines,
 }
 
 // extending a matrix's stencil
-void Matrix_tools::extend_matrix_stencil( const IntTab& stencil,
+void Matrix_tools::extend_matrix_stencil( const Stencil& stencil,
                                           Matrice&      matrix ,
                                           const bool&   attach_stencil_to_matrix )
 {
@@ -595,7 +594,7 @@ void Matrix_tools::extend_matrix_stencil( const IntTab& stencil,
       const int nb_lines   = matrix.valeur( ).nb_lignes( );
       const int nb_columns = matrix.valeur( ).nb_colonnes( );
 
-      IntTab full_stencil;
+      Stencil full_stencil;
       matrix.valeur( ).get_stencil( full_stencil );
 
       const int size = stencil.dimension( 0 );

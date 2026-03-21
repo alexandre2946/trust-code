@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -44,7 +44,7 @@ void Op_Div_PolyMAC_HFV::dimensionner_blocs(matrices_t matrices, const tabs_t& s
                  *matp = matrices.count("pression") ? matrices["pression"] : nullptr,
                   matv2, matp2;
 
-  IntTab sten_v(0, 2), sten_p(0, 2);
+  Stencil sten_v(0, 2), sten_p(0, 2);
   DoubleTab w2; //matrice w2 aux elements (la meme que dans Op_Grad et Assembleur_P)
 
   // Dependance en v : divergence par element et v = v_imp aux faces de Dirichlet

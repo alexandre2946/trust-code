@@ -76,7 +76,7 @@ void Op_Diff_DG_Elem::dimensionner(Matrice_Morse& la_matrice) const //TODO a rem
   int nb_elem_tot = le_dom_dg_->nb_elem_tot();
   int size_inc = indices_glob_elem(nb_elem_tot);
 
-  const IntTab& stencil_sorted = domaine.get_stencil_sorted();
+  const Stencil& stencil_sorted = domaine.get_stencil_sorted();
   const int nb_stencil_max = stencil_sorted.dimension(1);
 
   la_matrice.dimensionner(size_inc, size_inc, 0);

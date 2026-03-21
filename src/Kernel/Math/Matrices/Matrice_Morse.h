@@ -135,10 +135,10 @@ public :
   Matrice_Morse& operator *=(double );
   void scale( const double x ) override;
 
-  void get_stencil( IntTab& stencil ) const override;
+  void get_stencil( Stencil& stencil ) const override;
 
-  void get_stencil_and_coefficients(IntTab& stencil, ArrOfDouble& coefficients) const override;
-  void get_stencil_and_coeff_ptrs(IntTab& stencil, std::vector<const double *>& coeff_ptr) const override;
+  void get_stencil_and_coefficients(Stencil& stencil, StencilCoeffs& coefficients) const override;
+  void get_stencil_and_coeff_ptrs(Stencil& stencil, std::vector<const double *>& coeff_ptr) const override;
 
   Matrice_Morse& operator /=(double );
   Matrice_Morse& operator *=(const DoubleVect& );
@@ -232,7 +232,7 @@ protected :
   int symetrique_; // Pour inliner operator()(i,j) afin d'optimiser
 
   template<typename _TAB_T_, typename _VALUE_T_>
-  inline void get_stencil_coeff_templ( IntTab& stencil, _TAB_T_& coeffs_span) const;
+  inline void get_stencil_coeff_templ( Stencil& stencil, _TAB_T_& coeffs_span) const;
 
 private :
   double zero_;

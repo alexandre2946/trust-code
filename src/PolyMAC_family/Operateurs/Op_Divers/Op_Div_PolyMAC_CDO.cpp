@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -131,7 +131,7 @@ void Op_Div_PolyMAC_CDO::dimensionner(Matrice_Morse& matrice) const
   int nb_faces = domaine_PolyMAC_CDO.nb_faces();
   int nb_faces_tot = domaine_PolyMAC_CDO.nb_faces_tot();
   int nb_elem_tot = domaine_PolyMAC_CDO.nb_elem_tot();
-  IntTab stencyl(0, 2);
+  Stencil stencyl(0, 2);
 
   const IntTab& face_voisins = domaine_PolyMAC_CDO.face_voisins();
 

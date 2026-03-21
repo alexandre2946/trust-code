@@ -112,7 +112,7 @@ void Echange_Thermique_Volumique_Elem::dimensionner_blocs(matrices_t matrices, c
   const std::vector<std::map<mcIdType,double>>& interp = equation().probleme().domaine().get_remapper(o_ech_->equation().probleme().domaine(), true)->getCrudeMatrix();
 
   /* derivees : aux mailles ou Ai > 0 */
-  IntTab sten[2];
+  Stencil sten[2];
   sten[0].resize(0, 2);
   sten[1].resize(0, 2);
   for (int e = 0; e < dom.nb_elem(); e++)

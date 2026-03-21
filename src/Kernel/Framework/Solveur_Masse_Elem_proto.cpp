@@ -71,7 +71,7 @@ void Solveur_Masse_Elem_proto::dimensionner_blocs_proto(matrices_t matrices, con
         const DoubleTab& col = solv_mass_->equation().probleme().get_champ(i_m.first.c_str()).valeurs(); //tableau de l'inconnue par rapport a laquelle on derive
         int m, M = col.line_size();
 
-        IntTab stencil(0, 2);
+        Stencil stencil(0, 2);
 
 
         for (e = 0; e < ne; e++)

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -291,11 +291,11 @@ Matrice& Matrice_Bloc_Sym::get_bloc( int i, int j )
   return blocs_[i*(N_-1)-i*(i-1)/2+j];
 }
 
-void Matrice_Bloc_Sym::get_stencil( IntTab& stencil ) const
+void Matrice_Bloc_Sym::get_stencil( Stencil& stencil ) const
 {
   assert_check_symmetric_block_matrix_structure( );
 
-  IntTab symmetric_stencil;
+  Stencil symmetric_stencil;
   get_symmetric_stencil( symmetric_stencil );
 
   Matrice_Sym::unsymmetrize_stencil( nb_lignes( ),
@@ -303,7 +303,7 @@ void Matrice_Bloc_Sym::get_stencil( IntTab& stencil ) const
                                      stencil );
 }
 
-void Matrice_Bloc_Sym::get_symmetric_stencil( IntTab& stencil ) const
+void Matrice_Bloc_Sym::get_symmetric_stencil( Stencil& stencil ) const
 {
   assert_check_symmetric_block_matrix_structure( );
 
@@ -311,7 +311,7 @@ void Matrice_Bloc_Sym::get_symmetric_stencil( IntTab& stencil ) const
   const int nb_column_blocks = nb_bloc_colonnes( );
   const int nb_stencils      = nb_blocs_;
 
-  VECT( IntTab ) local_stencils;
+  VECT( Stencil ) local_stencils;
   local_stencils.dimensionner( nb_stencils );
 
   int imin  = 0;
@@ -332,7 +332,7 @@ void Matrice_Bloc_Sym::get_symmetric_stencil( IntTab& stencil ) const
 
           int stencil_index = i *( nb_line_blocks - 1 ) - i * ( i - 1) / 2 + j;
 
-          IntTab& local_stencil_ = local_stencils[ stencil_index ];
+          Stencil& local_stencil_ = local_stencils[ stencil_index ];
 
           if ( i == j )
             {
@@ -361,7 +361,7 @@ void Matrice_Bloc_Sym::get_symmetric_stencil( IntTab& stencil ) const
 
   for ( int i=0; i<nb_stencils; ++i )
     {
-      const IntTab& local_stencil_ = local_stencils[ i ];
+      const Stencil& local_stencil_ = local_stencils[ i ];
       const int size = local_stencil_.dimension( 0 );
 
       for ( int k=0; k<size; ++k )
@@ -383,7 +383,7 @@ void Matrice_Bloc_Sym::get_symmetric_stencil( IntTab& stencil ) const
 
   for ( int i=0; i<nb_stencils; ++i )
     {
-      const IntTab& local_stencil_ = local_stencils[ i ];
+      const Stencil& local_stencil_ = local_stencils[ i ];
       const int size = local_stencil_.dimension( 0 );
 
       for ( int k=0; k<size; ++k )
@@ -404,13 +404,13 @@ void Matrice_Bloc_Sym::get_symmetric_stencil( IntTab& stencil ) const
     }
 }
 
-void Matrice_Bloc_Sym::get_stencil_and_coefficients( IntTab&      stencil,
-                                                     ArrOfDouble& coefficients ) const
+void Matrice_Bloc_Sym::get_stencil_and_coefficients( Stencil&      stencil,
+                                                     StencilCoeffs& coefficients ) const
 {
   assert_check_symmetric_block_matrix_structure( );
 
-  IntTab symmetric_stencil;
-  ArrOfDouble symmetric_coefficients;
+  Stencil symmetric_stencil;
+  StencilCoeffs symmetric_coefficients;
   get_symmetric_stencil_and_coefficients( symmetric_stencil, symmetric_coefficients );
 
   Matrice_Sym::unsymmetrize_stencil_and_coefficients( nb_lignes( ),
@@ -420,8 +420,8 @@ void Matrice_Bloc_Sym::get_stencil_and_coefficients( IntTab&      stencil,
                                                       coefficients );
 }
 
-void Matrice_Bloc_Sym::get_symmetric_stencil_and_coefficients( IntTab&      stencil,
-                                                               ArrOfDouble& coefficients ) const
+void Matrice_Bloc_Sym::get_symmetric_stencil_and_coefficients( Stencil&      stencil,
+                                                               StencilCoeffs& coefficients ) const
 {
   assert_check_symmetric_block_matrix_structure( );
 
@@ -429,10 +429,10 @@ void Matrice_Bloc_Sym::get_symmetric_stencil_and_coefficients( IntTab&      sten
   const int nb_column_blocks = nb_bloc_colonnes( );
   const int nb_stencils      = nb_blocs_;
 
-  VECT( IntTab ) local_stencils;
+  VECT( Stencil ) local_stencils;
   local_stencils.dimensionner( nb_stencils );
 
-  VECT( ArrOfDouble ) local_coefficients;
+  VECT( StencilCoeffs ) local_coefficients;
   local_coefficients.dimensionner( nb_stencils );
 
   int imin  = 0;
@@ -453,8 +453,8 @@ void Matrice_Bloc_Sym::get_symmetric_stencil_and_coefficients( IntTab&      sten
 
           int stencil_index = i *( nb_line_blocks - 1 ) - i * ( i - 1) / 2 + j;
 
-          IntTab&      local_stencil_      = local_stencils[ stencil_index ];
-          ArrOfDouble& coefficients_       = local_coefficients[ stencil_index ];
+          Stencil&      local_stencil_      = local_stencils[ stencil_index ];
+          StencilCoeffs& coefficients_       = local_coefficients[ stencil_index ];
 
           if ( i == j )
             {
@@ -483,7 +483,7 @@ void Matrice_Bloc_Sym::get_symmetric_stencil_and_coefficients( IntTab&      sten
 
   for ( int i=0; i<nb_stencils; ++i )
     {
-      const IntTab& local_stencil_ = local_stencils[ i ];
+      const Stencil& local_stencil_ = local_stencils[ i ];
       const int size = local_stencil_.dimension( 0 );
 
       for ( int k=0; k<size; ++k )
@@ -506,8 +506,8 @@ void Matrice_Bloc_Sym::get_symmetric_stencil_and_coefficients( IntTab&      sten
 
   for ( int i=0; i<nb_stencils; ++i )
     {
-      const IntTab&      local_stencil_       = local_stencils[ i ];
-      const ArrOfDouble&        coefficients_ = local_coefficients[ i ];
+      const Stencil&      local_stencil_       = local_stencils[ i ];
+      const StencilCoeffs&        coefficients_ = local_coefficients[ i ];
 
       const int size = local_stencil_.dimension( 0 );
       assert( coefficients_.size_array( ) == size );

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -88,7 +88,7 @@ void Perte_Charge_Singuliere_VDF_Face::dimensionner_blocs(matrices_t matrices, c
   Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr, mat2;
 
   const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
-  IntTab stencil(0, 2);
+  Stencil stencil(0, 2);
 
   for (int f = 0; f < domaine_VDF.nb_faces(); f++)
     stencil.append_line(f, f);

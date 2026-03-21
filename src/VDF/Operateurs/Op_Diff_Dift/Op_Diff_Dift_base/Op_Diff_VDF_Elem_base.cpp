@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -120,7 +120,7 @@ void Op_Diff_VDF_Elem_base::dimensionner_termes_croises(Matrice_Morse& matrice, 
   const Conds_lim& cls = iter_->domaine_Cl().les_conditions_limites();
   int i, j, l, f, n, N = ch.valeurs().line_size();
 
-  IntTab stencil(0, 2);
+  Stencil stencil(0, 2);
 
   for (i = 0; i < cls.size(); i++)
     if (sub_type(Echange_contact_VDF, cls[i].valeur()))

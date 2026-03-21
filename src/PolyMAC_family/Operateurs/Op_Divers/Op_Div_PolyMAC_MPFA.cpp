@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -37,7 +37,7 @@ void Op_Div_PolyMAC_MPFA::dimensionner(Matrice_Morse& matrice) const
   const int ne_tot = domaine.nb_elem_tot(), nf_tot = domaine.nb_faces_tot(),
             N = equation().inconnue().valeurs().line_size(), D = dimension;
 
-  IntTab stencil(0, 2);
+  Stencil stencil(0, 2);
 
   for (int f = 0; f < domaine.nb_faces(); f++)
     for (int i = 0; i < 2; i++)

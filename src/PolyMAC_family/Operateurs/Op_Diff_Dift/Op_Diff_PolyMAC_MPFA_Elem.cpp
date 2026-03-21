@@ -201,7 +201,7 @@ void Op_Diff_PolyMAC_MPFA_Elem::dimensionner_blocs(matrices_t matrices, const ta
 
   const int N = equation().inconnue().valeurs().line_size(); //nombre de composantes
 
-  IntTab stencil; //stencils par matrice
+  Stencil stencil; //stencils par matrice
   stencil.resize(0, 2);
 
 

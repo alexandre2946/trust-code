@@ -40,7 +40,7 @@ void Sources_Multiphase_base::dimensionner_blocs_diagonal(matrices_t matrices, c
       const DoubleTab& dep = pb.get_champ(n_m.first.c_str()).valeurs();
       const int nc = dep.dimension_tot(0);
       const int M = dep.line_size();
-      IntTab sten(0, 2);
+      Stencil sten(0, 2);
 
       if (is_diag)
         for (int e = 0; e < ne; e++)
