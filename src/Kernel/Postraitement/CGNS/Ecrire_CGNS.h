@@ -117,7 +117,6 @@ private:
   void cgns_write_final_link_file_comm_group();
   void cgns_close_grid_or_solution_link_file(const double, const TYPE_LINK_CGNS,  bool is_cerr = true);
   void add_new_linked_base(const std::string&, const Nom&);
-  void add_new_linked_base_par_over_zone(const std::string&, const Nom&, const Nom&, const int);
 
   void cgns_write_iters();
 
