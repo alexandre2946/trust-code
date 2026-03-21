@@ -182,7 +182,7 @@ int Format_Post_CGNS::finir(const int est_le_dernier_post)
 void Format_Post_CGNS::ecrire_domaine_dual(const Domaine& domaine, const int est_le_premier_post)
 {
 #ifdef HAS_CGNS
-  cgns_writer_.cgns_write_domaine_dual(domaine, est_le_premier_post);
+  cgns_writer_.cgns_write_domaine_dual(domaine.le_nom(), est_le_premier_post);
 #endif
 }
 

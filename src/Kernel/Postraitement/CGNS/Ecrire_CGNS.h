@@ -37,7 +37,7 @@ public:
   void cgns_open_file();
   void cgns_finir();
   void cgns_add_time(const double );
-  void cgns_write_domaine_dual(const Domaine& , const int , const Nom& nom_dom = "??");
+  void cgns_write_domaine_dual(const Nom& , const int , const Nom& nom_dom = "??");
   void cgns_write_domaine(const Domaine * ,const Nom& , const DoubleTab& , const IntTab& , const Motcle& );
   void cgns_write_field(const Domaine&, const Noms&, double, const Nom&, const Nom&, const Nom&, const DoubleTab&);
   void finir_ecriture(double);
@@ -94,7 +94,7 @@ private:
   inline const IntTab& get_ef_dual() const { return ef_dual_;}
 
   // gestion elem/som/faces
-  void cgns_fill_field_loc_map(const Domaine&, const std::string&);
+  void cgns_fill_field_loc_map(const Nom&);
 
   // Methodes pour Domaine Lagrangien; ie: FTD
   bool is_lagrangian_ = false;

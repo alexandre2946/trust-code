@@ -95,6 +95,7 @@ void Ecrire_CGNS::cgns_open_file()
 
 void Ecrire_CGNS::fill_infos_loc()
 {
+  has_elem_field_ = false, has_faces_field_ = false, has_som_field_ = false;
   if (postraiter_domaine_)
     {
       has_som_field_ = true;
@@ -122,7 +123,7 @@ void Ecrire_CGNS::fill_infos_loc()
     }
 
   // j'ajoute ce test pour le moment ...
-  if (Process::is_parallel() && Option_CGNS::PARALLEL_OVER_ZONE && is_deformable_ && !postraiter_domaine_)
+  if (Process::is_parallel() && Option_CGNS::PARALLEL_OVER_ZONE && is_deformable_)
     {
       Cerr << "Error in Ecrire_CGNS::" << __func__ << " !!! You can not use the CGNS option PARALLEL_OVER_ZONE with your problem ..." << finl;
       Cerr << "Contact the TRUST team" << finl;
@@ -339,19 +340,17 @@ void Ecrire_CGNS::cgns_write_field(const Domaine& domaine, const Noms& noms_comp
                                    const Nom& id_du_champ, const Nom& id_du_domaine, const Nom& localisation,
                                    const DoubleTab& valeurs)
 {
-  const std::string LOC = Motcle(localisation).getString();
+  /* Gestion multi-loc support */
+  if (fld_loc_map_.empty()) /* Build different links to support mixed locations : just once for all ! */
+    cgns_fill_field_loc_map(domaine.le_nom());
 
-  /* 1 : if first time called ... build different links to support mixed locations */
-  if (first_time_post_)
-    cgns_fill_field_loc_map(domaine, LOC);
-
-  /* si link et deformable et multi-loc ... */
-  if (is_deformable_ && !multi_loc_deformable_support_linked_)
+  if (is_deformable_ && !multi_loc_deformable_support_linked_) /* si link et deformable et multi-loc : at each time step ! */
     link_multi_loc_support_pb_deformable();
 
-  /* 2 : on ecrit */
+  /* Write fields */
+  const std::string LOC = Motcle(localisation).getString();
   const int nb_cmp = valeurs.dimension(1);
-
+  assert(fld_loc_map_.count(LOC));
   if (Process::is_parallel())
     {
       for (int i = 0; i < nb_cmp; i++)
@@ -394,62 +393,57 @@ void Ecrire_CGNS::cgns_write_field(const Domaine& domaine, const Noms& noms_comp
  * METHODES PRIVEES CLASSE Ecrire_CGNS *
  * *********************************** *
  */
-// TODO FIXME : DO BETTER
-void Ecrire_CGNS::cgns_fill_field_loc_map(const Domaine& domaine, const std::string& LOC)
+void Ecrire_CGNS::cgns_fill_field_loc_map(const Nom& nom_dom_init)
 {
   assert (static_cast<int>(time_post_.size()) == 1 && first_time_post_);
+
+  /* helplers juste pour cette methode */
+  enum class InitMode { SOLUTIONLINK, LINKEDBASE };
+
+  auto modify_name_for_support = [&](const std::string& loc)
+  {
+    Nom nom_dom = nom_dom_init;
+    nom_dom += "_";
+    nom_dom += loc.c_str();
+    return nom_dom;
+  };
+
+  auto insert_loc_map_and_init = [&](const std::string& loc, InitMode mode)
+  {
+    assert(!fld_loc_map_.count(loc));
+    const Nom nom_dom = modify_name_for_support(loc);
+    fld_loc_map_.insert({ loc, nom_dom });
+
+    if (loc != "FACES")
+      (mode == InitMode::SOLUTIONLINK) ? cgns_init_solution_link_file(loc, nom_dom) :
+      add_new_linked_base(loc, nom_dom);
+  };
 
   /* pour les champs aux faces, il faut un support ! */
   if (has_faces_field_ && !is_dual_)
     {
-      Nom nom_dom = domaine.le_nom();
-      nom_dom += "_FACES";
       Cerr << "###  Building a new CGNS zone to host the fields located at FACES !" << finl;
-      cgns_write_domaine_dual(domaine, 0 /* pas premier post ... mais inutile */, nom_dom);
+      cgns_write_domaine_dual(nom_dom_init, 0 /* inutile */, modify_name_for_support("FACES"));
     }
 
   if (is_lagrangian_)
     {
-      if (multi_loc_deformable_support_linked_)
-        return; /* on sort */
-
-      Nom nom_dom;
-      std::string loc_link;
-
-      if (has_elem_field_)
+      if (!multi_loc_deformable_support_linked_)
         {
-          loc_link = "ELEM";
-          assert(!fld_loc_map_.count(loc_link));
-          nom_dom = domaine.le_nom();
-          nom_dom += "_ELEM";
-          fld_loc_map_.insert( { loc_link, nom_dom });
-          cgns_init_solution_link_file(loc_link, nom_dom);
-        }
+          if (has_elem_field_) insert_loc_map_and_init("ELEM", InitMode::SOLUTIONLINK);
 
-      if (has_som_field_)
-        {
+          if (has_som_field_) insert_loc_map_and_init("SOM", InitMode::SOLUTIONLINK);
 
-          loc_link = "SOM";
-          assert(!fld_loc_map_.count(loc_link));
-          nom_dom = domaine.le_nom();
-          nom_dom += "_SOM";
-          fld_loc_map_.insert( { loc_link, nom_dom });
-          cgns_init_solution_link_file(loc_link, nom_dom);
+          if (has_faces_field_) Process::exit("Error in Ecrire_CGNS::cgns_fill_field_loc_map : FACES fields are not yet supported ! \n");
         }
     }
   else if (!Option_CGNS::USE_LINKS || postraiter_domaine_)
     {
-      Nom nom_dom = domaine.le_nom();
-      nom_dom += "_";
-      nom_dom += LOC;
+      if (has_elem_field_) insert_loc_map_and_init("ELEM", InitMode::LINKEDBASE);
 
-      if (!fld_loc_map_.count(LOC))
-        {
-          fld_loc_map_.insert( { LOC, nom_dom });
+      if (has_som_field_) insert_loc_map_and_init("SOM", InitMode::LINKEDBASE);
 
-          if (LOC != "FACES")
-            add_new_linked_base(LOC, nom_dom);
-        }
+      if (has_faces_field_) insert_loc_map_and_init("FACES", InitMode::LINKEDBASE);
     }
   else // Option_CGNS::USE_LINKS
     {
@@ -459,37 +453,11 @@ void Ecrire_CGNS::cgns_fill_field_loc_map(const Domaine& domaine, const std::str
 
       if (!solution_file_opened_ || (is_deformable_ && !multi_loc_deformable_support_linked_))
         {
-          Nom nom_dom;
-          std::string loc_link;
+          if (has_elem_field_) insert_loc_map_and_init("ELEM", InitMode::SOLUTIONLINK);
 
-          if (has_elem_field_)
-            {
-              loc_link = "ELEM";
-              assert(!fld_loc_map_.count(loc_link));
-              nom_dom = domaine.le_nom();
-              nom_dom += "_ELEM";
-              fld_loc_map_.insert( { loc_link, nom_dom });
-              cgns_init_solution_link_file(loc_link, nom_dom);
-            }
+          if (has_som_field_) insert_loc_map_and_init("SOM", InitMode::SOLUTIONLINK);
 
-          if (has_som_field_)
-            {
-              loc_link = "SOM";
-              assert(!fld_loc_map_.count(loc_link));
-              nom_dom = domaine.le_nom();
-              nom_dom += "_SOM";
-              fld_loc_map_.insert( { loc_link, nom_dom });
-              cgns_init_solution_link_file(loc_link, nom_dom);
-            }
-
-          if (has_faces_field_)
-            {
-              loc_link = "FACES";
-              assert(!fld_loc_map_.count(loc_link));
-              nom_dom = domaine.le_nom();
-              nom_dom += "_FACES";
-              fld_loc_map_.insert( { loc_link, nom_dom });
-            }
+          if (has_faces_field_) insert_loc_map_and_init("FACES", InitMode::SOLUTIONLINK);
 
           if (!is_deformable_)
             cgns_open_solution_link_file(time_post_.back()); // 1ere ouverture sol file ici ! puis dans cgns_add_time
@@ -1282,9 +1250,9 @@ void Ecrire_CGNS::cgns_write_field_par_in_zone(const int comp, const double temp
  * Write Dual Mesh *
  * *************** *
  */
-void Ecrire_CGNS::cgns_write_domaine_dual(const Domaine& domaine, const int est_le_premier_post, const Nom& nom_dom_faces)
+void Ecrire_CGNS::cgns_write_domaine_dual(const Nom& nom_dom_init, const int est_le_premier_post, const Nom& nom_dom_faces)
 {
-  Cerr << "Writing the Dual mesh of " << domaine.le_nom() << " in a CGNS format ..." << finl;
+  Cerr << "Writing the Dual mesh of " << nom_dom_init << " in a CGNS format ..." << finl;
   assert(domaine_dis_.non_nul());
   if (Objet_U::dimension==0)
     Process::exit("Dimension is not defined. Check your data file.");
