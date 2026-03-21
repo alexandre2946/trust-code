@@ -16,6 +16,7 @@
 #include <Reorder_Mesh.h>
 #include <TRUSTTab.h>
 #include <Param.h>
+#include <Scatter.h>
 
 #include <vector>
 #include <algorithm>
@@ -195,9 +196,9 @@ uint64_t hilbertCode_3D(uint32_t x, uint32_t y, uint32_t z)
         int8_t v = perm[i];
         uint8_t idx = std::abs(v)-1;
         int8_t mask = (v < 0) ? 0b1 : 0b0;
-        res[idx] = cod2[i] ^ mask; // XOR
+        res[idx] = (uint8_t)(cod2[i] ^ mask); // XOR
       }
-    return (res[0] | (res[1] << 1) | (res[2] << 2));
+    return (uint8_t)(res[0] | (res[1] << 1) | (res[2] << 2));
   };
 
   cube_pos_t curr_perm = {1,2,3};   // 1 represents X axis, 2 the Y axis, 3 the Z axis.
@@ -288,6 +289,172 @@ Entree& Reorder_Mesh::readOn(Entree& is)
   return is;
 }
 
+/**! Performs the reordering of the nodes and elements of a domain according to the chosen algorithm
+ */
+template<typename _SIZE_>
+void Reorder_Mesh::reorder_domain(Domaine_32_64<_SIZE_>& dom) const
+{
+  using int_t = _SIZE_;
+  using ArrOfInt_t = ArrOfInt_T<_SIZE_>;
+  using DoubleTab_t = DoubleTab_T<_SIZE_>;
+
+  // No re-ordering requested or nothing to do:
+  if (algo() == Reorder_Algo::None) return;
+  if (skip_nodes() && skip_elems()) return;
+
+  Cerr << "****************************************************************" << finl;
+
+  std::string algon = algo() == Reorder_Algo::Morton ? "Morton" : "Hilbert";
+
+  // Renumbering utilities:
+  auto renum_tab_indices = [] (auto& tab, const auto& renum)
+  {
+    assert(tab.nb_dim() == 2);
+    auto new_tab(tab);
+    for (int_t i = 0; i < tab.dimension(0); i++)
+      for (int j = 0; j < tab.dimension(1); j++)
+        new_tab(renum(i), j) = tab(i, j);
+    tab = new_tab;
+  };
+  auto renum_tab_values = [] (auto& tab, const auto& renum)
+  {
+    assert(tab.nb_dim()==2);
+    int_t sz_renum = renum.size_array();
+    for (int_t i=0; i<tab.dimension_tot(0); i++)  // with virtuals
+      for (int j=0; j<tab.dimension(1); j++)
+        {
+          auto val = tab(i,j);
+          if (val < 0 || val >= sz_renum) continue;  // skip uninitialized or virtual values
+          tab(i,j) = renum(tab(i,j));
+        }
+  };
+  auto renum_vect_values = [] (auto& vect, const auto& renum)
+  {
+    for (int_t i=0; i<vect.size_array(); i++)
+      vect(i) = renum(vect(i));
+  };
+  auto compute_how_many = [] (ArrOfInt_t renum) -> int_t
+  {
+    int_t cnt = 0;
+    for(int_t i = 0; i < renum.size_array(); i++)
+      if (renum[i] != i) cnt++;
+    return cnt;
+  };
+
+  // Nodes and Cells renumbering
+  ArrOfInt_t renum_nodes, renum_elems;
+  int_t nnodes=0, nelems=0;
+
+  if (!skip_nodes())
+    {
+      Cerr << "[Reordering] mesh *nodes* using " << algon << " scheme ..." << finl;
+      compute_renumbering(dom.les_sommets(), renum_nodes);
+      nnodes = compute_how_many(renum_nodes);
+
+      dump_to_file(dom.les_sommets(), "reordering_som_before.txt");
+      renum_tab_indices(dom.les_sommets(), renum_nodes);
+      dump_to_file(dom.les_sommets(), "reordering_som_after.txt");
+
+      // renum_vect_values(renum_som_perio_, renum_nodes);
+      renum_tab_values(dom.les_elems(), renum_nodes);
+
+      for (int i=0; i<dom.faces_bord().size(); i++)
+        renum_tab_values(dom.bord(i).les_sommets_des_faces(), renum_nodes);
+      for (int i=0; i<dom.faces_raccord().size(); i++)
+        renum_tab_values(dom.raccord(i)->les_sommets_des_faces(), renum_nodes);
+      for (int i=0; i<dom.bords_int().size(); i++)
+        renum_tab_values(dom.bords_interne(i).les_sommets_des_faces(), renum_nodes);
+      for (int i=0; i<dom.groupes_faces().size(); i++)
+        renum_tab_values(dom.groupe_faces(i).les_sommets_des_faces(), renum_nodes);
+    }
+
+  if (!skip_elems())
+    {
+      Cerr << "[Reordering] mesh *elements* using " << algon << " scheme ..." << finl;
+      DoubleTab_t xp;
+
+      dom.calculer_centres_gravite(xp);
+      // grrrrr .... xp also contains virtuals, but without a proper // structure, hence dimension(0) == dimension_tot(0).
+      // And we just want to reorder real elements, not virtual ones (they must remain at the end)
+      // We must trim :
+      xp.resize(dom.les_elems().dimension(0), xp.dimension_int(1));
+
+      compute_renumbering(xp, renum_elems);
+      nelems = compute_how_many(renum_elems);
+
+      dump_to_file(xp, "reordering_elem_before.txt");
+
+      renum_tab_indices(dom.les_elems(), renum_elems);
+      renum_tab_indices(xp, renum_elems);
+
+      dump_to_file(xp, "reordering_elem_after.txt");
+    }
+
+  if (dom.nb_ss_domaines())
+    Process::exit("Reorder not impl for sub-domains");
+
+  for (int i=0; i<dom.domaines_frontieres().size(); i++)
+    reorder_domain(dom.domaine_frontiere(i));
+
+  if (Process::nproc()>1)
+    {
+      // If this piece of code is reached, we are necessarily after a Scatter, and hence with a Domaine_32 object:
+      if constexpr (std::is_same<_SIZE_, trustIdType>::value)
+        Process::exit("Should never happen!");
+      else
+        {
+          Domaine_32_64<int>& this32 = static_cast<Domaine_32_64<int>&>(dom);
+          Cerr << "[Reordering] Updating joints and parallel structures ..." << finl;
+          // Local bits of the joints needs renumbering so that they will be the items to be sent when we
+          // update the parallel structures:
+          if (!skip_nodes())
+            {
+              for (Joint & j: dom.faces_joint())
+                {
+                  ArrOfInt& ic = j.set_joint_item(JOINT_ITEM::SOMMET).set_items_communs();
+                  renum_vect_values(ic, renum_nodes);
+                  // Sort them by increasing order (requirement of Scatter::construire_correspondance_sommets_par_coordonnees ?)
+                  ic.ordonne_array();
+
+                  IntTab& soms = j.faces().les_sommets();
+                  renum_tab_values(soms, renum_nodes);
+                  if (!skip_elems())
+                    {
+                      IntTab& fv = j.faces().voisins();
+                      renum_tab_values(fv, renum_elems);
+                    }
+                }
+
+              // real only, not virtual
+              int nb_som = this32.les_sommets().dimension(0);
+              int nb_elem = this32.les_elems().dimension(0);
+
+              // Then update joints by exchanging with neighbor procs to recompute correspondances
+              // Logic here is the same as what is done in Raffiner_isotrope_parallele:
+
+
+              Scatter::uninit_sequential_domain(this32);
+
+              // Remove virtual parts from sommets and elems, they will be recomputed by construire_structures_paralleles()
+              this32.les_sommets().resize(nb_som, this32.les_sommets().dimension(1));  // cut virtual
+              this32.les_elems().resize(nb_elem, this32.les_elems().dimension(1));  // cut virtual
+
+
+              Scatter::trier_les_joints(this32.faces_joint());
+              Scatter::construire_correspondance_sommets_par_coordonnees(this32, false /* does not allow resize of items_communs */);
+              Noms liste_bords_periodiques; // TODO!
+              Scatter::construire_structures_paralleles(this32, liste_bords_periodiques);
+            }
+        }
+    }
+  else
+    Scatter::init_sequential_domain(dom);
+
+  Cerr << "[Reordering] " << nnodes << " nodes and " << nelems << " cells were permuted." << finl;
+  Cerr << "****************************************************************" << finl;
+}
+
+
 /**! Compute the renumbering of the given array so that the points follow either a Morton curve or a Hilbert curve.
  *
  * @param renum an array 'renum' so that renum[i] gives the new index of the point orginally numbered 'i' (old-to-new).
@@ -300,7 +467,7 @@ void Reorder_Mesh::compute_renumbering(const DoubleTab_T<_SIZE_>& points, ArrOfI
   const int dim = Objet_U::dimension;
   assert(points.dimension_int(1) == dim);
 
-  int_t nb_pts = points.dimension(0);
+  int_t nb_pts = points.dimension(0);  // without virtuals! They must remain unchanged at the end of the arrays.
 
   // Find bounding box
   std::array<double, 3> minV = { points(0,0), points(0,1), dim == 3 ? points(0,2) : 0.0 };
@@ -379,10 +546,12 @@ void Reorder_Mesh::dump_to_file(const DoubleTab_T<_SIZE_>& points, const std::st
 
 
 // Instanciate
+template void Reorder_Mesh::reorder_domain(Domaine_32_64<int>& dom) const;
 template void Reorder_Mesh::dump_to_file(const DoubleTab_T<int>& points, const std::string& filename) const;
 template void Reorder_Mesh::compute_renumbering(const DoubleTab_T<int>& points, ArrOfInt_T<int>& renum) const;
 
 #ifdef INT_is_64_
+template void Reorder_Mesh::reorder_domain(Domaine_32_64<trustIdType>& dom) const;
 template void Reorder_Mesh::dump_to_file(const DoubleTab_T<trustIdType>& points, const std::string& filename) const;
 template void Reorder_Mesh::compute_renumbering(const DoubleTab_T<trustIdType>& points, ArrOfInt_T<trustIdType>& renum) const;
 #endif

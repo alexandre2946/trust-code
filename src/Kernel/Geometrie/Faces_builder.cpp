@@ -424,7 +424,7 @@ void Faces_builder::creer_faces_frontiere(const int nb_voisins_attendus,
   ArrOfInt       voisins;
 
   ArrOfInt liste_faces_erreur0, liste_faces_erreur1, liste_faces_erreur2, liste_faces_erreur3;
-  constexpr bool STOP_FIRST_ERR = false; // set this to true in Debug to stop gdb at the right place.
+  constexpr bool STOP_FIRST_ERR = true; // set this to true in Debug to stop gdb at the right place.
 
   int i_face;
   int nb_sommets_par_face_fr=sommets_faces_fr.dimension(1);

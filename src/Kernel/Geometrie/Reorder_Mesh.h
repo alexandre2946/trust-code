@@ -19,6 +19,7 @@
 #include <TRUSTTabs_forward.h>
 #include <Objet_U.h>
 #include <Entree.h>
+#include <Domaine.h>
 
 /**! @brief Various methods of reordering Morton / Hilbert
  * See wiki: https://en.wikipedia.org/wiki/Z-order_curve
@@ -44,6 +45,9 @@ class Reorder_Mesh: public Objet_U
   Declare_instanciable(Reorder_Mesh);
 
 public:
+  template<typename _SIZE_>
+  void reorder_domain(Domaine_32_64<_SIZE_>& dom) const;
+
   template<typename _SIZE_>
   void compute_renumbering(const DoubleTab_T<_SIZE_>& points, ArrOfInt_T<_SIZE_>& renum) const;
 

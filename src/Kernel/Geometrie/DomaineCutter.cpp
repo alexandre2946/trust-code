@@ -1312,7 +1312,7 @@ void DomaineCutter_32_64<_SIZE_>::ecrire_domaines(const Nom& basename, const Dom
   myDomaines = 0;
   ArrsOfInt otherProcDomaines(Process::nproc());
 
-  //if some domaines are splitted between multiple procs,
+  //if some domains are splitted between multiple procs,
   //we assign consecutive indices to each of its fragment
   //(reading the .Zones files during Scatter will be more efficient)
   // Possible values for domaines_index[part]:

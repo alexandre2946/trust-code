@@ -96,6 +96,7 @@ void Domaine_VDF::compute_sort_key(Faces& les_faces, IntTab& sort_key)
   // en preservant l'ordre initial des faces de meme orientation
   const int nb_faces = les_faces_vdf.nb_faces();
 
+  nb_faces_std_ = 0;
   sort_key.resize(nb_faces, 2);
   // On ne trie pas les faces de bord, qui restent au debut:
   for (int i = 0; i < nb_faces_front; i++)
@@ -110,6 +111,7 @@ void Domaine_VDF::compute_sort_key(Faces& les_faces, IntTab& sort_key)
       sort_key(i, 0) = ori * nb_faces + i;
       sort_key(i, 1) = i;
     }
+  nb_faces_std_ = nb_faces - nb_faces_front;  // not as funny as in VEF ... :-)
 }
 
 /*! @brief Override to also renumber orientation_ member.

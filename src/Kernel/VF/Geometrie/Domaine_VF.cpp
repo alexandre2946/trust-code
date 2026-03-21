@@ -378,7 +378,7 @@ void Domaine_VF::discretiser()
 
   // Re-order the domain indices of elements and/or nodes (faces are handled later)
   if(reorder_.non_nul())
-    domaine().reorder_domain(reorder_.valeur());
+    reorder_->reorder_domain(domaine());
 
   Domaine& ledomaine=domaine();
   histogramme_angle(ledomaine,Cerr);
@@ -465,7 +465,6 @@ void Domaine_VF::discretiser()
 
     // Changement a la v1.5.7 beta: xv_ a maintenant un descripteur parallele: dimension(0)=nb_faces
     les_faces.calculer_centres_gravite(xv_);
-//    ZCurve::Dump_to_file(xv_, "faces_after.txt");
 
     // Calcul des volumes
     ledomaine.calculer_volumes(volumes_, inverse_volumes_);

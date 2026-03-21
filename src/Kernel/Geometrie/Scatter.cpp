@@ -698,20 +698,18 @@ void Scatter::construire_structures_paralleles(Domaine& dom, const Noms& liste_b
   reordonner_faces_de_joint(dom);
 }
 
-/*! @brief Tri des joints dans l'ordre croissant des processeurs
- *
+/*! @brief Sort joints by increasing neighbor proc number
  */
 void Scatter::trier_les_joints(Joints& joints)
 {
   const int nb_joints = joints.size();
   ArrOfInt pe_voisins(nb_joints);
-  int i;
-  for (i = 0; i < nb_joints; i++)
+  for (int i = 0; i < nb_joints; i++)
     pe_voisins[i] = joints[i].PEvoisin();
   pe_voisins.ordonne_array();
   // Copie la liste des joints
   Joints anciens_joints(joints);
-  for (i = 0; i < nb_joints; i++)
+  for (int i = 0; i < nb_joints; i++)
     {
       // On traite le processeur pe_voisin:
       const int pe_voisin = pe_voisins[i];

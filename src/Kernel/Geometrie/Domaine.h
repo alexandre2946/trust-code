@@ -238,6 +238,7 @@ public:
   /// Domaines frontieres
   ///
   inline const LIST(OBS_PTR(Domaine_32_64))& domaines_frontieres() const { return domaines_frontieres_; }
+  inline Domaine_32_64& domaine_frontiere(int i) { return domaines_frontieres_(i).valeur(); }
 
   ///
   /// Raccords
@@ -333,7 +334,6 @@ public:
   void read_former_domaine(Entree& s);  // used in Scatter
   void merge_wo_vertices_with(Domaine_32_64& z);
   void fill_from_list(std::list<Domaine_32_64*>& lst);
-  void reorder_domain(const Reorder_Mesh& reorder);
 
   ///
   /// MEDCoupling:
