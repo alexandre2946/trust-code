@@ -277,8 +277,9 @@ void Ecrire_CGNS::cgns_open_solution_link_file(const double t)
   solution_file_opened_ = true;
 
   if (is_deformable_)
-    return; /* Stop here si deformable */
+    return; /* Stop here if deformable */
 
+  /* Otherwise, we have a grid file already written ... we link the zones in the opened solution files to it (coords + connectivity) ! */
   for (auto &itr : fld_loc_map_)
     {
       const std::string& LOC = itr.first;
@@ -296,6 +297,10 @@ void Ecrire_CGNS::cgns_open_solution_link_file(const double t)
       if (cg_base_write(fileId_, nom_dom.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
         Cerr << "Error Ecrire_CGNS::cgns_open_solution_link_file : cg_base_write !" << finl, TRUST_CGNS_ERROR();
 
+      /*
+       * XXX this is done in //, not like final link file which is done only on proc 0
+       * So no need to get sizes per local comm ... each proc available on its comm group take the good values
+       */
       cgsize_t isize[3] = { sizeId_[ind_base][0] , sizeId_[ind_base][1] , 0 };
 
       std::string linkfile = baseFile_name_ + ".grid.cgns"; // file name
@@ -350,41 +355,28 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
           for (int gid = 0; gid < nb_grps; gid++)
             {
               int proc_grp = unique_vec_proc_maitre_local_comm_[gid];
-              std::string file_group_id = Nom(baseFile_name_).nom_me(proc_grp).getString();
-              TRUST_2_CGNS::remove_slash_linkfile(file_group_id);
-
               std::string zone_name = Nom("Zone").nom_me(proc_grp).getString();
-              std::string linkfile = file_group_id + ".grid.cgns";
+              std::string linkfile = Nom(baseFile_name_).nom_me(proc_grp).getString() + ".grid.cgns";
+              TRUST_2_CGNS::remove_slash_linkfile(linkfile);
 
               cgsize_t isize[3];
               isize[0] = sizeId_som_local_comm_[ind_base][gid];
               isize[1] = sizeId_elem_local_comm_[ind_base][gid];
               isize[2] = 0;
 
-              if (cg_zone_write(fileId_, baseId_[index_glob], zone_name.c_str(), isize, CGNS_ENUMV(Unstructured), &zoneId_tmp[gid]) != CG_OK)
-                Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_comm_group : cg_zone_write !" << finl, TRUST_CGNS_ERROR();
+              cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[index_glob], zone_name, isize, zoneId_tmp[gid], gid + 1,
+                                                             linkfile, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
+                                                             "Ecrire_CGNS::cgns_write_final_link_file_comm_group");
 
-              std::string linkpath = "/" + baseZone_name_[ind_base] + "/" + baseZone_name_[ind_base] + "/GridCoordinates/";
-
-              if (cg_goto(fileId_, baseId_[index_glob], "Zone_t", zoneId_tmp[gid], "end") != CG_OK)
-                Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_comm_group : cg_goto Zone_t !" << finl, TRUST_CGNS_ERROR();
-
-              if (cg_link_write("GridCoordinates", linkfile.c_str(), linkpath.c_str()) != CG_OK)
-                Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_comm_group : cg_link_write GridCoordinates !" << finl, TRUST_CGNS_ERROR();
-
-              for (auto& con : connectname_[ind_base])
-                {
-                  linkpath = "/" + baseZone_name_[ind_base] + "/" + baseZone_name_[ind_base] + "/" + con + "/";
-                  if (cg_link_write(con.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
-                    Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_comm_group : cg_link_write connectivity " << con << finl, TRUST_CGNS_ERROR();
-                }
+              std::string file_group_id = Nom(baseFile_name_).nom_me(proc_grp).getString();
+              TRUST_2_CGNS::remove_slash_linkfile(file_group_id);
 
               for (auto& itr_t : time_post_)
                 {
                   std::string solname = "FlowSolution" + cgns_helper_.convert_double_to_string(itr_t) + "_" + LOC;
                   linkfile = file_group_id + ".solution." + cgns_helper_.convert_double_to_string(itr_t) + ".cgns";
 //                  linkpath = "/" + baseZone_name_[ind_base] + "/" + baseZone_name_[ind_base] + "/" + solname + "/";
-                  linkpath = "/" + nom_dom.getString() + "/" + nom_dom.getString() + "/" + solname + "/";
+                  std::string linkpath = "/" + nom_dom.getString() + "/" + nom_dom.getString() + "/" + solname + "/";
 
                   if (cg_link_write(solname.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
                     Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_comm_group : cg_link_write FlowSolution " << solname << finl, TRUST_CGNS_ERROR();
@@ -423,7 +415,7 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
                   const bool write_connectivity = (!(isize[0] == 1 && isize[1] == 1));
 
                   /* He we dont link to solutions since no fields ... just other domais dis ;) */
-                  cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[ind_base], zone_name, isize, zoneId_tmp[gid], zoneId_tmp[gid],
+                  cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[ind_base], zone_name, isize, zoneId_tmp[gid], gid + 1,
                                                                  linkfile, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
                                                                  "Ecrire_CGNS::cgns_write_final_link_file", write_connectivity);
                 }
@@ -481,7 +473,7 @@ void Ecrire_CGNS::cgns_write_final_link_file()
           TRUST_2_CGNS::remove_slash_linkfile(linkfile);
           cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[index_glob], nom_dom.getString(), isize, zoneId_[index_glob], 1,
                                                          linkfile, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
-                                                         "Ecrire_CGNS::cgns_open_solution_link_file");
+                                                         "Ecrire_CGNS::cgns_write_final_link_file");
 
           // link solutions
           for (auto& itr_t : time_post_)

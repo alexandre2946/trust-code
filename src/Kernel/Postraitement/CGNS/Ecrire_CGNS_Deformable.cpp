@@ -140,14 +140,14 @@ void Ecrire_CGNS::link_multi_loc_support_lagrangian()
       const int nb_current_post = static_cast<int> (time_post_.size());
 
       if (cg_base_write(fileId_, nom_dom.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
-        Cerr << "Error Ecrire_CGNS::link_multi_loc_support_pb_deformable : cg_base_write !" << finl, TRUST_CGNS_ERROR();
+        Cerr << "Error Ecrire_CGNS::link_multi_loc_support_lagrangian : cg_base_write !" << finl, TRUST_CGNS_ERROR();
 
       cgsize_t isize[3] = { sizeId_[nb_current_post - 1][0], sizeId_[nb_current_post - 1][1], 0 };
 
 
       cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[index_glob], nom_dom.getString(), isize, zoneId_[index_glob], 1,
                                                      "" /* this file */, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
-                                                     "Ecrire_CGNS::link_multi_loc_support_pb_deformable");
+                                                     "Ecrire_CGNS::link_multi_loc_support_lagrangian");
     }
   multi_loc_deformable_support_linked_ = true; // of course !
 }
@@ -181,22 +181,15 @@ void Ecrire_CGNS::link_multi_loc_support_pb_deformable()
 
           cgsize_t isize[3] = { sizeId_[ind_base][0], sizeId_[ind_base][1], 0 };
 
-          if (cg_zone_write(fileId_, baseId_[index_glob], nom_dom.getChar() /* Dom name */, isize, CGNS_ENUMV(Unstructured), &zoneId_[index_glob]) != CG_OK)
-            Cerr << "Error Ecrire_CGNS::link_multi_loc_support_pb_deformable : cgns_open_solution_file !" << finl, TRUST_CGNS_ERROR();
+          // XXX we use the helper but we dont write connectivity because it is a bit special
+          cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[index_glob], nom_dom.getString(), isize, zoneId_[index_glob], 1,
+                                                         "" /* this file */, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
+                                                         "Ecrire_CGNS::link_multi_loc_support_pb_deformable", false /* DONT WRITE CONN */);
 
-          std::string linkfile = ""; // XXX this file
-
-          std::string linkpath = "/" + baseZone_name_[ind_base] + "/" + baseZone_name_[ind_base] + "/GridCoordinates/";
-
-          if (cg_goto(fileId_, baseId_[index_glob], "Zone_t", 1, "end") != CG_OK)
-            Cerr << "Error Ecrire_CGNS::link_multi_loc_support_pb_deformable : cg_goto !" << finl, TRUST_CGNS_ERROR();
-
-          if (cg_link_write("GridCoordinates", linkfile.c_str(), linkpath.c_str()) != CG_OK)
-            Cerr << "Error Ecrire_CGNS::link_multi_loc_support_pb_deformable : cg_link_write !" << finl, TRUST_CGNS_ERROR();
-
+          std::string linkfile;
           for (auto &itr_conn : connectname_[ind_base])
             {
-              linkpath = "/" + baseZone_name_[ind_base] + "/" + baseZone_name_[ind_base] + "/" + itr_conn + "/";
+              std::string linkpath = "/" + baseZone_name_[ind_base] + "/" + baseZone_name_[ind_base] + "/" + itr_conn + "/";
 
               if (!first_time_post_)
                 linkfile = (enter_group_comm ? Nom(baseFile_name_).nom_me(proc_maitre_local_comm_).getString() : baseFile_name_) +
@@ -221,14 +214,12 @@ void Ecrire_CGNS::link_multi_loc_support_pb_deformable()
           const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
           const int ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
 
-          std::string linkfile = ""; // XXX this file
-
           std::string linkpath = "/" + baseZone_name_[ind_base] + "/" + baseZone_name_[ind_base] + "/" + grid_name_loc_ + "/";
 
           if (cg_goto(fileId_, baseId_[index_glob], "Zone_t", 1, "end") != CG_OK)
             Cerr << "Error Ecrire_CGNS::link_multi_loc_support_pb_deformable : cg_goto !" << finl, TRUST_CGNS_ERROR();
 
-          if (cg_link_write(grid_name_loc_.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
+          if (cg_link_write(grid_name_loc_.c_str(), "" /* this file */, linkpath.c_str()) != CG_OK)
             Cerr << "Error Ecrire_CGNS::link_multi_loc_support_pb_deformable : cg_link_write !" << finl, TRUST_CGNS_ERROR();
         }
     }
