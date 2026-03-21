@@ -523,19 +523,7 @@ void Ecrire_CGNS::cgns_write_iters()
           else if (Process::is_parallel() && Option_CGNS::PARALLEL_OVER_ZONE)
             {
 #ifdef MPI_
-              int ind_new = ind;
-              if (ind > (static_cast<int>(T2CGNS_.size()) -1) )
-                {
-                  Nom nom_dom_mod = nom_dom;
-                  if (nom_dom.finit_par("_ELEM"))
-                    nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, "ELEM");
-                  else if (nom_dom.finit_par("_SOM"))
-                    nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, "SOM");
-
-                  ind_new = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
-                }
-
-              const TRUST_2_CGNS& TRUST2CGNS = T2CGNS_[ind_new];
+              const TRUST_2_CGNS& TRUST2CGNS = T2CGNS_[ind];
               const int nb_zones_to_write = TRUST2CGNS.nb_procs_writing();
 
               cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::PAR_OVER>(false /* has_field */, nb_zones_to_write, fileId_, baseId_[ind], ind, zoneId_par_[ind], "rien",
