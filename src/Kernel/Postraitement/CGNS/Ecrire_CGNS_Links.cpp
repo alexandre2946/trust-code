@@ -226,7 +226,7 @@ void Ecrire_CGNS::add_new_linked_base(const std::string& LOC, const Nom& nom_dom
           assert (ne_loc > 0);
 
           zoneId_.push_back(-123);
-          cgsize_t isize[3] = { ns_loc , ne_loc , 0 }; /* 0 => boundary vertex size (zero if elements not sorted) */
+          const cgsize_t isize[3] = { ns_loc , ne_loc , 0 }; /* 0 => boundary vertex size (zero if elements not sorted) */
 
           zonename = nom_dom.nom_me(indZ).getString();
           zonename_link = nom_dom_mod.nom_me(indZ).getString();
@@ -241,7 +241,7 @@ void Ecrire_CGNS::add_new_linked_base(const std::string& LOC, const Nom& nom_dom
   else
     {
       zoneId_.push_back(-123);
-      cgsize_t isize[3] = { sizeId_[ind_base][0] , sizeId_[ind_base][1] , 0 };
+      const cgsize_t isize[3] = { sizeId_[ind_base][0] , sizeId_[ind_base][1] , 0 };
 
       cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_.back(), nom_dom.getString(), isize, zoneId_.back(), 1,
                                                      "" /* meme fichier */, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
@@ -285,14 +285,8 @@ void Ecrire_CGNS::cgns_open_solution_link_file(const double t)
       const std::string& LOC = itr.first;
       const Nom& nom_dom = itr.second;
 
-      const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
-      int ind_base = index_glob;
-
-      if (LOC != "FACES")
-        {
-          const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
-          ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
-        }
+      int index_glob = -123, ind_base = -123;
+      TRUST_2_CGNS::init_glob_base_domain_idx(doms_written_, nom_dom, true /* has_fields */, LOC, index_glob, ind_base);
 
       if (cg_base_write(fileId_, nom_dom.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
         Cerr << "Error Ecrire_CGNS::cgns_open_solution_link_file : cg_base_write !" << finl, TRUST_CGNS_ERROR();
@@ -301,7 +295,7 @@ void Ecrire_CGNS::cgns_open_solution_link_file(const double t)
        * XXX this is done in //, not like final link file which is done only on proc 0
        * So no need to get sizes per local comm ... each proc available on its comm group take the good values
        */
-      cgsize_t isize[3] = { sizeId_[ind_base][0] , sizeId_[ind_base][1] , 0 };
+      const cgsize_t isize[3] = { sizeId_[ind_base][0] , sizeId_[ind_base][1] , 0 };
 
       std::string linkfile = baseFile_name_ + ".grid.cgns"; // file name
 
@@ -325,31 +319,22 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
   if (!Process::me())
     {
       std::string fn = baseFile_name_ + ".cgns";
-
       unlink(fn.c_str());
       cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::SEQ>(fn, fileId_, true);
 
       const int nb_grps = static_cast<int>(unique_vec_proc_maitre_local_comm_.size());
       std::vector<int> zoneId_tmp(nb_grps, -123);
-      std::vector<int> ind_doms_dumped;
 
-      /* 1 : on iter juste sur le map fld_loc_map_; ie: pas domaine dis ... */
-      for (auto& itr : fld_loc_map_)
+      for (auto &itr : doms_written_)
         {
-          const std::string& LOC = itr.first;
-          const Nom& nom_dom = itr.second;
+          bool has_field = false;
+          std::string LOC = "rien";
+          TRUST_2_CGNS::init_has_field_and_loc_iters(itr, fld_loc_map_, has_field, LOC);
 
-          const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
-          ind_doms_dumped.push_back(index_glob);
-          int ind_base = index_glob;
+          int index_glob = -123, ind_base = -123;
+          TRUST_2_CGNS::init_glob_base_domain_idx(doms_written_, itr, has_field, LOC, index_glob, ind_base);
 
-          if (LOC != "FACES")
-            {
-              const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
-              ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
-            }
-
-          if (cg_base_write(fileId_, nom_dom.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
+          if (cg_base_write(fileId_, itr.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
             Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_comm_group : cg_base_write !" << finl, TRUST_CGNS_ERROR();
 
           for (int gid = 0; gid < nb_grps; gid++)
@@ -360,61 +345,20 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
               std::string file_group_id = Nom(baseFile_name_).nom_me(proc_grp).getString();
               TRUST_2_CGNS::remove_slash_linkfile(file_group_id);
 
-              cgsize_t isize[3];
-              isize[0] = sizeId_som_local_comm_[ind_base][gid];
-              isize[1] = sizeId_elem_local_comm_[ind_base][gid];
-              isize[2] = 0;
+              const cgsize_t isize[3] = { sizeId_som_local_comm_[ind_base][gid], sizeId_elem_local_comm_[ind_base][gid], 0 };
+              const bool write_connectivity = (!(isize[0] == 1 && isize[1] == 1));
 
               cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[index_glob], zone_name, isize, zoneId_tmp[gid], gid + 1,
                                                              file_group_id + ".grid.cgns" /* linkfile */, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
-                                                             "Ecrire_CGNS::cgns_write_final_link_file_comm_group");
+                                                             "Ecrire_CGNS::cgns_write_final_link_file_comm_group", write_connectivity);
 
-
-              cgns_helper_.cgns_write_solution_classic_links(file_group_id, nom_dom.getString(), nom_dom.getString(), LOC, time_post_,
-                                                             "Ecrire_CGNS::cgns_write_final_link_file");
+              if(has_field)
+                cgns_helper_.cgns_write_solution_classic_links(file_group_id, itr.getString(), itr.getString(), LOC, time_post_,
+                                                               "Ecrire_CGNS::cgns_write_final_link_file");
             }
 
-          cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::SEQ>(true /* has_field */, nb_grps /* nb_zones_to_write */, fileId_, baseId_[index_glob], ind_base,
+          cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::SEQ>(has_field, nb_grps /* nb_zones_to_write */, fileId_, baseId_[index_glob], ind_base,
                                                                  zoneId_tmp, LOC, solname_som_, solname_elem_, solname_faces_, time_post_);
-
-        }
-
-      /* 2 : on iter sur les autres domaines; ie: domaine dis */
-      for (int i = 0; i < static_cast<int>(doms_written_.size()); i++)
-        {
-          if (std::find(ind_doms_dumped.begin(), ind_doms_dumped.end(), i) == ind_doms_dumped.end()) // indice pas dans ind_doms_dumped
-            {
-              const Nom& nom_dom = doms_written_[i];
-              const int ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
-              assert(ind_base > -1);
-
-              if (cg_base_write(fileId_, nom_dom.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[ind_base]) != CG_OK)
-                Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_comm_group : cg_base_write !" << finl, TRUST_CGNS_ERROR();
-
-              for (int gid = 0; gid < nb_grps; gid++)
-                {
-                  const int proc_grp = unique_vec_proc_maitre_local_comm_[gid];
-                  std::string zone_name = Nom("Zone").nom_me(proc_grp).getString();
-
-                  std::string file_group_id = Nom(baseFile_name_).nom_me(proc_grp).getString();
-                  TRUST_2_CGNS::remove_slash_linkfile(file_group_id);
-
-                  cgsize_t isize[3];
-                  isize[0] = sizeId_som_local_comm_[ind_base][gid];
-                  isize[1] = sizeId_elem_local_comm_[ind_base][gid];
-                  isize[2] = 0;
-
-                  const bool write_connectivity = (!(isize[0] == 1 && isize[1] == 1));
-
-                  /* He we dont link to solutions since no fields ... just other domais dis ;) */
-                  cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[ind_base], zone_name, isize, zoneId_tmp[gid], gid + 1,
-                                                                 file_group_id + ".grid.cgns" /* linkfile */, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
-                                                                 "Ecrire_CGNS::cgns_write_final_link_file", write_connectivity);
-                }
-
-              cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::SEQ>(false /* has_field */, nb_grps /* nb_zones_to_write */, fileId_, baseId_[ind_base], ind_base,
-                                                                     zoneId_tmp, "rien", solname_som_, solname_elem_,solname_faces_, time_post_);
-            }
         }
       cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::SEQ>(fn, fileId_, true);
     }
@@ -440,64 +384,31 @@ void Ecrire_CGNS::cgns_write_final_link_file()
       std::string base_link_file = baseFile_name_;
       TRUST_2_CGNS::remove_slash_linkfile(base_link_file);
 
-      std::vector<int> ind_doms_dumped;
-
-      /* 1 : on iter juste sur le map fld_loc_map_; ie: pas domaine dis ... */
-      for (auto& itr : fld_loc_map_)
+      for (auto &itr : doms_written_)
         {
-          const std::string& LOC = itr.first;
-          const Nom& nom_dom = itr.second;
-          const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
-          ind_doms_dumped.push_back(index_glob);
-          assert(index_glob > -1);
+          bool has_field = false;
+          std::string LOC = "rien";
+          TRUST_2_CGNS::init_has_field_and_loc_iters(itr, fld_loc_map_, has_field, LOC);
 
-          int ind_base = index_glob;
-          if (LOC != "FACES")
-            {
-              const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
-              ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
-            }
+          int index_glob = -123, ind_base = -123;
+          TRUST_2_CGNS::init_glob_base_domain_idx(doms_written_, itr, has_field, LOC, index_glob, ind_base);
 
-          if (cg_base_write(fileId_, nom_dom.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
+          if (cg_base_write(fileId_, itr.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
             Cerr << "Error Ecrire_CGNS::cgns_open_solution_link_file : cg_base_write !" << finl, TRUST_CGNS_ERROR();
 
-          cgsize_t isize[3] = { sizeId_[ind_base][0] , sizeId_[ind_base][1] , 0 };
+          const cgsize_t isize[3] = { sizeId_[ind_base][0] , sizeId_[ind_base][1] , 0 };
 
-          cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[index_glob], nom_dom.getString(), isize, zoneId_[index_glob], 1,
+          cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[index_glob], itr.getString(), isize, zoneId_[index_glob], 1,
                                                          base_link_file + ".grid.cgns" /* linkfile */, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
                                                          "Ecrire_CGNS::cgns_write_final_link_file");
 
-          cgns_helper_.cgns_write_solution_classic_links(base_link_file, nom_dom.getString(), nom_dom.getString(), LOC, time_post_,
-                                                         "Ecrire_CGNS::cgns_write_final_link_file");
+          if(has_field)
+            cgns_helper_.cgns_write_solution_classic_links(base_link_file, itr.getString(), itr.getString(), LOC, time_post_,
+                                                           "Ecrire_CGNS::cgns_write_final_link_file");
 
-          cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::SEQ>(true /* has_field */, 1, fileId_, baseId_[index_glob], index_glob /* 1st Zone */,
+          cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::SEQ>(has_field, 1, fileId_, baseId_[index_glob], index_glob /* 1st Zone */,
                                                                  zoneId_, LOC, solname_som_, solname_elem_, solname_faces_, time_post_);
 
-        }
-
-      /* 2 : on iter sur les autres domaines; ie: domaine dis */
-      for (int i = 0; i < static_cast<int>(doms_written_.size()); i++)
-        {
-          if (std::find(ind_doms_dumped.begin(), ind_doms_dumped.end(), i) == ind_doms_dumped.end()) // indice pas dans ind_doms_dumped
-            {
-              const Nom& nom_dom = doms_written_[i];
-              const int ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
-              assert(ind_base > -1);
-
-              if (cg_base_write(fileId_, nom_dom.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[ind_base]) != CG_OK)
-                Cerr << "Error Ecrire_CGNS::cgns_open_solution_link_file : cg_base_write !" << finl, TRUST_CGNS_ERROR();
-
-              cgsize_t isize[3] = { sizeId_[ind_base][0] , sizeId_[ind_base][1] , 0 };
-
-              /* He we dont link to solutions since no fields ... just other domais dis ;) */
-              cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[ind_base], nom_dom.getString(), isize, zoneId_[ind_base], 1,
-                                                             base_link_file + ".grid.cgns" /* linkfile */, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
-                                                             "Ecrire_CGNS::cgns_write_final_link_file");
-
-
-              cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::SEQ>(false /* has_field */, 1 /* nb_zones_to_write */, fileId_, baseId_[ind_base], ind_base,
-                                                                     zoneId_, "rien", solname_som_, solname_elem_,solname_faces_, time_post_);
-            }
         }
 
       cgns_close_grid_or_solution_link_file(-123. /* inutile*/, TYPE_LINK_CGNS::FINAL_LINK, true); // on ferme
