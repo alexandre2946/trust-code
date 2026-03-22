@@ -600,11 +600,11 @@ void Ecrire_CGNS::cgns_write_domaine_seq(const Domaine * domaine,const Nom& nom_
 
 void Ecrire_CGNS::cgns_write_field_seq(const int comp, const double temps, const Nom& id_du_champ, const Nom& id_du_domaine, const Nom& localisation, const Nom& nom_dom, const DoubleTab& valeurs)
 {
-  std::string LOC = Motcle(localisation).getString();
+  const std::string LOC = Motcle(localisation).getString();
   Motcle id_du_champ_modifie = TRUST_2_CGNS::modify_field_name_for_post(id_du_champ, id_du_domaine, LOC, fieldId_som_, fieldId_elem_, fieldId_faces_);
-  Nom& id_champ = id_du_champ_modifie;
+  const Nom& id_champ = id_du_champ_modifie;
 
-  /* 2 : Get corresponding domain index */
+  /* 1 : Get corresponding domain index */
   const int ind = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
   assert(ind > -1);
 
@@ -612,13 +612,13 @@ void Ecrire_CGNS::cgns_write_field_seq(const int comp, const double temps, const
 
   if (nb_vals)
     {
-      /* 3 : Write solution names for iterative data later */
+      /* 2 : Write solution names for iterative data later */
       cgns_helper_.cgns_sol_write<TYPE_ECRITURE_CGNS::SEQ>(1 /* nb_zones_to_write */, fileId_, baseId_[ind], ind, temps, zoneId_, LOC,
                                                            solname_som_, solname_elem_, solname_faces_,
                                                            solname_som_written_, solname_elem_written_, solname_faces_written_,
                                                            flowId_som_, flowId_elem_, flowId_faces_);
 
-      /* 4 : Fill field values & dump to cgns file */
+      /* 3 : Fill field values & dump to cgns file */
       if (LOC == "FACES")
         {
           const Domaine_VF& dom_vf = ref_cast(Domaine_VF, domaine_dis_.valeur());
@@ -836,43 +836,36 @@ void Ecrire_CGNS::cgns_write_field_par_over_zone(const int comp, const double te
 {
 #ifdef MPI_
   assert (!Option_CGNS::USE_LINKS || postraiter_domaine_);
-  std::string LOC = Motcle(localisation).getString();
+  const std::string LOC = Motcle(localisation).getString();
   Motcle id_du_champ_modifie = TRUST_2_CGNS::modify_field_name_for_post(id_du_champ, id_du_domaine, LOC, fieldId_som_, fieldId_elem_, fieldId_faces_);
-  Nom& id_champ = id_du_champ_modifie;
+  const Nom& id_champ = id_du_champ_modifie;
 
-  /* 2 : Get corresponding domain index */
-  const int proc_me = Process::me(), nb_vals = valeurs.dimension(0);
-  const int ind = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
-  assert(ind > -1);
+  /* 1 : Get corresponding domain index */
+  int ind_glob = -123, ind_base = -123;
+  TRUST_2_CGNS::init_glob_base_domain_idx(doms_written_, nom_dom, true /* has_field */, LOC, ind_glob, ind_base);
 
-  int ind_new = ind;
-  if (ind > (static_cast<int>(T2CGNS_.size()) -1) )
-    {
-      const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
-      ind_new = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
-    }
-
-  /* 3 : CREATION OF FILE STRUCTURE
+  /* 2 : CREATION OF FILE STRUCTURE
    *
    *  - All processors THAT HAVE nb_vals > 0 write the same information.
    *  - Only field meta-data is written to the library at this stage ... So no worries ^^
    *  - And just once per dt !
    */
-  const TRUST_2_CGNS& TRUST2CGNS = T2CGNS_[ind_new];
+  const TRUST_2_CGNS& TRUST2CGNS = T2CGNS_[ind_base];
 
   const int nb_zones_to_write = TRUST2CGNS.nb_procs_writing();
   const bool all_write = TRUST2CGNS.all_procs_write(); // all procs will write !
 
-  cgns_helper_.cgns_sol_write<TYPE_ECRITURE_CGNS::PAR_OVER>(nb_zones_to_write, fileId_, baseId_[ind], ind, temps, zoneId_par_[ind], LOC,
+  cgns_helper_.cgns_sol_write<TYPE_ECRITURE_CGNS::PAR_OVER>(nb_zones_to_write, fileId_, baseId_[ind_glob], ind_glob, temps, zoneId_par_[ind_glob], LOC,
                                                             solname_som_, solname_elem_, solname_faces_,
                                                             solname_som_written_, solname_elem_written_, solname_faces_written_,
                                                             flowId_som_, flowId_elem_, flowId_faces_);
 
-  cgns_helper_.cgns_field_write<TYPE_ECRITURE_CGNS::PAR_OVER>(nb_zones_to_write, fileId_, baseId_[ind], ind, zoneId_par_[ind], LOC,
+  cgns_helper_.cgns_field_write<TYPE_ECRITURE_CGNS::PAR_OVER>(nb_zones_to_write, fileId_, baseId_[ind_glob], ind_glob, zoneId_par_[ind_glob], LOC,
                                                               flowId_som_, flowId_elem_, flowId_faces_, id_champ.getChar(),
                                                               fieldId_som_, fieldId_elem_, fieldId_faces_);
 
-  /* 4 : Fill field values & dump to cgns file */
+  /* 3 : Fill field values & dump to cgns file */
+  const int proc_me = Process::me(), nb_vals = valeurs.dimension(0);
   if (nb_vals > 0) // this proc will write !
     {
       cgsize_t min = 1, max = nb_vals;
@@ -895,13 +888,13 @@ void Ecrire_CGNS::cgns_write_field_par_over_zone(const int comp, const double te
 
           max = new_vals.dimension(0); // XXX
 
-          cgns_helper_.cgns_field_write_data<TYPE_ECRITURE_CGNS::PAR_OVER>(fileId_, baseId_[ind], indx /* XXX */, zoneId_par_[ind], LOC,
+          cgns_helper_.cgns_field_write_data<TYPE_ECRITURE_CGNS::PAR_OVER>(fileId_, baseId_[ind_glob], indx /* XXX */, zoneId_par_[ind_glob], LOC,
                                                                            flowId_som_, flowId_elem_, flowId_faces_,
                                                                            fieldId_som_, fieldId_elem_, fieldId_faces_,
                                                                            comp, min, max, new_vals);
         }
       else
-        cgns_helper_.cgns_field_write_data<TYPE_ECRITURE_CGNS::PAR_OVER>(fileId_, baseId_[ind], indx /* XXX */, zoneId_par_[ind], LOC,
+        cgns_helper_.cgns_field_write_data<TYPE_ECRITURE_CGNS::PAR_OVER>(fileId_, baseId_[ind_glob], indx /* XXX */, zoneId_par_[ind_glob], LOC,
                                                                          flowId_som_, flowId_elem_, flowId_faces_,
                                                                          fieldId_som_, fieldId_elem_, fieldId_faces_,
                                                                          comp, min, max, valeurs);
@@ -1121,40 +1114,33 @@ void Ecrire_CGNS::cgns_write_field_par_in_zone(const int comp, const double temp
 {
 #ifdef MPI_
   const int nb_vals = valeurs.dimension(0);
-  const int ind = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
-  assert(ind > -1);
-
-  std::string LOC = Motcle(localisation).getString();
+  const std::string LOC = Motcle(localisation).getString();
   Motcle id_du_champ_modifie = TRUST_2_CGNS::modify_field_name_for_post(id_du_champ, id_du_domaine, LOC, fieldId_som_, fieldId_elem_, fieldId_faces_);
-  Nom& id_champ = id_du_champ_modifie;
+  const Nom& id_champ = id_du_champ_modifie;
 
-  /* 1 : CREATION OF FILE STRUCTURE
+  /* 1 : Get corresponding domain index */
+  int ind_glob = -123, ind_base = -123;
+  TRUST_2_CGNS::init_glob_base_domain_idx(doms_written_, nom_dom, true /* has_field */, LOC, ind_glob, ind_base);
+
+  /* 2 : CREATION OF FILE STRUCTURE
    *
    *  - All processors write the same information.
    *  - Only field meta-data is written to the library at this stage ... So no worries ^^
    *  - And just once per dt !
    */
-  cgns_helper_.cgns_sol_write<TYPE_ECRITURE_CGNS::PAR_IN>(1 /* nb_zones_to_write */, fileId_, baseId_[ind], ind, temps, zoneId_, LOC,
+  cgns_helper_.cgns_sol_write<TYPE_ECRITURE_CGNS::PAR_IN>(1 /* nb_zones_to_write */, fileId_, baseId_[ind_glob], ind_glob, temps, zoneId_, LOC,
                                                           solname_som_, solname_elem_, solname_faces_,
                                                           solname_som_written_, solname_elem_written_, solname_faces_written_,
                                                           flowId_som_, flowId_elem_, flowId_faces_);
 
-  cgns_helper_.cgns_field_write<TYPE_ECRITURE_CGNS::PAR_IN>(1 /* nb_zones_to_write */, fileId_, baseId_[ind], ind, zoneId_, LOC,
+  cgns_helper_.cgns_field_write<TYPE_ECRITURE_CGNS::PAR_IN>(1 /* nb_zones_to_write */, fileId_, baseId_[ind_glob], ind_glob, zoneId_, LOC,
                                                             flowId_som_, flowId_elem_,flowId_faces_,
                                                             id_champ.getChar(), fieldId_som_, fieldId_elem_, fieldId_faces_);
 
-  /* 2 : Fill field values & dump to cgns file */
+  /* 3 : Fill field values & dump to cgns file */
   if (nb_vals > 0) // this proc will write !
     {
-      int ind_new = ind;
-
-      if (ind > (static_cast<int>(T2CGNS_.size()) -1) )
-        {
-          const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
-          ind_new = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
-        }
-
-      const TRUST_2_CGNS& TRUST2CGNS = T2CGNS_[ind_new];
+      const TRUST_2_CGNS& TRUST2CGNS = T2CGNS_[ind_base];
       const bool enter_group_comm = (Option_CGNS::LINKED_FILES_PER_COMM_GROUP || Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)
                                     && PE_Groups::has_user_defined_group() && !postraiter_domaine_;
 
@@ -1183,13 +1169,13 @@ void Ecrire_CGNS::cgns_write_field_par_in_zone(const int comp, const double temp
           DoubleTrav new_vals;
           TRUST_2_CGNS::map_face_values(dom_vf, valeurs, new_vals);
 
-          cgns_helper_.cgns_field_write_data<TYPE_ECRITURE_CGNS::PAR_IN>(fileId_, baseId_[ind], ind, zoneId_, LOC,
+          cgns_helper_.cgns_field_write_data<TYPE_ECRITURE_CGNS::PAR_IN>(fileId_, baseId_[ind_glob], ind_glob, zoneId_, LOC,
                                                                          flowId_som_, flowId_elem_, flowId_faces_,
                                                                          fieldId_som_, fieldId_elem_, fieldId_faces_,
                                                                          comp, min, max, new_vals);
         }
       else
-        cgns_helper_.cgns_field_write_data<TYPE_ECRITURE_CGNS::PAR_IN>(fileId_, baseId_[ind], ind, zoneId_, LOC,
+        cgns_helper_.cgns_field_write_data<TYPE_ECRITURE_CGNS::PAR_IN>(fileId_, baseId_[ind_glob], ind_glob, zoneId_, LOC,
                                                                        flowId_som_, flowId_elem_, flowId_faces_,
                                                                        fieldId_som_, fieldId_elem_, fieldId_faces_,
                                                                        comp, min, max, valeurs);
