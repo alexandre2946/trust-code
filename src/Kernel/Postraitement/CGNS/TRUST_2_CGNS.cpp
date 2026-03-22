@@ -24,26 +24,6 @@
 
 #ifdef HAS_CGNS
 
-void TRUST_2_CGNS::remove_slash_linkfile(std::string& linkfile)
-{
-  const auto found = linkfile.find_last_of("/");
-  if (found != std::string::npos)
-    linkfile.erase(0, found + 1);
-}
-
-Nom TRUST_2_CGNS::modify_domaine_name_for_link(const Nom& nom_dom, const std::string& LOC)
-{
-  if (LOC != "FACES")
-    {
-      Nom nom_dom_mod = nom_dom;
-      nom_dom_mod.prefix(LOC.c_str());
-      nom_dom_mod.prefix("_");
-      return nom_dom_mod;
-    }
-  else
-    return nom_dom;
-}
-
 Motcle TRUST_2_CGNS::modify_field_name_for_post(const Nom& id_du_champ, const Nom& id_du_domaine, const std::string& LOC, int& fieldId_som, int& fieldId_elem, int& fieldId_faces)
 {
   Motcle id_du_champ_modifie(id_du_champ), iddomaine(id_du_domaine);
@@ -113,17 +93,6 @@ std::string TRUST_2_CGNS::modify_domaine_name_for_post(const Nom& nom_dom)
     }
 
   return nom_dom_modifie;
-}
-
-int TRUST_2_CGNS::get_index_nom_vector(const std::vector<Nom>& vect, const Nom& nom)
-{
-  int ind = -1;
-  auto it = find(vect.begin(), vect.end(), nom);
-
-  if (it != vect.end()) // element found
-    ind = static_cast<int>(it - vect.begin()); // XXX sinon utilse std::distance ...
-
-  return ind;
 }
 
 void TRUST_2_CGNS::map_face_values(const Domaine_VF& dom_vf, const DoubleTab& val_src, DoubleTrav& val_trgt)

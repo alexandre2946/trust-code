@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -98,11 +98,12 @@ public:
   void clear_vectors();
 
   /* methods statiques utiles */
+  static inline Nom modify_domaine_name_for_link(const Nom&, const std::string&);
+  static inline int get_index_nom_vector(const std::vector<Nom>&, const Nom&);
+  static inline void remove_slash_linkfile(std::string&);
+
   static Motcle modify_field_name_for_post(const Nom&, const Nom&, const std::string&, int&, int&, int&);
-  static Nom modify_domaine_name_for_link(const Nom&, const std::string&);
   static std::string modify_domaine_name_for_post(const Nom& );
-  static int get_index_nom_vector(const std::vector<Nom>&, const Nom&);
-  static void remove_slash_linkfile(std::string&);
   static void map_face_values(const Domaine_VF&, const DoubleTab& , DoubleTrav&);
 
 private:
@@ -136,6 +137,37 @@ private:
 
   std::vector<cgsize_t> local_fs_, local_fs_offset_, local_ef_, local_ef_offset_, local_es_, local_es_offset_;
 };
+
+inline Nom TRUST_2_CGNS::modify_domaine_name_for_link(const Nom& nom_dom, const std::string& LOC)
+{
+  if (LOC != "FACES")
+    {
+      Nom nom_dom_mod = nom_dom;
+      nom_dom_mod.prefix(LOC.c_str());
+      nom_dom_mod.prefix("_");
+      return nom_dom_mod;
+    }
+  else
+    return nom_dom;
+}
+
+inline int TRUST_2_CGNS::get_index_nom_vector(const std::vector<Nom>& vect, const Nom& nom)
+{
+  int ind = -1;
+  auto it = find(vect.begin(), vect.end(), nom);
+
+  if (it != vect.end()) // element found
+    ind = static_cast<int>(it - vect.begin()); // XXX sinon utilse std::distance ...
+
+  return ind;
+}
+
+inline void TRUST_2_CGNS::remove_slash_linkfile(std::string& linkfile)
+{
+  const auto found = linkfile.find_last_of("/");
+  if (found != std::string::npos)
+    linkfile.erase(0, found + 1);
+}
 
 #endif /* HAS_CGNS */
 
