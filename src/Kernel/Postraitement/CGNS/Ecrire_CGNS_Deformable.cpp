@@ -22,7 +22,7 @@
 
 void Ecrire_CGNS::cgns_write_final_link_file_lagrangian()
 {
-  if (Process::me()) return; // seul le proc 0 écrit le fichier link
+  if (Process::me()) return; // seul le proc 0 ecrit le fichier link
 
   const int nsteps = static_cast<int>(time_post_.size());
   const cgsize_t nuse = static_cast<cgsize_t>(nsteps);
@@ -229,15 +229,16 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group_pb_deformable()
       const int nb_grps = static_cast<int>(unique_vec_proc_maitre_local_comm_.size());
       std::vector<int> zoneId_tmp(nb_grps, -123);
 
-      for (auto &itr : fld_loc_map_)
+      for (auto &itr : doms_written_)
         {
-          const std::string& LOC = itr.first;
-          const Nom& nom_dom = itr.second;
+          bool has_field = false;
+          std::string LOC = "rien";
+          TRUST_2_CGNS::init_has_field_and_loc_iters(itr, fld_loc_map_, has_field, LOC);
 
           int index_glob = -123, ind_base = -123;
-          TRUST_2_CGNS::init_glob_base_domain_idx(doms_written_, nom_dom, true /* has_field */, LOC, index_glob, ind_base);
+          TRUST_2_CGNS::init_glob_base_domain_idx(doms_written_, itr, true /* has_field */, LOC, index_glob, ind_base);
 
-          if (cg_base_write(fileId_, nom_dom.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
+          if (cg_base_write(fileId_, itr.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
             Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_pb_deformable : cg_base_write !" << finl, TRUST_CGNS_ERROR();
 
           for (int gid = 0; gid < nb_grps; gid++)
@@ -250,18 +251,15 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group_pb_deformable()
               std::string file_group_id = Nom(baseFile_name_).nom_me(proc_grp).getString();
               TRUST_2_CGNS::remove_slash_linkfile(file_group_id);
 
-              cgns_helper_.cgns_write_zone_and_deformable_links(true /* write zone */, fileId_, baseId_[index_glob],
-                                                                zone_name, isize, zoneId_tmp[gid], gid + 1,
-                                                                file_group_id, baseZone_name_[ind_base], baseZone_name_[ind_base],
-                                                                connectname_[ind_base], nom_dom, LOC, time_post_,
+              cgns_helper_.cgns_write_zone_and_deformable_links(true /* write zone */, has_field, fileId_, baseId_[index_glob], zone_name, isize, zoneId_tmp[gid], gid + 1,
+                                                                file_group_id, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base], itr, LOC, time_post_,
                                                                 "Ecrire_CGNS::cgns_write_final_link_file_comm_group_pb_deformable");
-
             }
 
-          cgns_helper_.cgns_write_iters_deformable<TYPE_ECRITURE_CGNS::SEQ>(true, true /* has_field */, nb_grps /* nb_zones_to_write */, fileId_, baseId_[index_glob], ind_base,
+          cgns_helper_.cgns_write_iters_deformable<TYPE_ECRITURE_CGNS::SEQ>(true, has_field, nb_grps /* nb_zones_to_write */, fileId_, baseId_[index_glob], ind_base,
                                                                             zoneId_tmp, LOC, solname_som_, solname_elem_, solname_faces_, grid_name_, time_post_);
-        }
 
+        }
       cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::SEQ>(fn, fileId_, true);
     }
 }
@@ -285,32 +283,30 @@ void Ecrire_CGNS::cgns_write_final_link_file_pb_deformable()
       unlink(fn.c_str());
       cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::SEQ>(fn, fileId_, true);
 
-      for (auto& itr : fld_loc_map_)
+      std::string base_link_file = baseFile_name_;
+      TRUST_2_CGNS::remove_slash_linkfile(base_link_file);
+
+      for (auto &itr : doms_written_)
         {
-          const std::string& LOC = itr.first;
-          const Nom& nom_dom = itr.second;
+          bool has_field = false;
+          std::string LOC = "rien";
+          TRUST_2_CGNS::init_has_field_and_loc_iters(itr, fld_loc_map_, has_field, LOC);
 
           int index_glob = -123, ind_base = -123;
-          TRUST_2_CGNS::init_glob_base_domain_idx(doms_written_, nom_dom, true /* has_field */, LOC, index_glob, ind_base);
+          TRUST_2_CGNS::init_glob_base_domain_idx(doms_written_, itr, true /* has_field */, LOC, index_glob, ind_base);
 
-          if (cg_base_write(fileId_, nom_dom.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
+          if (cg_base_write(fileId_, itr.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
             Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_pb_deformable : cg_base_write !" << finl, TRUST_CGNS_ERROR();
 
           const cgsize_t isize[3] = { sizeId_[ind_base][0] , sizeId_[ind_base][1] , 0 };
 
-          std::string file_prefix = baseFile_name_;
-          TRUST_2_CGNS::remove_slash_linkfile(file_prefix);
-
-          cgns_helper_.cgns_write_zone_and_deformable_links(true /* write zone */, fileId_, baseId_[index_glob], nom_dom.getString(),
-                                                            isize, zoneId_[index_glob], zoneId_[index_glob],
-                                                            file_prefix, baseZone_name_[ind_base], baseZone_name_[ind_base],
-                                                            connectname_[ind_base], nom_dom, LOC, time_post_,
+          cgns_helper_.cgns_write_zone_and_deformable_links(true /* write zone */, has_field, fileId_, baseId_[index_glob], itr.getString(), isize, zoneId_[index_glob], 1,
+                                                            base_link_file, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base], itr, LOC, time_post_,
                                                             "Ecrire_CGNS::cgns_write_final_link_file_pb_deformable");
 
-          cgns_helper_.cgns_write_iters_deformable<TYPE_ECRITURE_CGNS::SEQ>(true /* deformable */, true /* has_field */, 1 /* 1 zone per base */, fileId_, baseId_[index_glob], index_glob /* 1st Zone */,
+          cgns_helper_.cgns_write_iters_deformable<TYPE_ECRITURE_CGNS::SEQ>(true /* deformable */, has_field, 1 /* 1 zone per base */, fileId_, baseId_[index_glob], index_glob /* 1st Zone */,
                                                                             zoneId_, LOC, solname_som_, solname_elem_, solname_faces_, grid_name_, time_post_);
         }
-
       cgns_close_grid_or_solution_link_file(-123., TYPE_LINK_CGNS::FINAL_LINK, true);
     }
 }

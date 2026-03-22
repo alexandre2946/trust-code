@@ -479,7 +479,7 @@ inline void Ecrire_CGNS_helper::cgns_write_solution_classic_links(const std::str
     }
 }
 
-inline void Ecrire_CGNS_helper::cgns_write_zone_and_deformable_links(const bool write_zone, const int fileId, const int baseId, const std::string& zone_name_to_write,
+inline void Ecrire_CGNS_helper::cgns_write_zone_and_deformable_links(const bool write_zone, const bool has_field, const int fileId, const int baseId, const std::string& zone_name_to_write,
                                                                      const cgsize_t *isize, int& zoneId, const int zone_goto_id,
                                                                      const std::string& file_prefix, const std::string& target_base_name, const std::string& target_zone_name,
                                                                      const std::vector<std::string>& connect_names, const Nom& nom_dom, const std::string& LOC,
@@ -520,11 +520,14 @@ inline void Ecrire_CGNS_helper::cgns_write_zone_and_deformable_links(const bool 
           conn_written = true;
         }
 
-      const std::string solname = "FlowSolution" + convert_double_to_string(itr_t) + "_" + LOC;
-      linkpath = "/" + nom_dom.getString() + "/" + nom_dom.getString() + "/" + solname + "/";
+      if (has_field)
+        {
+          const std::string solname = "FlowSolution" + convert_double_to_string(itr_t) + "_" + LOC;
+          linkpath = "/" + nom_dom.getString() + "/" + nom_dom.getString() + "/" + solname + "/";
 
-      if (cg_link_write(solname.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
-        Cerr << "Error " << where << " : cg_link_write FlowSolution " << solname << " !" << finl, TRUST_CGNS_ERROR();
+          if (cg_link_write(solname.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
+            Cerr << "Error " << where << " : cg_link_write FlowSolution " << solname << " !" << finl, TRUST_CGNS_ERROR();
+        }
     }
 }
 
