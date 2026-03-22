@@ -37,14 +37,9 @@ void Ecrire_CGNS::cgns_write_final_link_file_lagrangian()
     {
       const std::string& LOC = itr.first;
       const Nom& nom_dom = itr.second;
-      const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
 
-      int ind_base = index_glob;
-      if (LOC != "FACES")
-        {
-          const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
-          ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
-        }
+      int index_glob = -123, ind_base = -123;
+      TRUST_2_CGNS::init_glob_base_domain_idx(doms_written_, nom_dom, true /* has_field */, LOC, index_glob, ind_base);
 
       if (cg_base_write(fileId_, nom_dom.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
         Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_base_write !" << finl, TRUST_CGNS_ERROR();
@@ -130,20 +125,16 @@ void Ecrire_CGNS::link_multi_loc_support_lagrangian()
     {
       const std::string& LOC = itr.first;
       const Nom& nom_dom = itr.second;
-      assert(LOC != "FACES");
 
-      const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
-      const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
-      const int ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
+      int index_glob = -123, ind_base = -123;
+      TRUST_2_CGNS::init_glob_base_domain_idx(doms_written_, nom_dom, true /* has_field */, LOC, index_glob, ind_base);
       assert (ind_base == 0);
-
-      const int nb_current_post = static_cast<int> (time_post_.size());
 
       if (cg_base_write(fileId_, nom_dom.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
         Cerr << "Error Ecrire_CGNS::link_multi_loc_support_lagrangian : cg_base_write !" << finl, TRUST_CGNS_ERROR();
 
-      cgsize_t isize[3] = { sizeId_[nb_current_post - 1][0], sizeId_[nb_current_post - 1][1], 0 };
-
+      const int nb_current_post = static_cast<int> (time_post_.size());
+      const cgsize_t isize[3] = { sizeId_[nb_current_post - 1][0], sizeId_[nb_current_post - 1][1], 0 };
 
       cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[index_glob], nom_dom.getString(), isize, zoneId_[index_glob], 1,
                                                      "" /* this file */, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
@@ -170,30 +161,31 @@ void Ecrire_CGNS::link_multi_loc_support_pb_deformable()
         {
           const std::string& LOC = itr.first;
           const Nom& nom_dom = itr.second;
-          assert(LOC != "FACES");
 
-          const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
-          const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
-          const int ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
+          int index_glob = -123, ind_base = -123;
+          TRUST_2_CGNS::init_glob_base_domain_idx(doms_written_, nom_dom, true /* has_field */, LOC, index_glob, ind_base);
 
           if (cg_base_write(fileId_, nom_dom.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
             Cerr << "Error Ecrire_CGNS::link_multi_loc_support_pb_deformable : cg_base_write !" << finl, TRUST_CGNS_ERROR();
 
-          cgsize_t isize[3] = { sizeId_[ind_base][0], sizeId_[ind_base][1], 0 };
+          const cgsize_t isize[3] = { sizeId_[ind_base][0], sizeId_[ind_base][1], 0 };
 
-          // XXX we use the helper but we dont write connectivity because it is a bit special
+          // XXX we use the helper but we dont write connectivity because it is a bit special : we link grid coords to same file while connectivity to 1st sol file ...
           cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[index_glob], nom_dom.getString(), isize, zoneId_[index_glob], 1,
                                                          "" /* this file */, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
                                                          "Ecrire_CGNS::link_multi_loc_support_pb_deformable", false /* DONT WRITE CONN */);
 
+          // Write conn : linked to 1st solution file since deformable ...
           std::string linkfile;
+          if (!first_time_post_)
+            linkfile = (enter_group_comm ? Nom(baseFile_name_).nom_me(proc_maitre_local_comm_).getString() : baseFile_name_) +
+                       ".solution." + cgns_helper_.convert_double_to_string(time_post_[0]) + ".cgns";
+
+          TRUST_2_CGNS::remove_slash_linkfile(linkfile);
+
           for (auto &itr_conn : connectname_[ind_base])
             {
               std::string linkpath = "/" + baseZone_name_[ind_base] + "/" + baseZone_name_[ind_base] + "/" + itr_conn + "/";
-
-              if (!first_time_post_)
-                linkfile = (enter_group_comm ? Nom(baseFile_name_).nom_me(proc_maitre_local_comm_).getString() : baseFile_name_) +
-                           ".solution." + cgns_helper_.convert_double_to_string(time_post_[0]) + ".cgns";
 
               if (cg_link_write(itr_conn.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
                 Cerr << "Error Ecrire_CGNS::link_multi_loc_support_pb_deformable : cg_link_write !" << finl, TRUST_CGNS_ERROR();
@@ -208,11 +200,9 @@ void Ecrire_CGNS::link_multi_loc_support_pb_deformable()
         {
           const std::string& LOC = itr.first;
           const Nom& nom_dom = itr.second;
-          assert(LOC != "FACES");
 
-          const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
-          const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
-          const int ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
+          int index_glob = -123, ind_base = -123;
+          TRUST_2_CGNS::init_glob_base_domain_idx(doms_written_, nom_dom, true /* has_field */, LOC, index_glob, ind_base);
 
           std::string linkpath = "/" + baseZone_name_[ind_base] + "/" + baseZone_name_[ind_base] + "/" + grid_name_loc_ + "/";
 
@@ -243,14 +233,9 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group_pb_deformable()
         {
           const std::string& LOC = itr.first;
           const Nom& nom_dom = itr.second;
-          const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
 
-          int ind_base = index_glob;
-          if (LOC != "FACES")
-            {
-              const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
-              ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
-            }
+          int index_glob = -123, ind_base = -123;
+          TRUST_2_CGNS::init_glob_base_domain_idx(doms_written_, nom_dom, true /* has_field */, LOC, index_glob, ind_base);
 
           if (cg_base_write(fileId_, nom_dom.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
             Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_pb_deformable : cg_base_write !" << finl, TRUST_CGNS_ERROR();
@@ -260,10 +245,7 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group_pb_deformable()
               int proc_grp = unique_vec_proc_maitre_local_comm_[gid];
               std::string zone_name = Nom("Zone").nom_me(proc_grp).getString();
 
-              cgsize_t isize[3];
-              isize[0] = sizeId_som_local_comm_[ind_base][gid];
-              isize[1] = sizeId_elem_local_comm_[ind_base][gid];
-              isize[2] = 0;
+              const cgsize_t isize[3] = { sizeId_som_local_comm_[ind_base][gid], sizeId_elem_local_comm_[ind_base][gid], 0 };
 
               std::string file_group_id = Nom(baseFile_name_).nom_me(proc_grp).getString();
               TRUST_2_CGNS::remove_slash_linkfile(file_group_id);
@@ -303,24 +285,18 @@ void Ecrire_CGNS::cgns_write_final_link_file_pb_deformable()
       unlink(fn.c_str());
       cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::SEQ>(fn, fileId_, true);
 
-
       for (auto& itr : fld_loc_map_)
         {
           const std::string& LOC = itr.first;
           const Nom& nom_dom = itr.second;
-          const int index_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
 
-          int ind_base = index_glob;
-          if (LOC != "FACES")
-            {
-              const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
-              ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
-            }
+          int index_glob = -123, ind_base = -123;
+          TRUST_2_CGNS::init_glob_base_domain_idx(doms_written_, nom_dom, true /* has_field */, LOC, index_glob, ind_base);
 
           if (cg_base_write(fileId_, nom_dom.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
             Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_pb_deformable : cg_base_write !" << finl, TRUST_CGNS_ERROR();
 
-          cgsize_t isize[3] = { sizeId_[ind_base][0] , sizeId_[ind_base][1] , 0 };
+          const cgsize_t isize[3] = { sizeId_[ind_base][0] , sizeId_[ind_base][1] , 0 };
 
           std::string file_prefix = baseFile_name_;
           TRUST_2_CGNS::remove_slash_linkfile(file_prefix);
@@ -350,7 +326,6 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_seq(const Domaine * domaine,cons
   TRUST_2_CGNS& TRUST2CGNS = T2CGNS_[ind];
   TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_.non_nul() ? &(domaine_dis_.valeur()) : nullptr, les_som, les_elem, postraiter_domaine_);
 
-
   CGNS_TYPE cgns_type_elem = TRUST2CGNS.convert_elem_type(type_elem);
   const bool is_polyedre = (type_elem == "POLYEDRE" || type_elem == "PRISME" || type_elem == "PRISME_HEXAG");
   const int icelldim = TRUST2CGNS.topo_dim_from_elem(cgns_type_elem, is_polyedre); // avant ca : icelldim = les_som.dimension(1)
@@ -359,7 +334,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_seq(const Domaine * domaine,cons
   std::vector<double> xCoords, yCoords, zCoords;
   TRUST2CGNS.fill_coords(xCoords, yCoords, zCoords);
 
-  cgsize_t isize[3] = { (cgsize_t)nb_som, (cgsize_t)nb_elem, 0 }; /* 0 => boundary vertex size (zero if elements not sorted) */
+  const cgsize_t isize[3] = { (cgsize_t)nb_som, (cgsize_t)nb_elem, 0 }; /* 0 => boundary vertex size (zero if elements not sorted) */
 
   int coordsId = -1;
   char basename[CGNS_STR_SIZE];
@@ -376,7 +351,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_seq(const Domaine * domaine,cons
           if (cg_goto(fileId_, baseId_[ind], "Zone_t",zoneId_[ind], "GridCoordinates_t",  G, "end") != CG_OK)
             Cerr << "Error Ecrire_CGNS::cgns_write_domaine_deformable_seq : cg_goto Zone_t !" << finl, TRUST_CGNS_ERROR();
 
-          cgsize_t dims[1] = { (cgsize_t)nb_som };
+          const cgsize_t dims[1] = { (cgsize_t)nb_som };
 
           if (cg_array_write("CoordinateX", CGNS_ENUMV(RealDouble), 1, dims, xCoords.data()) != CG_OK)
             Cerr << "Error Ecrire_CGNS::cgns_write_domaine_deformable_seq : cg_array_write CoordinateX !" << finl, TRUST_CGNS_ERROR();
@@ -485,7 +460,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
       if (cg_goto(fileId_, baseId_[ind], "Zone_t",zoneId_[ind], "GridCoordinates_t",  G, "end") != CG_OK)
         Cerr << "Error Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone : cg_goto Zone_t !" << finl, TRUST_CGNS_ERROR();
 
-      cgsize_t dims[1] = { ns_tot };
+      const cgsize_t dims[1] = { ns_tot };
 
       if (cgp_array_write("CoordinateX", CGNS_ENUMV(RealDouble), 1, dims, &coordsIdx) != CG_OK)
         Cerr << "Error Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone : cgp_array_write CoordinateX !" << finl, TRUST_CGNS_ERROR();
@@ -502,7 +477,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
           const std::vector<int>& incr_max_som = TRUST2CGNS.get_global_incr_max_som(),
                                   &incr_min_som = TRUST2CGNS.get_global_incr_min_som();
 
-          cgsize_t min = incr_min_som[proc_me], max = incr_max_som[proc_me];
+          const cgsize_t min = incr_min_som[proc_me], max = incr_max_som[proc_me];
           assert (min < max);
 
           if (cgp_array_write_data(coordsIdx, &min, &max, xCoords.data()) != CG_OK)
@@ -538,7 +513,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
           if (ne_tot == 0 && ns_tot == 0) return; // XXX Elie Saikali : zone vide creer, rien a faire de plus ... (cas LINKED_FILES_PER_COMM_GROUP !!!)
 
           /* Construct the sections to host connectivity later */
-          cgsize_t start = 1, end = ne_tot;
+          const cgsize_t start = 1, end = ne_tot;
           assert(start <= end);
 
           if (cgns_type_elem == CGNS_ENUMV(NGON_n)) // cas polyedre
