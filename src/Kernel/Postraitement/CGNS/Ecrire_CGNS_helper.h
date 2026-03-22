@@ -121,6 +121,9 @@ struct Ecrire_CGNS_helper
                                                    const int zone_goto_id, const std::string& file_prefix, const std::string& target_base_name, const std::string& target_zone_name,
                                                    const std::vector<std::string>& connect_names, const Nom& nom_dom, const std::string& LOC, const std::vector<double>& time_post, const char *where);
 
+  inline void cgns_write_connectivity_deformable_links(const int fileId, const int baseId, const int zone_goto_id, const std::string& linkfile, const std::string& target_base_name,
+                                                       const std::string& target_zone_name, const std::vector<std::string>& connect_names, const char *where);
+
   std::string convert_double_to_string(const double t)
   {
     // On fait comme dans les latas !

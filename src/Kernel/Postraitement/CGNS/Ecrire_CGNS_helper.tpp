@@ -531,4 +531,20 @@ inline void Ecrire_CGNS_helper::cgns_write_zone_and_deformable_links(const bool 
     }
 }
 
+inline void Ecrire_CGNS_helper::cgns_write_connectivity_deformable_links(const int fileId, const int baseId, const int zone_goto_id, const std::string& linkfile,
+                                                                         const std::string& target_base_name, const std::string& target_zone_name,
+                                                                         const std::vector<std::string>& connect_names, const char *where)
+{
+  if (cg_goto(fileId, baseId, "Zone_t", zone_goto_id, "end") != CG_OK)
+    Cerr << "Error " << where << " : cg_goto Zone_t !" << finl, TRUST_CGNS_ERROR();
+
+  for (auto &itr_conn : connect_names)
+    {
+      const std::string linkpath = "/" + target_base_name + "/" + target_zone_name + "/" + itr_conn + "/";
+
+      if (cg_link_write(itr_conn.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
+        Cerr << "Error " << where << " : cg_link_write connectivity !" << finl, TRUST_CGNS_ERROR();
+    }
+}
+
 #endif /* Ecrire_CGNS_helper_tpp_included */

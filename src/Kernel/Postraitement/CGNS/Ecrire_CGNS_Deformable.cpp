@@ -183,13 +183,8 @@ void Ecrire_CGNS::link_multi_loc_support_pb_deformable()
 
           TRUST_2_CGNS::remove_slash_linkfile(linkfile);
 
-          for (auto &itr_conn : connectname_[ind_base])
-            {
-              std::string linkpath = "/" + baseZone_name_[ind_base] + "/" + baseZone_name_[ind_base] + "/" + itr_conn + "/";
-
-              if (cg_link_write(itr_conn.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
-                Cerr << "Error Ecrire_CGNS::link_multi_loc_support_pb_deformable : cg_link_write !" << finl, TRUST_CGNS_ERROR();
-            }
+          cgns_helper_.cgns_write_connectivity_deformable_links(fileId_, baseId_[index_glob], zoneId_[index_glob], linkfile, baseZone_name_[ind_base], baseZone_name_[ind_base],
+                                                                connectname_[ind_base], "Ecrire_CGNS::link_multi_loc_support_pb_deformable");
         }
     }
   else
@@ -336,6 +331,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_seq(const Domaine * domaine,cons
   char basename[CGNS_STR_SIZE];
   strcpy(basename, nom_dom.getChar()); // dom name
 
+  /* If deformable only and single_file, connectivity is already seen in same file. we just write new coords */
   if (!Option_CGNS::USE_LINKS && !is_lagrangian_)
     {
       if (nb_elem)
@@ -361,6 +357,10 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_seq(const Domaine * domaine,cons
         }
     }
   else
+    /* Here we use links. So we write coords in new solution file. However for connectivity we have 2 cases :
+     *  - Deformable => We link to conn from 1st solution file
+     *  - Lagrangian => We write new conn in the considered file
+     */
     {
       if (cg_base_write(fileId_, basename, icelldim, iphysdim, &baseId_[ind]) != CG_OK)
         Cerr << "Error Ecrire_CGNS::cgns_write_domaine_seq : cg_base_write !" << finl, TRUST_CGNS_ERROR();
@@ -371,11 +371,10 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_seq(const Domaine * domaine,cons
           cgns_helper_.cgns_write_zone_grid_coord<TYPE_ECRITURE_CGNS::SEQ>(icelldim, fileId_, baseId_[ind], basename /* Dom name */, isize,
                                                                            zoneId_[ind], xCoords, yCoords, zCoords, coordsId, coordsId, coordsId);
 
-          if (is_lagrangian_)
+          if (is_lagrangian_) /* Set element connectivity : we rewrite since topology can change !! */
             {
               sizeId_.push_back( { (cgsize_t)nb_som, (cgsize_t)nb_elem } ); // XXX required for links later !
 
-              /* Set element connectivity : we rewrite since topology can change !! */
               int sectionId;
               cgsize_t start = 1, end;
 
@@ -397,17 +396,8 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_seq(const Domaine * domaine,cons
               /* Set element connectivity : by links */
               std::string linkfile = baseFile_name_ + ".solution." + cgns_helper_.convert_double_to_string(time_post_[0]) + ".cgns";
               TRUST_2_CGNS::remove_slash_linkfile(linkfile);
-
-              if (cg_goto(fileId_, baseId_[ind], "Zone_t", zoneId_[ind], "end") != CG_OK)
-                Cerr << "Error Ecrire_CGNS::cgns_write_domaine_deformable_seq : cg_goto Zone_t !" << finl, TRUST_CGNS_ERROR();
-
-              for (auto &itr_conn : connectname_[ind])
-                {
-                  const std::string linkpath = "/" + baseZone_name_[ind] + "/" + baseZone_name_[ind] + "/" + itr_conn + "/";
-
-                  if (cg_link_write(itr_conn.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
-                    Cerr << "Error Ecrire_CGNS::cgns_write_domaine_deformable_seq : cg_link_write connectivity !" << finl, TRUST_CGNS_ERROR();
-                }
+              cgns_helper_.cgns_write_connectivity_deformable_links(fileId_, baseId_[ind], zoneId_[ind], linkfile, baseZone_name_[ind], baseZone_name_[ind],
+                                                                    connectname_[ind], "Ecrire_CGNS::cgns_write_domaine_deformable_seq");
             }
         }
     }
@@ -447,6 +437,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
 
   int coordsIdx = -123, coordsIdy = -123, coordsIdz = -123;
 
+  /* If deformable only and single_file, connectivity is already seen in same file. we just write new coords */
   if (!Option_CGNS::USE_LINKS && !is_lagrangian_)
     {
       int G = -1;
@@ -488,6 +479,10 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
         }
     }
   else
+    /* Here we use links. So we write coords in new solution file. However for connectivity we have 2 cases :
+     *  - Deformable => We link to conn from 1st solution file
+     *  - Lagrangian => We write new conn in the considered file
+     */
     {
       if (cg_base_write(fileId_, basename, icelldim, iphysdim, &baseId_[ind]) != CG_OK)
         Cerr << "Error Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone : cg_base_write !" << finl, TRUST_CGNS_ERROR();
@@ -502,13 +497,12 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
 
       int sectionId = -123;
 
-      if (is_lagrangian_)
+      if (is_lagrangian_) /* Construct the sections to host connectivity later since we will write them */
         {
           sizeId_.push_back( { isize[0], isize[1] } ); // XXX required for links later !
 
           if (ne_tot == 0 && ns_tot == 0) return; // XXX Elie Saikali : zone vide creer, rien a faire de plus ... (cas LINKED_FILES_PER_COMM_GROUP !!!)
 
-          /* Construct the sections to host connectivity later */
           const cgsize_t start = 1, end = ne_tot;
           assert(start <= end);
 
@@ -537,7 +531,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
           cgns_helper_.cgns_write_grid_coord_data<TYPE_ECRITURE_CGNS::PAR_IN>(icelldim, fileId_, baseId_[ind], zoneId_[ind],
                                                                               coordsIdx, coordsIdy, coordsIdz, min, max, xCoords, yCoords, zCoords);
 
-          if (is_lagrangian_)
+          if (is_lagrangian_) /* Set element connectivity : we rewrite since topology can change !! */
             {
               assert(cgns_type_elem != CGNS_ENUMV(NGON_n));
 
@@ -553,24 +547,15 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
               if (cgp_elements_write_data(fileId_, baseId_[ind], zoneId_[ind], sectionId, min, max, elems.data()) != CG_OK)
                 Cerr << "Error Ecrire_CGNS::cgns_write_domaine_par_in_zone : cgp_elements_write_data !" << finl, TRUST_CGNS_ERROR();
             }
-          else
+          else /* Set element connectivity : by links */
             {
-              /* Set element connectivity */
               std::string linkfile = (enter_group_comm ? Nom(baseFile_name_).nom_me(proc_maitre_local_comm_).getString() : baseFile_name_) +
                                      ".solution." + cgns_helper_.convert_double_to_string(time_post_[0]) + ".cgns";
 
               TRUST_2_CGNS::remove_slash_linkfile(linkfile);
 
-              if (cg_goto(fileId_, baseId_[ind], "Zone_t", zoneId_[ind], "end") != CG_OK)
-                Cerr << "Error Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone : cg_goto Zone_t !" << finl, TRUST_CGNS_ERROR();
-
-              for (auto &itr_conn : connectname_[ind])
-                {
-                  const std::string linkpath = "/" + baseZone_name_[ind] + "/" + baseZone_name_[ind] + "/" + itr_conn + "/";
-
-                  if (cg_link_write(itr_conn.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
-                    Cerr << "Error Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone : cg_link_write connectivity !" << finl, TRUST_CGNS_ERROR();
-                }
+              cgns_helper_.cgns_write_connectivity_deformable_links(fileId_, baseId_[ind], zoneId_[ind], linkfile, baseZone_name_[ind], baseZone_name_[ind],
+                                                                    connectname_[ind], "Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone");
             }
         }
     }
