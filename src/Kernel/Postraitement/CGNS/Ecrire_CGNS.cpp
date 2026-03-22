@@ -467,73 +467,37 @@ void Ecrire_CGNS::cgns_fill_field_loc_map(const Nom& nom_dom_init)
 
 void Ecrire_CGNS::cgns_write_iters()
 {
-  if (first_time_post_ || is_lagrangian_) return;
+  if (first_time_post_ || is_lagrangian_) return; /* Do nothing */
 
   if (!Option_CGNS::USE_LINKS && !ensure_modify_done_)
     ensure_modify_open_singlefile(); /* to make sure we can modify !! */
 
-  std::vector<int> ind_doms_dumped;
-
-  /* 1 : on iter juste sur le map fld_loc_map_; ie: pas domaine dis ... */
-  for (auto &itr : fld_loc_map_)
+  for (auto &itr : doms_written_)
     {
-      const std::string& LOC = itr.first;
-      const Nom& nom_dom = itr.second;
-      const int ind_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
-      ind_doms_dumped.push_back(ind_glob);
+      bool has_field = false;
+      std::string LOC = "rien";
+      TRUST_2_CGNS::init_has_field_and_loc_iters(itr, fld_loc_map_, has_field, LOC);
+
+      const int ind_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written_, itr); // Glob means can be with fields ..
       assert(ind_glob > -1);
 
       if (is_deformable_)
-        cgns_helper_.cgns_write_iters_deformable<TYPE_ECRITURE_CGNS::SEQ>(true /* deformable */, true /* has_field */, 1 /* 1 zone per base */, fileId_, baseId_[ind_glob], ind_glob /* 1st Zone */,
-                                                                          zoneId_, LOC, solname_som_, solname_elem_, solname_faces_, grid_name_, time_post_);
+        cgns_helper_.cgns_write_iters_deformable<TYPE_ECRITURE_CGNS::SEQ>(true /* deformable */, has_field, 1 /* 1 zone per base */, fileId_, baseId_[ind_glob],
+                                                                          ind_glob /* 1st Zone */, zoneId_, LOC, solname_som_, solname_elem_, solname_faces_, grid_name_, time_post_);
       else if (Process::is_parallel() && Option_CGNS::PARALLEL_OVER_ZONE)
         {
 #ifdef MPI_
-          int ind_new = ind_glob;
-          if (ind_glob > (static_cast<int>(T2CGNS_.size()) -1) )
-            {
-              const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
-              ind_new = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod);
-            }
-
-          const TRUST_2_CGNS& TRUST2CGNS = T2CGNS_[ind_new];
+          int ind_base = TRUST_2_CGNS::get_base_domain_idx(doms_written_, itr, has_field, LOC, ind_glob);
+          const TRUST_2_CGNS& TRUST2CGNS = T2CGNS_[ind_base];
           const int nb_zones_to_write = TRUST2CGNS.nb_procs_writing();
 
-          cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::PAR_OVER>(true /* has_field */, nb_zones_to_write, fileId_, baseId_[ind_glob], ind_glob, zoneId_par_[ind_glob], LOC,
+          cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::PAR_OVER>(has_field, nb_zones_to_write, fileId_, baseId_[ind_glob], ind_glob, zoneId_par_[ind_glob], LOC,
                                                                       solname_som_, solname_elem_, solname_faces_, time_post_);
 #endif /* MPI_ */
         }
       else
-        cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::SEQ>(true /* has_field */, 1 /* nb_zones_to_write */, fileId_, baseId_[ind_glob], ind_glob, zoneId_, LOC,
+        cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::SEQ>(has_field, 1 /* nb_zones_to_write */, fileId_, baseId_[ind_glob], ind_glob, zoneId_, LOC,
                                                                solname_som_, solname_elem_, solname_faces_, time_post_);
-    }
-
-  /* 2 : on iter sur les autres domaines; ie: domaine dis */
-  for (int i = 0; i < static_cast<int>(doms_written_.size()); i++)
-    {
-      if (std::find(ind_doms_dumped.begin(), ind_doms_dumped.end(), i) == ind_doms_dumped.end()) // indice pas dans ind_doms_dumped
-        {
-          const Nom& nom_dom = doms_written_[i];
-          const int ind = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
-          assert(ind > -1);
-
-          if (is_deformable_)
-            cgns_helper_.cgns_write_iters_deformable<TYPE_ECRITURE_CGNS::SEQ>(true /* deformable */, false /* has_field */, 1 /* 1 zone per base */, fileId_, baseId_[ind], ind /* 1st Zone */,
-                                                                              zoneId_, "rien", solname_som_, solname_elem_, solname_faces_, grid_name_, time_post_);
-          else if (Process::is_parallel() && Option_CGNS::PARALLEL_OVER_ZONE)
-            {
-#ifdef MPI_
-              const TRUST_2_CGNS& TRUST2CGNS = T2CGNS_[ind];
-              const int nb_zones_to_write = TRUST2CGNS.nb_procs_writing();
-
-              cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::PAR_OVER>(false /* has_field */, nb_zones_to_write, fileId_, baseId_[ind], ind, zoneId_par_[ind], "rien",
-                                                                          solname_som_, solname_elem_, solname_faces_, time_post_);
-#endif /* MPI_ */
-            }
-          else
-            cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::SEQ>(false /* has_field */, 1 /* nb_zones_to_write */, fileId_, baseId_[ind], ind, zoneId_, "rien",
-                                                                   solname_som_, solname_elem_,solname_faces_, time_post_);
-        }
     }
 }
 

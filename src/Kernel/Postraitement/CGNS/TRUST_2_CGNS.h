@@ -101,6 +101,9 @@ public:
   static inline Nom modify_domaine_name_for_link(const Nom&, const std::string&);
   static inline int get_index_nom_vector(const std::vector<Nom>&, const Nom&);
   static inline void remove_slash_linkfile(std::string&);
+  static inline void init_has_field_and_loc_iters(const Nom& nom_dom, const std::map<std::string, Nom>& map, bool& has_field, std::string& LOC);
+  static inline void init_glob_base_domain_idx(const std::vector<Nom>& doms_written, const Nom& nom_dom, const bool has_field, const std::string& LOC, int& ind_glob, int& ind_base);
+  static inline int get_base_domain_idx(const std::vector<Nom>& doms_written, const Nom& nom_dom, const bool has_field, const std::string& LOC, const int ind_glob);
 
   static Motcle modify_field_name_for_post(const Nom&, const Nom&, const std::string&, int&, int&, int&);
   static std::string modify_domaine_name_for_post(const Nom& );
@@ -167,6 +170,54 @@ inline void TRUST_2_CGNS::remove_slash_linkfile(std::string& linkfile)
   const auto found = linkfile.find_last_of("/");
   if (found != std::string::npos)
     linkfile.erase(0, found + 1);
+}
+
+inline void TRUST_2_CGNS::init_has_field_and_loc_iters(const Nom& nom_dom, const std::map<std::string, Nom>& map, bool& has_field, std::string& LOC)
+{
+  if (nom_dom.finit_par("_ELEM"))
+    has_field = true, LOC = "ELEM";
+  else if (nom_dom.finit_par("_SOM"))
+    has_field = true, LOC = "SOM";
+  else if (nom_dom.finit_par("_FACES"))
+    has_field = true, LOC = "FACES";
+
+  // XXX just to be sure that there is no issues of use; ie domaine dom_ELEM in jdd lol
+  if (has_field)
+    {
+      if (!map.count(LOC))
+        has_field = false, LOC = "rien";
+      else
+        {
+          const Nom& nom_dom_fld = map.at(LOC);
+          if (nom_dom_fld != nom_dom)
+            has_field = false, LOC = "rien";
+        }
+    }
+}
+
+inline void TRUST_2_CGNS::init_glob_base_domain_idx(const std::vector<Nom>& doms_written, const Nom& nom_dom, const bool has_field, const std::string& LOC, int& ind_glob, int& ind_base)
+{
+  ind_glob = TRUST_2_CGNS::get_index_nom_vector(doms_written, nom_dom); // Glob means can be with fields ..
+  assert(ind_glob > -1);
+  ind_base = ind_glob;
+  if (has_field && LOC != "FACES")
+    {
+      const Nom nom_dom_mod = modify_domaine_name_for_link(nom_dom, LOC);
+      ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written, nom_dom_mod); // index to base dom written by write domaine !
+    }
+  assert(ind_base > -1);
+}
+
+inline int TRUST_2_CGNS::get_base_domain_idx(const std::vector<Nom>& doms_written, const Nom& nom_dom, const bool has_field, const std::string& LOC, const int ind_glob)
+{
+  int ind_base = ind_glob;
+  if (has_field && LOC != "FACES")
+    {
+      const Nom nom_dom_mod = modify_domaine_name_for_link(nom_dom, LOC);
+      ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written, nom_dom_mod); // index to base dom written by write domaine !
+    }
+  assert(ind_base > -1);
+  return ind_base;
 }
 
 #endif /* HAS_CGNS */
