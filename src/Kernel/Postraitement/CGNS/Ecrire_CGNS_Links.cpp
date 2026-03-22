@@ -356,8 +356,9 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
             {
               int proc_grp = unique_vec_proc_maitre_local_comm_[gid];
               std::string zone_name = Nom("Zone").nom_me(proc_grp).getString();
-              std::string linkfile = Nom(baseFile_name_).nom_me(proc_grp).getString() + ".grid.cgns";
-              TRUST_2_CGNS::remove_slash_linkfile(linkfile);
+
+              std::string file_group_id = Nom(baseFile_name_).nom_me(proc_grp).getString();
+              TRUST_2_CGNS::remove_slash_linkfile(file_group_id);
 
               cgsize_t isize[3];
               isize[0] = sizeId_som_local_comm_[ind_base][gid];
@@ -365,22 +366,12 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
               isize[2] = 0;
 
               cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[index_glob], zone_name, isize, zoneId_tmp[gid], gid + 1,
-                                                             linkfile, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
+                                                             file_group_id + ".grid.cgns" /* linkfile */, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
                                                              "Ecrire_CGNS::cgns_write_final_link_file_comm_group");
 
-              std::string file_group_id = Nom(baseFile_name_).nom_me(proc_grp).getString();
-              TRUST_2_CGNS::remove_slash_linkfile(file_group_id);
 
-              for (auto& itr_t : time_post_)
-                {
-                  std::string solname = "FlowSolution" + cgns_helper_.convert_double_to_string(itr_t) + "_" + LOC;
-                  linkfile = file_group_id + ".solution." + cgns_helper_.convert_double_to_string(itr_t) + ".cgns";
-//                  linkpath = "/" + baseZone_name_[ind_base] + "/" + baseZone_name_[ind_base] + "/" + solname + "/";
-                  std::string linkpath = "/" + nom_dom.getString() + "/" + nom_dom.getString() + "/" + solname + "/";
-
-                  if (cg_link_write(solname.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
-                    Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_comm_group : cg_link_write FlowSolution " << solname << finl, TRUST_CGNS_ERROR();
-                }
+              cgns_helper_.cgns_write_solution_classic_links(file_group_id, nom_dom.getString(), nom_dom.getString(), LOC, time_post_,
+                                                             "Ecrire_CGNS::cgns_write_final_link_file");
             }
 
           cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::SEQ>(true /* has_field */, nb_grps /* nb_zones_to_write */, fileId_, baseId_[index_glob], ind_base,
@@ -404,8 +395,9 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
                 {
                   const int proc_grp = unique_vec_proc_maitre_local_comm_[gid];
                   std::string zone_name = Nom("Zone").nom_me(proc_grp).getString();
-                  std::string linkfile = Nom(baseFile_name_).nom_me(proc_grp).getString() + ".grid.cgns";
-                  TRUST_2_CGNS::remove_slash_linkfile(linkfile);
+
+                  std::string file_group_id = Nom(baseFile_name_).nom_me(proc_grp).getString();
+                  TRUST_2_CGNS::remove_slash_linkfile(file_group_id);
 
                   cgsize_t isize[3];
                   isize[0] = sizeId_som_local_comm_[ind_base][gid];
@@ -416,7 +408,7 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
 
                   /* He we dont link to solutions since no fields ... just other domais dis ;) */
                   cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[ind_base], zone_name, isize, zoneId_tmp[gid], gid + 1,
-                                                                 linkfile, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
+                                                                 file_group_id + ".grid.cgns" /* linkfile */, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
                                                                  "Ecrire_CGNS::cgns_write_final_link_file", write_connectivity);
                 }
 
@@ -445,6 +437,9 @@ void Ecrire_CGNS::cgns_write_final_link_file()
       unlink(fn.c_str());
       cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::SEQ>(fn, fileId_, true);
 
+      std::string base_link_file = baseFile_name_;
+      TRUST_2_CGNS::remove_slash_linkfile(base_link_file);
+
       std::vector<int> ind_doms_dumped;
 
       /* 1 : on iter juste sur le map fld_loc_map_; ie: pas domaine dis ... */
@@ -468,28 +463,12 @@ void Ecrire_CGNS::cgns_write_final_link_file()
 
           cgsize_t isize[3] = { sizeId_[ind_base][0] , sizeId_[ind_base][1] , 0 };
 
-          std::string linkfile = baseFile_name_ + ".grid.cgns"; // file name
-
-          TRUST_2_CGNS::remove_slash_linkfile(linkfile);
           cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[index_glob], nom_dom.getString(), isize, zoneId_[index_glob], 1,
-                                                         linkfile, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
+                                                         base_link_file + ".grid.cgns" /* linkfile */, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
                                                          "Ecrire_CGNS::cgns_write_final_link_file");
 
-          // link solutions
-          for (auto& itr_t : time_post_)
-            {
-              std::string solname = "FlowSolution" + cgns_helper_.convert_double_to_string(itr_t) + "_" + LOC;
-
-              linkfile = baseFile_name_ + ".solution." + cgns_helper_.convert_double_to_string(itr_t) + ".cgns"; // file name
-              TRUST_2_CGNS::remove_slash_linkfile(linkfile);
-
-//              std::string linkpath = "/" + baseZone_name_[ind_base] + "/" + baseZone_name_[ind_base] + "/" + solname + "/";
-              std::string linkpath = "/" + nom_dom.getString() + "/" + nom_dom.getString() + "/" + solname + "/";
-
-
-              if (cg_link_write(solname.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
-                Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file : cg_link_write !" << finl, TRUST_CGNS_ERROR();
-            }
+          cgns_helper_.cgns_write_solution_classic_links(base_link_file, nom_dom.getString(), nom_dom.getString(), LOC, time_post_,
+                                                         "Ecrire_CGNS::cgns_write_final_link_file");
 
           cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::SEQ>(true /* has_field */, 1, fileId_, baseId_[index_glob], index_glob /* 1st Zone */,
                                                                  zoneId_, LOC, solname_som_, solname_elem_, solname_faces_, time_post_);
@@ -510,12 +489,9 @@ void Ecrire_CGNS::cgns_write_final_link_file()
 
               cgsize_t isize[3] = { sizeId_[ind_base][0] , sizeId_[ind_base][1] , 0 };
 
-              std::string linkfile = baseFile_name_ + ".grid.cgns"; // file name
-              TRUST_2_CGNS::remove_slash_linkfile(linkfile);
-
               /* He we dont link to solutions since no fields ... just other domais dis ;) */
               cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[ind_base], nom_dom.getString(), isize, zoneId_[ind_base], 1,
-                                                             linkfile, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
+                                                             base_link_file + ".grid.cgns" /* linkfile */, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
                                                              "Ecrire_CGNS::cgns_write_final_link_file");
 
 

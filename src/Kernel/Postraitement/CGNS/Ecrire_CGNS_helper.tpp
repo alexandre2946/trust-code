@@ -465,6 +465,20 @@ inline void Ecrire_CGNS_helper::cgns_write_zone_and_classic_links(const bool wri
       }
 }
 
+inline void Ecrire_CGNS_helper::cgns_write_solution_classic_links(const std::string& base_linkfile, const std::string& target_base_name, const std::string& target_zone_name,
+                                                                  const std::string& LOC, const std::vector<double>& time_post, const char *where)
+{
+  for (auto& itr_t : time_post)
+    {
+      const std::string solname = "FlowSolution" + convert_double_to_string(itr_t) + "_" + LOC;
+      const std::string linkfile = base_linkfile + ".solution." + convert_double_to_string(itr_t) + ".cgns"; // file name
+      const std::string linkpath = "/" + target_base_name + "/" + target_zone_name + "/" + solname + "/";
+
+      if (cg_link_write(solname.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
+        Cerr << "Error " << where << " : cg_link_write solution !" << finl, TRUST_CGNS_ERROR();
+    }
+}
+
 inline void Ecrire_CGNS_helper::cgns_write_zone_and_deformable_links(const bool write_zone, const int fileId, const int baseId, const std::string& zone_name_to_write,
                                                                      const cgsize_t *isize, int& zoneId, const int zone_goto_id,
                                                                      const std::string& file_prefix, const std::string& target_base_name, const std::string& target_zone_name,
