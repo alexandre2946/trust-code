@@ -235,10 +235,6 @@ void Faces_builder::creer_faces_reeles(Domaine& domaine,
            << " (problem with faces_bords_internes ?)" << finl;
       Process::exit();
     }
-
-  // RAZ attribut smart_resize des tableaux faces_sommets et faces_voisins.
-
-
   // RAZ des attributs de la classe
   reset();
 }
@@ -427,25 +423,17 @@ void Faces_builder::creer_faces_frontiere(const int nb_voisins_attendus,
   ArrOfInt       une_face(nb_sommets_par_face);
   ArrOfInt       voisins;
 
-  ArrOfInt liste_faces_erreur0;
-
-  ArrOfInt liste_faces_erreur1;
-
-  ArrOfInt liste_faces_erreur2;
-
-  ArrOfInt liste_faces_erreur3;
-
+  ArrOfInt liste_faces_erreur0, liste_faces_erreur1, liste_faces_erreur2, liste_faces_erreur3;
+  constexpr bool STOP_FIRST_ERR = false; // set this to true in Debug to stop gdb at the right place.
 
   int i_face;
+  int nb_sommets_par_face_fr=sommets_faces_fr.dimension(1);
   for (i_face = 0; i_face < nb_faces; i_face++)
     {
-      {
-        int nb_sommets_par_face_fr=sommets_faces_fr.dimension(1);
-        for (int i = 0; i < std::min(nb_sommets_par_face, nb_sommets_par_face_fr); i++)
-          une_face[i] = sommets_faces_fr(i_face, i);
-        for (int i = std::min(nb_sommets_par_face, nb_sommets_par_face_fr); i < nb_sommets_par_face; i++)
-          une_face[i] = -1;
-      }
+      for (int i = 0; i < std::min(nb_sommets_par_face, nb_sommets_par_face_fr); i++)
+        une_face[i] = sommets_faces_fr(i_face, i);
+      for (int i = std::min(nb_sommets_par_face, nb_sommets_par_face_fr); i < nb_sommets_par_face; i++)
+        une_face[i] = -1;
       // Quels sont les elements voisins de cette face ?
       find_adjacent_elements(som_elem, une_face, voisins);
       const int nb_voisins = voisins.size_array();
@@ -460,6 +448,7 @@ void Faces_builder::creer_faces_frontiere(const int nb_voisins_attendus,
           {
             // Erreur: la face n'a pas de voisin
             liste_faces_erreur0.append_array(indice_face);
+            if(STOP_FIRST_ERR) Process::exit("A least one face has no neighbor!");
             break;
           }
         case 1:
@@ -481,23 +470,33 @@ void Faces_builder::creer_faces_frontiere(const int nb_voisins_attendus,
                             if (elem_faces(elem, i_face_elem) < 0)
                               elem_faces(elem, i_face_elem) = indice_face;
                             else
-                              // Erreur: cette face existe deja (dans cette frontiere ou une autre)
-                              liste_faces_erreur3.append_array(indice_face);
+                              {
+                                // Erreur: cette face existe deja (dans cette frontiere ou une autre)
+                                liste_faces_erreur3.append_array(indice_face);
+                                if(STOP_FIRST_ERR) Process::exit("A face already exists! Was found twice!");
+                              }
                           }
                       }
                     else
-                      // Erreur: la face n'est pas une face de l'element.
-                      liste_faces_erreur0.append_array(indice_face);
+                      {
+                        // Erreur: la face n'est pas une face de l'element.
+                        liste_faces_erreur0.append_array(indice_face);
+                        if(STOP_FIRST_ERR) Process::exit("A face does not belong to any element!");
+                      }
                   }
               }
             else
-              // Erreur, on attendait pas ce nombre de voisins.
-              liste_faces_erreur1.append_array(indice_face);
+              {
+                // Erreur, on attendait pas ce nombre de voisins.
+                liste_faces_erreur1.append_array(indice_face);
+                if(STOP_FIRST_ERR) Process::exit("A face has an unexpected number of neighbors!");
+              }
             break;
           }
         default:
           // Erreur, plus de deux voisins, c'est n'importe quoi...
           liste_faces_erreur2.append_array(indice_face);
+          if(STOP_FIRST_ERR) Process::exit("A face has more than 2 neighbors!");
         }
     }
   Nom msg;
@@ -568,7 +567,6 @@ void Faces_builder::creer_faces_internes(IntTab& faces_sommets,
   // Liste des faces n'ayant qu'un seul voisin et qui ne figurent pas
   // dans les faces de bord (ce sont des erreurs):
   ArrOfInt liste_faces_frontiere_non_declarees;
-
   ArrOfInt liste_faces_joint_non_declarees;
 
   // Liste des faces presentant une erreur de connectivite (plus de
@@ -576,6 +574,7 @@ void Faces_builder::creer_faces_internes(IntTab& faces_sommets,
   // sont pas une face de l'element:
   ArrOfInt liste_faces_erreurs_connectivite;
 
+  constexpr bool STOP_FIRST_ERR = false; // set this to true in Debug to stop gdb at the right place.
 
   // Boucle sur les elements
   ToDo_Kokkos("critical");
@@ -636,6 +635,7 @@ void Faces_builder::creer_faces_internes(IntTab& faces_sommets,
                       indice_face = ajouter_une_face(une_face, i_elem, -1,
                                                      faces_sommets, faces_voisins);
                       liste_faces_frontiere_non_declarees.append_array(indice_face);
+                      if(STOP_FIRST_ERR) Process::exit("Non declared face!");
                     }
 
                 }
@@ -673,12 +673,14 @@ void Faces_builder::creer_faces_internes(IntTab& faces_sommets,
                               // mais ne sont pas sur une face de cet element. Erreur de
                               // connectivite du maillage.
                               liste_faces_erreurs_connectivite.append_array(indice_face);
+                              if(STOP_FIRST_ERR) Process::exit("Connectivity issue with face!");
                             }
                           if (elem1 >= nb_elem)
                             {
                               // Erreur : le voisin est un element virtuel, cette face
                               // devrait etre dans les faces de joint, donc deja creee.
                               liste_faces_joint_non_declarees.append_array(indice_face);
+                              if(STOP_FIRST_ERR) Process::exit("Pb with face: its neighbor is virtual! Should not happen here.");
                             }
                         }
                       else
@@ -692,6 +694,7 @@ void Faces_builder::creer_faces_internes(IntTab& faces_sommets,
                           // mais qu'ils ne sont pas sur une face de cet element. C'est une
                           // erreur de connectivite.
                           liste_faces_erreurs_connectivite.append_array(indice_face);
+                          if(STOP_FIRST_ERR) Process::exit("Pb with face: connectivity error.");
                         }
                     }
 
@@ -706,6 +709,7 @@ void Faces_builder::creer_faces_internes(IntTab& faces_sommets,
                                                      faces_sommets, faces_voisins);
                     }
                   liste_faces_erreurs_connectivite.append_array(indice_face);
+                  if(STOP_FIRST_ERR) Process::exit("Pb with face: connectivity error 2.");
                 }
 
               // Si la face n'existait pas, on l'a creee et on a mis son indice
