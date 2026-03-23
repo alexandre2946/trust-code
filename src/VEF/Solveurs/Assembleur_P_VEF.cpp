@@ -42,12 +42,10 @@ int Assembleur_P_VEF::assembler(Matrice& la_matrice)
   DoubleVect volumes_entrelaces(volumes_entrelaces_ref);
   const DoubleVect& volumes_entrelaces_cl=le_dom_Cl_VEF->volumes_entrelaces_Cl();
   int size=volumes_entrelaces_cl.size();
+  ToDo_Kokkos("critical");
   for (int f=0; f<size; f++)
     if (volumes_entrelaces_cl(f)!=0)
-      {
-        //        if (volumes_entrelaces(f)!=volumes_entrelaces_cl(f))   Cerr<<f <<" vl" << volumes_entrelaces(f)<< " "<<volumes_entrelaces_cl(f)<<finl;
-        volumes_entrelaces(f)=volumes_entrelaces_cl(f);
-      }
+      volumes_entrelaces(f)=volumes_entrelaces_cl(f);
 
   volumes_entrelaces.echange_espace_virtuel();
   // On assemble la matrice
@@ -60,6 +58,7 @@ void calculer_inv_volume_special(DoubleTab& inv_volumes_entrelaces, const Domain
 {
   inv_volumes_entrelaces=volumes_entrelaces;
   int taille=volumes_entrelaces.dimension_tot(0);
+  ToDo_Kokkos("critical");
   for (int i=0; i<taille; i++)
     for (int comp=0; comp<Objet_U::dimension; comp++)
       inv_volumes_entrelaces(i,comp)=1./volumes_entrelaces(i,comp);
@@ -92,14 +91,13 @@ void Assembleur_P_VEF::calculer_inv_volume(DoubleTab& inv_volumes_entrelaces, co
           inv_volumes_entrelaces(i)=tmp(i);
           if (!est_egal(inv_volumes_entrelaces(i),1./volumes_entrelaces(i)))
             Cerr<<i<<" "<<inv_volumes_entrelaces(i)-1./volumes_entrelaces(i)<<" "<<inv_volumes_entrelaces(i)<<finl;;
-
         }
       Process::exit();
-
     }
   else
     {
       const DoubleVect& porosite_face=equation().milieu().porosite_face();
+      ToDo_Kokkos("critical");
       for (int i=0; i<taille; i++)
         for (int comp=0; comp<Objet_U::dimension; comp++)
           inv_volumes_entrelaces(i,comp)=1./volumes_entrelaces(i)*porosite_face(i);
@@ -112,7 +110,6 @@ int Assembleur_P_VEF::assembler_mat(Matrice& la_matrice, const DoubleVect& volum
   // On fixe les drapeaux de Assembleur_base
   set_resoudre_increment_pression(incr_pression);
   set_resoudre_en_u(resoudre_en_u);
-  //DoubleTab inv_volumes_entrelaces;
   const Domaine_Cl_VEF& domaine_Cl_VEF = le_dom_Cl_VEF.valeur();
   DoubleTab inverse_quantitee_entrelacee;
   calculer_inv_volume(inverse_quantitee_entrelacee, domaine_Cl_VEF, volumes_entrelaces);
@@ -145,15 +142,7 @@ int Assembleur_P_VEF::remplir(Matrice& la_matrice, const DoubleTab& inverse_quan
   int n1 = le_dom.domaine().nb_elem_tot();
   int n2 = le_dom.domaine().nb_elem();
 
-  int elem1,elem2;
-  double val;
-  int i;
 
-  const IntTab& face_voisins = le_dom.face_voisins();
-  const DoubleTab& face_normales = le_dom.face_normales();
-  const Conds_lim& les_cl = le_dom_cl.les_conditions_limites();
-
-  // int premiere_face_std=le_dom.premiere_face_std();
   // Rajout des porosites.
 
   la_matrice.typer("Matrice_Bloc"); // En fait Matrice_Bloc_Sym ?
@@ -172,25 +161,15 @@ int Assembleur_P_VEF::remplir(Matrice& la_matrice, const DoubleTab& inverse_quan
   MBrr.dimensionner(n2,0);
   MBrv.dimensionner(n2,0);
   MBvv.dimensionner(n1-n2,0);
-
   // Le sous blocs vr est dimensionne et nul
   MBvr.dimensionner(n1-n2,n2,0);
   MBvr.get_set_tab1() = 1;
 
-  auto& tab1RR = MBrr.get_set_tab1();
-  auto& tab2RR = MBrr.get_set_tab2();
-  auto& coeffRR = MBrr.get_set_coeff();
-  auto& tab1RV = MBrv.get_set_tab1();
-  auto& tab2RV = MBrv.get_set_tab2();
-  auto& coeffRV = MBrv.get_set_coeff();
-  auto& tab1VV = MBvv.get_set_tab1();
-  auto& tab2VV = MBvv.get_set_tab2();
-  auto& coeffVV = MBvv.get_set_coeff();
-
   // On traite les faces internes:
-
   int ndeb = le_dom_VEF->premiere_face_int();
   int nfin = le_dom_VEF->nb_faces_tot();
+  int nb_faces = le_dom_VEF->nb_faces();
+
 #ifdef TRUST_USE_GPU
   ArrOfTID rang_voisinRR(n2);
   ArrOfTID rang_voisinRV(n2);
@@ -204,55 +183,49 @@ int Assembleur_P_VEF::remplir(Matrice& la_matrice, const DoubleTab& inverse_quan
   rang_voisinRV=0; // Pas de diagonale
   rang_voisinVV=1; // Diagonale
 
-  has_P_ref=0;
-
-  for (int num_face=ndeb; num_face<nfin; num_face++)
-    {
-      elem1 = face_voisins(num_face,0);
-      elem2 = face_voisins(num_face,1);
-      if (!le_dom_VEF->est_une_face_virt_bord(num_face) && elem1 != -1 && elem2 != -1)
-        {
-          if (elem1 > elem2)
-            {
-              if(elem1<n2)
-                {
-                  (rang_voisinRR(elem2))++;
-                }
-              else
-                {
-                  if(elem2<n2)
-                    {
-                      (rang_voisinRV(elem2))++;
-                    }
-                  else
-                    {
-                      (rang_voisinVV(elem2-n2))++;
-                    }
-                }
-            }
-          else // elem2 >= elem1
-            {
-              if(elem2<n2)
-                {
-                  (rang_voisinRR(elem1))++;
-                }
-              else
-                {
-                  if(elem1<n2)
-                    {
-                      (rang_voisinRV(elem1))++;
-                    }
-                  else
-                    {
-                      (rang_voisinVV(elem1-n2))++;
-                    }
-                }
-            }
-        }
-    }
+  CIntTabView face_voisins = le_dom.face_voisins().view_ro();
+  CIntArrView ind_faces_virt_bord = le_dom_VEF->ind_faces_virt_bord().view_ro();
+  auto rang_voisinRR_v = rang_voisinRR.view_rw();
+  auto rang_voisinRV_v = rang_voisinRV.view_rw();
+  auto rang_voisinVV_v = rang_voisinVV.view_rw();
+  Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(ndeb, nfin), KOKKOS_LAMBDA(const int num_face)
+  {
+    int elem1 = face_voisins(num_face, 0);
+    int elem2 = face_voisins(num_face, 1);
+    const bool is_face_virt_bord = (num_face >= nb_faces) && (ind_faces_virt_bord(num_face - nb_faces) != -1);
+    if (!is_face_virt_bord && elem1 != -1 && elem2 != -1)
+      {
+        if (elem1 > elem2)
+          {
+            if(elem1 < n2)
+              Kokkos::atomic_add(&rang_voisinRR_v(elem2), 1);
+            else
+              {
+                if(elem2 < n2)
+                  Kokkos::atomic_add(&rang_voisinRV_v(elem2), 1);
+                else
+                  Kokkos::atomic_add(&rang_voisinVV_v(elem2 - n2), 1);
+              }
+          }
+        else // elem2 >= elem1
+          {
+            if(elem2 < n2)
+              Kokkos::atomic_add(&rang_voisinRR_v(elem1), 1);
+            else
+              {
+                if(elem1 < n2)
+                  Kokkos::atomic_add(&rang_voisinRV_v(elem1), 1);
+                else
+                  Kokkos::atomic_add(&rang_voisinVV_v(elem1 - n2), 1);
+              }
+          }
+      }
+  });
+  end_gpu_timer(__KERNEL_NAME__);
 
   // Prise en compte des conditions de type periodicite
-  for (i=0; i<les_cl.size(); i++)
+  const Conds_lim& les_cl = le_dom_cl.les_conditions_limites();
+  for (int i=0; i<les_cl.size(); i++)
     {
       const Cond_lim& la_cl = les_cl[i];
 
@@ -261,185 +234,182 @@ int Assembleur_P_VEF::remplir(Matrice& la_matrice, const DoubleTab& inverse_quan
           const Periodique& la_cl_perio = ref_cast(Periodique,la_cl.valeur());
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int nb_faces_bord_tot = le_bord.nb_faces_tot();
-          IntVect fait(nb_faces_bord_tot);
-          fait = 0;
-          for(int ind_face=0; ind_face<nb_faces_bord_tot; ind_face++)
-            {
-              int num_face = le_bord.num_face(ind_face);
-              if (fait[ind_face] == 0)
-                {
-                  fait[ind_face] = 1;
-                  fait[la_cl_perio.face_associee(ind_face)] = 1;
-                  elem1 = face_voisins(num_face,0);
-                  elem2 = face_voisins(num_face,1);
-                  if (elem1 !=-1 && elem2 != -1)
-                    {
-                      if (elem1 > elem2)
-                        {
-                          if(elem1<n2)
-                            {
-                              (rang_voisinRR(elem2))++;
-                            }
-                          else
-                            {
-                              if(elem2<n2)
-                                {
-                                  (rang_voisinRV(elem2))++;
-                                }
-                              else
-                                {
-                                  (rang_voisinVV(elem2-n2))++;
-                                }
-                            }
-                        }
-                      else // elem2 >= elem1
-                        {
-                          if(elem2<n2)
-                            {
-                              (rang_voisinRR(elem1))++;
-                            }
-                          else
-                            {
-                              if(elem1<n2)
-                                {
-                                  (rang_voisinRV(elem1))++;
-                                }
-                              else
-                                {
-                                  (rang_voisinVV(elem1-n2))++;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+          CIntArrView front_num_face = le_bord.num_face().view_ro();
+          CIntArrView face_associee = la_cl_perio.face_associee().view_ro();
+          Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(0, nb_faces_bord_tot), KOKKOS_LAMBDA(const int ind_face)
+          {
+            if (ind_face < face_associee(ind_face)) // Process each periodic pair once
+              {
+                int num_face = front_num_face(ind_face);
+                int elem1 = face_voisins(num_face, 0);
+                int elem2 = face_voisins(num_face, 1);
+                if (elem1 != -1 && elem2 != -1)
+                  {
+                    if (elem1 > elem2)
+                      {
+                        if(elem1 < n2)
+                          Kokkos::atomic_add(&rang_voisinRR_v(elem2), 1);
+                        else
+                          {
+                            if(elem2 < n2)
+                              Kokkos::atomic_add(&rang_voisinRV_v(elem2), 1);
+                            else
+                              Kokkos::atomic_add(&rang_voisinVV_v(elem2 - n2), 1);
+                          }
+                      }
+                    else // elem2 >= elem1
+                      {
+                        if(elem2 < n2)
+                          Kokkos::atomic_add(&rang_voisinRR_v(elem1), 1);
+                        else
+                          {
+                            if(elem1 < n2)
+                              Kokkos::atomic_add(&rang_voisinRV_v(elem1), 1);
+                            else
+                              Kokkos::atomic_add(&rang_voisinVV_v(elem1 - n2), 1);
+                          }
+                      }
+                  }
+              }
+          });
+          end_gpu_timer(__KERNEL_NAME__);
         }
     }
+
+  auto& tab1RR = MBrr.get_set_tab1();
+  auto& tab2RR = MBrr.get_set_tab2();
+  auto& tab1RV = MBrv.get_set_tab1();
+  auto& tab2RV = MBrv.get_set_tab2();
+  auto& tab1VV = MBvv.get_set_tab1();
+  auto& tab2VV = MBvv.get_set_tab2();
 
   tab1RR(0)=1;
   tab1RV(0)=1;
   tab1VV(0)=1;
-
-  for(i=0; i<n2; i++)
-    {
-      tab1RR(i+1)=rang_voisinRR(i)+tab1RR(i);
-      tab1RV(i+1)=rang_voisinRV(i)+tab1RV(i);
-    }
-  for(i=0; i<n1-n2; i++)
-    {
-      tab1VV(i+1)=rang_voisinVV(i)+tab1VV(i);
-    }
+  auto tab1RR_v = tab1RR.view_rw();
+  auto tab1RV_v = tab1RV.view_rw();
+  auto tab1VV_v = tab1VV.view_rw();
+  using tab1_value_t = typename decltype(tab1RR_v)::value_type;
+  Kokkos::parallel_scan(start_gpu_timer(__KERNEL_NAME__), range_1D(0, n2), KOKKOS_LAMBDA(const int i, tab1_value_t& update, const bool final)
+  {
+    update += rang_voisinRR_v(i);
+    if (final) tab1RR_v(i+1) = update + 1;
+  });
+  end_gpu_timer(__KERNEL_NAME__);
+  Kokkos::parallel_scan(start_gpu_timer(__KERNEL_NAME__), range_1D(0, n2), KOKKOS_LAMBDA(const int i, tab1_value_t& update, const bool final)
+  {
+    update += rang_voisinRV_v(i);
+    if (final) tab1RV_v(i+1) = update + 1;
+  });
+  end_gpu_timer(__KERNEL_NAME__);
+  Kokkos::parallel_scan(start_gpu_timer(__KERNEL_NAME__), range_1D(0, n1-n2), KOKKOS_LAMBDA(const int i, tab1_value_t& update, const bool final)
+  {
+    update += rang_voisinVV_v(i);
+    if (final) tab1VV_v(i+1) = update + 1;
+  });
+  end_gpu_timer(__KERNEL_NAME__);
   MBrr.dimensionner(n2,tab1RR(n2)-1);
   MBrv.dimensionner(n2,n1-n2,tab1RV(n2)-1);
   MBvv.dimensionner(n1-n2,n1-n2,tab1VV(n1-n2)-1);
 
-  for(i=0; i<n2; i++)
-    {
-      tab2RR[tab1RR[i]-1]=i+1; // Diagonale
-      rang_voisinRR[i]=tab1RR[i];
-      rang_voisinRV[i]=tab1RV[i]-1;
-    }
-  for(i=0; i<n1-n2; i++)
-    {
-      tab2VV[tab1VV[i]-1]=i+1; // Diagonale
-      rang_voisinVV[i]=tab1VV[i];
-    }
-  int affichage_progression=0;
-  int pourcent=0;
-  for (int num_face=ndeb; num_face<nfin; num_face++)
-    {
-      if (affichage_progression)
-        {
-          int tmp =(num_face*100)/nfin;
-          if(tmp>pourcent)
-            {
-              double dpourcent = tmp;
-              Cerr << dpourcent << "% de la matrice de pression P0 a ete assemblee\r " << flush;
-            }
-        }
-      elem1 = face_voisins(num_face,0);
-      elem2 = face_voisins(num_face,1);
-      // On ne traite que les faces internes virtuelles ou non
-      if (!le_dom_VEF->est_une_face_virt_bord(num_face) && elem1 != -1 && elem2 != -1)
-        {
-          /*Cerr << "face " << num_face << finl;
-          Cerr << "Traitement face interne "<<finl;
-          Cerr << "elem1 " << elem1 << finl;
-          Cerr << "elem2 " << elem2 << finl;*/
-          if(dimension==2)
-            {
-              val = (face_normales(num_face,0)*face_normales(num_face,0)*inverse_quantitee_entrelacee(num_face,0)
-                     + face_normales(num_face,1)*face_normales(num_face,1)*inverse_quantitee_entrelacee(num_face,1));
-            }
-          else
-            {
-              val = (face_normales(num_face,0)*face_normales(num_face,0)*inverse_quantitee_entrelacee(num_face,0)
-                     +face_normales(num_face,1)*face_normales(num_face,1)*inverse_quantitee_entrelacee(num_face,1)
-                     +face_normales(num_face,2)*face_normales(num_face,2)*inverse_quantitee_entrelacee(num_face,2));
-            }
-          //Cerr << "val " << val << finl;
-          //Cerr << "\n" << finl;
-          //if(num_face<premiere_face_std)
-          // val*=volumes_entrelaces(num_face)/volumes_entrelaces_Cl(num_face);
+  auto tab2RR_v = tab2RR.view_rw();
+  Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(0, n2), KOKKOS_LAMBDA(const int i)
+  {
+    tab2RR_v(tab1RR_v(i) - 1) = i+1; // Diagonale
+    rang_voisinRR_v(i) = tab1RR_v(i);
+    rang_voisinRV_v(i) = tab1RV_v(i) - 1;
+  });
+  end_gpu_timer(__KERNEL_NAME__);
+  auto tab2VV_v = tab2VV.view_rw();
+  Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(0, n1-n2), KOKKOS_LAMBDA(const int i)
+  {
+    tab2VV_v(tab1VV_v(i) - 1) = i+1; // Diagonale
+    rang_voisinVV_v(i) = tab1VV_v(i);
+  });
+  end_gpu_timer(__KERNEL_NAME__);
 
-          // diagonale :
-          if(elem1<n2) coeffRR[tab1RR[elem1]-1]+= val;
-          else coeffVV[tab1VV[elem1-n2]-1]+= val;
-          if(elem2<n2) coeffRR[tab1RR[elem2]-1]+= val;
-          else coeffVV[tab1VV[elem2-n2]-1]+= val;
-          if (elem1 > elem2)
-            {
-              if(elem1<n2)
-                {
-                  tab2RR[rang_voisinRR[elem2]]=elem1+1;
-                  coeffRR[rang_voisinRR[elem2]]-=val;
-                  rang_voisinRR[elem2]++;
-                }
-              else
-                {
-                  if(elem2<n2)
-                    {
-                      tab2RV[rang_voisinRV[elem2]]=(elem1-n2)+1;
-                      coeffRV[rang_voisinRV[elem2]]-=val;
-                      rang_voisinRV[elem2]++;
-                    }
-                  else
-                    {
-                      tab2VV[rang_voisinVV[elem2-n2]]=(elem1-n2)+1;
-                      coeffVV[rang_voisinVV[elem2-n2]]-=val;
-                      rang_voisinVV[elem2-n2]++;
-                    }
-                }
-            }
-          else
-            {
-              if(elem2<n2)
-                {
-                  tab2RR[rang_voisinRR[elem1]]=elem2+1;
-                  coeffRR[rang_voisinRR[elem1]]-=val;
-                  rang_voisinRR[elem1]++;
-                }
-              else
-                {
-                  if(elem1<n2)
-                    {
-                      tab2RV[rang_voisinRV[elem1]]=(elem2-n2)+1;
-                      coeffRV[rang_voisinRV[elem1]]-=val;
-                      rang_voisinRV[elem1]++;
-                    }
-                  else
-                    {
-                      tab2VV[rang_voisinVV[elem1-n2]]=(elem2-n2)+1;
-                      coeffVV[rang_voisinVV[elem1-n2]]-=val;
-                      rang_voisinVV[elem1-n2]++;
-                    }
-                }
-            }
-        }
-    }
-  if (affichage_progression) Cerr << finl;
+  int dim = Objet_U::dimension;
+
+  MBrr.dimensionner(n2,tab1RR(n2)-1);
+  MBrv.dimensionner(n2,n1-n2,tab1RV(n2)-1);
+  MBvv.dimensionner(n1-n2,n1-n2,tab1VV(n1-n2)-1);
+
+  auto tab2RV_v = tab2RV.view_rw();
+  DoubleArrView coeffRR = MBrr.get_set_coeff().view_rw();
+  DoubleArrView coeffRV = MBrv.get_set_coeff().view_rw();
+  DoubleArrView coeffVV = MBvv.get_set_coeff().view_rw();
+  CDoubleTabView face_normales = le_dom.face_normales().view_ro();
+  CDoubleTabView inverse_quantitee_entrelacee_v = inverse_quantitee_entrelacee.view_ro();
+  Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(ndeb, nfin), KOKKOS_LAMBDA(const int num_face)
+  {
+    int elem1 = face_voisins(num_face, 0);
+    int elem2 = face_voisins(num_face, 1);
+    const bool is_face_virt_bord = (num_face >= nb_faces) && (ind_faces_virt_bord(num_face - nb_faces) != -1);
+    if (!is_face_virt_bord && elem1 != -1 && elem2 != -1)
+      {
+        double val = 0.;
+        for (int d = 0; d < dim; d++)
+          val += face_normales(num_face, d) * face_normales(num_face, d) * inverse_quantitee_entrelacee_v(num_face, d);
+
+        // diagonale :
+        if (elem1 < n2) Kokkos::atomic_add(&coeffRR(tab1RR_v(elem1) - 1), val);
+        else            Kokkos::atomic_add(&coeffVV(tab1VV_v(elem1 - n2) - 1), val);
+        if (elem2 < n2) Kokkos::atomic_add(&coeffRR(tab1RR_v(elem2) - 1), val);
+        else            Kokkos::atomic_add(&coeffVV(tab1VV_v(elem2 - n2) - 1), val);
+
+        if (elem1 > elem2)
+          {
+            if (elem1 < n2)
+              {
+                auto slot = Kokkos::atomic_fetch_add(&rang_voisinRR_v(elem2), 1);
+                tab2RR_v(slot) = elem1 + 1;
+                coeffRR(slot) -= val;
+              }
+            else
+              {
+                if (elem2 < n2)
+                  {
+                    auto slot = Kokkos::atomic_fetch_add(&rang_voisinRV_v(elem2), 1);
+                    tab2RV_v(slot) = (elem1 - n2) + 1;
+                    coeffRV(slot) -= val;
+                  }
+                else
+                  {
+                    auto slot = Kokkos::atomic_fetch_add(&rang_voisinVV_v(elem2 - n2), 1);
+                    tab2VV_v(slot) = (elem1 - n2) + 1;
+                    coeffVV(slot) -= val;
+                  }
+              }
+          }
+        else
+          {
+            if (elem2 < n2)
+              {
+                auto slot = Kokkos::atomic_fetch_add(&rang_voisinRR_v(elem1), 1);
+                tab2RR_v(slot) = elem2 + 1;
+                coeffRR(slot) -= val;
+              }
+            else
+              {
+                if (elem1 < n2)
+                  {
+                    auto slot = Kokkos::atomic_fetch_add(&rang_voisinRV_v(elem1), 1);
+                    tab2RV_v(slot) = (elem2 - n2) + 1;
+                    coeffRV(slot) -= val;
+                  }
+                else
+                  {
+                    auto slot = Kokkos::atomic_fetch_add(&rang_voisinVV_v(elem1 - n2), 1);
+                    tab2VV_v(slot) = (elem2 - n2) + 1;
+                    coeffVV(slot) -= val;
+                  }
+              }
+          }
+      }
+  });
+  end_gpu_timer(__KERNEL_NAME__);
   // On traite les conditions aux limites
-  for (i=0; i<les_cl.size(); i++)
+  for (int i=0; i<les_cl.size(); i++)
     {
 
       // Le traitement depend du type de la condition aux limites :
@@ -456,121 +426,98 @@ int Assembleur_P_VEF::remplir(Matrice& la_matrice, const DoubleTab& inverse_quan
         {
           has_P_ref=1;
           MBrr.set_est_definie(1);
+          CIntArrView front_num_face = le_bord.num_face().view_ro();
+          DoubleArrView coeff_pression = static_cast<ArrOfDouble&>(les_coeff_pression).view_rw();
+          const int coeff_pression_size = les_coeff_pression.size_array();
+          Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(0, nb_faces_bord_tot), KOKKOS_LAMBDA(const int ind_face)
+          {
+            int num_face = front_num_face(ind_face);
+            double val = 0.;
+            for (int d = 0; d < dim; d++)
+              val += face_normales(num_face, d) * face_normales(num_face, d) * inverse_quantitee_entrelacee_v(num_face, d);
 
-          for(int ind_face=0; ind_face<nb_faces_bord_tot; ind_face++)
-            {
-              int num_face = le_bord.num_face(ind_face);
-              if(dimension==2)
-                {
-                  val = ( face_normales(num_face,0)*face_normales(num_face,0)*inverse_quantitee_entrelacee(num_face,0)
-                          +face_normales(num_face,1)*face_normales(num_face,1)*inverse_quantitee_entrelacee(num_face,1));
-                }
-              else
-                {
-                  val = ( face_normales(num_face,0)*face_normales(num_face,0)*inverse_quantitee_entrelacee(num_face,0)
-                          +face_normales(num_face,1)*face_normales(num_face,1)*inverse_quantitee_entrelacee(num_face,1)
-                          +face_normales(num_face,2)*face_normales(num_face,2)*inverse_quantitee_entrelacee(num_face,2));
-                }
-              //if(num_face<premiere_face_std)
-              //  val*=volumes_entrelaces(num_face)/volumes_entrelaces_Cl(num_face);
-
-              int elem=face_voisins(num_face,0);
-              if(elem<n2)
-                coeffRR[tab1RR[elem]-1] += val;
-              else
-                coeffVV[tab1VV[elem-n2]-1] += val;
-              // On stocke les coefficients de pression sur les faces reelles
-              if (num_face<les_coeff_pression.size_array())
-                les_coeff_pression[num_face] = val;
-            }
+            int elem = face_voisins(num_face, 0);
+            if (elem < n2) Kokkos::atomic_add(&coeffRR(tab1RR_v(elem) - 1), val);
+            else           Kokkos::atomic_add(&coeffVV(tab1VV_v(elem - n2) - 1), val);
+            // On stocke les coefficients de pression sur les faces reelles
+            if (num_face < coeff_pression_size)
+              coeff_pression(num_face) = val;
+          });
+          end_gpu_timer(__KERNEL_NAME__);
         }
       else if (sub_type(Periodique,la_cl.valeur()) )
         {
           const Periodique& la_cl_perio = ref_cast(Periodique,la_cl.valeur());
-          IntVect fait(nb_faces_bord_tot);
-          fait = 0;
+          CIntArrView front_num_face_coeff = le_bord.num_face().view_ro();
+          CIntArrView face_associee_coeff = la_cl_perio.face_associee().view_ro();
+          Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(0, nb_faces_bord_tot), KOKKOS_LAMBDA(const int ind_face)
+          {
+            if (ind_face < face_associee_coeff(ind_face)) // Process each periodic pair once
+              {
+                int num_face = front_num_face_coeff(ind_face);
+                int elem1 = face_voisins(num_face, 0);
+                int elem2 = face_voisins(num_face, 1);
+                double val = 0.;
+                for (int d = 0; d < dim; d++)
+                  val += face_normales(num_face, d) * face_normales(num_face, d) * inverse_quantitee_entrelacee_v(num_face, d);
 
-          for(int ind_face=0; ind_face<nb_faces_bord_tot; ind_face++)
-            {
-              int num_face = le_bord.num_face(ind_face);
-              if (fait[ind_face] == 0)
-                {
-                  fait[ind_face] = 1;
-                  fait[la_cl_perio.face_associee(ind_face)] = 1;
-                  elem1 = face_voisins(num_face,0);
-                  elem2 = face_voisins(num_face,1);
-                  if(dimension==2)
-                    {
-                      val = (face_normales(num_face,0)*face_normales(num_face,0)*inverse_quantitee_entrelacee(num_face,0)
-                             +face_normales(num_face,1)*face_normales(num_face,1)*inverse_quantitee_entrelacee(num_face,1));
-                    }
-                  else
-                    {
-                      val = (face_normales(num_face,0)*face_normales(num_face,0)*inverse_quantitee_entrelacee(num_face,0)
-                             +face_normales(num_face,1)*face_normales(num_face,1)*inverse_quantitee_entrelacee(num_face,1)
-                             +face_normales(num_face,2)*face_normales(num_face,2)*inverse_quantitee_entrelacee(num_face,2));
-                    }
-                  //if(num_face<premiere_face_std)
-                  //  val*=volumes_entrelaces(num_face)/volumes_entrelaces_Cl(num_face);
-                  // diagonale :
-                  if(elem1<n2)
-                    coeffRR[tab1RR[elem1]-1]+= val;
-                  else
-                    coeffVV[tab1VV[elem1-n2]-1]+= val;
-                  if(elem2<n2)
-                    coeffRR[tab1RR[elem2]-1]+= val;
-                  else
-                    coeffVV[tab1VV[elem2-n2]-1]+= val;
-                  if (elem1 > elem2)
-                    {
-                      if(elem1<n2)
-                        {
-                          tab2RR[rang_voisinRR[elem2]]=elem1+1;
-                          coeffRR[rang_voisinRR[elem2]]-=val;
-                          rang_voisinRR[elem2]++;
-                        }
-                      else
-                        {
-                          if(elem2<n2)
-                            {
-                              tab2RV[rang_voisinRV[elem2]]=elem1-n2+1;
-                              coeffRV[rang_voisinRV[elem2]]-=val;
-                              rang_voisinRV[elem2]++;
-                            }
-                          else
-                            {
-                              tab2VV[rang_voisinVV[elem2-n2]]=elem1-n2+1;
-                              coeffVV[rang_voisinVV[elem2-n2]]-=val;
-                              rang_voisinVV[elem2-n2]++;
-                            }
-                        }
-                    }
-                  else
-                    {
-                      if(elem2<n2)
-                        {
-                          tab2RR[rang_voisinRR[elem1]]=elem2+1;
-                          coeffRR[rang_voisinRR[elem1]]-=val;
-                          rang_voisinRR[elem1]++;
-                        }
-                      else
-                        {
-                          if(elem1<n2)
-                            {
-                              tab2RV[rang_voisinRV[elem1]]=elem2-n2+1;
-                              coeffRV[rang_voisinRV[elem1]]-=val;
-                              rang_voisinRV[elem1]++;
-                            }
-                          else
-                            {
-                              tab2VV[rang_voisinVV[elem1-n2]]=elem2-n2+1;
-                              coeffVV[rang_voisinVV[elem1-n2]]-=val;
-                              rang_voisinVV[elem1-n2]++;
-                            }
-                        }
-                    }
-                }
-            }
+                // diagonale :
+                if (elem1 < n2) Kokkos::atomic_add(&coeffRR(tab1RR_v(elem1) - 1), val);
+                else            Kokkos::atomic_add(&coeffVV(tab1VV_v(elem1 - n2) - 1), val);
+                if (elem2 < n2) Kokkos::atomic_add(&coeffRR(tab1RR_v(elem2) - 1), val);
+                else            Kokkos::atomic_add(&coeffVV(tab1VV_v(elem2 - n2) - 1), val);
+
+                if (elem1 > elem2)
+                  {
+                    if (elem1 < n2)
+                      {
+                        auto slot = Kokkos::atomic_fetch_add(&rang_voisinRR_v(elem2), 1);
+                        tab2RR_v(slot) = elem1 + 1;
+                        coeffRR(slot) -= val;
+                      }
+                    else
+                      {
+                        if (elem2 < n2)
+                          {
+                            auto slot = Kokkos::atomic_fetch_add(&rang_voisinRV_v(elem2), 1);
+                            tab2RV_v(slot) = elem1 - n2 + 1;
+                            coeffRV(slot) -= val;
+                          }
+                        else
+                          {
+                            auto slot = Kokkos::atomic_fetch_add(&rang_voisinVV_v(elem2 - n2), 1);
+                            tab2VV_v(slot) = elem1 - n2 + 1;
+                            coeffVV(slot) -= val;
+                          }
+                      }
+                  }
+                else
+                  {
+                    if (elem2 < n2)
+                      {
+                        auto slot = Kokkos::atomic_fetch_add(&rang_voisinRR_v(elem1), 1);
+                        tab2RR_v(slot) = elem2 + 1;
+                        coeffRR(slot) -= val;
+                      }
+                    else
+                      {
+                        if (elem1 < n2)
+                          {
+                            auto slot = Kokkos::atomic_fetch_add(&rang_voisinRV_v(elem1), 1);
+                            tab2RV_v(slot) = elem2 - n2 + 1;
+                            coeffRV(slot) -= val;
+                          }
+                        else
+                          {
+                            auto slot = Kokkos::atomic_fetch_add(&rang_voisinVV_v(elem1 - n2), 1);
+                            tab2VV_v(slot) = elem2 - n2 + 1;
+                            coeffVV(slot) -= val;
+                          }
+                      }
+                  }
+              }
+          });
+          end_gpu_timer(__KERNEL_NAME__);
         }
     }
   has_P_ref = (int)mp_max(has_P_ref);
@@ -606,19 +553,15 @@ int Assembleur_P_VEF::modifier_secmem(DoubleTab& secmem)
       int ndeb = la_front_dis.num_premiere_face();
       int nfin = ndeb + la_front_dis.nb_faces();
 
-
       // GF on est passe en increment de pression
       if ((sub_type(Neumann_sortie_libre,la_cl_base)) && (!get_resoudre_increment_pression()))
         {
-          double Pimp, coef;
           const Neumann_sortie_libre& la_cl_Neumann = ref_cast(Neumann_sortie_libre, la_cl_base);
-          //const Front_VF& la_front_dis = ref_cast(Front_VF,la_cl_base.frontiere_dis());
-          //int ndeb = la_front_dis.num_premiere_face();
-          //int nfin = ndeb + la_front_dis.nb_faces();
+          ToDo_Kokkos("critical");
           for (int num_face=ndeb; num_face<nfin; num_face++)
             {
-              Pimp = la_cl_Neumann.flux_impose(num_face-ndeb);
-              coef = les_coeff_pression[num_face]*Pimp;
+              double Pimp = la_cl_Neumann.flux_impose(num_face-ndeb);
+              double coef = les_coeff_pression[num_face]*Pimp;
               secmem[face_voisins(num_face,0)] += coef;
             }
         }
@@ -641,6 +584,7 @@ int Assembleur_P_VEF::modifier_secmem(DoubleTab& secmem)
         {
           const DoubleTab& Gpt = champ_front.derivee_en_temps();
           bool ch_unif = (Gpt.nb_dim()==1);
+          ToDo_Kokkos("critical");
           for (int num_face=ndeb; num_face<nfin; num_face++)
             {
               double Stt = 0.;
@@ -666,13 +610,14 @@ int Assembleur_P_VEF::modifier_solution(DoubleTab& pression)
       // On prend la pression minimale comme pression de reference
       // afin d'avoir la meme pression de reference en sequentiel et parallele
       press_0=DMAXFLOAT;
-      int n,nb_elem=le_dom_VEF->domaine().nb_elem();
-      for(n=0; n<nb_elem; n++)
+      int nb_elem=le_dom_VEF->domaine().nb_elem();
+      ToDo_Kokkos("critical");
+      for(int n=0; n<nb_elem; n++)
         if (pression[n] < press_0)
           press_0 = pression[n];
       press_0 = Process::mp_min(press_0);
-
-      for(n=0; n<nb_elem; n++)
+      ToDo_Kokkos("critical");
+      for(int n=0; n<nb_elem; n++)
         pression[n] -=press_0;
 
       pression.echange_espace_virtuel();
@@ -700,6 +645,7 @@ int Assembleur_P_VEF::modifier_matrice(Matrice& matrice)
       double distance=DMAXFLOAT;
       const DoubleTab& coord=le_dom_VEF->xp();
       int n = le_dom_VEF->nb_elem();
+      ToDo_Kokkos("critical");
       for(int i=0; i<n; i++)
         {
           double tmp=0;
