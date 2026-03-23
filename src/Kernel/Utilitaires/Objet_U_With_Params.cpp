@@ -19,7 +19,7 @@
 
 Implemente_base(Objet_U_With_Params,"Objet_U_With_Params",Objet_U);
 
-/*! @brief Called in the readOn of ObjetUWithParams. Must be overriden by user.
+/*! @brief Called in the readOn of Objet_U_With_Params. Must be overriden by user.
  *
  * In most cases, it should call the method of the base class to inherit the params.
  * This is not always the case. If not done, reasons must be explained clearly in a comment
@@ -44,6 +44,7 @@ void Objet_U_With_Params::set_param(Param& param) const
  *  2. params are read with param.lire_avec_accolades_depuis
  *  3. params are validated by the user in the const method validate_params
  *
+ * The actual work is done by __readOn_Impl_DO_NOT_OVERRIDE_UNLESS_THE_WORLD_IS_ENDING.
  *
  * @param (Entree& is) an input stream from which param will be read
  * @return (Entree&) the input stream, after reading a block { ... }

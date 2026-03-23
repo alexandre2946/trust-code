@@ -22,6 +22,22 @@ class Param;
 
 /*! @brief Inherits from Objet_U, adds the very common method set_param for the Objet_U hierarchy
  *
+ *  All classes introducing new keywords/parameters must inherit from this class and not Objet_U.
+ *  The goal is to promote the use of param.ajouter and move toward a more consistent grammar
+ *  for TRUST datasets.
+ *
+ *  readOn cannot be overriden when inheriting from this class.
+ *
+ *  Method set_param can be overriden to register params with param.ajouter
+ *
+ *  Method validate_params is provided for override if complex attribute validation is needed
+ *  It is called right after reading the params, and should not modify the objects.
+ *
+ *
+ *  Classes inheriting from Objet_U_With_Params must use one of the macros:
+ *  Declare_base_with_param or Declare_instanciable_with_param.
+ *  They do not declare the readOn function, which is not possible when deriving from this class.
+ *
  *
  */
 class Objet_U_With_Params : public Objet_U
@@ -30,7 +46,7 @@ class Objet_U_With_Params : public Objet_U
 protected:
   Entree& readOn(Entree&) override final;
 
-  /*! @brief Called in the readOn of ObjetUWithParams, after reading the params
+  /*! @brief Called in the readOn of Objet_U_With_Params, after reading the params
    *
    * Should check the coherence and validity of the params, throwing/exiting accordingly
    * At this point, we are still const.
