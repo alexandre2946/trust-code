@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -25,6 +25,11 @@
 #include <Perf_counters.h>
 #include <communications.h>
 #include <petsc_for_kernel.h>
+#ifdef PETSCKSP_H
+#include <petscdevice.h>
+#include <petscsys.h>
+#endif
+#include <Baltik_Version.h>
 #include <info_atelier.h>
 #include <unistd.h> // Pour chdir for other compiler
 #ifndef __CYGWIN__
@@ -32,13 +37,43 @@
 #endif
 
 #include <kokkos++.h>
+#include <Debog.h>
+
+namespace
+{
+static bool TRUST_LIBRARY_MODE = false;
+}
+
+void TRUST_set_library_mode(bool b)
+{
+  TRUST_LIBRARY_MODE = b;
+}
+
+void TRUST_global_finalize()
+{
+  if (!TRUST_LIBRARY_MODE) return;
+
+#ifdef PETSCKSP_H
+  // On PetscFinalize que si c'est necessaire
+  PetscBool isInitialized;
+  PetscInitialized(&isInitialized);
+  if (isInitialized==PETSC_TRUE)
+    {
+      PetscPopErrorHandler(); // Removes the latest error handler that was pushed with PetscPushErrorHandler in init_petsc
+      PetscFinalize();
+    }
+#endif
+
+  if (Kokkos::is_initialized())
+    Kokkos::finalize();
+}
 
 mon_main::mon_main(int verbose_level, bool journal_master, Nom log_directory, bool apply_verification, bool disable_stop)
 {
   verbose_level_ = verbose_level;
   journal_master_ = journal_master;
   log_directory_ = log_directory;
-  apply_verification_ = apply_verification;
+  LecFicDiffuse_JDD::apply_verif = apply_verification;
   // Creation d'un journal temporaire qui ecrit dans Cerr
   init_journal_file(verbose_level, 0 /* filename = 0 => Cerr */, 0 /* append */);
   trio_began_mpi_=false;
@@ -55,6 +90,11 @@ bool error_handlers = false;
 static int init_petsc(True_int argc, char **argv, bool with_mpi,bool& trio_began_mpi_)
 {
 #ifdef PETSCKSP_H
+  PetscBool isInitialized;
+  PetscInitialized(&isInitialized);
+  if (isInitialized)
+    return 1;
+
   static char help[] = "TRUST may solve linear systems with Petsc library.\n\n" ;
   Nom pwd(::pwd());
   // On initialise Petsc
@@ -68,6 +108,12 @@ static int init_petsc(True_int argc, char **argv, bool with_mpi,bool& trio_began
     }
 #else
   PetscInitialize(&argc, &argv, (char*)0, help);
+#endif
+#ifdef TRUST_USE_GPU
+  PetscDevice device;
+  PetscDeviceCreate(PETSC_DEVICE_DEFAULT(), PETSC_DECIDE, &device);
+  PetscDeviceView(device, PETSC_VIEWER_STDERR_WORLD);
+  //if (instance==1) PetscLogGpuTime(); // Slow down calculation ! Use -log_view_gpu_time
 #endif
   // Bizarrerie qui se produit sur une machine (ioulia, MPICH natif): PetscInitialize change le pwd()
   // en sequentiel et si le binaire n'est pas dans le repertoire de l'etude, le pwd est perdu...
@@ -87,21 +133,16 @@ static int init_petsc(True_int argc, char **argv, bool with_mpi,bool& trio_began
   // et de "masquer" les messages d'erreur TRUST:
   PetscPopSignalHandler();
 
-  char* theValue = getenv("TRUST_ENABLE_ERROR_HANDLERS");
-  if (theValue != nullptr) error_handlers = true;
-  if (error_handlers)
+#ifndef __CYGWIN__
+  if (error_handlers || getenv("TRUST_ENABLE_ERROR_HANDLERS") != nullptr)
     {
       Cerr << "Enabling error handlers catching SIGFPE and SIGABORT and giving a trace of where the fault happened." << finl;
-#ifndef __CYGWIN__
       install_handlers();
-#endif
     }
+#endif
 #else
-  // MPI_Init pour les machines ou Petsc n'est pas
-  // installe: ex AIX avec MPICH: il faut que argc et argv soit passes
-  // correctement et pas comme dans Comm_Group_MPI::init_group_trio
-  // sinon message: xm_348262:  p4_error: Command-line arguments are missing: 0
 #ifdef MPI_
+  // MPI_Init pour les machines ou Petsc n'est pas installe
   True_int flag;
   MPI_Initialized(&flag);
   if (!flag)
@@ -111,6 +152,7 @@ static int init_petsc(True_int argc, char **argv, bool with_mpi,bool& trio_began
     }
 #endif
 #endif
+
   return 1;
 }
 
@@ -119,7 +161,6 @@ static int init_parallel_mpi(OWN_PTR(Comm_Group) & groupe_trio)
 #ifdef MPI_
   groupe_trio.typer("Comm_Group_MPI");
   Comm_Group_MPI& mpi = ref_cast(Comm_Group_MPI, groupe_trio.valeur());
-  // Si ca n'a pas ete fait dans Petsc, c'est ici qu'on fait MPI_Init()
   mpi.init_group_trio();
   return 1;
 #else
@@ -168,22 +209,19 @@ void mon_main::init_parallel(const int argc, char **argv, bool with_mpi, bool ch
 {
   bool init_kokkos_before_mpi = (getenv("KOKKOS_AFTER_MPI") == nullptr);
   // https://kokkos.org/kokkos-core-wiki/ProgrammingGuide/Initialization.html say after !
-  if (init_kokkos_before_mpi)
+  if (init_kokkos_before_mpi && !Kokkos::is_initialized())
     {
       // Kokkos initialization
       True_int argc2 = argc;
       Kokkos::initialize(argc2, argv);
     }
-  Nom arguments_info="";
-  arguments_info +="Kokkos initialized!\n";
+  Nom arguments_info = "";
+  arguments_info += "Kokkos initialized!\n";
 
-#ifdef TRUST_USE_CUDA
-  //init_cuda(); Desactive car crash crash sur topaze ToDo OpenMP
-#endif
   bool must_mpi_initialize = true;
   if (with_petsc)
     {
-      if (init_petsc(argc, argv, with_mpi,trio_began_mpi_))
+      if (init_petsc(argc, argv, with_mpi, trio_began_mpi_))
         {
           must_mpi_initialize = false; // Deja fait par Petsc
           arguments_info += "Petsc initialization succeeded.\n";
@@ -232,7 +270,7 @@ void mon_main::init_parallel(const int argc, char **argv, bool with_mpi, bool ch
   // however, it is initialized later, as it involves communication operations, which require statistics to be initialized first...
   instantiate_node_mpi(node_group_, node_master_, with_mpi);
 
-  if (!init_kokkos_before_mpi)
+  if (!init_kokkos_before_mpi && !Kokkos::is_initialized())
     {
       // Kokkos initialization
       True_int argc2 = argc;
@@ -241,7 +279,12 @@ void mon_main::init_parallel(const int argc, char **argv, bool with_mpi, bool ch
         Cerr << "Kokkos initialized after MPI !" << finl;
     }
   if (Process::je_suis_maitre())
-    Cerr << "You can run --kokkos-help option." << finl;
+    {
+#ifdef TRUST_USE_GPU
+      Kokkos::print_configuration(std::cerr, true);
+#endif
+      Cerr << "You can run --kokkos-help option." << finl;
+    }
 }
 
 void mon_main::finalize()
@@ -261,24 +304,36 @@ void mon_main::finalize()
   if (sub_type(Comm_Group_MPI,node_group_.valeur()))
     ref_cast(Comm_Group_MPI,node_group_.valeur()).free_all(); // free comm + group
 
+  // user defined groups (if any !)
+  if (PE_Groups::has_user_defined_group())
+    {
+      auto& grp = PE_Groups::get_user_defined_group();
+      if (sub_type(Comm_Group_MPI,grp))
+        ref_cast_non_const(Comm_Group_MPI,grp).free_all(); // free comm + group
+    }
 
 #endif
+
 #ifdef PETSCKSP_H
-  // On PetscFinalize que si c'est necessaire
-  PetscBool isInitialized;
-  PetscInitialized(&isInitialized);
-  if (isInitialized==PETSC_TRUE)
+  if (!TRUST_LIBRARY_MODE)
     {
-      PetscPopErrorHandler(); // Removes the latest error handler that was pushed with PetscPushErrorHandler in init_petsc
+      // On PetscFinalize que si c'est necessaire
+      PetscBool isInitialized;
+      PetscInitialized(&isInitialized);
+      if (isInitialized==PETSC_TRUE)
+        {
+          PetscPopErrorHandler(); // Removes the latest error handler that was pushed with PetscPushErrorHandler in init_petsc
 #ifdef MPI_
-      if (sub_type(Comm_Group_MPI,PE_Groups::current_group()))
-        PETSC_COMM_WORLD = ref_cast(Comm_Group_MPI,PE_Groups::current_group()).get_mpi_comm();
+          if (sub_type(Comm_Group_MPI,PE_Groups::current_group()))
+            PETSC_COMM_WORLD = ref_cast(Comm_Group_MPI,PE_Groups::current_group()).get_mpi_comm();
 #endif
-      PetscFinalize();
+          PetscFinalize();
+        }
     }
 #endif
+
 #ifdef MPI_
-  if (trio_began_mpi_)
+  if (!TRUST_LIBRARY_MODE && trio_began_mpi_)
     {
       // On MPI_Finalize si MPI_Initialized and not MPI_Finalized
       True_int flag;
@@ -291,7 +346,8 @@ void mon_main::finalize()
         }
     }
 #endif
-  Kokkos::finalize();
+  if (!TRUST_LIBRARY_MODE && Kokkos::is_initialized())
+    Kokkos::finalize();
 }
 
 void mon_main::dowork(const Nom& nom_du_cas)
@@ -395,10 +451,15 @@ void mon_main::dowork(const Nom& nom_du_cas)
   Cout<< " *     | |    | ) \\ \\__ | (___) | /\\____) |    | |     *  " << finl;
   Cout<< " *     )_(    |/   \\__/ (_______) \\_______)    )_(     *   " << finl;
   Cout<< " *                                                     *     " << finl;
-  Cout<< " *                  version : " << TRUST_VERSION << "               *     "  << finl;
+  Cout<< " *                  version : " << TRUST_VERSION << "                    *     "  << finl;
+  Cout<< " *                                                     *     " << finl;
+#ifdef BALTIK_VERSION
+  Cout<< " *           Using " << BALTIK_NAME << " version : " << BALTIK_VERSION << "             *" << finl;
+#endif
+  Cout<< " *                                                     *     " << finl;
   Cout<< " *                       CEA - DES                     *     " << finl;
   Cout<< " *                                                     *     " << finl;
-  Cout<< " * * * * * * * * * * * * * * * * * * * * * * * * * * * * " << finl;
+  Cout<< " * * * * * * * * * * * * * * * * * * * * * * * * * * * *     " << finl;
   Cout<< " " << finl;
 
   info_atelier(Cout);
@@ -425,7 +486,7 @@ void mon_main::dowork(const Nom& nom_du_cas)
       {
         Cerr << "MAIN: Checking data file for matching { and }" << finl;
         {
-          LecFicDiffuse_JDD verifie_entree(nomentree, ios::in, apply_verification_);
+          LecFicDiffuse_JDD verifie_entree(nomentree, ios::in);
           interprete_principal_.interpreter_bloc(verifie_entree,
                                                  Interprete_bloc::FIN /* on attend FIN a la fin */,
                                                  1 /* verifie_sans_interpreter */);
@@ -433,7 +494,7 @@ void mon_main::dowork(const Nom& nom_du_cas)
       }
     Cerr << "MAIN: Reading and executing data file" << finl;
     {
-      LecFicDiffuse_JDD lit_entree(nomentree, ios::in, apply_verification_);
+      LecFicDiffuse_JDD lit_entree(nomentree, ios::in);
       lit_entree.set_check_types(1);
       interprete_principal_.interpreter_bloc(lit_entree,
                                              Interprete_bloc::FIN /* on attend FIN a la fin */,
@@ -443,6 +504,14 @@ void mon_main::dowork(const Nom& nom_du_cas)
 
   Cerr << "MAIN: End of data file" << finl;
   Process::imprimer_ram_totale(1);
+
+  std::cout << "Hello World to cout." << std::endl;
+  std::cerr << "Hello World to cerr." << std::endl;
+  Cout << "Hello World to Cout." << finl;
+  Cerr << "Hello World to Cerr." << finl;
+  Process::Journal() << "Hello World to Journal." << finl;
+  double var=2.5;
+  Debog::verifier("- Debog test message!",var);
 
   statistics().print_TU_files("Post-resolution statistics");
 
@@ -473,4 +542,3 @@ mon_main::~mon_main()
   node_group_.detach();
 
 }
-
