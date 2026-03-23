@@ -3,7 +3,7 @@
  Acceleration_VDF_Face Terme_Source_Acceleration_VDF_Face Terme_Source_Acceleration_VDF_Face.h
  Acceleration_VEF_P1NC Terme_Source_Acceleration_VEF_Face Terme_Source_Acceleration_VEF_Face.h
  Aire_interfaciale|Interfacial_area Aire_interfaciale Aire_interfaciale.h
- Analyse_Angle Analyse_Angle Analyse_Angle.h
+ Analyse_Angle Analyse_Angle_32_64 Analyse_Angle.h
  Aretes Aretes Aretes.h
  Array_base Array_base Array_base.h
  ArrOfBit ArrOfBit_32_64 ArrOfBit.h
@@ -669,6 +669,7 @@
  Objet_a_lire Objet_a_lire Objet_a_lire.h
  objet_interne_ptrPram ptrParam ptrParam.h
  Objet_U_ptr Objet_U_ptr Objet_U_ptr.h
+ Objet_U_With_Params Objet_U_With_Params Objet_U_With_Params.h
  OctreeRoot OctreeRoot_32_64 Octree.h
  Operateurs_Statistique_tps Operateurs_Statistique_tps Operateurs_Statistique_tps.h
  Operateur_base Operateur_base Operateur_base.h

@@ -9,7 +9,7 @@ class Constituant_Avec_Vitesse : public Constituant
   Declare_instanciable(Constituant_Avec_Vitesse);
 public :
   int   initialiser(const double temps) override;
-  void  set_param(Param& param) override;
+  void  set_param(Param& param) const override;
   void  mettre_a_jour(double temps) override;
   const Champ_Don_base& vit_convection_constituant() const;
   bool has_vit_convection_constituant() const { return C_.non_nul(); }

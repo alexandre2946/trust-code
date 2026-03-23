@@ -18,7 +18,7 @@ Entree& Constituant_Avec_Vitesse::readOn(Entree& is)
   return is;
 }
 
-void Constituant_Avec_Vitesse::set_param(Param& param)
+void Constituant_Avec_Vitesse::set_param(Param& param) const
 {
   Constituant::set_param(param);
   param.ajouter("vitesse_convection",&C_,Param::REQUIRED); // XD_ADD_P field_base not_set
