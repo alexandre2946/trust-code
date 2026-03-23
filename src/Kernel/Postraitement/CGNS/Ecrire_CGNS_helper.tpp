@@ -483,11 +483,13 @@ inline void Ecrire_CGNS_helper::cgns_write_zone_and_deformable_links(const bool 
                                                                      const cgsize_t *isize, int& zoneId, const int zone_goto_id,
                                                                      const std::string& file_prefix, const std::string& target_base_name, const std::string& target_zone_name,
                                                                      const std::vector<std::string>& connect_names, const Nom& nom_dom, const std::string& LOC,
-                                                                     const std::vector<double>& time_post, const char *where)
+                                                                     const std::vector<double>& time_post, const char *where, const bool write_connectivity)
 {
   if (write_zone)
     if (cg_zone_write(fileId, baseId, zone_name_to_write.c_str(), isize, CGNS_ENUMV(Unstructured), &zoneId) != CG_OK)
       Cerr << "Error " << where << " : cg_zone_write !" << finl, TRUST_CGNS_ERROR();
+
+  if (!write_connectivity) return;
 
   if (cg_goto(fileId, baseId, "Zone_t", zone_goto_id, "end") != CG_OK)
     Cerr << "Error " << where << " : cg_goto Zone_t !" << finl, TRUST_CGNS_ERROR();
