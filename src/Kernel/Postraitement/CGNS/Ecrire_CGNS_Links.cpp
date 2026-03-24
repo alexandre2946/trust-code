@@ -318,6 +318,7 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
   if (vec_proc_maitre_local_comm_.empty())
     gather_local_sizeId_for_comm_group();
 
+  /* Fichier link : Only master proc writes the link file ! */
   if (!Process::me())
     {
       std::string fn = baseFile_name_ + ".cgns";
@@ -340,8 +341,9 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
             Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_comm_group : cg_base_write !" << finl, TRUST_CGNS_ERROR();
 
           int zone_goto_idx = 1;
-          zoneId_tmp.clear();//(nb_grps, -123);
+          zoneId_tmp.clear();
 
+          /* Loop on groups that have something to link to ;) */
           for (int gid = 0; gid < nb_grps; gid++)
             {
               int proc_grp = unique_vec_proc_maitre_local_comm_[gid];
@@ -356,19 +358,41 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
 
               zoneId_tmp.push_back(-123);
 
-              cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[index_glob], zone_name, isize, zoneId_tmp.back(), zone_goto_idx,
-                                                             file_group_id + ".grid.cgns" /* linkfile */, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
-                                                             "Ecrire_CGNS::cgns_write_final_link_file_comm_group");
+              if (is_deformable_)
+                {
+                  cgns_helper_.cgns_write_zone_and_deformable_links(true /* write zone */, has_field, fileId_, baseId_[index_glob],
+                                                                    zone_name, isize, zoneId_tmp.back(), zone_goto_idx,
+                                                                    file_group_id, baseZone_name_[ind_base], baseZone_name_[ind_base],
+                                                                    connectname_[ind_base], itr, LOC, time_post_,
+                                                                    "Ecrire_CGNS::cgns_write_final_link_file_comm_group");
+                }
+              else
+                {
+                  cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[index_glob], zone_name,
+                                                                 isize, zoneId_tmp.back(), zone_goto_idx,
+                                                                 file_group_id + ".grid.cgns" /* linkfile */, baseZone_name_[ind_base],
+                                                                 baseZone_name_[ind_base], connectname_[ind_base],
+                                                                 "Ecrire_CGNS::cgns_write_final_link_file_comm_group");
 
-              if(has_field)
-                cgns_helper_.cgns_write_solution_classic_links(file_group_id, itr.getString(), itr.getString(), LOC, time_post_,
-                                                               "Ecrire_CGNS::cgns_write_final_link_file");
+                  if(has_field)
+                    cgns_helper_.cgns_write_solution_classic_links(file_group_id, itr.getString(), itr.getString(), LOC, time_post_,
+                                                                   "Ecrire_CGNS::cgns_write_final_link_file_comm_group");
+                }
 
               zone_goto_idx++;
             }
 
-          cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::SEQ>(has_field, static_cast<int>(zoneId_tmp.size()) /* nb_zones_to_write */, fileId_, baseId_[index_glob], ind_base,
-                                                                 zoneId_tmp, LOC, solname_som_, solname_elem_, solname_faces_, time_post_);
+          /* Finally, write the iters ;) */
+          if (is_deformable_)
+            cgns_helper_.cgns_write_iters_deformable<TYPE_ECRITURE_CGNS::SEQ>(true, has_field, static_cast<int>(zoneId_tmp.size()) /* nb_zones_to_write */,
+                                                                              fileId_, baseId_[index_glob], ind_base,
+                                                                              zoneId_tmp, LOC, solname_som_, solname_elem_,
+                                                                              solname_faces_, grid_name_, time_post_);
+          else
+            cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::SEQ>(has_field, static_cast<int>(zoneId_tmp.size()) /* nb_zones_to_write */,
+                                                                   fileId_, baseId_[index_glob], ind_base,
+                                                                   zoneId_tmp, LOC, solname_som_, solname_elem_,
+                                                                   solname_faces_, time_post_);
         }
       cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::SEQ>(fn, fileId_, true);
     }
@@ -383,10 +407,9 @@ void Ecrire_CGNS::cgns_write_final_link_file()
       return;
     }
 
-  /* Only master proc writes the link file ! */
+  /* Fichier link : Only master proc writes the link file ! */
   if (!Process::me())
     {
-      // Fichier link maintenant
       std::string fn = baseFile_name_ + ".cgns"; // file name
       unlink(fn.c_str());
       cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::SEQ>(fn, fileId_, true);
@@ -408,17 +431,35 @@ void Ecrire_CGNS::cgns_write_final_link_file()
 
           const cgsize_t isize[3] = { sizeId_[ind_base][0] , sizeId_[ind_base][1] , 0 };
 
-          cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[index_glob], itr.getString(), isize, zoneId_[index_glob], 1,
-                                                         base_link_file + ".grid.cgns" /* linkfile */, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
-                                                         "Ecrire_CGNS::cgns_write_final_link_file");
+          if (is_deformable_)
+            {
+              cgns_helper_.cgns_write_zone_and_deformable_links(true /* write zone */, has_field, fileId_, baseId_[index_glob],
+                                                                itr.getString(), isize, zoneId_[index_glob], 1,
+                                                                base_link_file, baseZone_name_[ind_base], baseZone_name_[ind_base],
+                                                                connectname_[ind_base], itr, LOC, time_post_,
+                                                                "Ecrire_CGNS::cgns_open_solution_link_file");
 
-          if(has_field)
-            cgns_helper_.cgns_write_solution_classic_links(base_link_file, itr.getString(), itr.getString(), LOC, time_post_,
-                                                           "Ecrire_CGNS::cgns_write_final_link_file");
+              cgns_helper_.cgns_write_iters_deformable<TYPE_ECRITURE_CGNS::SEQ>(true /* deformable */, has_field, 1 /* 1 zone per base */, fileId_,
+                                                                                baseId_[index_glob], index_glob /* 1st Zone */,
+                                                                                zoneId_, LOC, solname_som_, solname_elem_,
+                                                                                solname_faces_, grid_name_, time_post_);
+            }
+          else
+            {
+              cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[index_glob],
+                                                             itr.getString(), isize, zoneId_[index_glob], 1,
+                                                             base_link_file + ".grid.cgns" /* linkfile */, baseZone_name_[ind_base],
+                                                             baseZone_name_[ind_base], connectname_[ind_base],
+                                                             "Ecrire_CGNS::cgns_write_final_link_file");
 
-          cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::SEQ>(has_field, 1, fileId_, baseId_[index_glob], index_glob /* 1st Zone */,
-                                                                 zoneId_, LOC, solname_som_, solname_elem_, solname_faces_, time_post_);
+              if(has_field)
+                cgns_helper_.cgns_write_solution_classic_links(base_link_file, itr.getString(), itr.getString(), LOC, time_post_,
+                                                               "Ecrire_CGNS::cgns_write_final_link_file");
 
+              cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::SEQ>(has_field, 1, fileId_, baseId_[index_glob], index_glob /* 1st Zone */,
+                                                                     zoneId_, LOC, solname_som_, solname_elem_, solname_faces_, time_post_);
+
+            }
         }
 
       cgns_close_grid_or_solution_link_file(-123. /* inutile*/, TYPE_LINK_CGNS::FINAL_LINK, true); // on ferme

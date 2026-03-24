@@ -144,8 +144,6 @@ void Ecrire_CGNS::finir_ecriture(double temps)
       /* rewrite the link file so you can visualize during simulation !!! */
       if (is_lagrangian_)
         cgns_write_final_link_file_lagrangian();
-      else if (is_deformable_)
-        cgns_write_final_link_file_pb_deformable();
       else
         cgns_write_final_link_file();
     }
