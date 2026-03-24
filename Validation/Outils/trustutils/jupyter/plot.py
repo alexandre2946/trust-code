@@ -273,7 +273,7 @@ class Graph:
             self.addPlot(self.coordonee())
 
         ### On plot les données ###
-        self.subplot.errorbar(x, y, xerr, yerr, marker=marker, label=label, **kwargs)
+        self.subplot.errorbar(x, y, xerr=xerr, yerr=yerr, marker=marker, label=label, **kwargs)
 
         if label:
             self.subplot.legend()
