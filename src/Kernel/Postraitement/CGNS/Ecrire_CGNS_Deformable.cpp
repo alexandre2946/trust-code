@@ -497,13 +497,14 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
      *  - Lagrangian => We write new conn in the considered file
      */
     {
+      int glob_min_nb_elem = Process::mp_min(nb_elem); // XXX avant sinon blocage !
+
+      // XXX Elie Saikali : zone vide, rien a ecrire (base aussi !) ... (cas LINKED_FILES_PER_COMM_GROUP !!!)
+      if (ne_tot == 0 && ns_tot == 0)
+        return;
+
       if (cg_base_write(fileId_, basename, icelldim, iphysdim, &baseId_[ind]) != CG_OK)
         Cerr << "Error Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone : cg_base_write !" << finl, TRUST_CGNS_ERROR();
-
-      int glob_min_nb_elem = Process::mp_min(nb_elem);
-
-      if (ne_tot == 0 && ns_tot == 0)
-        return; // XXX Elie Saikali : zone vide, rien a ecrire ... (cas LINKED_FILES_PER_COMM_GROUP !!!)
 
       const cgsize_t isize[3]= { ns_tot, ne_tot, 0 }; /* boundary vertex size (zero if elements not sorted) */
 

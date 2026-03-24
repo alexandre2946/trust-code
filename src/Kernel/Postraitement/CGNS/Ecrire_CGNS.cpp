@@ -921,11 +921,13 @@ void Ecrire_CGNS::cgns_write_domaine_par_in_zone(const Domaine * domaine,const N
   T2CGNS_.push_back(TRUST_2_CGNS());
   TRUST_2_CGNS& TRUST2CGNS = T2CGNS_.back();
   TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_.non_nul() ? &(domaine_dis_.valeur()) : nullptr, les_som, les_elem, postraiter_domaine_);
+
   if (is_dual_ && Objet_U::dimension == 3)
     {
       assert(fs_dual_.size() > 0 && ef_dual_.size() > 0);
       TRUST2CGNS.associer_connec_pour_dual(fs_dual_, ef_dual_);
     }
+
   CGNS_TYPE cgns_type_elem = TRUST2CGNS.convert_elem_type(type_elem);
   const bool is_polyedre = (type_elem == "POLYEDRE" || type_elem == "PRISME" || type_elem == "PRISME_HEXAG");
   const int icelldim = TRUST2CGNS.topo_dim_from_elem(cgns_type_elem, is_polyedre); // avant ca : icelldim = les_som.dimension(1)
@@ -934,20 +936,6 @@ void Ecrire_CGNS::cgns_write_domaine_par_in_zone(const Domaine * domaine,const N
   /* 2 : Fill coords */
   std::vector<double> xCoords, yCoords, zCoords;
   TRUST2CGNS.fill_coords(xCoords, yCoords, zCoords);
-
-  /* 3 : Base write */
-  baseId_.push_back(-123); // pour chaque dom, on a une baseId
-  char basename[CGNS_STR_SIZE];
-  strcpy(basename, nom_dom.getChar()); // dom name
-
-  if (cg_base_write(fileId_, basename, icelldim, iphysdim, &baseId_.back()) != CG_OK)
-    Cerr << "Error Ecrire_CGNS::cgns_write_domaine_par_in_zone : cg_base_write !" << finl, TRUST_CGNS_ERROR();
-
-  /* 4 : CREATION OF FILE STRUCTURE : zones, coords & sections
-   *
-   *  - All processors write the same information.
-   *  - XXX XXX XXX Only ONE zone meta-data is written to the library at this stage ...
-   */
 
   TRUST2CGNS.fill_global_infos(); // XXX
 
@@ -963,12 +951,27 @@ void Ecrire_CGNS::cgns_write_domaine_par_in_zone(const Domaine * domaine,const N
 
   assert (enter_group_comm || (!enter_group_comm && ns_tot > 0 && ne_tot > 0));
 
+  char basename[CGNS_STR_SIZE];
+  strcpy(basename, nom_dom.getChar()); // dom name
+
   cgns_fill_info_grid_link_file(basename, cgns_type_elem, icelldim, ns_tot, ne_tot, is_polyedre);
 
-  zoneId_.push_back(-123); // XXX on touche pas, avant le return oui ...
+  /* 3-4 : CREATION OF FILE STRUCTURE : base, zones, coords & sections
+   *
+   *  - All processors write the same information.
+   *  - XXX XXX XXX Only ONE zone meta-data is written to the library at this stage ...
+   */
 
+  // XXX on touche pas, avant le return oui .
+  baseId_.push_back(-123); // pour chaque dom, on a une baseId
+  zoneId_.push_back(-123); // pareil, pour chaque dom, on a une zoneId
+
+  // XXX Elie Saikali : zone vide, rien a ecrire (base aussi !) ... (cas LINKED_FILES_PER_COMM_GROUP !!!)
   if (ne_tot == 0 && ns_tot == 0)
-    return; // XXX Elie Saikali : zone vide, rien a ecrire ... (cas LINKED_FILES_PER_COMM_GROUP !!!)
+    return;
+
+  if (cg_base_write(fileId_, basename, icelldim, iphysdim, &baseId_.back()) != CG_OK)
+    Cerr << "Error Ecrire_CGNS::cgns_write_domaine_par_in_zone : cg_base_write !" << finl, TRUST_CGNS_ERROR();
 
   /* 4.1 : Create zone & grid */
   const cgsize_t isize[3]= { ns_tot, ne_tot, 0 }; /* boundary vertex size (zero if elements not sorted) */
