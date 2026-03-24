@@ -984,7 +984,6 @@ void Domaine_VEF::creer_tableau_p1bulle(Array_base& x, RESIZE_OPTIONS opt) const
   MD_Vector_tools::creer_tableau_distribue(md, x, opt);
 }
 
-
 void Domaine_VEF::calculer_h_carre()
 {
   const int nbe = nb_elem();
@@ -992,27 +991,35 @@ void Domaine_VEF::calculer_h_carre()
   h_carre = 1.e30;
   h_carre_.resize(nbe);
   // Calcul des surfaces
-  const DoubleVect& surfaces = face_surfaces();
   const int nb_faces_elem = domaine().nb_faces_elem();
-  for (int num_elem = 0; num_elem < nbe; num_elem++)
-    {
-      double surf_max = 0;
-      for (int i = 0; i < nb_faces_elem; i++)
-        {
-          double surf = surfaces(elem_faces(num_elem, i));
-          surf_max = (surf > surf_max) ? surf : surf_max;
-        }
-      double vol = volumes(num_elem) / surf_max;
-      vol *= vol;
-      h_carre_(num_elem) = vol;
-      h_carre = (vol < h_carre) ? vol : h_carre;
-    }
-  // Modif BM: je pense qu'avec mp_min(h_carre) on va eviter beaucoup de differences seq/par
+  CDoubleArrView face_surfaces_v = face_surfaces().view_ro();
+  CDoubleArrView volumes_v = volumes().view_ro();
+  CIntTabView elem_faces_v = elem_faces().view_ro();
+  DoubleArrView h_carre_v = h_carre_.view_rw();
+  Kokkos::parallel_reduce(start_gpu_timer(__KERNEL_NAME__), range_1D(0, nbe),
+                          KOKKOS_LAMBDA(const int num_elem, double& h_carre_local)
+  {
+    double surf_max = 0;
+    for (int i = 0; i < nb_faces_elem; i++)
+      {
+        double surf = face_surfaces_v(elem_faces_v(num_elem, i));
+        surf_max = (surf > surf_max) ? surf : surf_max;
+      }
+    double vol = volumes_v(num_elem) / surf_max;
+    vol *= vol;
+    h_carre_v(num_elem) = vol;
+    if (vol < h_carre_local) h_carre_local = vol;
+  }, Kokkos::Min<double>(h_carre));
+  end_gpu_timer(__KERNEL_NAME__);
   h_carre = mp_min(h_carre);
   Cerr << "Lowest cell size h=(Volume/max(Surface))= " << sqrt(h_carre) << finl;
   double moyenne = 0.;
-  for (int i = 0; i < nbe; i++)
-    moyenne += h_carre_(i);
+  Kokkos::parallel_reduce(start_gpu_timer(__KERNEL_NAME__), range_1D(0, nbe),
+                          KOKKOS_LAMBDA(const int i, double& sum)
+  {
+    sum += h_carre_v(i);
+  }, moyenne);
+  end_gpu_timer(__KERNEL_NAME__);
   moyenne = mp_sum(moyenne);
   double h_carre_moyen = moyenne / mp_sum((double) nbe);
   Cerr << "Average cell size <h>= " << sqrt(h_carre_moyen) << finl;
