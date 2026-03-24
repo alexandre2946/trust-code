@@ -520,108 +520,209 @@ int Matrice_Morse::ordre() const
 void Matrice_Morse::compacte(int elim_coeff_nul)
 {
   int n=nb_lignes();
-
   int coeff_nuls=0;
   int coeff_quasi_nuls=0;
-  ArrOfInt elim_coeff((int)tab2_.size_array());
+  auto tab_elim_coeff(tab2_); // Possibly BigArrOfInt
+  tab_elim_coeff = 0;
   if (elim_coeff_nul)
     {
-      ArrOfDouble coeff_max(n);
+      ArrOfDouble tab_coeff_max(n);
+      tab_coeff_max = 0.;
       // Recherche des coefficients nuls hors diagonale a supprimer de la matrice morse
-      for(int i=0; i<n; i++)
-        for (auto k=tab1_(i)-1; k<tab1_(i+1)-1; k++)
-          {
-            if (std::fabs(coeff_(k))>coeff_max(i)) coeff_max(i)=std::fabs(coeff_(k));
-            if (coeff_(k)==0)
-              {
-                coeff_nuls++;
-                elim_coeff((int)k)=1;
-              }
-          }
+      {
+        ArrOfInt tab_cnt(1);
+        tab_cnt = 0;
+        auto tab1 = tab1_.view_ro();
+        CDoubleArrView coeff = coeff_.view_ro();
+        DoubleArrView coeff_max = tab_coeff_max.view_rw();
+        auto elim_coeff = tab_elim_coeff.view_rw();
+        IntArrView cnt = tab_cnt.view_rw();
+        Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(0, n), KOKKOS_LAMBDA(const int i)
+        {
+          auto k1 = tab1(i)-1;
+          auto k2 = tab1(i+1)-1;
+          for (auto k = k1; k < k2; k++)
+            {
+              double abs_c = Kokkos::fabs(coeff(k));
+              if (abs_c > coeff_max(i)) coeff_max(i) = abs_c;
+              if (coeff(k) == 0)
+                {
+                  Kokkos::atomic_add(&cnt(0), 1);
+                  elim_coeff(k) = 1;
+                }
+            }
+        });
+        end_gpu_timer(__KERNEL_NAME__);
+        coeff_nuls = tab_cnt(0);
+      }
 
       if (elim_coeff_nul==2)
         {
           // Recherche des coefficients quasi nuls hors diagonale (1.e-12 plus petit que le coefficient le plus grand de la ligne) a supprimer de la matrice morse
-          for(int i=0; i<n; i++)
-            if (!est_egal(coeff_max(i),0)         // Le plus grand coefficient doit etre strictement positif
-                && coeff_max(i)<1e10)          // On ne supprime pas un coefficient quasi-nul d'une ligne ou la diagonale peut etre mise a 1e12
-              for (auto k=tab1_(i)-1; k<tab1_(i+1)-1; k++)
-                if (coeff_(k)!=0                 // Les coefficients nuls ont deja ete trouves
-                    && est_egal(std::fabs(coeff_(k))/coeff_max(i),0))
-                  {
-                    coeff_quasi_nuls++;
-                    elim_coeff((int)k)=1;
-                  }
+          const double eps = Objet_U::precision_geom;
+          ArrOfInt tab_cnt(1);
+          tab_cnt = 0;
+          auto tab1 = tab1_.view_ro();
+          CDoubleArrView coeff = coeff_.view_ro();
+          CDoubleArrView coeff_max = tab_coeff_max.view_ro();
+          IntArrView elim_coeff = tab_elim_coeff.view_rw();
+          IntArrView cnt = tab_cnt.view_rw();
+          Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(0, n), KOKKOS_LAMBDA(const int i)
+          {
+            double cm = coeff_max(i);
+            if (!est_egal(cm, 0., eps) && cm < 1e10)
+              {
+                auto k1 = tab1(i) - 1;
+                auto k2 = tab1(i + 1) - 1;
+                for (auto k = k1; k < k2; k++)
+                  if (coeff(k) != 0 && est_egal(Kokkos::fabs(coeff(k)) / cm, 0., eps))
+                    {
+                      Kokkos::atomic_add(&cnt(0), 1);
+                      elim_coeff(k) = 1;
+                    }
+              }
+          });
+          end_gpu_timer(__KERNEL_NAME__);
+          coeff_quasi_nuls = tab_cnt(0);
         }
     }
   // Recherche des coefficients doublons
-  int doublons=0;
-  for(int i=0; i<n; i++)
+  int nb_doublons=0;
+  {
+    auto tab1 = tab1_.view_ro();
+    CIntArrView tab2 = tab2_.view_ro();
+    CDoubleArrView coeff = coeff_.view_ro();
+    IntArrView elim_coeff = tab_elim_coeff.view_rw();
+    ArrOfInt tab_doublons(1);
+    tab_doublons = 0;
+    ArrOfInt tab_error(1);
+    tab_error = 0;
+    IntArrView doublons = tab_doublons.view_rw();
+    IntArrView error = tab_error.view_rw();
+    Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(0, n), KOKKOS_LAMBDA(const int i)
     {
-      auto kmin=tab1_(i)-1;
-      auto kmax=tab1_(i+1)-1;
-      int jmax=-1; // Highest column of a coefficient in the line i
-      for (auto k=kmin; k<kmax; k++)
+      auto k1 = tab1(i)-1;
+      auto k2 = tab1(i+1)-1;
+      int jmax = -1; // Highest column of a coefficient in the line i
+      for (auto k = k1; k < k2; k++)
         {
-          int j = tab2_(k)-1;
-          if (j>jmax)
-            jmax=j;
+          int j = tab2(k)-1;
+          if (j > jmax)
+            jmax = j;
           else
             {
               // Found a column j lower than jmax, check if not defined before:
-              for (auto kk=k-1; kk>=kmin; kk--)
+              for (auto kk = k-1; kk >= k1; kk--)
                 {
-                  int jj = tab2_(kk)-1;
+                  int jj = tab2(kk)-1;
                   if (jj == j)
                     {
                       // Already defined!
-                      doublons=1;
-                      elim_coeff((int)k)=1;
+                      Kokkos::atomic_add(&doublons(0), 1);
+                      elim_coeff(k) = 1;
                       // Check if same coefficients:
-                      if (coeff_(kk)!=coeff_(k))
-                        {
-                          Cerr << "Error in a Matrix Morse:" << finl;
-                          Cerr << "A("<<i<<","<<j<<")="<<coeff_(k)<<" != "<<"A("<<i<<","<<jj<<")="<<coeff_(kk)<<finl;
-                          exit();
-                        }
+                      if (coeff(kk) != coeff(k))
+                        Kokkos::atomic_add(&error(0), 1);
                       break;
                     }
                 }
             }
         }
-    }
+    });
+    end_gpu_timer(__KERNEL_NAME__);
+    nb_doublons = tab_doublons(0);
+    if (tab_error(0))
+      {
+        Cerr << "Error in a Matrix Morse: duplicate entries with different values!" << finl;
+        exit();
+      }
+  }
 
   auto nnz(tab1_(0));
   nnz=0;
-  auto kdeb = tab1_(0)-1;
-  int coefficient_suppressed=0; // Nombre de coefficients supprimes
-  if (doublons || coeff_nuls || coeff_quasi_nuls)
+  if (nb_doublons || coeff_nuls || coeff_quasi_nuls)
     {
-      // Suppress coefficients
-      for (int i=0; i<n; i++)
+      // Step 1: Count kept entries per row (parallel_for over rows)
+      ArrOfInt tab_kept_per_row(n);
+      {
+        auto tab1 = tab1_.view_ro();
+        CIntArrView elim_coeff = tab_elim_coeff.view_ro();
+        IntArrView kept_per_row = tab_kept_per_row.view_wo();
+        Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(0, n), KOKKOS_LAMBDA(const int i)
         {
-          auto kfin = tab1_(i+1)-1;
-          for (auto k=kdeb; k<kfin; k++)
-            {
-              if (!elim_coeff((int)k))
-                {
-                  coeff_(nnz) = coeff_(k);
-                  tab2_(nnz) = tab2_(k);
-                  nnz++;
-                }
-              else
-                coefficient_suppressed++;
-            }
-          // Modification de tab1_ en fonction du nombre de coefficients deja enleves
-          tab1_(i+1)-=coefficient_suppressed;
-          kdeb = kfin;
-        }
+          int count = 0;
+          auto k1 = tab1(i)-1;
+          auto k2 = tab1(i+1)-1;
+          for (auto k = k1; k < k2; k++)
+            if (!elim_coeff(k)) count++;
+          kept_per_row(i) = count;
+        });
+        end_gpu_timer(__KERNEL_NAME__);
+      }
+
+      // Step 2: Save old tab1_ (needed for source offsets in scatter step)
+      auto old_tab1(tab1_);
+
+      // Step 3: Update tab1_ via prefix scan (updates tab1_(1..n), tab1_(0)=1 unchanged)
+      using tab1_scan_t = decltype(nnz);
+      {
+        auto tab1 = tab1_.view_rw();
+        CIntArrView kept_per_row = tab_kept_per_row.view_ro();
+        Kokkos::parallel_scan(start_gpu_timer(__KERNEL_NAME__), range_1D(0, n), KOKKOS_LAMBDA(const int i, tab1_scan_t& update, const bool final)
+        {
+          update += kept_per_row(i);
+          if (final) tab1(i+1) = update + 1;
+        });
+        end_gpu_timer(__KERNEL_NAME__);
+      }
+
+      // Step 4: Out-of-place scatter of coeff_ and tab2_ to new positions (parallel_for over rows)
+      // Safe because new_pos(i) <= old_pos(i) always, and rows are processed independently
+      nnz = tab1_[n] - 1;
+      auto new_coeff(coeff_);
+      auto new_tab2(tab2_);
+      {
+        auto tab1 = tab1_.view_ro();
+        auto old_tab1_ro = old_tab1.view_ro();
+        CDoubleArrView coeff_src = coeff_.view_ro();
+        CIntArrView tab2_src = tab2_.view_ro();
+        DoubleArrView coeff_dst = new_coeff.view_wo();
+        IntArrView tab2_dst = new_tab2.view_wo();
+        CIntArrView elim_coeff = tab_elim_coeff.view_ro();
+        Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(0, n), KOKKOS_LAMBDA(const int i)
+        {
+          auto new_pos = tab1(i) - 1;
+          auto k1 = old_tab1_ro(i)-1;
+          auto k2 = old_tab1_ro(i+1)-1;
+          for (auto k = k1; k < k2; k++)
+            if (!elim_coeff(k))
+              {
+                coeff_dst(new_pos) = coeff_src(k);
+                tab2_dst(new_pos) = tab2_src(k);
+                new_pos++;
+              }
+        });
+        end_gpu_timer(__KERNEL_NAME__);
+      }
+
+      // Step 5: Copy compacted data back
+      {
+        auto tab2 = tab2_.view_rw();
+        auto coeff = coeff_.view_rw();
+        CIntArrView new_tab2_ro = new_tab2.view_ro();
+        CDoubleArrView new_coeff_ro = new_coeff.view_ro();
+        Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(0, nnz), KOKKOS_LAMBDA(const int i)
+        {
+          tab2(i) = new_tab2_ro(i);
+          coeff(i) = new_coeff_ro(i);
+        });
+        end_gpu_timer(__KERNEL_NAME__);
+      }
     }
   else
     {
       nnz = tab1_[n] - 1;
     }
-
 
   // On redimensionne les tableaux
   tab2_.resize(nnz);
