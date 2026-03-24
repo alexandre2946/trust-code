@@ -8,48 +8,46 @@ Time is given in seconds
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                               Context of the computation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Date:     07-01-2026 -- 17:21:13
+Date:     24-03-2026 -- 13:45:37
 OS:       is157091__Linux__x86_64__5.11.12-300.fc34.x86_64__#1 SMP Wed Apr 7 16:31:13 UTC 2021
-CPU:      Model name:  AMD Ryzen Threadripper PRO 5975WX 32-Cores ; Thread(s) per core:  2
-GPU:      No GPU was used for the computation
-Nb procs: 2
+CPU model : AMD Ryzen Threadripper PRO 5975WX 32-Cores
+Total number of threads:64
+GPU model: No GPU used for the computation
+Nb procs used for the computation: 2
 TRUST version: 1.9.8_beta
+Total number of elements used for the calculation: 125000
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                            Computation start-up statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Total time of the start-up:                                                0.3901         
-Percent of untracked time during computation start-up:                     6.15227e-07    
+Total time of the start-up:                                                0.39944        
 Number of virtual exchanges:                                               623            
-Maximum number of MPI allreduce per time step                              655            
+Maximum number of MPI allreduce per time step                              647            
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                                  Time loop statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Total time of the time loop:                                               0.529831       
+Total time of the time loop:                                               0.511238       
 Number of time steps:                                                      3              
 Skipped time steps:                                                        0              
-Average time per time step:                                                0.17661        
-Standard deviation between time steps:                                     0.0118232      
+Average time per time step:                                                0.170413       
+Standard deviation between time steps:                                     0.0137483      
 Time elapsed in the skipped time steps:                                    0              
 
-Percent of total time spend in communication:                              3.66681        
+Percent of total time spend in communication:                              3.35807        
 
 Standard counter description             | Time/step       | % loop time | Call(s)/step   
 ------------------------------------------------------------------------------------------
-Convection operator                      | 0.0248364       | 14.1        | 2              
-Diffusion operator                       | 0.01083248      |  6.1        | 2              
-Gradient operator                        | 0.002377809     |  1.3        | 2              
-Divergence operator                      | 0.001715837     |  1.0        | 2              
-Source terms                             | 0.0007736693    |  0.4        | 1              
-Update ::mettre_a_jour                   | 0.001342059     |  0.8        | 1              
-Computation of the time step dt          | 0.001793707     |  1.0        | 4              
-Post-treatment operations                | 0.000870108     |  0.5        | 1              
-Other operations                         | 0.1320682       | 74.8        | 
-
-Untracked time                           | 1.7e-05         | 0.00321     | 
-
-Total number of virtual exchanges:                                         1195           
-Maximum number of MPI allreduce per time step                              277            
+Convection operator                      | 0.0284416       | 16.7        | 2              
+Diffusion operator                       | 0.009463033     |  5.6        | 2              
+Gradient operator                        | 0.002544217     |  1.5        | 2              
+Divergence operator                      | 0.001548384     |  0.9        | 2              
+Source terms                             | 0.0007883507    |  0.5        | 1              
+Update ::mettre_a_jour                   | 0.001138988     |  0.7        | 1              
+Computation of the time step dt          | 0.001788261     |  1.0        | 4              
+Post-treatment operations                | 0.0009056927    |  0.5        | 1              
+Other operations                         | 0.1237943       | 72.6        | 
+Number of virtual exchanges per time step:                                 398            
+Maximum number of MPI allreduce per time step                              275            
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  Warning: number of MPI allreduce calls per time step is high. Contact TRUST team to run massive parallel calculations
@@ -58,21 +56,21 @@ Maximum number of MPI allreduce per time step                              277
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                                Time loop statistics: IO
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Output write sequential:                                                   2596           MB/s
-Average of the fraction of the time spent in communications between processors:      3.4            %
-Max of the fraction of the time spent in communications between processors:          3.8            %
-Min of the fraction of the time spent in communications between processors:          3              %
-Time of one mpsum measured by an internal bench over 0.1s (network latency):         4.4083e-07     
-Network maximum bandwidth on all processors:                                          6.6 GB/s      
+Output write sequential:                                                   2308           MB/s
+Average of the fraction of the time spent in communications between processors:      2.9            %
+Max of the fraction of the time spent in communications between processors:          3.2            %
+Min of the fraction of the time spent in communications between processors:          2.6            %
+Time of one mpsum measured by an internal bench over 0.1s (network latency):         5.0766e-07     
+Network maximum bandwidth on all processors:                                          8.4 GB/s      
 Total network traffic:                                                               65.7321        MB/time step
 Average message size:                                                                40.743         kB
-Min waiting time:                                                                    2.9            % of total time
-Max waiting time:                                                                    3.8            % of total time
-Avg waiting time:                                                                    3.35           % of total time
+Min waiting time:                                                                    2.6            % of total time
+Max waiting time:                                                                    3              % of total time
+Avg waiting time:                                                                    2.8            % of total time
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                               Post-resolution statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Time of the post-resolution:                                               0.00139483     
+Time of the post-resolution:                                               0.00149032     
 Maximum number of MPI allreduce per time step                              6              
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -80,5 +78,5 @@ Max waiting time big    => probably due to a bad partitioning
 Communications > 30%    => too many processors or network too slow
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Total time for the whole computation                                       0.921325       
+Total time for the whole computation                                       0.912172       
 
