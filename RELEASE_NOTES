@@ -1,3 +1,4 @@
+XX/XX/26 (TRUST) Change       : Warning, VEF VerifierCoin keyword algorithm has been rewritten which possibly change the numerotation of the mesh and the partitioned mesh 
 XX/XX/26 (TRUST) Solver       : Sparskit based solver "solveur gen { solv_elem bicgstab|gmres ... }" removed. It can be replaced by more efficient PETSc equivalent solvers
 XX/XX/26 (TRUST) Tool         : trust -energy JOB_ID returns now on well-configured cluster the energy consumption of your job
 -------------------------------------------------------------------------------------------------

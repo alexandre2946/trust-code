@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,6 @@
 
 #include <LecFicDiffuse.h>
 #include <VerifierCoin.h>
-#include <TRUSTLists.h>
 #include <Scatter.h>
 #include <Domaine.h>
 #include <Param.h>
@@ -23,29 +22,61 @@
 
 Implemente_instanciable(VerifierCoin,"VerifierCoin",Interprete_geometrique_base);
 
-/*! @brief Simple appel a: Interprete::printOn(Sortie&)
- *
- *     Imprime l'interprete sur un flot de sortie
- *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
- */
-Sortie& VerifierCoin::printOn(Sortie& os) const
+/*! @brief Simple appel a: Interprete::printOn(Sortie&) */
+Sortie& VerifierCoin::printOn(Sortie& os) const { return Interprete::printOn(os); }
+
+/*! @brief Simple appel a: Interprete::readOn(Entree&) */
+Entree& VerifierCoin::readOn(Entree& is) { return Interprete::readOn(is); }
+
+// Split element `elem` into (dimension+1) sub-elements by inserting a centroid node.
+// The centroid coordinates are taken from xp(elem,:).
+// New elements are appended to les_elems; the sub-domains index is updated accordingly.
+void VerifierCoin::cut_elem(int elem, const DoubleTab& xp)
 {
-  return Interprete::printOn(os);
+  Domaine& dom=domaine();
+  DoubleTab& sommets = dom.les_sommets();
+  int nouveau_sommet = sommets.dimension(0);
+  IntTab& les_elems=dom.les_elems();
+  sommets.resize(nouveau_sommet+1, dimension);
+  for (int j = 0; j < dimension; j++)
+    sommets(nouveau_sommet,j) = xp(elem,j);
+
+  int oldsz = les_elems.dimension(0);
+  les_elems.resize(oldsz+dimension, dimension+1);
+  Cerr << "-> The element number " << elem << " is cut in " << dimension+1 << " elements." << finl;
+
+  int i0 = les_elems(elem,0);
+  int i1 = les_elems(elem,1);
+  int i2 = les_elems(elem,2);
+
+  les_elems(elem,0) = i0;
+  les_elems(elem,1) = i1;
+  les_elems(elem,2) = nouveau_sommet;
+
+  les_elems(oldsz,0) = i1;
+  les_elems(oldsz,1) = i2;
+  les_elems(oldsz,2) = nouveau_sommet;
+
+  les_elems(oldsz+1,0) = i0;
+  les_elems(oldsz+1,1) = i2;
+  les_elems(oldsz+1,2) = nouveau_sommet;
+
+  if (dimension == 3)
+    {
+      int i3 = les_elems(elem,3);
+
+      les_elems(elem,3)   = i3;
+      les_elems(oldsz,3)  = i3;
+      les_elems(oldsz+1,3)= i3;
+
+      les_elems(oldsz+2,0) = i0;
+      les_elems(oldsz+2,1) = i1;
+      les_elems(oldsz+2,2) = i2;
+      les_elems(oldsz+2,3) = nouveau_sommet;
+    }
+
+  mettre_a_jour_sous_domaine(dom, elem, oldsz, dimension);
 }
-
-
-/*! @brief Simple appel a: Interprete::readOn(Entree&)
- *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- */
-Entree& VerifierCoin::readOn(Entree& is)
-{
-  return Interprete::readOn(is);
-}
-
 
 /*! @brief Fonction principale de l'interprete: resoudre un probleme
  *
@@ -97,46 +128,13 @@ Entree& VerifierCoin::interpreter_(Entree& is)
 
   IntTab& les_elems=dom.les_elems();
   int nbelem=dom.nb_elem();
-  int elem,ns,ns1,ne,somm;
 
-  IntLists sommets_associes(nbsom);
-  IntLists elements_associes(nbsom);
-
-  IntVect test_double(nbsom);
-  test_double=0;
-
-  //On parcourt les elements et pour un element ne, on parcourt ses sommets. Pour chaque sommet on detecte les
-  //sommets "voisins". Une fois tous les elements parcourus, s il n y a pas un doublon dans les sommets voisins
-  //d un sommet somm, il faut decouper l element (ou les elements) qui porte ce sommet.
-
-  ne=0;
-
-  while (ne<nbelem)
-    {
-      ns=0;
-
-      while (ns<dimension+1)
-        {
-
-          somm = les_elems(ne,ns);
-          elements_associes[somm].add_if_not(ne);
-          ns1=0;
-          while ((ns1<dimension+1) && (test_double(somm)==0))
-            {
-              if (les_elems(ne,ns1)!=somm)
-                {
-                  if (sommets_associes[somm].contient(les_elems(ne,ns1)))
-                    test_double(somm)=1;
-                  else
-                    sommets_associes[somm].add(les_elems(ne,ns1));
-                }
-              ns1++;
-            }
-
-          ns++;
-        }
-      ne++;
-    }
+  // On compte les elements attaches a chaque sommet:
+  ArrOfInt nb_elem_per_som(nbsom);
+  nb_elem_per_som = 0;
+  for (int ne = 0; ne < nbelem; ne++)
+    for (int ns = 0; ns < dimension+1; ns++)
+      nb_elem_per_som(les_elems(ne,ns))++;
 
   //On decoupe les elements pour le sommet qui pose probleme
   // PQ : 25/05/07
@@ -148,8 +146,6 @@ Entree& VerifierCoin::interpreter_(Entree& is)
   // 1 : decoupage en passant par le sommet oppose de l'element voisin
 
   int option_decoupage=-1;
-  int somm_lu,elem_opp,somm_opp,somm1,somm2;
-  int dim_cas,nbsom_cas;
 
   LecFicDiffuse fic;
   if (lecture_decoupage_som)
@@ -158,6 +154,7 @@ Entree& VerifierCoin::interpreter_(Entree& is)
       fic.ouvrir(decoup_som);
       if(fic.good())
         {
+          int dim_cas, nbsom_cas;
           fic >> option_decoupage;
           fic >> dim_cas;
           fic >> nbsom_cas;
@@ -185,39 +182,30 @@ Entree& VerifierCoin::interpreter_(Entree& is)
           Process::exit();
         }
       Cerr << "option_decoupage " << option_decoupage << finl;
-    }
 
-  for (somm=0; somm<nbsom; somm++)
-    {
-
-      //On decoupe les elements pour le sommet qui pose probleme
-
-      if (test_double(somm)==0)
+      for (int somm=0; somm<nbsom; somm++)
         {
-          if(lecture_decoupage_som)
+          if (nb_elem_per_som(somm) != 1) continue;
+          //On decoupe les elements pour le sommet qui pose probleme
+          int somm_lu = -1, elem_opp, somm_opp, somm1, somm2, elem;
+          fic >> somm_lu >> somm_opp >> somm1 >> somm2;
+          if (dimension==3)
             {
-              fic >> somm_lu >> somm_opp >> somm1 >> somm2;
-              if (dimension==3)
-                {
-                  int somm3;
-                  fic >> somm3;
-                }
-              fic >> elem >> elem_opp;
-              if(somm_lu!=-1) somm = somm_lu; // -1 indice de fin de fichier
-              if(nbsom<=somm)
-                {
-                  Cerr << "Error in VerifierCoin::interpreter" << finl;
-                  Cerr << "The node " << somm << " is not found." << finl;
-                  Cerr << "Check the .Zones files are up to date with your mesh file." << finl;
-                  Process::exit();
-                }
+              int somm3;
+              fic >> somm3;
+            }
+          fic >> elem >> elem_opp;
+          if(somm_lu!=-1) somm = somm_lu; // -1 indice de fin de fichier
+          if(nbsom<=somm)
+            {
+              Cerr << "Error in VerifierCoin::interpreter" << finl;
+              Cerr << "The node " << somm << " is not found." << finl;
+              Cerr << "Check the .Zones files are up to date with your mesh file." << finl;
+              Process::exit();
             }
           Cerr<<"-> VerifierCoin is applied on the node "<<somm<< " of coordinates: ";
           for(int dir=0; dir<dimension; dir++) Cerr<<sommets(somm,dir)<<" ";
           Cerr<<"..."<<finl;
-
-          IntList_Curseur liste_elem(elements_associes[somm]);
-          int size_elem= elements_associes[somm].size();
 
           if (option_decoupage==1 && dimension==2 && somm_lu!=-1)  // inversion des sommets
             {
@@ -229,63 +217,31 @@ Entree& VerifierCoin::interpreter_(Entree& is)
               les_elems(elem_opp,1) = somm_opp ;
               les_elems(elem_opp,2) = somm2 ;
             }
-
           else // creation d'un nouveau sommet au centre de gravite de l'element
-            {
-              for (int k=0; k<size_elem; k++)
-                {
-                  elem=liste_elem.valeur();
-
-                  // On cree un sommet au centre de gravite de l'element
-                  int nouveau_sommet=sommets.dimension(0);
-                  sommets.resize(nouveau_sommet+1, dimension);
-                  for(int j=0; j<dimension; j++)
-                    sommets(nouveau_sommet,j)=xp(elem,j);
-
-                  // On divise l'element elem en dimension+1 elements
-                  int oldsz=les_elems.dimension(0);
-                  les_elems.resize(oldsz+dimension, dimension+1);
-                  Cerr << "-> The element number " << elem <<" is cut in " << dimension+1 << " elements." << finl;
-                  // On recupere les sommets de l'element elem
-                  int i0=les_elems(elem,0);
-                  int i1=les_elems(elem,1);
-                  int i2=les_elems(elem,2);
-
-                  // On affecte les sommets aux nouveaux elements
-                  les_elems(elem,0)=i0;
-                  les_elems(elem,1)=i1;
-                  les_elems(elem,2)=nouveau_sommet;
-
-                  les_elems(oldsz,0)=i1;
-                  les_elems(oldsz,1)=i2;
-                  les_elems(oldsz,2)=nouveau_sommet;
-
-                  les_elems(oldsz+1,0)=i0;
-                  les_elems(oldsz+1,1)=i2;
-                  les_elems(oldsz+1,2)=nouveau_sommet;
-
-                  if (dimension==3)
-                    {
-                      int i3=les_elems(elem,3);
-
-                      les_elems(elem,3)=i3;
-                      les_elems(oldsz,3)=i3;
-                      les_elems(oldsz+1,3)=i3;
-
-                      les_elems(oldsz+2,0)=i0;
-                      les_elems(oldsz+2,1)=i1;
-                      les_elems(oldsz+2,2)=i2;
-                      les_elems(oldsz+2,3)=nouveau_sommet;
-                    }
-
-                  mettre_a_jour_sous_domaine(dom,elem,oldsz,dimension);
-
-                  ++liste_elem;
-                }
-            }// option_decoupage
+            cut_elem(elem, xp);
         }
-
     }
+  else
+    {
+      std::map<int,int> som_elem; // Pour trier les sommets comme avant
+      for (int elem = 0; elem < nbelem; elem++)
+        for (int ns = 0; ns < dimension+1; ns++)
+          {
+            int somm = les_elems(elem, ns);
+            if (nb_elem_per_som(somm) == 1) som_elem.insert({somm, elem});
+          }
+      for (auto pair : som_elem)
+        {
+          int somm = pair.first;
+          int elem = pair.second;
+          nb_elem_per_som(somm) = 0;  // mark: vertex processed, avoid double split
+          Cerr << "-> VerifierCoin is applied on the node " << somm << " of coordinates: ";
+          for (int dir = 0; dir < dimension; dir++) Cerr << sommets(somm, dir) << " ";
+          Cerr << "..." << finl;
+          cut_elem(elem, xp);
+        }
+    }
+
   Scatter::init_sequential_domain(dom);
 
   return is;

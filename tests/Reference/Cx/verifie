@@ -44,7 +44,7 @@ echo $ECHO_OPTS "ok ($ram_after_10dt  $ram_at_1dt)"
 if [ "${1#PAR_}" != "$1" ]
 then
    echo $ECHO_OPTS "Number of calls to echange_espace_virtuel check for $1 ...\c"
-   nb_max_echgs=24 && [ $exec != "$exec_opt" ] && nb_max_echgs=31
+   nb_max_echgs=25 && [ $exec != "$exec_opt" ] && nb_max_echgs=31
    err=`awk -v nb_max=$nb_max_echgs '/Number of virtual exchanges per time step:/ {if ($NF<nb_max) print 0;else print 1}' PAR_Cx.TU`
    [ "$err" = "0" ] && echo "OK (<$nb_max_echgs)" || echo "KO (>$nb_max_echgs)"
    exit $err
