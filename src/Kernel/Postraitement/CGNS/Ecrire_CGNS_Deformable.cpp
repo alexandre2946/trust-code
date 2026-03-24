@@ -416,55 +416,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
 
       /* Connectivity to be written => Construct the sections to host connectivity later */
       if (should_write_conn)
-        {
-          cgsize_t start = -123, end = -123;
-          if (cgns_type_elem == CGNS_ENUMV(NGON_n)) // cas polyedre
-            {
-              cgsize_t maxoffset = -123;
-
-              if (is_polyedre) // Pas pour polygone
-                {
-                  const int nb_fs = TRUST2CGNS.get_nfs_tot();
-                  const int nb_fs_offset = TRUST2CGNS.get_nfs_offset_tot();
-
-                  start = 1, end = start + nb_fs - 1;
-                  maxoffset = nb_fs_offset;
-                  assert(start <= end);
-
-                  if (cgp_poly_section_write(fileId_, baseId_[ind], zoneId_[ind], "NGON_n", CGNS_ENUMV(NGON_n), start, end, maxoffset, 0, &sectionId) != CG_OK)
-                    Cerr << "Error Ecrire_CGNS::cgns_write_domaine_par_in_zone : cgp_poly_section_write !" << finl, TRUST_CGNS_ERROR();
-
-                  const int nb_ef = TRUST2CGNS.get_nef_tot();
-                  const int nb_ef_offset = TRUST2CGNS.get_nef_offset_tot();
-
-                  start = end + 1, end = start + nb_ef - 1;
-                  maxoffset = nb_ef_offset;
-                  assert(start <= end);
-
-                  if (cgp_poly_section_write(fileId_, baseId_[ind], zoneId_[ind], "NFACE_n", CGNS_ENUMV(NFACE_n), start, end, maxoffset, 0, &sectionId2) != CG_OK)
-                    Cerr << "Error Ecrire_CGNS::cgns_write_domaine_par_in_zone : cgp_poly_section_write !" << finl, TRUST_CGNS_ERROR();
-                }
-              else // polygon
-                {
-                  const int nb_es = ne_tot;
-                  const int nb_es_offset = TRUST2CGNS.get_nes_offset_tot();
-
-                  start = 1, end = start + nb_es - 1;
-                  maxoffset = nb_es_offset;
-
-                  if (cgp_poly_section_write(fileId_, baseId_[ind], zoneId_[ind], "NGON_n", CGNS_ENUMV(NGON_n), start, end, maxoffset, 0, &sectionId) != CG_OK)
-                    Cerr << "Error Ecrire_CGNS::cgns_write_domaine_par_in_zone : cgp_poly_section_write !" << finl, TRUST_CGNS_ERROR();
-                }
-            }
-          else
-            {
-              start = 1, end = ne_tot;
-              assert(start <= end);
-
-              if (cgp_section_write(fileId_, baseId_[ind], zoneId_[ind], "Elem", cgns_type_elem, start, end, 0, &sectionId) != CG_OK)
-                Cerr << "Error Ecrire_CGNS::cgns_write_domaine_par_in_zone : cgp_section_write !" << finl, TRUST_CGNS_ERROR();
-            }
-        }
+        cgns_build_connectivity_sections_par_in_zone(cgns_type_elem, is_polyedre, TRUST2CGNS, ind, ne_tot, sectionId, sectionId2);
 
       if (nb_elem > 0) // seulement si le proc a qlq chose a ecrire
         {
@@ -480,59 +432,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
 
           /* Set element connectivity : we rewrite since either topology changes or we need to do that !! */
           if (should_write_conn)
-            {
-              if (cgns_type_elem == CGNS_ENUMV(NGON_n)) // cas polyedre
-                {
-                  if (is_polyedre)
-                    {
-                      const std::vector<cgsize_t>& fs = TRUST2CGNS.get_local_fs(), &fs_offset = TRUST2CGNS.get_local_fs_offset();
-
-                      const std::vector<int>& incr_min_face_som = TRUST2CGNS.get_global_incr_min_face_som(), &incr_max_face_som = TRUST2CGNS.get_global_incr_max_face_som();
-
-                      min = incr_min_face_som[proc_me], max = incr_max_face_som[proc_me];
-                      assert(min < max);
-
-                      if (cgp_poly_elements_write_data(fileId_, baseId_[ind], zoneId_[ind], sectionId, min, max, fs.data(), fs_offset.data()) != CG_OK)
-                        Cerr << "Error Ecrire_CGNS::cgns_write_domaine_par_in_zone : cgp_poly_elements_write_data !" << finl, TRUST_CGNS_ERROR();
-
-                      const std::vector<cgsize_t>& ef = TRUST2CGNS.get_local_ef(), &ef_offset = TRUST2CGNS.get_local_ef_offset();
-
-                      const std::vector<int>& incr_min_elem_face = TRUST2CGNS.get_global_incr_min_elem_face(), &incr_max_elem_face = TRUST2CGNS.get_global_incr_max_elem_face();
-
-                      min = incr_max_face_som.back() + incr_min_elem_face[proc_me]; // BOOM
-                      max = incr_max_face_som.back() + incr_max_elem_face[proc_me]; // BEEM
-                      assert(min <= max);
-
-                      if (cgp_poly_elements_write_data(fileId_, baseId_[ind], zoneId_[ind], sectionId2, min, max, ef.data(), ef_offset.data()) != CG_OK)
-                        Cerr << "Error Ecrire_CGNS::cgns_write_domaine_par_in_zone : cgp_poly_elements_write_data !" << finl, TRUST_CGNS_ERROR();
-                    }
-                  else
-                    {
-                      const std::vector<cgsize_t>& es = TRUST2CGNS.get_local_es(), &es_offset = TRUST2CGNS.get_local_es_offset();
-
-                      const std::vector<int>& incr_max_elem = TRUST2CGNS.get_global_incr_max_elem(), &incr_min_elem = TRUST2CGNS.get_global_incr_min_elem();
-
-                      min = incr_min_elem[proc_me], max = incr_max_elem[proc_me];
-                      assert(min <= max);
-
-                      if (cgp_poly_elements_write_data(fileId_, baseId_[ind], zoneId_[ind], sectionId, min, max, es.data(), es_offset.data()) != CG_OK)
-                        Cerr << "Error Ecrire_CGNS::cgns_write_domaine_par_in_zone : cgp_poly_elements_write_data !" << finl, TRUST_CGNS_ERROR();
-                    }
-                }
-              else
-                {
-                  std::vector<cgsize_t> elems;
-                  TRUST2CGNS.convert_connectivity(cgns_type_elem, elems);
-
-                  const std::vector<int>& incr_max_elem = TRUST2CGNS.get_global_incr_max_elem(), &incr_min_elem = TRUST2CGNS.get_global_incr_min_elem();
-
-                  min = incr_min_elem[proc_me], max = incr_max_elem[proc_me];
-                  assert(min <= max);
-
-                  if (cgp_elements_write_data(fileId_, baseId_[ind], zoneId_[ind], sectionId, min, max, elems.data()) != CG_OK)
-                    Cerr << "Error Ecrire_CGNS::cgns_write_domaine_par_in_zone : cgp_elements_write_data !" << finl, TRUST_CGNS_ERROR();
-                }
-            }
+            cgns_write_connectivity_par_in_zone(cgns_type_elem, is_polyedre, TRUST2CGNS, ind, sectionId, sectionId2);
         }
 
       if (!should_write_conn) /* Set element connectivity : by links */

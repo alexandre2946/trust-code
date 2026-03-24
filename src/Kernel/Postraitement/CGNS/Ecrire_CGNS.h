@@ -116,8 +116,6 @@ private:
   void cgns_close_grid_or_solution_link_file(const double, const TYPE_LINK_CGNS,  bool is_cerr = true);
   void add_new_linked_base(const std::string&, const Nom&);
 
-  void cgns_write_iters();
-
   // Version sequentielle
   void cgns_write_domaine_seq(const Domaine * ,const Nom& , const DoubleTab& , const IntTab& , const Motcle& );
   void cgns_write_domaine_deformable_seq(const Domaine * ,const Nom& , const DoubleTab& , const IntTab& , const Motcle& );
@@ -131,8 +129,15 @@ private:
   void cgns_write_domaine_par_in_zone(const Domaine * ,const Nom& , const DoubleTab& , const IntTab& , const Motcle& );
   void cgns_write_domaine_deformable_par_in_zone(const Domaine * ,const Nom& , const DoubleTab& , const IntTab& , const Motcle& );
   void cgns_write_field_par_in_zone(const int, const double, const Nom&, const Nom&, const Nom&, const Nom&, const DoubleTab&);
+  void cgns_build_connectivity_sections_par_in_zone(const CGNS_TYPE cgns_type_elem, const bool is_polyedre,
+                                                    const TRUST_2_CGNS& TRUST2CGNS, const int ind_base_zone,
+                                                    const int ne_tot, int& sectionId, int& sectionId2 ) const;
+  void cgns_write_connectivity_par_in_zone(const CGNS_TYPE cgns_type_elem, const bool is_polyedre,
+                                           const TRUST_2_CGNS& TRUST2CGNS, const int ind_base_zone,
+                                           const int sectionId, const int sectionId2) const;
 
   // Version fichier CGNS unique (safe !)
+  void cgns_write_iters();
   void ensure_modify_open_singlefile();
   void cgns_flush_to_disk() const;
   bool ensure_modify_done_ = false;
