@@ -249,6 +249,8 @@ void Ecrire_CGNS::add_new_linked_base(const std::string& LOC, const Nom& nom_dom
     }
 }
 
+/* Used to open a new solution file, link all required supports to grid file (elem/som)
+ * ie : called once at the beginning while filling fld_loc_map_, and then at each add_time */
 void Ecrire_CGNS::cgns_open_solution_link_file(const double t)
 {
   assert((Option_CGNS::USE_LINKS && !postraiter_domaine_) || is_lagrangian_);
@@ -323,7 +325,7 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
       cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::SEQ>(fn, fileId_, true);
 
       const int nb_grps = static_cast<int>(unique_vec_proc_maitre_local_comm_.size());
-      std::vector<int> zoneId_tmp(nb_grps, -123);
+      std::vector<int> zoneId_tmp;//(nb_grps, -123);
 
       for (auto &itr : doms_written_)
         {
@@ -337,6 +339,9 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
           if (cg_base_write(fileId_, itr.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
             Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_comm_group : cg_base_write !" << finl, TRUST_CGNS_ERROR();
 
+          int zone_goto_idx = 1;
+          zoneId_tmp.clear();//(nb_grps, -123);
+
           for (int gid = 0; gid < nb_grps; gid++)
             {
               int proc_grp = unique_vec_proc_maitre_local_comm_[gid];
@@ -346,18 +351,23 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
               TRUST_2_CGNS::remove_slash_linkfile(file_group_id);
 
               const cgsize_t isize[3] = { sizeId_som_local_comm_[ind_base][gid], sizeId_elem_local_comm_[ind_base][gid], 0 };
-              const bool write_connectivity = (!(isize[0] == 1 && isize[1] == 1));
 
-              cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[index_glob], zone_name, isize, zoneId_tmp[gid], gid + 1,
+              if ((isize[0] == 0 && isize[1] == 0)) continue;
+
+              zoneId_tmp.push_back(-123);
+
+              cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[index_glob], zone_name, isize, zoneId_tmp.back(), zone_goto_idx,
                                                              file_group_id + ".grid.cgns" /* linkfile */, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
-                                                             "Ecrire_CGNS::cgns_write_final_link_file_comm_group", write_connectivity);
+                                                             "Ecrire_CGNS::cgns_write_final_link_file_comm_group");
 
               if(has_field)
                 cgns_helper_.cgns_write_solution_classic_links(file_group_id, itr.getString(), itr.getString(), LOC, time_post_,
                                                                "Ecrire_CGNS::cgns_write_final_link_file");
+
+              zone_goto_idx++;
             }
 
-          cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::SEQ>(has_field, nb_grps /* nb_zones_to_write */, fileId_, baseId_[index_glob], ind_base,
+          cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::SEQ>(has_field, static_cast<int>(zoneId_tmp.size()) /* nb_zones_to_write */, fileId_, baseId_[index_glob], ind_base,
                                                                  zoneId_tmp, LOC, solname_som_, solname_elem_, solname_faces_, time_post_);
         }
       cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::SEQ>(fn, fileId_, true);

@@ -406,7 +406,7 @@ inline void Ecrire_CGNS_helper::cgns_write_iters_deformable(const bool is_deform
 
   const char* solname = (LOC == "SOM") ? solname_som.c_str() : (LOC == "FACES") ? solname_faces.c_str() : solname_elem.c_str();
 
-  cgsize_t idata[2] = { CGNS_STR_SIZE , nuse};
+  const cgsize_t idata[2] = { CGNS_STR_SIZE , nuse};
 
   constexpr bool is_PAR_OVER = (_TYPE_ == TYPE_ECRITURE_CGNS::PAR_OVER);
   const bool is_comm_group = (Option_CGNS::LINKED_FILES_PER_COMM_GROUP || Option_CGNS::SINGLE_FILE_PER_COMM_GROUP);
@@ -489,8 +489,6 @@ inline void Ecrire_CGNS_helper::cgns_write_zone_and_deformable_links(const bool 
     if (cg_zone_write(fileId, baseId, zone_name_to_write.c_str(), isize, CGNS_ENUMV(Unstructured), &zoneId) != CG_OK)
       Cerr << "Error " << where << " : cg_zone_write !" << finl, TRUST_CGNS_ERROR();
 
-  if (!write_connectivity) return;
-
   if (cg_goto(fileId, baseId, "Zone_t", zone_goto_id, "end") != CG_OK)
     Cerr << "Error " << where << " : cg_goto Zone_t !" << finl, TRUST_CGNS_ERROR();
 
@@ -512,13 +510,14 @@ inline void Ecrire_CGNS_helper::cgns_write_zone_and_deformable_links(const bool 
 
       if (!conn_written)
         {
-          for (const auto &itr_conn : connect_names)
-            {
-              linkpath = "/" + target_base_name + "/" + target_zone_name + "/" + itr_conn + "/";
+          if (write_connectivity)
+            for (const auto &itr_conn : connect_names)
+              {
+                linkpath = "/" + target_base_name + "/" + target_zone_name + "/" + itr_conn + "/";
 
-              if (cg_link_write(itr_conn.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
-                Cerr << "Error " << where << " : cg_link_write connectivity !" << finl, TRUST_CGNS_ERROR();
-            }
+                if (cg_link_write(itr_conn.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
+                  Cerr << "Error " << where << " : cg_link_write connectivity !" << finl, TRUST_CGNS_ERROR();
+              }
           conn_written = true;
         }
 

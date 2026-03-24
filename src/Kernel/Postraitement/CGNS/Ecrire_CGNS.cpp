@@ -967,22 +967,22 @@ void Ecrire_CGNS::cgns_write_domaine_par_in_zone(const Domaine * domaine,const N
 
   /* 4.1 : Create zone & grid */
   cgsize_t isize[3];
-  isize[0] = (ns_tot == 0 && enter_group_comm) ? 1 : ns_tot; // si ns_tot = 0, on va juste creer une zone vide
-  isize[1] = (ne_tot == 0 && enter_group_comm) ? 1 : ne_tot; // si ne_tot = 0, on va juste creer une zone vide
+  isize[0] = ns_tot; // si ns_tot = 0, on va juste creer une zone vide
+  isize[1] = ne_tot; // si ne_tot = 0, on va juste creer une zone vide
   isize[2] = 0; /* boundary vertex size (zero if elements not sorted) */
 
-  cgns_fill_info_grid_link_file(basename, cgns_type_elem, icelldim,
-                                (ns_tot == 0 && enter_group_comm) ? 1 : ns_tot,
-                                (ne_tot == 0 && enter_group_comm) ? 1 : ne_tot,
-                                is_polyedre);
+  cgns_fill_info_grid_link_file(basename, cgns_type_elem, icelldim, ns_tot, ne_tot, is_polyedre);
+
+  zoneId_.push_back(-123);
+
+  if (ne_tot == 0 && ns_tot == 0)
+    return; // XXX Elie Saikali : zone vide, rien a ecrire ... (cas LINKED_FILES_PER_COMM_GROUP !!!)
 
   int coordsIdx = -123, coordsIdy = -123, coordsIdz = -123, sectionId = -123, sectionId2 = -123;
-  zoneId_.push_back(-123);
+
 
   cgns_helper_.cgns_write_zone_grid_coord<TYPE_ECRITURE_CGNS::PAR_IN>(icelldim, fileId_, baseId_.back(), basename /* Dom name */, isize,
                                                                       zoneId_.back(), xCoords, yCoords, zCoords, coordsIdx, coordsIdy, coordsIdz);
-
-  if (ne_tot == 0 && ns_tot == 0) return; // XXX Elie Saikali : zone vide creer, rien a faire de plus ... (cas LINKED_FILES_PER_COMM_GROUP !!!)
 
   /* 4.2 : Construct the sections to host connectivity later */
   cgsize_t start = -123, end = -123;
