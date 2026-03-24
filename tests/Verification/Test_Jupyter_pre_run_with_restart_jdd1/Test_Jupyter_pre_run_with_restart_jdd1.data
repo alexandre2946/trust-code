@@ -1,5 +1,5 @@
 # PARALLEL NOT #
-# parce que le pre_run ne peut pas etre lancé en parallele... probleme a resoudre plus tard #
+# parce que le pre_run ne peut pas etre lance en parallele... probleme a resoudre plus tard #
 dimension 2
 Pb_conduction pb
 Domaine dom

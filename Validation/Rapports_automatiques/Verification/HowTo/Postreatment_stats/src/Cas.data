@@ -1,4 +1,5 @@
 # ThermoHydraulique 3D : canal quasi compressible gaz parfait VDF #
+# lance_test 14 ecarts sur rhodia8 #
 # PARALLEL NOT #
 dimension 3
 Pb_Thermohydraulique_QC pb
