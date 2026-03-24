@@ -100,7 +100,7 @@ int Entree_Fichier_base::ouvrir(const char* name, IOS_OPEN_MODE mode)
           // rewind, to go back at begining of file:
           delete ifstream_;
           ifstream_ = new ifstream(name,ios_mod);
-          ok = ifstream_->good() && existing_file(name);
+          ok = ifstream_->good() && fileExists(name);
           set_istream(ifstream_);
         }
     }
