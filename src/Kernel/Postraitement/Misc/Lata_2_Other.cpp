@@ -30,10 +30,6 @@ Implemente_instanciable(Lata_2_Other, "lata_to_other|lata_2_other", Interprete);
 // XD attr mot chaine(into=["format_post_sup"]) mot 0 not_set
 // XD attr format chaine(into=["lml","lata","lata_v2","med"]) format 1 generated file post_med.data use format (MED or LATA or LML keyword).
 
-// XD format_lata_to_CGNS objet_lecture nul 0 not_set
-// XD attr mot chaine(into=["format_post_sup"]) mot 0 not_set
-// XD attr format chaine(into=["lml","lata","lata_v2","med","cgns"]) format 1 generated file post_CGNS.data use format (CGNS or LATA or LML keyword).
-
 // XD lata_to_other interprete lata_to_other -1 To convert results file written with LATA format to CGNS, MED or LML format. Warning: Fields located at faces are not supported yet.
 // XD attr format chaine(into=["lml","lata","lata_v2","med","cgns"]) format 1 Results format (CGNS, MED or LATA or LML keyword).
 // XD attr file chaine file 0 LATA file to convert to the new format.

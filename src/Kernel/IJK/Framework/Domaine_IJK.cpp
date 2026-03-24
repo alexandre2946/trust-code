@@ -20,7 +20,7 @@
 #define print_vect(x) (Nom("[") + Nom(x[0]) + Nom(" ") + Nom(x[1]) + Nom(" ") + Nom(x[2]) + Nom("]"))
 
 
-// XD domaine_IJK Domaine_base domaine_ijk -1 domain for IJK simulation (used in TrioCFD)
+// XD domaine_IJK domaine_base domaine_ijk -1 domain for IJK simulation (used in TrioCFD)
 Implemente_instanciable_sans_constructeur(Domaine_IJK, "Domaine_IJK", Domaine_base);
 
 // XD attr nbelem listentierf nbelem 0 Number of elements in each direction  (integers, 2 or 3 values depending on dimension)

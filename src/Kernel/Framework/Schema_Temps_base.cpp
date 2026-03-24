@@ -276,9 +276,7 @@ void Schema_Temps_base::set_param(Param& param) const
   param.ajouter( "impr_extremums",&impr_extremums_); // XD_ADD_P entier Print unknowns extremas
   param.ajouter( "no_error_if_not_converged_diffusion_implicite",&no_error_if_not_converged_diff_impl_); // XD_ADD_P entier not_set
   param.ajouter( "no_conv_subiteration_diffusion_implicite",&no_conv_subiteration_diff_impl_); // XD_ADD_P entier not_set
-  param.ajouter_non_std( "dt_start",(this)); // XD attr dt_start dt_start dt_start 1 dt_start dt_min : the first iteration is based on dt_min. NL2 dt_start dt_calc : the time step at first iteration is calculated in agreement with CFL condition. NL2 dt_start dt_fixe value : the first time step is fixed by the user (recommended when resuming calculation with Crank Nicholson temporal scheme to ensure continuity). NL2 By default, the first iteration is based on dt_calc.
-  // param.ajouter( "nb_pas_dt_max",&nb_pas_dt_max_);
-  // nb_pas_dt_max non standard pour valgrind
+  param.ajouter_non_std( "dt_start",(this)); // XD_ADD_P dt_start dt_start dt_min : the first iteration is based on dt_min. NL2 dt_start dt_calc : the time step at first iteration is calculated in agreement with CFL condition. NL2 dt_start dt_fixe value : the first time step is fixed by the user (recommended when resuming calculation with Crank Nicholson temporal scheme to ensure continuity). NL2 By default, the first iteration is based on dt_calc.
   param.ajouter_non_std( "nb_pas_dt_max",(this)); // XD_ADD_P entier Maximum number of calculation time steps (1e9 by default).
   param.ajouter( "niter_max_diffusion_implicite",&niter_max_diff_impl_); // XD_ADD_P entier This keyword changes the default value (number of unknowns) of the maximal iterations number in the conjugate gradient method used for implicit diffusion.
   param.ajouter( "precision_impr",&precision_impr_); // XD_ADD_P entier Optional keyword to define the digit number for flux values printed into .out files (by default 3).

@@ -3,7 +3,7 @@
 
 dimension 3
 Pb_Thermohydraulique_turbulent pb
-export domaine dom_pb1
+domaine dom_pb1
 
 # BEGIN MESH #
 Read_file dom_pb1 croix_3D_VEF.geom

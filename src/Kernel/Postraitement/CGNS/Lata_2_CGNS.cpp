@@ -20,7 +20,6 @@
 
 Implemente_instanciable(Lata_2_CGNS, "Lata_To_CGNS|Lata_2_CGNS", Interprete);
 // XD lata_to_CGNS interprete lata_to_CGNS -1 To convert results file written with LATA format to CGNS file. Warning: Fields located on faces are not supported yet.
-// XD attr format format_lata_to_CGNS format 1 generated file post_CGNS.data use format (CGNS or LATA or LML keyword).
 // XD attr file chaine file 0 LATA file to convert to the new format.
 // XD attr file_CGNS chaine file_CGNS 0 Name of the CGNS file.
 

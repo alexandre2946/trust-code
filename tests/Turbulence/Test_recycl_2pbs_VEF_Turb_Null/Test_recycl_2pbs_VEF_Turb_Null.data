@@ -2,8 +2,8 @@
 # PARALLEL OK #
 dimension 3
 
-Export domaine dom1
-Export domaine dom2
+domaine dom1
+domaine dom2
 
 # BEGIN MESH #
 Mailler dom1
