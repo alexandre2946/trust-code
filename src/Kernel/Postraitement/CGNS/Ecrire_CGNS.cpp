@@ -546,7 +546,7 @@ void Ecrire_CGNS::cgns_write_domaine_seq(const Domaine * domaine,const Nom& nom_
     Cerr << "Error Ecrire_CGNS::cgns_write_domaine_seq : cg_base_write !" << finl, TRUST_CGNS_ERROR();
 
   /* 4 : Vertex, cell & boundary vertex sizes */
-  cgsize_t isize[3] = { (cgsize_t)nb_som , (cgsize_t)nb_elem , 0 }; /* 0 => boundary vertex size (zero if elements not sorted) */
+  const cgsize_t isize[3] = { (cgsize_t)nb_som , (cgsize_t)nb_elem , 0 }; /* 0 => boundary vertex size (zero if elements not sorted) */
 
   cgns_fill_info_grid_link_file(basename, cgns_type_elem, icelldim, nb_som, nb_elem, is_polyedre);
 
@@ -710,7 +710,7 @@ void Ecrire_CGNS::cgns_write_domaine_par_over_zone(const Domaine * domaine,const
       assert (ne_loc > 0);
 
       cgsize_t start = 1, end = ne_loc;
-      cgsize_t isize[3] = { ns_loc , end , 0 }; /* 0 => boundary vertex size (zero if elements not sorted) */
+      const cgsize_t isize[3] = { ns_loc , end , 0 }; /* 0 => boundary vertex size (zero if elements not sorted) */
 
       zoneId_.push_back(-123);
       zonename = nom_dom.nom_me(indZ).getString();
@@ -764,8 +764,6 @@ void Ecrire_CGNS::cgns_write_domaine_par_over_zone(const Domaine * domaine,const
     }
 
   zoneId_par_.push_back(zoneId_); // XXX : Dont touch
-
-//  Process::barrier();
 
   /* 6 : Write grid coordinates & set connectivity */
   if (nb_elem > 0) // this proc will write !
@@ -965,21 +963,16 @@ void Ecrire_CGNS::cgns_write_domaine_par_in_zone(const Domaine * domaine,const N
 
   assert (enter_group_comm || (!enter_group_comm && ns_tot > 0 && ne_tot > 0));
 
-  /* 4.1 : Create zone & grid */
-  cgsize_t isize[3];
-  isize[0] = ns_tot; // si ns_tot = 0, on va juste creer une zone vide
-  isize[1] = ne_tot; // si ne_tot = 0, on va juste creer une zone vide
-  isize[2] = 0; /* boundary vertex size (zero if elements not sorted) */
-
   cgns_fill_info_grid_link_file(basename, cgns_type_elem, icelldim, ns_tot, ne_tot, is_polyedre);
 
-  zoneId_.push_back(-123);
+  zoneId_.push_back(-123); // XXX on touche pas, avant le return oui ...
 
   if (ne_tot == 0 && ns_tot == 0)
     return; // XXX Elie Saikali : zone vide, rien a ecrire ... (cas LINKED_FILES_PER_COMM_GROUP !!!)
 
+  /* 4.1 : Create zone & grid */
+  const cgsize_t isize[3]= { ns_tot, ne_tot, 0 }; /* boundary vertex size (zero if elements not sorted) */
   int coordsIdx = -123, coordsIdy = -123, coordsIdz = -123, sectionId = -123, sectionId2 = -123;
-
 
   cgns_helper_.cgns_write_zone_grid_coord<TYPE_ECRITURE_CGNS::PAR_IN>(icelldim, fileId_, baseId_.back(), basename /* Dom name */, isize,
                                                                       zoneId_.back(), xCoords, yCoords, zCoords, coordsIdx, coordsIdy, coordsIdz);
@@ -1106,7 +1099,8 @@ void Ecrire_CGNS::cgns_write_domaine_par_in_zone(const Domaine * domaine,const N
             Cerr << "Error Ecrire_CGNS::cgns_write_domaine_par_in_zone : cgp_elements_write_data !" << finl, TRUST_CGNS_ERROR();
         }
     }
-  TRUST2CGNS.clear_vectors();
+  if (!is_deformable_)
+    TRUST2CGNS.clear_vectors();
 #endif
 }
 

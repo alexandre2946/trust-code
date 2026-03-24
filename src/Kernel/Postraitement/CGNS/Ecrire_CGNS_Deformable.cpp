@@ -214,6 +214,10 @@ void Ecrire_CGNS::link_multi_loc_support_pb_deformable()
 
 void Ecrire_CGNS::cgns_write_final_link_file_comm_group_pb_deformable()
 {
+#ifdef MPI_
+  if (vec_proc_maitre_local_comm_.empty())
+    gather_local_sizeId_for_comm_group();
+
   if (!Process::me())
     {
       std::string fn = baseFile_name_ + ".cgns";
@@ -222,7 +226,7 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group_pb_deformable()
       cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::SEQ>(fn, fileId_, true);
 
       const int nb_grps = static_cast<int>(unique_vec_proc_maitre_local_comm_.size());
-      std::vector<int> zoneId_tmp(nb_grps, -123);
+      std::vector<int> zoneId_tmp; //(nb_grps, -123);
 
       for (auto &itr : doms_written_)
         {
@@ -236,44 +240,49 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group_pb_deformable()
           if (cg_base_write(fileId_, itr.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
             Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_pb_deformable : cg_base_write !" << finl, TRUST_CGNS_ERROR();
 
+          int zone_goto_idx = 1;
+          zoneId_tmp.clear();//(nb_grps, -123);
+
           for (int gid = 0; gid < nb_grps; gid++)
             {
               int proc_grp = unique_vec_proc_maitre_local_comm_[gid];
               std::string zone_name = Nom("Zone").nom_me(proc_grp).getString();
 
               const cgsize_t isize[3] = { sizeId_som_local_comm_[ind_base][gid], sizeId_elem_local_comm_[ind_base][gid], 0 };
-              const bool write_connectivity = (!(isize[0] == 1 && isize[1] == 1));
+
+              if ((isize[0] == 0 && isize[1] == 0)) continue;
+
+              zoneId_tmp.push_back(-123);
 
               std::string file_group_id = Nom(baseFile_name_).nom_me(proc_grp).getString();
               TRUST_2_CGNS::remove_slash_linkfile(file_group_id);
 
-              cgns_helper_.cgns_write_zone_and_deformable_links(true /* write zone */, has_field, fileId_, baseId_[index_glob], zone_name, isize, zoneId_tmp[gid], gid + 1,
+              cgns_helper_.cgns_write_zone_and_deformable_links(true /* write zone */, has_field, fileId_, baseId_[index_glob], zone_name, isize, zoneId_tmp.back(), zone_goto_idx,
                                                                 file_group_id, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base], itr, LOC, time_post_,
-                                                                "Ecrire_CGNS::cgns_write_final_link_file_comm_group_pb_deformable", write_connectivity);
+                                                                "Ecrire_CGNS::cgns_write_final_link_file_comm_group_pb_deformable");
+
+              zone_goto_idx++;
             }
 
-          cgns_helper_.cgns_write_iters_deformable<TYPE_ECRITURE_CGNS::SEQ>(true, has_field, nb_grps /* nb_zones_to_write */, fileId_, baseId_[index_glob], ind_base,
+          cgns_helper_.cgns_write_iters_deformable<TYPE_ECRITURE_CGNS::SEQ>(true, has_field, static_cast<int>(zoneId_tmp.size()) /* nb_zones_to_write */, fileId_, baseId_[index_glob], ind_base,
                                                                             zoneId_tmp, LOC, solname_som_, solname_elem_, solname_faces_, grid_name_, time_post_);
 
         }
       cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::SEQ>(fn, fileId_, true);
     }
+#endif
 }
 
 void Ecrire_CGNS::cgns_write_final_link_file_pb_deformable()
 {
   if (Process::is_parallel() && Option_CGNS::LINKED_FILES_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
     {
-#ifdef MPI_
-      if (vec_proc_maitre_local_comm_.empty())
-        gather_local_sizeId_for_comm_group();
-
       cgns_write_final_link_file_comm_group_pb_deformable();
-#endif
       return;
     }
 
-  if (!Process::me()) // seul le proc 0 ecrit le fichier link
+  /* Only master proc writes the link file ! */
+  if (!Process::me())
     {
       std::string fn = baseFile_name_ + ".cgns"; // file name
       unlink(fn.c_str());
@@ -491,22 +500,22 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
       if (cg_base_write(fileId_, basename, icelldim, iphysdim, &baseId_[ind]) != CG_OK)
         Cerr << "Error Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone : cg_base_write !" << finl, TRUST_CGNS_ERROR();
 
-      cgsize_t isize[3];
-      isize[0] = (ns_tot == 0 && enter_group_comm) ? 1 : ns_tot; // si ns_tot = 0, on va juste creer une zone vide
-      isize[1] = (ne_tot == 0 && enter_group_comm) ? 1 : ne_tot; // si ne_tot = 0, on va juste creer une zone vide
-      isize[2] = 0; /* boundary vertex size (zero if elements not sorted) */
+      int glob_min_nb_elem = Process::mp_min(nb_elem);
+
+      if (ne_tot == 0 && ns_tot == 0)
+        return; // XXX Elie Saikali : zone vide, rien a ecrire ... (cas LINKED_FILES_PER_COMM_GROUP !!!)
+
+      const cgsize_t isize[3]= { ns_tot, ne_tot, 0 }; /* boundary vertex size (zero if elements not sorted) */
 
       cgns_helper_.cgns_write_zone_grid_coord<TYPE_ECRITURE_CGNS::PAR_IN>(icelldim, fileId_, baseId_[ind], basename /* Dom name */, isize,
                                                                           zoneId_[ind], xCoords, yCoords, zCoords, coordsIdx, coordsIdy, coordsIdz);
 
       int sectionId = -123, sectionId2 = -123;
 
-      const bool should_write_conn = (is_lagrangian_ || (Process::mp_min(nb_elem) <= 0));
+      const bool should_write_conn = (is_lagrangian_ || glob_min_nb_elem <= 0);
 
       if (is_lagrangian_)
         sizeId_.push_back( { isize[0], isize[1] } ); // XXX required for links later !
-
-      if (ne_tot == 0 && ns_tot == 0) return; // XXX Elie Saikali : zone vide creer, rien a faire de plus ... (cas LINKED_FILES_PER_COMM_GROUP !!!)
 
       /* Connectivity to be written => Construct the sections to host connectivity later */
       if (should_write_conn)
