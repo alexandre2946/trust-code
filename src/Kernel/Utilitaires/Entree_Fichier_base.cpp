@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,7 +16,7 @@
 #include <Entree_Fichier_base.h>
 #include <Process.h>
 #include <Nom.h>
-
+#include <sys/stat.h>
 #ifndef LATATOOLS
 #include <EntreeSortie.h>
 #endif
@@ -37,10 +37,19 @@ Entree_Fichier_base::Entree_Fichier_base()
   ifstream_=0;
 }
 
+bool fileExists(const char* name)
+{
+  std::cerr << "Provisoire name=" << name << std::endl;
+  struct stat buffer;
+  if (stat(name, &buffer) == 0 && S_ISREG(buffer.st_mode))
+    return true;
+  else
+    return false;
+}
 Entree_Fichier_base::Entree_Fichier_base(const char* name,IOS_OPEN_MODE mode)
 {
   ifstream_ = new ifstream(name, mode);
-  if(ifstream_->fail())
+  if(ifstream_->fail() || !fileExists(name))
     {
       Cerr << "Error while opening the file " << name << finl;
       Process::exit();
@@ -68,7 +77,7 @@ int Entree_Fichier_base::ouvrir(const char* name, IOS_OPEN_MODE mode)
       ios_mod=ios_mod|ios::binary;
     }
   ifstream_ = new ifstream(name,ios_mod);
-  int ok = ifstream_->good();
+  int ok = ifstream_->good() && fileExists(name);
   set_istream(ifstream_);
 
   if (bin_)
@@ -91,7 +100,7 @@ int Entree_Fichier_base::ouvrir(const char* name, IOS_OPEN_MODE mode)
           // rewind, to go back at begining of file:
           delete ifstream_;
           ifstream_ = new ifstream(name,ios_mod);
-          ok = ifstream_->good();
+          ok = ifstream_->good() && existing_file(name);
           set_istream(ifstream_);
         }
     }
