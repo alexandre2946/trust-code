@@ -972,11 +972,16 @@ class TRUSTSuite(object):
         
         
         list_exclu_nr = []
-        if os.path.exists("src/liste_cas_exclu_nr"):
-            list_cases = np.loadtxt("src/liste_cas_exclu_nr", dtype=str)
+        path_liste_cas_exclu_nr = os.path.join(ORIGIN_DIRECTORY, "src/liste_cas_exclu_nr")
+        if os.path.exists(path_liste_cas_exclu_nr):
+            list_cases = np.loadtxt(path_liste_cas_exclu_nr, dtype=str)
             if len(list_cases) == 0:
                 raise RuntimeError("Empty file 'liste_cas_exclu_nr' in your src directory. Please remove it.")
             list_exclu_nr = list(map(lambda a: os.path.normpath(a), list_cases))
+        else:
+            path_liste_cas_exclu_nr=""
+
+        list_test_case_normalized=[]
 
         for c in self.getCases():
             if c.dir_ != ".":
@@ -984,11 +989,36 @@ class TRUSTSuite(object):
             else:
                 t = c.name_ + ".data"
             t = os.path.normpath(t)
-            
+
+            # save test paths encountered. 
+            # Used later to check that the liste_cas_exclu_nr does not contain extra test names
+            list_test_case_normalized.append(t)
+
             if c.excluNR: continue
             if t in list_exclu_nr: continue
             
             print("@@@CAS_NR_JY@@@ " + t)
+
+        # non existent test names not allowed in liste_cas_exclu_nr
+        list_extra_test_case=[]
+        for t in list_exclu_nr:
+            if t not in list_test_case_normalized:
+                list_extra_test_case.append(t)
+        # report all wrong tests at once
+        if len(list_extra_test_case) > 0:
+            print("path to problematic liste_cas_exclu_nr:")
+            print(path_liste_cas_exclu_nr)
+            print("Extra tests", t)
+            print(list_extra_test_case)
+            print("Avail tests:")
+            print(list_test_case_normalized)
+            print("========")
+            print("========")
+            print("IF USING JUPYTER NOTEBOOK, PLEASE USE ARGUMENT excluNR=True IN THE NOTEBOOK.")
+            print("liste_cas_exclu_nr IS DEPRECATED for jupyter notebooks")
+            print("========")
+            print("========")
+            raise RuntimeError(f"Error: liste_cas_exclu_nr contains {len(list_extra_test_case)} extra test names that are not part of the report. Please remove them. For jupyter notebooks, liste_cas_exclu_nr IS DEPRECATED. Use 'excluNR=True' in addCase method.")
 
     def printCases(self):
         """
