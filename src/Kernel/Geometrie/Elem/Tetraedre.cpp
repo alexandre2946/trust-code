@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -207,44 +207,30 @@ int Tetraedre_32_64<_SIZE_>::contient(const SmallArrOfTID_t& som, int_t element 
  * @param (DoubleVect& volumes) le vecteur contenant les valeurs  des des volumes des elements du domaine
  */
 template <typename _SIZE_>
-void Tetraedre_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
+void Tetraedre_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& tab_volumes) const
 {
   const Domaine_t& domaine=mon_dom.valeur();
-  const Domaine_t& dom=domaine;
-
-  double x0,y0,z0;
-  double x1,y1,z1;
-  double x2,y2,z2;
-  double x3,y3,z3;
-  int_t s[4];
 
   int_t size_tot = domaine.nb_elem_tot();
-  assert(volumes.size_totale()==size_tot);
-  for (int_t num_poly=0; num_poly<size_tot; num_poly++)
-    {
-      for (int i=0; i<4; i++)
-        s[i] = domaine.sommet_elem(num_poly,i);
-
-      x0 = dom.coord(s[0],0);
-      y0 = dom.coord(s[0],1);
-      z0 = dom.coord(s[0],2);
-
-      x1 = dom.coord(s[1],0);
-      y1 = dom.coord(s[1],1);
-      z1 = dom.coord(s[1],2);
-
-      x2 = dom.coord(s[2],0);
-      y2 = dom.coord(s[2],1);
-      z2 = dom.coord(s[2],2);
-
-      x3 = dom.coord(s[3],0);
-      y3 = dom.coord(s[3],1);
-      z3 = dom.coord(s[3],2);
-
-      volumes[num_poly] = std::fabs((x1-x0)*((y2-y0)*(z3-z0)-(y3-y0)*(z2-z0))-
-                                    (x2-x0)*((y1-y0)*(z3-z0)-(y3-y0)*(z1-z0))+
-                                    (x3-x0)*((y1-y0)*(z2-z0)-(y2-y0)*(z1-z0)))/6;
-    }
+  assert(tab_volumes.size_totale()==size_tot);
+  ConstView<_SIZE_,2> les_Polys = domaine.les_elems().view_ro();
+  CDoubleTabView coord = domaine.coord_sommets().view_ro();
+  auto volumes = tab_volumes.view_wo();
+  Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), size_tot, KOKKOS_LAMBDA(const int_t num_poly)
+  {
+    int_t s0 = les_Polys(num_poly, 0);
+    int_t s1 = les_Polys(num_poly, 1);
+    int_t s2 = les_Polys(num_poly, 2);
+    int_t s3 = les_Polys(num_poly, 3);
+    double x0 = coord(s0, 0), y0 = coord(s0, 1), z0 = coord(s0, 2);
+    double x1 = coord(s1, 0), y1 = coord(s1, 1), z1 = coord(s1, 2);
+    double x2 = coord(s2, 0), y2 = coord(s2, 1), z2 = coord(s2, 2);
+    double x3 = coord(s3, 0), y3 = coord(s3, 1), z3 = coord(s3, 2);
+    volumes(num_poly) = Kokkos::fabs((x1-x0)*((y2-y0)*(z3-z0)-(y3-y0)*(z2-z0))-
+                                     (x2-x0)*((y1-y0)*(z3-z0)-(y3-y0)*(z1-z0))+
+                                     (x3-x0)*((y1-y0)*(z2-z0)-(y2-y0)*(z1-z0)))/6;
+  });
+  end_gpu_timer(__KERNEL_NAME__);
 }
 
 
@@ -259,22 +245,20 @@ void Tetraedre_32_64<_SIZE_>::calculer_normales(const IntTab_t& Face_sommets, Do
   const Domaine_t& domaine_geom = mon_dom.valeur();
   const DoubleTab_t& les_coords = domaine_geom.coord_sommets();
   int_t nbfaces = Face_sommets.dimension(0);
-  double x1,y1,z1,x2,y2,z2;
-  int_t n0,n1,n2;
   for (int_t numface=0; numface<nbfaces; numface++)
     {
 
-      n0 = Face_sommets(numface,0);
-      n1 = Face_sommets(numface,1);
-      n2 = Face_sommets(numface,2);
+      int_t n0 = Face_sommets(numface,0);
+      int_t n1 = Face_sommets(numface,1);
+      int_t n2 = Face_sommets(numface,2);
 
-      x1 = les_coords(n0,0) - les_coords(n1,0);
-      y1 = les_coords(n0,1) - les_coords(n1,1);
-      z1 = les_coords(n0,2) - les_coords(n1,2);
+      double x1 = les_coords(n0,0) - les_coords(n1,0);
+      double y1 = les_coords(n0,1) - les_coords(n1,1);
+      double z1 = les_coords(n0,2) - les_coords(n1,2);
 
-      x2 = les_coords(n2,0) - les_coords(n1,0);
-      y2 = les_coords(n2,1) - les_coords(n1,1);
-      z2 = les_coords(n2,2) - les_coords(n1,2);
+      double x2 = les_coords(n2,0) - les_coords(n1,0);
+      double y2 = les_coords(n2,1) - les_coords(n1,1);
+      double z2 = les_coords(n2,2) - les_coords(n1,2);
 
       face_normales(numface,0) = (y1*z2 - y2*z1)/2;
       face_normales(numface,1) = (-x1*z2 + x2*z1)/2;
