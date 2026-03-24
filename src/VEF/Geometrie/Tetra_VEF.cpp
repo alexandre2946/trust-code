@@ -126,80 +126,64 @@ void Tetra_VEF::normale(int num_Face,DoubleTab& Face_normales,
  *
  */
 void Tetra_VEF::creer_facette_normales(const Domaine_VEF& dom_VEF,
-                                       const IntVect& rang_elem_non_std) const
+                                       const IntVect& tab_rang_elem_non_std) const
 {
   const Domaine& domaine_geom = dom_VEF.domaine();
   auto& facette_normales = const_cast<Domaine_VEF&>(dom_VEF).facette_normales();
-  const DoubleTab& les_coords = domaine_geom.coord_sommets();
-  const IntTab& les_Polys = domaine_geom.les_elems();
   int nb_elem_tot = domaine_geom.nb_elem_tot();
-
-  int i,fa7;
-  int num_som[4];
-  double x[4][3];
-  double xg[3];
-  double xj0[3];
-  double u[3];
-  double v[3];
-  double psc;
-  double pv[3];
 
   if (facette_normales.dimension(0) != nb_elem_tot)
     facette_normales.resize(nb_elem_tot,6,3);
 
-  for(i=0; i<nb_elem_tot; i++)
-    {
-      if (rang_elem_non_std(i)==-1)
-        {
-          num_som[0]=les_Polys(i,0);
-          num_som[1]=les_Polys(i,1);
-          num_som[2]=les_Polys(i,2);
-          num_som[3]=les_Polys(i,3);
-          x[0][0]=les_coords(num_som[0],0);
-          x[0][1]=les_coords(num_som[0],1);
-          x[0][2]=les_coords(num_som[0],2);
-          x[1][0]=les_coords(num_som[1],0);
-          x[1][1]=les_coords(num_som[1],1);
-          x[1][2]=les_coords(num_som[1],2);
-          x[2][0]=les_coords(num_som[2],0);
-          x[2][1]=les_coords(num_som[2],1);
-          x[2][2]=les_coords(num_som[2],2);
-          x[3][0]=les_coords(num_som[3],0);
-          x[3][1]=les_coords(num_som[3],1);
-          x[3][2]=les_coords(num_som[3],2);
-          xg[0]=0.25*(x[0][0]+x[1][0]+x[2][0]+x[3][0]);
-          xg[1]=0.25*(x[0][1]+x[1][1]+x[2][1]+x[3][1]);
-          xg[2]=0.25*(x[0][2]+x[1][2]+x[2][2]+x[3][2]);
-          for (fa7=0; fa7<6; fa7++)
-            {
-              // la fa7 a pour sommets KEL_(2,fa7), KEL_(3,fa7), "G"
-              u[0]=x[KEL_(2,fa7)][0]-xg[0];
-              u[1]=x[KEL_(2,fa7)][1]-xg[1];
-              u[2]=x[KEL_(2,fa7)][2]-xg[2];
-              v[0]=x[KEL_(3,fa7)][0]-xg[0];
-              v[1]=x[KEL_(3,fa7)][1]-xg[1];
-              v[2]=x[KEL_(3,fa7)][2]-xg[2];
-              prodvect(u,v,pv);
-              // Orientation des normales :
-              xj0[0]= x[KEL_(0,fa7)][0]-x[KEL_(1,fa7)][0];
-              xj0[1]= x[KEL_(0,fa7)][1]-x[KEL_(1,fa7)][1];
-              xj0[2]= x[KEL_(0,fa7)][2]-x[KEL_(1,fa7)][2];
-              psc=xj0[0]*pv[0] + xj0[1]*pv[1] + xj0[2]*pv[2] ;
-              if (psc < 0)
-                {
-                  facette_normales(i,fa7,0) = -pv[0]/2;
-                  facette_normales(i,fa7,1) = -pv[1]/2;
-                  facette_normales(i,fa7,2) = -pv[2]/2;
-                }
-              else
-                {
-                  facette_normales(i,fa7,0)  = pv[0]/2;
-                  facette_normales(i,fa7,1)= pv[1]/2;
-                  facette_normales(i,fa7,2)= pv[2]/2;
-                }
-            }
-        }
-    }
+  CDoubleTabView les_coords = domaine_geom.coord_sommets().view_ro();
+  CIntTabView les_Polys = domaine_geom.les_elems().view_ro();
+  CIntArrView rang_elem_non_std = tab_rang_elem_non_std.view_ro();
+  CIntTabView KEL = KEL_.view_ro();
+  DoubleTabView3 facette_normale = facette_normales.view_rw<3>();
+  Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(0, nb_elem_tot), KOKKOS_LAMBDA(const int i)
+  {
+    if (rang_elem_non_std(i) == -1)
+      {
+        int num_som[4];
+        double x[4][3];
+        num_som[0] = les_Polys(i, 0);
+        num_som[1] = les_Polys(i, 1);
+        num_som[2] = les_Polys(i, 2);
+        num_som[3] = les_Polys(i, 3);
+        for (int s = 0; s < 4; s++)
+          for (int d = 0; d < 3; d++)
+            x[s][d] = les_coords(num_som[s], d);
+        double xg[3];
+        xg[0] = 0.25*(x[0][0]+x[1][0]+x[2][0]+x[3][0]);
+        xg[1] = 0.25*(x[0][1]+x[1][1]+x[2][1]+x[3][1]);
+        xg[2] = 0.25*(x[0][2]+x[1][2]+x[2][2]+x[3][2]);
+        for (int fa7 = 0; fa7 < 6; fa7++)
+          {
+            // la fa7 a pour sommets kel(2,fa7), kel(3,fa7), "G"
+            double u[3], v[3], pv[3], xj0[3];
+            u[0] = x[KEL(2,fa7)][0]-xg[0];
+            u[1] = x[KEL(2,fa7)][1]-xg[1];
+            u[2] = x[KEL(2,fa7)][2]-xg[2];
+            v[0] = x[KEL(3,fa7)][0]-xg[0];
+            v[1] = x[KEL(3,fa7)][1]-xg[1];
+            v[2] = x[KEL(3,fa7)][2]-xg[2];
+            // inline prodvect (not KOKKOS_INLINE_FUNCTION)
+            pv[0] = u[1]*v[2]-u[2]*v[1];
+            pv[1] = u[2]*v[0]-u[0]*v[2];
+            pv[2] = u[0]*v[1]-u[1]*v[0];
+            // Orientation des normales :
+            xj0[0] = x[KEL(0,fa7)][0]-x[KEL(1,fa7)][0];
+            xj0[1] = x[KEL(0,fa7)][1]-x[KEL(1,fa7)][1];
+            xj0[2] = x[KEL(0,fa7)][2]-x[KEL(1,fa7)][2];
+            double psc = xj0[0]*pv[0]+xj0[1]*pv[1]+xj0[2]*pv[2];
+            double sign = (psc < 0) ? -0.5 : 0.5;
+            facette_normale(i,fa7,0) = sign*pv[0];
+            facette_normale(i,fa7,1) = sign*pv[1];
+            facette_normale(i,fa7,2) = sign*pv[2];
+          }
+      }
+  });
+  end_gpu_timer(__KERNEL_NAME__);
 }
 
 
