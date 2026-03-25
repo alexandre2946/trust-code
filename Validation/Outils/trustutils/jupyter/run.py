@@ -147,9 +147,11 @@ def _initBuildDir():
     _set_run_sequential()
     
     # if Sserver detected, use it
-    if ("-parallel_sjob" in opt) or _detectSserver():
-        _set_use_sserver()
-        _set_run_parallel()
+    # but not when extracting test cases/lists
+    if not isExtractingNR() and not isExtractingNR_ListOnly():
+        if ("-parallel_sjob" in opt) or _detectSserver():
+            _set_use_sserver()
+            _set_run_parallel()
     
     if ("-not_run" in opt):
         _set_not_run()
