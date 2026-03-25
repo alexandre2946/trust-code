@@ -95,25 +95,9 @@ int Format_Post_CGNS::initialize(const Nom& file_basename, const int format, con
   return 1;
 }
 
-// E Saikali : on ajoute cette liste qui est utile pour un probleme couple dans le cas ou on ecrit dans meme fichier
-// Soucis plus tard car ecrire_temps est pas appelee si pb > 1. donc pour le moment on n'autorise paq
-static Noms liste_cgns_ecrit;
-
 int Format_Post_CGNS::ecrire_entete(const double temps_courant,const int reprise,const int est_le_premier_post)
 {
   verify_if_cgns(__func__);
-  const bool not_in_list =  !liste_cgns_ecrit.contient_(cgns_basename_);
-
-  if (not_in_list) liste_cgns_ecrit.add(cgns_basename_);
-  else
-    {
-      Cerr << "==============================================================================================================================================================" << finl;
-      Cerr << "==============================================================================================================================================================" << finl;
-      Cerr << "Error Format_Post_CGNS::ecrire_entete - We can not write coupled problems in same file. Please use the ***fichier*** keyword to dump field in seperate files !" << finl;
-      Cerr << "==============================================================================================================================================================" << finl;
-      Cerr << "==============================================================================================================================================================" << finl;
-      Process::exit();
-    }
 
   if (est_le_premier_post)
     {

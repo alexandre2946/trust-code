@@ -330,13 +330,19 @@ Entree& Postraitement::readOn(Entree& s)
     }
 
   if (Motcle(format_) == "MED") format_ = "med";
-
+  if (Motcle(format_) == "CGNS") format_ = "cgns"; // useless just to have lower case ...
   if (Motcle(format_) == "LATA_V2") format_ = "lata";
-
   if (Motcle(format_) == "SINGLE_LATA")
     {
       is_single_lata = true;
       format_ = "lata";
+    }
+
+  // XXX Elie Saikali : modif "nom_fich_" cas post CGNS si pb_couple ...
+  if (format_ == "cgns" && le_pb.is_coupled())
+    {
+      nom_fich_ += "_";
+      nom_fich_ += le_pb.le_nom();
     }
 
   nom_fich_ += ".";
