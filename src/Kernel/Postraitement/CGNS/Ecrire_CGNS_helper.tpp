@@ -148,18 +148,18 @@ Ecrire_CGNS_helper::cgns_write_grid_coord_data(const int icelldim, const int fil
 
 template<TYPE_ECRITURE_CGNS _TYPE_>
 inline void Ecrire_CGNS_helper::cgns_sol_write(const int nb_zones_to_write, const int fileId, const int baseId, const int ind,
-                                               const double temps, const std::vector<int>& zoneId, const std::string& LOC,
+                                               const int iteration, const std::vector<int>& zoneId, const std::string& LOC,
                                                std::string& solname_som, std::string& solname_elem, std::string& solname_faces,
                                                bool& solname_som_written, bool& solname_elem_written, bool& solname_faces_written,
                                                int& flowId_som, int& flowId_elem, int& flowId_faces)
 {
   // une fois par dt !!
   constexpr bool is_SEQ = (_TYPE_ == TYPE_ECRITURE_CGNS::SEQ), is_PAR_OVER = (_TYPE_ == TYPE_ECRITURE_CGNS::PAR_OVER);
+  std::string solname = "FlowSolution_itr_" + std::to_string(iteration);
+  solname.resize(CGNS_STR_SIZE, ' ');
 
   if (!solname_som_written && LOC == "SOM")
     {
-      std::string solname = "FlowSolution" + convert_double_to_string(temps) + "_" + LOC;
-      solname.resize(CGNS_STR_SIZE, ' ');
       solname_som += solname;
 
       // on boucle seulement sur les procs qui n'ont pas des nb_elem 0
@@ -179,8 +179,6 @@ inline void Ecrire_CGNS_helper::cgns_sol_write(const int nb_zones_to_write, cons
 
   if (!solname_elem_written && LOC == "ELEM")
     {
-      std::string solname = "FlowSolution" + convert_double_to_string(temps) + "_" + LOC;
-      solname.resize(CGNS_STR_SIZE, ' ');
       solname_elem += solname;
 
       // on boucle seulement sur les procs qui n'ont pas des nb_elem 0
@@ -200,8 +198,6 @@ inline void Ecrire_CGNS_helper::cgns_sol_write(const int nb_zones_to_write, cons
 
   if (!solname_faces_written && LOC == "FACES")
     {
-      std::string solname = "FlowSolution" + convert_double_to_string(temps) + "_" + LOC;
-      solname.resize(CGNS_STR_SIZE, ' ');
       solname_faces += solname;
 
       // on boucle seulement sur les procs qui n'ont pas des nb_elem 0
@@ -468,14 +464,16 @@ inline void Ecrire_CGNS_helper::cgns_write_zone_and_classic_links(const bool wri
 inline void Ecrire_CGNS_helper::cgns_write_solution_classic_links(const std::string& base_linkfile, const std::string& target_base_name, const std::string& target_zone_name,
                                                                   const std::string& LOC, const std::vector<double>& time_post, const char *where)
 {
+  int idx = 0;
   for (auto& itr_t : time_post)
     {
-      const std::string solname = "FlowSolution" + convert_double_to_string(itr_t) + "_" + LOC;
+      const std::string solname = "FlowSolution_itr_" + std::to_string(idx);
       const std::string linkfile = base_linkfile + ".solution." + convert_double_to_string(itr_t) + ".cgns"; // file name
       const std::string linkpath = "/" + target_base_name + "/" + target_zone_name + "/" + solname + "/";
 
       if (cg_link_write(solname.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
         Cerr << "Error " << where << " : cg_link_write solution !" << finl, TRUST_CGNS_ERROR();
+      idx++;
     }
 }
 
@@ -495,6 +493,7 @@ inline void Ecrire_CGNS_helper::cgns_write_zone_and_deformable_links(const bool 
   std::string linkfile, linkpath, grid_name_loc;
   bool conn_written = false;
 
+  int idx = 0;
   for (const auto &itr_t : time_post)
     {
       linkfile = file_prefix + ".solution." + convert_double_to_string(itr_t) + ".cgns";
@@ -503,7 +502,10 @@ inline void Ecrire_CGNS_helper::cgns_write_zone_and_deformable_links(const bool 
 
       grid_name_loc = "GridCoordinates";
       if (conn_written)
-        grid_name_loc += convert_double_to_string(itr_t);
+        {
+          grid_name_loc += "_itr_";
+          grid_name_loc += std::to_string(idx);
+        }
 
       if (cg_link_write(grid_name_loc.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
         Cerr << "Error " << where << " : cg_link_write GridCoordinates !" << finl, TRUST_CGNS_ERROR();
@@ -523,12 +525,13 @@ inline void Ecrire_CGNS_helper::cgns_write_zone_and_deformable_links(const bool 
 
       if (has_field)
         {
-          const std::string solname = "FlowSolution" + convert_double_to_string(itr_t) + "_" + LOC;
+          const std::string solname = "FlowSolution_itr_" + std::to_string(idx);
           linkpath = "/" + nom_dom.getString() + "/" + nom_dom.getString() + "/" + solname + "/";
 
           if (cg_link_write(solname.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
             Cerr << "Error " << where << " : cg_link_write FlowSolution " << solname << " !" << finl, TRUST_CGNS_ERROR();
         }
+      idx++;
     }
 }
 

@@ -303,7 +303,10 @@ void Ecrire_CGNS::update_grid_name()
   grid_name_loc_ = "GridCoordinates";
 
   if (!first_time_post_) // Pas la premiere fois
-    grid_name_loc_ += cgns_helper_.convert_double_to_string(time_post_.back());
+    {
+      grid_name_loc_ += "_itr_";
+      grid_name_loc_ += std::to_string(static_cast<int>(time_post_.size() - 1));
+    }
 
   std::string c = grid_name_loc_;
   c.resize(CGNS_STR_SIZE, ' ');
@@ -611,7 +614,8 @@ void Ecrire_CGNS::cgns_write_field_seq(const int comp, const double temps, const
   if (nb_vals)
     {
       /* 2 : Write solution names for iterative data later */
-      cgns_helper_.cgns_sol_write<TYPE_ECRITURE_CGNS::SEQ>(1 /* nb_zones_to_write */, fileId_, baseId_[ind], ind, temps, zoneId_, LOC,
+      cgns_helper_.cgns_sol_write<TYPE_ECRITURE_CGNS::SEQ>(1 /* nb_zones_to_write */, fileId_, baseId_[ind], ind,
+                                                           static_cast<int>(time_post_.size() - 1), zoneId_, LOC,
                                                            solname_som_, solname_elem_, solname_faces_,
                                                            solname_som_written_, solname_elem_written_, solname_faces_written_,
                                                            flowId_som_, flowId_elem_, flowId_faces_);
@@ -944,7 +948,8 @@ void Ecrire_CGNS::cgns_write_field_par_over_zone(const int comp, const double te
   const int nb_zones_to_write = TRUST2CGNS.nb_procs_writing();
   const bool all_write = TRUST2CGNS.all_procs_write(); // all procs will write !
 
-  cgns_helper_.cgns_sol_write<TYPE_ECRITURE_CGNS::PAR_OVER>(nb_zones_to_write, fileId_, baseId_[ind_glob], ind_glob, temps, zoneId_par_[ind_glob], LOC,
+  cgns_helper_.cgns_sol_write<TYPE_ECRITURE_CGNS::PAR_OVER>(nb_zones_to_write, fileId_, baseId_[ind_glob], ind_glob,
+                                                            static_cast<int>(time_post_.size() - 1), zoneId_par_[ind_glob], LOC,
                                                             solname_som_, solname_elem_, solname_faces_,
                                                             solname_som_written_, solname_elem_written_, solname_faces_written_,
                                                             flowId_som_, flowId_elem_, flowId_faces_);
@@ -1239,7 +1244,8 @@ void Ecrire_CGNS::cgns_write_field_par_in_zone(const int comp, const double temp
    *  - Only field meta-data is written to the library at this stage ... So no worries ^^
    *  - And just once per dt !
    */
-  cgns_helper_.cgns_sol_write<TYPE_ECRITURE_CGNS::PAR_IN>(1 /* nb_zones_to_write */, fileId_, baseId_[ind_glob], ind_glob, temps, zoneId_, LOC,
+  cgns_helper_.cgns_sol_write<TYPE_ECRITURE_CGNS::PAR_IN>(1 /* nb_zones_to_write */, fileId_, baseId_[ind_glob], ind_glob,
+                                                          static_cast<int>(time_post_.size() - 1), zoneId_, LOC,
                                                           solname_som_, solname_elem_, solname_faces_,
                                                           solname_som_written_, solname_elem_written_, solname_faces_written_,
                                                           flowId_som_, flowId_elem_, flowId_faces_);

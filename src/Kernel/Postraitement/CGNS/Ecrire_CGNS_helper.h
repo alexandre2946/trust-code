@@ -78,7 +78,7 @@ struct Ecrire_CGNS_helper
                              const std::vector<double>&, const std::vector<double>&, const std::vector<double>&);
 
   template<TYPE_ECRITURE_CGNS _TYPE_>
-  inline void cgns_sol_write(const int, const int, const int, const int, const double, const std::vector<int>&,
+  inline void cgns_sol_write(const int, const int, const int, const int, const int, const std::vector<int>&,
                              const std::string&, std::string&, std::string&, std::string&,
                              bool&, bool&, bool&, int&, int&, int&);
 

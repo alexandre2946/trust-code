@@ -607,11 +607,14 @@ void Ecrire_CGNS::cgns_write_final_link_file_lagrangian()
       zone_ptrs.reserve(static_cast<size_t>(CGNS_STR_SIZE) * nsteps);
 
       bool first_zone = true;
-      for (double t : time_post_)
+      for (int i = 0; i < nsteps; i++)
         {
           std::string zname = nom_dom.getString();
           if (!first_zone)
-            zname += cgns_helper_.convert_double_to_string(t);
+            {
+              zname += "_itr_";
+              zname += std::to_string(i);
+            }
           first_zone = false;
 
           zname.resize(CGNS_STR_SIZE, ' ');
@@ -627,7 +630,10 @@ void Ecrire_CGNS::cgns_write_final_link_file_lagrangian()
           std::string zn = nom_dom.getString();
 
           if (i > 0)
-            zn += cgns_helper_.convert_double_to_string(time_post_[i]);
+            {
+              zn += "_itr_";
+              zn += std::to_string(i);
+            }
 
           if (cg_zone_write(fileId_, baseId_[index_glob], zn.c_str(), isize, CGNS_ENUMV(Unstructured), &zoneId_[index_glob]) != CG_OK)
             Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_zone_write !" << finl, TRUST_CGNS_ERROR();
@@ -649,7 +655,7 @@ void Ecrire_CGNS::cgns_write_final_link_file_lagrangian()
                 Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_link_write connectivity !" << finl, TRUST_CGNS_ERROR();
             }
 
-          std::string solname = "FlowSolution" + cgns_helper_.convert_double_to_string(time_post_[i]) + "_" + LOC;
+          std::string solname = "FlowSolution_itr_" + std::to_string(i);
           linkpath = "/" + nom_dom.getString() + "/" + nom_dom.getString() + "/" + solname + "/";
           if (cg_link_write(solname.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
             Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_link_write FlowSolution !" << finl, TRUST_CGNS_ERROR();
