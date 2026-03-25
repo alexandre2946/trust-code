@@ -24,7 +24,7 @@ pd.set_option("display.max_rows", None)
 
 def loadText(data, index_column=0, nb_column=-1, transpose=True, dtype="float", skiprows=0, **kwargs):
     """
-    Method for loading and saving files.
+    Method for loading files. Wraps np.loadtxt
 
     Parameters
     ---------
@@ -60,14 +60,14 @@ def loadText(data, index_column=0, nb_column=-1, transpose=True, dtype="float", 
         if transpose:
             matrix = np.loadtxt(data, dtype=dtype, skiprows=skiprows, **kwargs).T[index_column:nb]
         else:
-            matrix = np.loadtxt(data, dtype=dtype, skiprows=skiprows)[index_column:nb]
+            matrix = np.loadtxt(data, dtype=dtype, skiprows=skiprows, **kwargs)[index_column:nb]
     except FileNotFoundError as e: 
         # if file not found, don't try again...
         raise e
     except:
         # if someone knows what is supposed to be caught here, please specify it
         # catching anything and then trying the same thing is a bad idea...
-        matrix = np.loadtxt(data, dtype=dtype, skiprows=skiprows)
+        matrix = np.loadtxt(data, dtype=dtype, skiprows=skiprows, **kwargs)
 
     saveFileAccumulator(data)
     os.chdir(origin)
