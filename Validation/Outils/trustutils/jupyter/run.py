@@ -200,6 +200,8 @@ def _runCommand(cmd, verbose):
 def _detectSserver():
     """ Detect whether the Sserver is running on the machine
     """
+    if isExtractingNR() or isExtractingNR_ListOnly():
+        return False
     squeue = os.path.join(os.environ["TRUST_ROOT"], "bin", "Sjob", "Squeue")
     try:
         subprocess.check_call([squeue], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
