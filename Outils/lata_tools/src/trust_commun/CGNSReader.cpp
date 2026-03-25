@@ -905,6 +905,27 @@ namespace
       }
   }
 
+  static bool is_generic_parallel_zone_name(const std::string& zonename)
+  {
+    const std::string generic_prefix = "Zone_";
+    if (zonename.rfind(generic_prefix, 0) != 0)
+      return false;
+
+    const std::string suffix = zonename.substr(generic_prefix.size());
+    return is_all_digits(suffix);
+  }
+
+  static std::string build_geometry_name_from_base_and_zone(const std::string& basename,
+                                                            const std::string& zonename)
+  {
+    // Cas master/base parallele avec Zone_0000, Zone_0002, ... => le vrai nom logique est le nom de base
+    if (is_generic_parallel_zone_name(zonename))
+      return strip_parallel_suffix_if_any(basename);
+
+    // Cas classique: dom_boundaries_xxx_0000 => dom_boundaries_xxx
+    return strip_parallel_suffix_if_any(zonename);
+  }
+
   // *******************
   // *** Pour polys ...
   // *******************
@@ -931,12 +952,6 @@ namespace
           }
       }
     return false;
-  }
-
-  static bool zone_is_poly(int fn, int ibase, int izone)
-  {
-    return zone_has_section_type(fn, ibase, izone, NGON_n, nullptr)
-        || zone_has_section_type(fn, ibase, izone, NFACE_n, nullptr);
   }
 
   static void read_cgns_poly_raw(int fn, int ibase, int izone, int isec, std::vector<cgsize_t> &conn, std::vector<cgsize_t> &offsets,
@@ -1292,7 +1307,10 @@ void cgns_reader(const char *cgnsfilename, const char *data_filename, LataDB &la
       int nzones = 0;
       cgns_check(cg_nzones(fn, ibase, &nzones), "cg_nzones");
 
-      const bool merge_parallel_over_zone = ((int)parts.size() >= 2);
+      // XXX cas comm_group => nb_bases/zones pas unique dans les fichiers ....
+      // Donc on merge des qu'on a au moins une zone parallele reconnue.
+      // XXX march eaussi pour les bases qui ne contiennent qu'une seule zone generique Zone_xxxx !!!
+      const bool merge_parallel_over_zone = !parts.empty();
 
       if (!merge_parallel_over_zone)
         {
@@ -1319,8 +1337,11 @@ void cgns_reader(const char *cgnsfilename, const char *data_filename, LataDB &la
                          << " nb_cells=" << nb_cells
                          << " phys_dim=" << phys_dim << endl;
 
+              const std::string zone_name_str(zonename);
+              const std::string geom_name_str = build_geometry_name_from_base_and_zone(basename_str, zone_name_str);
+
               LataDBGeometry geom;
-              geom.name_ = strip_parallel_suffix_if_any(std::string(zonename)).c_str();;
+              geom.name_ = geom_name_str.c_str();
               geom.timestep_ = tstep_geom;
               lata_db.add_geometry(geom);
 
