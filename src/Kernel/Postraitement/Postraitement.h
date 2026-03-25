@@ -76,6 +76,8 @@ public:
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   void resetTime(double t, const std::string dirname) override;
 
+  void modify_cgns_basenames_and_reinit();
+
   //
   // Methodes specifiques :
   //
@@ -108,6 +110,7 @@ public:
   int nb_pas_dt_post() const { return nb_pas_dt_post_; }
 
   inline double dt_post() const { return dt_post_; }
+  inline const Nom& format() const { return format_; }
   inline Nom nom_fich() const { return nom_fich_; }
   static inline LIST(Nom)& noms_fichiers_sondes() { return noms_fichiers_sondes_; }
   inline int& est_le_premier_postraitement_pour_nom_fich() { return est_le_premier_postraitement_pour_nom_fich_; }

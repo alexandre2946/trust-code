@@ -15,6 +15,7 @@
 
 #include <Postraitements.h>
 #include <Postraitement.h>
+#include <unordered_set>
 
 Implemente_instanciable(Postraitements,"Postraitements|Post_processings",LIST(OWN_PTR(Postraitement_base)));
 // XD postraitements listobj postraitements -1 un_postraitement 0 Keyword to use several results files. List of objects of post-processing (with name).
@@ -108,7 +109,7 @@ int Postraitements::lire_postraitements(Entree& is, const Motcle& motlu, const P
   motcles[2] = "liste_postraitements";
   motcles[3] = "liste_de_postraitements";
 
-  int lerang = motcles.search(motlu);
+  const int lerang = motcles.search(motlu);
 
   // a cause du cas Liste_Postraitements (rang=2)
   //=> obligation de creer la liste de nom de fichier associes au post
@@ -130,6 +131,8 @@ int Postraitements::lire_postraitements(Entree& is, const Motcle& motlu, const P
     }
   else if (lerang == 1 || lerang == 2 || lerang == 3 )
     {
+      std::vector<std::string> cgns_post_file_names; // management of duplicated files if cgns
+
       // Lecture d'une liste
       // Lire l'accolade
       //Nom post_which_contains_statistic("");
@@ -179,6 +182,13 @@ int Postraitements::lire_postraitements(Entree& is, const Motcle& motlu, const P
           post.typer(type);
           post->associer_nom_et_pb_base(nom_du_post, mon_pb);
           is >> post.valeur();
+
+          // XXX Elie Saikali : prevent any surprise in the future ...
+          const Postraitement * z_post = dynamic_cast<const Postraitement*>(&(post.valeur()));
+
+          if (z_post && z_post->format() == "cgns")
+            cgns_post_file_names.push_back(z_post->nom_fich().getString());
+
           /*
           // Check if statistic block is defined several times
           // Not supported yet cause, backup files will contains several
@@ -208,6 +218,34 @@ int Postraitements::lire_postraitements(Entree& is, const Motcle& motlu, const P
           Cerr << "You can use the same name for the storing data file in two different blocks of post-processing" << finl;
           Cerr << "Check your datafile." << finl;
           exit();
+        }
+
+      // XXX Elie Saikali : prevent any surprise in the future ...
+      if (cgns_post_file_names.size() > 1)
+        {
+          // chef if we have duplicated file names !
+          std::unordered_set<std::string> seen;
+          bool has_duplicates = false;
+
+          for (const auto &s : cgns_post_file_names)
+            {
+              if (!seen.insert(s).second)
+                {
+                  has_duplicates = true;
+                  break;
+                }
+            }
+
+          if (has_duplicates) // si has_duplicates => on renomme tout !
+            {
+              std::string nom_fich_post;
+              for (auto &itr : *this)
+                {
+                  Postraitement *z_post = dynamic_cast<Postraitement*>(&(itr.valeur()));
+                  if (z_post && z_post->format() == "cgns")
+                    z_post->modify_cgns_basenames_and_reinit();
+                }
+            }
         }
     }
   else

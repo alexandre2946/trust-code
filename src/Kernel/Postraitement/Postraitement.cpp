@@ -368,6 +368,30 @@ Entree& Postraitement::readOn(Entree& s)
   return s;
 }
 
+void Postraitement::modify_cgns_basenames_and_reinit()
+{
+  if (format_ != "cgns") return;
+
+  nom_fich_.prefix(format_);
+  nom_fich_.prefix(".");
+
+  const Nom& le_nom_du_post = le_nom();
+  Nom vide;
+  if ((le_nom_du_post != "neant") && (le_nom_du_post != vide))
+    {
+      nom_fich_ += "_";
+      nom_fich_ += le_nom_du_post;
+    }
+
+  nom_fich_ += ".";
+  nom_fich_ += format_;
+
+  Nom base_name(nom_fich_);
+  base_name.prefix(format_);
+  base_name.prefix(".");
+  format_post_->initialize(base_name, binaire_, option_para_);
+}
+
 static const std::map<std::string, std::string> keyword_dictionnary
 {
   {"CHAMPS",                "FIELDS"},
