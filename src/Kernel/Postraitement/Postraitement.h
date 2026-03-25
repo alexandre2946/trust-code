@@ -76,7 +76,8 @@ public:
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   void resetTime(double t, const std::string dirname) override;
 
-  void modify_cgns_basenames_and_reinit();
+  // specifique cgns : avoid duplicated file names
+  void modify_cgns_basenames_and_reinit(const int, const int);
 
   //
   // Methodes specifiques :

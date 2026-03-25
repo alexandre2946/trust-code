@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -45,6 +45,9 @@ public:
   void completer();
   void completer_sondes();
   void resetTime(double t, const std::string dirname);
+
+protected:
+  std::vector<std::string> cgns_post_file_names_; // management of duplicated files if cgns
 };
 
 #endif

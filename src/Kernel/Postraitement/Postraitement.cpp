@@ -368,7 +368,7 @@ Entree& Postraitement::readOn(Entree& s)
   return s;
 }
 
-void Postraitement::modify_cgns_basenames_and_reinit()
+void Postraitement::modify_cgns_basenames_and_reinit(const int nom_cas_fich_ind, const int count_nom_cas_fich)
 {
   if (format_ != "cgns") return;
 
@@ -381,6 +381,18 @@ void Postraitement::modify_cgns_basenames_and_reinit()
     {
       nom_fich_ += "_";
       nom_fich_ += le_nom_du_post;
+    }
+  else if (nom_fich_ == nom_du_cas())
+    {
+      if (count_nom_cas_fich > 1) // we have several basenames with jdd name
+        {
+          assert (nom_cas_fich_ind <= count_nom_cas_fich);
+          if (nom_cas_fich_ind > 1) // not first one
+            {
+              nom_fich_ += "_bloc_";
+              nom_fich_ += std::to_string(nom_cas_fich_ind);
+            }
+        }
     }
 
   nom_fich_ += ".";

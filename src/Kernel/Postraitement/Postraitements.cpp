@@ -128,11 +128,15 @@ int Postraitements::lire_postraitements(Entree& is, const Motcle& motlu, const P
         post.typer("Postraitement");
       post->associer_nom_et_pb_base("neant", mon_pb);
       is >> post.valeur();
+
+      // XXX Elie Saikali : prevent any surprise in the future ...
+      const Postraitement * z_post = dynamic_cast<const Postraitement*>(&(post.valeur()));
+
+      if (z_post && z_post->format() == "cgns")
+        cgns_post_file_names_.push_back(z_post->nom_fich().getString());
     }
   else if (lerang == 1 || lerang == 2 || lerang == 3 )
     {
-      std::vector<std::string> cgns_post_file_names; // management of duplicated files if cgns
-
       // Lecture d'une liste
       // Lire l'accolade
       //Nom post_which_contains_statistic("");
@@ -187,7 +191,7 @@ int Postraitements::lire_postraitements(Entree& is, const Motcle& motlu, const P
           const Postraitement * z_post = dynamic_cast<const Postraitement*>(&(post.valeur()));
 
           if (z_post && z_post->format() == "cgns")
-            cgns_post_file_names.push_back(z_post->nom_fich().getString());
+            cgns_post_file_names_.push_back(z_post->nom_fich().getString());
 
           /*
           // Check if statistic block is defined several times
@@ -219,34 +223,6 @@ int Postraitements::lire_postraitements(Entree& is, const Motcle& motlu, const P
           Cerr << "Check your datafile." << finl;
           exit();
         }
-
-      // XXX Elie Saikali : prevent any surprise in the future ...
-      if (cgns_post_file_names.size() > 1)
-        {
-          // chef if we have duplicated file names !
-          std::unordered_set<std::string> seen;
-          bool has_duplicates = false;
-
-          for (const auto &s : cgns_post_file_names)
-            {
-              if (!seen.insert(s).second)
-                {
-                  has_duplicates = true;
-                  break;
-                }
-            }
-
-          if (has_duplicates) // si has_duplicates => on renomme tout !
-            {
-              std::string nom_fich_post;
-              for (auto &itr : *this)
-                {
-                  Postraitement *z_post = dynamic_cast<Postraitement*>(&(itr.valeur()));
-                  if (z_post && z_post->format() == "cgns")
-                    z_post->modify_cgns_basenames_and_reinit();
-                }
-            }
-        }
     }
   else
     {
@@ -258,92 +234,100 @@ int Postraitements::lire_postraitements(Entree& is, const Motcle& motlu, const P
 void Postraitements::postraiter()
 {
   for (auto& itr : *this)
-    {
-      Postraitement_base& post = itr.valeur();
-      post.postraiter(1); // On force le postraitement
-    }
+    itr->postraiter(1); // On force le postraitement
 }
 
 void Postraitements::traiter_postraitement()
 {
   for (auto& itr : *this)
-    {
-      Postraitement_base& post = itr.valeur();
-      post.postraiter(0); // Postraitement si intervalle de temps ecoule
-    }
+    itr->postraiter(0); // Postraitement si intervalle de temps ecoule
 }
 
 void Postraitements::mettre_a_jour(double temps)
 {
   for (auto& itr : *this)
-    {
-      Postraitement_base& post = itr.valeur();
-      post.mettre_a_jour(temps);
-    }
+    itr->mettre_a_jour(temps);
 }
 
 void Postraitements::resetTime(double t, const std::string dirname)
 {
   for (auto& itr : *this)
-    {
-      Postraitement_base& post = itr.valeur();
-      post.resetTime(t, dirname);
-    }
+    itr->resetTime(t, dirname);
 }
 
 void Postraitements::init()
 {
   for (auto& itr : *this)
-    {
-      Postraitement_base& post = itr.valeur();
-      post.init();
-    }
+    itr->init();
 }
 
 void Postraitements::finir()
 {
   for (auto& itr : *this)
-    {
-      Postraitement_base& post = itr.valeur();
-      post.finir();
-    }
+    itr->finir();
 }
 
 int Postraitements::sauvegarder(Sortie& os) const
 {
   int bytes = 0;
   for (const auto& itr : *this)
-    {
-      const Postraitement_base& post = itr.valeur();
-      bytes += post.sauvegarder(os);
-    }
+    bytes += itr->sauvegarder(os);
   return bytes;
 }
 
 int Postraitements::reprendre(Entree& is)
 {
   for (auto& itr : *this)
-    {
-      Postraitement_base& post = itr.valeur();
-      post.reprendre(is);
-    }
+    itr->reprendre(is);
   return 1;
 }
 
 void Postraitements::completer()
 {
-  for (auto& itr : *this)
+  // XXX Elie Saikali : CGNS duplicated file_names management ...
+  if (cgns_post_file_names_.size() > 1)
     {
-      Postraitement_base& post = itr.valeur();
-      post.completer();
+      // check if we have duplicated file names !
+      std::unordered_set<std::string> seen;
+      bool has_duplicates = false;
+
+      // test also classic file name
+      const std::string nom_fich_cas = nom_du_cas().getString() + ".cgns";
+      int count_nom_cas_fich = 0;
+
+      for (const auto &s : cgns_post_file_names_)
+        {
+          if (s == nom_fich_cas)
+            count_nom_cas_fich++;
+
+          if (!seen.insert(s).second)
+            has_duplicates = true;
+        }
+
+      if (has_duplicates) // si has_duplicates => on renomme tout !
+        {
+          int nom_cas_fich_ind = 0;
+          for (auto &itr : *this)
+            {
+              Postraitement *z_post = dynamic_cast<Postraitement*>(&(itr.valeur()));
+              if (z_post && z_post->format() == "cgns")
+                {
+                  if (z_post->nom_fich().getString() == nom_fich_cas)
+                    nom_cas_fich_ind++;
+
+                  z_post->modify_cgns_basenames_and_reinit(nom_cas_fich_ind, count_nom_cas_fich);
+                }
+            }
+        }
     }
+
+  // on complete les posts !
+  for (auto& itr : *this)
+    itr->completer();
 }
 
 void Postraitements::completer_sondes()
 {
   for (auto& itr : *this)
-    {
-      Postraitement_base& post = itr.valeur();
-      post.completer_sondes();
-    }
+    itr->completer_sondes();
 }
