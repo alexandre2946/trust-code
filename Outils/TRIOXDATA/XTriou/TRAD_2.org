@@ -33,10 +33,6 @@ list_list_nom listobj nul 1 list_un_pb 1 pour les groupes
 darcy source_base darcy 0 Class for calculation in a porous media with source term of Darcy -nu/K*V. This keyword must be used with a permeability model. For the moment there are two models : permeability constant or Ergun\'s law. Darcy source term is available for quasi compressible calculation. A new keyword is aded for porosity (porosite).
   attr bloc bloc_lecture bloc 0 Description.
 
-debut_bloc interprete { 0 Block\'s beginning.
-fin_bloc interprete } 0 Block\'s end.
-export interprete export 0 Class to make the object have a global range, if not its range will apply to the block only (the associated object will be destroyed on exiting the block).
-
 troisf objet_lecture nul 0 Auxiliary class to extrude.
   attr lx floattant lx 0 X direction of the extrude operation.
   attr ly floattant ly 0 Y direction of the extrude operation.

@@ -4,7 +4,7 @@ dimension 3
 
 Pb_hydraulique pb
 
-export domaine DOM
+domaine DOM
 
 # BEGIN MESH #
 Read_file DOM couronne_30.geom

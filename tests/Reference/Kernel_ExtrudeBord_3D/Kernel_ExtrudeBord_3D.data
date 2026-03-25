@@ -2,7 +2,7 @@
 #  #
 # Le bord n'est pas plan #
 dimension 3
-export domaine dom3D
+domaine dom3D
 
 Mailler dom3D
 {

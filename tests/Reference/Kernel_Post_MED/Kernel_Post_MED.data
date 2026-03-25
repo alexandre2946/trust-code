@@ -1,8 +1,8 @@
 # Pbc_MED #
 # PARALLEL NOT #
 Dimension 2
-export Domaine dom_solide
-export Domaine dom_fluide
+Domaine dom_solide
+Domaine dom_fluide
 Pbc_MED pbmed
 Read pbmed
 {

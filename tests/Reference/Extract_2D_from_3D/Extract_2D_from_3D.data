@@ -1,6 +1,6 @@
 # Extract a 2D mesh by selecting a boundary of the 3D mesh #
 dimension 3
-export domaine DOM
+domaine DOM
 PrecisionGeom 7.e-7
 # BEGIN MESH #
 Read_file DOM trio_DOM_geo.geom

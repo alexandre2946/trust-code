@@ -3,7 +3,7 @@
 
 dimension 3
 Pb_Thermohydraulique pb
-export domaine dom_pb1
+domaine dom_pb1
 
 # BEGIN MESH #
 Read_file dom_pb1 croix_3D_VDF.geom

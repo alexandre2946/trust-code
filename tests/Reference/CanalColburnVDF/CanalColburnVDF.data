@@ -2,7 +2,7 @@
 # PARALLEL NOT #
 Dimension 3
 
-export domaine dom_pb1
+domaine dom_pb1
 
 # BEGIN MESH #
 Read_file dom_pb1 canal.geom
