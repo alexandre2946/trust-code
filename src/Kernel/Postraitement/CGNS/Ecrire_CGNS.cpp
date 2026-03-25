@@ -104,7 +104,13 @@ void Ecrire_CGNS::fill_infos_loc()
     }
 
   assert (loc_vect_.non_nul());
-  assert (static_cast<int>(loc_vect_->size()) <= 3 && static_cast<int>(loc_vect_->size()) > 0);
+  assert (static_cast<int>(loc_vect_->size()) <= 3);
+
+  if (static_cast<int>(loc_vect_->size()) == 0)
+    {
+      need_post_field_ = false;
+      return;
+    }
 
   for (auto& itr : loc_vect_.valeur())
     {
@@ -341,6 +347,7 @@ void Ecrire_CGNS::cgns_write_field(const Domaine& domaine, const Noms& noms_comp
                                    const Nom& id_du_champ, const Nom& id_du_domaine, const Nom& localisation,
                                    const DoubleTab& valeurs)
 {
+  assert (need_post_field_);
   /* Gestion multi-loc support */
   if (fld_loc_map_.empty()) /* Build different links to support mixed locations : just once for all ! */
     cgns_fill_field_loc_map(domaine.le_nom());
