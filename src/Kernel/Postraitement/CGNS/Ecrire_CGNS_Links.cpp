@@ -466,4 +466,197 @@ void Ecrire_CGNS::cgns_write_final_link_file()
     }
 }
 
+void Ecrire_CGNS::link_multi_loc_support_pb_deformable()
+{
+  if (is_lagrangian_)
+    {
+      link_multi_loc_support_lagrangian();
+      return;
+    }
+
+  const bool enter_group_comm = Process::is_parallel() && Option_CGNS::LINKED_FILES_PER_COMM_GROUP &&
+                                PE_Groups::has_user_defined_group() && !postraiter_domaine_;
+
+  // loop and write linked supports !
+  if (Option_CGNS::USE_LINKS)
+    {
+      for (auto &itr : fld_loc_map_)
+        {
+          const std::string& LOC = itr.first;
+          const Nom& nom_dom = itr.second;
+
+          int index_glob = -123, ind_base = -123;
+          TRUST_2_CGNS::init_glob_base_domain_idx(doms_written_, nom_dom, true /* has_field */, LOC, index_glob, ind_base);
+
+          if (cg_base_write(fileId_, nom_dom.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
+            Cerr << "Error Ecrire_CGNS::link_multi_loc_support_pb_deformable : cg_base_write !" << finl, TRUST_CGNS_ERROR();
+
+          const cgsize_t isize[3] = { sizeId_[ind_base][0], sizeId_[ind_base][1], 0 };
+
+          // XXX we use the helper but we dont write connectivity because it is a bit special : we link grid coords to same file while connectivity to 1st sol file ...
+          cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[index_glob], nom_dom.getString(), isize, zoneId_[index_glob], 1,
+                                                         "" /* this file */, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
+                                                         "Ecrire_CGNS::link_multi_loc_support_pb_deformable", false /* DONT WRITE CONN */);
+
+          // Write conn : linked to 1st solution file since deformable ...
+          std::string linkfile;
+          if (!first_time_post_)
+            linkfile = (enter_group_comm ? Nom(baseFile_name_).nom_me(proc_maitre_local_comm_).getString() : baseFile_name_) +
+                       ".solution." + cgns_helper_.convert_double_to_string(time_post_[0]) + ".cgns";
+
+          TRUST_2_CGNS::remove_slash_linkfile(linkfile);
+
+          cgns_helper_.cgns_write_connectivity_deformable_links(fileId_, baseId_[index_glob], zoneId_[index_glob], linkfile, baseZone_name_[ind_base], baseZone_name_[ind_base],
+                                                                connectname_[ind_base], "Ecrire_CGNS::link_multi_loc_support_pb_deformable");
+        }
+    }
+  else
+    {
+      if (first_time_post_) return; /* Mais ouiiiiii car fait dans cgns_fill_field_loc_map !! */
+
+      for (auto &itr : fld_loc_map_)
+        {
+          const std::string& LOC = itr.first;
+          const Nom& nom_dom = itr.second;
+
+          int index_glob = -123, ind_base = -123;
+          TRUST_2_CGNS::init_glob_base_domain_idx(doms_written_, nom_dom, true /* has_field */, LOC, index_glob, ind_base);
+
+          std::string linkpath = "/" + baseZone_name_[ind_base] + "/" + baseZone_name_[ind_base] + "/" + grid_name_loc_ + "/";
+
+          if (cg_goto(fileId_, baseId_[index_glob], "Zone_t", 1, "end") != CG_OK)
+            Cerr << "Error Ecrire_CGNS::link_multi_loc_support_pb_deformable : cg_goto !" << finl, TRUST_CGNS_ERROR();
+
+          if (cg_link_write(grid_name_loc_.c_str(), "" /* this file */, linkpath.c_str()) != CG_OK)
+            Cerr << "Error Ecrire_CGNS::link_multi_loc_support_pb_deformable : cg_link_write !" << finl, TRUST_CGNS_ERROR();
+        }
+    }
+
+  multi_loc_deformable_support_linked_ = true; // of course !
+}
+
+// Specifique FT !!
+void Ecrire_CGNS::link_multi_loc_support_lagrangian()
+{
+  for (auto &itr : fld_loc_map_)
+    {
+      const std::string& LOC = itr.first;
+      const Nom& nom_dom = itr.second;
+
+      int index_glob = -123, ind_base = -123;
+      TRUST_2_CGNS::init_glob_base_domain_idx(doms_written_, nom_dom, true /* has_field */, LOC, index_glob, ind_base);
+      assert (ind_base == 0);
+
+      if (cg_base_write(fileId_, nom_dom.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
+        Cerr << "Error Ecrire_CGNS::link_multi_loc_support_lagrangian : cg_base_write !" << finl, TRUST_CGNS_ERROR();
+
+      const int nb_current_post = static_cast<int> (time_post_.size());
+      const cgsize_t isize[3] = { sizeId_[nb_current_post - 1][0], sizeId_[nb_current_post - 1][1], 0 };
+
+      cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_[index_glob], nom_dom.getString(), isize, zoneId_[index_glob], 1,
+                                                     "" /* this file */, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
+                                                     "Ecrire_CGNS::link_multi_loc_support_lagrangian");
+    }
+  multi_loc_deformable_support_linked_ = true; // of course !
+}
+
+void Ecrire_CGNS::cgns_write_final_link_file_lagrangian()
+{
+  if (Process::me()) return; // seul le proc 0 ecrit le fichier link
+
+  const int nsteps = static_cast<int>(time_post_.size());
+  const cgsize_t nuse = static_cast<cgsize_t>(nsteps);
+
+  if (nsteps == 0) return;
+
+  std::string fn = baseFile_name_ + ".cgns"; // file name
+  unlink(fn.c_str());
+  cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::SEQ>(fn, fileId_, true);
+
+  for (auto &itr : fld_loc_map_)
+    {
+      const std::string& LOC = itr.first;
+      const Nom& nom_dom = itr.second;
+
+      int index_glob = -123, ind_base = -123;
+      TRUST_2_CGNS::init_glob_base_domain_idx(doms_written_, nom_dom, true /* has_field */, LOC, index_glob, ind_base);
+
+      if (cg_base_write(fileId_, nom_dom.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_[index_glob]) != CG_OK)
+        Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_base_write !" << finl, TRUST_CGNS_ERROR();
+
+      if (cg_biter_write(fileId_, baseId_[index_glob], "TimeIterValues", nsteps) != CG_OK)
+        Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_biter_write !" << finl, TRUST_CGNS_ERROR();
+
+      if (cg_goto(fileId_, baseId_[index_glob], "BaseIterativeData_t", 1, "end") != CG_OK)
+        Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_goto BaseIterativeData_t !" << finl, TRUST_CGNS_ERROR();
+
+      // TimeValues
+      if (cg_array_write("TimeValues", CGNS_DOUBLE_TYPE, 1, &nuse, time_post_.data()) != CG_OK)
+        Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_array_write TimeValues !" << finl, TRUST_CGNS_ERROR();
+
+      if (cg_simulation_type_write(fileId_, baseId_[index_glob], CGNS_ENUMV(TimeAccurate)) != CG_OK)
+        Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_simulation_type_write !" << finl, TRUST_CGNS_ERROR();
+
+      // NumberOfZones : 1 zone active par step
+      std::vector<int> number_of_zones(nsteps, 1);
+      if (cg_array_write("NumberOfZones", CGNS_ENUMV(Integer), 1, &nuse, number_of_zones.data()) != CG_OK)
+        Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_array_write NumberOfZones !" << finl, TRUST_CGNS_ERROR();
+
+      cgsize_t zpdims[3] = { CGNS_STR_SIZE, 1, nuse };
+      std::string zone_ptrs;
+      zone_ptrs.reserve(static_cast<size_t>(CGNS_STR_SIZE) * nsteps);
+
+      bool first_zone = true;
+      for (double t : time_post_)
+        {
+          std::string zname = nom_dom.getString();
+          if (!first_zone)
+            zname += cgns_helper_.convert_double_to_string(t);
+          first_zone = false;
+
+          zname.resize(CGNS_STR_SIZE, ' ');
+          zone_ptrs += zname;
+        }
+
+      if (cg_array_write("ZonePointers", CGNS_ENUMV(Character), 3, zpdims, zone_ptrs.c_str()) != CG_OK)
+        Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_array_write ZonePointers !" << finl, TRUST_CGNS_ERROR();
+
+      for (int i = 0; i < nsteps; i++)
+        {
+          cgsize_t isize[3] = { sizeId_[i][0] , sizeId_[i][1] , 0 };
+          std::string zn = nom_dom.getString();
+
+          if (i > 0)
+            zn += cgns_helper_.convert_double_to_string(time_post_[i]);
+
+          if (cg_zone_write(fileId_, baseId_[index_glob], zn.c_str(), isize, CGNS_ENUMV(Unstructured), &zoneId_[index_glob]) != CG_OK)
+            Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_zone_write !" << finl, TRUST_CGNS_ERROR();
+
+          std::string linkfile = baseFile_name_ + ".solution." + cgns_helper_.convert_double_to_string(time_post_[i]) + ".cgns";
+          TRUST_2_CGNS::remove_slash_linkfile(linkfile);
+          std::string linkpath = "/" + baseZone_name_[ind_base] + "/" + baseZone_name_[ind_base] + "/GridCoordinates/";
+
+          if (cg_goto(fileId_, baseId_[index_glob], "Zone_t", zoneId_[index_glob], "end") != CG_OK)
+            Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_goto Zone_t !" << finl, TRUST_CGNS_ERROR();
+
+          if (cg_link_write("GridCoordinates", linkfile.c_str(), linkpath.c_str()) != CG_OK)
+            Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_link_write GridCoordinates !" << finl, TRUST_CGNS_ERROR();
+
+          for (auto& itr_conn : connectname_[ind_base])
+            {
+              linkpath = "/" + baseZone_name_[ind_base] + "/" + baseZone_name_[ind_base] + "/" + itr_conn + "/";
+              if (cg_link_write(itr_conn.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
+                Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_link_write connectivity !" << finl, TRUST_CGNS_ERROR();
+            }
+
+          std::string solname = "FlowSolution" + cgns_helper_.convert_double_to_string(time_post_[i]) + "_" + LOC;
+          linkpath = "/" + nom_dom.getString() + "/" + nom_dom.getString() + "/" + solname + "/";
+          if (cg_link_write(solname.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
+            Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_lagrangian : cg_link_write FlowSolution !" << finl, TRUST_CGNS_ERROR();
+        }
+    }
+
+  cgns_close_grid_or_solution_link_file(-123., TYPE_LINK_CGNS::FINAL_LINK, true);
+}
+
 #endif /* HAS_CGNS */
