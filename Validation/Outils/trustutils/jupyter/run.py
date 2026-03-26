@@ -1085,7 +1085,7 @@ def sanitizePathToBUILD_DIRECTORY(input_path, relative=False):
         output_path=Path(normpath(os.path.join(BUILD_DIRECTORY, input_path)))
 
     if relative:
-        return output_path.relative_to(Path(BUILD_DIRECTORY), walk_up=False).as_posix()
+        return output_path.relative_to(Path(BUILD_DIRECTORY)).as_posix()
     else:
         return output_path.as_posix()
 
