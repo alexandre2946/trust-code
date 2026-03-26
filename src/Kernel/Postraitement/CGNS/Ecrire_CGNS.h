@@ -18,6 +18,7 @@
 
 #include <Domaine_forward.h>
 #include <TRUST_2_CGNS.h>
+#include <unordered_set>
 #include <map>
 
 class Nom;
@@ -53,7 +54,7 @@ private:
 
   std::map<std::string, Nom> fld_loc_map_; /* { Loc , Nom_dom } */
   std::vector<Nom> doms_written_;
-  std::vector<Nom> fieldName_dumped_; /* filled just once to see what fields are already written ! */
+  std::unordered_set<std::string> fieldName_dumped_; /* manage doubled fields / synonyms / compos .. ! */
   std::string solname_elem_ = "", solname_som_ = "", solname_faces_ = "", baseFile_name_ = "";
   std::string grid_name_ = "", grid_name_loc_ = "";
   std::vector<double> time_post_;

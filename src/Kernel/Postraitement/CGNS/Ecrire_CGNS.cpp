@@ -371,16 +371,14 @@ void Ecrire_CGNS::cgns_write_field(const Domaine& domaine, const Noms& noms_comp
       for (int i = 0; i < nb_cmp; i++)
         {
           const Motcle field_name = nb_cmp > 1 ? Motcle(noms_compo[i]) : id_du_champ;
-          const Motcle field_name_check = is_lagrangian_ ? field_name + LOC.c_str() : field_name;
+          const std::string field_name_check = is_lagrangian_ ? field_name.getString() + LOC : field_name.getString();
 
-          if (std::find(fieldName_dumped_.begin(), fieldName_dumped_.end(), field_name_check) == fieldName_dumped_.end()) // pas dedans => faut ecrire !
+          if (fieldName_dumped_.insert(field_name_check).second)
             {
               if (Option_CGNS::PARALLEL_OVER_ZONE || postraiter_domaine_)
                 cgns_write_field_par_over_zone(i /* compo */, temps, field_name, id_du_domaine, localisation, fld_loc_map_.at(LOC), valeurs);
               else
                 cgns_write_field_par_in_zone(i /* compo */, temps, field_name, id_du_domaine, localisation, fld_loc_map_.at(LOC), valeurs);
-
-              fieldName_dumped_.push_back(field_name_check);
             }
           else
             Cerr << "Field " << field_name << " is already written => we skip it ..." << finl;
@@ -390,14 +388,10 @@ void Ecrire_CGNS::cgns_write_field(const Domaine& domaine, const Noms& noms_comp
     for (int i = 0; i < nb_cmp; i++)
       {
         const Motcle field_name = nb_cmp > 1 ? Motcle(noms_compo[i]) : id_du_champ;
-        const Motcle field_name_check = is_lagrangian_ ? field_name + LOC.c_str() : field_name;
+        const std::string field_name_check = is_lagrangian_ ? field_name.getString() + LOC : field_name.getString();
 
-        if (std::find(fieldName_dumped_.begin(), fieldName_dumped_.end(), field_name_check) == fieldName_dumped_.end()) // pas dedans => faut ecrire !
-          {
-            cgns_write_field_seq(i /* compo */, temps, field_name, id_du_domaine, localisation, fld_loc_map_.at(LOC), valeurs);
-
-            fieldName_dumped_.push_back(field_name_check);
-          }
+        if (fieldName_dumped_.insert(field_name_check).second)
+          cgns_write_field_seq(i /* compo */, temps, field_name, id_du_domaine, localisation, fld_loc_map_.at(LOC), valeurs);
         else
           Cerr << "Field " << field_name << " is already written => we skip it ..." << finl;
       }
