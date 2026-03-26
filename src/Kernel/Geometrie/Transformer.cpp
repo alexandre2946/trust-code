@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -24,6 +24,8 @@ Implemente_instanciable_32_64(Transformer_32_64, "Transformer", Interprete_geome
 // XD transformer interprete transformer -1 Keyword to transform the coordinates of the geometry. NL2 Exemple to rotate your mesh by a 90o rotation and to scale the z coordinates by a factor 2: Transformer domain_name -y -x 2*z
 // XD  attr domain_name ref_domaine domain_name 0 Name of domain.
 // XD  attr formule listchainef formule 0 Function_for_x Function_for_y \[ Function_for z \]
+
+// XD transformer_64 transformer transformer_64 -1 Transformer keyword applied on a big mesh
 
 template <typename _SIZE_>
 Sortie& Transformer_32_64<_SIZE_>::printOn(Sortie& os) const

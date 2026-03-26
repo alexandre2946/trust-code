@@ -1,4 +1,4 @@
-# Run geometric interprets on big mesh, so with _64 # 
+# Run geometric interprets on big mesh, so with _64 #
 dimension 3
 
 # VDF domain #
@@ -22,9 +22,7 @@ Mailler_64 dom
     }
 }
 Raffiner_simplexes_64 dom
-
-Analyse_Angle_64 dom 10
-
+Transformer_64 dom x y z
 Partition_64 dom
 {
     Partition_tool metis_64 { nb_parts 4 }
