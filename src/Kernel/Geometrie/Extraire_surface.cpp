@@ -153,23 +153,22 @@ void Extraire_surface::extraire_surface_without_cleaning(Domaine& domaine_surfac
   ArrOfInt tab_marq(nb_faces);
   // on marque les joints
   int nbjoints=domaine_vf.nb_joints();
-  if (nbjoints>0)
-    {
-      ToDo_Kokkos("critical");
-    }
   for(int njoint=0; njoint<nbjoints; njoint++)
     {
       const Joint& joint_temp = domaine_vf.joint(njoint);
       int pe_voisin=joint_temp.PEvoisin();
       if (pe_voisin<me())
         {
-          const IntTab& indices_faces_joint = joint_temp.joint_item(JOINT_ITEM::FACE).renum_items_communs();
-          const int nbfaces = indices_faces_joint.dimension(0);
-          for (int j = 0; j < nbfaces; j++)
-            {
-              int face_de_joint = indices_faces_joint(j, 1);
-              tab_marq[face_de_joint] = -1;
-            }
+          const IntTab& tab_indices_faces_joint = joint_temp.joint_item(JOINT_ITEM::FACE).renum_items_communs();
+          const int nbfaces = tab_indices_faces_joint.dimension(0);
+          CIntTabView indices_faces_joint = tab_indices_faces_joint.view_ro();
+          IntArrView marq = tab_marq.view_rw();
+          Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(0, nbfaces), KOKKOS_LAMBDA(const int j)
+          {
+            int face_de_joint = indices_faces_joint(j, 1);
+            marq[face_de_joint] = -1;
+          });
+          end_gpu_timer(__KERNEL_NAME__);
         }
     }
   int nb_t=0;
@@ -185,14 +184,17 @@ void Extraire_surface::extraire_surface_without_cleaning(Domaine& domaine_surfac
           Cerr<<" the option avec_les_bords is incompatible with the option avec_certains_bords"<<finl;
           exit();
         }
-      ToDo_Kokkos("critical");
       for (int b=0; b<noms_des_bords.size(); b++)
         {
           const Frontiere& fr=domaine_vf.frontiere_dis(domaine_vf.rang_frontiere(noms_des_bords[b])).frontiere();
           int deb=fr.num_premiere_face();
           int fin=deb+fr.nb_faces();
-          for (int f=deb; f<fin; f++)
-            tab_face_bord_int[f]=1;
+          IntArrView face_bord_int = tab_face_bord_int.view_rw();
+          Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(deb, fin), KOKKOS_LAMBDA(const int f)
+          {
+            face_bord_int[f]=1;
+          });
+          end_gpu_timer(__KERNEL_NAME__);
         }
     }
 
