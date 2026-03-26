@@ -63,10 +63,56 @@ Motcle TRUST_2_CGNS::modify_field_name_for_post(const Nom& id_du_champ, const No
 #ifndef NDEBUG
       Cerr << "The field " << id_char << " contains " << sz << " chars & CGNS is limited to " << CGNS_STR_SIZE << " ==> renamed to ";
 #endif
-      std::string prem(id_char, 25); // Les 25 premiers
-      std::string der(id_char + sz - 5, 5); // Les 5 derniers
-      std::string new_id_du_champ_modifie = prem + ".." + der;
-      id_du_champ_modifie = Motcle(new_id_du_champ_modifie);
+
+      std::string new_id_du_champ_modifie(id_char);
+
+      auto replace_all = [](std::string& s, const std::string& from, const std::string& to)
+      {
+        size_t pos = 0;
+        while ((pos = s.find(from, pos)) != std::string::npos)
+          {
+            s.replace(pos, from.length(), to);
+            pos += to.length();
+          }
+      };
+
+      // 1. Premier essai : prefixer par le nom du cas si besoin
+      Motcle truncate_try_1(id_du_champ_modifie), nom_du_cas(Objet_U::nom_du_cas());
+      truncate_try_1.suffix(nom_du_cas.getChar());
+      truncate_try_1.suffix("_");
+
+      if (std::strlen(truncate_try_1.getChar()) <= CGNS_STR_SIZE)
+        new_id_du_champ_modifie = truncate_try_1.getChar();
+
+
+      // 2. Si toujours trop long, on tente qlqs remplacements
+      if (new_id_du_champ_modifie.size() > CGNS_STR_SIZE)
+        {
+          replace_all(new_id_du_champ_modifie, "VITESSE", "VIT");
+          replace_all(new_id_du_champ_modifie, "TEMPERATURE", "TEMP");
+          replace_all(new_id_du_champ_modifie, "CONCENTRATION", "CONC");
+          replace_all(new_id_du_champ_modifie, "CONVECTION", "CONV");
+          replace_all(new_id_du_champ_modifie, "DIFFUSION", "DIFF");
+          replace_all(new_id_du_champ_modifie, "VISQUEUSE", "VISQ");
+          replace_all(new_id_du_champ_modifie, "MASSE_VOLUMIQUE", "RHO");
+          replace_all(new_id_du_champ_modifie, "LIQUIDE", "LIQ");
+        }
+
+      // 3. Si encore trop long .. vraiment desole !
+      if (new_id_du_champ_modifie.size() > CGNS_STR_SIZE)
+        {
+          static constexpr size_t keep_first = 25;
+          static constexpr size_t keep_last = 5;
+
+          const size_t new_sz = new_id_du_champ_modifie.size();
+          const std::string prem = new_id_du_champ_modifie.substr(0, keep_first);
+          const std::string der = new_id_du_champ_modifie.substr(new_sz - keep_last, keep_last);
+
+          new_id_du_champ_modifie = prem + "__" + der;
+        }
+
+      id_du_champ_modifie = Motcle(new_id_du_champ_modifie.c_str());
+
 #ifndef NDEBUG
       Cerr << id_du_champ_modifie << " !!! " << finl;
 #endif
