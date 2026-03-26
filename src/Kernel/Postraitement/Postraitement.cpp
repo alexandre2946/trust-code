@@ -147,9 +147,7 @@ void Postraitement::mettre_a_jour(double temps)
     }
 }
 
-Motcles Postraitement::formats_supportes_=Motcles(0);
 LIST(Nom) Postraitement::noms_fichiers_sondes_=LIST(Nom)();
-
 
 inline void nom_fichier(const Postraitement& post, const OWN_PTR(Champ_Generique_Statistiques_base)& op, const Domaine& dom, Nom& nom_fichier)
 {
@@ -1538,15 +1536,6 @@ void Postraitement::init()
   Schema_Temps_base& sch = mon_probleme->schema_temps();
   double temps_courant = sch.temps_courant();
   double tinit = sch.temps_init();
-  Postraitement::formats_supportes_=Motcles(4);
-  assert(formats_supportes_.size()==4);
-  if(formats_supportes_[0]!="lml")
-    {
-      formats_supportes_[0]="lml";
-      formats_supportes_[1]="lata";
-      formats_supportes_[2]="med";
-      formats_supportes_[3]="xyz";
-    }
 
   const Domaine& dom=le_domaine_.valeur();
   const Nom& nom_du_domaine = dom.le_nom();

@@ -219,7 +219,6 @@ protected:
   Nom nom_fich_, format_, option_para_;
   Nom suffix_for_reset_; // Suffix appended to post base name when the method resetTime() was invoked - default to "_AFTER_RESET"
   double temps_, dernier_temps_; // temps du precedent appel a postraiter()
-  static Motcles formats_supportes_;
   OBS_PTR(Domaine) le_domaine_;
   OBS_PTR(Domaine_dis_base) domaine_dis_pour_faces_;
 };
