@@ -1236,7 +1236,11 @@ int Postraitement::lire_champs_a_postraiter(Entree& s, bool expect_acco)
                   int nb_eq = probleme().nombre_d_equations();
                   for (int i=0; i<nb_eq; i++)
                     {
-                      int nb_morceaux = probleme().equation(i).nombre_d_operateurs();
+                      // on teste loc par eq juste sur l'op 0
+                      const Motcle& loc = probleme().equation(i).operateur(0).l_op_base().get_localisation_pour_post(motlu);
+                      add_locs_required_if_not(loc);
+
+                      const int nb_morceaux = probleme().equation(i).nombre_d_operateurs();
                       for (int j=0; j<nb_morceaux; j++)
                         creer_champ_post_moreqn("operateur","stabilite",i,j,-1,s);
                     }
@@ -1246,7 +1250,11 @@ int Postraitement::lire_champs_a_postraiter(Entree& s, bool expect_acco)
                   int nb_eq = probleme().nombre_d_equations();
                   for (int i=0; i<nb_eq; i++)
                     {
-                      int nb_morceaux = probleme().equation(i).nombre_d_operateurs_tot();
+                      // on teste loc par eq juste sur l'op 0
+                      const Motcle& loc = probleme().equation(i).operateur(0).l_op_base().get_localisation_pour_post(motlu);
+                      add_locs_required_if_not(loc);
+
+                      const int nb_morceaux = probleme().equation(i).nombre_d_operateurs_tot();
                       const Champ_Inc_base& ch_inco = probleme().equation(i).inconnue();
                       int nb_compo = ch_inco.nb_comp();
 
@@ -1776,6 +1784,7 @@ void Postraitement::postprocess_field_values()
 
       /* XXX Elie SAIKALI : champ vect aux faces seulement pour post et si CGNS */
       const bool isChamp_Face_VDF_CGNS = (Motcle(format_) == "CGNS") &&
+                                         champ_ecriture.nature_du_champ() == vectoriel && // sinon flux_bords VDF par exemple !
                                          (champ_ecriture.que_suis_je() == ("Champ_Face") ||
                                           champ_ecriture.que_suis_je() == ("Champ_Fonc_Face"));
 
