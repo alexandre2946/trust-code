@@ -39,30 +39,42 @@ int Assembleur_P_VEF::assembler(Matrice& la_matrice)
 {
   // Si rho est constant, on resout avec la pression P*=P/rho
   const DoubleVect& volumes_entrelaces_ref=le_dom_VEF->volumes_entrelaces();
-  DoubleVect volumes_entrelaces(volumes_entrelaces_ref);
-  const DoubleVect& volumes_entrelaces_cl=le_dom_Cl_VEF->volumes_entrelaces_Cl();
-  int size=volumes_entrelaces_cl.size();
-  ToDo_Kokkos("critical");
-  for (int f=0; f<size; f++)
-    if (volumes_entrelaces_cl(f)!=0)
-      volumes_entrelaces(f)=volumes_entrelaces_cl(f);
+  DoubleVect tab_volumes_entrelaces(volumes_entrelaces_ref);
+  const DoubleVect& tab_volumes_entrelaces_cl=le_dom_Cl_VEF->volumes_entrelaces_Cl();
+  int size=tab_volumes_entrelaces_cl.size();
+  {
+    CDoubleArrView volumes_entrelaces_cl = static_cast<const ArrOfDouble&>(tab_volumes_entrelaces_cl).view_ro();
+    DoubleArrView volumes_entrelaces = static_cast<ArrOfDouble&>(tab_volumes_entrelaces).view_rw();
+    Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(0, size), KOKKOS_LAMBDA(const int f)
+    {
+      if (volumes_entrelaces_cl(f)!=0)
+        volumes_entrelaces(f)=volumes_entrelaces_cl(f);
+    });
+    end_gpu_timer(__KERNEL_NAME__);
+  }
 
-  volumes_entrelaces.echange_espace_virtuel();
+  tab_volumes_entrelaces.echange_espace_virtuel();
   // On assemble la matrice
-  return assembler_mat(la_matrice,volumes_entrelaces,1,1);
+  return assembler_mat(la_matrice,tab_volumes_entrelaces,1,1);
 }
 
 
 
-void calculer_inv_volume_special(DoubleTab& inv_volumes_entrelaces, const Domaine_Cl_VEF& domaine_Cl_VEF,const DoubleTab& volumes_entrelaces)
+void calculer_inv_volume_special(DoubleTab& tab_inv_volumes_entrelaces, const Domaine_Cl_VEF& domaine_Cl_VEF,const DoubleTab& tab_volumes_entrelaces)
 {
-  inv_volumes_entrelaces=volumes_entrelaces;
-  int taille=volumes_entrelaces.dimension_tot(0);
-  ToDo_Kokkos("critical");
-  for (int i=0; i<taille; i++)
-    for (int comp=0; comp<Objet_U::dimension; comp++)
-      inv_volumes_entrelaces(i,comp)=1./volumes_entrelaces(i,comp);
-
+  tab_inv_volumes_entrelaces=tab_volumes_entrelaces;
+  int taille=tab_volumes_entrelaces.dimension_tot(0);
+  {
+    CDoubleTabView volumes_entrelaces = tab_volumes_entrelaces.view_ro();
+    DoubleTabView inv_volumes_entrelaces = tab_inv_volumes_entrelaces.view_rw();
+    const int dimension = Objet_U::dimension;
+    Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(0, taille), KOKKOS_LAMBDA(const int i)
+    {
+      for (int comp=0; comp<dimension; comp++)
+        inv_volumes_entrelaces(i,comp)=1./volumes_entrelaces(i,comp);
+    });
+    end_gpu_timer(__KERNEL_NAME__);
+  }
 }
 void Assembleur_P_VEF::calculer_inv_volume(DoubleTab& inv_volumes_entrelaces, const Domaine_Cl_VEF& domaine_Cl_VEF,const DoubleVect& volumes_entrelaces)
 {
@@ -96,11 +108,16 @@ void Assembleur_P_VEF::calculer_inv_volume(DoubleTab& inv_volumes_entrelaces, co
     }
   else
     {
-      const DoubleVect& porosite_face=equation().milieu().porosite_face();
-      ToDo_Kokkos("critical");
-      for (int i=0; i<taille; i++)
-        for (int comp=0; comp<Objet_U::dimension; comp++)
-          inv_volumes_entrelaces(i,comp)=1./volumes_entrelaces(i)*porosite_face(i);
+      CDoubleArrView porosite_face = static_cast<const ArrOfDouble&>(equation().milieu().porosite_face()).view_ro();
+      CDoubleArrView volumes_entrelaces_v = static_cast<const ArrOfDouble&>(volumes_entrelaces).view_ro();
+      DoubleTabView inv_volumes_entrelaces_v = inv_volumes_entrelaces.view_rw();
+      const int dim = Objet_U::dimension;
+      Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(0, taille), KOKKOS_LAMBDA(const int i)
+      {
+        for (int comp=0; comp<dim; comp++)
+          inv_volumes_entrelaces_v(i,comp)=1./volumes_entrelaces_v(i)*porosite_face(i);
+      });
+      end_gpu_timer(__KERNEL_NAME__);
     }
 }
 
