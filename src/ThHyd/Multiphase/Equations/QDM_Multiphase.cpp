@@ -315,7 +315,7 @@ void QDM_Multiphase::creer_champ(const Motcle& motlu)
       for (int dU = 0 ; dU< D ; dU++)
         for (int dX = 0 ; dX < D ; dX++)
           {
-            noms[ D * dU + dX]=Nom(composantsVitesse[dU] + "/" + composantsDerivee[dX]);
+            noms[ D * dU + dX]=Nom(composantsVitesse[dU] + composantsDerivee[dX]);
             unites[ D * dU + dX] = Nom("m2/s");
           }
       noms[0] = noms_grad_vit_phases_[i]; // Pour lui donner le bon nom dans discretiser_champ ; consequence : la premiere coordonnee en sortie n'a pas le bon nom
