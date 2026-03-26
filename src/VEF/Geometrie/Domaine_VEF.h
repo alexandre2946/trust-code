@@ -87,8 +87,8 @@ public:
   inline IntVect& rang_elem_non_std() { return rang_elem_non_std_; }
   inline const IntVect& rang_elem_non_std() const { return rang_elem_non_std_; }
 
-  inline double volume_au_sommet(int som) const { return volumes_som[som]; }
-  inline const DoubleVect& volume_aux_sommets() const { return volumes_som; }
+  inline double volume_au_sommet(int som) const { return volumes_som_[som]; }
+  inline const DoubleVect& volume_aux_sommets() const { return volumes_som_; }
   inline int get_P1Bulle() const { assert(P1Bulle != -1); return P1Bulle; }
   inline int get_alphaE() const { assert(alphaE != -1); return alphaE; }
   inline int get_alphaS() const { assert(alphaS != -1); return alphaS; }
@@ -123,7 +123,7 @@ private:
   IntVect orientation_;
 
 
-  DoubleVect volumes_som, volumes_aretes;
+  DoubleVect volumes_som_, volumes_aretes;
   ArrOfInt renum_arete_perio;
   IntVect ok_arete;
 

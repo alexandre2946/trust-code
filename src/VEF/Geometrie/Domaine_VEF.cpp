@@ -283,8 +283,6 @@ void Domaine_VEF::discretiser()
         }
     }
 
-  int num_face;
-
   // On remplit le tableau face_normales_;
   //  Attention : le tableau face_voisins n'est pas exactement un
   //  tableau distribue. Une face n'a pas ses deux voisins dans le
@@ -299,7 +297,8 @@ void Domaine_VEF::discretiser()
     const IntTab& face_vois = face_voisins();
     const IntTab& elem_face = elem_faces();
     const int n_tot = nb_faces_tot();
-    for (num_face = 0; num_face < n_tot; num_face++)
+    ToDo_Kokkos("critical");
+    for (int num_face = 0; num_face < n_tot; num_face++)
       {
         type_elem_->normale(num_face, face_normales_, face_som, face_vois, elem_face, domaine_geom);
       }
@@ -313,7 +312,7 @@ void Domaine_VEF::discretiser()
 
   calculer_h_carre();
 
-  domaine().creer_tableau_sommets(volumes_som, RESIZE_OPTIONS::NOCOPY_NOINIT);
+  domaine().creer_tableau_sommets(volumes_som_, RESIZE_OPTIONS::NOCOPY_NOINIT);
 
   double coeff=1./3.;
   if (dimension==3)
@@ -329,17 +328,17 @@ void Domaine_VEF::discretiser()
 
   // Annule tout le tableau car on va faire += sur des items virtuels
   // (sinon acces a des cases non initialisees)
-  operator_egal(volumes_som, 0., VECT_ALL_ITEMS);
+  operator_egal(volumes_som_, 0., VECT_ALL_ITEMS);
   for(int k=0; k<n; k++)
     {
       double volume = coeff * volume_elem(k);
       for(int isom=0; isom<nb_som_elem; isom++)
         {
           int som = elements(k, isom);
-          volumes_som(som)+=volume;
+          volumes_som_(som)+=volume;
         }
     }
-  volumes_som.echange_espace_virtuel();
+  volumes_som_.echange_espace_virtuel();
 }
 
 void Domaine_VEF::discretiser_suite(const VEF_discretisation& discr)
@@ -1114,26 +1113,28 @@ void Domaine_VEF::modifier_pour_Cl(const Conds_lim& conds_lim)
   construire_num_fac_loc();
 
   static DoubleVect* ptr=0;
-  if(ptr!=&volumes_som)
+  if(ptr!=&volumes_som_)
     {
       const Domaine& dom=domaine();
       const int ns = nb_som();
-      ToDo_Kokkos("critical");
-      for(int i=0; i<ns; i++)
-        {
-          int j=(dom.get_renum_som_perio(i));
-          if(i!=j)
-            volumes_som(j)+=volumes_som(i);
-        }
-      ToDo_Kokkos("critical");
-      for(int i=0; i<ns; i++)
-        {
-          int j=(dom.get_renum_som_perio(i));
-          if(i!=j)
-            volumes_som(i)=volumes_som(j);
-        }
-      volumes_som.echange_espace_virtuel();
-      ptr = &volumes_som;
+      CIntArrView renum_som_perio = dom.get_renum_som_perio().view_ro();
+      DoubleArrView volumes_som = volumes_som_.view_rw();
+      Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(0, ns), KOKKOS_LAMBDA(const int i)
+      {
+        int j = renum_som_perio(i);
+        if (i != j)
+          Kokkos::atomic_add(&volumes_som(j), volumes_som(i));
+      });
+      end_gpu_timer(__KERNEL_NAME__);
+      Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_1D(0, ns), KOKKOS_LAMBDA(const int i)
+      {
+        int j = renum_som_perio(i);
+        if (i != j)
+          volumes_som(i) = volumes_som(j);
+      });
+      end_gpu_timer(__KERNEL_NAME__);
+      volumes_som_.echange_espace_virtuel();
+      ptr = &volumes_som_;
     }
 
   // Verification du tableau renum_som_perio
