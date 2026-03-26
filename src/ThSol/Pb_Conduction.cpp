@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,7 +18,7 @@
 Implemente_instanciable(Pb_Conduction,"Pb_Conduction",Probleme_base);
 // XD Pb_Conduction Pb_base Pb_Conduction -1 Resolution of the heat equation.
 // XD  attr solide solide solide 1 The medium associated with the problem.
-// XD   attr Conduction Conduction Conduction 1 Heat equation.
+// XD  attr Conduction Conduction Conduction 1 Heat equation.
 
 /*! @brief NE FAIT RIEN
  *

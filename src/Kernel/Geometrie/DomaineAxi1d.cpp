@@ -17,7 +17,7 @@
 #include <Param.h>
 
 Implemente_instanciable_sans_constructeur_32_64( DomaineAxi1d_32_64, "DomaineAxi1d", Domaine_32_64<_T_> ) ;
-// XD domaineAxi1d domaine_base domaineAxi1d -1 1D domain
+// XD domaineAxi1d domaine domaineAxi1d -1 1D domain
 
 template <typename _SIZE_>
 DomaineAxi1d_32_64<_SIZE_>::DomaineAxi1d_32_64()
