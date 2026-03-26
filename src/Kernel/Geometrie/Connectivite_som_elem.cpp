@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -67,12 +67,10 @@ void construire_connectivite_som_elem(const _SIZE_       nb_sommets,
 
   // Premier passage : on calcule le nombre d'elements voisins de chaque
   // sommet pour creer la structure de donnees
-  _SIZE_ elem;
-  int i;
-
-  for (elem = 0; elem < nb_elem; elem++)
+  ToDo_Kokkos("critical");
+  for (_SIZE_ elem = 0; elem < nb_elem; elem++)
     {
-      for (i = 0; i < nb_sommets_par_element; i++)
+      for (int i = 0; i < nb_sommets_par_element; i++)
         {
           _SIZE_ sommet = les_elems(elem, i);
           // GF cas des polyedres
@@ -80,7 +78,6 @@ void construire_connectivite_som_elem(const _SIZE_       nb_sommets,
           nb_elements_voisins[sommet]++;
         }
     }
-
   som_elem.set_list_sizes(nb_elements_voisins);
 
   // On reutilise le tableau pour stocker le nombre d'elements dans
@@ -88,9 +85,10 @@ void construire_connectivite_som_elem(const _SIZE_       nb_sommets,
   nb_elements_voisins = 0;
 
   // Remplissage du tableau des elements voisins.
-  for (elem = 0; elem < nb_elem; elem++)
+  ToDo_Kokkos("critical");
+  for (_SIZE_ elem = 0; elem < nb_elem; elem++)
     {
-      for (i = 0; i < nb_sommets_par_element; i++)
+      for (int i = 0; i < nb_sommets_par_element; i++)
         {
           _SIZE_ sommet = les_elems(elem, i);
           // GF cas des polyedres

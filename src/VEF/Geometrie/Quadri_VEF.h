@@ -43,8 +43,8 @@ public:
                  const DoubleTab& ,const Champ_Inc_base& ,int, const DoubleVect& ) const override;
   void calcul_xg(DoubleVect& ,const DoubleTab& ,const int ,int& ,
                  int& ,int& ,int& ) const override;
-  void normale(int ,DoubleTab&, const IntTab& ,const IntTab&,
-               const IntTab& ,const Domaine& )  const override ;
+  void creer_face_normales(DoubleTab&, const IntTab& ,const IntTab&,
+                           const IntTab& ,const Domaine& )  const override ;
 
   void traiter_normales_facettes_Cl(DoubleTab& ,int ,int ,
                                     const DoubleTab& ,const DoubleVect& ,

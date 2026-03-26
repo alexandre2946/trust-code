@@ -53,86 +53,90 @@ Quadri_VEF::Quadri_VEF()
 /*! @brief remplit le tableau face_normales dans le Domaine_VEF
  *
  */
-void Quadri_VEF::normale(int num_Face,DoubleTab& Face_normales,
-                         const  IntTab& Face_sommets,
-                         const IntTab& Face_voisins,
-                         const IntTab& elem_faces,
-                         const Domaine& domaine_geom) const
+void Quadri_VEF::creer_face_normales(DoubleTab& Face_normales,
+                                     const  IntTab& Face_sommets,
+                                     const IntTab& Face_voisins,
+                                     const IntTab& elem_faces,
+                                     const Domaine& domaine_geom) const
 {
   const DoubleTab& les_coords = domaine_geom.coord_sommets();
-  double x1,y1;
-  double nx,ny;
-  double x1g=0,y1g=0;
-  double x2g=0,y2g=0;
-  double grx,gry,psc;
-  int sign=1,i;
-  int n0 = Face_sommets(num_Face,0);
-  int n1 = Face_sommets(num_Face,1);
-  x1 = les_coords(n0,0)-les_coords(n1,0);
-  y1 = les_coords(n0,1)-les_coords(n1,1);
-  nx = -y1;
-  ny = x1;
-  int elem1=Face_voisins(num_Face,0);
-  int elem2=Face_voisins(num_Face,1);
-
-  //Orientation de la normale vers le plus grand numero d'elem
-  //pour cela on teste d'abord si l'on est sur le bord
-  if (elem2!=-1)
+  int nb_face_tot = Face_normales.dimension_tot(0);
+  for (int num_Face=0; num_Face<nb_face_tot; num_Face++)
     {
-      //on oriente a partir du centre de gravite
-      //calcul du centre de gravite de chaque element
-      for(i=0; i<4; i++)
-        {
-          x1g+=les_coords(Face_sommets(elem_faces(elem1,i),0),0);
-          x1g+=les_coords(Face_sommets(elem_faces(elem1,i),1),0);
-          y1g+=les_coords(Face_sommets(elem_faces(elem1,i),0),1);
-          y1g+=les_coords(Face_sommets(elem_faces(elem1,i),1),1);
-          x2g+=les_coords(Face_sommets(elem_faces(elem2,i),0),0);
-          x2g+=les_coords(Face_sommets(elem_faces(elem2,i),1),0);
-          y2g+=les_coords(Face_sommets(elem_faces(elem2,i),0),1);
-          y2g+=les_coords(Face_sommets(elem_faces(elem2,i),1),1);
-        }
+      double x1, y1;
+      double nx, ny;
+      double x1g = 0, y1g = 0;
+      double x2g = 0, y2g = 0;
+      double grx, gry, psc;
+      int sign = 1, i;
+      int n0 = Face_sommets(num_Face, 0);
+      int n1 = Face_sommets(num_Face, 1);
+      x1 = les_coords(n0, 0) - les_coords(n1, 0);
+      y1 = les_coords(n0, 1) - les_coords(n1, 1);
+      nx = -y1;
+      ny = x1;
+      int elem1 = Face_voisins(num_Face, 0);
+      int elem2 = Face_voisins(num_Face, 1);
 
-      grx=(x2g-x1g)*0.125;
-      gry=(y2g-y1g)*0.125;
-
-      //on regarde le signe du produit scalaire
-      psc=grx*nx+gry*ny;
-      if(psc<0)
+      //Orientation de la normale vers le plus grand numero d'elem
+      //pour cela on teste d'abord si l'on est sur le bord
+      if (elem2 != -1)
         {
-          if(elem1<elem2)
-            sign=-1;
-          else if(elem2<elem1)
-            sign=-1;
+          //on oriente a partir du centre de gravite
+          //calcul du centre de gravite de chaque element
+          for (i = 0; i < 4; i++)
+            {
+              x1g += les_coords(Face_sommets(elem_faces(elem1, i), 0), 0);
+              x1g += les_coords(Face_sommets(elem_faces(elem1, i), 1), 0);
+              y1g += les_coords(Face_sommets(elem_faces(elem1, i), 0), 1);
+              y1g += les_coords(Face_sommets(elem_faces(elem1, i), 1), 1);
+              x2g += les_coords(Face_sommets(elem_faces(elem2, i), 0), 0);
+              x2g += les_coords(Face_sommets(elem_faces(elem2, i), 1), 0);
+              y2g += les_coords(Face_sommets(elem_faces(elem2, i), 0), 1);
+              y2g += les_coords(Face_sommets(elem_faces(elem2, i), 1), 1);
+            }
+
+          grx = (x2g - x1g) * 0.125;
+          gry = (y2g - y1g) * 0.125;
+
+          //on regarde le signe du produit scalaire
+          psc = grx * nx + gry * ny;
+          if (psc < 0)
+            {
+              if (elem1 < elem2)
+                sign = -1;
+              else if (elem2 < elem1)
+                sign = -1;
+            }
         }
+      else
+        {
+          //on oriente a partir du centre de gravite et du milieu de la
+          //face courante
+
+          for (i = 0; i < 4; i++)
+            {
+              x1g += les_coords(Face_sommets(elem_faces(elem1, i), 0), 0);
+              x1g += les_coords(Face_sommets(elem_faces(elem1, i), 1), 0);
+              y1g += les_coords(Face_sommets(elem_faces(elem1, i), 0), 1);
+              y1g += les_coords(Face_sommets(elem_faces(elem1, i), 1), 1);
+            }
+          // Cerr << "xg et yg de Face_normales: " << x1g << " " << y1g << finl;
+
+          x2g = les_coords(n0, 0) + les_coords(n1, 0);
+          y2g = les_coords(n0, 1) + les_coords(n1, 1);
+          grx = x2g * 0.5 - x1g * 0.125;
+          gry = y2g * 0.5 - y1g * 0.125;
+
+          //   Cerr << "grx et gry : " << grx << " " << gry << finl;
+          //on regarde le signe du produit scalaire
+          psc = grx * nx + gry * ny;
+          if (psc < 0)
+            sign = -1;
+        }
+      Face_normales(num_Face, 0) = sign * nx;
+      Face_normales(num_Face, 1) = sign * ny;
     }
-  else
-    {
-      //on oriente a partir du centre de gravite et du milieu de la
-      //face courante
-
-      for(i=0; i<4; i++)
-        {
-          x1g+=les_coords(Face_sommets(elem_faces(elem1,i),0),0);
-          x1g+=les_coords(Face_sommets(elem_faces(elem1,i),1),0);
-          y1g+=les_coords(Face_sommets(elem_faces(elem1,i),0),1);
-          y1g+=les_coords(Face_sommets(elem_faces(elem1,i),1),1);
-        }
-      // Cerr << "xg et yg de Face_normales: " << x1g << " " << y1g << finl;
-
-      x2g = les_coords(n0,0)+les_coords(n1,0);
-      y2g = les_coords(n0,1)+les_coords(n1,1);
-      grx=x2g*0.5-x1g*0.125;
-      gry=y2g*0.5-y1g*0.125;
-
-      //   Cerr << "grx et gry : " << grx << " " << gry << finl;
-      //on regarde le signe du produit scalaire
-      psc=grx*nx+gry*ny;
-      if(psc<0)
-        sign=-1;
-    }
-  Face_normales(num_Face,0)=sign*nx;
-  Face_normales(num_Face,1)=sign*ny;
 }
 
 /*! @brief calcule les normales des facettes pour des elem standards

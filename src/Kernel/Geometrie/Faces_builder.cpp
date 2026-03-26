@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -578,12 +578,11 @@ void Faces_builder::creer_faces_internes(IntTab& faces_sommets,
 
 
   // Boucle sur les elements
-  int i_elem;
-  for (i_elem = 0; i_elem < nb_elem; i_elem++)
+  ToDo_Kokkos("critical");
+  for (int i_elem = 0; i_elem < nb_elem; i_elem++)
     {
-      int i_face;
       // Boucle sur les faces de l'element
-      for (i_face = 0; i_face < nb_faces_par_element; i_face++)
+      for (int i_face = 0; i_face < nb_faces_par_element; i_face++)
         {
 
           // L'indice de cette face dans le tableau faces_sommets.
@@ -591,11 +590,10 @@ void Faces_builder::creer_faces_internes(IntTab& faces_sommets,
           int indice_face = elem_faces(i_elem, i_face);
 
           // Calcul des indices des sommets de la face dans le domaine:
-          int i;
           // Attention il ne faut laisser l'appel ici...
           const IntTab& faces_elem_ref       = faces_element_reference(i_elem);
 
-          for (i = 0; i < nb_sommets_par_face; i++)
+          for (int i = 0; i < nb_sommets_par_face; i++)
             {
               // indice du sommet sur l'element de reference
               const int i_som_ref = faces_elem_ref(i_face, i);

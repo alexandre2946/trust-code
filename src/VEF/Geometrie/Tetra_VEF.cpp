@@ -53,73 +53,68 @@ Tetra_VEF::Tetra_VEF()
       KEL_(i,j)=tmp[i][j];
 }
 
-void Tetra_VEF::normale(int num_Face,DoubleTab& Face_normales,
-                        const IntTab& Face_sommets,
-                        const IntTab& Face_voisins,
-                        const IntTab& elem_faces,
-                        const Domaine& domaine_geom) const
+void Tetra_VEF::creer_face_normales(DoubleTab& Face_normales,
+                                    const IntTab& Face_sommets,
+                                    const IntTab& Face_voisins,
+                                    const IntTab& elem_faces,
+                                    const Domaine& domaine_geom) const
 {
-
-  //Cerr << " num_Face " << num_Face << finl;
   const DoubleTab& les_coords = domaine_geom.coord_sommets();
-
-  // Cerr << "les face sommet " << Face_sommets << finl;
-  double x1,y1,z1,x2,y2,z2;
-  double nx,ny,nz;
-  int f0,no4;
-
-  int n0 = Face_sommets(num_Face,0);
-  int n1 = Face_sommets(num_Face,1);
-  int n2 = Face_sommets(num_Face,2);
-
-
-  x1 = les_coords(n0,0) - les_coords(n1,0);
-  y1 = les_coords(n0,1) - les_coords(n1,1);
-  z1 = les_coords(n0,2) - les_coords(n1,2);
-
-  x2 = les_coords(n2,0) - les_coords(n1,0);
-  y2 = les_coords(n2,1) - les_coords(n1,1);
-  z2 = les_coords(n2,2) - les_coords(n1,2);
-
-  nx = (y1*z2 - y2*z1)/2;
-  ny = (-x1*z2 + x2*z1)/2;
-  nz = (x1*y2 - x2*y1)/2;
-  // Cerr << "nx " << nx << " ny " << ny << " nz " << nz << finl;
-
-  // Orientation de la normale de elem1 vers elem2
-  // pour cela recherche du sommet de elem1 qui n'est pas sur la Face
-  int elem1 = Face_voisins(num_Face,0);
-  if ( (f0 = elem_faces(elem1,0)) == num_Face )
-    f0 = elem_faces(elem1,1);
-
-  if ( (no4 = Face_sommets(f0,0)) != n0    &&   no4 != n1
-       &&   no4 != n2)
-    { /* Do nothing */}
-  else if ( (no4 = Face_sommets(f0,1)) != n0 && no4 != n1
-            && no4 != n2 )
-    { /* Do nothing */}
-  else
-    no4 = Face_sommets(f0,2);
-
-  x1 = les_coords(no4,0) - les_coords(n0,0);
-  y1 = les_coords(no4,1) - les_coords(n0,1);
-  z1 = les_coords(no4,2) - les_coords(n0,2);
-
-  if ( (nx*x1+ny*y1+nz*z1) > 0 )
+  int nb_face_tot = Face_normales.dimension_tot(0);
+  for (int num_Face=0; num_Face<nb_face_tot; num_Face++)
     {
-      Face_normales(num_Face,0) = - nx;
-      Face_normales(num_Face,1) = - ny;
-      Face_normales(num_Face,2) = - nz;
-    }
-  else
-    {
-      Face_normales(num_Face,0) = nx;
-      Face_normales(num_Face,1) = ny;
-      Face_normales(num_Face,2) = nz;
-    }
+      double x1, y1, z1, x2, y2, z2;
+      double nx, ny, nz;
+      int f0, no4;
 
-  // Cerr << "Face_normales " << Face_normales << finl;
+      int n0 = Face_sommets(num_Face, 0);
+      int n1 = Face_sommets(num_Face, 1);
+      int n2 = Face_sommets(num_Face, 2);
 
+
+      x1 = les_coords(n0, 0) - les_coords(n1, 0);
+      y1 = les_coords(n0, 1) - les_coords(n1, 1);
+      z1 = les_coords(n0, 2) - les_coords(n1, 2);
+
+      x2 = les_coords(n2, 0) - les_coords(n1, 0);
+      y2 = les_coords(n2, 1) - les_coords(n1, 1);
+      z2 = les_coords(n2, 2) - les_coords(n1, 2);
+
+      nx = (y1 * z2 - y2 * z1) / 2;
+      ny = (-x1 * z2 + x2 * z1) / 2;
+      nz = (x1 * y2 - x2 * y1) / 2;
+      // Cerr << "nx " << nx << " ny " << ny << " nz " << nz << finl;
+
+      // Orientation de la normale de elem1 vers elem2
+      // pour cela recherche du sommet de elem1 qui n'est pas sur la Face
+      int elem1 = Face_voisins(num_Face, 0);
+      if ((f0 = elem_faces(elem1, 0)) == num_Face)
+        f0 = elem_faces(elem1, 1);
+
+      if ((no4 = Face_sommets(f0, 0)) != n0 && no4 != n1
+          && no4 != n2) { /* Do nothing */}
+      else if ((no4 = Face_sommets(f0, 1)) != n0 && no4 != n1
+               && no4 != n2) { /* Do nothing */}
+      else
+        no4 = Face_sommets(f0, 2);
+
+      x1 = les_coords(no4, 0) - les_coords(n0, 0);
+      y1 = les_coords(no4, 1) - les_coords(n0, 1);
+      z1 = les_coords(no4, 2) - les_coords(n0, 2);
+
+      if ((nx * x1 + ny * y1 + nz * z1) > 0)
+        {
+          Face_normales(num_Face, 0) = -nx;
+          Face_normales(num_Face, 1) = -ny;
+          Face_normales(num_Face, 2) = -nz;
+        }
+      else
+        {
+          Face_normales(num_Face, 0) = nx;
+          Face_normales(num_Face, 1) = ny;
+          Face_normales(num_Face, 2) = nz;
+        }
+    }
 }
 
 /*! @brief remplit le tableau face_normales dans le Domaine_VEF

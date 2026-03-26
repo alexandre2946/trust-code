@@ -296,12 +296,7 @@ void Domaine_VEF::discretiser()
     const IntTab& face_som = face_sommets();
     const IntTab& face_vois = face_voisins();
     const IntTab& elem_face = elem_faces();
-    const int n_tot = nb_faces_tot();
-    ToDo_Kokkos("critical");
-    for (int num_face = 0; num_face < n_tot; num_face++)
-      {
-        type_elem_->normale(num_face, face_normales_, face_som, face_vois, elem_face, domaine_geom);
-      }
+    type_elem_->creer_face_normales(face_normales_, face_som, face_vois, elem_face, domaine_geom);
   }
 
   // Calcul de facette_normales_
