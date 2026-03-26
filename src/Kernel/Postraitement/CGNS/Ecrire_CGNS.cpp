@@ -13,6 +13,7 @@
 *
 *****************************************************************************/
 
+#include <Sortie_Fichier_base.h>
 #include <Format_Post_CGNS.h>
 #include <Comm_Group_MPI.h>
 #include <communications.h>
@@ -29,7 +30,13 @@
 
 void Ecrire_CGNS::cgns_set_base_name(const Nom& fn)
 {
-  baseFile_name_ = fn.getString();
+  // See if root is set ... utile pour reset time ...
+  baseFile_name_ = Sortie_Fichier_base::root;
+
+  if (baseFile_name_ != "")
+    baseFile_name_ += "/";
+
+  baseFile_name_ += fn.getString();
 }
 
 void Ecrire_CGNS::cgns_associer_domaine_dis(const Domaine_dis_base& domaine_dis_base)

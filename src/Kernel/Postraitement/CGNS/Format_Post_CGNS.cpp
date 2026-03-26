@@ -62,6 +62,7 @@ Sortie& Format_Post_CGNS::printOn(Sortie& os) const
 
 Entree& Format_Post_CGNS::readOn(Entree& is)
 {
+  Process::exit("Format_Post_CGNS::readOn - Should not be called ! ");
   verify_if_cgns(__func__);
   init_my_com_group();
   return Format_Post_base::readOn(is);
@@ -69,6 +70,7 @@ Entree& Format_Post_CGNS::readOn(Entree& is)
 
 void Format_Post_CGNS::set_param(Param& param) const
 {
+  Process::exit("Format_Post_CGNS::readOn - Should not be called ! ");
   verify_if_cgns(__func__);
   param.ajouter("nom_fichier", &cgns_basename_, Param::REQUIRED);
 }
