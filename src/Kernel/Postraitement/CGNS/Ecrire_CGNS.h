@@ -41,6 +41,7 @@ public:
   void cgns_write_domaine_dual(const Nom& , const int , const Nom& nom_dom = "??");
   void cgns_write_domaine(const Domaine * ,const Nom& , const DoubleTab& , const IntTab& , const Motcle& );
   void cgns_write_field(const Domaine&, const Noms&, double, const Nom&, const Nom&, const Nom&, const DoubleTab&);
+  void cgns_resetTime(const double t, const std::string& dirname, const Nom& basefile);
   void finir_ecriture(double);
 
 private:
@@ -54,6 +55,7 @@ private:
 
   std::map<std::string, Nom> fld_loc_map_; /* { Loc , Nom_dom } */
   std::vector<Nom> doms_written_;
+  std::vector<std::string> baseFile_name_vect_;
   std::unordered_set<std::string> fieldName_dumped_; /* manage doubled fields / synonyms / compos .. ! */
   std::string solname_elem_ = "", solname_som_ = "", solname_faces_ = "", baseFile_name_ = "";
   std::string grid_name_ = "", grid_name_loc_ = "";

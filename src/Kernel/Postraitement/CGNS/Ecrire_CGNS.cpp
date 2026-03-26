@@ -39,6 +39,53 @@ void Ecrire_CGNS::cgns_set_base_name(const Nom& fn)
   baseFile_name_ += fn.getString();
 }
 
+void Ecrire_CGNS::cgns_resetTime(const double t, const std::string& dirname, const Nom& basefile)
+{
+  /* 1. Reset */
+  solname_elem_ = "", solname_som_ = "", solname_faces_ = "";
+  grid_name_ = "", grid_name_loc_ = "";
+  need_post_field_ = true, first_time_post_ = true;
+  has_elem_field_ = false, has_faces_field_ = false, has_som_field_ = false;
+  solname_elem_written_ = false, solname_som_written_ = false, solname_faces_written_ = false;
+  multi_loc_deformable_support_linked_ = false, grid_name_written_ = false;
+  grid_file_opened_ = false, solution_file_opened_ = false;
+  ensure_modify_done_ = false, singlefile_open_ = false;
+  flowId_elem_ = 0, flowId_som_ = 0, flowId_faces_ = 0;
+  fieldId_elem_ = 0, fieldId_som_ = 0, fieldId_faces_ = 0;
+  step_single_file_counter_ = 0;
+
+  fieldName_dumped_.clear(), time_post_.clear();
+  T2CGNS_.clear();
+  fld_loc_map_.clear(), doms_written_.clear();
+  baseId_.clear(), zoneId_.clear(), sizeId_.clear();
+  baseZone_name_.clear(), connectname_.clear();
+  cellDim_.clear(), zoneId_par_.clear();
+
+  /* 2. Management of file name*/
+  baseFile_name_vect_.push_back(baseFile_name_);
+
+  if (dirname != "") /* dirname not empty, we use it */
+    {
+      baseFile_name_ = dirname;
+      baseFile_name_ += "/";
+      baseFile_name_ += basefile.getString();
+    }
+  else if (Sortie_Fichier_base::root != "")
+    {
+      baseFile_name_ = Sortie_Fichier_base::root;
+      baseFile_name_ += "/";
+      baseFile_name_ += basefile.getString();
+    }
+  else
+    baseFile_name_ = basefile.getString();
+
+  if (std::find(baseFile_name_vect_.begin(), baseFile_name_vect_.end(), baseFile_name_) != baseFile_name_vect_.end())
+    {
+      baseFile_name_ += "_reset_";
+      baseFile_name_ += std::to_string(static_cast<int>(baseFile_name_vect_.size()));
+    }
+}
+
 void Ecrire_CGNS::cgns_associer_domaine_dis(const Domaine_dis_base& domaine_dis_base)
 {
   domaine_dis_ = domaine_dis_base;
@@ -54,7 +101,8 @@ void Ecrire_CGNS::cgns_init_MPI()
       if (cgp_mpi_comm(comm_loc.get_mpi_comm()) != CG_OK)
         Cerr << "Error Ecrire_CGNS::cgns_init_MPI : cgp_mpi_comm -- Comm_Group_MPI !" << finl, TRUST_CGNS_ERROR();
 
-      init_proc_maitre_local_comm();
+      if (proc_maitre_local_comm_ == -123)
+        init_proc_maitre_local_comm();
     }
   else
     {

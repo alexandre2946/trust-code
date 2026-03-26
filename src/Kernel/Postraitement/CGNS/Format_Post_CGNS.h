@@ -64,6 +64,7 @@ public:
   void set_deformable_domain() override;
   void set_lagrangian_domain() override;
   void set_loc_vector(const std::vector<std::string>&) override;
+  void resetTime(double t, const std::string dirname) override;
   int initialize_by_default(const Nom&) override;
   int initialize(const Nom&, const int, const Nom&) override;
 

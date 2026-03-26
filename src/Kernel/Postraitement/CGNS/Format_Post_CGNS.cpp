@@ -75,6 +75,13 @@ void Format_Post_CGNS::set_param(Param& param) const
   param.ajouter("nom_fichier", &cgns_basename_, Param::REQUIRED);
 }
 
+void Format_Post_CGNS::resetTime(double t, const std::string dirname)
+{
+#ifdef HAS_CGNS
+  cgns_writer_.cgns_resetTime(t, dirname, cgns_basename_);
+#endif
+}
+
 int Format_Post_CGNS::initialize_by_default(const Nom& file_basename)
 {
   verify_if_cgns(__func__);
