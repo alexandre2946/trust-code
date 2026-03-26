@@ -39,7 +39,6 @@ Entree_Fichier_base::Entree_Fichier_base()
 
 bool fileExists(const char* name)
 {
-  std::cerr << "Provisoire name=" << name << std::endl;
   struct stat buffer;
   if (stat(name, &buffer) == 0 && S_ISREG(buffer.st_mode))
     return true;
