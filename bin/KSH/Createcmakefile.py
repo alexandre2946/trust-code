@@ -193,6 +193,20 @@ if(NOT VISUAL)
 endif(NOT VISUAL)
 
 #
+# Optional archiver override:
+# export TRUST_AR=/path/to/ar and TRUST_RANLIB=/path/to/ranlib
+# to bypass platform-specific archiver issues while keeping monolithic .a output.
+#
+set(TRUST_AR "$ENV{TRUST_AR}")
+if(NOT TRUST_AR STREQUAL "")
+   set(CMAKE_AR ${TRUST_AR})
+endif()
+set(TRUST_RANLIB "$ENV{TRUST_RANLIB}")
+if(NOT TRUST_RANLIB STREQUAL "")
+   set(CMAKE_RANLIB ${TRUST_RANLIB})
+endif()
+
+#
 # Use a specified linker (typically mold) if provided - this greatly increase debug linking time:
 #
 set(TRUST_LINKER "$ENV{TRUST_LINKER}")
@@ -732,4 +746,3 @@ if  __name__ == '__main__':
 
     if atelier:
         generate_baltik_cmake()
-
