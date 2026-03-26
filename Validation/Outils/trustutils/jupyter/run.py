@@ -1319,7 +1319,15 @@ def reset(keepBuildDir=True,keepSubdirectories=False):
 
     global defaultSuite_
     defaultSuite_ = None
+
+    # do not keep in NR mode
+    if isExtractingNR() or isExtractingNR_ListOnly():
+        keepBuildDir=False
+
     if os.path.exists(BUILD_DIRECTORY):
+        if not keepBuildDir:
+            shutil.rmtree(BUILD_DIRECTORY)
+            return
         # only delete content. to avoid killing your terminal if you are inside BUILD_DIRECTORY
         # can even choose to keep empty dirs with the optional variable
         for root, dirs, files in os.walk(BUILD_DIRECTORY, topdown=False):
@@ -1328,8 +1336,6 @@ def reset(keepBuildDir=True,keepSubdirectories=False):
             if not keepSubdirectories:
                 for name in dirs:
                     os.rmdir(os.path.join(root, name))
-        if not keepBuildDir:
-            shutil.rmtree(BUILD_DIRECTORY)
 
 
 def getCases():
