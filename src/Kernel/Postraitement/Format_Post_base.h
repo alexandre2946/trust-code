@@ -133,6 +133,7 @@ public:
   virtual void set_postraiter_domain() { /* Do nothing */ }
   virtual void set_deformable_domain() { /* Do nothing */ }
   virtual void set_lagrangian_domain() { /* Do nothing */ }
+  virtual void set_discr_type(const Nom&) { /* Do nothing */ }
   virtual void set_loc_vector(const std::vector<std::string>&) { /* Do nothing */ }
 
 protected:

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -108,6 +108,7 @@ Domaine_dis_base& Domaine_dis_cache::build_or_get_poly_post(const Nom& type, con
     if (itr.first.find(new_type) != std::string::npos)
       return cache_[itr.first].valeur();
 
+  Cerr << "Domaine_dis_cache::build_or_get_poly_post ... Trying to build_or_get Domaine_dis for domaine " << dom.le_nom() << " with type " << type << finl;
   return build_or_get(type, dom);
 }
 

@@ -63,6 +63,7 @@ public:
   void set_postraiter_domain() override;
   void set_deformable_domain() override;
   void set_lagrangian_domain() override;
+  void set_discr_type(const Nom&) override;
   void set_loc_vector(const std::vector<std::string>&) override;
   void resetTime(double t, const std::string dirname) override;
   int initialize_by_default(const Nom&) override;

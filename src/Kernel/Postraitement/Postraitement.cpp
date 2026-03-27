@@ -355,7 +355,15 @@ Entree& Postraitement::readOn(Entree& s)
   format_post_.typer(type_format.getChar());
 
   format_post_->set_single_lata_option(is_single_lata); // utile pour single_lata ...
-  format_post_->set_loc_vector(locs_required_); // utile pour CGNS pour le moment ...
+
+  // pour cgns ...
+  if (le_pb.has_domaine_dis())
+    format_post_->set_discr_type(le_pb.domaine_dis().que_suis_je());
+
+  if (le_domaine_->deformable())
+    format_post_->set_deformable_domain();
+
+  format_post_->set_loc_vector(locs_required_);
 
   Nom base_name(nom_fich_);
   base_name.prefix(format_);
@@ -1549,10 +1557,6 @@ void Postraitement::init()
   const Nom& nom_du_domaine = dom.le_nom();
   Nom name=nom_fich().prefix(format_);
   name.prefix(".");
-
-  // XXX Elie Saikali : utile pour CGNS
-  if (dom.deformable())
-    format_post_->set_deformable_domain();
 
   if (besoin_postraiter_champs())
     {

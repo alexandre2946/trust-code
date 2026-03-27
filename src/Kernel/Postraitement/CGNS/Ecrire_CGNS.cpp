@@ -585,7 +585,8 @@ void Ecrire_CGNS::cgns_write_domaine_seq(const Domaine * domaine,const Nom& nom_
   /* 1 : Instance of TRUST_2_CGNS */
   T2CGNS_.push_back(TRUST_2_CGNS());
   TRUST_2_CGNS& TRUST2CGNS = T2CGNS_.back();
-  TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_.non_nul() ? &(domaine_dis_.valeur()) : nullptr, les_som, les_elem, postraiter_domaine_);
+  TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_.non_nul() ? &(domaine_dis_.valeur()) : nullptr,
+                                    les_som, les_elem, postraiter_domaine_, discr_type_);
   if (is_dual_ && Objet_U::dimension == 3)
     {
       assert(fs_dual_.size() > 0 && ef_dual_.size() > 0);
@@ -711,7 +712,8 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_seq(const Domaine * domaine,cons
 {
   const int ind = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
   TRUST_2_CGNS& TRUST2CGNS = T2CGNS_[ind];
-  TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_.non_nul() ? &(domaine_dis_.valeur()) : nullptr, les_som, les_elem, postraiter_domaine_);
+  TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_.non_nul() ? &(domaine_dis_.valeur()) : nullptr,
+                                    les_som, les_elem, postraiter_domaine_, discr_type_);
 
   CGNS_TYPE cgns_type_elem = TRUST2CGNS.convert_elem_type(type_elem);
   const bool is_polyedre = (type_elem == "POLYEDRE" || type_elem == "PRISME" || type_elem == "PRISME_HEXAG");
@@ -814,7 +816,9 @@ void Ecrire_CGNS::cgns_write_domaine_par_over_zone(const Domaine * domaine,const
   /* 1 : Instance of TRUST_2_CGNS */
   T2CGNS_.push_back(TRUST_2_CGNS());
   TRUST_2_CGNS& TRUST2CGNS = T2CGNS_.back();
-  TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_.non_nul() ? &(domaine_dis_.valeur()) : nullptr,les_som, les_elem, postraiter_domaine_);
+  TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_.non_nul() ? &(domaine_dis_.valeur()) : nullptr,
+                                    les_som, les_elem, postraiter_domaine_, discr_type_);
+
   if (is_dual_ && Objet_U::dimension == 3)
     {
       assert(fs_dual_.size() > 0 && ef_dual_.size() > 0);
@@ -1083,7 +1087,8 @@ void Ecrire_CGNS::cgns_write_domaine_par_in_zone(const Domaine * domaine,const N
   /* 1 : Instance of TRUST_2_CGNS */
   T2CGNS_.push_back(TRUST_2_CGNS());
   TRUST_2_CGNS& TRUST2CGNS = T2CGNS_.back();
-  TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_.non_nul() ? &(domaine_dis_.valeur()) : nullptr, les_som, les_elem, postraiter_domaine_);
+  TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_.non_nul() ? &(domaine_dis_.valeur()) : nullptr,
+                                    les_som, les_elem, postraiter_domaine_, discr_type_);
 
   if (is_dual_ && Objet_U::dimension == 3)
     {
@@ -1373,7 +1378,8 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
 #ifdef MPI_
   const int ind = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
   TRUST_2_CGNS& TRUST2CGNS = T2CGNS_[ind];
-  TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_.non_nul() ? &(domaine_dis_.valeur()) : nullptr, les_som, les_elem, postraiter_domaine_);
+  TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_.non_nul() ? &(domaine_dis_.valeur()) : nullptr,
+                                    les_som, les_elem, postraiter_domaine_, discr_type_);
 
   CGNS_TYPE cgns_type_elem = TRUST2CGNS.convert_elem_type(type_elem);
   const bool is_polyedre = (type_elem == "POLYEDRE" || type_elem == "PRISME" || type_elem == "PRISME_HEXAG");

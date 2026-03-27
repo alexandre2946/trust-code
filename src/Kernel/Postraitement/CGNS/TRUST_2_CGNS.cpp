@@ -165,13 +165,14 @@ void TRUST_2_CGNS::map_face_values(const Domaine_VF& dom_vf, const DoubleTab& va
     }
 }
 
-void TRUST_2_CGNS::associer_domaine_TRUST(const Domaine * dom, const Domaine_dis_base* dom_dis, const DoubleTab& som, const IntTab& elem, const bool post_dom)
+void TRUST_2_CGNS::associer_domaine_TRUST(const Domaine * dom, const Domaine_dis_base* dom_dis, const DoubleTab& som, const IntTab& elem, const bool post_dom, const std::string& discr_type)
 {
   if (dom) dom_trust_ = *dom;
   if (dom_dis) domaine_dis_ = *dom_dis;
   sommets_ = som;
   elems_ = elem;
   postraiter_domaine_ = post_dom;
+  discr_type_ = discr_type;
 }
 
 void TRUST_2_CGNS::associer_connec_pour_dual(const IntTab& fs, const IntTab& ef)
@@ -329,14 +330,29 @@ void TRUST_2_CGNS::fill_global_infos()
 
 void TRUST_2_CGNS::get_domaine_dis_vf_if_poly(Domaine_dis_base*& domaine_dis, Domaine_VF*& vf)
 {
+  assert(dom_trust_.non_nul());
   domaine_dis = nullptr;
   vf = nullptr;
 
   if (fs_dual_.est_nul() && ef_dual_.est_nul())
     {
-      const Nom polym("Domaine_PolyMAC");
-      domaine_dis = domaine_dis_.non_nul() ? &(domaine_dis_.valeur()) :
-                    &(Domaine_dis_cache::Build_or_get_poly_post(polym, dom_trust_.valeur()));
+      if (domaine_dis_.non_nul()
+          && domaine_dis_->domaine().le_nom() == dom_trust_->le_nom() // XXX peut etre sous_zone ;)
+          && domaine_dis_->face_sommets().size() > 0)  // see if well filled for example
+        {
+          domaine_dis = &(domaine_dis_.valeur());
+        }
+      else
+        {
+          if (discr_type_ != "")
+            domaine_dis = &(Domaine_dis_cache::Build_or_get_poly_post(discr_type_, dom_trust_.valeur()));
+          else
+            {
+              // the user seems to post the domaine before discretizing the domain of before filling the post bloc ... we try our chance with Domaine_PolyMAC_MPFA
+              Nom type = "Domaine_PolyMAC_MPFA";
+              domaine_dis = &(Domaine_dis_cache::Build_or_get_poly_post(type, dom_trust_.valeur()));
+            }
+        }
 
       vf = &(ref_cast (Domaine_VF, *domaine_dis));
     }

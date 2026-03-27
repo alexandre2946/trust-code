@@ -117,6 +117,13 @@ int Format_Post_CGNS::ecrire_entete(const double temps_courant,const int reprise
   return 1;
 }
 
+void Format_Post_CGNS::set_discr_type(const Nom& type)
+{
+#ifdef HAS_CGNS
+  cgns_writer_.cgns_set_discr_type(type);
+#endif
+}
+
 void Format_Post_CGNS::set_postraiter_domain()
 {
 #ifdef HAS_CGNS

@@ -35,6 +35,7 @@ public:
   void cgns_set_lagrangian_domain() { is_lagrangian_ = true, is_deformable_ = true; } /* pour FTD on active les 2 flags */
   void cgns_set_loc_vector(const std::vector<std::string>& vec) { loc_vect_ = vec; }
   void cgns_set_base_name(const Nom& );
+  void cgns_set_discr_type(const Nom& type) { discr_type_ = type.getString(); }
   void cgns_open_file();
   void cgns_finir();
   void cgns_add_time(const double );
@@ -59,6 +60,7 @@ private:
   std::unordered_set<std::string> fieldName_dumped_; /* manage doubled fields / synonyms / compos .. ! */
   std::string solname_elem_ = "", solname_som_ = "", solname_faces_ = "", baseFile_name_ = "";
   std::string grid_name_ = "", grid_name_loc_ = "";
+  std::string discr_type_ = "";
   std::vector<double> time_post_;
   std::vector<int> baseId_, zoneId_;
 

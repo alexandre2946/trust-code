@@ -103,6 +103,7 @@ public:
   Schema_Temps_base& schema_temps();
   const Domaine& domaine() const;
   Domaine& domaine();
+  bool has_domaine_dis() const { return le_domaine_dis_.non_nul(); }
   const Domaine_dis_base& domaine_dis() const;
   Domaine_dis_base& domaine_dis();
   bool is_dilatable() const;
