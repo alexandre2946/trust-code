@@ -360,6 +360,93 @@ void main_pilote_icoco_3(Probleme_U& pb_to_solve, int nb_pas_dt_reset)
   pb.terminate();
 }
 
+/**
+ * This one is used to test setInputStringValue("SORTIE_ROOT_DIRECTORY", "./")
+ */
+void main_pilote_icoco_4(Probleme_U& pb_to_solve, int sortie_root_directory, int nstep_stabilized, int nb_pas_dt_reset)
+{
+  ProblemTrio pb;
+  TRUST_set_library_mode(false);
+
+  pb.initialize_pb(pb_to_solve);
+
+  bool stop=false; // Does the Problem want to stop ?
+  bool ok=true; // Is the time interval successfully solved ?
+
+  // Compute the first time step length
+  double dt=pb.computeTimeStep(stop);
+
+  assert(nstep_stabilized < nb_pas_dt_reset);
+  int cnt = 1;
+  bool reset = false;
+  // Loop on the time steps
+  statistics().start_timeloop();
+  while(!stop)
+    {
+      statistics().begin_count(STD_COUNTERS::timeloop);
+      ok=false; // Is the time interval successfully solved ?
+
+      // Loop on the time interval tries
+      while (!ok && !stop)
+        {
+          // Prepare the next time step
+          ok=pb.initTimeStep(dt);
+          if (!ok)
+            break;
+
+          // Solve the next time step
+          ok=pb.solveTimeStep();
+
+          if (!ok)   // The resolution failed, try with a new time interval.
+            {
+              pb.abortTimeStep();
+              dt=pb.computeTimeStep(stop);
+            }
+          else // The resolution was successful, validate and go to the
+            // next time step.
+            pb.validateTimeStep();
+        }
+
+      if (!ok) // Impossible to solve the next time step, the Problem
+        break; // has given up
+
+      // stabilized transient step
+      if (cnt <= nstep_stabilized)
+        {
+          if (sortie_root_directory == 1)
+            pb.setInputStringValue("SORTIE_ROOT_DIRECTORY", "./");
+          else if (sortie_root_directory == 2)
+            pb.setInputStringValue("SORTIE_ROOT_DIRECTORY", "LATA");
+          pb.resetTime(0.);
+        }
+      // resetime directive
+      if (cnt >= nb_pas_dt_reset && !reset)
+        {
+          if (sortie_root_directory == 1)
+            pb.setInputStringValue("SORTIE_ROOT_DIRECTORY", "./");
+          else if (sortie_root_directory == 2)
+            pb.setInputStringValue("SORTIE_ROOT_DIRECTORY", "LATA");
+          pb.resetTime(0);
+          reset = true;
+        }
+
+      // Compute the next time step length
+      dt=pb.computeTimeStep(stop);
+
+      // Stop the resolution if the Problem is stationnary
+      if (pb.isStationary())
+        stop=true;
+
+      cnt ++;
+      statistics().end_count(STD_COUNTERS::timeloop);
+    }
+  statistics().end_timeloop();
+  if (!Objet_U::disable_TU)
+    statistics().print_TU_files("Time loop statistics");
+
+  pb.terminate();
+}
+
 
 /*! @brief Fonction principale de l'interprete: resoudre un probleme
  *
@@ -441,15 +528,20 @@ Entree& Pilote_ICoCo::interpreter(Entree& is)
 {
   Param param(que_suis_je());
   Nom nom1;
-  int nb_pas_dt_reset = -1;
-  param.ajouter("pb_name",&nom1,Param::REQUIRED);
+  int nb_pas_dt_reset = 1000000000;
+  int nstep_stabilized = 0;
+  int sortie_root_directory = 0;
   int methode = -1;
+  param.ajouter("pb_name",&nom1,Param::REQUIRED);
   param.ajouter("main",&methode,Param::REQUIRED);
   param.dictionnaire("abort_time_step",0);
   param.dictionnaire("Pilote_ICoCo_1",1);
   param.dictionnaire("Pilote_ICoCo_2",2);
   param.dictionnaire("Pilote_ICoCo_3",3);
+  param.dictionnaire("Pilote_ICoCo_4",4);
   param.ajouter("nb_pas_dt_reset",&nb_pas_dt_reset);
+  param.ajouter("nstep_stabilized",&nstep_stabilized);
+  param.ajouter("sortie_root_directory",&sortie_root_directory);
   param.lire_avec_accolades_depuis(is);
   Probleme_U& pb_to_solve=ref_cast(Probleme_U,objet(nom1));
   switch (methode)
@@ -464,8 +556,10 @@ Entree& Pilote_ICoCo::interpreter(Entree& is)
       main_pilote_icoco_2(pb_to_solve);
       break;
     case 3:
-      assert (nb_pas_dt_reset != -1);
       main_pilote_icoco_3(pb_to_solve, nb_pas_dt_reset);
+      break;
+    case 4:
+      main_pilote_icoco_4(pb_to_solve, sortie_root_directory, nstep_stabilized, nb_pas_dt_reset);
       break;
     default:
       {
