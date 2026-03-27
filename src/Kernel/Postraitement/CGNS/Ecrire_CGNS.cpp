@@ -30,13 +30,19 @@
 
 void Ecrire_CGNS::cgns_set_base_name(const Nom& fn)
 {
-  // See if root is set ... utile pour reset time ...
-  baseFile_name_ = Sortie_Fichier_base::root;
+  // See if root is set ... utile pour champ parametrique ... on fait comme dan sla methode cgns_resetTime
+  std::string dir_to_use = Sortie_Fichier_base::root;
 
-  if (baseFile_name_ != "")
-    baseFile_name_ += "/";
+  if (dir_to_use == "." || dir_to_use == "./")
+    dir_to_use.clear();
 
-  baseFile_name_ += fn.getString();
+  while (!dir_to_use.empty() && dir_to_use.back() == '/')
+    dir_to_use.pop_back();
+
+  if (!dir_to_use.empty())
+    baseFile_name_ = dir_to_use + "/" + fn.getString();
+  else
+    baseFile_name_ = fn.getString();
 }
 
 void Ecrire_CGNS::cgns_resetTime(const double t, const std::string& dirname, const Nom& basefile)
@@ -64,18 +70,23 @@ void Ecrire_CGNS::cgns_resetTime(const double t, const std::string& dirname, con
   /* 2. Management of file name*/
   baseFile_name_vect_.push_back(baseFile_name_);
 
-  if (dirname != "") /* dirname not empty, we use it */
-    {
-      baseFile_name_ = dirname;
-      baseFile_name_ += "/";
-      baseFile_name_ += basefile.getString();
-    }
+  std::string dir_to_use;
+
+  if (!dirname.empty())
+    dir_to_use = dirname;
   else if (Sortie_Fichier_base::root != "")
-    {
-      baseFile_name_ = Sortie_Fichier_base::root;
-      baseFile_name_ += "/";
-      baseFile_name_ += basefile.getString();
-    }
+    dir_to_use = Sortie_Fichier_base::root;
+
+  // evite ./basefile et .//basefile ...
+  if (dir_to_use == "." || dir_to_use == "./")
+    dir_to_use.clear();
+
+  // Supprimer les / a la fin (sauf si dir_to_use devient vide haha)
+  while (!dir_to_use.empty() && dir_to_use.back() == '/')
+    dir_to_use.pop_back();
+
+  if (!dir_to_use.empty())
+    baseFile_name_ = dir_to_use + "/" + basefile.getString();
   else
     baseFile_name_ = basefile.getString();
 
