@@ -2244,6 +2244,9 @@ void Postraitement::creer_champ_post_stat(const Motcle& motlu1,const Motcle& mot
 
   if (((motlu3=="Moyenne") || (motlu3=="Ecart_type")) || (motlu3=="Correlation"))
     {
+      if (motlu2 != "NATIF")
+        add_locs_required_if_not(motlu2);
+
       ajout = set_expression_champ(motlu1,motlu2,motlu3,motlu4,0);
       Entree_complete s_complete(ajout,s);
       s_complete>>champ;
