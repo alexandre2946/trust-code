@@ -20,7 +20,6 @@
 #include <Param.h>
 
 Implemente_instanciable(Constituant, "Constituant", Milieu_base);
-// XD constituant milieu_base constituant -1 Constituent.
 
 Sortie& Constituant::printOn(Sortie& os) const { return os; }
 
@@ -29,8 +28,8 @@ Entree& Constituant::readOn(Entree& is) { return Milieu_base::readOn(is); }
 void Constituant::set_param(Param& param) const
 {
   Milieu_base::set_param(param);
-  param.ajouter("coefficient_diffusion", &D_, Param::REQUIRED); // XD_ADD_P field_base Constituent diffusion coefficient value (m2.s-1). If a multi-constituent problem is being processed, the diffusivite will be a vectorial and each components will be the diffusion of the constituent.
-  param.ajouter_non_std("is_multi_scalar|is_multi_scalar_diffusion", (this)); // XD_ADD_P rien Flag to activate the multi_scalar diffusion operator
+  param.ajouter("coefficient_diffusion", &D_, Param::REQUIRED);
+  param.ajouter_non_std("is_multi_scalar|is_multi_scalar_diffusion", (this));
 }
 
 void Constituant::discretiser(const Probleme_base& pb, const Discretisation_base& dis)
