@@ -1040,6 +1040,11 @@ def saveFileAccumulator(data):
     data: str
         name of the file we want to save.
     """
+
+    # do nothing in test extraction mode
+    if isExtractingNR() or isExtractingNR_ListOnly():
+        return
+
     from .filelist import FileAccumulator
 
     path = os.getcwd()
@@ -1603,6 +1608,11 @@ def _wait_for_available_procs(n_procs):
     
     
     """
+
+    # do nothing in test extraction mode
+    if isExtractingNR() or isExtractingNR_ListOnly():
+        return
+        
     max_procs = int(os.environ.get("TRUST_NB_PROCS","")) # if not set, then what ? should not happen anyway...
     used = _count_procs_usage()
     free = max_procs - used
@@ -1731,7 +1741,7 @@ def wait_run(verbose=False):
                     deps_running=_count_running_deps(deps)
                     if deps_running == 0:
                         # Wait for cpu availability if Sserver is not managing the jobs
-                        if not(_USE_SSERVER):
+                        if _RUN_PARALLEL and not(_USE_SSERVER):
                             _wait_for_available_procs(case.nbProcs_)
                             
                         _print("Starting case", case._relPath(), "from waiting list", also_to_nb=verbose)
