@@ -2039,13 +2039,22 @@ Nom Postraitement::set_expression_champ(const Motcle& motlu1,const Motcle& motlu
 
 void Postraitement::add_locs_required_if_not(const Motcle& motlu2)
 {
-  if (Motcle(format_) == "CGNS")
+  Motcle var(format_);
+  if (var == "CGNS")
     {
-      if (motlu2 != "FACES" && motlu2 != "SOM" && motlu2 != "ELEM")
-        Process::exit("What ??? Error in Postraitement::add_locs_required_if_not -- CGNS understands only ELEM, SOM or FACES !!! \n ");
+      var = motlu2;
 
-      if(std::find(locs_required_.begin(), locs_required_.end(), motlu2.getString()) == locs_required_.end())
-        locs_required_.push_back(motlu2.getString()); // add only if not inside
+      if (var == "FACE") var = "FACES"; /* lol pour flux vef .... */
+
+      if (var != "FACES" && var != "SOM" && var != "ELEM")
+        {
+          Cerr << "What ??? Error in Postraitement::add_locs_required_if_not" << finl;
+          Cerr << "CGNS understands only ELEM, SOM or FACES !!! Not " << var << finl;;
+          Process::exit();
+        }
+
+      if(std::find(locs_required_.begin(), locs_required_.end(), var.getString()) == locs_required_.end())
+        locs_required_.push_back(var.getString()); // add only if not inside
     }
 }
 
