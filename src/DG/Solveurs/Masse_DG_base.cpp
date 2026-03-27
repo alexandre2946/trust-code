@@ -156,16 +156,16 @@ void Masse_DG_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, double
     {
       for (int e = 0; e < nb_elem_tot; e++)
         {
-          for (int d = 0; d<dim; d++)
+          for (int i=0; i<nb_bfunc; i++)
             {
-              for (int i=0; i<nb_bfunc; i++)
+              for (int d = 0; d<dim; d++)
                 {
                   if (mat)
-                    (*mat)(current_indice+i, current_indice+i) += coef[e]*volume[e] / dt;
-                  secmem(e,i) += coef[e]*volume[e]*passe(e,i) / dt;
+                    (*mat)(current_indice+i+d*nb_bfunc, current_indice+i+d*nb_bfunc) += coef[e]*volume[e] / dt;
+                  secmem(e,i+d*nb_bfunc) += coef[e]*volume[e]*passe(e,i+d*nb_bfunc) / dt;
                 }
-              current_indice+=nb_bfunc;
             }
+          current_indice+=nb_bfunc*dim;
         }
     }
   else
