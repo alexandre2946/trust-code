@@ -132,8 +132,10 @@ echo "./configure" >> configure.sh
 
 #echo "./configure && make $MODE" >> make.sh # ajout du configure, necessaire quand il a un pre_configure (ex -std=c++0x)
 echo "make $MODE" >> make.sh
-[ "`ls */share/swig/makefile 2>/dev/null`" != "" ] && echo "make swig_$SWIG_MODE" >> make.sh
 echo "ret=\$?" >> make.sh
+echo "SWIG_MODE=$SWIG_MODE" >> make.sh
+echo '[ "`grep swig Makefile 2>/dev/null`" != "" ] && make swig_$SWIG_MODE' >> make.sh
+#[ "`ls */share/swig/makefile 2>/dev/null`" != "" ] && echo "make swig_$SWIG_MODE" >> make.sh
 
 # droits apres la compilation
 if [ "$titan" = "1" ]

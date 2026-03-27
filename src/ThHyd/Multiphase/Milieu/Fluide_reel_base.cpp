@@ -26,7 +26,6 @@
 #include <cmath>
 
 Implemente_base_sans_constructeur(Fluide_reel_base, "Fluide_reel_base", Fluide_base);
-// XD fluide_reel_base fluide_base fluide_reel_base -1 Class for real fluids.
 
 Sortie& Fluide_reel_base::printOn(Sortie& os) const { return os; }
 Entree& Fluide_reel_base::readOn(Entree& is)

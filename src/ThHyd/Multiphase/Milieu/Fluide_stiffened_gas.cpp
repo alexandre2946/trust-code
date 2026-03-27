@@ -16,14 +16,7 @@
 #include <Fluide_stiffened_gas.h>
 
 Implemente_instanciable_sans_constructeur(Fluide_stiffened_gas, "StiffenedGas", Fluide_reel_base);
-// XD fluide_stiffened_gas fluide_reel_base fluide_stiffened_gas -1 Class for Stiffened Gas
-// XD attr gamma floattant gamma 1 Heat capacity ratio (Cp/Cv)
-// XD attr pinf floattant pinf 1 Stiffened gas pressure constant (if set to zero, the state law becomes identical to that of perfect gases)
-// XD attr mu floattant mu 1 Dynamic viscosity
-// XD attr lambda floattant lambda 1 Thermal conductivity
-// XD attr Cv floattant Cv 1 Thermal capacity at constant volume
-// XD attr q floattant q 1 Reference energy
-// XD attr q_prim floattant q_prim 1 Model constant
+// XD fluide_stiffened_gas fluide_base fluide_stiffened_gas -1 Class for Stiffened Gas
 
 Fluide_stiffened_gas::Fluide_stiffened_gas() : pinf_(0.), Cv_(-1.), q_(0.), q_prim_(0.), gamma_(1.4), R_(8.31446261815324), mu__(0.), lambda__(0.) { }
 
@@ -39,13 +32,13 @@ Entree& Fluide_stiffened_gas::readOn(Entree& is)
 void Fluide_stiffened_gas::set_param(Param& param) const
 {
   Fluide_reel_base::set_param(param);
-  param.ajouter("gamma",&gamma_);
-  param.ajouter("pinf",&pinf_);
-  param.ajouter("mu",&mu__);
-  param.ajouter("lambda",&lambda__);
-  param.ajouter("Cv",&Cv_);
-  param.ajouter("q",&q_);
-  param.ajouter("q_prim",&q_prim_);
+  param.ajouter("gamma",&gamma_); // XD_ADD_P floattant Heat capacity ratio (Cp/Cv)
+  param.ajouter("pinf",&pinf_); // XD_ADD_P floattant Stiffened gas pressure constant (if set to zero, the state law becomes identical to that of perfect gases)
+  param.ajouter("mu",&mu__); // XD_ADD_P floattant Dynamic viscosity
+  param.ajouter("lambda",&lambda__); // XD_ADD_P floattant Thermal conductivity
+  param.ajouter("Cv",&Cv_); // XD_ADD_P floattant Thermal capacity at constant volume
+  param.ajouter("q",&q_); // XD_ADD_P floattant Reference energy
+  param.ajouter("q_prim",&q_prim_); // XD_ADD_P floattant Model constant
 }
 
 #define ind std::distance(res.begin(), &val)

@@ -22,7 +22,7 @@
 #include <Param.h>
 
 Implemente_instanciable(Fluide_Quasi_Compressible,"Fluide_Quasi_Compressible",Fluide_Dilatable_base);
-// XD fluide_quasi_compressible fluide_dilatable_base fluide_quasi_compressible -1 Quasi-compressible flow with a low mach number assumption; this means that the thermo-dynamic pressure (used in state law) is uniform in space.
+// XD fluide_quasi_compressible fluide_base fluide_quasi_compressible -1 Quasi-compressible flow with a low mach number assumption; this means that the thermo-dynamic pressure (used in state law) is uniform in space.
 // XD attr sutherland bloc_sutherland sutherland 1 Sutherland law for viscosity and for conductivity.
 // XD attr pression double pression 1 Initial thermo-dynamic pressure used in the assosciated state law.
 // XD attr loi_etat loi_etat_base loi_etat 1 The state law that will be associated to the Quasi-compressible fluid.

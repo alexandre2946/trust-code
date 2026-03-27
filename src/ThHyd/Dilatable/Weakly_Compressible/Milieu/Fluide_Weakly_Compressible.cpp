@@ -27,7 +27,7 @@
 #include <Param.h>
 
 Implemente_instanciable(Fluide_Weakly_Compressible,"Fluide_Weakly_Compressible",Fluide_Dilatable_base);
-// XD fluide_weakly_compressible fluide_dilatable_base fluide_weakly_compressible -1 Weakly-compressible flow with a low mach number assumption; this means that the thermo-dynamic pressure (used in state law) can vary in space.
+// XD fluide_weakly_compressible fluide_base fluide_weakly_compressible -1 Weakly-compressible flow with a low mach number assumption; this means that the thermo-dynamic pressure (used in state law) can vary in space.
 // XD attr loi_etat loi_etat_base loi_etat 1 The state law that will be associated to the Weakly-compressible fluid.
 // XD attr sutherland bloc_sutherland sutherland 1 Sutherland law for viscosity and for conductivity.
 // XD attr traitement_pth chaine(into=["constant"]) traitement_pth 1 Particular treatment for the thermodynamic pressure Pth ; there is currently one possibility: NL2 1) the keyword \'constant\' makes it possible to have a constant Pth but not uniform in space ; it\'s the good choice when the flow is open (e.g. with pressure boundary conditions).
