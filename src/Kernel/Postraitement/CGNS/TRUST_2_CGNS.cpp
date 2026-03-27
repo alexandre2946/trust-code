@@ -198,12 +198,26 @@ void TRUST_2_CGNS::fill_coords(std::vector<double>& xCoords, std::vector<double>
   else
     zCoords.clear();
 
-  for (int i = 0; i < nb_som; ++i)
+  if (Objet_U::axi) // au cas ou
     {
-      xCoords[i] = sommets(i, 0);
-      yCoords[i] = sommets(i, 1);
-      if (phys_dim == 3)
-        zCoords[i] = sommets(i, 2);
+      for (int i = 0; i < nb_som; ++i)
+        {
+          const double r = sommets(i, 0), theta = sommets(i, 1);
+          xCoords[i] = r * cos(theta);
+          yCoords[i] = r * sin(theta);
+          if (phys_dim == 3)
+            zCoords[i] = sommets(i, 2);
+        }
+    }
+  else
+    {
+      for (int i = 0; i < nb_som; ++i)
+        {
+          xCoords[i] = sommets(i, 0);
+          yCoords[i] = sommets(i, 1);
+          if (phys_dim == 3)
+            zCoords[i] = sommets(i, 2);
+        }
     }
 }
 
@@ -639,9 +653,10 @@ int TRUST_2_CGNS::convert_connectivity(const CGNS_TYPE type, std::vector<cgsize_
 
 CGNS_TYPE TRUST_2_CGNS::convert_elem_type(const Motcle& type) const
 {
-  if (type == "HEXAEDRE" || type == "HEXAEDRE_VEF")
+  if (type == "HEXAEDRE" || type == "HEXAEDRE_VEF" || type == "HEXAEDRE_VEF")
     return CGNS_ENUMV(HEXA_8);
-  else if (type == "RECTANGLE" || type == "RECTANGLE_2D_AXI" || type == "QUADRANGLE" || type == "QUADRANGLE_3D")
+  else if (type == "RECTANGLE" || type == "RECTANGLE_2D_AXI" || type == "RECTANGLE_AXI" ||
+           type == "QUADRANGLE" || type == "QUADRANGLE_3D")
     return CGNS_ENUMV(QUAD_4);
   else if (type == "TRIANGLE" || type == "TRIANGLE_3D")
     return CGNS_ENUMV(TRI_3);
