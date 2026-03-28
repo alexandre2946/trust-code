@@ -1160,7 +1160,7 @@ void Ecrire_CGNS::cgns_write_domaine_par_in_zone(const Domaine * domaine,const N
                               &incr_min_som = TRUST2CGNS.get_global_incr_min_som();
 
       cgsize_t min = incr_min_som[proc_me], max = incr_max_som[proc_me];
-      assert (min < max);
+      assert (min <= max);
 
       /* 5.1 : Write grid coordinates */
       cgns_helper_.cgns_write_grid_coord_data<TYPE_ECRITURE_CGNS::PAR_IN>(icelldim, fileId_, baseId_.back(), zoneId_.back(),
@@ -1249,7 +1249,7 @@ void Ecrire_CGNS::cgns_write_connectivity_par_in_zone(const CGNS_TYPE cgns_type_
                                   &incr_max_face_som = TRUST2CGNS.get_global_incr_max_face_som();
 
           min = incr_min_face_som[proc_me], max = incr_max_face_som[proc_me];
-          assert (min < max);
+          assert (min <= max);
 
           if (cgp_poly_elements_write_data(fileId_, baseId_[ind_base_zone], zoneId_[ind_base_zone], sectionId, min, max, fs.data(), fs_offset.data()) != CG_OK)
             Cerr << "Error Ecrire_CGNS::cgns_write_domaine_par_in_zone : cgp_poly_elements_write_data !" << finl, TRUST_CGNS_ERROR();
@@ -1433,7 +1433,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
                                   &incr_min_som = TRUST2CGNS.get_global_incr_min_som();
 
           const cgsize_t min = incr_min_som[proc_me], max = incr_max_som[proc_me];
-          assert (min < max);
+          assert (min <= max);
 
           if (cgp_array_write_data(coordsIdx, &min, &max, xCoords.data()) != CG_OK)
             Cerr << "Error Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone : cgp_array_write_data CoordinateX !" << finl, TRUST_CGNS_ERROR();
@@ -1484,7 +1484,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
                                   &incr_min_som = TRUST2CGNS.get_global_incr_min_som();
 
           cgsize_t min = incr_min_som[proc_me], max = incr_max_som[proc_me];
-          assert (min < max);
+          assert (min <= max);
 
           /* Write grid coordinates */
           cgns_helper_.cgns_write_grid_coord_data<TYPE_ECRITURE_CGNS::PAR_IN>(icelldim, fileId_, baseId_[ind], zoneId_[ind],
