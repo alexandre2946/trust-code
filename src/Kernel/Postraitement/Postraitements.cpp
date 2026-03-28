@@ -287,35 +287,40 @@ void Postraitements::completer()
   // XXX Elie Saikali : CGNS duplicated file_names management ...
   if (cgns_post_file_names_.size() > 1)
     {
-      // check if we have duplicated file names !
-      std::unordered_set<std::string> seen;
+      // check & count if we have duplicated file names !
+      std::unordered_map<std::string, int> file_name_counts;
+      for (const auto &name : cgns_post_file_names_)
+        file_name_counts[name]++;
+
+      // chick if we have at least one duplicated names
       bool has_duplicates = false;
-
-      // test also classic file name
-      const std::string nom_fich_cas = nom_du_cas().getString() + ".cgns";
-      int count_nom_cas_fich = 0;
-
-      for (const auto &s : cgns_post_file_names_)
-        {
-          if (s == nom_fich_cas)
-            count_nom_cas_fich++;
-
-          if (!seen.insert(s).second)
+      for (const auto& [name, count] : file_name_counts)
+        if (count > 1)
+          {
             has_duplicates = true;
-        }
+            break;
+          }
 
-      if (has_duplicates) // si has_duplicates => on renomme tout !
+      if (has_duplicates) // si has_duplicates => on renomme SEULEMENT les doublons !
         {
-          int nom_cas_fich_ind = 0;
+          std::unordered_map<std::string, int> current_occurrence; // detect what is the index of duplication : 1st ? 2nd ? ...
+
           for (auto &itr : *this)
             {
               Postraitement *z_post = dynamic_cast<Postraitement*>(&(itr.valeur()));
-              if (z_post && z_post->format() == "cgns")
-                {
-                  if (z_post->nom_fich().getString() == nom_fich_cas)
-                    nom_cas_fich_ind++;
+              if (!z_post || z_post->format() != "cgns")
+                continue;
 
-                  z_post->modify_cgns_basenames_and_reinit(nom_cas_fich_ind, count_nom_cas_fich);
+              const std::string file_name = z_post->nom_fich().getString();
+
+              // only if duplicated ...
+              if (file_name_counts[file_name] > 1)
+                {
+                  current_occurrence[file_name]++;
+
+                  // dont change 1st file ...
+                  if (current_occurrence[file_name] > 1)
+                    z_post->modify_cgns_basenames_and_reinit(current_occurrence[file_name], file_name_counts[file_name]);
                 }
             }
         }
