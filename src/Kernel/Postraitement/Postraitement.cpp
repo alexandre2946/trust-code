@@ -1244,13 +1244,13 @@ int Postraitement::lire_champs_a_postraiter(Entree& s, bool expect_acco)
                   int nb_eq = probleme().nombre_d_equations();
                   for (int i=0; i<nb_eq; i++)
                     {
-                      // on teste loc par eq juste sur l'op 0
-                      const Motcle& loc = probleme().equation(i).operateur(0).l_op_base().get_localisation_pour_post(motlu);
-                      add_locs_required_if_not(loc);
-
                       const int nb_morceaux = probleme().equation(i).nombre_d_operateurs();
                       for (int j=0; j<nb_morceaux; j++)
-                        creer_champ_post_moreqn("operateur","stabilite",i,j,-1,s);
+                        {
+                          const Motcle& loc = probleme().equation(i).operateur(j).l_op_base().get_localisation_pour_post("stabilite");
+                          add_locs_required_if_not(loc);
+                          creer_champ_post_moreqn("operateur","stabilite",i,j,-1,s);
+                        }
                     }
                 }
               else if (motlu=="flux_bords" || motlu=="flux_surfacique_bords")
