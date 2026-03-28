@@ -606,6 +606,14 @@ int TRUST_2_CGNS::convert_connectivity(const CGNS_TYPE type, std::vector<cgsize_
       return -100;
     }
 
+  if (nodes_per_elem != elems_->dimension(1))
+    {
+      Cerr << "Big issue in TRUST_2_CGNS::convert_connectivity !!!" << finl;
+      Cerr << "   We have nodes_per_elem = " << nodes_per_elem << " while we have a connectivity of width = " << elems_->dimension(1) << finl;
+      Process::exit();
+      return -100;
+    }
+
   conn_elem.resize(nb_elem * nodes_per_elem); // allocation une fois
   cgsize_t* data = conn_elem.data();
 
@@ -653,21 +661,36 @@ int TRUST_2_CGNS::convert_connectivity(const CGNS_TYPE type, std::vector<cgsize_
 
 CGNS_TYPE TRUST_2_CGNS::convert_elem_type(const Motcle& type) const
 {
+  assert(elems_.non_nul());
+  const int nb_comp = elems_->dimension(1);
+
   if (type == "HEXAEDRE" || type == "HEXAEDRE_VEF" || type == "HEXAEDRE_VEF")
     return CGNS_ENUMV(HEXA_8);
-  else if (type == "RECTANGLE" || type == "RECTANGLE_2D_AXI" || type == "RECTANGLE_AXI" ||
-           type == "QUADRANGLE" || type == "QUADRANGLE_3D")
-    return CGNS_ENUMV(QUAD_4);
-  else if (type == "TRIANGLE" || type == "TRIANGLE_3D")
-    return CGNS_ENUMV(TRI_3);
-  else if (type == "SEGMENT" || type == "SEGMENT_2D" || type == "SEGMENT_AXI")
-    return CGNS_ENUMV(BAR_2);
-  else if (type == "POINT")
-    return CGNS_ENUMV(NODE);
   else if (type == "TETRAEDRE")
     return CGNS_ENUMV(TETRA_4);
-  else if (type == "POLYEDRE" || type == "POLYGONE" || type == "PRISME" || type == "PRISME_HEXAG" || type == "POLYGONE_3D")
-    return CGNS_ENUMV(NGON_n);
+  else if (type == "TRIANGLE" || type == "TRIANGLE_3D")
+    return CGNS_ENUMV(TRI_3);
+  else if (type == "RECTANGLE" || type == "RECTANGLE_2D_AXI" || type == "RECTANGLE_AXI" ||
+           type == "QUADRANGLE" || type == "QUADRANGLE_3D")
+    {
+      return CGNS_ENUMV(QUAD_4);
+    }
+  else if (type == "SEGMENT" || type == "SEGMENT_2D" || type == "SEGMENT_AXI")
+    {
+      /* So bad ... EF defined Bds as segments not points ... */
+      if (nb_comp == 1) return CGNS_ENUMV(NODE);
+      if (nb_comp == 2) return CGNS_ENUMV(BAR_2);
+
+      Cerr << "Unexpected SEGMENT connectivity of width = " << nb_comp << finl;
+      return CGNS_ENUMV(ElementTypeNull);
+    }
+  else if (type == "POLYEDRE" || type == "POLYGONE" || type == "PRISME"
+           || type == "PRISME_HEXAG" || type == "POLYGONE_3D")
+    {
+      return CGNS_ENUMV(NGON_n);
+    }
+  else if (type == "POINT")
+    return CGNS_ENUMV(NODE);
   else
     {
       Cerr << "The type " << type << " is not yet available for the CGNS format ! Call the 911 !" << finl;
