@@ -664,18 +664,19 @@ CGNS_TYPE TRUST_2_CGNS::convert_elem_type(const Motcle& type) const
   assert(elems_.non_nul());
   const int nb_comp = elems_->dimension(1);
 
-  if (type == "HEXAEDRE" || type == "HEXAEDRE_VEF" || type == "HEXAEDRE_VEF")
+  if (type.debute_par("HEXAEDRE"))
     return CGNS_ENUMV(HEXA_8);
+  else if (type.debute_par("RECTANGLE") || type.debute_par("QUADRANGLE"))
+    return CGNS_ENUMV(QUAD_4);
   else if (type == "TETRAEDRE")
     return CGNS_ENUMV(TETRA_4);
-  else if (type == "TRIANGLE" || type == "TRIANGLE_3D")
+  else if (type.debute_par("TRIANGLE"))
     return CGNS_ENUMV(TRI_3);
-  else if (type == "RECTANGLE" || type == "RECTANGLE_2D_AXI" || type == "RECTANGLE_AXI" ||
-           type == "QUADRANGLE" || type == "QUADRANGLE_3D")
-    {
-      return CGNS_ENUMV(QUAD_4);
-    }
-  else if (type == "SEGMENT" || type == "SEGMENT_2D" || type == "SEGMENT_AXI")
+  else if (type == "POINT")
+    return CGNS_ENUMV(NODE);
+  else if (type == "POLYEDRE" || type.debute_par("POLYGONE") || type.debute_par("PRISME"))
+    return CGNS_ENUMV(NGON_n);
+  else if (type.debute_par("SEGMENT"))
     {
       /* So bad ... EF defined Bds as segments not points ... */
       if (nb_comp == 1) return CGNS_ENUMV(NODE);
@@ -684,13 +685,6 @@ CGNS_TYPE TRUST_2_CGNS::convert_elem_type(const Motcle& type) const
       Cerr << "Unexpected SEGMENT connectivity of width = " << nb_comp << finl;
       return CGNS_ENUMV(ElementTypeNull);
     }
-  else if (type == "POLYEDRE" || type == "POLYGONE" || type == "PRISME"
-           || type == "PRISME_HEXAG" || type == "POLYGONE_3D")
-    {
-      return CGNS_ENUMV(NGON_n);
-    }
-  else if (type == "POINT")
-    return CGNS_ENUMV(NODE);
   else
     {
       Cerr << "The type " << type << " is not yet available for the CGNS format ! Call the 911 !" << finl;
