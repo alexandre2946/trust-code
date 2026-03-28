@@ -103,11 +103,12 @@ Sortie& Postraitements::printOn(Sortie& s) const
 
 int Postraitements::lire_postraitements(Entree& is, const Motcle& motlu, const Probleme_base& mon_pb)
 {
-  Motcles motcles(4);
+  Motcles motcles(5);
   motcles[0] = "Postraitement|Post_processing";
   motcles[1] = "Postraitements|Post_processings";
   motcles[2] = "liste_postraitements";
   motcles[3] = "liste_de_postraitements";
+  motcles[4] = "Postraitement_FT_Lata";
 
   const int lerang = motcles.search(motlu);
 
@@ -223,6 +224,13 @@ int Postraitements::lire_postraitements(Entree& is, const Motcle& motlu, const P
           Cerr << "Check your datafile." << finl;
           exit();
         }
+    }
+  else if (lerang == 4) /* pour FT lata triocfd */
+    {
+      OWN_PTR(Postraitement_base) & post = add( OWN_PTR(Postraitement_base)() );
+      post.typer("Postraitement_FT_Lata");
+      post->associer_nom_et_pb_base("neant", mon_pb);
+      is >> post.valeur();
     }
   else
     {
