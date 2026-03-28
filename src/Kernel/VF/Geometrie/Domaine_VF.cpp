@@ -1590,11 +1590,38 @@ void Domaine_VF::build_mc_dual_mesh() const
   cIP[0] = 0; // better not forget this ...
   int gi = 0; // global index of dual elements created
 
+  auto corrige_voisins_dual_perio = [&](int f, int &e1, int &e2)
+  {
+    assert (est_face_bord_[f] == 2);
+    auto d2 = [&](int e) -> double
+    {
+      double s = 0.;
+      for (int d = 0; d < dim; d++)
+        {
+          double dx = xp_(e, d) - xv_(f, d);
+          s += dx * dx;
+        }
+      return s;
+    };
+
+    if (e1 >= 0 && e2 >= 0)
+      {
+        // On garde l'element vraiment adjacent a la face geometrique
+        if (d2(e1) <= d2(e2)) e2 = -1;
+        else e1 = -1;
+      }
+  };
+
   // Precompute needed size:
   mcIdType totSz = 0;
   for(int f=0; f<nb_fac; f++)    // For all the (real) faces
     {
       int e1=face_voisins_(f, 0), e2=face_voisins_(f, 1);
+
+      // XXX Elie Saikali : face periodique : la traiter comme une face de bord geometrique ...
+      if (est_face_bord_[f] == 2)
+        corrige_voisins_dual_perio(f, e1, e2);
+
       for (int e: {e1, e2})
         {
           if (e==-1 || e >= nb_elem) continue;  // skip boundary or virtual
@@ -1621,7 +1648,12 @@ void Domaine_VF::build_mc_dual_mesh() const
 
   for(int f=0; f<nb_fac; f++)    // For all the (real) faces
     {
-      int e1 = face_voisins_(f, 0), e2 = face_voisins(f, 1);
+      int e1 = face_voisins_(f, 0), e2 = face_voisins_(f, 1);
+
+      // XXX Elie Saikali : face periodique : la traiter comme une face de bord geometrique ...
+      if (est_face_bord_[f] == 2)
+        corrige_voisins_dual_perio(f, e1, e2);
+
       for (int e: {e1, e2})
         {
           if (e==-1 || e >= nb_elem) continue;  // skip boundary or virtual
