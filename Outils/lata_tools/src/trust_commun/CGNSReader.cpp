@@ -184,6 +184,9 @@ namespace
   {
     switch(t)
       {
+      case NODE:
+        nb_comp = 1;
+        return "POINT";
       case BAR_2:
         nb_comp = 2;
         return "SEGMENT";
