@@ -32,6 +32,9 @@ public:
 
   /* Multiple linked files options : NOT BY DEFAULT */
   static bool USE_LINKS, LINKED_FILES_PER_COMM_GROUP;
+
+  /* Keep old cgns files if resetTime is used ... */
+  static bool KEEP_FILES_BEFORE_RESET_TIME;
 };
 
 #endif /* Option_CGNS_included */

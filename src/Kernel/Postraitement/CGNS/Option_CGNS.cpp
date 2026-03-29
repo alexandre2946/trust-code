@@ -23,6 +23,7 @@ bool Option_CGNS::PARALLEL_OVER_ZONE = false; /* NOT BY DEFAULT */
 bool Option_CGNS::USE_LINKS = false; /* NOT BY DEFAULT */
 bool Option_CGNS::LINKED_FILES_PER_COMM_GROUP = false; /* NOT BY DEFAULT */
 bool Option_CGNS::SINGLE_FILE_PER_COMM_GROUP = false; /* NOT BY DEFAULT */
+bool Option_CGNS::KEEP_FILES_BEFORE_RESET_TIME = false; /* NOT BY DEFAULT */
 int Option_CGNS::CLOSE_EVERY_N = -1; /* -1 BY DEFAULT => never opened/closed */
 int Option_CGNS::FLUSH_EVERY_N = 1; /* 1 BY DEFAULT => flush each dt post */
 
@@ -36,6 +37,7 @@ Entree& Option_CGNS::interpreter(Entree& is)
   param.ajouter_flag("USE_LINKS", &USE_LINKS); // XD_ADD_P rien If used, data will be written in separate files; one file for mesh, and then one file for solution time. Links will be used.
   param.ajouter_flag("LINKED_FILES_PER_COMM_GROUP", &LINKED_FILES_PER_COMM_GROUP); // XD_ADD_P rien If used, data will be written (at each comm group) in separate files; one file for mesh, and then one file for solution time. Links will be used.
   param.ajouter_flag("SINGLE_FILE_PER_COMM_GROUP", &SINGLE_FILE_PER_COMM_GROUP); // XD_ADD_P rien If used, data will be written (at each comm group) in a single file.
+  param.ajouter_flag("KEEP_FILES_BEFORE_RESET_TIME", &KEEP_FILES_BEFORE_RESET_TIME); // XD_ADD_P rien If used with resetTime, CGNS files will be kept. Otherwise the files are overwritten.
   param.ajouter("CLOSE_EVERY_N", &CLOSE_EVERY_N); // XD_ADD_P entier Used to fix the opening/closing frequency when writing in a single CGNS file (choice by defaut).
   param.ajouter("FLUSH_EVERY_N", &FLUSH_EVERY_N); // XD_ADD_P entier Used to fix the flush-to-disc frequency when writing in a single CGNS file (choice by defaut).
   param.lire_avec_accolades_depuis(is);

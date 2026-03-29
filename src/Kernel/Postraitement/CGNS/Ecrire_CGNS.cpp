@@ -68,7 +68,8 @@ void Ecrire_CGNS::cgns_resetTime(const double t, const std::string& dirname, con
   cellDim_.clear(), zoneId_par_.clear();
 
   /* 2. Management of file name*/
-  baseFile_name_vect_.push_back(baseFile_name_);
+  if (Option_CGNS::KEEP_FILES_BEFORE_RESET_TIME)
+    baseFile_name_vect_.push_back(baseFile_name_);
 
   std::string dir_to_use;
 
@@ -90,11 +91,12 @@ void Ecrire_CGNS::cgns_resetTime(const double t, const std::string& dirname, con
   else
     baseFile_name_ = basefile.getString();
 
-  if (std::find(baseFile_name_vect_.begin(), baseFile_name_vect_.end(), baseFile_name_) != baseFile_name_vect_.end())
-    {
-      baseFile_name_ += "_reset_";
-      baseFile_name_ += std::to_string(static_cast<int>(baseFile_name_vect_.size()));
-    }
+  if (Option_CGNS::KEEP_FILES_BEFORE_RESET_TIME)
+    if (std::find(baseFile_name_vect_.begin(), baseFile_name_vect_.end(), baseFile_name_) != baseFile_name_vect_.end())
+      {
+        baseFile_name_ += "_reset_";
+        baseFile_name_ += std::to_string(static_cast<int>(baseFile_name_vect_.size()));
+      }
 }
 
 void Ecrire_CGNS::cgns_associer_domaine_dis(const Domaine_dis_base& domaine_dis_base)
