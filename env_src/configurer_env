@@ -984,6 +984,14 @@ then
        echo "       is older than minimum required (3.26.0); you need to provide at least cmake 3.26.0 to install TRUST"
        exit -1
     fi
+    # export de CMAKE_POLICY_VERSION_MINIMUM=3.5 evite de la passer dans les installer de MC, PDI, VC, ...
+    CMAKE_VERSION_4=`cmake --version 2>&1 | awk '/cmake version/ {split($3,a,".");v=a[1];print (v>3?1:0)}'`
+    if [ "$CMAKE_VERSION_4" = "1" ]
+    then
+       echo "export CMAKE_POLICY_VERSION_MINIMUM=3.5  # needed for MC, XDATA, VC, PDI on cmake 4" >> $env
+       export CMAKE_POLICY_VERSION_MINIMUM=3.5
+    fi
+
     PYTHON_TEST_OK=1 && [ "`$TRUST_ROOT/exec/python/bin/python ./test.py 1>/dev/null 2>&1;echo $?`" != 0 ] && PYTHON_TEST_OK=0
     if [ "$PYTHON_TEST_OK" != 1 ]
     then
