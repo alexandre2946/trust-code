@@ -47,6 +47,9 @@ void Ecrire_CGNS::cgns_set_base_name(const Nom& fn)
 
 void Ecrire_CGNS::cgns_resetTime(const double t, const std::string& dirname, const Nom& basefile)
 {
+  if (dirname.empty())
+    Process::exit("\nError in Ecrire_CGNS::cgns_resetTime. The name of the directory is empty !!! \n");
+
   /* 1. Reset */
   solname_elem_ = "", solname_som_ = "", solname_faces_ = "";
   grid_name_ = "", grid_name_loc_ = "";
@@ -71,12 +74,7 @@ void Ecrire_CGNS::cgns_resetTime(const double t, const std::string& dirname, con
   if (Option_CGNS::KEEP_FILES_BEFORE_RESET_TIME)
     baseFile_name_vect_.push_back(baseFile_name_);
 
-  std::string dir_to_use;
-
-  if (!dirname.empty())
-    dir_to_use = dirname;
-  else if (Sortie_Fichier_base::root != "")
-    dir_to_use = Sortie_Fichier_base::root;
+  std::string dir_to_use(dirname);
 
   // evite ./basefile et .//basefile ...
   if (dir_to_use == "." || dir_to_use == "./")
