@@ -145,7 +145,7 @@ void Ecrire_CGNS::cgns_open_file()
 
   if (Process::is_parallel())
     {
-      if (Option_CGNS::SINGLE_FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
+      if (Option_CGNS::SINGLE_FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group() && !postraiter_domaine_)
         {
           fn = (Nom(baseFile_name_)).nom_me(proc_maitre_local_comm_).getString() + ".cgns"; // file name
           unlink(fn.c_str());
@@ -230,7 +230,9 @@ void Ecrire_CGNS::finir_ecriture(double temps)
           /* single but SAFE file => update iterateurs + close to force flush on disc so you can visualize during simulation !!! */
           if (will_flush || will_close)
             {
-              if (!first_time_post_ && !Option_CGNS::SINGLE_FILE_PER_COMM_GROUP) /* write iters */
+              if (!first_time_post_ && !(Process::is_parallel() &&
+                                         Option_CGNS::SINGLE_FILE_PER_COMM_GROUP &&
+                                         PE_Groups::has_user_defined_group()) ) /* write iters */
                 cgns_write_iters();
 
               if (!will_close)
@@ -261,7 +263,7 @@ void Ecrire_CGNS::cgns_finir()
   if (Option_CGNS::USE_LINKS && !postraiter_domaine_)
     return; /* All done */
 
-  if (!Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)
+  if (!(Process::is_parallel() && Option_CGNS::SINGLE_FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group()))
     if (!postraiter_domaine_ && !first_time_post_)
       cgns_write_iters();
 
@@ -271,7 +273,7 @@ void Ecrire_CGNS::cgns_finir()
 
   if (Process::is_parallel())
     {
-      if ( Option_CGNS::SINGLE_FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
+      if ( Option_CGNS::SINGLE_FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group() && !postraiter_domaine_)
         {
           cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::PAR>(fn /* inutile */, fileId_, false);
           Cerr << "**** Multiple parallel CGNS files " << baseFile_name_ << "_XXXX.cgns closed !" << finl;
