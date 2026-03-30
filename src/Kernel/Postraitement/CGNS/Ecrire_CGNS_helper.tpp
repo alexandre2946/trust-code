@@ -468,7 +468,8 @@ inline void Ecrire_CGNS_helper::cgns_write_solution_classic_links(const std::str
   for (auto& itr_t : time_post)
     {
       const std::string solname = "FlowSolution_itr_" + std::to_string(idx);
-      const std::string linkfile = base_linkfile + ".solution." + convert_double_to_string(itr_t) + ".cgns"; // file name
+      const std::string linkfile = Option_CGNS::SINGLE_FILE_PER_COMM_GROUP ? base_linkfile + ".cgns" :
+                                   base_linkfile + ".solution." + convert_double_to_string(itr_t) + ".cgns"; // file name
       const std::string linkpath = "/" + target_base_name + "/" + target_zone_name + "/" + solname + "/";
 
       if (cg_link_write(solname.c_str(), linkfile.c_str(), linkpath.c_str()) != CG_OK)
@@ -496,7 +497,8 @@ inline void Ecrire_CGNS_helper::cgns_write_zone_and_deformable_links(const bool 
   int idx = 0;
   for (const auto &itr_t : time_post)
     {
-      linkfile = file_prefix + ".solution." + convert_double_to_string(itr_t) + ".cgns";
+      linkfile = Option_CGNS::SINGLE_FILE_PER_COMM_GROUP ? file_prefix + ".cgns" :
+                 file_prefix + ".solution." + convert_double_to_string(itr_t) + ".cgns";
 
       linkpath = "/" + target_base_name + "/" + target_zone_name + "/GridCoordinates/";
 

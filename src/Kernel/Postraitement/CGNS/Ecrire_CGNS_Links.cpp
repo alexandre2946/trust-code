@@ -312,6 +312,91 @@ void Ecrire_CGNS::cgns_open_solution_link_file(const double t)
     }
 }
 
+void Ecrire_CGNS::cgns_write_final_link_file_for_single_file_comm_group()
+{
+#ifdef MPI_
+  if (vec_proc_maitre_local_comm_.empty())
+    gather_local_sizeId_for_comm_group();
+
+  int fileId_link;
+  std::string fn = baseFile_name_ + ".cgns";
+  unlink(fn.c_str());
+  cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR>(fn, fileId_link, true);
+
+  const int nb_grps = static_cast<int>(unique_vec_proc_maitre_local_comm_.size());
+  std::vector<int> zoneId_tmp;//(nb_grps, -123);
+  std::vector<int> baseId_tmp(baseId_);
+
+  for (auto &itr : doms_written_)
+    {
+      bool has_field = false;
+      std::string LOC = "rien";
+      TRUST_2_CGNS::init_has_field_and_loc_iters(itr, fld_loc_map_, has_field, LOC);
+
+      int index_glob = -123, ind_base = -123;
+      TRUST_2_CGNS::init_glob_base_domain_idx(doms_written_, itr, has_field, LOC, index_glob, ind_base);
+
+      if (cg_base_write(fileId_link, itr.getChar(), cellDim_[ind_base], Objet_U::dimension, &baseId_tmp[index_glob]) != CG_OK)
+        Cerr << "Error Ecrire_CGNS::cgns_write_final_link_file_comm_group : cg_base_write !" << finl, TRUST_CGNS_ERROR();
+
+      int zone_goto_idx = 1;
+      zoneId_tmp.clear();
+
+      /* Loop on groups that have something to link to ;) */
+      for (int gid = 0; gid < nb_grps; gid++)
+        {
+          int proc_grp = unique_vec_proc_maitre_local_comm_[gid];
+          std::string zone_name = Nom("Zone").nom_me(proc_grp).getString();
+
+          std::string file_group_id = Nom(baseFile_name_).nom_me(proc_grp).getString();
+          TRUST_2_CGNS::remove_slash_linkfile(file_group_id);
+
+          const cgsize_t isize[3] = { sizeId_som_local_comm_[ind_base][gid], sizeId_elem_local_comm_[ind_base][gid], 0 };
+
+          if ((isize[0] == 0 && isize[1] == 0)) continue;
+
+          zoneId_tmp.push_back(-123);
+
+          if (is_deformable_)
+            {
+              cgns_helper_.cgns_write_zone_and_deformable_links(true /* write zone */, has_field, fileId_link, baseId_tmp[index_glob],
+                                                                zone_name, isize, zoneId_tmp.back(), zone_goto_idx,
+                                                                file_group_id, baseZone_name_[ind_base], baseZone_name_[ind_base],
+                                                                connectname_[ind_base], itr, LOC, time_post_,
+                                                                "Ecrire_CGNS::cgns_write_final_link_file_comm_group");
+            }
+          else
+            {
+              cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_link, baseId_tmp[index_glob], zone_name,
+                                                             isize, zoneId_tmp.back(), zone_goto_idx,
+                                                             file_group_id + ".cgns" /* linkfile */, baseZone_name_[ind_base],
+                                                             baseZone_name_[ind_base], connectname_[ind_base],
+                                                             "Ecrire_CGNS::cgns_write_final_link_file_for_single_file_comm_group");
+
+              if(has_field)
+                cgns_helper_.cgns_write_solution_classic_links(file_group_id, itr.getString(), itr.getString(), LOC, time_post_,
+                                                               "Ecrire_CGNS::cgns_write_final_link_file_comm_group");
+            }
+
+          zone_goto_idx++;
+        }
+
+      /* Finally, write the iters ;) */
+      if (is_deformable_)
+        cgns_helper_.cgns_write_iters_deformable<TYPE_ECRITURE_CGNS::SEQ>(true, has_field, static_cast<int>(zoneId_tmp.size()) /* nb_zones_to_write */,
+                                                                          fileId_link, baseId_tmp[index_glob], ind_base,
+                                                                          zoneId_tmp, LOC, solname_som_, solname_elem_,
+                                                                          solname_faces_, grid_name_, time_post_);
+      else
+        cgns_helper_.cgns_write_iters<TYPE_ECRITURE_CGNS::SEQ>(has_field, static_cast<int>(zoneId_tmp.size()) /* nb_zones_to_write */,
+                                                               fileId_link, baseId_tmp[index_glob], ind_base,
+                                                               zoneId_tmp, LOC, solname_som_, solname_elem_,
+                                                               solname_faces_, time_post_);
+    }
+  cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::PAR>(fn, fileId_link, true);
+#endif
+}
+
 void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
 {
 #ifdef MPI_

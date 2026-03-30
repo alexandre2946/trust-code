@@ -207,8 +207,6 @@ void Ecrire_CGNS::finir_ecriture(double temps)
 {
   if (postraiter_domaine_) return; /* rien a faire */
 
-  if (Option_CGNS::SINGLE_FILE_PER_COMM_GROUP) return; // FIXME
-
   if (Option_CGNS::USE_LINKS || is_lagrangian_)
     {
       cgns_close_grid_or_solution_link_file(temps, TYPE_LINK_CGNS::SOLUTION);
@@ -232,7 +230,7 @@ void Ecrire_CGNS::finir_ecriture(double temps)
           /* single but SAFE file => update iterateurs + close to force flush on disc so you can visualize during simulation !!! */
           if (will_flush || will_close)
             {
-              if (!first_time_post_) /* write iters */
+              if (!first_time_post_ && !Option_CGNS::SINGLE_FILE_PER_COMM_GROUP) /* write iters */
                 cgns_write_iters();
 
               if (!will_close)
@@ -250,6 +248,9 @@ void Ecrire_CGNS::finir_ecriture(double temps)
             }
         }
     }
+
+  if (Process::is_parallel() && Option_CGNS::SINGLE_FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
+    cgns_write_final_link_file_for_single_file_comm_group();
 }
 
 void Ecrire_CGNS::cgns_finir()
@@ -257,12 +258,14 @@ void Ecrire_CGNS::cgns_finir()
   if (is_lagrangian_)
     return; /* All done */
 
-  if (Option_CGNS::USE_LINKS && !postraiter_domaine_ && !singlefile_open_)
+  if (Option_CGNS::USE_LINKS && !postraiter_domaine_)
     return; /* All done */
 
-  if (!Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)  // FIXME
+  if (!Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)
     if (!postraiter_domaine_ && !first_time_post_)
       cgns_write_iters();
+
+  if (!singlefile_open_) return;
 
   std::string fn = baseFile_name_ + ".cgns"; // file name
 
