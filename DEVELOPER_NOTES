@@ -1,6 +1,7 @@
 -------------------------------------------------------------
 Developer notes version 1.9.8_beta : Changes since version 1.9.7 :
 -------------------------------------------------------------
+17/03/26 (TRUST) New feature  : Add a new API for asynchronous echange_espace_virtuel
 23/03/26 (TRUST) Param        : Introducing Objet_U_With_Params. All classes inheriting from it must use the set_param() logic, ensuring a consistent usage of the TRUST grammar, and avoiding wild readOn() overrides. validate_params can be overriden for further validation of the read values.
 24/02/26 (TRUST) GPU          : Update to Kokkos 5.0, AmgX 2.5.0, PETSc 3.23.7 (latest branch for GPU build)
 24/02/26 (TRUST) Library      : ArborX library (geometric search) available with C++20 build
