@@ -443,6 +443,8 @@ void Postraitement::set_param(Param& param) const
 // XD attr expression_vy_ana chaine expression_vy_ana 1 not_set (for IJK)
 // XD attr expression_vz_ana chaine expression_vz_ana 1 not_set (for IJK)
 // XD attr expression_p_ana chaine expression_p_ana 1 not_set (for IJK)
+// XD attr postprocessor_stt rien postprocessor_stt 1 not_set (for STT)
+// XD attr format_trustlata format_trustlata Format_IJKLata 1 not_set (for STT)
 // XD attr interfaces interface_posts interfaces 1 Keyword to read all the caracteristics of the interfaces. Different kind of interfaces exist as well as different interface intitialisations.
   param.ajouter("Fichier",&nom_fich_); // XD_ADD_P chaine Name of file.
   param.ajouter("Format",&format_); // XD_ADD_P chaine(into=["lml","lata","single_lata","lata_v2","med","cgns"]) This optional parameter specifies the format of the output file. The basename used for the output file is the basename of the data file. For the fmt parameter, choices are lml or lata. A short description of each format can be found below. The default value is lml.
@@ -479,6 +481,11 @@ void Postraitement::set_param(Param& param) const
     }
 }
 
+// XD format_trustlata objet_lecture nul 1 Post-processing for STT
+// XD attr fields_to_write bloc_lecture fields_to_write 1 not_set
+// XD attr write_all_fields rien write_all_fields 1 not_set
+// XD attr use_XYZ_Nodes rien use_XYZ_Nodes 1 not_set
+// XD attr use_XY_Nodes rien use_XY_Nodes 1 not_set
 
 // XD bloc_fichier objet_lecture nul 1 Block containing the name of the file
 // XD   attr fichier chaine file 0 File name

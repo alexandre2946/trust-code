@@ -25,7 +25,6 @@
 #include <Param.h>
 
 Implemente_base(Fluide_Dilatable_base,"Fluide_Dilatable_base",Fluide_base);
-// XD fluide_dilatable_base fluide_base fluide_dilatable_base -1 Basic class for dilatable fluids.
 
 Sortie& Fluide_Dilatable_base::printOn(Sortie& os) const
 {

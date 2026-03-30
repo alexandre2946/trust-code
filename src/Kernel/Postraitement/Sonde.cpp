@@ -45,8 +45,8 @@ Implemente_instanciable_sans_constructeur_ni_destructeur(Sonde,"Sonde",Objet_U);
 // XD attr nbr entier nbr 0 Number of probe points of the segment, evenly distributed.
 // XD attr point_deb un_point point_deb 0 First outer probe segment point.
 // XD attr point_fin un_point point_fin 0 Second outer probe segment point.
-// XD segmentfacesz sonde_base segmentfacesz 0 Segment probe where points are moved to the nearest z faces
 
+// XD segmentfacesz sonde_base segmentfacesz 0 Segment probe where points are moved to the nearest z faces
 // XD attr nbr entier nbr 0 Number of probe points of the segment, evenly distributed.
 // XD attr point_deb un_point point_deb 0 First outer probe segment point.
 // XD attr point_fin un_point point_fin 0 Second outer probe segment point.
