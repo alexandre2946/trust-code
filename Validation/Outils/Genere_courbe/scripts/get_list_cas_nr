@@ -34,6 +34,11 @@ else
         get_nr_opts="--listonly"
     fi
 
+    # If LC_ALL not unset, call to get_nr_cases_jup.py fail on python3.6 (redhat 8) with
+    # UnicodeEncodeError: 'ascii' codec can't encode character '\xe9' in position ...
+    # Seen since argparse introduced in that script...
+    [ "`python3 --version | grep 'Python 3.6' 2>/dev/null`" != "" ] && export LC_ALL=""
+
     cmd="python $DIR/get_nr_cases_jup.py $get_nr_opts $ze_file"
     
     # echo "list cas: get_nr_opts: $get_nr_opts" >> $TRUST_ROOT/log

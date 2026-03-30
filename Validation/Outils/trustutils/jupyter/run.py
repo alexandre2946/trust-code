@@ -329,7 +329,7 @@ class TRUSTCase(object):
             Text we want to substitute with python Template formalism (character identified with $ in datafile)
         """
         path = self._fullPath()
-        with open(path, "r") as file: filedata = Template(file.read())
+        with open(path, "r", encoding="utf-8") as file: filedata = Template(file.read())
         try:
             result = filedata.substitute(subs_dict)
         except KeyError as e:
@@ -344,7 +344,7 @@ class TRUSTCase(object):
         except ValueError as e:
             raise Exception(f"Error in template substitution for case {self.dir_}/{self.name_}.data:\n{e}")
             
-        with open(path, "w") as file: file.write(result)
+        with open(path, "w", encoding="utf-8") as file: file.write(result)
 
     def copy(self, targetName, targetDirectory=None, nbProcs=1, execOptions="", excluNR=False, pre_run=None, post_run=None):
         """ 
@@ -1514,7 +1514,6 @@ def _set_run_sequential():
     _NOT_RUN=False
     _RUN_SEQUENTIAL=True
     _RUN_PARALLEL=False
-    _print("Set sequential run")
     
 def _set_run_parallel():
     global _NOT_RUN
