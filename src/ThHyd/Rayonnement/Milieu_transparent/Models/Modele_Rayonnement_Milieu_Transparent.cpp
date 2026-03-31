@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -64,42 +64,7 @@ Entree& Modele_Rayonnement_Milieu_Transparent::readOn(Entree& is)
   int rang = les_mots.search(motlu2);
   if (rang == -1)
     {
-      Cerr << "On passse dans l'ancien readOn" << finl;
-      // Lecture de fichiers de definition
-      nom1 = motlu2;
-      is >> nom2;
-      is >> nom3;
-
-      if (nom3 == Nom(accolade_fermee))
-        {
-          inversion_debut_ = 1;
-          fic_mat_ray_inv_bin_ = 0;
-          // on force l'inversion au debut meme si nom3 n'est pas defini
-          lire_fichiers(nom1, nom2);
-          motlu = nom3;
-        }
-      else
-        {
-
-          inversion_debut_ = 1;
-          is >> motlu;
-          if (motlu == "binaire")
-            {
-              fic_mat_ray_inv_bin_ = 1;
-              is >> motlu;
-            }
-          else
-            fic_mat_ray_inv_bin_ = 0;
-
-          lire_fichiers(nom1, nom2, nom3);
-          //assert(motlu == accolade_fermee);
-        }
-      if (motlu == "relaxation")
-        {
-          is >> relaxation_;
-          is >> motlu;
-        }
-      assert(motlu == accolade_fermee);
+      Process::exit();
     }
   else
     {
