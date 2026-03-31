@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -34,8 +34,6 @@ public:
 
   Modele_Rayonnement_Milieu_Transparent(double Sigma = SIGMA_DEFAULT) { SIGMA_ = Sigma; }
 
-  void lire_fichiers(Nom& nom1, Nom& nom2);
-  void lire_fichiers(Nom& nom1, Nom& nom2, Nom& nom3);
   void discretiser(const Discretisation_base&, const Domaine&);
   void mettre_a_jour(double temps);
   void preparer_calcul();
@@ -57,6 +55,9 @@ public:
   inline int ordre_matrice_fac_forme() const { return ordre_mat_forme_; }
 
 private:
+  void lire_fichiers(Nom& nom1, Nom& nom2);
+  void lire_fichiers(Nom& nom1, Nom& nom2, Nom& nom3);
+
   VECT(Face_Rayonnante) les_faces_rayonnantes_;
   int nb_faces_rayonnantes_ = -123, nb_faces_totales_ = -123, ordre_mat_forme_ = -123;
   double temps_ = -123.; // on garde le temps pour les impressions
@@ -66,10 +67,10 @@ private:
   mutable IntVect corres_;
 
   double SIGMA_ = SIGMA_DEFAULT, relaxation_ = 1.;
-  int inversion_debut_ = -123;
+
   // Par defaut, on suppose qu'il faut inverser la matrice de rayonnement
-  int lire_matrice_inv_ = 0, fic_mat_ray_inv_bin_ = -123;
-  Nom nom_fic_mat_ray_inv_, nom_pb_rayonnant_ = "non_donne";
+  bool lire_matrice_inv_ = false, fic_mat_ray_inv_bin_ = false;
+  Nom nom_fic_mat_ray_inv_, nom_pb_rayonnant_;
   int processeur_rayonnant_ = -123;
 };
 

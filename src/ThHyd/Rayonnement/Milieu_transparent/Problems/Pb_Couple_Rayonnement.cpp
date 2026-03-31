@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -140,7 +140,7 @@ void Pb_Couple_Rayonnement::completer()
     }
   if (nb_pb_fluide > 1)
     {
-      if (mod_rayo.nom_pb_rayonnant() == "non_donne")
+      if (mod_rayo.nom_pb_rayonnant() == "??")
         {
           Cerr << "On ne sait traiter qu'un seul pb fluide" << finl;
           Cerr << " a moins d'indiquer le nom_pb_rayonnant au modele de rayonnement" << finl;
