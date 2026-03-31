@@ -162,7 +162,7 @@ void Masse_DG_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, double
                 {
                   if (mat)
                     (*mat)(current_indice+i+d*nb_bfunc, current_indice+i+d*nb_bfunc) += coef[e]*volume[e] / dt;
-                  secmem(e,i+d*nb_bfunc) += coef[e]*volume[e]*passe(e,i+d*nb_bfunc) / dt;
+                  secmem(e,i+d*nb_bfunc) += coef[e]*volume[e]*(passe(e,i+d*nb_bfunc) - resoudre_en_increments*inco(e,i+d*nb_bfunc))/ dt;
                 }
             }
           current_indice+=nb_bfunc*dim;
@@ -177,7 +177,7 @@ void Masse_DG_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, double
               {
                 if (mat)
                   (*mat)(current_indice+d, current_indice+d) += coef[e]*volume[e] / dt;
-                secmem(e,d) += coef[e]*volume[e]*passe(e,d) / dt;
+                secmem(e,d) += coef[e]*volume[e]*(passe(e,d)-resoudre_en_increments*inco(e,d)) / dt;
                 current_indice+=nb_bfunc;
               }
           else
@@ -200,7 +200,7 @@ void Masse_DG_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, double
                         {
                           if (mat)
                             (*mat)(current_indice+i+d*nb_bfunc, current_indice+j+d*nb_bfunc) += coef[e]*integral / dt;
-                          secmem(e,i+d*nb_bfunc) += coef[e]*integral*passe(e,j+d*nb_bfunc) / dt;
+                          secmem(e,i+d*nb_bfunc) += coef[e]*integral*(passe(e,j+d*nb_bfunc) - resoudre_en_increments*inco(e,j+d*nb_bfunc)) / dt;
                         }
                     }
                 }

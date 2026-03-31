@@ -123,7 +123,7 @@ void Op_Grad_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl
 void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
 
-  const DoubleTab& inco_p = semi_impl.count("pression") ? semi_impl.at("pression") : equation().inconnue().valeurs(); // NB : is this working ?
+  const DoubleTab& inco_p = semi_impl.count("pression") ? semi_impl.at("pression") :  ref_cast(Navier_Stokes_std, equation()).pression().valeurs(); // NB : is this working ?
   Matrice_Morse *mat = matrices.count("pression") ? matrices.at("pression") : nullptr; // pression for the stabilisation term if np==nv
 
   const Domaine_DG& domaine = le_dom_DG.valeur();
@@ -137,18 +137,19 @@ void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tab
   const BasisFunction& bfunc_p = domaine.get_basisFunction(order_p);
   const int nb_bfunc_p = bfunc_p.nb_bfunc();
 
-  const int quad_order = bfunc_p.get_default_quadrature_order(); //TODO DG should we choose the max or the p order quadrature ?
-  const Quadrature_base& quad = domaine.get_quadrature(quad_order);  // Same quadrature for all champs
-  int nb_pts_integ_max = quad.nb_pts_integ_max();
-  double coeff;
-
-  DoubleTab grad_fbase_elem(nb_bfunc_p, nb_pts_integ_max, Objet_U::dimension);
-  DoubleTab f_base_v(nb_bfunc_v, nb_pts_integ_max);
-  DoubleTab scalar_product_dim(nb_pts_integ_max);
-
   const int dim = Objet_U::dimension;
   const IntTab& indices_glob_elem_v = bfunc_v.indices_glob_elem(dim);
   const IntTab& indices_glob_elem_p = bfunc_p.indices_glob_elem();
+
+  const int quad_order = bfunc_p.get_default_quadrature_order(); //TODO DG should we choose the max or the p order quadrature ?
+  const Quadrature_base& quad = domaine.get_quadrature(quad_order);  // Same quadrature for all champs
+
+
+  int nb_pts_integ_max = quad.nb_pts_integ_max();
+  double coeff;
+  DoubleTab grad_fbase_elem(nb_bfunc_p, nb_pts_integ_max, Objet_U::dimension);
+  DoubleTab f_base_v(nb_bfunc_v, nb_pts_integ_max);
+  DoubleTab scalar_product_dim(nb_pts_integ_max);
 
   // Loop over elements to compute \int q_h div(u_h) dV
   for (int elem = 0; elem < domaine.nb_elem(); elem++)
@@ -161,7 +162,6 @@ void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tab
         for (int velocity_index = 0; velocity_index < nb_bfunc_v; velocity_index++)
           for (int pressure_index = 0; pressure_index < nb_bfunc_p; pressure_index++)
             {
-              scalar_product_dim = 0.;
               for (int k = 0; k < quad.nb_pts_integ(elem); k++)
                 scalar_product_dim(k) = grad_fbase_elem(pressure_index, k, d) * f_base_v(velocity_index, k);
               coeff = quad.compute_integral_on_elem(elem, scalar_product_dim);
@@ -172,9 +172,9 @@ void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tab
     }
 
   const DoubleTab& face_normales = domaine.face_normales();
-  const IntTab& face_voisins = domaine.face_voisins();
   const DoubleVect& face_surfaces = domaine.face_surfaces();
   int nb_pts_int_fac = quad.nb_pts_integ_facets();
+  const IntTab& face_voisins = domaine.face_voisins();
 
   double coeff00, coeff10, coeff01, coeff11;
 
@@ -182,7 +182,6 @@ void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tab
   DoubleTab eval_jump_on_facet01(nb_pts_int_fac);
   DoubleTab eval_jump_on_facet10(nb_pts_int_fac);
   DoubleTab eval_jump_on_facet11(nb_pts_int_fac);
-  //DoubleTab mean_v(nb_pts_int_fac);
 
   DoubleTab f_base_v0(nb_bfunc_v, nb_pts_int_fac);
   DoubleTab f_base_v1(nb_bfunc_v, nb_pts_int_fac);
@@ -205,19 +204,12 @@ void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tab
       bfunc_v.eval_bfunc_on_facets(quad, elem1, face, f_base_v1);
       bfunc_p.eval_bfunc_on_facets(quad, elem0, face, f_base_p0);
       bfunc_p.eval_bfunc_on_facets(quad, elem1, face, f_base_p1);
-      for (int velocity_index = 0; velocity_index < nb_bfunc_v; velocity_index++)
+      for (int d = 0; d < Objet_U::dimension; d++)
         {
-          for (int d = 0; d < Objet_U::dimension; d++)
+          for (int velocity_index = 0; velocity_index < nb_bfunc_v; velocity_index++)
             {
-              //for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
-              //  mean_v(k) = 0.5*(f_base_v0(velocity_index, k) + f_base_v1(velocity_index, k));
-
               for (int pressure_index = 0; pressure_index < nb_bfunc_p; pressure_index++)
                 {
-                  eval_jump_on_facet00 = 0.;
-                  eval_jump_on_facet01 = 0.;
-                  eval_jump_on_facet10 = 0.;
-                  eval_jump_on_facet11 = 0.;
                   for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
                     {
                       eval_jump_on_facet00(k) = -f_base_p0(pressure_index, k) * face_normales(face, d)  * 0.5 * f_base_v0(velocity_index, k) / sur_f;
