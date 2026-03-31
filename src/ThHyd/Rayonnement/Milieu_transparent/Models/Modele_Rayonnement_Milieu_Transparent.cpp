@@ -24,6 +24,7 @@
 #include <Fluide_base.h>
 #include <Interprete.h>
 #include <sys/stat.h>
+#include <Param.h>
 
 Implemente_instanciable_sans_constructeur(Modele_Rayonnement_Milieu_Transparent, "Modele_Rayonnement_Milieu_Transparent", Objet_U);
 
@@ -38,81 +39,30 @@ Sortie& Modele_Rayonnement_Milieu_Transparent::printOn(Sortie& os) const
 
 Entree& Modele_Rayonnement_Milieu_Transparent::readOn(Entree& is)
 {
-  // lire { puis nom1 et nom2 les nom de fichier issus du prepro.
-  Motcle motlu, accolade_fermee = "}", accolade_ouverte = "{";
-  Nom nom1, nom2, nom3, motlu2;
-  Motcles les_mots(6);
-  les_mots[0] = "fichier_face_rayo";
-  les_mots[1] = "fichier_fij";
-  les_mots[2] = "fichier_matrice";
-  les_mots[3] = "fichier_matrice_binaire";
-  les_mots[4] = "relaxation";
-  les_mots[5] = "nom_pb_rayonnant";
+  Cerr << "Reading params of " << que_suis_je() << finl;
+  Nom fichier_face_rayo, fichier_fij, fichier_matrice("??"), fichier_matrice_binaire("??");
 
-  is >> motlu;
-  if (motlu != accolade_ouverte)
-    {
-      Cerr << "On attendait une { a la lecture d'une " << que_suis_je() << finl;
-      Cerr << "et non : " << motlu << finl;
-      Process::exit();
-    }
+  Param param(que_suis_je());
+  param.ajouter("fichier_face_rayo", &fichier_face_rayo, Param::REQUIRED);
+  param.ajouter("fichier_fij", &fichier_fij, Param::REQUIRED);
+  param.ajouter("fichier_matrice", &fichier_matrice);
+  param.ajouter("fichier_matrice_binaire", &fichier_matrice_binaire);
+  param.ajouter("relaxation", &relaxation_);
+  param.ajouter("nom_pb_rayonnant", &nom_pb_rayonnant_);
+  param.lire_avec_accolades_depuis(is);
 
-  // Par defaut, on suppose qu'il faut inverser la matrice de rayonnement
-  // Dans ce qui suit on test si la matrice inverse n'exste pas deja dans le fichier mentionne par nom3.
+  fic_mat_ray_inv_bin_ = 0;
+  inversion_debut_ = 1;
 
-  is >> motlu2;
-  int rang = les_mots.search(motlu2);
-  if (rang == -1)
-    {
-      Process::exit();
-    }
+  if (fichier_matrice_binaire != "??")
+    fic_mat_ray_inv_bin_ = 1;
+
+  const bool has_fichier_bin = (fichier_matrice_binaire != "??" && fichier_matrice != "??");
+
+  if (has_fichier_bin)
+    lire_fichiers(fichier_face_rayo, fichier_fij, fic_mat_ray_inv_bin_ ? fichier_matrice_binaire : fichier_matrice);
   else
-    {
-      int fic_lu = 0;
-      fic_mat_ray_inv_bin_ = 0;
-      motlu = motlu2;
-      inversion_debut_ = 1;
-      while (motlu != accolade_fermee)
-        {
-          int rang2 = les_mots.search(motlu);
-          switch(rang2)
-            {
-            case 0:
-              is >> nom1;
-              break;
-            case 1:
-              is >> nom2;
-              break;
-            case 2:
-              is >> nom3;
-              fic_lu = 1;
-              break;
-            case 3:
-              fic_mat_ray_inv_bin_ = 1;
-              fic_lu = 1;
-              is >> nom3;
-              break;
-            case 4:
-              is >> relaxation_;
-              break;
-            case 5:
-              is >> nom_pb_rayonnant_;
-              break;
-            default:
-              {
-                Cerr << "Un " << que_suis_je() << " n'a pas la propriete " << motlu << finl;
-                Cerr << "On attendait un mot dans :" << finl << les_mots << finl;
-                abort();
-              }
-            }
-          is >> motlu;
-
-        }
-      if (fic_lu)
-        lire_fichiers(nom1, nom2, nom3);
-      else
-        lire_fichiers(nom1, nom2);
-    }
+    lire_fichiers(fichier_face_rayo, fichier_fij);
 
   // si on a lu le nom du pb rayonnant on indique au pb qu'il est rayonnant
   if (nom_pb_rayonnant_ != "non_donne")
