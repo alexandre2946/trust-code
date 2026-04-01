@@ -81,7 +81,7 @@ public:
   virtual void creer_champs_non_lus();
   virtual void discretiser(const Probleme_base& pb, const Discretisation_base& dis);
   virtual int is_rayo_semi_transp() const { return 0; }
-  virtual int is_rayo_transp() const { return 0; }
+  virtual bool is_rayo_transp() const { return false; }
   virtual void mettre_a_jour(double temps);
   virtual bool initTimeStep(double dt) { return true; }
   virtual void abortTimeStep();

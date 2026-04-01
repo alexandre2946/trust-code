@@ -82,7 +82,7 @@ public :
 
   // Modif CHD 07/05/03 Ajout des parametres pour un fluide semi transparent on les ramene ici pour ne plus avoir a utiliser de Fluide incompressible semi transparent.
   int is_rayo_semi_transp() const override;
-  int is_rayo_transp() const override;
+  bool is_rayo_transp() const override { return is_rad_transp_med_; }
   void fixer_type_rayo();
   void reset_type_rayo();
   int longueur_rayo_is_discretised();
@@ -97,6 +97,8 @@ protected :
   mutable OWN_PTR(Champ_base) ch_e_int_, ch_h_ou_T_; //pour la creation sur demande : h is Energie_Multiphase et T si Energie_Multiphase_Enthalpie
   OWN_PTR(Champ_Don_base) ch_mu_, ch_nu_, ch_beta_co_;
   double h0_ = 0, T0_ = 0;
+
+  bool is_rad_transp_med_ = false; // fluide rayonnant transparent
 
   // Parametres du fluide rayonnant semi transparent
   OWN_PTR(Champ_Don_base) coeff_absorption_, indice_refraction_;

@@ -39,15 +39,13 @@ Sortie& Modele_Rayonnement_Milieu_Transparent::printOn(Sortie& os) const
 
 Entree& Modele_Rayonnement_Milieu_Transparent::readOn(Entree& is)
 {
-  Cerr << "Reading params of " << que_suis_je() << finl;
   Nom fichier_face_rayo, fichier_fij;
-
+  Cerr << "Reading params of " << que_suis_je() << finl;
   Param param(que_suis_je());
   param.ajouter("fichier_face_rayo", &fichier_face_rayo, Param::REQUIRED);
   param.ajouter("fichier_fij", &fichier_fij, Param::REQUIRED);
   param.ajouter("fichier_matrice", &nom_fic_mat_ray_inv_);
   param.ajouter("relaxation", &relaxation_);
-  param.ajouter("nom_pb_rayonnant", &nom_pb_rayonnant_);
   param.ajouter_flag("format_binaire", &fic_mat_ray_inv_bin_);
   param.lire_avec_accolades_depuis(is);
 
@@ -56,18 +54,6 @@ Entree& Modele_Rayonnement_Milieu_Transparent::readOn(Entree& is)
   else
     lire_fichiers(fichier_face_rayo, fichier_fij);
 
-  // si on a lu le nom du pb rayonnant on indique au pb qu'il est rayonnant
-  if (nom_pb_rayonnant_ != "??")
-    {
-      Probleme_base& pb = ref_cast(Probleme_base, interprete().objet(nom_pb_rayonnant_));
-      if (sub_type(Fluide_base, pb.milieu()))
-        {
-          Fluide_base& fluide = ref_cast(Fluide_base, pb.milieu());
-          fluide.fixer_type_rayo();
-        }
-      else
-        Process::exit("Le nom du pb rayonnant n'est pas un pb fluide !! \n");
-    }
   return is;
 }
 

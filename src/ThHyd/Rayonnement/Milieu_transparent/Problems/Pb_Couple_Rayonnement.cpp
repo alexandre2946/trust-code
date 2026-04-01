@@ -37,48 +37,22 @@ int Pb_Couple_Rayonnement::associer_(Objet_U& ob)
   int set_type_rayo = 0;
   if (Probleme_Couple::associer_(ob))
     {
-      set_type_rayo = 1;
+      set_type_rayo=1;
+
     }
   else
     {
-      if (sub_type(Modele_Rayonnement_Milieu_Transparent, ob))
+      if( sub_type(Modele_Rayonnement_Milieu_Transparent, ob))
         {
-          set_type_rayo = 1;
+          set_type_rayo=1;
           Cerr << "association du modele au pbc" << finl;
           le_modele_rayo_associe(ref_cast(Modele_Rayonnement_Milieu_Transparent, ob));
         }
       else
         return 0;
     }
-  if (set_type_rayo == 1)
-    {
-      int nb_pb_fluide = 0;
-      for (int l = 0; l < nb_problemes(); l++)
-        {
-
-          Probleme_base& pb = ref_cast(Probleme_base, probleme(l));
-
-          if (sub_type(Fluide_base, pb.milieu()))
-            nb_pb_fluide++;
-        }
-
-      for (int l = 0; l < nb_problemes(); l++)
-        {
-
-          Probleme_base& pb = ref_cast(Probleme_base, probleme(l));
-
-          if (sub_type(Fluide_base, pb.milieu()))
-            {
-              Fluide_base& fluide = ref_cast(Fluide_base, pb.milieu());
-              if (nb_pb_fluide == 1)
-                fluide.fixer_type_rayo();
-              else
-                fluide.reset_type_rayo();
-            }
-        }
-
-      return 1;
-    }
+  if (set_type_rayo==1)
+    return 1;
   else
     return 0;
 }
@@ -155,6 +129,8 @@ void Pb_Couple_Rayonnement::completer()
   else
     mod_rayo.nom_pb_rayonnant() = probleme(pb_fluide).le_nom();
 
+
+
   for (l = 0; l < nb_problemes(); l++)
     {
       Probleme_base& le_pb = ref_cast(Probleme_base, probleme(l));
@@ -168,6 +144,7 @@ void Pb_Couple_Rayonnement::completer()
           //          ref_cast(Fluide_base,le_pb.milieu()).fixer_type_rayo();
           Cerr << "Le probleme rayonnant trouve est : " << le_pb.le_nom() << finl;
         }
+
       for (int j = 0; j < le_pb.nombre_d_equations(); j++)
         {
           Domaine_Cl_dis_base& la_zcl = le_pb.equation(j).domaine_Cl_dis();
@@ -186,7 +163,6 @@ void Pb_Couple_Rayonnement::completer()
                       int ok = 0;
                       for (int i = 0; i < mod_rayo.nb_faces_totales(); i++)
                         {
-
                           if (mod_rayo.face_rayonnante(i).nom_bord_rayo() == la_zcl.les_conditions_limites(num_cl)->frontiere_dis().le_nom())
                             //if (la_cl.frontiere_dis().frontiere().nb_faces()!=0)
                             {

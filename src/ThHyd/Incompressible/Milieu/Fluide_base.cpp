@@ -33,6 +33,7 @@ Implemente_instanciable(Fluide_base, "Fluide_base", Milieu_base);
 // XD fluide_base milieu_base fluide_base -3 Basic class for fluids.
 // XD attr indice field_base indice 1 Refractivity of fluid.
 // XD attr kappa field_base kappa 1 Absorptivity of fluid (m-1).
+// XD attr rayonnement_milieu_transparent rien transparent_medium_radiation 1 Flag to activate transparent medium radiation calculation. A model in this case in mandatory.
 
 Sortie& Fluide_base::printOn(Sortie& os) const
 {
@@ -85,6 +86,7 @@ void Fluide_base::set_param(Param& param) const
   param.ajouter("beta_co", &ch_beta_co_);
   param.ajouter("kappa", &coeff_absorption_);
   param.ajouter("indice", &indice_refraction_);
+  param.ajouter_flag("rayonnement_milieu_transparent|transparent_medium_radiation", &is_rad_transp_med_);
 }
 
 void Fluide_base::creer_champs_non_lus()
@@ -374,11 +376,6 @@ int Fluide_base::initialiser(const double temps)
 int Fluide_base::is_rayo_semi_transp() const
 {
   return int(indic_rayo_ == SEMITRANSP);
-}
-
-int Fluide_base::is_rayo_transp() const
-{
-  return int(indic_rayo_ == TRANSP);
 }
 
 void Fluide_base::reset_type_rayo()
