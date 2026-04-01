@@ -94,54 +94,41 @@ void Pb_Couple_Rayonnement::validateTimeStep()
 void Pb_Couple_Rayonnement::completer()
 {
   le_modele_de_rayo_->discretiser(ref_cast(Probleme_base,probleme(0)).discretisation(), ref_cast(Probleme_base,probleme(0)).domaine());
-  int nb_pb_fluide = 0;
   Modele_Rayonnement_Milieu_Transparent& mod_rayo = le_modele_de_rayo_.valeur();
 
+  int nb_pb_ray = 0;
   int compte_nb_bords_rayo = 0;
-  int l;
-  int pb_fluide = -1;
-  int is_pb_nom_existe = 0;
-  for (l = 0; l < nb_problemes(); l++)
+
+  for (int l = 0; l < nb_problemes(); l++)
     {
       Probleme_base& le_pb = ref_cast(Probleme_base, probleme(l));
       if (sub_type(Fluide_base, le_pb.milieu()))
         {
-          nb_pb_fluide++;
-          pb_fluide = l;
-          if (le_pb.le_nom() == mod_rayo.nom_pb_rayonnant())
-            is_pb_nom_existe = 1;
+          if (ref_cast(Fluide_base, le_pb.milieu()).is_rayo_transp())
+            nb_pb_ray++;
         }
     }
-  if (nb_pb_fluide > 1)
+  if (nb_pb_ray > 1)
     {
-      if (mod_rayo.nom_pb_rayonnant() == "??")
-        {
-          Cerr << "On ne sait traiter qu'un seul pb fluide" << finl;
-          Cerr << " a moins d'indiquer le nom_pb_rayonnant au modele de rayonnement" << finl;
-          Process::exit();
-        }
-      else if (is_pb_nom_existe == 0)
-        {
-          Cerr << "On a au moins deux problemes fluides, le nom du pb rayonnant indique est " << mod_rayo.nom_pb_rayonnant() << " et ne corrrespond pas a un probleme fluide existant" << finl;
-          Process::exit();
-        }
+      Cerr << "Pb_Couple_Rayonnement::completer - We can only treat 1 transparent medium at present. You defined " << nb_pb_ray << " !!!" << finl;
+      Process::exit();
     }
-  else
-    mod_rayo.nom_pb_rayonnant() = probleme(pb_fluide).le_nom();
+  else if (nb_pb_ray == 0)
+    Process::exit("Pb_Couple_Rayonnement::completer - You should define the transparent medium using the flag transparent_medium_radiation !!!\n");
 
-
-
-  for (l = 0; l < nb_problemes(); l++)
+  for (int l = 0; l < nb_problemes(); l++)
     {
       Probleme_base& le_pb = ref_cast(Probleme_base, probleme(l));
-      //          Probleme_base& le_pb = probleme(l);
-      int is_pb_fluide = (mod_rayo.nom_pb_rayonnant() == le_pb.le_nom());
 
-      if (is_pb_fluide == 1)
+      bool is_pb_fluide = false;
+
+      if (sub_type(Fluide_base, le_pb.milieu()))
+        if (ref_cast(Fluide_base, le_pb.milieu()).is_rayo_transp())
+          is_pb_fluide = true;
+
+      if (is_pb_fluide)
         {
-          // normalement deja fait
-          assert(le_pb.milieu().is_rayo_transp() == 1);
-          //          ref_cast(Fluide_base,le_pb.milieu()).fixer_type_rayo();
+          le_modele_de_rayo_->set_nom_pb_rayonnant(le_pb.le_nom());
           Cerr << "Le probleme rayonnant trouve est : " << le_pb.le_nom() << finl;
         }
 
@@ -202,47 +189,31 @@ void Pb_Couple_Rayonnement::completer()
     abort();
 
   if (nproc() == 1)
-    {
-      mod_rayo.associer_processeur_rayonnant(me());
-    }
+    mod_rayo.associer_processeur_rayonnant(me());
   else
     {
-      //      if (compte_nb_bords_rayo == mod_rayo.nb_faces_rayonnantes())
-      //         {
-      //           mod_rayo.associer_processeur_rayonnant(me());
-      //           Cerr<<"le processeur rayonnant est "<<me()<<finl;
-      //         }
-      //       else
-      {
-        if (compte_nb_bords_rayo != 0)
-          {
-            LIST(Nom) collectnoms;
-            for (int i = 0; i < mod_rayo.nb_faces_rayonnantes(); i++)
-              {
-                if (mod_rayo.face_rayonnante(i).ensembles_faces_bord(0).nb_faces_bord() != 0)
-                  collectnoms.add(mod_rayo.face_rayonnante(i).nom_bord_rayo_lu());
-              }
-            Cerr << me() << collectnoms << finl;
-            // on verifie que l'on a bien tous les noms
-            // pour verifier a la fin;
-            /*
-             for (int n=0;n<nb_proc()-1;n++)
-
-             abort();
-             */
-            if (me() == 0)
-              mod_rayo.associer_processeur_rayonnant(me());
-            else
-              mod_rayo.associer_processeur_rayonnant(-1);
-          }
-        else
-          {
-            //tout est ok
-            Cerr << "On redimenssionne le tableau de faces de bord" << finl;
-            Cerr << "compte_nb_bords_rayo = " << compte_nb_bords_rayo << finl;
-            Cerr << "mod_rayo.nb_faces_rayonnantes() = " << mod_rayo.nb_faces_rayonnantes() << finl;
+      if (compte_nb_bords_rayo != 0)
+        {
+          LIST(Nom) collectnoms;
+          for (int i = 0; i < mod_rayo.nb_faces_rayonnantes(); i++)
+            {
+              if (mod_rayo.face_rayonnante(i).ensembles_faces_bord(0).nb_faces_bord() != 0)
+                collectnoms.add(mod_rayo.face_rayonnante(i).nom_bord_rayo_lu());
+            }
+          Cerr << me() << collectnoms << finl;
+          // on verifie que l'on a bien tous les noms
+          if (me() == 0)
+            mod_rayo.associer_processeur_rayonnant(me());
+          else
             mod_rayo.associer_processeur_rayonnant(-1);
-          }
-      }
+        }
+      else
+        {
+          //tout est ok
+          Cerr << "On redimenssionne le tableau de faces de bord" << finl;
+          Cerr << "compte_nb_bords_rayo = " << compte_nb_bords_rayo << finl;
+          Cerr << "mod_rayo.nb_faces_rayonnantes() = " << mod_rayo.nb_faces_rayonnantes() << finl;
+          mod_rayo.associer_processeur_rayonnant(-1);
+        }
     }
 }

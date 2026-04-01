@@ -46,7 +46,7 @@ public:
   inline Face_Rayonnante& face_rayonnante(int j) { return les_faces_rayonnantes_[j]; }
   inline const Face_Rayonnante& face_rayonnante(int j) const { return les_faces_rayonnantes_[j]; }
   inline const Nom& nom_pb_rayonnant() const { return nom_pb_rayonnant_; }
-  inline Nom& nom_pb_rayonnant() { return nom_pb_rayonnant_; }
+  inline void set_nom_pb_rayonnant(const Nom& pb) { nom_pb_rayonnant_ = pb; }
   inline double relaxation() const { return relaxation_; }
   inline int processeur_rayonnant() { return processeur_rayonnant_; }
   inline int processeur_rayonnant() const { return processeur_rayonnant_; }
