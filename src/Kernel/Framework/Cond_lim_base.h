@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -73,9 +73,9 @@ public:
 //  virtual void set_app_domains() = 0;
 
   // methode virtuelle pour les CL rayonnement ! Attention, Cond_Lim_Rayo ne derive pas d'objet_U
-  virtual int is_la_cl_rayo(Cond_Lim_Rayo*& la_cl_rayo)
+  virtual bool is_la_cl_rayo(Cond_Lim_Rayo*& la_cl_rayo)
   {
-    return 0; /* par defaut pas rayo ! */
+    return false; /* par defaut pas rayo ! */
   }
 
 protected:

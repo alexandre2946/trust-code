@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -29,10 +29,10 @@ public:
   void calculer_Teta_i();
   int compatible_avec_eqn(const Equation_base&) const override { return 1; }
 
-  inline int is_la_cl_rayo(Cond_Lim_Rayo *& la_cl_rayo) override
+  inline bool is_la_cl_rayo(Cond_Lim_Rayo *& la_cl_rayo) override
   {
     la_cl_rayo = &((Cond_Lim_Rayo&) (*this));
-    return 1;
+    return true;
   }
 };
 
