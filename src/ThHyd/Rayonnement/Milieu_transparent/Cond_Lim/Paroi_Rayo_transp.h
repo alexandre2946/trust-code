@@ -16,10 +16,10 @@
 #ifndef Paroi_Rayo_transp_included
 #define Paroi_Rayo_transp_included
 
-#include <Cond_Lim_Rayo.h>
+#include <Cond_lim_rayo_milieu_transp.h>
 #include <Neumann_paroi.h>
 
-class Paroi_Rayo_transp: public Cond_Lim_Rayo, public Neumann_paroi
+class Paroi_Rayo_transp: public Cond_lim_rayo_milieu_transp, public Neumann_paroi
 {
   Declare_base(Paroi_Rayo_transp);
 public:
@@ -28,9 +28,9 @@ public:
   double flux_impose(int i, int j) const override;
   int compatible_avec_eqn(const Equation_base&) const override { return 1; }
 
-  inline bool is_la_cl_rayo(Cond_Lim_Rayo *& la_cl_rayo) override
+  inline bool is_bc_rayo_milieu_transp(Cond_lim_rayo_milieu_transp *& la_cl_rayo) override
   {
-    la_cl_rayo = &((Cond_Lim_Rayo&) (*this));
+    la_cl_rayo = &((Cond_lim_rayo_milieu_transp&) (*this));
     return true;
   }
 };

@@ -21,9 +21,10 @@
 #include <Motcle.h>
 #include <vector>
 
+class Cond_lim_rayo_milieu_transp;
+class Cond_lim_rayo_semi_transp;
 class Discretisation_base;
 class Domaine_Cl_dis_base;
-class Cond_Lim_Rayo;
 class Equation_base;
 
 /*! @brief classe Cond_lim_base Classe de base pour la hierarchie des classes qui representent les differentes conditions aux limites (Dirichlet, Neumann ...).
@@ -70,10 +71,13 @@ public:
   virtual int avancer(double temps);
   virtual int reculer(double temps);
 
-//  virtual void set_app_domains() = 0;
+  // methode virtuelle pour les CL rayonnement ! Attention, Cond_lim_rayo_milieu_transp et Cond_lim_rayo_semi_transp ne derive pas d'objet_U
+  virtual bool is_bc_rayo_milieu_transp(Cond_lim_rayo_milieu_transp*& la_cl_rayo)
+  {
+    return false; /* par defaut pas rayo ! */
+  }
 
-  // methode virtuelle pour les CL rayonnement ! Attention, Cond_Lim_Rayo ne derive pas d'objet_U
-  virtual bool is_la_cl_rayo(Cond_Lim_Rayo*& la_cl_rayo)
+  virtual bool is_bc_rayo_semi_transp(Cond_lim_rayo_semi_transp*& la_cl_rayo)
   {
     return false; /* par defaut pas rayo ! */
   }

@@ -16,7 +16,7 @@
 #ifndef Echange_contact_rayo_semi_transp_VDF_included
 #define Echange_contact_rayo_semi_transp_VDF_included
 
-#include <Cond_Lim_rayo_semi_transp.h>
+#include <Cond_lim_rayo_semi_transp.h>
 #include <Echange_contact_VDF.h>
 
 
@@ -28,7 +28,7 @@
  *
  *
  */
-class Echange_contact_rayo_semi_transp_VDF: public Cond_Lim_rayo_semi_transp, public Echange_contact_VDF
+class Echange_contact_rayo_semi_transp_VDF: public Cond_lim_rayo_semi_transp, public Echange_contact_VDF
 {
   Declare_instanciable(Echange_contact_rayo_semi_transp_VDF);
 
@@ -43,6 +43,15 @@ public :
   void calculer_Teta_paroi(DoubleTab& Teta_p,const DoubleTab& mon_h,const DoubleTab& autre_h,int i,double temps) override;
   void calculer_Teta_equiv(DoubleTab& Teta_eq,const DoubleTab& mon_h,const DoubleTab& autre_h,int i,double temps) override;
   Echange_contact_rayo_semi_transp_VDF& la_Cl_opposee();
+
+  void completer_Cl_opposee_si_contact() override;
+
+  bool is_bc_rayo_semi_transp(Cond_lim_rayo_semi_transp*& la_cl_rayo) override
+  {
+    la_cl_rayo = &((Cond_lim_rayo_semi_transp&) (*this));
+    return true;
+  }
+
 protected :
 
   OWN_PTR(Champ_front_base) T_paroi;

@@ -20,18 +20,11 @@
 #include <Symetrie.h>
 #include <Frontiere_dis_base.h>
 #include <Fluide_base.h>
-#include <Frontiere_ouverte_rayo_semi_transp.h>
-#include <Frontiere_ouverte_temperature_imposee_rayo_semi_transp.h>
-#include <Neumann_paroi_rayo_semi_transp_VEF.h>
-#include <Neumann_paroi_rayo_semi_transp_VDF.h>
-#include <Echange_externe_impose_rayo_semi_transp.h>
-#include <Echange_contact_rayo_semi_transp_VDF.h>
-#include <Echange_global_impose_rayo_semi_transp.h>
-#include <Temperature_imposee_paroi_rayo_semi_transp.h>
 #include <Source_rayo_semi_transp_base.h>
 #include <verif_cast.h>
 #include <Champ_Uniforme.h>
 #include <Discretisation_base.h>
+#include <Cond_lim_rayo_semi_transp.h>
 #include <Domaine.h>
 
 Implemente_instanciable(Modele_rayo_semi_transp, "Modele_rayo_semi_transp", Probleme_base);
@@ -80,52 +73,6 @@ Champ_Inc_base& Modele_rayo_semi_transp::put_irradience()
   return irradiance;
 }
 
-int is_la_cl_rayo(const Cond_lim_base& la_cl, Cond_Lim_rayo_semi_transp *& la_cl_rayo_semi_transp)
-{
-  if (sub_type(Frontiere_ouverte_rayo_semi_transp, la_cl))
-    {
-      la_cl_rayo_semi_transp = &(verif_cast(Cond_Lim_rayo_semi_transp&, ref_cast(Frontiere_ouverte_rayo_semi_transp,la_cl)));
-      return 1;
-    }
-  if (sub_type(Frontiere_ouverte_temperature_imposee_rayo_semi_transp, la_cl))
-    {
-      la_cl_rayo_semi_transp = &(verif_cast(Cond_Lim_rayo_semi_transp&, ref_cast(Frontiere_ouverte_temperature_imposee_rayo_semi_transp,la_cl)));
-      return 1;
-    }
-  if (sub_type(Neumann_paroi_rayo_semi_transp_VEF, la_cl))
-    {
-      la_cl_rayo_semi_transp = &(verif_cast(Cond_Lim_rayo_semi_transp&, ref_cast(Neumann_paroi_rayo_semi_transp_VEF,la_cl)));
-      return 1;
-    }
-  if (sub_type(Echange_externe_impose_rayo_semi_transp, la_cl))
-    {
-      la_cl_rayo_semi_transp = &(verif_cast(Cond_Lim_rayo_semi_transp&, ref_cast(Echange_externe_impose_rayo_semi_transp,la_cl)));
-      return 1;
-    }
-  if (sub_type(Neumann_paroi_rayo_semi_transp_VDF, la_cl))
-    {
-      la_cl_rayo_semi_transp = &(verif_cast(Cond_Lim_rayo_semi_transp&, ref_cast(Neumann_paroi_rayo_semi_transp_VDF,la_cl)));
-      return 1;
-    }
-  if (sub_type(Echange_contact_rayo_semi_transp_VDF, la_cl))
-    {
-      la_cl_rayo_semi_transp = &(verif_cast(Cond_Lim_rayo_semi_transp&, ref_cast(Echange_contact_rayo_semi_transp_VDF,la_cl)));
-      return 1;
-    }
-  if (sub_type(Temperature_imposee_paroi_rayo_semi_transp, la_cl))
-    {
-      la_cl_rayo_semi_transp = &(verif_cast(Cond_Lim_rayo_semi_transp&, ref_cast(Temperature_imposee_paroi_rayo_semi_transp,la_cl)));
-      return 1;
-    }
-  if (sub_type(Echange_global_impose_rayo_semi_transp, la_cl))
-    {
-      la_cl_rayo_semi_transp = &(verif_cast(Cond_Lim_rayo_semi_transp&, ref_cast(Echange_global_impose_rayo_semi_transp,la_cl)));
-      return 1;
-    }
-
-  return 0;
-}
-
 void Modele_rayo_semi_transp::preparer_calcul()
 {
 
@@ -139,20 +86,15 @@ void Modele_rayo_semi_transp::preparer_calcul()
       for (int num_cl = 0; num_cl < la_zcl.nb_cond_lim(); num_cl++)
         {
           Cond_lim_base& la_cl = la_zcl.les_conditions_limites(num_cl).valeur();
-          Cond_Lim_rayo_semi_transp *la_cl_rayo_semi_transp;
+          Cond_lim_rayo_semi_transp *la_cl_rayo_semi_transp;
 
-          if (is_la_cl_rayo(la_cl, la_cl_rayo_semi_transp))
+          if (la_cl.is_bc_rayo_semi_transp(la_cl_rayo_semi_transp))
             {
               la_cl_rayo_semi_transp->associer_modele(*this);
               la_cl_rayo_semi_transp->recherche_emissivite_et_A();
+
               // Dans le cas d'un echange contact, il faut aussi completer la CL opposee
-              if (sub_type(Echange_contact_rayo_semi_transp_VDF, la_cl))
-                {
-                  Echange_contact_rayo_semi_transp_VDF& la_cl_ech = ref_cast(Echange_contact_rayo_semi_transp_VDF, la_cl);
-                  Echange_contact_rayo_semi_transp_VDF& la_cl_opp = la_cl_ech.la_Cl_opposee();
-                  la_cl_opp.associer_modele(*this);
-                  la_cl_opp.recherche_emissivite_et_A();
-                }
+              la_cl_rayo_semi_transp->completer_Cl_opposee_si_contact();
             }
         }
 

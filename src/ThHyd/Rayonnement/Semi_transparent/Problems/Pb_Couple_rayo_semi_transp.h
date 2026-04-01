@@ -21,7 +21,7 @@
 #include <Domaine.h>
 #include <TRUST_Ref.h>
 
-class Cond_Lim_rayo_semi_transp;
+class Cond_lim_rayo_semi_transp;
 class Modele_rayo_semi_transp;
 class Cond_lim_base;
 

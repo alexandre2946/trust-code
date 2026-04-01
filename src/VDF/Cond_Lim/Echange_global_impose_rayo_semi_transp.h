@@ -16,7 +16,7 @@
 #ifndef Echange_global_impose_rayo_semi_transp_included
 #define Echange_global_impose_rayo_semi_transp_included
 
-#include <Cond_Lim_rayo_semi_transp.h>
+#include <Cond_lim_rayo_semi_transp.h>
 #include <Echange_global_impose.h>
 
 /*! @brief classe Echange_global_impose_rayo_semi_transp cette classe est utilisee pour imposer une temperature de paroi imposee
@@ -25,7 +25,7 @@
  *
  *
  */
-class Echange_global_impose_rayo_semi_transp: public Cond_Lim_rayo_semi_transp, public Echange_global_impose
+class Echange_global_impose_rayo_semi_transp: public Cond_lim_rayo_semi_transp, public Echange_global_impose
 {
   Declare_instanciable(Echange_global_impose_rayo_semi_transp);
 
@@ -38,6 +38,12 @@ public :
   int compatible_avec_eqn(const Equation_base&) const override { return 1; }
   void completer() override;
   void verifie_ch_init_nb_comp() const override;
+
+  bool is_bc_rayo_semi_transp(Cond_lim_rayo_semi_transp*& la_cl_rayo) override
+  {
+    la_cl_rayo = &((Cond_lim_rayo_semi_transp&) (*this));
+    return true;
+  }
 };
 
 #endif /* Echange_global_impose_rayo_semi_transp_included */

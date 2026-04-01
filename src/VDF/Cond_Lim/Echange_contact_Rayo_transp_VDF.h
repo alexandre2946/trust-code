@@ -17,9 +17,9 @@
 #define Echange_contact_Rayo_transp_VDF_included
 
 #include <Echange_contact_VDF.h>
-#include <Cond_Lim_Rayo.h>
+#include <Cond_lim_rayo_milieu_transp.h>
 
-class Echange_contact_Rayo_transp_VDF: public Cond_Lim_Rayo, public Echange_contact_VDF
+class Echange_contact_Rayo_transp_VDF: public Cond_lim_rayo_milieu_transp, public Echange_contact_VDF
 {
   Declare_instanciable(Echange_contact_Rayo_transp_VDF);
 public:
@@ -30,9 +30,9 @@ public:
   void calculer_Teta_equiv(DoubleTab& Teta_equiv, const DoubleTab& mon_h, const DoubleTab& autre_h, int is_pb_fluide, double temps) override;
 
   int compatible_avec_eqn(const Equation_base&) const override { return 1; }
-  inline bool is_la_cl_rayo(Cond_Lim_Rayo *& la_cl_rayo) override
+  inline bool is_bc_rayo_milieu_transp(Cond_lim_rayo_milieu_transp *& la_cl_rayo) override
   {
-    la_cl_rayo = &((Cond_Lim_Rayo&) (*this));
+    la_cl_rayo = &((Cond_lim_rayo_milieu_transp&) (*this));
     return true;
   }
 

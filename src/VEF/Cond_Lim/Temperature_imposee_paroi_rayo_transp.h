@@ -17,9 +17,9 @@
 #define Temperature_imposee_paroi_rayo_transp_included
 
 #include <Temperature_imposee_paroi.h>
-#include <Cond_Lim_Rayo.h>
+#include <Cond_lim_rayo_milieu_transp.h>
 
-class Temperature_imposee_paroi_rayo_transp: public Cond_Lim_Rayo, public Temperature_imposee_paroi
+class Temperature_imposee_paroi_rayo_transp: public Cond_lim_rayo_milieu_transp, public Temperature_imposee_paroi
 {
   Declare_instanciable(Temperature_imposee_paroi_rayo_transp);
 public:
@@ -30,9 +30,9 @@ public:
   void calculer_Teta_i(double temps);
   int compatible_avec_eqn(const Equation_base&) const override { return 1; }
 
-  inline bool is_la_cl_rayo(Cond_Lim_Rayo *& la_cl_rayo) override
+  inline bool is_bc_rayo_milieu_transp(Cond_lim_rayo_milieu_transp *& la_cl_rayo) override
   {
-    la_cl_rayo = &((Cond_Lim_Rayo&) (*this));
+    la_cl_rayo = &((Cond_lim_rayo_milieu_transp&) (*this));
     return true;
   }
 };

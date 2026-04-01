@@ -152,8 +152,8 @@ void Pb_Couple_Rayonnement::completer()
             {
               Cond_lim_base& la_cl = la_zcl.les_conditions_limites(num_cl).valeur();
 
-              Cond_Lim_Rayo *la_cl_rayo;
-              if (la_cl.is_la_cl_rayo(la_cl_rayo))
+              Cond_lim_rayo_milieu_transp *la_cl_rayo;
+              if (la_cl.is_bc_rayo_milieu_transp(la_cl_rayo))
                 {
                   ((*la_cl_rayo)).associer_modele_rayo(mod_rayo);
 

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,32 +13,49 @@
 *
 *****************************************************************************/
 
-#ifndef Cond_Lim_Rayo_included
-#define Cond_Lim_Rayo_included
+#ifndef Cond_lim_rayo_semi_transp_included
+#define Cond_lim_rayo_semi_transp_included
 
+#include <Neumann_sortie_libre.h>
 #include <Cond_lim_base.h>
 #include <TRUST_Ref.h>
 
-class Modele_Rayonnement_Milieu_Transparent;
+class Modele_rayo_semi_transp;
 
-class Cond_Lim_Rayo
+/*! @brief classe Cond_lim_rayo_semi_transp
+ *
+ * @sa Ce n'est pas une classe de l'arbre TRUST a elle seule., Cette classe est faite etre une classe mere d'une classe, qui heritera par ailleurs d'Objet_U
+ */
+class Cond_lim_rayo_semi_transp
 {
 public:
-  virtual ~Cond_Lim_Rayo() { }
+  virtual ~Cond_lim_rayo_semi_transp() { }
 
-  virtual void completer();
-  void preparer_surface(const Frontiere_dis_base&, const Domaine_Cl_dis_base&);
-  virtual void associer_modele_rayo(Modele_Rayonnement_Milieu_Transparent&);
+  virtual void associer_modele(const Modele_rayo_semi_transp&);
+  inline const Modele_rayo_semi_transp& modele() const
+  {
+    assert(mon_modele.non_nul());
+    return mon_modele.valeur();
+  }
+  inline Modele_rayo_semi_transp& modele()
+  {
+    assert(mon_modele.non_nul());
+    return mon_modele.valeur();
+  }
 
-  inline virtual double surface(int numfa) const { return surf_i_[numfa]; }
-  inline virtual double teta_i(int numfa) const { return teta_i_[numfa]; }
+  inline Champ_front_base& emissivite() { return emissivite_; }
+  inline const Champ_front_base& emissivite() const { return emissivite_; }
+  inline double& A() { return A_; }
+  inline const double& A() const { return A_; }
 
-  inline Modele_Rayonnement_Milieu_Transparent& modele_rayo() { return le_modele_rayo.valeur(); }
-  inline const Modele_Rayonnement_Milieu_Transparent& modele_rayo() const { return le_modele_rayo.valeur(); }
+  virtual void recherche_emissivite_et_A();
+  virtual const Cond_lim_base& la_cl() const =0;
+  virtual void completer_Cl_opposee_si_contact() { }
 
 protected:
-  DoubleVect surf_i_, teta_i_;
-  OBS_PTR(Modele_Rayonnement_Milieu_Transparent) le_modele_rayo;
+  OBS_PTR(Modele_rayo_semi_transp) mon_modele;
+  OWN_PTR(Champ_front_base) emissivite_;
+  double A_ = -123.;
 };
 
-#endif /* Cond_Lim_Rayo_included */
+#endif /* Cond_lim_rayo_semi_transp_included */

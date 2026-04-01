@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -69,7 +69,7 @@ int Ensemble_Faces_base::is_ok() const
 
 void Ensemble_Faces_base::associer_les_cl(Cond_lim_base& la_cl)
 {
-  la_cl.is_la_cl_rayo(la_cond_lim_rayo_);
+  la_cl.is_bc_rayo_milieu_transp(la_cond_lim_rayo_);
   les_cl_base_ = la_cl;
   Frontiere& le_bord = la_cl.frontiere_dis().frontiere();
   nb_faces_bord_ = le_bord.nb_faces();

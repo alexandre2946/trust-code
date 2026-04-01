@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,7 +17,7 @@
 #define Ensemble_Faces_base_included
 
 #include <Domaine_forward.h>
-#include <Cond_Lim_Rayo.h>
+#include <Cond_lim_rayo_milieu_transp.h>
 #include <TRUST_Ref.h>
 #include <Motcle.h>
 
@@ -33,13 +33,13 @@ public:
   int contient(int) const;
   int is_ok() const;
 
-  inline const Cond_Lim_Rayo& cond_lim_rayo() const
+  inline const Cond_lim_rayo_milieu_transp& cond_lim_rayo() const
   {
     assert(la_cond_lim_rayo_ != 0);
     return *la_cond_lim_rayo_;
   }
 
-  inline Cond_Lim_Rayo& cond_lim_rayo()
+  inline Cond_lim_rayo_milieu_transp& cond_lim_rayo()
   {
     assert(la_cond_lim_rayo_ != 0);
     return *la_cond_lim_rayo_;
@@ -55,7 +55,7 @@ public:
 protected:
   int nb_faces_bord_ = 0;
   OBS_PTR(Cond_lim_base) les_cl_base_;
-  Cond_Lim_Rayo *la_cond_lim_rayo_ = nullptr;
+  Cond_lim_rayo_milieu_transp *la_cond_lim_rayo_ = nullptr;
   IntVect num_face_Ensemble_; //contient_;
   DoubleTab positions_;
 };

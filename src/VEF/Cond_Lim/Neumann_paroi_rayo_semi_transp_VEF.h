@@ -16,10 +16,10 @@
 #ifndef Neumann_paroi_rayo_semi_transp_VEF_included
 #define Neumann_paroi_rayo_semi_transp_VEF_included
 
-#include <Cond_Lim_rayo_semi_transp.h>
+#include <Cond_lim_rayo_semi_transp.h>
 #include <Neumann_paroi.h>
 
-class Neumann_paroi_rayo_semi_transp_VEF : public Cond_Lim_rayo_semi_transp, public Neumann_paroi
+class Neumann_paroi_rayo_semi_transp_VEF : public Cond_lim_rayo_semi_transp, public Neumann_paroi
 {
   Declare_instanciable(Neumann_paroi_rayo_semi_transp_VEF);
 
@@ -34,6 +34,12 @@ public :
 
   inline Champ_front_base& temperature_bord() { return temperature_bord_; }
   inline const Champ_front_base& temperature_bord() const { return temperature_bord_; }
+
+  bool is_bc_rayo_semi_transp(Cond_lim_rayo_semi_transp*& la_cl_rayo) override
+  {
+    la_cl_rayo = &((Cond_lim_rayo_semi_transp&) (*this));
+    return true;
+  }
 
 protected :
   OWN_PTR(Champ_front_base) temperature_bord_;

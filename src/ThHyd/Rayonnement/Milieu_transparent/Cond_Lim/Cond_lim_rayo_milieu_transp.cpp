@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,21 +15,21 @@
 
 #include <Modele_Rayonnement_Milieu_Transparent.h>
 #include <Domaine_Cl_dis_base.h>
-#include <Cond_Lim_Rayo.h>
+#include <Cond_lim_rayo_milieu_transp.h>
 #include <Domaine_VF.h>
 
-void Cond_Lim_Rayo::associer_modele_rayo(Modele_Rayonnement_Milieu_Transparent& mod)
+void Cond_lim_rayo_milieu_transp::associer_modele_rayo(Modele_Rayonnement_Milieu_Transparent& mod)
 {
   le_modele_rayo = mod;
 }
 
-void Cond_Lim_Rayo::completer()
+void Cond_lim_rayo_milieu_transp::completer()
 {
-  Cerr << "Cond_Lim_Rayo::doit etre surchargee" << finl;
+  Cerr << "Cond_lim_rayo_milieu_transp::doit etre surchargee" << finl;
   Process::exit();
 }
 
-void Cond_Lim_Rayo::preparer_surface(const Frontiere_dis_base& fr, const Domaine_Cl_dis_base& zcl)
+void Cond_lim_rayo_milieu_transp::preparer_surface(const Frontiere_dis_base& fr, const Domaine_Cl_dis_base& zcl)
 {
   const Front_VF& la_frontiere_VF = ref_cast(Front_VF, fr);
   const int ndeb = la_frontiere_VF.num_premiere_face();

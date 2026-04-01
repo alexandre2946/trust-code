@@ -16,7 +16,7 @@
 #ifndef Temperature_imposee_paroi_rayo_semi_transp_included
 #define Temperature_imposee_paroi_rayo_semi_transp_included
 
-#include <Cond_Lim_rayo_semi_transp.h>
+#include <Cond_lim_rayo_semi_transp.h>
 #include <Temperature_imposee_paroi.h>
 
 /*! @brief classe Temperature_imposee_paroi_rayo_semi_transp cette classe est utilisee pour imposer une temperature de paroi imposee
@@ -25,7 +25,7 @@
  *
  *
  */
-class Temperature_imposee_paroi_rayo_semi_transp: public Cond_Lim_rayo_semi_transp, public Temperature_imposee_paroi
+class Temperature_imposee_paroi_rayo_semi_transp: public Cond_lim_rayo_semi_transp, public Temperature_imposee_paroi
 {
   Declare_instanciable(Temperature_imposee_paroi_rayo_semi_transp);
 
@@ -36,6 +36,12 @@ public :
   Champ_front_base& temperature_bord();
   void calculer_temperature_bord(double temps);
   void completer() override;
+
+  bool is_bc_rayo_semi_transp(Cond_lim_rayo_semi_transp*& la_cl_rayo) override
+  {
+    la_cl_rayo = &((Cond_lim_rayo_semi_transp&) (*this));
+    return true;
+  }
 };
 
 #endif /* Temperature_imposee_paroi_rayo_semi_transp_included */

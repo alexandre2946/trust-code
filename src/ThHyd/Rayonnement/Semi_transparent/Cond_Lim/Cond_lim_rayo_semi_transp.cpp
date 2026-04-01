@@ -13,18 +13,18 @@
 *
 *****************************************************************************/
 
-#include <Cond_Lim_rayo_semi_transp.h>
+#include <Cond_lim_rayo_semi_transp.h>
 #include <Modele_rayo_semi_transp.h>
 #include <Flux_radiatif_base.h>
 #include <Frontiere_dis_base.h>
 #include <Symetrie.h>
 
-void Cond_Lim_rayo_semi_transp::associer_modele(const Modele_rayo_semi_transp& un_modele)
+void Cond_lim_rayo_semi_transp::associer_modele(const Modele_rayo_semi_transp& un_modele)
 {
   mon_modele=un_modele;
 }
 
-void Cond_Lim_rayo_semi_transp::recherche_emissivite_et_A()
+void Cond_lim_rayo_semi_transp::recherche_emissivite_et_A()
 {
   // On recupere le modele
   int num_cl_rayo=0;

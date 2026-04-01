@@ -16,9 +16,9 @@
 #ifndef Frontiere_ouverte_rayo_semi_transp_included
 #define Frontiere_ouverte_rayo_semi_transp_included
 
-#include <Cond_Lim_rayo_semi_transp.h>
+#include <Cond_lim_rayo_semi_transp.h>
 
-class Frontiere_ouverte_rayo_semi_transp: public Cond_Lim_rayo_semi_transp, public Neumann_sortie_libre
+class Frontiere_ouverte_rayo_semi_transp: public Cond_lim_rayo_semi_transp, public Neumann_sortie_libre
 {
   Declare_instanciable(Frontiere_ouverte_rayo_semi_transp);
 
@@ -33,6 +33,12 @@ public :
   inline int compatible_avec_eqn(const Equation_base&) const override { return 1; }
   inline Champ_front_base& temperature_bord() { return le_champ_front; }
   inline const Champ_front_base& temperature_bord() const { return le_champ_front; }
+
+  bool is_bc_rayo_semi_transp(Cond_lim_rayo_semi_transp*& la_cl_rayo) override
+  {
+    la_cl_rayo = &((Cond_lim_rayo_semi_transp&) (*this));
+    return true;
+  }
 };
 
 #endif /* Frontiere_ouverte_rayo_semi_transp_included */

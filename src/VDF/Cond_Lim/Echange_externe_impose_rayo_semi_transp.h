@@ -16,7 +16,7 @@
 #ifndef Echange_externe_impose_rayo_semi_transp_included
 #define Echange_externe_impose_rayo_semi_transp_included
 
-#include <Cond_Lim_rayo_semi_transp.h>
+#include <Cond_lim_rayo_semi_transp.h>
 #include <Echange_externe_impose.h>
 
 /*! @brief classe Echange_externe_impose_rayo_semi_transp cette classe est utilisee pour imposer une temperature de paroi imposee
@@ -25,7 +25,7 @@
  *
  *
  */
-class Echange_externe_impose_rayo_semi_transp: public Cond_Lim_rayo_semi_transp, public Echange_externe_impose
+class Echange_externe_impose_rayo_semi_transp: public Cond_lim_rayo_semi_transp, public Echange_externe_impose
 {
   Declare_instanciable(Echange_externe_impose_rayo_semi_transp);
 
@@ -37,6 +37,12 @@ public :
   void calculer_temperature_bord(double temps) { }
   int compatible_avec_eqn(const Equation_base&) const override { return 1; }
   void completer() override;
+
+  bool is_bc_rayo_semi_transp(Cond_lim_rayo_semi_transp*& la_cl_rayo) override
+  {
+    la_cl_rayo = &((Cond_lim_rayo_semi_transp&) (*this));
+    return true;
+  }
 };
 
 #endif /* Echange_externe_impose_rayo_semi_transp_included */

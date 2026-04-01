@@ -17,9 +17,9 @@
 #define Frontiere_Ouverte_Rayo_transp_included
 
 #include <Neumann_sortie_libre.h>
-#include <Cond_Lim_Rayo.h>
+#include <Cond_lim_rayo_milieu_transp.h>
 
-class Frontiere_Ouverte_Rayo_transp: public Cond_Lim_Rayo, public Neumann_sortie_libre
+class Frontiere_Ouverte_Rayo_transp: public Cond_lim_rayo_milieu_transp, public Neumann_sortie_libre
 {
   Declare_instanciable(Frontiere_Ouverte_Rayo_transp);
 public:
@@ -28,9 +28,9 @@ public:
   void mettre_a_jour(double) override;
   void calculer_Teta_i();
 
-  inline bool is_la_cl_rayo(Cond_Lim_Rayo *& la_cl_rayo) override
+  inline bool is_bc_rayo_milieu_transp(Cond_lim_rayo_milieu_transp *& la_cl_rayo) override
   {
-    la_cl_rayo = &((Cond_Lim_Rayo&) (*this));
+    la_cl_rayo = &((Cond_lim_rayo_milieu_transp&) (*this));
     return true;
   }
 };
