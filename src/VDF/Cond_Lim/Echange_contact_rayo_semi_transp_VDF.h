@@ -46,9 +46,9 @@ public :
 
   void completer_Cl_opposee_si_contact() override;
 
-  bool is_bc_rayo_semi_transp(Cond_lim_rayo_semi_transp*& la_cl_rayo) override
+  inline bool is_bc_rayo_semi_transp(Cond_lim_rayo_semi_transp*& la_cl_rayo) override
   {
-    la_cl_rayo = &((Cond_lim_rayo_semi_transp&) (*this));
+    la_cl_rayo = static_cast<Cond_lim_rayo_semi_transp*>(this);
     return true;
   }
 

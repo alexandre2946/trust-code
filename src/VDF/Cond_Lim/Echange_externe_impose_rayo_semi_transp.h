@@ -38,9 +38,9 @@ public :
   int compatible_avec_eqn(const Equation_base&) const override { return 1; }
   void completer() override;
 
-  bool is_bc_rayo_semi_transp(Cond_lim_rayo_semi_transp*& la_cl_rayo) override
+  inline bool is_bc_rayo_semi_transp(Cond_lim_rayo_semi_transp*& la_cl_rayo) override
   {
-    la_cl_rayo = &((Cond_lim_rayo_semi_transp&) (*this));
+    la_cl_rayo = static_cast<Cond_lim_rayo_semi_transp*>(this);
     return true;
   }
 };
