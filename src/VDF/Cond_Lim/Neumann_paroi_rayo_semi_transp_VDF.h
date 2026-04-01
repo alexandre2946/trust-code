@@ -19,12 +19,6 @@
 #include <Cond_Lim_rayo_semi_transp.h>
 #include <Neumann_paroi.h>
 
-/*! @brief classe Neumann_paroi_rayo_semi_transp_VDF
- *
- *  .SECTION
- *
- *
- */
 class Neumann_paroi_rayo_semi_transp_VDF: public Cond_Lim_rayo_semi_transp, public Neumann_paroi
 {
   Declare_instanciable(Neumann_paroi_rayo_semi_transp_VDF);
@@ -34,24 +28,14 @@ public :
   const Cond_lim_base& la_cl() const override;
   double flux_impose(int i) const override;
   double flux_impose(int i,int j) const override;
-  inline Champ_front_base& temperature_bord();
-  inline const Champ_front_base& temperature_bord() const;
   void calculer_temperature_bord(double temps);
   void completer() override;
+
+  inline Champ_front_base& temperature_bord() { return temperature_bord_; }
+  inline const Champ_front_base& temperature_bord() const { return temperature_bord_; }
 
 protected :
   OWN_PTR(Champ_front_base) temperature_bord_;
 };
 
-inline Champ_front_base& Neumann_paroi_rayo_semi_transp_VDF::temperature_bord()
-{
-  return temperature_bord_;
-}
-
-
-inline const Champ_front_base& Neumann_paroi_rayo_semi_transp_VDF::temperature_bord() const
-{
-  return temperature_bord_;
-}
-
-#endif
+#endif /* Neumann_paroi_rayo_semi_transp_VDF_included */

@@ -32,36 +32,16 @@
 
 Implemente_instanciable(Eq_rayo_semi_transp_VDF,"Eq_rayo_semi_transp_VDF",Equation_rayonnement_base);
 
-/*! @brief Imprime le type de l'equation sur un flot de sortie.
- *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
- */
 Sortie& Eq_rayo_semi_transp_VDF::printOn(Sortie& s ) const
 {
   return s << que_suis_je() << "\n";
 }
 
-
-
-/*! @brief
- *
- * @param (Entree& s) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- */
 Entree& Eq_rayo_semi_transp_VDF::readOn(Entree& s )
 {
   return Equation_rayonnement_base::readOn(s);
 }
 
-
-
-/*! @brief Calcule le champ de l'irradiance en fonction des CLs au temps donne en parametre et de la temperature au temps par defaut.
- *
- *     Met le resultat dans inconnue.valeurs()
- *     Suppose que le schema en temps est Euler explicite...
- *
- */
 void Eq_rayo_semi_transp_VDF::resoudre(double temps)
 {
   //  Cerr<<"Eq_rayo_semi_transp_VDF::resoudre : Debut"<<finl;
@@ -70,13 +50,13 @@ void Eq_rayo_semi_transp_VDF::resoudre(double temps)
   const DoubleTab& kappa = fluide().kappa().valeurs();
   //calcul du second membre
   DoubleTrav secmem(inconnue().valeurs());
-  Probleme_base& pb = Modele().probleme();
+  Probleme_base& pb = modele().probleme();
   double n,k;
 
   assert(pb.equation(1).inconnue().le_nom()=="temperature");
   const DoubleTab& temper = pb.equation(1).inconnue().valeurs();
   const DoubleTab& indice = fluide().indice().valeurs();
-  const double sigma = Modele().valeur_sigma();
+  const double sigma = modele().valeur_sigma();
 
   secmem = 0;
   int elem;
@@ -161,7 +141,7 @@ void Eq_rayo_semi_transp_VDF::evaluer_cl_rayonnement(double temps)
   Conds_lim& les_cl_rayo = domaine_Cl_dis().les_conditions_limites();
 
   // recherche des conditions aux limites associes au l'equation de temperature
-  Equation_base& eq_temp = Modele().probleme().equation(1);
+  Equation_base& eq_temp = modele().probleme().equation(1);
   assert(eq_temp.inconnue().le_nom()=="temperature");
 
   Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites();
@@ -245,7 +225,7 @@ void Eq_rayo_semi_transp_VDF::evaluer_cl_rayonnement(double temps)
             Cerr<<"On n'a pas remplie le tableau des temperatures de bord !!!!"<<finl;
           const Domaine_VF& zvf = ref_cast(Domaine_VF,domaine_dis());
           la_cl_rayon.evaluer_cl_rayonnement(Tb.valeur(), fluide().kappa(), fluide().longueur_rayo(),
-                                             fluide().indice(),zvf,Modele().valeur_sigma(),temps);
+                                             fluide().indice(),zvf,modele().valeur_sigma(),temps);
         }
       else if (sub_type(Symetrie,la_cl_rayo.valeur()))
         {
@@ -422,453 +402,6 @@ void Eq_rayo_semi_transp_VDF::assembler_matrice()
   // rayonnantes sur les elements de bord
   modifier_matrice();
 }
-
-void Eq_rayo_semi_transp_VDF::typer_op_grad()
-{
-  ;
-}
-
-/*
-  void Eq_rayo_semi_transp_VDF::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice_tmp)
-  {
-  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,domaine_dis());
-  const IntTab& face_voisins = domaine_VDF.face_voisins();
-
-  int elem1,elem2;
-  int num_face,face;
-  int n1 = nb_colonnes_tot();
-  int n2 = nb_colonnes();
-
-  matrice_tmp.typer("Matrice_Bloc");
-  Matrice_Bloc& matrice=ref_cast(Matrice_Bloc, matrice_tmp.valeur());
-  matrice.dimensionner(1,2);
-  matrice(0,0).typer("Matrice_Morse_Sym");
-  matrice(0,1).typer("Matrice_Morse");
-
-  Matrice_Morse_Sym& MBrr =  ref_cast(Matrice_Morse_Sym,matrice(0,0).valeur());
-  Matrice_Morse& MBrv =  ref_cast(Matrice_Morse,matrice(0,1).valeur());
-  MBrr.dimensionner(n2,0);
-  MBrv.dimensionner(n2,0);
-
-  IntVect& tab1RR=MBrr.get_set_tab1();
-  IntVect& tab2RR=MBrr.get_set_tab2();
-  IntVect& tab1RV=MBrv.get_set_tab1();
-  IntVect& tab2RV=MBrv.get_set_tab2();
-
-  // On traite les faces internes: dimensionnement des matrices reelles et virtuelles.
-  int ndeb = domaine_VDF.premiere_face_int();
-  int nfin = domaine_VDF.nb_faces();
-  //  int pourcent=0;
-  //  int tmp;
-
-  IntVect rang_voisinRR(n2);
-  IntVect rang_voisinRV(n2);
-  rang_voisinRR=1;
-  rang_voisinRV=0;
-
-  for (num_face=ndeb; num_face<nfin; num_face++)
-  {
-  elem1 = face_voisins(num_face,0);
-  elem2 = face_voisins(num_face,1);
-  if (elem1 > elem2)
-  {
-  if(elem1<n2)
-  {
-  (rang_voisinRR(elem2))++;
-  }
-  else
-  {
-  if(elem2<n2)
-  {
-  (rang_voisinRV(elem2))++;
-  }
-  }
-  }
-  else // elem2 >= elem1
-  {
-  if(elem2<n2)
-  {
-  (rang_voisinRR(elem1))++;
-  }
-  else
-  {
-  if(elem1<n2)
-  {
-  (rang_voisinRV(elem1))++;
-  }
-  }
-  }
-  }
-
-  // Prise en compte des conditions de type periodicite
-  int i;
-  const Conds_lim& les_cl = domaine_Cl_dis().les_conditions_limites();
-
-  for (i=0; i<les_cl.size(); i++)
-  {
-  const Cond_lim& la_cl = les_cl[i];
-
-  if (sub_type(Periodique,la_cl.valeur()))
-  {
-  const Periodique& la_cl_perio = ref_cast(Periodique,la_cl.valeur());
-  const Front_VF& la_front_dis = ref_cast(Front_VF,la_cl.frontiere_dis());
-  int numdeb = la_front_dis.num_premiere_face();
-  int nfaces = la_front_dis.nb_faces();
-  int ind_face_global;
-  IntVect fait(nfaces);
-  fait = 0;
-  for (face=0; face<nfaces; face++)
-  {
-  if (fait[face] == 0)
-  {
-  fait[face] = 1;
-  fait[la_cl_perio.face_associee(face)] = 1;
-  ind_face_global = face+numdeb;
-  elem1 = face_voisins(ind_face_global,0);
-  elem2 = face_voisins(ind_face_global,1);
-  assert(elem1>=0);
-  assert(elem2>=0);
-  if (elem1 > elem2)
-  {
-  if(elem1<n2)
-  {
-  (rang_voisinRR(elem2))++;
-  }
-  else
-  {
-  if(elem2<n2)
-  {
-  (rang_voisinRV(elem2))++;
-  }
-  }
-  }
-  else // elem2 >= elem1
-  {
-  if(elem2<n2)
-  {
-  (rang_voisinRR(elem1))++;
-  }
-  else
-  {
-  if(elem1<n2)
-  {
-  (rang_voisinRV(elem1))++;
-  }
-  }
-  }
-  }
-  }
-  }
-  }
-
-  tab1RR(0)=1;
-  tab1RV(0)=1;
-  for(i=0; i<n2; i++)
-  {
-  tab1RR(i+1)=rang_voisinRR(i)+tab1RR(i);
-  tab1RV(i+1)=rang_voisinRV(i)+tab1RV(i);
-  }
-  MBrr.dimensionner(n2,tab1RR(n2)-1);
-  MBrv.dimensionner(n2,n1-n2,tab1RV(n2)-1);
-  for(i=0; i<n2; i++)
-  {
-  tab2RR[tab1RR[i]-1]=i+1;
-  rang_voisinRR[i]=tab1RR[i];
-  rang_voisinRV[i]=tab1RV[i]-1;
-  }
-
-
-  for (num_face=ndeb; num_face<nfin; num_face++)
-  {
-  elem1 = face_voisins(num_face,0);
-  elem2 = face_voisins(num_face,1);
-
-  if (elem1 > elem2)
-  {
-  if(elem1<n2)
-  {
-  tab2RR[rang_voisinRR[elem2]]=elem1+1;
-  rang_voisinRR[elem2]++;
-  }
-  else
-  {
-  if(elem2<n2)
-  {
-  tab2RV[rang_voisinRV[elem2]]=(elem1-n2)+1;
-  rang_voisinRV[elem2]++;
-  }
-  }
-  }
-  else
-  {
-  if(elem2<n2)
-  {
-  tab2RR[rang_voisinRR[elem1]]=elem2+1;
-  rang_voisinRR[elem1]++;
-  }
-  else
-  {
-  if(elem1<n2)
-  {
-  tab2RV[rang_voisinRV[elem1]]=(elem2-n2)+1;
-  rang_voisinRV[elem1]++;
-  }
-  }
-  }
-  }
-  Cerr << finl;
-  // On traite les conditions aux limites
-  for (i=0; i<les_cl.size(); i++)
-  {
-  // Le traitement depend du type de la condition aux limites :
-  const Cond_lim& la_cl = les_cl[i];
-  const Front_VF& la_front_dis = ref_cast(Front_VF,la_cl.frontiere_dis());
-  int ndeb = la_front_dis.num_premiere_face();
-  int nfin = ndeb + la_front_dis.nb_faces();
-
-  if (sub_type(Periodique,la_cl.valeur()) )
-  {
-  const Periodique& la_cl_perio = ref_cast(Periodique,la_cl.valeur());
-  int ind_face_local;
-  IntVect fait(nfin-ndeb);
-  fait = 0;
-  for (num_face=ndeb; num_face<nfin; num_face++)
-  {
-  ind_face_local = num_face - ndeb;
-  if (fait[ind_face_local] == 0)
-  {
-  fait[ind_face_local] = 1;
-  fait[la_cl_perio.face_associee(ind_face_local)] = 1;
-  elem1 = face_voisins(num_face,0);
-  elem2 = face_voisins(num_face,1);
-
-  // diagonale :
-  if (elem1 > elem2) {
-  if(elem1<n2) {
-  tab2RR[rang_voisinRR[elem2]]=elem1+1;
-  rang_voisinRR[elem2]++;
-  }
-  else {
-  if(elem2<n2) {
-  tab2RV[rang_voisinRV[elem2]]=elem1+1;
-  rang_voisinRV[elem2]++;
-  }
-  }
-  }
-  else {
-  if(elem2<n2) {
-  tab2RR[rang_voisinRR[elem1]]=elem2+1;
-  rang_voisinRR[elem1]++;
-  }
-  else {
-  if(elem1<n2) {
-  tab2RV[rang_voisinRV[elem1]]=elem2+1;
-  rang_voisinRV[elem1]++;
-  }
-  }
-  }
-  }
-  }
-  }
-  }
-  }*/
-
-
-/*
-  void Eq_rayo_semi_transp_VDF::dimensionner_Mat_Bloc_Morse(Matrice& matrice_tmp)
-  {
-  const Domaine_VDF& domaine_VDF = ref_cast(Domaine_VDF,domaine_dis());
-  const IntTab& face_voisins = domaine_VDF.face_voisins();
-
-  int elem1,elem2;
-  int num_face,face;
-  int n1 = nb_colonnes_tot();
-  int n2 = nb_colonnes();
-
-  matrice_tmp.typer("Matrice_Bloc");
-  Matrice_Bloc& matrice=ref_cast(Matrice_Bloc, matrice_tmp.valeur());
-  matrice.dimensionner(1,2);
-  matrice(0,0).typer("Matrice_Morse");
-  matrice(0,1).typer("Matrice_Morse");
-
-  Matrice_Morse& MBrr =  ref_cast(Matrice_Morse,matrice(0,0).valeur());
-  Matrice_Morse& MBrv =  ref_cast(Matrice_Morse,matrice(0,1).valeur());
-  MBrr.dimensionner(n2,0);
-  MBrv.dimensionner(n2,0);
-
-  IntVect& tab1RR=MBrr.get_set_tab1();
-  IntVect& tab2RR=MBrr.get_set_tab2();
-  IntVect& tab1RV=MBrv.get_set_tab1();
-  IntVect& tab2RV=MBrv.get_set_tab2();
-
-  // On traite les faces internes: dimensionnement des matrices reelles et virtuelles.
-  int ndeb = domaine_VDF.premiere_face_int();
-  int nfin = domaine_VDF.nb_faces();
-  //  int pourcent=0;
-  //  int tmp;
-
-  IntVect rang_voisinRR(n2);
-  IntVect rang_voisinRV(n2);
-  rang_voisinRR=1;
-  rang_voisinRV=0;
-
-  for (num_face=ndeb; num_face<nfin; num_face++)
-  {
-  elem1 = face_voisins(num_face,0);
-  elem2 = face_voisins(num_face,1);
-  if ((elem1 < n2) && (elem2 < n2))
-  {
-  (rang_voisinRR(elem2))++;
-  (rang_voisinRR(elem1))++;
-  }
-  else
-  {
-  if(elem2<n2)
-  (rang_voisinRV(elem2))++;
-  else
-  (rang_voisinRV(elem1))++;
-  }
-  }
-
-  // Prise en compte des conditions de type periodicite
-  int i;
-  const Conds_lim& les_cl = domaine_Cl_dis().les_conditions_limites();
-
-  for (i=0; i<les_cl.size(); i++)
-  {
-  const Cond_lim& la_cl = les_cl[i];
-
-  if (sub_type(Periodique,la_cl.valeur()))
-  {
-  const Periodique& la_cl_perio = ref_cast(Periodique,la_cl.valeur());
-  const Front_VF& la_front_dis = ref_cast(Front_VF,la_cl.frontiere_dis());
-  int numdeb = la_front_dis.num_premiere_face();
-  int nfaces = la_front_dis.nb_faces();
-  int ind_face_global;
-  IntVect fait(nfaces);
-  fait = 0;
-  for (face=0; face<nfaces; face++)
-  {
-  if (fait[face] == 0)
-  {
-  fait[face] = 1;
-  fait[la_cl_perio.face_associee(face)] = 1;
-  ind_face_global = face+numdeb;
-  elem1 = face_voisins(ind_face_global,0);
-  elem2 = face_voisins(ind_face_global,1);
-  assert(elem1>=0);
-  assert(elem2>=0);
-  if ((elem1 < n2) && (elem2 < n2))
-  {
-  (rang_voisinRR(elem2))++;
-  (rang_voisinRR(elem1))++;
-  }
-  else
-  {
-  if(elem2<n2)
-  (rang_voisinRV(elem2))++;
-  else
-  (rang_voisinRV(elem1))++;
-  }
-  }
-  }
-  }
-  }
-
-  tab1RR(0)=1;
-  tab1RV(0)=1;
-  for(i=0; i<n2; i++)
-  {
-  tab1RR(i+1)=rang_voisinRR(i)+tab1RR(i);
-  tab1RV(i+1)=rang_voisinRV(i)+tab1RV(i);
-  }
-  MBrr.dimensionner(n2,tab1RR(n2)-1);
-  MBrv.dimensionner(n2,n1-n2,tab1RV(n2)-1);
-  for(i=0; i<n2; i++)
-  {
-  tab2RR[tab1RR[i]-1]=i+1;
-  rang_voisinRR[i]=tab1RR[i];
-  rang_voisinRV[i]=tab1RV[i]-1;
-  }
-
-  for (num_face=ndeb; num_face<nfin; num_face++)
-  {
-  elem1 = face_voisins(num_face,0);
-  elem2 = face_voisins(num_face,1);
-  if ((elem1 < n2) && (elem2 < n2))
-  {
-  tab2RR[rang_voisinRR[elem2]]=elem1+1;
-  tab2RR[rang_voisinRR[elem1]]=elem2+1;
-  rang_voisinRR[elem2]++;
-  rang_voisinRR[elem1]++;
-  }
-  else
-  {
-  if(elem2<n2)
-  {
-  tab2RV[rang_voisinRV[elem2]]=(elem1-n2)+1;
-  rang_voisinRV[elem2]++;
-  }
-  else
-  {
-  tab2RV[rang_voisinRV[elem1]]=(elem2-n2)+1;
-  rang_voisinRV[elem1]++;
-  }
-  }
-  }
-
-  // On traite les conditions aux limites
-  for (i=0; i<les_cl.size(); i++)
-  {
-  // Le traitement depend du type de la condition aux limites :
-  const Cond_lim& la_cl = les_cl[i];
-  const Front_VF& la_front_dis = ref_cast(Front_VF,la_cl.frontiere_dis());
-  int ndeb = la_front_dis.num_premiere_face();
-  int nfin = ndeb + la_front_dis.nb_faces();
-
-  if (sub_type(Periodique,la_cl.valeur()) )
-  {
-  const Periodique& la_cl_perio = ref_cast(Periodique,la_cl.valeur());
-  int ind_face_local;
-  IntVect fait(nfin-ndeb);
-  fait = 0;
-  for (num_face=ndeb; num_face<nfin; num_face++)
-  {
-  ind_face_local = num_face - ndeb;
-  if (fait[ind_face_local] == 0)
-  {
-  fait[ind_face_local] = 1;
-  fait[la_cl_perio.face_associee(ind_face_local)] = 1;
-  elem1 = face_voisins(num_face,0);
-  elem2 = face_voisins(num_face,1);
-
-  // diagonale :
-  if ((elem1 < n2) && (elem2 < n2))
-  {
-  tab2RR[rang_voisinRR[elem2]]=elem1+1;
-  tab2RR[rang_voisinRR[elem1]]=elem2+1;
-  rang_voisinRR[elem2]++;
-  rang_voisinRR[elem1]++;
-  }
-  else
-  {
-  if(elem2<n2)
-  {
-  tab2RV[rang_voisinRV[elem2]]=(elem1-n2)+1;
-  rang_voisinRV[elem2]++;
-  }
-  else
-  {
-  tab2RV[rang_voisinRV[elem1]]=(elem2-n2)+1;
-  rang_voisinRV[elem1]++;
-  }
-  }
-  }
-  }
-  }
-  }
-  }*/
-
 
 int Eq_rayo_semi_transp_VDF::nb_colonnes_tot()
 {

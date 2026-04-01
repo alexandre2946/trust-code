@@ -17,21 +17,11 @@
 
 Implemente_instanciable(Frontiere_ouverte_rayo_semi_transp,"Frontiere_ouverte_rayo_semi_transp",Neumann_sortie_libre);
 
-/*! @brief
- *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
- */
 Sortie& Frontiere_ouverte_rayo_semi_transp::printOn(Sortie& os) const
 {
   return os;
 }
 
-/*! @brief Lecture des parametres de la condition Neumann_paroi
- *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- */
 Entree& Frontiere_ouverte_rayo_semi_transp::readOn(Entree& is)
 {
   return Neumann_sortie_libre::readOn(is);
@@ -40,13 +30,6 @@ Entree& Frontiere_ouverte_rayo_semi_transp::readOn(Entree& is)
 const Cond_lim_base& Frontiere_ouverte_rayo_semi_transp::la_cl() const
 {
   return (*this);
-}
-
-void Frontiere_ouverte_rayo_semi_transp::calculer_temperature_bord(double temps)
-{
-  // Cette methode ne fait rien car la temperature de paroi est
-  // directement donnee par T_ext()
-  ;
 }
 
 void Frontiere_ouverte_rayo_semi_transp::completer()

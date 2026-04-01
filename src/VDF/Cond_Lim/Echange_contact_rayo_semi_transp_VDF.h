@@ -46,9 +46,8 @@ public :
 protected :
 
   OWN_PTR(Champ_front_base) T_paroi;
-  int num_premiere_face_dans_pb_fluide;
+  int num_premiere_face_dans_pb_fluide = -1;
 };
 
-
-#endif
+#endif /* Echange_contact_rayo_semi_transp_VDF_included */
 

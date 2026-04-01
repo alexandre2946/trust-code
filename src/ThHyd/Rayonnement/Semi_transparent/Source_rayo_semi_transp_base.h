@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,38 +20,25 @@
 #include <TRUST_Ref.h>
 
 class Modele_rayo_semi_transp;
+
 /*! @brief classe Source_rayo_semi_transp_base Classe de base de la hierarchie des termes sources de l'eqution de
  *
  *     temperature pour les problemes de rayonnement semi transparent.
  *
  */
-class Source_rayo_semi_transp_base : public Source_base
+class Source_rayo_semi_transp_base: public Source_base
 {
   Declare_base(Source_rayo_semi_transp_base);
 
-public :
+public:
 
-  inline Modele_rayo_semi_transp& Modele();
-  inline const Modele_rayo_semi_transp& Modele() const;
+  inline Modele_rayo_semi_transp& modele() { return le_modele_.valeur(); }
+  inline const Modele_rayo_semi_transp& modele() const { return le_modele_.valeur(); }
   virtual void associer_modele_rayo(Modele_rayo_semi_transp& modele);
-  void mettre_a_jour(double temps) override
-  {
-    ;
-  }
+  void mettre_a_jour(double temps) override { }
 
-protected :
-
+protected:
   OBS_PTR(Modele_rayo_semi_transp) le_modele_;
 };
 
-inline Modele_rayo_semi_transp& Source_rayo_semi_transp_base::Modele()
-{
-  return le_modele_.valeur();
-}
-
-inline const Modele_rayo_semi_transp& Source_rayo_semi_transp_base::Modele() const
-{
-  return le_modele_.valeur();
-}
-
-#endif
+#endif /* Source_rayo_semi_transp_base_included */

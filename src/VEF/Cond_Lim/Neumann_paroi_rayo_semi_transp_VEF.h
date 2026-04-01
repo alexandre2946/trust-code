@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -29,25 +29,14 @@ public :
   void mettre_a_jour(double temps) override;
   double flux_impose(int i) const override;
   double flux_impose(int i,int j) const override;
-  inline Champ_front_base& temperature_bord();
-  inline const Champ_front_base& temperature_bord() const;
   void calculer_temperature_bord(double temps);
-
   void completer() override;
+
+  inline Champ_front_base& temperature_bord() { return temperature_bord_; }
+  inline const Champ_front_base& temperature_bord() const { return temperature_bord_; }
 
 protected :
   OWN_PTR(Champ_front_base) temperature_bord_;
 };
 
-
-inline Champ_front_base& Neumann_paroi_rayo_semi_transp_VEF::temperature_bord()
-{
-  return temperature_bord_;
-}
-
-inline const Champ_front_base& Neumann_paroi_rayo_semi_transp_VEF::temperature_bord() const
-{
-  return temperature_bord_;
-}
-
-#endif
+#endif /* Neumann_paroi_rayo_semi_transp_VEF_included */

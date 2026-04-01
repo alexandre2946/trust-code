@@ -13,20 +13,12 @@
 *
 *****************************************************************************/
 
-
 #ifndef Frontiere_ouverte_temperature_imposee_rayo_semi_transp_included
 #define Frontiere_ouverte_temperature_imposee_rayo_semi_transp_included
 
-#include <Cond_Lim_rayo_semi_transp.h>
 #include <Dirichlet_entree_fluide_leaves.h>
+#include <Cond_Lim_rayo_semi_transp.h>
 
-
-/*! @brief classe Frontiere_ouverte_temperature_imposee_rayo_semi_transp
- *
- *  .SECTION
- *
- *
- */
 class Frontiere_ouverte_temperature_imposee_rayo_semi_transp: public Cond_Lim_rayo_semi_transp, public Entree_fluide_temperature_imposee
 {
   Declare_instanciable(Frontiere_ouverte_temperature_imposee_rayo_semi_transp);
@@ -35,23 +27,13 @@ public :
 
   const Cond_lim_base& la_cl() const override;
   void completer() override;
-  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
-  inline Champ_front_base& temperature_bord();
-  inline const Champ_front_base& temperature_bord() const;
-  void calculer_temperature_bord(double temps);
 
-protected :
+  // Cette methode ne fait rien car la temperature de paroi est directement donnee par T_ext()
+  void calculer_temperature_bord(double temps) { }
 
+  inline int compatible_avec_eqn(const Equation_base&) const override { return 1; }
+  inline Champ_front_base& temperature_bord() { return le_champ_front; }
+  inline const Champ_front_base& temperature_bord() const { return le_champ_front; }
 };
 
-inline Champ_front_base& Frontiere_ouverte_temperature_imposee_rayo_semi_transp::temperature_bord()
-{
-  return le_champ_front;
-}
-
-inline const Champ_front_base& Frontiere_ouverte_temperature_imposee_rayo_semi_transp::temperature_bord() const
-{
-  return le_champ_front;
-}
-
-#endif
+#endif /* Frontiere_ouverte_temperature_imposee_rayo_semi_transp_included */

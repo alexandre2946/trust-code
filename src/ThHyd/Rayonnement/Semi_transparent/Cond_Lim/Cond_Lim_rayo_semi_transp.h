@@ -16,9 +16,7 @@
 #ifndef Cond_Lim_rayo_semi_transp_included
 #define Cond_Lim_rayo_semi_transp_included
 
-
 #include <Neumann_sortie_libre.h>
-
 #include <TRUST_Ref.h>
 
 class Modele_rayo_semi_transp;
@@ -29,75 +27,33 @@ class Modele_rayo_semi_transp;
  */
 class Cond_Lim_rayo_semi_transp
 {
-
 public:
+  virtual ~Cond_Lim_rayo_semi_transp() { }
+
   virtual void associer_modele(const Modele_rayo_semi_transp&);
-  inline const Modele_rayo_semi_transp& modele() const;
-  inline Modele_rayo_semi_transp& modele();
+  inline const Modele_rayo_semi_transp& modele() const
+  {
+    assert(mon_modele.non_nul());
+    return mon_modele.valeur();
+  }
+  inline Modele_rayo_semi_transp& modele()
+  {
+    assert(mon_modele.non_nul());
+    return mon_modele.valeur();
+  }
+
+  inline Champ_front_base& emissivite() { return emissivite_; }
+  inline const Champ_front_base& emissivite() const { return emissivite_; }
+  inline double& A() { return A_; }
+  inline const double& A() const { return A_; }
 
   virtual void recherche_emissivite_et_A();
+  virtual const Cond_lim_base& la_cl() const =0;
 
-  inline Champ_front_base& emissivite();
-  inline const Champ_front_base& emissivite() const;
-  inline double& A();
-  inline const double& A() const;
-
-  virtual const Cond_lim_base& la_cl() const=0;
-
-protected :
+protected:
   OBS_PTR(Modele_rayo_semi_transp) mon_modele;
   OWN_PTR(Champ_front_base) emissivite_;
-  double A_;
-
-  inline virtual ~Cond_Lim_rayo_semi_transp();
+  double A_ = -123.;
 };
 
-Cond_Lim_rayo_semi_transp::~Cond_Lim_rayo_semi_transp()
-{}
-
-/*! @brief Renvoie la reference sur le modele pointe par Cond_Lim_rayo_semi_transp::mon_modele.
- *
- *     (version const)
- *
- * @return (Equation_base&) le modele associe a l'objet
- * @throws pas de modele associe
- */
-inline const Modele_rayo_semi_transp& Cond_Lim_rayo_semi_transp::modele() const
-{
-  assert (mon_modele.non_nul());
-  return mon_modele.valeur();
-}
-
-
-/*! @brief Renvoie la reference sur le modele pointe par Cond_Lim_rayo_semi_transp::mon_modele.
- *
- * @return (Equation_base&) le modele associe a l'objet
- * @throws pas de modele associe
- */
-inline Modele_rayo_semi_transp& Cond_Lim_rayo_semi_transp::modele()
-{
-  assert (mon_modele.non_nul());
-  return mon_modele.valeur();
-}
-
-inline Champ_front_base& Cond_Lim_rayo_semi_transp::emissivite()
-{
-  return emissivite_;
-}
-
-inline const Champ_front_base& Cond_Lim_rayo_semi_transp::emissivite() const
-{
-  return emissivite_;
-}
-
-inline double& Cond_Lim_rayo_semi_transp::A()
-{
-  return A_;
-}
-
-inline const double& Cond_Lim_rayo_semi_transp::A() const
-{
-  return A_;
-}
-
-#endif
+#endif /* Cond_Lim_rayo_semi_transp_included */

@@ -19,18 +19,10 @@
 #include <Frontiere_dis_base.h>
 #include <Symetrie.h>
 
-/*! @brief Associe une equation a l'objet.
- *
- * Affecte le membre Cond_Lim_rayo_semi_transp::mon_modele avec l'objet
- *     passe en parametre.
- *
- * @param (Modele_rayo_semi_transp& modele) le modele auquel on veut s'associer
- */
 void Cond_Lim_rayo_semi_transp::associer_modele(const Modele_rayo_semi_transp& un_modele)
 {
   mon_modele=un_modele;
 }
-
 
 void Cond_Lim_rayo_semi_transp::recherche_emissivite_et_A()
 {
@@ -58,7 +50,7 @@ void Cond_Lim_rayo_semi_transp::recherche_emissivite_et_A()
             }
           else if (sub_type(Symetrie,la_cl_rayo.valeur()))
             {
-              ;
+              /* Do nothing */
             }
           else
             {

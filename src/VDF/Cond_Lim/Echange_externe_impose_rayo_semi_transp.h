@@ -19,7 +19,6 @@
 #include <Cond_Lim_rayo_semi_transp.h>
 #include <Echange_externe_impose.h>
 
-
 /*! @brief classe Echange_externe_impose_rayo_semi_transp cette classe est utilisee pour imposer une temperature de paroi imposee
  *
  *    uniquement pour une discretisation VDF.
@@ -33,13 +32,11 @@ class Echange_externe_impose_rayo_semi_transp: public Cond_Lim_rayo_semi_transp,
 public :
   const Cond_lim_base& la_cl() const override;
   Champ_front_base& temperature_bord();
-  //void calculer_temperature_bord();
-  void calculer_temperature_bord(double temps);
+
+  // La temperature de paroi etant directement donnee par le champ_front T_ext, il n'y a rien a calculer ici
+  void calculer_temperature_bord(double temps) { }
   int compatible_avec_eqn(const Equation_base&) const override { return 1; }
   void completer() override;
-
-protected :
-
 };
 
-#endif
+#endif /* Echange_externe_impose_rayo_semi_transp_included */

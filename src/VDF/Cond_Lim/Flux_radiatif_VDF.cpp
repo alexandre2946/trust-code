@@ -271,7 +271,7 @@ void Flux_radiatif_VDF::calculer_flux_radiatif(const Equation_base& eq_temp)
       else
         n = indice(elem,0);
 
-      double sigma = eq_rayo.Modele().valeur_sigma();
+      double sigma = eq_rayo.modele().valeur_sigma();
       double Tbord;
 
       assert(Tb.valeur().nb_comp() == 1);

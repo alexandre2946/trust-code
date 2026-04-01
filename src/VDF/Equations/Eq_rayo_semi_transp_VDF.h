@@ -13,7 +13,6 @@
 *
 *****************************************************************************/
 
-
 #ifndef Eq_rayo_semi_transp_VDF_included
 #define Eq_rayo_semi_transp_VDF_included
 
@@ -39,12 +38,11 @@ public:
   void resoudre(double temps) override;
   void evaluer_cl_rayonnement(double temps) override;
   void completer() override;
-  void typer_op_grad() override;
+  void typer_op_grad() override { }
   void assembler_matrice() override;
 
   int nb_colonnes_tot() override;
   int nb_colonnes() override;
 };
 
-
-#endif
+#endif /* Eq_rayo_semi_transp_VDF_included */

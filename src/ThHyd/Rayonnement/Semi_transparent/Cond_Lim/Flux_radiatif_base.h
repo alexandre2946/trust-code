@@ -19,69 +19,29 @@
 #include <Neumann_paroi.h>
 class Equation_base;
 
-/*! @brief Decrire ici la classe Flux_radiatif_base
- *
- *  .FINHTML
- *  .FINEPS
- *
- *
- */
 class Flux_radiatif_base : public Neumann_paroi
 {
   Declare_base(Flux_radiatif_base);
 
 public :
-  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
-  inline Champ_front_base& emissivite();
-  inline const Champ_front_base& emissivite() const;
-  inline double& A();
-  inline const double& A() const;
+  inline int compatible_avec_eqn(const Equation_base&) const override { return 1; }
+  inline Champ_front_base& emissivite() { return emissivite_.valeur(); }
+  inline const Champ_front_base& emissivite() const { return emissivite_.valeur(); }
+  inline double& A() { return A_; }
+  inline const double& A() const { return A_; }
+  inline Champ_front_base& flux_radiatif() { return flux_radiatif_.valeur(); }
+  inline const Champ_front_base& flux_radiatif() const { return flux_radiatif_.valeur(); }
 
   virtual void calculer_flux_radiatif(const Equation_base& eq_temp)=0;
-  inline Champ_front_base& flux_radiatif();
-  inline const Champ_front_base& flux_radiatif() const;
   void completer() override;
 
   double flux_impose(int i) const override;
   double flux_impose(int i,int j) const override;
 
 protected :
-  double A_;
+  double A_ = -123.;
   OWN_PTR(Champ_front_base) emissivite_;
   OWN_PTR(Champ_front_base) flux_radiatif_;
 };
 
-
-
-inline Champ_front_base& Flux_radiatif_base::flux_radiatif()
-{
-  return flux_radiatif_;
-}
-
-inline const Champ_front_base& Flux_radiatif_base::flux_radiatif() const
-{
-  return flux_radiatif_;
-}
-
-inline double& Flux_radiatif_base::A()
-{
-  return A_;
-}
-
-inline const double& Flux_radiatif_base::A() const
-{
-  return A_;
-}
-
-
-inline Champ_front_base& Flux_radiatif_base::emissivite()
-{
-  return emissivite_;
-}
-
-inline const Champ_front_base& Flux_radiatif_base::emissivite() const
-{
-  return emissivite_;
-}
-
-#endif
+#endif /* Flux_radiatif_base_included */

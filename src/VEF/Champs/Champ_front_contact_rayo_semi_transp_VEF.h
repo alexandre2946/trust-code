@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -21,12 +21,6 @@
 
 class Modele_rayo_semi_transp;
 
-/*! @brief classe Champ_front_contact_rayo_semi_transp_VEF
- *
- *  .SECTION
- *
- *
- */
 class Champ_front_contact_rayo_semi_transp_VEF: public Champ_front_contact_VEF
 {
   Declare_instanciable(Champ_front_contact_rayo_semi_transp_VEF);
@@ -36,80 +30,28 @@ public :
   void calculer_temperature_bord(double temps);
   Champ_front_base& affecter_(const Champ_front_base& ch) override ;
   void mettre_a_jour(double temps) override;
-  inline Champ_Inc_base& inconnue1();
-  inline const Champ_Inc_base& inconnue1() const;
-
-  inline Champ_Inc_base& inconnue2();
-  inline const Champ_Inc_base& inconnue2() const;
-
-  inline Nom& nom_prob1();
-  inline const Nom& nom_prob1() const;
-  inline Nom& nom_prob2();
-  inline const Nom& nom_prob2() const;
-
-  inline void associer_modele_rayo(const Modele_rayo_semi_transp& modele);
-  inline const Modele_rayo_semi_transp& modele_rayo() const;
   void mettre_a_jour_flux_radiatif(); // le copie du modele
   void calcul_grads_locaux(double temps) override;
   void modifie_gradients_pour_rayonnement(DoubleVect& gradient_num_transf, DoubleVect& gradient_num_transf_autre_pb);
 
+  inline Champ_Inc_base& inconnue1() { return l_inconnue1.valeur(); }
+  inline const Champ_Inc_base& inconnue1() const { return l_inconnue1.valeur(); }
+  inline Champ_Inc_base& inconnue2() { return l_inconnue2.valeur(); }
+  inline const Champ_Inc_base& inconnue2() const { return l_inconnue2.valeur(); }
+  inline const Modele_rayo_semi_transp& modele_rayo() const { return le_modele_rayo.valeur(); }
+  inline Nom& nom_prob1() { return nom_pb1; }
+  inline const Nom& nom_prob1() const { return nom_pb1; }
+  inline Nom& nom_prob2() { return nom_pb2; }
+  inline const Nom& nom_prob2() const { return nom_pb2; }
+
+  inline void associer_modele_rayo(const Modele_rayo_semi_transp& modele)
+  {
+    le_modele_rayo = modele;
+  }
 
 protected :
-
   DoubleVect flux_radiatif;
   OBS_PTR(Modele_rayo_semi_transp) le_modele_rayo;
-
 };
 
-
-inline void Champ_front_contact_rayo_semi_transp_VEF::associer_modele_rayo(const Modele_rayo_semi_transp& modele)
-{
-  le_modele_rayo = modele;
-}
-
-inline const Modele_rayo_semi_transp& Champ_front_contact_rayo_semi_transp_VEF::modele_rayo() const
-{
-  return le_modele_rayo.valeur();
-}
-
-inline Nom& Champ_front_contact_rayo_semi_transp_VEF::nom_prob1()
-{
-  return nom_pb1;
-}
-
-inline const Nom& Champ_front_contact_rayo_semi_transp_VEF::nom_prob1() const
-{
-  return nom_pb1;
-}
-
-inline Nom& Champ_front_contact_rayo_semi_transp_VEF::nom_prob2()
-{
-  return nom_pb2;
-}
-
-inline const Nom& Champ_front_contact_rayo_semi_transp_VEF::nom_prob2() const
-{
-  return nom_pb2;
-}
-
-inline Champ_Inc_base& Champ_front_contact_rayo_semi_transp_VEF::inconnue1()
-{
-  return l_inconnue1.valeur();
-}
-
-inline const Champ_Inc_base& Champ_front_contact_rayo_semi_transp_VEF::inconnue1() const
-{
-  return l_inconnue1.valeur();
-}
-
-inline Champ_Inc_base& Champ_front_contact_rayo_semi_transp_VEF::inconnue2()
-{
-  return l_inconnue2.valeur();
-}
-
-inline const Champ_Inc_base& Champ_front_contact_rayo_semi_transp_VEF::inconnue2() const
-{
-  return l_inconnue2.valeur();
-}
-
-#endif
+#endif /* Champ_front_contact_rayo_semi_transp_VEF_included */

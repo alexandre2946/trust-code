@@ -13,32 +13,16 @@
 *
 *****************************************************************************/
 
-
 #include <Echange_externe_impose_rayo_semi_transp.h>
 #include <Motcle.h>
 
-Implemente_instanciable(Echange_externe_impose_rayo_semi_transp,"Paroi_Echange_externe_impose_rayo_semi_transp",Echange_externe_impose);
+Implemente_instanciable(Echange_externe_impose_rayo_semi_transp, "Paroi_Echange_externe_impose_rayo_semi_transp", Echange_externe_impose);
 
-
-
-/*! @brief
- *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
- */
 Sortie& Echange_externe_impose_rayo_semi_transp::printOn(Sortie& os) const
 {
   return os;
 }
 
-
-/*! @brief Lecture des parametres de la condition Echange_impose Lecture de l'emissivite de la paroi
- *
- *     Lecture du coefficient A
- *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- */
 Entree& Echange_externe_impose_rayo_semi_transp::readOn(Entree& is)
 {
   Motcle motlu;
@@ -68,50 +52,38 @@ Entree& Echange_externe_impose_rayo_semi_transp::readOn(Entree& is)
           }
         default:
           {
-            Cerr << "Erreur a la lecture de la condition aux limites de type "<<finl;
+            Cerr << "Erreur a la lecture de la condition aux limites de type " << finl;
             Cerr << "Echange_externe_impose_rayo_semi_transp " << finl;
-            Cerr << "On attendait " << les_motcles << "a la place de " <<  motlu << finl;
+            Cerr << "On attendait " << les_motcles << "a la place de " << motlu << finl;
             Process::exit();
           }
         }
       ind++;
     }
 
-  if(local_min_vect(h_imp_->valeurs()) < 1.e9)
+  if (local_min_vect(h_imp_->valeurs()) < 1.e9)
     {
-      Cerr<<"Erreur sur l'utilisation de la condition a la limite"<<finl;
-      Cerr<<"Echange_externe_impose_rayo_semi_transp. Celle ci ne peut"<<finl;
-      Cerr<<"etre utilisee pour un probleme de rayonnement que pour "<<finl;
-      Cerr<<"imposer une temperature sur une paroi"<<finl;
+      Cerr << "Erreur sur l'utilisation de la condition a la limite" << finl;
+      Cerr << "Echange_externe_impose_rayo_semi_transp. Celle ci ne peut" << finl;
+      Cerr << "etre utilisee pour un probleme de rayonnement que pour " << finl;
+      Cerr << "imposer une temperature sur une paroi" << finl;
       Process::exit();
     }
 
   return is;
 }
 
-
-
 void Echange_externe_impose_rayo_semi_transp::completer()
 {
   Echange_externe_impose::completer();
 }
-
-
 
 const Cond_lim_base& Echange_externe_impose_rayo_semi_transp::la_cl() const
 {
   return (*this);
 }
 
-
 Champ_front_base& Echange_externe_impose_rayo_semi_transp::temperature_bord()
 {
   return T_ext();
-}
-
-void Echange_externe_impose_rayo_semi_transp::calculer_temperature_bord(double temps)
-{
-  // La temperature de paroi etant directement donnee par le champ_front
-  // T_ext, il n'y a rien a calculer ici
-  ;
 }

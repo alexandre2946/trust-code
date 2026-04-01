@@ -32,11 +32,13 @@ class Echange_global_impose_rayo_semi_transp: public Cond_Lim_rayo_semi_transp, 
 public :
   const Cond_lim_base& la_cl() const override;
   Champ_front_base& temperature_bord();
-  void calculer_temperature_bord(double temps);
+
+  // La temperature de paroi etant directement donnee par le champ_front T_ext, il n'y a rien a calculer ici
+  void calculer_temperature_bord(double temps) {}
   int compatible_avec_eqn(const Equation_base&) const override { return 1; }
   void completer() override;
   void verifie_ch_init_nb_comp() const override;
 };
 
-#endif
+#endif /* Echange_global_impose_rayo_semi_transp_included */
 

@@ -13,33 +13,17 @@
 *
 *****************************************************************************/
 
-
 #include <Echange_global_impose_rayo_semi_transp.h>
-#include <Motcle.h>
 #include <Equation_base.h>
+#include <Motcle.h>
 
-Implemente_instanciable(Echange_global_impose_rayo_semi_transp,"Echange_global_impose_rayo_semi_transp",Echange_global_impose);
+Implemente_instanciable(Echange_global_impose_rayo_semi_transp, "Echange_global_impose_rayo_semi_transp", Echange_global_impose);
 
-
-
-/*! @brief
- *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
- */
 Sortie& Echange_global_impose_rayo_semi_transp::printOn(Sortie& os) const
 {
   return os;
 }
 
-
-/*! @brief Lecture des parametres de la condition Echange_impose Lecture de l'emissivite de la paroi
- *
- *     Lecture du coefficient A
- *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- */
 Entree& Echange_global_impose_rayo_semi_transp::readOn(Entree& is)
 {
   Motcle motlu;
@@ -69,9 +53,9 @@ Entree& Echange_global_impose_rayo_semi_transp::readOn(Entree& is)
           }
         default:
           {
-            Cerr << "Erreur a la lecture de la condition aux limites de type "<<finl;
+            Cerr << "Erreur a la lecture de la condition aux limites de type " << finl;
             Cerr << "Echange_global_impose_rayo_semi_transp " << finl;
-            Cerr << "On attendait " << les_motcles << "a la place de " <<  motlu << finl;
+            Cerr << "On attendait " << les_motcles << "a la place de " << motlu << finl;
             Process::exit();
           }
         }
@@ -80,8 +64,6 @@ Entree& Echange_global_impose_rayo_semi_transp::readOn(Entree& is)
 
   return is;
 }
-
-
 
 void Echange_global_impose_rayo_semi_transp::completer()
 {
@@ -94,7 +76,7 @@ void Echange_global_impose_rayo_semi_transp::verifie_ch_init_nb_comp() const
     {
       const Equation_base& eq = domaine_Cl_dis().equation();
       const int nb_comp = le_champ_front->nb_comp();
-      eq.verifie_ch_init_nb_comp(eq.inconnue(),nb_comp);
+      eq.verifie_ch_init_nb_comp(eq.inconnue(), nb_comp);
     }
 }
 
@@ -103,16 +85,7 @@ const Cond_lim_base& Echange_global_impose_rayo_semi_transp::la_cl() const
   return (*this);
 }
 
-
 Champ_front_base& Echange_global_impose_rayo_semi_transp::temperature_bord()
 {
   return T_ext();
 }
-
-void Echange_global_impose_rayo_semi_transp::calculer_temperature_bord(double temps)
-{
-  // La temperature de paroi etant directement donnee par le champ_front
-  // T_ext, il n'y a rien a calculer ici
-  ;
-}
-

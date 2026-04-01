@@ -15,29 +15,17 @@
 
 #include <Champ_front_rayonnement.h>
 
-Implemente_instanciable(Champ_front_rayonnement,"Champ_front_rayonnement",Champ_front_var_instationnaire);
+Implemente_instanciable(Champ_front_rayonnement, "Champ_front_rayonnement", Champ_front_var_instationnaire);
 
-
-/*! @brief
- *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
- */
 Sortie& Champ_front_rayonnement::printOn(Sortie& os) const
 {
-  const DoubleTab& tab=valeurs();
+  const DoubleTab& tab = valeurs();
   os << tab.size() << " ";
-  int i;
-  for(i=0; i<tab.size(); i++)
-    os << tab(0,i);
+  for (int i = 0; i < tab.size(); i++)
+    os << tab(0, i);
   return os;
 }
 
-/*! @brief
- *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- */
 Entree& Champ_front_rayonnement::readOn(Entree& is)
 {
   return is;
@@ -47,7 +35,6 @@ Champ_front_base& Champ_front_rayonnement::affecter_(const Champ_front_base& ch)
 {
   return *this;
 }
-
 
 /*! @brief Cette methode ne fait rien, le tableau de valeurs est mis a jour par Flux_radiatif_V?F::evaluer_cl_rayonnement
  *

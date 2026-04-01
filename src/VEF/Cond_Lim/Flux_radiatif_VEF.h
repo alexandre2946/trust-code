@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -21,13 +21,6 @@
 class Champ_Don_base;
 class Domaine_VF;
 
-/*! @brief Decrire ici la classe Flux_radiatif_VEF
- *
- *  .FINHTML
- *  .FINEPS
- *
- *
- */
 class Flux_radiatif_VEF : public Flux_radiatif_base
 {
   Declare_instanciable(Flux_radiatif_VEF);
@@ -39,9 +32,6 @@ public :
 
 
   void calculer_flux_radiatif(const Equation_base& eq_temp) override;
-
-protected :
 };
 
-
-#endif
+#endif /* Flux_radiatif_VEF_included */

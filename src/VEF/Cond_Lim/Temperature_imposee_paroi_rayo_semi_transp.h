@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -36,9 +36,6 @@ public :
   Champ_front_base& temperature_bord();
   void calculer_temperature_bord(double temps);
   void completer() override;
-
-protected :
-
 };
 
-#endif
+#endif /* Temperature_imposee_paroi_rayo_semi_transp_included */

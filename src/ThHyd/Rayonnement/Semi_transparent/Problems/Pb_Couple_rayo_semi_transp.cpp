@@ -23,33 +23,26 @@
 #include <verif_cast.h>
 #include <Interprete_bloc.h>
 
-Implemente_instanciable(Pb_Couple_rayo_semi_transp,"Pb_Couple_rayo_semi_transp",Probleme_Couple);
+Implemente_instanciable(Pb_Couple_rayo_semi_transp, "Pb_Couple_rayo_semi_transp", Probleme_Couple);
 
+Entree& Pb_Couple_rayo_semi_transp::readOn(Entree& is) { return is; }
 
-Entree& Pb_Couple_rayo_semi_transp::readOn(Entree& is)
-{
-  return is;
-}
+Sortie& Pb_Couple_rayo_semi_transp::printOn(Sortie& os) const { return Probleme_Couple::printOn(os); }
 
-Sortie& Pb_Couple_rayo_semi_transp::printOn(Sortie& os) const
-{
-  return Probleme_Couple::printOn(os);
-}
-
-void Pb_Couple_rayo_semi_transp::initialize( )
+void Pb_Couple_rayo_semi_transp::initialize()
 {
   Probleme_Couple::initialize();
-  Probleme_base& le_pb=modele().probleme();
+  Probleme_base& le_pb = modele().probleme();
   // Associer le modele aux sources de rayonnement
-  for (int i=0; i<le_pb.nombre_d_equations(); i++)
+  for (int i = 0; i < le_pb.nombre_d_equations(); i++)
     {
-      Sources& les_sources=le_pb.equation(i).sources();
-      for (int j=0; j<les_sources.size(); j++)
+      Sources& les_sources = le_pb.equation(i).sources();
+      for (int j = 0; j < les_sources.size(); j++)
         {
-          Source& la_source=les_sources[j];
-          if (sub_type(Source_rayo_semi_transp_base,la_source.valeur()))   // premier cas
+          Source& la_source = les_sources[j];
+          if (sub_type(Source_rayo_semi_transp_base, la_source.valeur()))   // premier cas
             {
-              Source_rayo_semi_transp_base& source_rayo=ref_cast(Source_rayo_semi_transp_base,la_source.valeur());
+              Source_rayo_semi_transp_base& source_rayo = ref_cast(Source_rayo_semi_transp_base, la_source.valeur());
               Cerr << "Association MODELE a SOURCE" << finl;
               source_rayo.associer_modele_rayo(modele());
             }
@@ -59,25 +52,20 @@ void Pb_Couple_rayo_semi_transp::initialize( )
   modele().eq_rayo().resoudre(presentTime());
   modele().calculer_flux_radiatif();
 
-  for (int i=0; i<nb_problemes(); i++)
+  for (int i = 0; i < nb_problemes(); i++)
     {
-      Probleme_base& pb=ref_cast(Probleme_base,probleme(i));
-      for (int j=0; j<pb.nombre_d_equations(); j++)
+      Probleme_base& pb = ref_cast(Probleme_base, probleme(i));
+      for (int j = 0; j < pb.nombre_d_equations(); j++)
         {
           pb.equation(j).domaine_Cl_dis().calculer_coeffs_echange(presentTime());
         }
     }
 }
 
-// void Pb_Couple_rayo_semi_transp::terminate() {
-//   Probleme_Couple::terminate();
-//   modele().terminate();
-// }
-
 void Pb_Couple_rayo_semi_transp::associer_sch_tps_base(Schema_Temps_base& sch)
 {
   Probleme_Couple::associer_sch_tps_base(sch);
-  sch_clone=sch;
+  sch_clone = sch;
   if (!le_modele_.non_nul())
     {
       Cerr << "Attention, le modele de rayonnement semi transparent n'est pas encore defini." << finl;
@@ -93,8 +81,8 @@ void Pb_Couple_rayo_semi_transp::associer_sch_tps_base(Schema_Temps_base& sch)
 
 int Pb_Couple_rayo_semi_transp::associer_(Objet_U& ob)
 {
-  Cerr << "Appel a associer_ "  << ob.que_suis_je() << finl;
-  if(sub_type(Modele_rayo_semi_transp, ob))
+  Cerr << "Appel a associer_ " << ob.que_suis_je() << finl;
+  if (sub_type(Modele_rayo_semi_transp, ob))
     {
       Cerr << "association du modele au pbc" << finl;
       le_modele_rayo_associe(ref_cast(Modele_rayo_semi_transp, ob));
@@ -114,8 +102,8 @@ int Pb_Couple_rayo_semi_transp::associer_(Objet_U& ob)
         {
           Probleme_Couple::ajouter(modele());
 
-          ArrOfInt new_groupes(nb_groupes+1);
-          for (int i=0; i<nb_groupes; ++i)
+          ArrOfInt new_groupes(nb_groupes + 1);
+          for (int i = 0; i < nb_groupes; ++i)
             {
               new_groupes[i] = groupes[i];
             }
@@ -127,12 +115,12 @@ int Pb_Couple_rayo_semi_transp::associer_(Objet_U& ob)
     }
   else if (Probleme_Couple::associer_(ob))
     {
-      if (sub_type(Probleme_base,ob))
+      if (sub_type(Probleme_base, ob))
         {
-          Probleme_base& pb=ref_cast(Probleme_base,ob);
-          if (sub_type(Fluide_base,pb.milieu()))
+          Probleme_base& pb = ref_cast(Probleme_base, ob);
+          if (sub_type(Fluide_base, pb.milieu()))
             {
-              Fluide_base& fluide=ref_cast(Fluide_base,pb.milieu());
+              Fluide_base& fluide = ref_cast(Fluide_base, pb.milieu());
               fluide.fixer_type_rayo();
             }
         }
@@ -150,22 +138,22 @@ void Pb_Couple_rayo_semi_transp::le_modele_rayo_associe(const Modele_rayo_semi_t
       Process::exit();
     }
   le_modele_ = un_modele_de_rayonnement;
-  int le_pb_a_associer=-1;
+  int le_pb_a_associer = -1;
   // On associe au modele de rayonnement
   // le dernier probleme fluide du probleme couple.
-  for(int l=0; l<nb_problemes(); l++)
+  for (int l = 0; l < nb_problemes(); l++)
     {
-      Probleme_base& pb=ref_cast(Probleme_base,probleme(l));
+      Probleme_base& pb = ref_cast(Probleme_base, probleme(l));
       if (pb.milieu().is_rayo_semi_transp())
-        le_pb_a_associer=l;
+        le_pb_a_associer = l;
     }
 
-  if (le_pb_a_associer==-1)
+  if (le_pb_a_associer == -1)
     {
       Cerr << "Attention : il n'y a aucun probleme fluide auquel associer le modele de rayonnement." << finl;
       Process::exit();
     }
-  Probleme_base& le_pb=ref_cast(Probleme_base,probleme(le_pb_a_associer));
+  Probleme_base& le_pb = ref_cast(Probleme_base, probleme(le_pb_a_associer));
   // Le probleme a associer est maintenant reference dans le_pb.
 
   // Associer le probleme au modele
@@ -174,13 +162,13 @@ void Pb_Couple_rayo_semi_transp::le_modele_rayo_associe(const Modele_rayo_semi_t
   // Clonage et association du domaine (WEC)
   // Deviendra inutile avec la version de gomtrie de B. Mathieu
   der_domaine_clone.typer("Domaine");
-  Domaine& dom_clone=ref_cast(Domaine,der_domaine_clone.valeur());
-  dom_clone=le_pb.domaine();
-  Nom new_name=dom_clone.le_nom()+"_copy";
+  Domaine& dom_clone = ref_cast(Domaine, der_domaine_clone.valeur());
+  dom_clone = le_pb.domaine();
+  Nom new_name = dom_clone.le_nom() + "_copy";
   dom_clone.nommer(new_name); // nommage
   modele().associer_domaine(dom_clone); // association
   // Ici ajouter d'ventuelles autres associations ...
-  Interprete_bloc::interprete_courant().ajouter(new_name,der_domaine_clone);
+  Interprete_bloc::interprete_courant().ajouter(new_name, der_domaine_clone);
 
 }
 

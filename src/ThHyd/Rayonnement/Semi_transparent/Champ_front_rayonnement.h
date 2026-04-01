@@ -22,7 +22,7 @@
  *
  *      le rayonnement.
  *      Elle ne fait rien, le tableau de valeurs est mis a jour par
- *      Flux_radiatif_V?F::evaluer_cl_rayonnement
+ *      Flux_radiatif_VEF::evaluer_cl_rayonnement
  *      De ce fait, elle est inclassable dans la hierarchie... Eviter
  *      si possible d'utiliser les champs de cette facon : le tableau
  *      de valeurs ne devrait etre modifie que par les methodes
@@ -30,15 +30,14 @@
  *
  *
  */
-class Champ_front_rayonnement : public Champ_front_var_instationnaire
+class Champ_front_rayonnement: public Champ_front_var_instationnaire
 {
   Declare_instanciable(Champ_front_rayonnement);
 
-public :
+public:
 
   Champ_front_base& affecter_(const Champ_front_base& ch) override;
   void mettre_a_jour(double) override;
-
 };
 
-#endif
+#endif /* Champ_front_rayonnement_included */

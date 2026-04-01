@@ -19,9 +19,6 @@
 #include <Equation_rayonnement_base.h>
 #include <Probleme_base.h>
 
-class Nom;
-class Probleme_base;
-
 /*! @brief Le Modele_rayo_semi_transp est un Probleme_base qui a 4 particularites : * Son equation doit etre typee en fonction de la dicretisation.
  *
  *     Cela impose de differer certaines initialisations jusqu'a
@@ -43,12 +40,6 @@ class Modele_rayo_semi_transp: public Probleme_base
 
 public:
 
-  ///////////////////////////////////////////////
-  //                                           //
-  // Implementation de l'interface de Problem  //
-  //                                           //
-  ///////////////////////////////////////////////
-
   void terminate() override  {  finir(); }
 
   double computeTimeStep(bool& stop) const override
@@ -56,21 +47,11 @@ public:
     stop=false;
     return DMAXFLOAT;
   }
+
   bool initTimeStep(double dt) override;
   bool iterateTimeStep(bool& converged) override;
   void validateTimeStep() override;
 
-  ////////////////////////////////////////////////////////
-  //                                                    //
-  // Fin de l'implementation de l'interface de Problem  //
-  //                                                    //
-  ////////////////////////////////////////////////////////
-
-  /////////////////////////////////////////////////////
-  //                                                 //
-  // Implementation de l'interface de Probleme_base  //
-  //                                                 //
-  /////////////////////////////////////////////////////
 
   void completer() override { }
   int nombre_d_equations() const override   { return 1; }
@@ -92,12 +73,6 @@ public:
   void discretiser(Discretisation_base&) override;
   void associer_sch_tps_base(const Schema_Temps_base&) override;
 
-  //////////////////////////////////////////////////////////////
-  //                                                          //
-  // Fin de l'implementation de l'interface de Probleme_base  //
-  //                                                          //
-  //////////////////////////////////////////////////////////////
-
   inline void associer_probleme(Probleme_base& Pb);
   Champ_Inc_base& put_irradience();
   inline Probleme_base& probleme();
@@ -111,9 +86,8 @@ public:
 protected :
   OBS_PTR(Probleme_base) mon_probleme_;
   OWN_PTR(Equation_rayonnement_base) Eq_rayo_;
-  static const double sigma;
+  static constexpr double sigma = 5.67e-8;
 };
-
 
 inline Equation_rayonnement_base& Modele_rayo_semi_transp::eq_rayo()
 {
@@ -171,4 +145,4 @@ inline const Probleme_base& Modele_rayo_semi_transp::probleme() const
   return mon_probleme_.valeur();
 }
 
-#endif
+#endif /* Modele_rayo_semi_transp_included */

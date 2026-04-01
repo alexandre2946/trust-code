@@ -14,33 +14,18 @@
 *****************************************************************************/
 
 #include <Flux_radiatif_base.h>
-#include <Motcle.h>
 #include <Front_VF.h>
+#include <Param.h>
 
 Implemente_base(Flux_radiatif_base,"Flux_radiatif_base",Neumann_paroi);
 
-/*! @brief Imprime le type de l'equation sur un flot de sortie.
- *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
- */
 Sortie& Flux_radiatif_base::printOn(Sortie& s ) const
 {
   return s << que_suis_je() << "\n";
 }
 
-
-/*! @brief Appel Neumann_paroi::readOn(Entree& is)
- *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws solveur pression non defini dans jeu de donnees
- */
 Entree& Flux_radiatif_base::readOn(Entree& is)
 {
-  //Nom nom_pb, nom_bord;
-  //Motcle nom_champ;
-
   Motcle motlu;
   Motcles les_motcles(2);
   {
@@ -68,9 +53,9 @@ Entree& Flux_radiatif_base::readOn(Entree& is)
           }
         default:
           {
-            Cerr << "Erreur a la lecture de la condition aux limites de type "<<finl;
+            Cerr << "Erreur a la lecture de la condition aux limites de type " << finl;
             Cerr << "Flux_radiatif_base " << finl;
-            Cerr << "On attendait " << les_motcles << "a la place de " <<  motlu << finl;
+            Cerr << "On attendait " << les_motcles << "a la place de " << motlu << finl;
             Process::exit();
           }
         }
@@ -86,54 +71,45 @@ Entree& Flux_radiatif_base::readOn(Entree& is)
   return is;
 }
 
-
-
-/*! @brief cette methode permet de typer les champs_front : - le_champ_front
- *
- *         - flux_radiatif_
- *
- */
 void Flux_radiatif_base::completer()
 {
   Neumann_paroi::completer();
   // On type le champ_front flux_radiatif_ qui est associe a la condition a la limite
-  const Front_VF& front_vf=ref_cast(Front_VF, le_champ_front->frontiere_dis());
+  const Front_VF& front_vf = ref_cast(Front_VF, le_champ_front->frontiere_dis());
   int nb_comp = 1;
 
   flux_radiatif().nommer(front_vf.le_nom());
   DoubleTab& tab_flux = flux_radiatif().valeurs();
-  tab_flux.resize(front_vf.nb_faces(),nb_comp);
+  tab_flux.resize(front_vf.nb_faces(), nb_comp);
 
   champ_front().nommer(front_vf.le_nom());
-  DoubleTab& tab= champ_front().valeurs();
-  tab.resize(front_vf.nb_faces(),nb_comp);
+  DoubleTab& tab = champ_front().valeurs();
+  tab.resize(front_vf.nb_faces(), nb_comp);
   emissivite_->associer_fr_dis_base(front_vf);
 }
-
 
 /*! @brief Renvoie la valeur de flux imposes a la paroi radiative
  *
  */
 double Flux_radiatif_base::flux_impose(int i) const
 {
-  if (le_champ_front->valeurs().size()==1)
-    return le_champ_front->valeurs()(0,0);
-  else if (le_champ_front->valeurs().dimension(1)==1)
-    return le_champ_front->valeurs()(i,0);
+  if (le_champ_front->valeurs().size() == 1)
+    return le_champ_front->valeurs()(0, 0);
+  else if (le_champ_front->valeurs().dimension(1) == 1)
+    return le_champ_front->valeurs()(i, 0);
   else
     Cerr << "Flux_radiatif_base::flux_impose erreur" << finl;
   Process::exit();
   return 0.;
 }
 
-
 /*! @brief Renvoie la valeur de flux imposes a la paroi radiative
  *
  */
-double Flux_radiatif_base::flux_impose(int i,int j) const
+double Flux_radiatif_base::flux_impose(int i, int j) const
 {
-  if (le_champ_front->valeurs().dimension(0)==1)
-    return le_champ_front->valeurs()(0,j);
+  if (le_champ_front->valeurs().dimension(0) == 1)
+    return le_champ_front->valeurs()(0, j);
   else
-    return le_champ_front->valeurs()(i,j);
+    return le_champ_front->valeurs()(i, j);
 }
