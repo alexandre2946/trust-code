@@ -62,23 +62,6 @@ void Pb_Couple_rayo_semi_transp::initialize()
     }
 }
 
-void Pb_Couple_rayo_semi_transp::associer_sch_tps_base(Schema_Temps_base& sch)
-{
-  Probleme_Couple::associer_sch_tps_base(sch);
-  sch_clone = sch;
-  if (!le_modele_.non_nul())
-    {
-      Cerr << "Attention, le modele de rayonnement semi transparent n'est pas encore defini." << finl;
-      Cerr << "La definition des problemes a change depuis la 1.5.2. En particulier, le modele" << finl;
-      Cerr << "de rayonnement (qui est devenu un probleme avec son propre postraitement) doit etre" << finl;
-      Cerr << "associe au probleme couple avant l'association du schema en temps avec le probleme couple." << finl;
-      Cerr << "Voir la documentation des problemes thermohydrauliques avec modele de rayonnement" << finl;
-      Cerr << "ou contacter le support TRUST pour plus de precisions." << finl;
-      Process::exit();
-    }
-  modele().associer_sch_tps_base(sch_clone); // association
-}
-
 int Pb_Couple_rayo_semi_transp::associer_(Objet_U& ob)
 {
   Cerr << "Appel a associer_ " << ob.que_suis_je() << finl;

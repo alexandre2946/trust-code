@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -31,18 +31,14 @@ public:
   int associer_(Objet_U&) override;
   int postraiter(int force = 1) override;
 
-  void le_modele_rayo_associe(const Modele_Rayonnement_Milieu_Transparent&);
-  void associer_cl_base(const Cond_lim_base&);
   void completer();
   void validateTimeStep() override;
   void initialize() override;
 
   inline Modele_Rayonnement_Milieu_Transparent& le_modele_rayo() { return le_modele_de_rayo_.valeur(); }
-  inline Cond_lim_base& cond_l_base() { return les_cl_.valeur(); }
 
 protected:
   OBS_PTR(Modele_Rayonnement_Milieu_Transparent) le_modele_de_rayo_;
-  OBS_PTR(Cond_lim_base) les_cl_;
 };
 
 #endif /* Pb_Couple_Rayonnement_included */

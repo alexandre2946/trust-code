@@ -44,14 +44,12 @@ public:
 
   void le_modele_rayo_associe(const Modele_rayo_semi_transp&);
   int associer_(Objet_U&) override;
-  void associer_sch_tps_base(Schema_Temps_base&) override;
 
   inline Modele_rayo_semi_transp& modele() { return le_modele_.valeur(); }
   inline const Modele_rayo_semi_transp& modele() const { return le_modele_.valeur(); }
 
 protected:
   DerObjU der_domaine_clone;
-  OWN_PTR(Schema_Temps_base) sch_clone;
   OBS_PTR(Modele_rayo_semi_transp) le_modele_;
 };
 

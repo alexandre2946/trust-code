@@ -46,7 +46,8 @@ int Pb_Couple_Rayonnement::associer_(Objet_U& ob)
         {
           set_type_rayo=1;
           Cerr << "association du modele au pbc" << finl;
-          le_modele_rayo_associe(ref_cast(Modele_Rayonnement_Milieu_Transparent, ob));
+
+          le_modele_de_rayo_ = ref_cast(Modele_Rayonnement_Milieu_Transparent, ob);
         }
       else
         return 0;
@@ -55,16 +56,6 @@ int Pb_Couple_Rayonnement::associer_(Objet_U& ob)
     return 1;
   else
     return 0;
-}
-
-void Pb_Couple_Rayonnement::le_modele_rayo_associe(const Modele_Rayonnement_Milieu_Transparent& un_modele_de_rayonnement)
-{
-  le_modele_de_rayo_ = un_modele_de_rayonnement;
-}
-
-void Pb_Couple_Rayonnement::associer_cl_base(const Cond_lim_base& les_cl)
-{
-  les_cl_ = les_cl;
 }
 
 int Pb_Couple_Rayonnement::postraiter(int force)
