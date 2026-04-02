@@ -69,30 +69,7 @@ int Pb_Couple_rayo_semi_transp::associer_(Objet_U& ob)
     {
       Cerr << "association du modele au pbc" << finl;
       le_modele_rayo_associe(ref_cast(Modele_rayo_semi_transp, ob));
-
-      // Je rajoute le modele de rayonnement dans la liste des problemes
-      int nb_groupes = groupes.size_array();
-      if (nb_groupes == 0)
-        {
-          // on est passe par associer dans le readOn
-          // donc les groupes ne sont pas encore crees
-          groupes.resize_array(2);
-          groupes[0] = nb_problemes();
-          Probleme_Couple::ajouter(modele());
-          groupes[1] = 1;
-        }
-      else
-        {
-          Probleme_Couple::ajouter(modele());
-
-          ArrOfInt new_groupes(nb_groupes + 1);
-          for (int i = 0; i < nb_groupes; ++i)
-            {
-              new_groupes[i] = groupes[i];
-            }
-          new_groupes[nb_groupes] = 1;
-          groupes.ref_array(new_groupes);
-        }
+      ajouter(modele());
 
       return 1;
     }
