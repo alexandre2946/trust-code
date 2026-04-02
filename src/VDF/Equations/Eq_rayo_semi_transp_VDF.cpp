@@ -50,7 +50,7 @@ void Eq_rayo_semi_transp_VDF::resoudre(double temps)
   const DoubleTab& kappa = fluide().kappa().valeurs();
   //calcul du second membre
   DoubleTrav secmem(inconnue().valeurs());
-  Probleme_base& pb = modele().probleme();
+  Probleme_base& pb = modele().probleme_fluide();
   double n,k;
 
   assert(pb.equation(1).inconnue().le_nom()=="temperature");
@@ -141,7 +141,7 @@ void Eq_rayo_semi_transp_VDF::evaluer_cl_rayonnement(double temps)
   Conds_lim& les_cl_rayo = domaine_Cl_dis().les_conditions_limites();
 
   // recherche des conditions aux limites associes au l'equation de temperature
-  Equation_base& eq_temp = modele().probleme().equation(1);
+  Equation_base& eq_temp = modele().probleme_fluide().equation(1);
   assert(eq_temp.inconnue().le_nom()=="temperature");
 
   Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites();

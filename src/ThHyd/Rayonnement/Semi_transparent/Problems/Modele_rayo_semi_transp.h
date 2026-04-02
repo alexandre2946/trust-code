@@ -24,8 +24,6 @@
  *     Cela impose de differer certaines initialisations jusqu'a
  *     connaitre la discretisation utilisee.
  *   * Il partage son domaine avec un probleme de type hydraulique
- *     En l'etat actuel, toute la geometrie est clonee (donc postraitee 2 fois!)
- *     Apres le travail de B. Mathieu sur la geometrie, ce ne sera plus necessaire.
  *   * Il n'y a qu'une seule valeur temporelle (futur=present).
  *     Il faudrait en faire un probleme independant du temps.
  *   * Il conserve une ref sur le probleme hydraulique. Cette ref est utilisee de
@@ -37,10 +35,8 @@
 class Modele_rayo_semi_transp: public Probleme_base
 {
   Declare_instanciable(Modele_rayo_semi_transp);
-
 public:
-
-  void terminate() override  {  finir(); }
+  void terminate() override { finir(); }
 
   double computeTimeStep(bool& stop) const override
   {
@@ -52,20 +48,13 @@ public:
   bool iterateTimeStep(bool& converged) override;
   void validateTimeStep() override;
 
-
   void completer() override { }
-  int nombre_d_equations() const override   { return 1; }
-  const Equation_base& equation(int i) const override;
-  Equation_base& equation(int i) override;
-  const Equation_base& get_equation_by_name(const Nom&) const override;
-  Equation_base& getset_equation_by_name(const Nom&) override;
+  int nombre_d_equations() const override { return 1; }
+
   double calculer_pas_de_temps() const override  {  return DMAXFLOAT;  }
 
   // Cette methode ne doivent pas servir : on passe par l'interface de Problem
-  void mettre_a_jour(double temps) override
-  {
-    Process::exit();
-  }
+  void mettre_a_jour(double temps) override { Process::exit(); }
 
   bool is_pb_rayo() override { return true ; }
 
@@ -73,76 +62,53 @@ public:
   void discretiser(Discretisation_base&) override;
   void associer_sch_tps_base(const Schema_Temps_base&) override;
 
-  inline void associer_probleme(Probleme_base& Pb);
   Champ_Inc_base& put_irradience();
-  inline Probleme_base& probleme();
-  inline const Probleme_base& probleme() const;
-  inline Equation_rayonnement_base& eq_rayo();
-  inline const Equation_rayonnement_base& eq_rayo() const;
-  inline const double& valeur_sigma() const;
   const Champ_front_base& flux_radiatif(const Nom& nom_bord) const;
   void calculer_flux_radiatif();
 
+  inline Probleme_base& probleme_fluide() { return pb_fluide_.valeur(); }
+  inline const Probleme_base& probleme_fluide() const { return pb_fluide_.valeur(); }
+  inline const double& valeur_sigma() const { return sigma_; }
+  inline void associer_probleme_fluide(Probleme_base& Pb) { pb_fluide_ = Pb; }
+
+  inline const Equation_base& equation(int i) const override
+  {
+    assert(i==0);
+    return eq_rayo_;
+  }
+  inline Equation_base& equation(int i) override
+  {
+    assert(i==0);
+    return eq_rayo_;
+  }
+  inline const Equation_base& get_equation_by_name(const Nom& un_nom) const override
+  {
+    assert(Motcle(un_nom)==Motcle("Eq_rayo_semi_transp"));
+    return eq_rayo_;
+  }
+
+  inline Equation_base& getset_equation_by_name(const Nom& un_nom) override
+  {
+    assert(Motcle(un_nom)==Motcle("Eq_rayo_semi_transp"));
+    return eq_rayo_;
+  }
+
+  inline Equation_rayonnement_base& eq_rayo()
+  {
+    assert(eq_rayo_.non_nul());
+    return eq_rayo_.valeur();
+  }
+
+  inline const Equation_rayonnement_base& eq_rayo() const
+  {
+    assert(eq_rayo_.non_nul());
+    return eq_rayo_.valeur();
+  }
+
 protected :
-  OBS_PTR(Probleme_base) mon_probleme_;
-  OWN_PTR(Equation_rayonnement_base) Eq_rayo_;
-  static constexpr double sigma = 5.67e-8;
+  OBS_PTR(Probleme_base) pb_fluide_;
+  OWN_PTR(Equation_rayonnement_base) eq_rayo_;
+  static constexpr double sigma_ = 5.67e-8;
 };
-
-inline Equation_rayonnement_base& Modele_rayo_semi_transp::eq_rayo()
-{
-  assert(Eq_rayo_.non_nul());
-  return Eq_rayo_.valeur();
-}
-
-inline const Equation_rayonnement_base& Modele_rayo_semi_transp::eq_rayo() const
-{
-  assert(Eq_rayo_.non_nul());
-  return Eq_rayo_.valeur();
-}
-
-inline const Equation_base& Modele_rayo_semi_transp::equation(int i) const
-{
-  assert(i==0);
-  return Eq_rayo_;
-}
-
-inline Equation_base& Modele_rayo_semi_transp::equation(int i)
-{
-  assert(i==0);
-  return Eq_rayo_;
-}
-
-inline const Equation_base& Modele_rayo_semi_transp::get_equation_by_name(const Nom& un_nom) const
-{
-  assert(Motcle(un_nom)==Motcle("Eq_rayo_semi_transp"));
-  return Eq_rayo_;
-}
-
-inline Equation_base& Modele_rayo_semi_transp::getset_equation_by_name(const Nom& un_nom)
-{
-  assert(Motcle(un_nom)==Motcle("Eq_rayo_semi_transp"));
-  return Eq_rayo_;
-}
-
-inline const double& Modele_rayo_semi_transp::valeur_sigma() const
-{
-  return sigma;
-}
-
-inline void Modele_rayo_semi_transp::associer_probleme(Probleme_base& Pb)
-{
-  mon_probleme_ = Pb;
-}
-
-inline Probleme_base& Modele_rayo_semi_transp::probleme()
-{
-  return mon_probleme_.valeur();
-}
-
-inline const Probleme_base& Modele_rayo_semi_transp::probleme() const
-{
-  return mon_probleme_.valeur();
-}
 
 #endif /* Modele_rayo_semi_transp_included */

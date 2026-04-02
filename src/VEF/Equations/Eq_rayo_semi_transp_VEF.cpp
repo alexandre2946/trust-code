@@ -61,7 +61,7 @@ void Eq_rayo_semi_transp_VEF::resoudre(double temps)
 
   //calcul du second membre
   DoubleTrav secmem(inconnue().valeurs());
-  Probleme_base& pb = modele().probleme();
+  Probleme_base& pb = modele().probleme_fluide();
   double n;
   double k;
 
@@ -228,7 +228,7 @@ void Eq_rayo_semi_transp_VEF::evaluer_cl_rayonnement(double temps)
   Conds_lim& les_cl_rayo = domaine_Cl_dis().les_conditions_limites();
 
   // recherche des conditions aux limites associes au l'equation de temperature
-  Probleme_base& pb = modele().probleme();
+  Probleme_base& pb = modele().probleme_fluide();
   Equation_base& eq_temp = pb.equation(1);
 
   Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites();

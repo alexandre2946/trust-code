@@ -32,7 +32,7 @@ Sortie& Pb_Couple_rayo_semi_transp::printOn(Sortie& os) const { return Probleme_
 void Pb_Couple_rayo_semi_transp::initialize()
 {
   Probleme_Couple::initialize();
-  Probleme_base& le_pb = modele().probleme();
+  Probleme_base& le_pb = modele().probleme_fluide();
   // Associer le modele aux sources de rayonnement
   for (int i = 0; i < le_pb.nombre_d_equations(); i++)
     {
@@ -117,6 +117,6 @@ void Pb_Couple_rayo_semi_transp::le_modele_rayo_associe(const Modele_rayo_semi_t
   // Le probleme a associer est maintenant reference dans le_pb.
 
   // Associer le probleme au modele
-  modele().associer_probleme(le_pb);
+  modele().associer_probleme_fluide(le_pb);
 }
 

@@ -52,7 +52,7 @@ bool Modele_rayo_semi_transp::iterateTimeStep(bool& converged)
 
 void Modele_rayo_semi_transp::validateTimeStep()
 {
-  double temps = probleme().presentTime();
+  double temps = pb_fluide_->presentTime();
   eq_rayo().mettre_a_jour(temps);
   calculer_flux_radiatif();
   les_postraitements_.mettre_a_jour(temps);
@@ -75,14 +75,13 @@ Champ_Inc_base& Modele_rayo_semi_transp::put_irradience()
 
 void Modele_rayo_semi_transp::preparer_calcul()
 {
-
   int contient_source_rayo_semi_transp = 0;
 
-  for (int j = 0; j < probleme().nombre_d_equations(); j++)
+  for (int j = 0; j < pb_fluide_->nombre_d_equations(); j++)
     {
 
       // Associer le modele au CL rayonnantes.
-      Domaine_Cl_dis_base& la_zcl = probleme().equation(j).domaine_Cl_dis();
+      Domaine_Cl_dis_base& la_zcl = pb_fluide_->equation(j).domaine_Cl_dis();
       for (int num_cl = 0; num_cl < la_zcl.nb_cond_lim(); num_cl++)
         {
           Cond_lim_base& la_cl = la_zcl.les_conditions_limites(num_cl).valeur();
@@ -99,7 +98,7 @@ void Modele_rayo_semi_transp::preparer_calcul()
         }
 
       // Associer le modele au terme source de rayonnement de l'equation de temperature
-      Sources& les_sources = probleme().equation(j).sources();
+      Sources& les_sources = pb_fluide_->equation(j).sources();
       for (int num_source = 0; num_source < les_sources.size(); num_source++)
         {
           if ((sub_type(Source_rayo_semi_transp_base, les_sources[num_source].valeur())) || (les_sources[num_source]->que_suis_je() == "Source_rayo_semi_transp_QC_VDF_P0_VDF")
@@ -125,7 +124,7 @@ void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
 
   // Typage de l'equation de rayonnement
   Cerr << "typage de l'equation de rayonnement ";
-  Equation_base& eq_base = probleme().equation(1);
+  Equation_base& eq_base = pb_fluide_->equation(1);
   Nom disc = eq_base.discretisation().que_suis_je(), type = "Eq_rayo_semi_transp_";
   if (disc == "VEFPreP1B")
     disc = "VEF";
@@ -133,14 +132,14 @@ void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
   type += disc;
   Cerr << type << finl;
 
-  Eq_rayo_.typer(type);
+  eq_rayo_.typer(type);
   //
   // Creation des associations pour l'equation de rayonnement.
   // Necessairement ici car, contrairement aux cas classiques, l'equation
   // a besoin d'etre typee !
   //
-  Eq_rayo_->associer_modele_rayonnement(*this);
-  Eq_rayo_->associer_sch_tps_base(schema_temps());
+  eq_rayo_->associer_modele_rayonnement(*this);
+  eq_rayo_->associer_sch_tps_base(schema_temps());
 
   //  Probleme_base::discretiser(dis);
   associer();
@@ -165,11 +164,11 @@ void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
 
   // Association du fluide + diverses operations
 
-  if (sub_type(Fluide_base, probleme().milieu()))
+  if (sub_type(Fluide_base, pb_fluide_->milieu()))
     {
 
-      Fluide_base& fluide = ref_cast(Fluide_base, probleme().milieu());
-      Eq_rayo_->associer_fluide(fluide);
+      Fluide_base& fluide = ref_cast(Fluide_base, pb_fluide_->milieu());
+      eq_rayo_->associer_fluide(fluide);
 
       if (fluide.is_rayo_semi_transp())
         {
@@ -197,7 +196,7 @@ void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
               Cerr << "Pb_Couple_rayo_semi_transp::discretiser pour pouvoir prendre" << finl;
               Cerr << "en compte ce type de Champ_Don" << finl;
             }
-          const double temps = probleme().schema_temps().temps_courant();
+          const double temps = pb_fluide_->schema_temps().temps_courant();
           fluide.initialiser(temps);
         }
       else
@@ -214,7 +213,7 @@ void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
     {
       Cerr << "Erreur dans Modele_rayo_semi_transp::readOn " << finl;
       Cerr << "Le modele de rayonnement semi transparent ne peut etre utilise" << finl;
-      Cerr << "qu'avec un Fluide_base et non " << probleme().milieu().que_suis_je() << finl;
+      Cerr << "qu'avec un Fluide_base et non " << pb_fluide_->milieu().que_suis_je() << finl;
       Process::exit();
     }
 
@@ -233,7 +232,7 @@ void Modele_rayo_semi_transp::calculer_flux_radiatif()
       if (sub_type(Flux_radiatif_base, la_cl_rayo.valeur()))
         {
           Flux_radiatif_base& la_cl_rayon = ref_cast(Flux_radiatif_base, la_cl_rayo.valeur());
-          Equation_base& eq_temp = probleme().equation(1);
+          Equation_base& eq_temp = pb_fluide_->equation(1);
           la_cl_rayon.calculer_flux_radiatif(eq_temp);
         }
       else if (sub_type(Symetrie, la_cl_rayo.valeur()))
