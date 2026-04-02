@@ -56,8 +56,6 @@ public:
   // Cette methode ne doivent pas servir : on passe par l'interface de Problem
   void mettre_a_jour(double temps) override { Process::exit(); }
 
-  bool is_pb_rayo() override { return true ; }
-
   void preparer_calcul() override;
   void discretiser(Discretisation_base&) override;
   void associer_sch_tps_base(const Schema_Temps_base&) override;

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -190,9 +190,6 @@ public:
   OBS_PTR(Field_base) findInputField(const Nom& name) const override { return findInputField_impl(*this, name); }
   OBS_PTR(Champ_Generique_base) findOutputField(const Nom& name) const override { return findOutputField_impl(*this, name); }
 
-  virtual bool is_pb_med() { return false ; }
-  virtual bool is_pb_rayo() { return false ; }
-
   void associer_pb_couple(const Probleme_Couple& pbc) { pbc_ = pbc; }
   const Probleme_Couple& get_pb_couple() const { return pbc_; }
   Probleme_Couple& get_pb_couple() { return pbc_; }
@@ -212,14 +209,12 @@ public:
 
 protected :
 
-  void warn_old_syntax();
   virtual void typer_lire_milieu(Entree& is) ;
   virtual void lire_solved_equations(Entree& is) { /* Do nothing */ }
   Entree& read_optional_equations(Entree& is, Motcle& mot);
   virtual Entree& lire_correlations(Entree& is);
 
   Save_Restart save_restart_;
-  bool milieu_via_associer_ = false;
   std::vector<OWN_PTR(Milieu_base)> le_milieu_;
   OBS_PTR(Domaine_dis_base) le_domaine_dis_;   // Discretized domain. Just a REF since Domaine_dis_cache is the real owner.
   Postraitements les_postraitements_;

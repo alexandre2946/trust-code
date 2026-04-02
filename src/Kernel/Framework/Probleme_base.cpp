@@ -125,10 +125,7 @@ Entree& Probleme_base::readOn(Entree& is)
 
   /* 1 : solved_equations + milieu : NEW SYNTAX */
   lire_solved_equations(is);
-
-  if (!milieu_via_associer_ && !is_pb_med() && !is_pb_rayo())
-    typer_lire_milieu(is);
-  else assert((int)le_milieu_.size() == 0);
+  typer_lire_milieu(is);
 
   /* 2 : On lit les equations */
   lire_equations(is, motlu); //"motlu" contient le premier mot apres la lecture des equations
@@ -256,19 +253,6 @@ void Probleme_base::associer()
     equation(i).associer_pb_base(*this);
 }
 
-void Probleme_base::warn_old_syntax()
-{
-  if (!is_pb_rayo())
-    {
-      Cerr << "YOU ARE USING AN OLD SYNTAX IN YOUR DATA FILE AND THIS IS NO MORE SUPPORTED !" << finl;
-      Cerr << "STARTING FROM TRUST-v1.9.3 : THE MEDIUM SHOULD BE READ INSIDE THE PROBLEM AND NOT VIA ASSOSCIATION ... " << finl;
-      Cerr << "HAVE A LOOK TO ANY TRUST TEST CASE TO SEE HOW IT SHOULD BE DONE ($TRUST_ROOT/tests/) ... " << finl;
-      Cerr << "OR RUN -convert_data OPTION OF YOUR APPLICATION SCRIPT, FOR TRUST FOR EXAMPLE:" << finl;
-      Cerr << "   trust -convert_data " << Objet_U::nom_du_cas() << ".data" << finl;
-      Process::exit();
-    }
-}
-
 /*! @brief surcharge Objet_U::associer_(Objet_U& ob) Associe differents objets au probleme en controlant
  *
  *      le type de l'objet a associer a l'execution.
@@ -293,6 +277,13 @@ int Probleme_base::associer_(Objet_U& ob)
       associer_domaine(ref_cast(Domaine, ob));
       return 1;
     }
+  if (sub_type(Loi_Fermeture_base,ob))
+    {
+      Loi_Fermeture_base& loi=ref_cast(Loi_Fermeture_base,ob);
+      liste_loi_fermeture_.add(loi);
+      loi.associer_pb_base(*this);
+      return 1;
+    }
   if (sub_type(Domaine_32_64<trustIdType>, ob))
     {
       Cerr << "ERROR: You are trying to associate a 64-bit Domain to a Problem!" << finl;
@@ -302,20 +293,12 @@ int Probleme_base::associer_(Objet_U& ob)
     }
   if (sub_type(Milieu_base, ob))
     {
-      warn_old_syntax();
-      milieu_via_associer_ = true;
-      if (!ref_cast(Milieu_base, ob).est_deja_associe())
-        return 2;
-      associer_milieu_base(ref_cast(Milieu_base, ob));
-      return 1;
-    }
-  if (sub_type(Loi_Fermeture_base,ob))
-    {
-      Loi_Fermeture_base& loi=ref_cast(Loi_Fermeture_base,ob);
-      liste_loi_fermeture_.add(loi);
-      loi.associer_pb_base(*this);
-
-      return 1;
+      Cerr << "YOU ARE USING AN OLD SYNTAX IN YOUR DATA FILE AND THIS IS NO MORE SUPPORTED !" << finl;
+      Cerr << "STARTING FROM TRUST-v1.9.3 : THE MEDIUM SHOULD BE READ INSIDE THE PROBLEM AND NOT VIA ASSOSCIATION ... " << finl;
+      Cerr << "HAVE A LOOK TO ANY TRUST TEST CASE TO SEE HOW IT SHOULD BE DONE ($TRUST_ROOT/tests/) ... " << finl;
+      Cerr << "OR RUN -convert_data OPTION OF YOUR APPLICATION SCRIPT, FOR TRUST FOR EXAMPLE:" << finl;
+      Cerr << "   trust -convert_data " << Objet_U::nom_du_cas() << ".data" << finl;
+      Process::exit();
     }
   return 0;
 }
@@ -400,22 +383,6 @@ void Probleme_base::discretiser(Discretisation_base& une_discretisation)
   le_domaine_dis_ = une_discretisation.discretiser();
   // Can not do this before, since the Domaine_dis is not typed yet:
   le_domaine_dis_->associer_domaine(le_domaine_);
-
-  if (milieu_via_associer_)
-    {
-      discretiser_equations();
-      Noms milieux_deja_discretises;
-      for (int i = 0; i < nombre_d_equations(); i++)
-        {
-          equation(i).associer_milieu_equation(); // remontee de l'inconnue vers le milieu
-          const Nom& le_milieu = equation(i).milieu().que_suis_je();
-          if (!milieux_deja_discretises.contient_(le_milieu))
-            {
-              equation(i).milieu().discretiser((*this), une_discretisation);
-              milieux_deja_discretises.add(le_milieu);
-            }
-        }
-    }
 
   for (auto& itr : liste_loi_fermeture_)
     {
