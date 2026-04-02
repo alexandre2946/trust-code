@@ -31,6 +31,42 @@ Sortie& Pb_Couple_rayo_semi_transp::printOn(Sortie& os) const { return Probleme_
 
 void Pb_Couple_rayo_semi_transp::initialize()
 {
+  // 1er truc a faire
+  int nb_pb_ray = 0;
+  for (int l = 0; l < nb_problemes(); l++)
+    {
+      Probleme_base& le_pb = ref_cast(Probleme_base, probleme(l));
+
+      if (!sub_type(Modele_rayo_semi_transp, le_pb))
+        if (sub_type(Fluide_base, le_pb.milieu()))
+          if (ref_cast(Fluide_base, le_pb.milieu()).is_rayo_semi_transp())
+            nb_pb_ray++;
+    }
+
+  if (nb_pb_ray > 1)
+    {
+      Cerr << "Pb_Couple_rayo_semi_transp::initialize - We can only treat 1 semi-transparent problem at present. You defined " << nb_pb_ray << " !!!" << finl;
+      Process::exit();
+    }
+  else if (nb_pb_ray == 0)
+    Process::exit("Pb_Couple_rayo_semi_transp::initialize - It seems you forgot to define the radiation properties in your medium !!!\n");
+
+  // on associe le pb fluide au modele
+  for (int l = 0; l < nb_problemes(); l++)
+    {
+      Probleme_base& le_pb = ref_cast(Probleme_base, probleme(l));
+
+      if (!sub_type(Modele_rayo_semi_transp, le_pb))
+        if (sub_type(Fluide_base, le_pb.milieu()))
+          if (ref_cast(Fluide_base, le_pb.milieu()).is_rayo_semi_transp())
+            {
+              modele().associer_probleme_fluide(le_pb);
+              break;
+            }
+    }
+
+  modele().discretise_longueur_rayo();
+
   Probleme_Couple::initialize();
   Probleme_base& le_pb = modele().probleme_fluide();
   // Associer le modele aux sources de rayonnement
@@ -73,21 +109,8 @@ int Pb_Couple_rayo_semi_transp::associer_(Objet_U& ob)
 
       return 1;
     }
-  else if (Probleme_Couple::associer_(ob))
-    {
-      if (sub_type(Probleme_base, ob))
-        {
-          Probleme_base& pb = ref_cast(Probleme_base, ob);
-          if (sub_type(Fluide_base, pb.milieu()))
-            {
-              Fluide_base& fluide = ref_cast(Fluide_base, pb.milieu());
-              fluide.fixer_type_rayo();
-            }
-        }
-      return 1;
-    }
   else
-    return 0;
+    return Probleme_Couple::associer_(ob);
 }
 
 void Pb_Couple_rayo_semi_transp::le_modele_rayo_associe(const Modele_rayo_semi_transp& un_modele_de_rayonnement)
@@ -98,25 +121,6 @@ void Pb_Couple_rayo_semi_transp::le_modele_rayo_associe(const Modele_rayo_semi_t
       Process::exit();
     }
   le_modele_ = un_modele_de_rayonnement;
-  int le_pb_a_associer = -1;
-  // On associe au modele de rayonnement
-  // le dernier probleme fluide du probleme couple.
-  for (int l = 0; l < nb_problemes(); l++)
-    {
-      Probleme_base& pb = ref_cast(Probleme_base, probleme(l));
-      if (pb.milieu().is_rayo_semi_transp())
-        le_pb_a_associer = l;
-    }
 
-  if (le_pb_a_associer == -1)
-    {
-      Cerr << "Attention : il n'y a aucun probleme fluide auquel associer le modele de rayonnement." << finl;
-      Process::exit();
-    }
-  Probleme_base& le_pb = ref_cast(Probleme_base, probleme(le_pb_a_associer));
-  // Le probleme a associer est maintenant reference dans le_pb.
-
-  // Associer le probleme au modele
-  modele().associer_probleme_fluide(le_pb);
 }
 
