@@ -37,7 +37,6 @@ public:
   void resoudre(double temps) override;
   void evaluer_cl_rayonnement(double temps) override;
   void completer() override;
-  void typer_op_grad() override { }
   void assembler_matrice() override;
 
   int nb_colonnes_tot() override;

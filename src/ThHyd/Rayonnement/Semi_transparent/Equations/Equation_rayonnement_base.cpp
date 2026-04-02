@@ -14,14 +14,12 @@
 *****************************************************************************/
 
 #include <Equation_rayonnement_base.h>
-#include <Discret_Thyd.h>
 #include <Modele_rayo_semi_transp.h>
-#include <Operateur_Diff_base.h>
-#include <Schema_Temps_base.h>
-#include <Fluide_base.h>
+#include <Matrice_Morse_Sym.h>
 #include <Champ_Uniforme.h>
 #include <Matrice_Bloc.h>
-#include <Matrice_Morse_Sym.h>
+#include <Discret_Thyd.h>
+#include <Fluide_base.h>
 #include <Param.h>
 
 Implemente_base(Equation_rayonnement_base, "Equation_rayonnement_base", Equation_base);
@@ -38,25 +36,49 @@ bool Equation_rayonnement_base::solve()
   return true;
 }
 
-Sortie& Equation_rayonnement_base::printOn(Sortie& s) const
+Sortie& Equation_rayonnement_base::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
+
+Entree& Equation_rayonnement_base::readOn(Entree& is) { return Equation_base::readOn(is); }
+
+void Equation_rayonnement_base::set_param(Param& param) const
 {
-  return s << que_suis_je() << "\n";
+  param.ajouter_non_std("conditions_limites|boundary_conditions", (this), Param::REQUIRED);
+  param.ajouter_non_std("solveur", (this), Param::REQUIRED);
 }
 
-/*! @brief cf Equation_base::readOn(Entree& is)
- *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws solveur pression non defini dans jeu de donnees
- */
-Entree& Equation_rayonnement_base::readOn(Entree& is)
+int Equation_rayonnement_base::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
-  Equation_base::readOn(is);
+  int retval = 1;
+  if (mot == "conditions_limites|boundary_conditions")
+    {
+      lire_cl(is);
+      verif_Cl();
+    }
+  else if (mot == "solveur")
+    {
+      Cerr << "Reading and typing of the radiation equation solver :" << finl;
+      Nom nom_solveur("Solv_");
+      Nom type_solv_sys;
+      is >> type_solv_sys;
+      nom_solveur += type_solv_sys;
+      Cerr << "Name of the radiation equation solver : " << nom_solveur << finl;
+      solveur.typer(nom_solveur);
+      is >> solveur.valeur();
+      solveur.nommer("solveur_irradiance");
+    }
+  else
+    retval = -1;
+
+  return retval;
+}
+
+void Equation_rayonnement_base::completer()
+{
   // typage de l'operateur de diffusion
   if (sub_type(Fluide_base, fluide()))
     if (fluide().is_rayo_semi_transp())
       {
-        if (fluide().longueur_rayo_is_discretised())
+        if (fluide().is_longueur_rayo_discretised())
           {
             const Champ_Don_base& long_rayo = fluide().longueur_rayo();
             terme_diffusif.associer_diffusivite(long_rayo);
@@ -136,39 +158,7 @@ Entree& Equation_rayonnement_base::readOn(Entree& is)
       Process::exit();
     }
 
-  return is;
-}
-
-void Equation_rayonnement_base::set_param(Param& param) const
-{
-  param.ajouter_non_std("conditions_limites|boundary_conditions", (this), Param::REQUIRED);
-  param.ajouter_non_std("solveur", (this), Param::REQUIRED);
-}
-
-int Equation_rayonnement_base::lire_motcle_non_standard(const Motcle& mot, Entree& is)
-{
-  int retval = 1;
-  if (mot == "conditions_limites|boundary_conditions")
-    {
-      lire_cl(is);
-      verif_Cl();
-    }
-  else if (mot == "solveur")
-    {
-      Cerr << "Reading and typing of the radiation equation solver :" << finl;
-      Nom nom_solveur("Solv_");
-      Nom type_solv_sys;
-      is >> type_solv_sys;
-      nom_solveur += type_solv_sys;
-      Cerr << "Name of the radiation equation solver : " << nom_solveur << finl;
-      solveur.typer(nom_solveur);
-      is >> solveur.valeur();
-      solveur.nommer("solveur_irradiance");
-    }
-  else
-    retval = -1;
-
-  return retval;
+  Equation_base::completer();
 }
 
 /*! @brief Associe un milieu physique a l'equation
@@ -202,15 +192,6 @@ void Equation_rayonnement_base::associer_milieu_base(const Milieu_base& un_milie
     }
 }
 
-/*! @brief Associe le modele de rayonnement a l'equation de rayonnement
- *
- * @param (Modele_rayo_semi_transp& un_modele) le modele de rayonnement associe a l'equation de rayonnement
- */
-void Equation_rayonnement_base::associer_modele_rayonnement(const Modele_rayo_semi_transp& un_modele)
-{
-  le_modele = un_modele;
-}
-
 /*! @brief Renvoie le milieu physique de l'equation (le Fluide_base upcaste en Milieu_base)
  *
  * @return (Milieu_base&) le Fluide_base de l'equation upcaste en Milieu_base
@@ -239,17 +220,6 @@ Milieu_base& Equation_rayonnement_base::milieu()
       Process::exit();
     }
   return le_fluide.valeur();
-}
-
-/*! @brief Renvoie le nombre d'operateurs de l'equation.
- *
- * Ici 1.
- *
- * @return (int) le nombre d'operateurs de l'equation
- */
-int Equation_rayonnement_base::nombre_d_operateurs() const
-{
-  return 1;
 }
 
 /*! @brief Renvoie l'operateur specifie par son index: renvoie terme_diffusif si i = 0
@@ -300,49 +270,21 @@ Operateur& Equation_rayonnement_base::operateur(int i)
   return terme_diffusif;
 }
 
-/*! @brief Renvoie l'irradiance (champ inconnue de l'equation de rayonnement) (version const)
- *
- * @return (Champ_Inc_base&) le champ inconnue representant l'irradience
- */
-const Champ_Inc_base& Equation_rayonnement_base::inconnue() const
+void Equation_rayonnement_base::get_noms_champs_postraitables(Noms& noms, Option opt) const
 {
-  return irradiance_;
+  if (opt == DESCRIPTION)
+    Cerr << que_suis_je() << " : " << champs_compris_.liste_noms_compris() << finl;
+  else
+    noms.add(champs_compris_.liste_noms_compris());
 }
 
-/*! @brief Renvoie l'irradiance (champ inconnue de l'equation de rayonnement) (version const)
- *
- * @return (Champ_Inc_base&) le champ inconnue representant l'irradience
- */
-Champ_Inc_base& Equation_rayonnement_base::inconnue()
-{
-  return irradiance_;
-}
-
-/*! @brief Dicretise l'equation.
- *
- */
 void Equation_rayonnement_base::discretiser()
 {
-  //
   // Discretisation de l'equation de rayonnement
-  //
   const Discret_Thyd& dis = ref_cast(Discret_Thyd, discretisation());
   Cerr << "Radiation equation discretisation" << finl;
-  Cerr << "Do not matter with the fact that discretization of the temperature" << finl;
-  Cerr << "is indicated indeed it is the irradiance wich is discretized." << finl;
-  dis.temperature(schema_temps(), domaine_dis(), irradiance_);
-
-  // La methode temperature(schema_temps(), domaine_dis(), irradiance_) permet
-  // d'associer tout la bonne discretisation au champ de l'irradiance
-  // toutefois, il faut modifier certaines grandeurs telles que le nom ou l'unite
-  // de l'irradiance.
-  irradiance_->fixer_nb_valeurs_temporelles(1);
-  irradiance_->nommer("irradiance");
-  irradiance_->fixer_unite("w/m2");
+  dis.discretiser_champ("temperature", domaine_dis(), "irradiance", "w/m2", 1, 1 /* une case */, schema_temps().temps_courant(), irradiance_);
   champs_compris_.ajoute_champ(irradiance_);
-  //
-  // Fin de discretisation de l'equation de rayonnement
-  //
 
   Equation_base::discretiser();
 }
@@ -354,35 +296,14 @@ void Equation_rayonnement_base::discretiser()
  */
 const Discretisation_base& Equation_rayonnement_base::discretisation() const
 {
-  //  if(!le_modele->probleme().non_nul())
-  //  {
-  //    Cerr << "Erreur : " << que_suis_je()
-  //           << "n'a pas ete associee a un probleme ! " << finl;
-  //    Process::exit();
-  //  }
   return le_modele->discretisation();
-}
-
-void Equation_rayonnement_base::completer()
-{
-  Equation_base::completer();
-  //  gradient.completer();
 }
 
 void Equation_rayonnement_base::associer_pb_base(const Probleme_base& pb)
 {
   Equation_base::associer_pb_base(pb);
-  gradient.associer_eqn(*this);
-}
-
-Operateur_Grad& Equation_rayonnement_base::operateur_gradient()
-{
-  return gradient;
-}
-
-const Operateur_Grad& Equation_rayonnement_base::operateur_gradient() const
-{
-  return gradient;
+  le_modele = ref_cast(Modele_rayo_semi_transp, pb);
+  associer_sch_tps_base(pb.schema_temps());
 }
 
 void Equation_rayonnement_base::Mat_Morse_to_Mat_Bloc(Matrice& matrice_tmp)
@@ -418,16 +339,6 @@ void Equation_rayonnement_base::Mat_Morse_to_Mat_Bloc(Matrice& matrice_tmp)
       for (k = tab1RV(i) - 1; k < tab1RV(i + 1) - 1; k++)
         coeffRV[k] = ligne_tmp(n2 + tab2RV[k] - 1);
     }
-
-  /*  Cerr<<"Impression de la_matrice"<<finl;
-   la_matrice.imprimer_formatte(Cerr);
-   Cerr<<"Impression de MBrr"<<finl;
-   MBrr.imprimer_formatte(Cerr);
-   Cerr<<"Impression de MBrv"<<finl;
-   MBrv.imprimer_formatte(Cerr);
-
-   Debog::verifier_Mat_faces("avant resolution systeme : la_matrice",la_matrice);
-   Debog::verifier_Mat_faces("avant resolution systeme : MBrr",MBrr);*/
 }
 
 void Equation_rayonnement_base::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice_tmp)

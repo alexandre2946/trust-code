@@ -66,6 +66,10 @@ public:
   const Champ_front_base& flux_radiatif(const Nom& nom_bord) const;
   void calculer_flux_radiatif();
 
+  void discretise_longueur_rayo();
+  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
+  void creer_champ(const Motcle& motlu) override { }
+
   inline Probleme_base& probleme_fluide() { return pb_fluide_.valeur(); }
   inline const Probleme_base& probleme_fluide() const { return pb_fluide_.valeur(); }
   inline const double& valeur_sigma() const { return sigma_; }

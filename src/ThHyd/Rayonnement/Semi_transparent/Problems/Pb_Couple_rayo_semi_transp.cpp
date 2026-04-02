@@ -13,15 +13,10 @@
 *
 *****************************************************************************/
 
-#include <Pb_Couple_rayo_semi_transp.h>
-#include <Schema_Temps_base.h>
-#include <Interprete.h>
-#include <Modele_rayo_semi_transp.h>
 #include <Source_rayo_semi_transp_base.h>
+#include <Pb_Couple_rayo_semi_transp.h>
+#include <Modele_rayo_semi_transp.h>
 #include <Fluide_base.h>
-#include <Champ_Uniforme.h>
-#include <verif_cast.h>
-#include <Interprete_bloc.h>
 
 Implemente_instanciable(Pb_Couple_rayo_semi_transp, "Pb_Couple_rayo_semi_transp", Probleme_Couple);
 

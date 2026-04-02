@@ -13,31 +13,22 @@
 *
 *****************************************************************************/
 
-#include <Modele_rayo_semi_transp.h>
-#include <Flux_radiatif_base.h>
-#include <Probleme_base.h>
-#include <Schema_Temps_base.h>
-#include <Symetrie.h>
-#include <Frontiere_dis_base.h>
-#include <Fluide_base.h>
 #include <Source_rayo_semi_transp_base.h>
-#include <verif_cast.h>
-#include <Champ_Uniforme.h>
-#include <Discretisation_base.h>
 #include <Cond_lim_rayo_semi_transp.h>
+#include <Modele_rayo_semi_transp.h>
+#include <Discretisation_base.h>
+#include <Flux_radiatif_base.h>
+#include <Schema_Temps_base.h>
+#include <Champ_Uniforme.h>
+#include <Fluide_base.h>
+#include <Symetrie.h>
 #include <Domaine.h>
 
 Implemente_instanciable(Modele_rayo_semi_transp, "Modele_rayo_semi_transp", Probleme_base);
 
-Entree& Modele_rayo_semi_transp::readOn(Entree& is)
-{
-  return Probleme_base::readOn(is);
-}
+Entree& Modele_rayo_semi_transp::readOn(Entree& is) { return Probleme_base::readOn(is); }
 
-Sortie& Modele_rayo_semi_transp::printOn(Sortie& os) const
-{
-  return os;
-}
+Sortie& Modele_rayo_semi_transp::printOn(Sortie& os) const { return os; }
 
 bool Modele_rayo_semi_transp::initTimeStep(double dt)
 {
@@ -73,97 +64,15 @@ Champ_Inc_base& Modele_rayo_semi_transp::put_irradience()
   return irradiance;
 }
 
-void Modele_rayo_semi_transp::preparer_calcul()
+void Modele_rayo_semi_transp::get_noms_champs_postraitables(Noms& noms,Option opt) const
 {
-  int contient_source_rayo_semi_transp = 0;
-
-  for (int j = 0; j < pb_fluide_->nombre_d_equations(); j++)
-    {
-
-      // Associer le modele au CL rayonnantes.
-      Domaine_Cl_dis_base& la_zcl = pb_fluide_->equation(j).domaine_Cl_dis();
-      for (int num_cl = 0; num_cl < la_zcl.nb_cond_lim(); num_cl++)
-        {
-          Cond_lim_base& la_cl = la_zcl.les_conditions_limites(num_cl).valeur();
-          Cond_lim_rayo_semi_transp *la_cl_rayo_semi_transp;
-
-          if (la_cl.is_bc_rayo_semi_transp(la_cl_rayo_semi_transp))
-            {
-              la_cl_rayo_semi_transp->associer_modele(*this);
-              la_cl_rayo_semi_transp->recherche_emissivite_et_A();
-
-              // Dans le cas d'un echange contact, il faut aussi completer la CL opposee
-              la_cl_rayo_semi_transp->completer_Cl_opposee_si_contact();
-            }
-        }
-
-      // Associer le modele au terme source de rayonnement de l'equation de temperature
-      Sources& les_sources = pb_fluide_->equation(j).sources();
-      for (int num_source = 0; num_source < les_sources.size(); num_source++)
-        {
-          if ((sub_type(Source_rayo_semi_transp_base, les_sources[num_source].valeur())) || (les_sources[num_source]->que_suis_je() == "Source_rayo_semi_transp_QC_VDF_P0_VDF")
-              || (les_sources[num_source]->que_suis_je() == "Source_rayo_semi_transp_QC_VEF_P1NC"))
-            {
-              contient_source_rayo_semi_transp = 1;
-            }
-        }
-    }
-
-  if (contient_source_rayo_semi_transp == 0)
-    {
-      Cerr << "Attention, vous n'avez pas defini de terme source de rayonnement semi transparent" << finl;
-      Cerr << "pensez a ajourter le terme source Source_rayo_semi_transp dans la liste des termes " << finl;
-      Cerr << "sources de l'equation de l'energie" << finl;
-      Process::exit();
-    }
-  eq_rayo().completer();
+  for (int i=0; i<nombre_d_equations(); i++)
+    equation(i).get_noms_champs_postraitables(noms,opt);
 }
 
-void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
+void Modele_rayo_semi_transp::discretise_longueur_rayo()
 {
-
-  // Typage de l'equation de rayonnement
-  Cerr << "typage de l'equation de rayonnement ";
-  Equation_base& eq_base = pb_fluide_->equation(1);
-  Nom disc = eq_base.discretisation().que_suis_je(), type = "Eq_rayo_semi_transp_";
-  if (disc == "VEFPreP1B")
-    disc = "VEF";
-
-  type += disc;
-  Cerr << type << finl;
-
-  eq_rayo_.typer(type);
-  //
-  // Creation des associations pour l'equation de rayonnement.
-  // Necessairement ici car, contrairement aux cas classiques, l'equation
-  // a besoin d'etre typee !
-  //
-  eq_rayo_->associer_modele_rayonnement(*this);
-  eq_rayo_->associer_sch_tps_base(schema_temps());
-
-  //  Probleme_base::discretiser(dis);
-  associer();
-  la_discretisation_ = dis;
-  Cerr << "Discretisation du domaine associe au probleme " << le_nom() << finl;
-  if (!le_domaine_.non_nul())
-    Process::exit("ERROR: Discretize - You're trying to discretize a problem without having associated a Domain to it!!! Fix your dataset.");
-  // Initialisation du tableau renum_som_perio
-  le_domaine_->init_renum_perio();
-
-  dis.associer_domaine(le_domaine_.valeur());
-  le_domaine_dis_ = dis.discretiser();
-  // Can not do this before, since the Domaine_dis is not typed yet:
-  le_domaine_dis_->associer_domaine(le_domaine_);
-
-  Cerr << "Discretisation des equations" << finl;
-  for (int i = 0; i < nombre_d_equations(); i++)
-    {
-      equation(i).associer_domaine_dis(domaine_dis());
-      equation(i).discretiser();
-    }
-
   // Association du fluide + diverses operations
-
   if (sub_type(Fluide_base, pb_fluide_->milieu()))
     {
 
@@ -216,6 +125,87 @@ void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
       Cerr << "qu'avec un Fluide_base et non " << pb_fluide_->milieu().que_suis_je() << finl;
       Process::exit();
     }
+}
+
+void Modele_rayo_semi_transp::preparer_calcul()
+{
+  int contient_source_rayo_semi_transp = 0;
+
+  for (int j = 0; j < pb_fluide_->nombre_d_equations(); j++)
+    {
+
+      // Associer le modele au CL rayonnantes.
+      Domaine_Cl_dis_base& la_zcl = pb_fluide_->equation(j).domaine_Cl_dis();
+      for (int num_cl = 0; num_cl < la_zcl.nb_cond_lim(); num_cl++)
+        {
+          Cond_lim_base& la_cl = la_zcl.les_conditions_limites(num_cl).valeur();
+          Cond_lim_rayo_semi_transp *la_cl_rayo_semi_transp;
+
+          if (la_cl.is_bc_rayo_semi_transp(la_cl_rayo_semi_transp))
+            {
+              la_cl_rayo_semi_transp->associer_modele(*this);
+              la_cl_rayo_semi_transp->recherche_emissivite_et_A();
+
+              // Dans le cas d'un echange contact, il faut aussi completer la CL opposee
+              la_cl_rayo_semi_transp->completer_Cl_opposee_si_contact();
+            }
+        }
+
+      // Associer le modele au terme source de rayonnement de l'equation de temperature
+      Sources& les_sources = pb_fluide_->equation(j).sources();
+      for (int num_source = 0; num_source < les_sources.size(); num_source++)
+        {
+          if ((sub_type(Source_rayo_semi_transp_base, les_sources[num_source].valeur())) || (les_sources[num_source]->que_suis_je() == "Source_rayo_semi_transp_QC_VDF_P0_VDF")
+              || (les_sources[num_source]->que_suis_je() == "Source_rayo_semi_transp_QC_VEF_P1NC"))
+            {
+              contient_source_rayo_semi_transp = 1;
+            }
+        }
+    }
+
+  if (contient_source_rayo_semi_transp == 0)
+    {
+      Cerr << "Attention, vous n'avez pas defini de terme source de rayonnement semi transparent" << finl;
+      Cerr << "pensez a ajourter le terme source Source_rayo_semi_transp dans la liste des termes " << finl;
+      Cerr << "sources de l'equation de l'energie" << finl;
+      Process::exit();
+    }
+  eq_rayo().completer();
+}
+
+void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
+{
+  // Typage de l'equation de rayonnement
+  Cerr << "typage de l'equation de rayonnement ";
+  Nom disc = dis.que_suis_je(), type = "Eq_rayo_semi_transp_";
+  if (disc == "VEFPreP1B")
+    disc = "VEF";
+
+  type += disc;
+  Cerr << type << finl;
+
+  eq_rayo_.typer(type);
+
+  associer();
+  la_discretisation_ = dis;
+  Cerr << "Discretisation du domaine associe au probleme " << le_nom() << finl;
+  if (!le_domaine_.non_nul())
+    Process::exit("ERROR: Discretize - You're trying to discretize a problem without having associated a Domain to it!!! Fix your dataset.");
+
+  // Initialisation du tableau renum_som_perio
+  le_domaine_->init_renum_perio();
+
+  dis.associer_domaine(le_domaine_.valeur());
+  le_domaine_dis_ = dis.discretiser();
+  // Can not do this before, since the Domaine_dis is not typed yet:
+  le_domaine_dis_->associer_domaine(le_domaine_);
+
+  Cerr << "Discretisation des equations" << finl;
+  for (int i = 0; i < nombre_d_equations(); i++)
+    {
+      equation(i).associer_domaine_dis(domaine_dis());
+      equation(i).discretiser();
+    }
 
   Cerr << "Modele_rayo_semi_transp::discretiser fin" << finl;
 }
@@ -237,6 +227,7 @@ void Modele_rayo_semi_transp::calculer_flux_radiatif()
         }
       else if (sub_type(Symetrie, la_cl_rayo.valeur()))
         {
+          /* Do nothing */
         }
       else
         {
@@ -281,5 +272,4 @@ const Champ_front_base& Modele_rayo_semi_transp::flux_radiatif(const Nom& nom_bo
   const Cond_lim& la_cl_rayo = eq_rayo().domaine_Cl_dis().les_conditions_limites(0);
   Flux_radiatif_base& la_cl_rayon = ref_cast_non_const(Flux_radiatif_base, la_cl_rayo.valeur());
   return la_cl_rayon.flux_radiatif();
-  //  Cerr<<"Modele_rayo_semi_transp::flux_radiatif const : Fin"<<finl;
 }

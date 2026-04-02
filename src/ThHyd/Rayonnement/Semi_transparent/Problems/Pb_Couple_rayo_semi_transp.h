@@ -16,14 +16,10 @@
 #ifndef Pb_Couple_rayo_semi_transp_included
 #define Pb_Couple_rayo_semi_transp_included
 
-#include <Schema_Temps_base.h>
 #include <Probleme_Couple.h>
-#include <Domaine.h>
 #include <TRUST_Ref.h>
 
-class Cond_lim_rayo_semi_transp;
 class Modele_rayo_semi_transp;
-class Cond_lim_base;
 
 /*! @brief classe derivee de Probleme_Couple Cette classe couple, outre des Probleme_base, un modele de
  *

@@ -17,7 +17,6 @@
 #define Equation_rayonnement_base_included
 
 #include <Operateur_Diff.h>
-#include <Operateur_Grad.h>
 #include <Matrice_Morse.h>
 #include <TRUST_Ref.h>
 
@@ -36,20 +35,21 @@ public:
   bool initTimeStep(double dt) override;
   virtual bool solve();
   void associer_milieu_base(const Milieu_base&) override;
-  inline void associer_fluide(const Fluide_base&);
-  void associer_modele_rayonnement(const Modele_rayo_semi_transp&);
   Milieu_base& milieu() override;
   const Milieu_base& milieu() const override;
   inline const Modele_rayo_semi_transp&  modele() const { return le_modele.valeur(); }
   inline Modele_rayo_semi_transp& modele() { return le_modele.valeur(); }
-  int nombre_d_operateurs() const override;
   const Operateur& operateur(int) const override;
   Operateur& operateur(int) override;
-  const Champ_Inc_base& inconnue() const override;
-  Champ_Inc_base& inconnue() override;
   void discretiser() override;
-  inline Fluide_base& fluide();
-  inline const Fluide_base& fluide() const;
+  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
+
+  const Champ_Inc_base& inconnue() const override { return irradiance_.valeur(); }
+  Champ_Inc_base& inconnue() override { return irradiance_.valeur(); }
+  inline void associer_fluide(const Fluide_base& un_fluide) { le_fluide = un_fluide; }
+  inline Fluide_base& fluide() { return le_fluide.valeur(); }
+  inline const Fluide_base& fluide() const { return le_fluide.valeur(); }
+  inline int nombre_d_operateurs() const override { return 1; }
 
   // pas de flux calcule correctement par les operateurs...
   inline int impr(Sortie& os) const override { return 1; }
@@ -60,10 +60,6 @@ public:
   void dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice_tmp);
 
   const Discretisation_base& discretisation() const;
-
-  Operateur_Grad& operateur_gradient();
-  const Operateur_Grad& operateur_gradient() const;
-  virtual void typer_op_grad()=0;
 
   void associer_pb_base(const Probleme_base& pb) override;
 
@@ -76,44 +72,13 @@ public:
   void completer() override;
 
 protected:
-
   OBS_PTR(Fluide_base) le_fluide;
   OBS_PTR(Modele_rayo_semi_transp) le_modele;
+  OWN_PTR(Champ_Inc_base) irradiance_;
 
   Operateur_Diff terme_diffusif;
-
-  OWN_PTR(Champ_Inc_base) irradiance_;
-  SolveurSys solveur;
   Matrice_Morse la_matrice;
-
-  Operateur_Grad gradient;
+  SolveurSys solveur;
 };
-
-/*! @brief Associe un fluide incompressible semi transparent a l'equation.
- *
- * @param (Fluide_base& un_fluide) le fluide incompressible semi transparent a associer
- */
-inline void Equation_rayonnement_base::associer_fluide(const Fluide_base& un_fluide)
-{
-  le_fluide = un_fluide;
-}
-
-/*! @brief renvoie le fluide semi transparent associe a l'equation de rayonnement
- *
- * @return (le fluide associe a l'equation de rayonnement)
- */
-inline const Fluide_base& Equation_rayonnement_base::fluide() const
-{
-  return le_fluide.valeur();
-}
-
-/*! @brief renvoie le fluide semi transparent associe a l'equation de rayonnement
- *
- * @return (le fluide associe a l'equation de rayonnement)
- */
-inline Fluide_base& Equation_rayonnement_base::fluide()
-{
-  return le_fluide.valeur();
-}
 
 #endif /* Equation_rayonnement_base_included */
