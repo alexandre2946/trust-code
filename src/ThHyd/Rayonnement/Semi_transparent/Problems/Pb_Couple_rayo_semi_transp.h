@@ -49,7 +49,6 @@ public:
   inline const Modele_rayo_semi_transp& modele() const { return le_modele_.valeur(); }
 
 protected:
-  DerObjU der_domaine_clone;
   OBS_PTR(Modele_rayo_semi_transp) le_modele_;
 };
 
