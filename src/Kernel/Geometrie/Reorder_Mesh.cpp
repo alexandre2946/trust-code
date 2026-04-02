@@ -390,8 +390,9 @@ void Reorder_Mesh::reorder_domain(Domaine_32_64<_SIZE_>& dom) const
       dump_to_file(xp, "reordering_elem_after.txt");
     }
 
-  if (dom.nb_ss_domaines())
-    Process::exit("Reorder not impl for sub-domains");
+  if (dom.nb_ss_domaines() && !skip_elems())
+    for (int i = 0; i < dom.nb_ss_domaines(); i++)
+      renum_vect_values(dom.ss_domaine(i).les_elems(), renum_elems);
 
   for (int i=0; i<dom.domaines_frontieres().size(); i++)
     reorder_domain(dom.domaine_frontiere(i));
@@ -468,6 +469,7 @@ void Reorder_Mesh::compute_renumbering(const DoubleTab_T<_SIZE_>& points, ArrOfI
   assert(points.dimension_int(1) == dim);
 
   int_t nb_pts = points.dimension(0);  // without virtuals! They must remain unchanged at the end of the arrays.
+  if (nb_pts==0) return; // Nothing to do :-)
 
   // Find bounding box
   std::array<double, 3> minV = { points(0,0), points(0,1), dim == 3 ? points(0,2) : 0.0 };
@@ -485,7 +487,7 @@ void Reorder_Mesh::compute_renumbering(const DoubleTab_T<_SIZE_>& points, ArrOfI
   auto quantize = [&](double value, double minVal, double maxVal) -> uint32_t
   {
     const uint32_t MAX_VAL = dim == 2 ? MAX_VAL_2D : MAX_VAL_3D;
-    double normalized = (value - minVal) / (maxVal - minVal);
+    double normalized = maxVal == minVal ? 0 : (value - minVal) / (maxVal - minVal);
     normalized = std::clamp(normalized, 0.0, 1.0);
     return static_cast<uint32_t>(std::round(normalized * MAX_VAL));
   };
