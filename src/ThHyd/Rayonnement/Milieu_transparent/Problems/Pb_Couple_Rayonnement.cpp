@@ -34,28 +34,13 @@ void Pb_Couple_Rayonnement::initialize()
 
 int Pb_Couple_Rayonnement::associer_(Objet_U& ob)
 {
-  int set_type_rayo = 0;
-  if (Probleme_Couple::associer_(ob))
+  if( sub_type(Modele_Rayonnement_Milieu_Transparent, ob))
     {
-      set_type_rayo=1;
-
+      Cerr << "association du modele au pbc" << finl;
+      le_modele_de_rayo_ = ref_cast(Modele_Rayonnement_Milieu_Transparent, ob);
+      return 1;
     }
-  else
-    {
-      if( sub_type(Modele_Rayonnement_Milieu_Transparent, ob))
-        {
-          set_type_rayo=1;
-          Cerr << "association du modele au pbc" << finl;
-
-          le_modele_de_rayo_ = ref_cast(Modele_Rayonnement_Milieu_Transparent, ob);
-        }
-      else
-        return 0;
-    }
-  if (set_type_rayo==1)
-    return 1;
-  else
-    return 0;
+  else return Probleme_Couple::associer_(ob);
 }
 
 int Pb_Couple_Rayonnement::postraiter(int force)
