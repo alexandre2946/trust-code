@@ -724,14 +724,14 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
     }
   else if (is_ALE)
     {
-	  // ALE explicit volumetric correction:
+      // ALE explicit volumetric correction:
       // In ALE formulation, the conservative form of the transient term is:
-	  // (V^{n+1} U^{n+1} - V^n U^n ) / dt
-	  // For an explicit Euler scheme, this leads to the additional term:
+      // (V^{n+1} U^{n+1} - V^n U^n ) / dt
+      // For an explicit Euler scheme, this leads to the additional term:
       // (V^n / V^{n+1}) * (U^n / dt) which is added to the explicit RHS (M-1(F - BtP)).
-	  // This ensures discrete mass conservation (Geometric Conservation Law) when the mesh is deformable.
-	  // This correction is required only for explicit schemes because
-	  // implicit schemes naturally incorporate the volume variation inside the mass matrix formulation.
+      // This ensures discrete mass conservation (Geometric Conservation Law) when the mesh is deformable.
+      // This correction is required only for explicit schemes because
+      // implicit schemes naturally incorporate the volume variation inside the mass matrix formulation.
       DoubleTab derivee2(derivee);
       // Conservative ALE form: deriveeALE= (Volume_n+1/Volume_n)*Un/delta t + derivee
       probleme().domaine().ajouter_correctif_volumique(la_vitesse->valeurs(), derivee, dt, derivee2);

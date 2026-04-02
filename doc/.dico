@@ -671,7 +671,6 @@
  Operateurs_Statistique_tps Operateurs_Statistique_tps Operateurs_Statistique_tps.h
  Operateur_base Operateur_base Operateur_base.h
  Operateur_Conv Operateur_Conv Operateur_Conv.h
- Operateur_Conv_ALE Op_Conv_ALE Op_Conv_ALE.h
  Operateur_Conv_base Operateur_Conv_base Operateur_Conv_base.h
  Operateur_Diff Operateur_Diff Operateur_Diff.h
  Operateur_Diff_base Operateur_Diff_base Operateur_Diff_base.h
@@ -1019,6 +1018,7 @@
  Prisme Prisme_32_64 Prisme.h
  Probleme_base Probleme_base Probleme_base.h
  Probleme_Couple Probleme_Couple Probleme_Couple.h
+ Probleme_Couple_Point_Fixe Probleme_Couple_Point_Fixe Probleme_Couple.h
  Probleme_Elasticite_Lineaire Probleme_Elasticite_Lineaire Probleme_Elasticite_Lineaire.h
  Probleme_U Probleme_U Probleme_U.h
  Puissance_Thermique_EF Puissance_Thermique_EF Puissance_Thermique_EF.h

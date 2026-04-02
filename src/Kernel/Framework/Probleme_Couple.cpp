@@ -173,11 +173,10 @@ bool Probleme_Couple_Point_Fixe::solveTimeStep()
   if (!ok || !converged)
     {
       if (limpr())
-        Cout << le_nom() << " : Echec du point fixe implicite apres " << compteur << " iterations." << finl;
+        Cerr << le_nom() << " : Failure in Probleme_Couple_Point_Fixe::solveTimeStep after " << compteur << " iterations." << finl;
       return false;
     }
 
-  Cout << "Convergence du point fixe a t = " << schema_temps().temps_courant() << " en " << compteur << " iterations." << finl;
   for (int i = 0; i < nb_problemes(); i++)
     per_pb_schemas[i]->test_stationnaire(ref_cast(Probleme_base, probleme(i)));
 
