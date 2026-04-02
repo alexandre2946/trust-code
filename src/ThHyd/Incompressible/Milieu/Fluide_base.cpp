@@ -373,29 +373,6 @@ int Fluide_base::initialiser(const double temps)
   return 1;
 }
 
-int Fluide_base::is_rayo_semi_transp() const
-{
-  return int(indic_rayo_ == SEMITRANSP);
-}
-
-void Fluide_base::reset_type_rayo()
-{
-  indic_rayo_ = NONRAYO;
-}
-
-void Fluide_base::fixer_type_rayo()
-{
-  if ((coeff_absorption_.non_nul()) && (indice_refraction_.non_nul()))
-    indic_rayo_ = SEMITRANSP;
-  else
-    indic_rayo_ = TRANSP;
-}
-
-int Fluide_base::longueur_rayo_is_discretised()
-{
-  return longueur_rayo_.non_nul();
-}
-
 void Fluide_base::set_h0_T0(double h0, double T0)
 {
   T0_ = T0;

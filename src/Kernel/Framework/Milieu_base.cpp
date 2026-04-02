@@ -28,14 +28,8 @@
 #include <Param.h>
 
 
-Implemente_base_sans_constructeur(Milieu_base,"Milieu_base",Objet_U);
+Implemente_base(Milieu_base,"Milieu_base",Objet_U);
 // XD milieu_base objet_u milieu_base -1 Basic class for medium (physics properties of medium).
-
-Milieu_base::Milieu_base()
-{
-  indic_rayo_ = NONRAYO;
-  deja_associe_=0;
-}
 
 Sortie& Milieu_base::printOn(Sortie& os) const
 {

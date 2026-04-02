@@ -80,12 +80,10 @@ public :
   inline const Champ_Don_base& longeur_rayo() const { return longueur_rayo_.valeur(); }
   void typer_longeur_rayo(const Nom& typ) { longueur_rayo_.typer(typ); }
 
-  // Modif CHD 07/05/03 Ajout des parametres pour un fluide semi transparent on les ramene ici pour ne plus avoir a utiliser de Fluide incompressible semi transparent.
-  int is_rayo_semi_transp() const override;
+  bool is_rayo_semi_transp() const override { return (coeff_absorption_.non_nul() && indice_refraction_.non_nul()); }
   bool is_rayo_transp() const override { return is_rad_transp_med_; }
-  void fixer_type_rayo();
-  void reset_type_rayo();
-  int longueur_rayo_is_discretised();
+  bool is_longueur_rayo_discretised() const { return longueur_rayo_.non_nul(); }
+
 protected :
   void creer_e_int() const; // creation sur demande de e_int / h
   void creer_temperature_multiphase() const; // seulement si Energie_Multiphase_Enthalpie

@@ -48,9 +48,8 @@ class Param;
  */
 class Milieu_base : public Champs_compris_interface, public Objet_U
 {
-  Declare_base_sans_constructeur(Milieu_base);
+  Declare_base(Milieu_base);
 public:
-  Milieu_base();
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   int associer_(Objet_U&) override;
   void nommer(const Nom&) override;
@@ -80,7 +79,7 @@ public:
   virtual void verifier_coherence_champs(int& err, Nom& message);
   virtual void creer_champs_non_lus();
   virtual void discretiser(const Probleme_base& pb, const Discretisation_base& dis);
-  virtual int is_rayo_semi_transp() const { return 0; }
+  virtual bool is_rayo_semi_transp() const { return false; }
   virtual bool is_rayo_transp() const { return false; }
   virtual void mettre_a_jour(double temps);
   virtual bool initTimeStep(double dt) { return true; }
@@ -143,9 +142,6 @@ protected:
   Nom nom_;
   LIST(OBS_PTR(Champ_Don_base)) champs_don_;
 
-  enum Type_rayo { NONRAYO, TRANSP, SEMITRANSP };
-  Type_rayo indic_rayo_;
-
   mutable std::map<std::string, const Equation_base *> equation_;
   virtual void calculer_alpha();
   void ecrire(Sortie& ) const;
@@ -172,7 +168,7 @@ private:
   const bool& is_user_porosites() { return is_user_porosites_; }
   const bool& is_field_porosites() { return is_field_porosites_; }
 
-  mutable int deja_associe_;
+  mutable int deja_associe_ = 0;
   bool via_associer_ = false;
   void warn_old_syntax();
   OBS_PTR(Champ_Don_base) g_via_associer_;
