@@ -72,6 +72,7 @@ public:
   inline const Probleme_base& probleme_fluide() const { return pb_fluide_.valeur(); }
   inline const double& valeur_sigma() const { return sigma_; }
   inline void associer_probleme_fluide(Probleme_base& Pb) { pb_fluide_ = Pb; }
+  void typer_lire_milieu(Entree& is) override { /* Do nothing */ }
 
   inline const Equation_base& equation(int i) const override
   {
