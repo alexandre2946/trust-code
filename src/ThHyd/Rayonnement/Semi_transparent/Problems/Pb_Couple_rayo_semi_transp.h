@@ -19,17 +19,17 @@
 #include <Probleme_Couple.h>
 #include <TRUST_Ref.h>
 
-class Modele_rayo_semi_transp;
+class Pb_rayo_semi_transp;
 
-/*! @brief classe derivee de Probleme_Couple Cette classe couple, outre des Probleme_base, un modele de
+/*! @brief classe derivee de Probleme_Couple Cette classe couple, outre des Probleme_base, un pb de
  *
- *      rayonnement.
+ *      rayonnement semi transparent.
  *      Seule l'etape d'initialisation impose actuellement que le
- *      modele de rayonnement soit differencie, et donc l'existence de
+ *      pb de rayonnement soit differencie, et donc l'existence de
  *      la classe Pb_Couple_rayo_semi_transp.
  *
  *
- * @sa Probleme_Couple Modele_rayo_semi_transp
+ * @sa Probleme_Couple Pb_rayo_semi_transp
  */
 class Pb_Couple_rayo_semi_transp: public Probleme_Couple
 {
@@ -37,15 +37,10 @@ class Pb_Couple_rayo_semi_transp: public Probleme_Couple
 public:
 
   void initialize() override;
-
-  void le_modele_rayo_associe(const Modele_rayo_semi_transp&);
   int associer_(Objet_U&) override;
 
-  inline Modele_rayo_semi_transp& modele() { return le_modele_.valeur(); }
-  inline const Modele_rayo_semi_transp& modele() const { return le_modele_.valeur(); }
-
 protected:
-  OBS_PTR(Modele_rayo_semi_transp) le_modele_;
+  OBS_PTR(Pb_rayo_semi_transp) pb_rayo_semi_transp_;
 };
 
 #endif /* Pb_Couple_rayo_semi_transp_included */

@@ -14,7 +14,7 @@
 *****************************************************************************/
 
 #include <Equation_rayonnement_base.h>
-#include <Modele_rayo_semi_transp.h>
+#include <Pb_rayo_semi_transp.h>
 #include <Matrice_Morse_Sym.h>
 #include <Champ_Uniforme.h>
 #include <Matrice_Bloc.h>
@@ -296,13 +296,13 @@ void Equation_rayonnement_base::discretiser()
  */
 const Discretisation_base& Equation_rayonnement_base::discretisation() const
 {
-  return le_modele_->discretisation();
+  return pb_rayo_semi_transp_->discretisation();
 }
 
 void Equation_rayonnement_base::associer_pb_base(const Probleme_base& pb)
 {
   Equation_base::associer_pb_base(pb);
-  le_modele_ = ref_cast(Modele_rayo_semi_transp, pb);
+  pb_rayo_semi_transp_ = ref_cast(Pb_rayo_semi_transp, pb);
   associer_sch_tps_base(pb.schema_temps());
 }
 

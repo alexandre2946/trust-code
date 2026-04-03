@@ -19,7 +19,7 @@
 #include <Source_base.h>
 #include <TRUST_Ref.h>
 
-class Modele_rayo_semi_transp;
+class Pb_rayo_semi_transp;
 
 /*! @brief classe Source_rayo_semi_transp_base Classe de base de la hierarchie des termes sources de l'eqution de
  *
@@ -32,13 +32,13 @@ class Source_rayo_semi_transp_base: public Source_base
 
 public:
 
-  inline Modele_rayo_semi_transp& modele() { return le_modele_.valeur(); }
-  inline const Modele_rayo_semi_transp& modele() const { return le_modele_.valeur(); }
-  virtual void associer_modele_rayo(Modele_rayo_semi_transp& modele);
+  inline Pb_rayo_semi_transp& pb_rayo_semi_transp() { return pb_rayo_semi_transp_.valeur(); }
+  inline const Pb_rayo_semi_transp& pb_rayo_semi_transp() const { return pb_rayo_semi_transp_.valeur(); }
+  virtual void associer_pb_rayo_semi_transp(Pb_rayo_semi_transp& );
   void mettre_a_jour(double temps) override { }
 
 protected:
-  OBS_PTR(Modele_rayo_semi_transp) le_modele_;
+  OBS_PTR(Pb_rayo_semi_transp) pb_rayo_semi_transp_;
 };
 
 #endif /* Source_rayo_semi_transp_base_included */

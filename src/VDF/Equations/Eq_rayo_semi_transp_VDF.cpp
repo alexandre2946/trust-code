@@ -15,7 +15,7 @@
 
 #include <Eq_rayo_semi_transp_VDF.h>
 #include <Fluide_Incompressible.h>
-#include <Modele_rayo_semi_transp.h>
+#include <Pb_rayo_semi_transp.h>
 #include <Operateur_Diff_base.h>
 #include <Champ_Uniforme.h>
 #include <Champ_front_uniforme.h>
@@ -50,13 +50,13 @@ void Eq_rayo_semi_transp_VDF::resoudre(double temps)
   const DoubleTab& kappa = fluide().kappa().valeurs();
   //calcul du second membre
   DoubleTrav secmem(inconnue().valeurs());
-  Probleme_base& pb = modele().probleme_fluide();
+  Probleme_base& pb = pb_rayo_semi_transp().probleme_fluide();
   double n,k;
 
   assert(pb.equation(1).inconnue().le_nom()=="temperature");
   const DoubleTab& temper = pb.equation(1).inconnue().valeurs();
   const DoubleTab& indice = fluide().indice().valeurs();
-  const double sigma = modele().valeur_sigma();
+  const double sigma = pb_rayo_semi_transp().valeur_sigma();
 
   secmem = 0;
   int elem;
@@ -141,7 +141,7 @@ void Eq_rayo_semi_transp_VDF::evaluer_cl_rayonnement(double temps)
   Conds_lim& les_cl_rayo = domaine_Cl_dis().les_conditions_limites();
 
   // recherche des conditions aux limites associes au l'equation de temperature
-  Equation_base& eq_temp = modele().probleme_fluide().equation(1);
+  Equation_base& eq_temp = pb_rayo_semi_transp().probleme_fluide().equation(1);
   assert(eq_temp.inconnue().le_nom()=="temperature");
 
   Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites();
@@ -225,7 +225,7 @@ void Eq_rayo_semi_transp_VDF::evaluer_cl_rayonnement(double temps)
             Cerr<<"On n'a pas remplie le tableau des temperatures de bord !!!!"<<finl;
           const Domaine_VF& zvf = ref_cast(Domaine_VF,domaine_dis());
           la_cl_rayon.evaluer_cl_rayonnement(Tb.valeur(), fluide().kappa(), fluide().longueur_rayo(),
-                                             fluide().indice(),zvf,modele().valeur_sigma(),temps);
+                                             fluide().indice(),zvf,pb_rayo_semi_transp().valeur_sigma(),temps);
         }
       else if (sub_type(Symetrie,la_cl_rayo.valeur()))
         {

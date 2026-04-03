@@ -15,7 +15,7 @@
 
 #include <Echange_contact_rayo_semi_transp_VDF.h>
 #include <Pb_Conduction.h>
-#include <Modele_rayo_semi_transp.h>
+#include <Pb_rayo_semi_transp.h>
 #include <Champ_front_calc.h>
 #include <Milieu_base.h>
 #include <Domaine_VDF.h>
@@ -208,8 +208,8 @@ void Echange_contact_rayo_semi_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_p
   Teta_p.resize(nb_faces_bord, 1);
   DoubleTab& t_autre = T_autre_pb().valeurs_au_temps(temps);
 
-  const Modele_rayo_semi_transp& le_modele = modele();
-  const DoubleTab& flux_radiatif = le_modele.flux_radiatif(frontiere_dis().le_nom()).valeurs();
+  const Pb_rayo_semi_transp& le_pb_rayo = pb_rayo_semi_transp();
+  const DoubleTab& flux_radiatif = le_pb_rayo.flux_radiatif(frontiere_dis().le_nom()).valeurs();
   for (int numfa = 0; numfa < nb_faces_bord; numfa++)
     {
       ind_fac = numfa + ndeb;
@@ -247,8 +247,8 @@ void Echange_contact_rayo_semi_transp_VDF::calculer_Teta_equiv(DoubleTab& Teta_e
 
   assert(Teta_eq.dimension(0) == nb_faces_bord);
   assert(Teta_eq.dimension(1) == 1);
-  const Modele_rayo_semi_transp& le_modele = modele();
-  const DoubleTab& flux_radiatif = le_modele.flux_radiatif(frontiere_dis().le_nom()).valeurs();
+  const Pb_rayo_semi_transp& le_pb_rayo = pb_rayo_semi_transp();
+  const DoubleTab& flux_radiatif = le_pb_rayo.flux_radiatif(frontiere_dis().le_nom()).valeurs();
   DoubleTab& t_autre = T_autre_pb().valeurs_au_temps(temps);
   for (int numfa = 0; numfa < nb_faces_bord; numfa++)
     Teta_eq(numfa, 0) = t_autre(numfa, 0) - (1 / lautre_h(numfa, 0)) * flux_radiatif(numfa, 0);
@@ -281,6 +281,6 @@ Echange_contact_rayo_semi_transp_VDF& Echange_contact_rayo_semi_transp_VDF::la_C
 void Echange_contact_rayo_semi_transp_VDF::completer_Cl_opposee_si_contact()
 {
   Echange_contact_rayo_semi_transp_VDF& la_cl_opp = la_Cl_opposee();
-  la_cl_opp.associer_modele(mon_modele_.valeur());
+  la_cl_opp.associer_pb_rayo_semi_transp(pb_rayo_semi_transp_.valeur());
   la_cl_opp.recherche_emissivite_et_A();
 }

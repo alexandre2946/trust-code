@@ -81,12 +81,12 @@ void Temperature_imposee_paroi_rayo_semi_transp::calculer_temperature_bord(doubl
     }
 }
 
-void Temperature_imposee_paroi_rayo_semi_transp::associer_modele(const Modele_rayo_semi_transp& un_modele)
+void Temperature_imposee_paroi_rayo_semi_transp::associer_pb_rayo_semi_transp(const Pb_rayo_semi_transp& pb)
 {
-  Cond_lim_rayo_semi_transp::associer_modele(un_modele);
+  Cond_lim_rayo_semi_transp::associer_pb_rayo_semi_transp(pb);
   if (sub_type(Champ_front_contact_rayo_semi_transp_VEF, le_champ_front.valeur()))
     {
       Champ_front_contact_rayo_semi_transp_VEF& Ch_contact = ref_cast(Champ_front_contact_rayo_semi_transp_VEF, le_champ_front.valeur());
-      Ch_contact.associer_modele_rayo(un_modele);
+      Ch_contact.associer_pb_rayo_semi_transp(pb);
     }
 }

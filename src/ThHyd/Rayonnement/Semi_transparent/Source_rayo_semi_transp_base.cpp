@@ -14,7 +14,7 @@
 *****************************************************************************/
 
 #include <Source_rayo_semi_transp_base.h>
-#include <Modele_rayo_semi_transp.h>
+#include <Pb_rayo_semi_transp.h>
 
 Implemente_base(Source_rayo_semi_transp_base, "Source_rayo_semi_transp_base", Source_base);
 
@@ -22,7 +22,7 @@ Sortie& Source_rayo_semi_transp_base::printOn(Sortie& s) const { return s << que
 
 Entree& Source_rayo_semi_transp_base::readOn(Entree& s) { return s; }
 
-void Source_rayo_semi_transp_base::associer_modele_rayo(Modele_rayo_semi_transp& mod)
+void Source_rayo_semi_transp_base::associer_pb_rayo_semi_transp(Pb_rayo_semi_transp& pb)
 {
-  le_modele_ = mod;
+  pb_rayo_semi_transp_ = pb;
 }

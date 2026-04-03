@@ -20,7 +20,7 @@
 #include <Cond_lim_base.h>
 #include <TRUST_Ref.h>
 
-class Modele_rayo_semi_transp;
+class Pb_rayo_semi_transp;
 
 /*! @brief classe Cond_lim_rayo_semi_transp
  *
@@ -31,16 +31,16 @@ class Cond_lim_rayo_semi_transp
 public:
   virtual ~Cond_lim_rayo_semi_transp() { }
 
-  virtual void associer_modele(const Modele_rayo_semi_transp&);
-  inline const Modele_rayo_semi_transp& modele() const
+  virtual void associer_pb_rayo_semi_transp(const Pb_rayo_semi_transp&);
+  inline const Pb_rayo_semi_transp& pb_rayo_semi_transp() const
   {
-    assert(mon_modele_.non_nul());
-    return mon_modele_.valeur();
+    assert(pb_rayo_semi_transp_.non_nul());
+    return pb_rayo_semi_transp_.valeur();
   }
-  inline Modele_rayo_semi_transp& modele()
+  inline Pb_rayo_semi_transp& pb_rayo_semi_transp()
   {
-    assert(mon_modele_.non_nul());
-    return mon_modele_.valeur();
+    assert(pb_rayo_semi_transp_.non_nul());
+    return pb_rayo_semi_transp_.valeur();
   }
 
   inline Champ_front_base& emissivite() { return emissivite_; }
@@ -53,7 +53,7 @@ public:
   virtual void completer_Cl_opposee_si_contact() { }
 
 protected:
-  OBS_PTR(Modele_rayo_semi_transp) mon_modele_;
+  OBS_PTR(Pb_rayo_semi_transp) pb_rayo_semi_transp_;
   OWN_PTR(Champ_front_base) emissivite_;
   double A_ = -123.;
 };

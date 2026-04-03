@@ -21,7 +21,7 @@
 #include <Frontiere_ouverte_temperature_imposee_rayo_semi_transp.h>
 #include <Frontiere_ouverte_rayo_semi_transp.h>
 #include <Eq_rayo_semi_transp_VDF.h>
-#include <Modele_rayo_semi_transp.h>
+#include <Pb_rayo_semi_transp.h>
 #include <Fluide_base.h>
 #include <Champ_Uniforme.h>
 #include <Champ_front_uniforme.h>
@@ -271,7 +271,7 @@ void Flux_radiatif_VDF::calculer_flux_radiatif(const Equation_base& eq_temp)
       else
         n = indice(elem,0);
 
-      double sigma = eq_rayo.modele().valeur_sigma();
+      double sigma = eq_rayo.pb_rayo_semi_transp().valeur_sigma();
       double Tbord;
 
       assert(Tb.valeur().nb_comp() == 1);

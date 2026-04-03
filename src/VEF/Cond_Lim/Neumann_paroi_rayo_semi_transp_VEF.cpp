@@ -14,7 +14,7 @@
 *****************************************************************************/
 
 #include <Neumann_paroi_rayo_semi_transp_VEF.h>
-#include <Modele_rayo_semi_transp.h>
+#include <Pb_rayo_semi_transp.h>
 #include <Champ_Uniforme.h>
 #include <Milieu_base.h>
 #include <Front_VF.h>
@@ -39,7 +39,7 @@ void Neumann_paroi_rayo_semi_transp_VEF::mettre_a_jour(double temps)
 
 double Neumann_paroi_rayo_semi_transp_VEF::flux_impose(int i) const
 {
-  const DoubleTab& flux_radiatif = modele().flux_radiatif(frontiere_dis().le_nom()).valeurs();
+  const DoubleTab& flux_radiatif = pb_rayo_semi_transp().flux_radiatif(frontiere_dis().le_nom()).valeurs();
 
   if (le_champ_front->valeurs().size() == 1)
     return le_champ_front->valeurs()(0, 0) - flux_radiatif(i, 0);
@@ -53,7 +53,7 @@ double Neumann_paroi_rayo_semi_transp_VEF::flux_impose(int i) const
 
 double Neumann_paroi_rayo_semi_transp_VEF::flux_impose(int i, int j) const
 {
-  const DoubleTab& flux_radiatif = modele().flux_radiatif(frontiere_dis().le_nom()).valeurs();
+  const DoubleTab& flux_radiatif = pb_rayo_semi_transp().flux_radiatif(frontiere_dis().le_nom()).valeurs();
 
   if (le_champ_front->valeurs().dimension(0) == 1)
     return le_champ_front->valeurs()(0, j) - flux_radiatif(i);

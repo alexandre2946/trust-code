@@ -15,7 +15,7 @@
 
 #include <Source_rayo_semi_transp_base.h>
 #include <Pb_Couple_rayo_semi_transp.h>
-#include <Modele_rayo_semi_transp.h>
+#include <Pb_rayo_semi_transp.h>
 #include <Fluide_base.h>
 
 Implemente_instanciable(Pb_Couple_rayo_semi_transp, "Pb_Couple_rayo_semi_transp", Probleme_Couple);
@@ -32,7 +32,7 @@ void Pb_Couple_rayo_semi_transp::initialize()
     {
       Probleme_base& le_pb = ref_cast(Probleme_base, probleme(l));
 
-      if (!sub_type(Modele_rayo_semi_transp, le_pb))
+      if (!sub_type(Pb_rayo_semi_transp, le_pb))
         if (sub_type(Fluide_base, le_pb.milieu()))
           if (ref_cast(Fluide_base, le_pb.milieu()).is_rayo_semi_transp())
             nb_pb_ray++;
@@ -46,25 +46,25 @@ void Pb_Couple_rayo_semi_transp::initialize()
   else if (nb_pb_ray == 0)
     Process::exit("Pb_Couple_rayo_semi_transp::initialize - It seems you forgot to define the radiation properties in your medium !!!\n");
 
-  // on associe le pb fluide au modele
+  // on associe le pb fluide au pb_rayo
   for (int l = 0; l < nb_problemes(); l++)
     {
       Probleme_base& le_pb = ref_cast(Probleme_base, probleme(l));
 
-      if (!sub_type(Modele_rayo_semi_transp, le_pb))
+      if (!sub_type(Pb_rayo_semi_transp, le_pb))
         if (sub_type(Fluide_base, le_pb.milieu()))
           if (ref_cast(Fluide_base, le_pb.milieu()).is_rayo_semi_transp())
             {
-              modele().associer_probleme_fluide(le_pb);
+              pb_rayo_semi_transp_->associer_probleme_fluide(le_pb);
               break;
             }
     }
 
-  modele().discretise_longueur_rayo();
+  pb_rayo_semi_transp_->discretise_longueur_rayo();
 
   Probleme_Couple::initialize();
-  Probleme_base& le_pb = modele().probleme_fluide();
-  // Associer le modele aux sources de rayonnement
+  Probleme_base& le_pb = pb_rayo_semi_transp_->probleme_fluide();
+  // Associer le pb rayo aux sources de rayonnement
   for (int i = 0; i < le_pb.nombre_d_equations(); i++)
     {
       Sources& les_sources = le_pb.equation(i).sources();
@@ -74,48 +74,36 @@ void Pb_Couple_rayo_semi_transp::initialize()
           if (sub_type(Source_rayo_semi_transp_base, la_source.valeur()))   // premier cas
             {
               Source_rayo_semi_transp_base& source_rayo = ref_cast(Source_rayo_semi_transp_base, la_source.valeur());
-              Cerr << "Association MODELE a SOURCE" << finl;
-              source_rayo.associer_modele_rayo(modele());
+              Cerr << "Association pb rayo semi transp au terme source rayo" << finl;
+              source_rayo.associer_pb_rayo_semi_transp(pb_rayo_semi_transp_.valeur());
             }
         }
     }
 
-  modele().eq_rayo().resoudre(presentTime());
-  modele().calculer_flux_radiatif();
+  pb_rayo_semi_transp_->eq_rayo().resoudre(presentTime());
+  pb_rayo_semi_transp_->calculer_flux_radiatif();
 
   for (int i = 0; i < nb_problemes(); i++)
     {
       Probleme_base& pb = ref_cast(Probleme_base, probleme(i));
       for (int j = 0; j < pb.nombre_d_equations(); j++)
-        {
-          pb.equation(j).domaine_Cl_dis().calculer_coeffs_echange(presentTime());
-        }
+        pb.equation(j).domaine_Cl_dis().calculer_coeffs_echange(presentTime());
     }
 }
 
 int Pb_Couple_rayo_semi_transp::associer_(Objet_U& ob)
 {
-  Cerr << "Appel a associer_ " << ob.que_suis_je() << finl;
-  if (sub_type(Modele_rayo_semi_transp, ob))
+  if (sub_type(Pb_rayo_semi_transp, ob))
     {
-      Cerr << "association du modele au pbc" << finl;
-      le_modele_rayo_associe(ref_cast(Modele_rayo_semi_transp, ob));
-      ajouter(modele());
+      Cerr << "association du pb rayo semi transp au pb couple" << finl;
+      if (pb_rayo_semi_transp_.non_nul())
+        Process::exit("Attention : on ne peut associer qu'un pb de rayonnement a un Pb_Couple_rayo_semi_transp !!! \n");
+
+      pb_rayo_semi_transp_ = ref_cast(Pb_rayo_semi_transp, ob);
+      ajouter(pb_rayo_semi_transp_.valeur());
 
       return 1;
     }
   else
     return Probleme_Couple::associer_(ob);
 }
-
-void Pb_Couple_rayo_semi_transp::le_modele_rayo_associe(const Modele_rayo_semi_transp& un_modele_de_rayonnement)
-{
-  if (le_modele_.non_nul())
-    {
-      Cerr << "Attention : on ne peut associer qu'un modele de rayonnement a un Pb_Couple_rayo_semi_transp" << finl;
-      Process::exit();
-    }
-  le_modele_ = un_modele_de_rayonnement;
-
-}
-

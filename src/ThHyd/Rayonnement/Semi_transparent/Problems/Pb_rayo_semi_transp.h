@@ -13,13 +13,13 @@
 *
 *****************************************************************************/
 
-#ifndef Modele_rayo_semi_transp_included
-#define Modele_rayo_semi_transp_included
+#ifndef Pb_rayo_semi_transp_included
+#define Pb_rayo_semi_transp_included
 
 #include <Equation_rayonnement_base.h>
 #include <Probleme_base.h>
 
-/*! @brief Le Modele_rayo_semi_transp est un Probleme_base qui a 4 particularites : * Son equation doit etre typee en fonction de la dicretisation.
+/*! @brief Le Pb_rayo_semi_transp est un Probleme_base qui a 4 particularites : * Son equation doit etre typee en fonction de la dicretisation.
  *
  *     Cela impose de differer certaines initialisations jusqu'a
  *     connaitre la discretisation utilisee.
@@ -32,9 +32,9 @@
  *
  * @sa Pb_Couple_rayo_semi_transp Equation_rayonnement_base
  */
-class Modele_rayo_semi_transp: public Probleme_base
+class Pb_rayo_semi_transp: public Probleme_base
 {
-  Declare_instanciable(Modele_rayo_semi_transp);
+  Declare_instanciable(Pb_rayo_semi_transp);
 public:
   void terminate() override { finir(); }
 
@@ -114,4 +114,4 @@ protected :
   static constexpr double sigma_ = 5.67e-8;
 };
 
-#endif /* Modele_rayo_semi_transp_included */
+#endif /* Pb_rayo_semi_transp_included */

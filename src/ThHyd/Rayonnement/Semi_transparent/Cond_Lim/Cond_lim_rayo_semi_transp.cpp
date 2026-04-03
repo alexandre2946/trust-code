@@ -14,22 +14,21 @@
 *****************************************************************************/
 
 #include <Cond_lim_rayo_semi_transp.h>
-#include <Modele_rayo_semi_transp.h>
+#include <Pb_rayo_semi_transp.h>
 #include <Flux_radiatif_base.h>
 #include <Frontiere_dis_base.h>
 #include <Symetrie.h>
 
-void Cond_lim_rayo_semi_transp::associer_modele(const Modele_rayo_semi_transp& un_modele)
+void Cond_lim_rayo_semi_transp::associer_pb_rayo_semi_transp(const Pb_rayo_semi_transp& pb)
 {
-  mon_modele_=un_modele;
+  pb_rayo_semi_transp_ = pb;
 }
 
 void Cond_lim_rayo_semi_transp::recherche_emissivite_et_A()
 {
-  // On recupere le modele
   int num_cl_rayo=0;
 
-  Equation_rayonnement_base& eq_rayo = modele().eq_rayo();
+  Equation_rayonnement_base& eq_rayo = pb_rayo_semi_transp().eq_rayo();
   Conds_lim& les_cl_rayo = eq_rayo.domaine_Cl_dis().les_conditions_limites();
 
   int test_nom=0;

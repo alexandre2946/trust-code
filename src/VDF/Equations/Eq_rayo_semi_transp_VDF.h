@@ -22,7 +22,7 @@
 /*! @brief classe Eq_rayo_semi_transp Cette classe represente l'equation de rayonnement pour l'irradiance
  *
  *     dans un milieu semi transparent.
- *     elle est associee au modele de rayonnement semi transparent
+ *     elle est associee au probleme de rayonnement semi transparent
  *     Elle definit la methode resoudre et calcule l'irradiance.
  *
  *

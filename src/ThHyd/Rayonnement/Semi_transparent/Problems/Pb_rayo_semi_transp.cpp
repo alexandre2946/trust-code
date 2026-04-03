@@ -15,7 +15,7 @@
 
 #include <Source_rayo_semi_transp_base.h>
 #include <Cond_lim_rayo_semi_transp.h>
-#include <Modele_rayo_semi_transp.h>
+#include <Pb_rayo_semi_transp.h>
 #include <Discretisation_base.h>
 #include <Flux_radiatif_base.h>
 #include <Schema_Temps_base.h>
@@ -24,24 +24,24 @@
 #include <Symetrie.h>
 #include <Domaine.h>
 
-Implemente_instanciable(Modele_rayo_semi_transp, "Modele_rayo_semi_transp", Probleme_base);
+Implemente_instanciable(Pb_rayo_semi_transp, "Pb_rayo_semi_transp", Probleme_base);
 
-Entree& Modele_rayo_semi_transp::readOn(Entree& is) { return Probleme_base::readOn(is); }
+Entree& Pb_rayo_semi_transp::readOn(Entree& is) { return Probleme_base::readOn(is); }
 
-Sortie& Modele_rayo_semi_transp::printOn(Sortie& os) const { return os; }
+Sortie& Pb_rayo_semi_transp::printOn(Sortie& os) const { return os; }
 
-bool Modele_rayo_semi_transp::initTimeStep(double dt)
+bool Pb_rayo_semi_transp::initTimeStep(double dt)
 {
   return eq_rayo().initTimeStep(dt);
 }
 
-bool Modele_rayo_semi_transp::iterateTimeStep(bool& converged)
+bool Pb_rayo_semi_transp::iterateTimeStep(bool& converged)
 {
   converged = true;
   return eq_rayo().solve();
 }
 
-void Modele_rayo_semi_transp::validateTimeStep()
+void Pb_rayo_semi_transp::validateTimeStep()
 {
   double temps = pb_fluide_->presentTime();
   eq_rayo().mettre_a_jour(temps);
@@ -52,25 +52,25 @@ void Modele_rayo_semi_transp::validateTimeStep()
   statistics().end_count(STD_COUNTERS::update_variables);
 }
 
-void Modele_rayo_semi_transp::associer_sch_tps_base(const Schema_Temps_base& un_schema_en_temps)
+void Pb_rayo_semi_transp::associer_sch_tps_base(const Schema_Temps_base& un_schema_en_temps)
 {
   le_schema_en_temps_ = un_schema_en_temps;
   le_schema_en_temps_->associer_pb(*this);
 }
 
-Champ_Inc_base& Modele_rayo_semi_transp::put_irradience()
+Champ_Inc_base& Pb_rayo_semi_transp::put_irradience()
 {
   Champ_Inc_base& irradiance = eq_rayo().inconnue();
   return irradiance;
 }
 
-void Modele_rayo_semi_transp::get_noms_champs_postraitables(Noms& noms,Option opt) const
+void Pb_rayo_semi_transp::get_noms_champs_postraitables(Noms& noms,Option opt) const
 {
   for (int i=0; i<nombre_d_equations(); i++)
     equation(i).get_noms_champs_postraitables(noms,opt);
 }
 
-void Modele_rayo_semi_transp::discretise_longueur_rayo()
+void Pb_rayo_semi_transp::discretise_longueur_rayo()
 {
   // Association du fluide + diverses operations
   if (sub_type(Fluide_base, pb_fluide_->milieu()))
@@ -120,21 +120,21 @@ void Modele_rayo_semi_transp::discretise_longueur_rayo()
 
   else
     {
-      Cerr << "Erreur dans Modele_rayo_semi_transp::readOn " << finl;
-      Cerr << "Le modele de rayonnement semi transparent ne peut etre utilise" << finl;
+      Cerr << "Erreur dans Pb_rayo_semi_transp::readOn " << finl;
+      Cerr << "Le probleme de rayonnement semi transparent ne peut etre utilise" << finl;
       Cerr << "qu'avec un Fluide_base et non " << pb_fluide_->milieu().que_suis_je() << finl;
       Process::exit();
     }
 }
 
-void Modele_rayo_semi_transp::preparer_calcul()
+void Pb_rayo_semi_transp::preparer_calcul()
 {
   int contient_source_rayo_semi_transp = 0;
 
   for (int j = 0; j < pb_fluide_->nombre_d_equations(); j++)
     {
 
-      // Associer le modele au CL rayonnantes.
+      // Associer le pb au CL rayonnantes.
       Domaine_Cl_dis_base& la_zcl = pb_fluide_->equation(j).domaine_Cl_dis();
       for (int num_cl = 0; num_cl < la_zcl.nb_cond_lim(); num_cl++)
         {
@@ -143,7 +143,7 @@ void Modele_rayo_semi_transp::preparer_calcul()
 
           if (la_cl.is_bc_rayo_semi_transp(la_cl_rayo_semi_transp))
             {
-              la_cl_rayo_semi_transp->associer_modele(*this);
+              la_cl_rayo_semi_transp->associer_pb_rayo_semi_transp(*this);
               la_cl_rayo_semi_transp->recherche_emissivite_et_A();
 
               // Dans le cas d'un echange contact, il faut aussi completer la CL opposee
@@ -151,7 +151,7 @@ void Modele_rayo_semi_transp::preparer_calcul()
             }
         }
 
-      // Associer le modele au terme source de rayonnement de l'equation de temperature
+      // Associer le pb au terme source de rayonnement de l'equation de temperature
       Sources& les_sources = pb_fluide_->equation(j).sources();
       for (int num_source = 0; num_source < les_sources.size(); num_source++)
         {
@@ -173,7 +173,7 @@ void Modele_rayo_semi_transp::preparer_calcul()
   eq_rayo().completer();
 }
 
-void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
+void Pb_rayo_semi_transp::discretiser(Discretisation_base& dis)
 {
   // Typage de l'equation de rayonnement
   Cerr << "typage de l'equation de rayonnement ";
@@ -207,11 +207,11 @@ void Modele_rayo_semi_transp::discretiser(Discretisation_base& dis)
       equation(i).discretiser();
     }
 
-  Cerr << "Modele_rayo_semi_transp::discretiser fin" << finl;
+  Cerr << "Pb_rayo_semi_transp::discretiser fin" << finl;
 }
 
 // On met a jour le flux radiatif pour tous les bords du probleme
-void Modele_rayo_semi_transp::calculer_flux_radiatif()
+void Pb_rayo_semi_transp::calculer_flux_radiatif()
 {
   Conds_lim& les_cl_rayo = eq_rayo().domaine_Cl_dis().les_conditions_limites();
 
@@ -238,9 +238,9 @@ void Modele_rayo_semi_transp::calculer_flux_radiatif()
     }
 }
 
-const Champ_front_base& Modele_rayo_semi_transp::flux_radiatif(const Nom& nom_bord) const
+const Champ_front_base& Pb_rayo_semi_transp::flux_radiatif(const Nom& nom_bord) const
 {
-  //  Cerr<<"Modele_rayo_semi_transp::flux_radiatif const : Debut"<<finl;
+  //  Cerr<<"Pb_rayo_semi_transp::flux_radiatif const : Debut"<<finl;
   // On fait une boucle sur les bords pour trouver celui dont le nom est nom_bord
   const Conds_lim& les_cl_rayo = eq_rayo().domaine_Cl_dis().les_conditions_limites();
 
@@ -265,7 +265,7 @@ const Champ_front_base& Modele_rayo_semi_transp::flux_radiatif(const Nom& nom_bo
             }
         }
     }
-  Cerr << "Erreur : Modele_rayo_semi_transp::flux_radiatif" << finl;
+  Cerr << "Erreur : Pb_rayo_semi_transp::flux_radiatif" << finl;
   Cerr << "il n'y a pas de condition a la limite portant le nom " << nom_bord << finl;
   Process::exit();
   //pour les compilos

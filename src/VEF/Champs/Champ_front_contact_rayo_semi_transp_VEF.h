@@ -19,7 +19,7 @@
 #include <Champ_front_contact_VEF.h>
 #include <TRUST_Ref.h>
 
-class Modele_rayo_semi_transp;
+class Pb_rayo_semi_transp;
 
 class Champ_front_contact_rayo_semi_transp_VEF: public Champ_front_contact_VEF
 {
@@ -30,7 +30,7 @@ public :
   void calculer_temperature_bord(double temps);
   Champ_front_base& affecter_(const Champ_front_base& ch) override ;
   void mettre_a_jour(double temps) override;
-  void mettre_a_jour_flux_radiatif(); // le copie du modele
+  void mettre_a_jour_flux_radiatif();
   void calcul_grads_locaux(double temps) override;
   void modifie_gradients_pour_rayonnement(DoubleVect& gradient_num_transf, DoubleVect& gradient_num_transf_autre_pb);
 
@@ -38,20 +38,20 @@ public :
   inline const Champ_Inc_base& inconnue1() const { return l_inconnue1.valeur(); }
   inline Champ_Inc_base& inconnue2() { return l_inconnue2.valeur(); }
   inline const Champ_Inc_base& inconnue2() const { return l_inconnue2.valeur(); }
-  inline const Modele_rayo_semi_transp& modele_rayo() const { return le_modele_rayo.valeur(); }
+  inline const Pb_rayo_semi_transp& pb_rayo_semi_transp() const { return pb_rayo_semi_transp_.valeur(); }
   inline Nom& nom_prob1() { return nom_pb1; }
   inline const Nom& nom_prob1() const { return nom_pb1; }
   inline Nom& nom_prob2() { return nom_pb2; }
   inline const Nom& nom_prob2() const { return nom_pb2; }
 
-  inline void associer_modele_rayo(const Modele_rayo_semi_transp& modele)
+  inline void associer_pb_rayo_semi_transp(const Pb_rayo_semi_transp& pb)
   {
-    le_modele_rayo = modele;
+    pb_rayo_semi_transp_ = pb;
   }
 
 protected :
-  DoubleVect flux_radiatif;
-  OBS_PTR(Modele_rayo_semi_transp) le_modele_rayo;
+  DoubleVect flux_radiatif_;
+  OBS_PTR(Pb_rayo_semi_transp) pb_rayo_semi_transp_;
 };
 
 #endif /* Champ_front_contact_rayo_semi_transp_VEF_included */

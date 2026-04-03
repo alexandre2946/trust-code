@@ -22,7 +22,7 @@
 #include <Champ_front_uniforme.h>
 #include <Schema_Temps_base.h>
 #include <Debog.h>
-#include <Modele_rayo_semi_transp.h>
+#include <Pb_rayo_semi_transp.h>
 #include <Fluide_base.h>
 #include <Champ_Uniforme.h>
 #include <Domaine_VEF.h>
@@ -174,7 +174,7 @@ void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
         n = indice(0, 0);
       else
         n = indice(face + ndeb, 0);
-      double sigma = eq_rayo.modele().valeur_sigma();
+      double sigma = eq_rayo.pb_rayo_semi_transp().valeur_sigma();
       double Tbord;
       assert(Tb->nb_comp() == 1);
       if (sub_type(Champ_front_uniforme, Tb.valeur()))

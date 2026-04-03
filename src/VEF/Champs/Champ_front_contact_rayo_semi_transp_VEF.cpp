@@ -17,7 +17,7 @@
 #include <Domaine_VEF.h>
 #include <Schema_Temps_base.h>
 #include <Pb_Couple_rayo_semi_transp.h>
-#include <Modele_rayo_semi_transp.h>
+#include <Pb_rayo_semi_transp.h>
 
 Implemente_instanciable(Champ_front_contact_rayo_semi_transp_VEF, "Champ_front_contact_rayo_semi_transp_VEF", Champ_front_contact_VEF);
 
@@ -47,7 +47,7 @@ void Champ_front_contact_rayo_semi_transp_VEF::mettre_a_jour(double temps)
 int Champ_front_contact_rayo_semi_transp_VEF::initialiser(double temps, const Champ_Inc_base& inco)
 {
   int nb_faces = frontiere_dis().frontiere().nb_faces();
-  flux_radiatif.resize(nb_faces);
+  flux_radiatif_.resize(nb_faces);
   int ok = Champ_front_contact_VEF::initialiser(temps, inco);
   return ok;
 }
@@ -55,19 +55,19 @@ int Champ_front_contact_rayo_semi_transp_VEF::initialiser(double temps, const Ch
 void Champ_front_contact_rayo_semi_transp_VEF::mettre_a_jour_flux_radiatif()
 {
 
-  if (is_conduction)   // Le modele est connu par l'autre probleme
+  if (is_conduction)   // Le pb_rayo est connu par l'autre probleme
     {
       const Champ_front_contact_rayo_semi_transp_VEF& ch_fr_rayo = ref_cast(Champ_front_contact_rayo_semi_transp_VEF, ch_fr_autre_pb.valeur());
-      const DoubleTab& tab_fl_rad = ch_fr_rayo.modele_rayo().flux_radiatif(frontiere_dis().le_nom()).valeurs();
+      const DoubleTab& tab_fl_rad = ch_fr_rayo.pb_rayo_semi_transp().flux_radiatif(frontiere_dis().le_nom()).valeurs();
       // Le rapatrier
-      trace_face_raccord(fr_vf_autre_pb.valeur(), tab_fl_rad, flux_radiatif);
+      trace_face_raccord(fr_vf_autre_pb.valeur(), tab_fl_rad, flux_radiatif_);
     }
   else
     {
       int nb_faces = frontiere_dis().frontiere().nb_faces();
-      const DoubleTab& tab_fl_rad = le_modele_rayo->flux_radiatif(frontiere_dis().le_nom()).valeurs();
+      const DoubleTab& tab_fl_rad = pb_rayo_semi_transp_->flux_radiatif(frontiere_dis().le_nom()).valeurs();
       for (int fac_front = 0; fac_front < nb_faces; fac_front++)
-        flux_radiatif(fac_front) = tab_fl_rad(fac_front, 0);
+        flux_radiatif_(fac_front) = tab_fl_rad(fac_front, 0);
     }
 }
 
@@ -139,11 +139,11 @@ void Champ_front_contact_rayo_semi_transp_VEF::modifie_gradients_pour_rayonnemen
   if (is_conduction)
     {
       for (int fac_front = 0; fac_front < nb_faces; fac_front++)
-        gradient_num_local(fac_front) = gradient_num_local(fac_front) + flux_radiatif(fac_front);
+        gradient_num_local(fac_front) = gradient_num_local(fac_front) + flux_radiatif_(fac_front);
     }
   else
     {
       for (int fac_front = 0; fac_front < nb_faces; fac_front++)
-        gradient_num_transf_autre_pb(fac_front) = gradient_num_transf_autre_pb(fac_front) + flux_radiatif(fac_front);
+        gradient_num_transf_autre_pb(fac_front) = gradient_num_transf_autre_pb(fac_front) + flux_radiatif_(fac_front);
     }
 }

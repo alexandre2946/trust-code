@@ -20,7 +20,7 @@
 #include <Matrice_Morse.h>
 #include <TRUST_Ref.h>
 
-class Modele_rayo_semi_transp;
+class Pb_rayo_semi_transp;
 class Motcle;
 class Milieu_base;
 class Fluide_base;
@@ -33,19 +33,25 @@ public:
   void set_param(Param& titi) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   bool initTimeStep(double dt) override;
-  virtual bool solve();
+  void discretiser() override;
+  void completer() override;
+  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
+  const Discretisation_base& discretisation() const;
+
+  bool solve();
+
+  void associer_pb_base(const Probleme_base& pb) override;
   void associer_milieu_base(const Milieu_base&) override;
   Milieu_base& milieu() override;
   const Milieu_base& milieu() const override;
-  inline const Modele_rayo_semi_transp&  modele() const { return le_modele_.valeur(); }
-  inline Modele_rayo_semi_transp& modele() { return le_modele_.valeur(); }
+
   const Operateur& operateur(int) const override;
   Operateur& operateur(int) override;
-  void discretiser() override;
-  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
 
-  const Champ_Inc_base& inconnue() const override { return irradiance_.valeur(); }
-  Champ_Inc_base& inconnue() override { return irradiance_.valeur(); }
+  inline const Pb_rayo_semi_transp& pb_rayo_semi_transp() const { return pb_rayo_semi_transp_.valeur(); }
+  inline Pb_rayo_semi_transp& pb_rayo_semi_transp() { return pb_rayo_semi_transp_.valeur(); }
+  inline const Champ_Inc_base& inconnue() const override { return irradiance_.valeur(); }
+  inline Champ_Inc_base& inconnue() override { return irradiance_.valeur(); }
   inline void associer_fluide(const Fluide_base& un_fluide) { le_fluide_ = un_fluide; }
   inline Fluide_base& fluide() { return le_fluide_.valeur(); }
   inline const Fluide_base& fluide() const { return le_fluide_.valeur(); }
@@ -54,26 +60,19 @@ public:
   // pas de flux calcule correctement par les operateurs...
   inline int impr(Sortie& os) const override { return 1; }
 
-  virtual int nb_colonnes_tot()=0;
-  virtual int nb_colonnes()=0;
   void Mat_Morse_to_Mat_Bloc(Matrice& matrice_tmp);
   void dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice_tmp);
 
-  const Discretisation_base& discretisation() const;
-
-  void associer_pb_base(const Probleme_base& pb) override;
-
+  virtual int nb_colonnes_tot()=0;
+  virtual int nb_colonnes()=0;
   virtual void resoudre(double temps)=0;
   virtual void assembler_matrice()=0;
-
   virtual void modifier_matrice()=0;
   virtual void evaluer_cl_rayonnement(double temps)=0;
 
-  void completer() override;
-
 protected:
   OBS_PTR(Fluide_base) le_fluide_;
-  OBS_PTR(Modele_rayo_semi_transp) le_modele_;
+  OBS_PTR(Pb_rayo_semi_transp) pb_rayo_semi_transp_;
   OWN_PTR(Champ_Inc_base) irradiance_;
 
   Operateur_Diff terme_diffusif_;

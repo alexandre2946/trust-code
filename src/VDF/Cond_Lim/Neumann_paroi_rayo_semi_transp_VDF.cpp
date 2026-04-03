@@ -14,7 +14,7 @@
 *****************************************************************************/
 
 #include <Neumann_paroi_rayo_semi_transp_VDF.h>
-#include <Modele_rayo_semi_transp.h>
+#include <Pb_rayo_semi_transp.h>
 #include <Fluide_Incompressible.h>
 #include <Champ_front_uniforme.h>
 #include <Schema_Temps_base.h>
@@ -47,7 +47,7 @@ double Neumann_paroi_rayo_semi_transp_VDF::flux_impose(int i) const
     elem = face_voisins(ndeb + i, 1);
 
   double signe = 1;
-  const DoubleTab& flux_radiatif = modele().flux_radiatif(frontiere_dis().le_nom()).valeurs();
+  const DoubleTab& flux_radiatif = pb_rayo_semi_transp().flux_radiatif(frontiere_dis().le_nom()).valeurs();
 
   if (le_champ_front->valeurs().size() == 1)
     return signe * le_champ_front->valeurs()(0, 0) - flux_radiatif(i, 0);
@@ -70,7 +70,7 @@ double Neumann_paroi_rayo_semi_transp_VDF::flux_impose(int i, int j) const
   if (elem == -1)
     elem = face_voisins(ndeb + i, 1);
 
-  const DoubleTab& flux_radiatif = modele().flux_radiatif(frontiere_dis().le_nom()).valeurs();
+  const DoubleTab& flux_radiatif = pb_rayo_semi_transp().flux_radiatif(frontiere_dis().le_nom()).valeurs();
 
   if (le_champ_front->valeurs().dimension(0) == 1)
     return le_champ_front->valeurs()(0, j) - flux_radiatif(i);
@@ -128,7 +128,7 @@ void Neumann_paroi_rayo_semi_transp_VDF::calculer_temperature_bord(double temps)
   const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue().valeurs();
   DoubleTab& T_b = temperature_bord_->valeurs_au_temps(temps);
 
-  const DoubleTab& flux_radiatif = modele().flux_radiatif(frontiere_dis().le_nom()).valeurs();
+  const DoubleTab& flux_radiatif = pb_rayo_semi_transp().flux_radiatif(frontiere_dis().le_nom()).valeurs();
 
   int face = 0;
   int num_face;
