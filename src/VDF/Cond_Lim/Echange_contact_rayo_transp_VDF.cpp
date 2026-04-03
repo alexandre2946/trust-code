@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,7 +14,7 @@
 *****************************************************************************/
 
 #include <Modele_Rayonnement_Milieu_Transparent.h>
-#include <Echange_contact_Rayo_transp_VDF.h>
+#include <Echange_contact_rayo_transp_VDF.h>
 #include <Champ_front_uniforme.h>
 #include <Champ_front_calc.h>
 #include <Champ_Uniforme.h>
@@ -22,19 +22,19 @@
 #include <Domaine_VDF.h>
 #include <Debog.h>
 
-Implemente_instanciable(Echange_contact_Rayo_transp_VDF, "Echange_contact_Rayo_transp_VDF", Echange_contact_VDF);
+Implemente_instanciable(Echange_contact_rayo_transp_VDF, "Echange_contact_rayo_transp_VDF", Echange_contact_VDF);
 
-Sortie& Echange_contact_Rayo_transp_VDF::printOn(Sortie& is) const
+Sortie& Echange_contact_rayo_transp_VDF::printOn(Sortie& is) const
 {
   return is;
 }
 
-Entree& Echange_contact_Rayo_transp_VDF::readOn(Entree& s)
+Entree& Echange_contact_rayo_transp_VDF::readOn(Entree& s)
 {
   return Echange_contact_VDF::readOn(s);
 }
 
-void Echange_contact_Rayo_transp_VDF::completer()
+void Echange_contact_rayo_transp_VDF::completer()
 {
   Echange_contact_VDF::completer();
   preparer_surface(frontiere_dis(), domaine_Cl_dis());
@@ -66,7 +66,7 @@ void Echange_contact_Rayo_transp_VDF::completer()
 
 }
 
-void Echange_contact_Rayo_transp_VDF::mettre_a_jour(double temps)
+void Echange_contact_rayo_transp_VDF::mettre_a_jour(double temps)
 {
   //  Echange_contact_VDF::mettre_a_jour(temps);
   Champ_front_calc& ch = ref_cast(Champ_front_calc, T_autre_pb());
@@ -149,13 +149,13 @@ void Echange_contact_Rayo_transp_VDF::mettre_a_jour(double temps)
   Echange_global_impose::mettre_a_jour(temps);
 }
 
-void Echange_contact_Rayo_transp_VDF::calculer_Teta_equiv(DoubleTab& Teta_eq, const DoubleTab& mon_h, const DoubleTab& lautre_h, int i, double temps)
+void Echange_contact_rayo_transp_VDF::calculer_Teta_equiv(DoubleTab& Teta_eq, const DoubleTab& mon_h, const DoubleTab& lautre_h, int i, double temps)
 {
-  Cerr << "On ne doit pas passer par la Echange_contact_Rayo_transp_VDF::calculer_Teta_equiv " << __FILE__ << finl;
+  Cerr << "On ne doit pas passer par la Echange_contact_rayo_transp_VDF::calculer_Teta_equiv " << __FILE__ << finl;
   Process::exit();
 }
 
-void Echange_contact_Rayo_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_equiv, const DoubleTab& mon_h, const DoubleTab& lautre_h, int i, double temps)
+void Echange_contact_rayo_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_equiv, const DoubleTab& mon_h, const DoubleTab& lautre_h, int i, double temps)
 {
   // i servira en radiatif
   //
@@ -226,21 +226,21 @@ void Echange_contact_Rayo_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_equiv,
           Process::exit();
         }
     }
-  Debog::verifier("Teta_equiv dans Echange_contact_Rayo_transp_VDF::calculer_Teta_paroi", Teta_equiv);
+  Debog::verifier("Teta_equiv dans Echange_contact_rayo_transp_VDF::calculer_Teta_paroi", Teta_equiv);
 }
 
 /////////////////////////////////////////////
 
-Implemente_instanciable_sans_constructeur(Echange_contact_Rayo_transp_sans_relax_VDF, "Echange_contact_Rayo_transp_sans_relax_VDF", Echange_contact_Rayo_transp_VDF);
+Implemente_instanciable_sans_constructeur(Echange_contact_Rayo_transp_sans_relax_VDF, "Echange_contact_Rayo_transp_sans_relax_VDF", Echange_contact_rayo_transp_VDF);
 
 Sortie& Echange_contact_Rayo_transp_sans_relax_VDF::printOn(Sortie& is) const
 {
-  return Echange_contact_Rayo_transp_VDF::printOn(is);
+  return Echange_contact_rayo_transp_VDF::printOn(is);
 }
 
 Entree& Echange_contact_Rayo_transp_sans_relax_VDF::readOn(Entree& s)
 {
-  return Echange_contact_Rayo_transp_VDF::readOn(s);
+  return Echange_contact_rayo_transp_VDF::readOn(s);
 }
 
 Echange_contact_Rayo_transp_sans_relax_VDF::Echange_contact_Rayo_transp_sans_relax_VDF()

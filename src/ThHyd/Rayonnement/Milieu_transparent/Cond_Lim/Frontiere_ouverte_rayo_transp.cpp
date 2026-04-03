@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,30 +13,30 @@
 *
 *****************************************************************************/
 
-#include <Frontiere_Ouverte_temperature_imposee_Rayo_transp.h>
+#include <Frontiere_ouverte_rayo_transp.h>
 #include <Front_VF.h>
 
-Implemente_instanciable(Frontiere_Ouverte_temperature_imposee_Rayo_transp, "Frontiere_Ouverte_temperature_imposee_Rayo_transp", Entree_fluide_temperature_imposee);
+Implemente_instanciable(Frontiere_ouverte_rayo_transp, "Frontiere_ouverte_rayo_transp", Neumann_sortie_libre);
 
-Sortie& Frontiere_Ouverte_temperature_imposee_Rayo_transp::printOn(Sortie& is) const { return is; }
+Sortie& Frontiere_ouverte_rayo_transp::printOn(Sortie& is) const { return is; }
 
-Entree& Frontiere_Ouverte_temperature_imposee_Rayo_transp::readOn(Entree& s) { return Entree_fluide_temperature_imposee::readOn(s); }
+Entree& Frontiere_ouverte_rayo_transp::readOn(Entree& s) { return Neumann_sortie_libre::readOn(s); }
 
-void Frontiere_Ouverte_temperature_imposee_Rayo_transp::completer()
+void Frontiere_ouverte_rayo_transp::completer()
 {
-  Entree_fluide_temperature_imposee::completer();
+  Neumann_sortie_libre::completer();
   preparer_surface(frontiere_dis(), domaine_Cl_dis());
 }
 
-void Frontiere_Ouverte_temperature_imposee_Rayo_transp::mettre_a_jour(double temps)
+void Frontiere_ouverte_rayo_transp::mettre_a_jour(double temps)
 {
-  Entree_fluide_temperature_imposee::mettre_a_jour(temps);
+  Neumann_sortie_libre::mettre_a_jour(temps);
   calculer_Teta_i();
 }
 
-void Frontiere_Ouverte_temperature_imposee_Rayo_transp::calculer_Teta_i()
+void Frontiere_ouverte_rayo_transp::calculer_Teta_i()
 {
   const Front_VF& front_vf = ref_cast(Front_VF, frontiere_dis());
   for (int numfa = 0; numfa < front_vf.nb_faces(); numfa++)
-    teta_i_[numfa] = val_imp(numfa);
+    teta_i_[numfa] = val_ext(numfa);
 }

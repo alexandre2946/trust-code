@@ -16,7 +16,7 @@
 #ifndef Modele_Rayonnement_Milieu_Transparent_included
 #define Modele_Rayonnement_Milieu_Transparent_included
 
-#include <Face_Rayonnante.h>
+#include <Face_rayo_transp.h>
 #include <Domaine_forward.h>
 #include <Matrice_Morse.h>
 #include <TRUST_Vector.h>
@@ -43,8 +43,8 @@ public:
   double flux_radiatif(int num_face_global) const; // 0 < face < nb_faces_de_bord
 
   inline void associer_processeur_rayonnant(int proc) { processeur_rayonnant_ = proc; }
-  inline Face_Rayonnante& face_rayonnante(int j) { return les_faces_rayonnantes_[j]; }
-  inline const Face_Rayonnante& face_rayonnante(int j) const { return les_faces_rayonnantes_[j]; }
+  inline Face_rayo_transp& face_rayonnante(int j) { return les_faces_rayonnantes_[j]; }
+  inline const Face_rayo_transp& face_rayonnante(int j) const { return les_faces_rayonnantes_[j]; }
   inline const Nom& nom_pb_rayonnant() const { return nom_pb_rayonnant_; }
   inline void set_nom_pb_rayonnant(const Nom& pb) { nom_pb_rayonnant_ = pb; }
   inline double relaxation() const { return relaxation_; }
@@ -58,7 +58,7 @@ private:
   void lire_fichiers(Nom& nom1, Nom& nom2);
   void lire_fichiers(Nom& nom1, Nom& nom2, Nom& nom3);
 
-  VECT(Face_Rayonnante) les_faces_rayonnantes_;
+  VECT(Face_rayo_transp) les_faces_rayonnantes_;
   int nb_faces_rayonnantes_ = -123, nb_faces_totales_ = -123, ordre_mat_forme_ = -123;
   double temps_ = -123.; // on garde le temps pour les impressions
   mutable int deja_imprime_ = 0;

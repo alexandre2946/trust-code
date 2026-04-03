@@ -15,7 +15,7 @@
 
 #include <Modele_Rayonnement_Milieu_Transparent.h>
 #include <Pb_Couple_Rayonnement.h>
-#include <Paroi_Rayo_transp.h>
+#include <Paroi_rayo_transp.h>
 #include <Probleme_base.h>
 #include <Fluide_base.h>
 

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,7 +14,7 @@
 *****************************************************************************/
 
 #include <Modele_Rayonnement_Milieu_Transparent.h>
-#include <Paroi_flux_impose_Rayo_transp_VEF.h>
+#include <Paroi_flux_impose_rayo_transp_VEF.h>
 #include <Schema_Temps_base.h>
 #include <Champ_Uniforme.h>
 #include <Probleme_base.h>
@@ -22,15 +22,15 @@
 #include <Milieu_base.h>
 #include <Domaine_VF.h>
 
-Implemente_instanciable(Paroi_flux_impose_Rayo_transp_VEF, "Paroi_flux_impose_Rayo_transp_VEF", Paroi_flux_impose_Rayo_transp);
+Implemente_instanciable(Paroi_flux_impose_rayo_transp_VEF, "Paroi_flux_impose_rayo_transp_VEF", Paroi_flux_impose_rayo_transp);
 
-Sortie& Paroi_flux_impose_Rayo_transp_VEF::printOn(Sortie& s) const { return s; }
+Sortie& Paroi_flux_impose_rayo_transp_VEF::printOn(Sortie& s) const { return s; }
 
-Entree& Paroi_flux_impose_Rayo_transp_VEF::readOn(Entree& is) { return Paroi_flux_impose_Rayo_transp::readOn(is); }
+Entree& Paroi_flux_impose_rayo_transp_VEF::readOn(Entree& is) { return Paroi_flux_impose_rayo_transp::readOn(is); }
 
-void Paroi_flux_impose_Rayo_transp_VEF::completer()
+void Paroi_flux_impose_rayo_transp_VEF::completer()
 {
-  Paroi_flux_impose_Rayo_transp::completer();
+  Paroi_flux_impose_rayo_transp::completer();
 
   const DoubleTab& T_p = mon_dom_cl_dis->equation().inconnue().valeurs();
   const Front_VF& la_frontiere_VF = ref_cast(Front_VF, frontiere_dis());
@@ -41,7 +41,7 @@ void Paroi_flux_impose_Rayo_transp_VEF::completer()
     teta_i_[numfa] = T_p(numfa + ndeb);
 }
 
-void Paroi_flux_impose_Rayo_transp_VEF::calculer_Teta_i()
+void Paroi_flux_impose_rayo_transp_VEF::calculer_Teta_i()
 {
   const DoubleTab& T_p = mon_dom_cl_dis->equation().inconnue().valeurs();
   double Temp;

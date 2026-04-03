@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,13 +14,10 @@
 *****************************************************************************/
 
 #include <Cond_lim_utilisateur_base.h>
-#include <Domaine_Cl_dis_base.h>
-#include <Probleme_Couple.h>
 #include <Entree_complete.h>
 #include <Probleme_base.h>
 #include <Equation_base.h>
 #include <Milieu_base.h>
-#include <Interprete.h>
 #include <SFichier.h>
 
 Implemente_base(Cond_lim_utilisateur_base, "Cond_lim_utilisateur_base", Cond_lim_base);
@@ -71,8 +68,7 @@ void Cond_lim_utilisateur_base::complement(Nom&)
  */
 int Cond_lim_utilisateur_base::is_pb_rayo()
 {
-  Probleme_base& pb = mon_equation->probleme();
-  Milieu_base& milieu = ref_cast(Milieu_base, pb.milieu());
+  const Milieu_base& milieu = ref_cast(Milieu_base, mon_equation->probleme().milieu());
 
   if (milieu.is_rayo_transp())
     return 2;

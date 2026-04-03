@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,17 +13,21 @@
 *
 *****************************************************************************/
 
-#ifndef Paroi_flux_impose_Rayo_transp_VEF_included
-#define Paroi_flux_impose_Rayo_transp_VEF_included
+#ifndef Paroi_flux_impose_rayo_transp_included
+#define Paroi_flux_impose_rayo_transp_included
 
-#include <Paroi_flux_impose_Rayo_transp.h>
+#include <Paroi_rayo_transp.h>
+#include <Champ_front_calc.h>
+#include <TRUST_Ref.h>
 
-class Paroi_flux_impose_Rayo_transp_VEF: public Paroi_flux_impose_Rayo_transp
+class Paroi_flux_impose_rayo_transp: public Paroi_rayo_transp
 {
-  Declare_instanciable(Paroi_flux_impose_Rayo_transp_VEF);
+  Declare_base(Paroi_flux_impose_rayo_transp);
 public:
-  void calculer_Teta_i() override;
+
+  virtual void calculer_Teta_i() = 0;
+  void mettre_a_jour(double temps) override;
   void completer() override;
 };
 
-#endif /* Paroi_flux_impose_Rayo_transp_VEF_included */
+#endif /* Paroi_flux_impose_rayo_transp_included */

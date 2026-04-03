@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,7 +14,7 @@
 *****************************************************************************/
 
 #include <Modele_Rayonnement_Milieu_Transparent.h>
-#include <Paroi_flux_impose_Rayo_transp_VDF.h>
+#include <Paroi_flux_impose_rayo_transp_VDF.h>
 #include <Schema_Temps_base.h>
 #include <Champ_Uniforme.h>
 #include <Probleme_base.h>
@@ -22,15 +22,15 @@
 #include <Milieu_base.h>
 #include <Domaine_VDF.h>
 
-Implemente_instanciable(Paroi_flux_impose_Rayo_transp_VDF, "Paroi_flux_impose_Rayo_transp_VDF", Paroi_flux_impose_Rayo_transp);
+Implemente_instanciable(Paroi_flux_impose_rayo_transp_VDF, "Paroi_flux_impose_rayo_transp_VDF", Paroi_flux_impose_rayo_transp);
 
-Sortie& Paroi_flux_impose_Rayo_transp_VDF::printOn(Sortie& s) const { return s; }
+Sortie& Paroi_flux_impose_rayo_transp_VDF::printOn(Sortie& s) const { return s; }
 
-Entree& Paroi_flux_impose_Rayo_transp_VDF::readOn(Entree& is) { return Paroi_flux_impose_Rayo_transp::readOn(is); }
+Entree& Paroi_flux_impose_rayo_transp_VDF::readOn(Entree& is) { return Paroi_flux_impose_rayo_transp::readOn(is); }
 
-void Paroi_flux_impose_Rayo_transp_VDF::completer()
+void Paroi_flux_impose_rayo_transp_VDF::completer()
 {
-  Paroi_flux_impose_Rayo_transp::completer();
+  Paroi_flux_impose_rayo_transp::completer();
 
   const Domaine_VF& domaine_VDF = ref_cast(Domaine_VDF, domaine_Cl_dis().domaine_dis());
   const DoubleTab& T_f = mon_dom_cl_dis->equation().inconnue().valeurs();
@@ -49,7 +49,7 @@ void Paroi_flux_impose_Rayo_transp_VDF::completer()
     }
 }
 
-void Paroi_flux_impose_Rayo_transp_VDF::calculer_Teta_i()
+void Paroi_flux_impose_rayo_transp_VDF::calculer_Teta_i()
 {
   const Domaine_VDF& le_dom_vdf = ref_cast(Domaine_VDF, domaine_Cl_dis().domaine_dis());
   const Milieu_base& le_milieu = mon_dom_cl_dis->equation().milieu();
@@ -129,7 +129,7 @@ void Paroi_flux_impose_Rayo_transp_VDF::calculer_Teta_i()
         teta_i_(numfa) = omega * ((le_champ_front->valeurs()(numfa, 0) - flux_radia) / (d_Lambda / e) + T_f(elem)) + (1 - omega) * teta_i_(numfa);
       else
         {
-          Cerr << "Paroi_flux_impose_Rayo_transp::calculer_Teta_i() erreur" << finl;
+          Cerr << "Paroi_flux_impose_rayo_transp::calculer_Teta_i() erreur" << finl;
           Process::exit();
         }
     }

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,37 +13,42 @@
 *
 *****************************************************************************/
 
-#include <Modele_Rayonnement_Milieu_Transparent.h>
-#include <Paroi_Rayo_transp.h>
-#include <Front_VF.h>
+#ifndef Face_rayo_transp_included
+#define Face_rayo_transp_included
 
-Implemente_base(Paroi_Rayo_transp, "Paroi_Rayo_transp", Neumann_paroi);
+#include <Ensemble_faces_rayo_transp.h>
+#include <TRUST_Vector.h>
 
-Sortie& Paroi_Rayo_transp::printOn(Sortie& s) const { return s; }
-
-Entree& Paroi_Rayo_transp::readOn(Entree& is) { return is; }
-
-double Paroi_Rayo_transp::flux_impose(int i) const
+class Face_rayo_transp: public Objet_U
 {
-  const Front_VF& la_frontiere_VF = ref_cast(Front_VF, frontiere_dis());
-  int ndeb = la_frontiere_VF.num_premiere_face();
-  double flux_radia = le_modele_rayo->flux_radiatif(i + ndeb);
-  if (le_champ_front->valeurs().size() == 1)
-    return le_champ_front->valeurs()(0, 0) - flux_radia;
-  else if (le_champ_front->valeurs().dimension(1) == 1)
-    return le_champ_front->valeurs()(i, 0) - flux_radia;
-  else
-    Cerr << "Paroi_Rayo_transp::flux_impose erreur" << finl;
+  Declare_instanciable(Face_rayo_transp);
+public:
 
-  Process::exit();
-  return 0.;
-}
+  int chercher_ensemble_faces(const Nom&) const;
+  void ecrire_temperature_bord() const;
 
-double Paroi_Rayo_transp::flux_impose(int i, int j) const
-{
-  const Front_VF& la_frontiere_VF = ref_cast(Front_VF, frontiere_dis());
-  int ndeb = la_frontiere_VF.num_premiere_face();
-  double flux_radia = le_modele_rayo->flux_radiatif(i + ndeb);
-  const int k = (le_champ_front->valeurs().size() == 1) ? 0 : i;
-  return le_champ_front->valeurs()(k, j) - flux_radia;
-}
+  double calculer_temperature();
+  double imprimer_flux_radiatif(Sortie&, Sortie&, Sortie&) const;
+
+  inline double T_face_rayo() const { return T_face_rayo_; }
+  inline double emissivite() const { return emissivite_; }
+  inline double flux_radiatif() const { return flux_radiatif_; }
+  inline double surface_rayo() const { return surf_; }
+  inline void mettre_a_jour_flux_radiatif(double J) { flux_radiatif_ = J; }
+  inline const Nom& nom_bord_rayo() const { return nom_bord_rayo_; }
+  inline const Nom& nom_bord_rayo_lu() const { return nom_bord_rayo_lu_; }
+  inline const IntVect& num_faces(int j) const { return num_faces_; }
+  inline int nb_ensembles_faces() const { return nb_ensembles_faces_; }
+
+  inline const Ensemble_faces_rayo_transp& ensembles_faces_bord(int j) const { return les_ensembles_faces_bord_[j]; }
+  inline Ensemble_faces_rayo_transp& ensembles_faces_bord(int j) { return les_ensembles_faces_bord_[j]; }
+
+private:
+  VECT(Ensemble_faces_rayo_transp) les_ensembles_faces_bord_;
+  IntVect num_faces_;
+  Nom nom_bord_rayo_, nom_bord_rayo_lu_;
+  double T_face_rayo_ = -123., emissivite_ = -123., surf_ = -123., flux_radiatif_ = 0.;
+  int nb_ensembles_faces_ = 1;
+};
+
+#endif /* Face_rayo_transp_included */

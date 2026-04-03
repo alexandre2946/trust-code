@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,21 +13,27 @@
 *
 *****************************************************************************/
 
-#include <Paroi_flux_impose_Rayo_transp.h>
+#ifndef Frontiere_ouverte_temperature_imposee_rayo_transp_included
+#define Frontiere_ouverte_temperature_imposee_rayo_transp_included
 
-Implemente_base(Paroi_flux_impose_Rayo_transp, "Paroi_flux_impose_Rayo_transp", Paroi_Rayo_transp);
+#include <Dirichlet_entree_fluide_leaves.h>
+#include <Cond_lim_rayo_milieu_transp.h>
 
-Sortie& Paroi_flux_impose_Rayo_transp::printOn(Sortie& s) const { return s; }
-
-Entree& Paroi_flux_impose_Rayo_transp::readOn(Entree& is) { return Neumann_paroi::readOn(is); }
-
-void Paroi_flux_impose_Rayo_transp::mettre_a_jour(double temps)
+class Frontiere_ouverte_temperature_imposee_rayo_transp: public Cond_lim_rayo_milieu_transp, public Entree_fluide_temperature_imposee
 {
-  Neumann_paroi::mettre_a_jour(temps);
-  calculer_Teta_i();
-}
+  Declare_instanciable(Frontiere_ouverte_temperature_imposee_rayo_transp);
+public:
 
-void Paroi_flux_impose_Rayo_transp::completer()
-{
-  preparer_surface(frontiere_dis(), domaine_Cl_dis());
-}
+  void completer() override;
+  void mettre_a_jour(double) override;
+  void calculer_Teta_i();
+  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
+
+  inline bool is_bc_rayo_milieu_transp(Cond_lim_rayo_milieu_transp *& la_cl_rayo) override
+  {
+    la_cl_rayo = static_cast<Cond_lim_rayo_milieu_transp*>(this);
+    return true;
+  }
+};
+
+#endif /* Frontiere_ouverte_temperature_imposee_rayo_transp_included */

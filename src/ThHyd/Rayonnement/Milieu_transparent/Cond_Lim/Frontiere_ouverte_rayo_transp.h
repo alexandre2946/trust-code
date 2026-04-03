@@ -13,51 +13,26 @@
 *
 *****************************************************************************/
 
-#ifndef Ensemble_faces_rayo_included
-#define Ensemble_faces_rayo_included
+#ifndef Frontiere_ouverte_rayo_transp_included
+#define Frontiere_ouverte_rayo_transp_included
 
+#include <Neumann_sortie_libre.h>
 #include <Cond_lim_rayo_milieu_transp.h>
-#include <Domaine_forward.h>
-#include <TRUST_Ref.h>
-#include <Motcle.h>
 
-class Cond_lim_base;
-
-class Ensemble_faces_rayo: public Objet_U
+class Frontiere_ouverte_rayo_transp: public Cond_lim_rayo_milieu_transp, public Neumann_sortie_libre
 {
-  Declare_instanciable(Ensemble_faces_rayo);
+  Declare_instanciable(Frontiere_ouverte_rayo_transp);
 public:
 
-  void associer_les_cl(Cond_lim_base&);
-  void lire(const Nom&, const Nom&, const Domaine&);
-  int contient(int) const;
-  int is_ok() const;
+  void completer() override;
+  void mettre_a_jour(double) override;
+  void calculer_Teta_i();
 
-  inline const Cond_lim_rayo_milieu_transp& cond_lim_rayo() const
+  inline bool is_bc_rayo_milieu_transp(Cond_lim_rayo_milieu_transp *& la_cl_rayo) override
   {
-    assert(la_cond_lim_rayo_ != 0);
-    return *la_cond_lim_rayo_;
+    la_cl_rayo = static_cast<Cond_lim_rayo_milieu_transp*>(this);
+    return true;
   }
-
-  inline Cond_lim_rayo_milieu_transp& cond_lim_rayo()
-  {
-    assert(la_cond_lim_rayo_ != 0);
-    return *la_cond_lim_rayo_;
-  }
-
-  inline double surface(int numfa) const { return la_cond_lim_rayo_->surface(numfa); }
-  inline double teta_i(int numfa) { return la_cond_lim_rayo_->teta_i(numfa); }
-  inline const Cond_lim_base& la_cl_base() const { return les_cl_base_; }
-  inline Cond_lim_base& la_cl_base() { return les_cl_base_; }
-  inline const IntVect& Table_faces() const { return num_face_Ensemble_; }
-  inline int nb_faces_bord() const { return nb_faces_bord_; }
-
-protected:
-  int nb_faces_bord_ = 0;
-  OBS_PTR(Cond_lim_base) les_cl_base_;
-  Cond_lim_rayo_milieu_transp *la_cond_lim_rayo_ = nullptr;
-  IntVect num_face_Ensemble_;
-  DoubleTab positions_;
 };
 
-#endif /* Ensemble_faces_rayo_included */
+#endif /* Frontiere_ouverte_rayo_transp_included */

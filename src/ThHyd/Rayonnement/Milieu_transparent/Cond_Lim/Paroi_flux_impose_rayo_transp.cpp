@@ -13,42 +13,21 @@
 *
 *****************************************************************************/
 
-#ifndef Face_Rayonnante_included
-#define Face_Rayonnante_included
+#include <Paroi_flux_impose_rayo_transp.h>
 
-#include <Ensemble_faces_rayo.h>
-#include <TRUST_Vector.h>
+Implemente_base(Paroi_flux_impose_rayo_transp, "Paroi_flux_impose_rayo_transp", Paroi_rayo_transp);
 
-class Face_Rayonnante: public Objet_U
+Sortie& Paroi_flux_impose_rayo_transp::printOn(Sortie& s) const { return s; }
+
+Entree& Paroi_flux_impose_rayo_transp::readOn(Entree& is) { return Neumann_paroi::readOn(is); }
+
+void Paroi_flux_impose_rayo_transp::mettre_a_jour(double temps)
 {
-  Declare_instanciable(Face_Rayonnante);
-public:
+  Neumann_paroi::mettre_a_jour(temps);
+  calculer_Teta_i();
+}
 
-  int chercher_ensemble_faces(const Nom&) const;
-  void ecrire_temperature_bord() const;
-
-  double calculer_temperature();
-  double imprimer_flux_radiatif(Sortie&, Sortie&, Sortie&) const;
-
-  inline double T_face_rayo() const { return T_face_rayo_; }
-  inline double emissivite() const { return emissivite_; }
-  inline double flux_radiatif() const { return flux_radiatif_; }
-  inline double surface_rayo() const { return surf_; }
-  inline void mettre_a_jour_flux_radiatif(double J) { flux_radiatif_ = J; }
-  inline const Nom& nom_bord_rayo() const { return nom_bord_rayo_; }
-  inline const Nom& nom_bord_rayo_lu() const { return nom_bord_rayo_lu_; }
-  inline const IntVect& num_faces(int j) const { return num_faces_; }
-  inline int nb_ensembles_faces() const { return nb_ensembles_faces_; }
-
-  inline const Ensemble_faces_rayo& ensembles_faces_bord(int j) const { return les_ensembles_faces_bord_[j]; }
-  inline Ensemble_faces_rayo& ensembles_faces_bord(int j) { return les_ensembles_faces_bord_[j]; }
-
-private:
-  VECT(Ensemble_faces_rayo) les_ensembles_faces_bord_;
-  IntVect num_faces_;
-  Nom nom_bord_rayo_, nom_bord_rayo_lu_;
-  double T_face_rayo_ = -123., emissivite_ = -123., surf_ = -123., flux_radiatif_ = 0.;
-  int nb_ensembles_faces_ = 1;
-};
-
-#endif /* Face_Rayonnante_included */
+void Paroi_flux_impose_rayo_transp::completer()
+{
+  preparer_surface(frontiere_dis(), domaine_Cl_dis());
+}

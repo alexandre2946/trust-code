@@ -13,19 +13,19 @@
 *
 *****************************************************************************/
 
-#include <Ensemble_faces_rayo.h>
+#include <Ensemble_faces_rayo_transp.h>
 #include <Frontiere_dis_base.h>
 #include <TRUSTList.h>
 #include <EFichier.h>
 #include <Domaine.h>
 
-Implemente_instanciable(Ensemble_faces_rayo, "Ensemble_faces_rayo", Objet_U);
+Implemente_instanciable(Ensemble_faces_rayo_transp, "Ensemble_faces_rayo_transp", Objet_U);
 
-Entree& Ensemble_faces_rayo::readOn(Entree& is) { return is; }
+Entree& Ensemble_faces_rayo_transp::readOn(Entree& is) { return is; }
 
-Sortie& Ensemble_faces_rayo::printOn(Sortie& os) const { return os; }
+Sortie& Ensemble_faces_rayo_transp::printOn(Sortie& os) const { return os; }
 
-void Ensemble_faces_rayo::lire(const Nom& nom_bord_lu, const Nom& nom_bord, const Domaine& dom)
+void Ensemble_faces_rayo_transp::lire(const Nom& nom_bord_lu, const Nom& nom_bord, const Domaine& dom)
 {
   {
     Nom fic2(dom.le_nom() + "." + nom_bord);
@@ -41,7 +41,7 @@ void Ensemble_faces_rayo::lire(const Nom& nom_bord_lu, const Nom& nom_bord, cons
   }
 }
 
-int Ensemble_faces_rayo::contient(int num_face) const
+int Ensemble_faces_rayo_transp::contient(int num_face) const
 {
   // Dans notre cas une face rayonnantes est exactement une face de bord
   if (num_face_Ensemble_.size() == 0)
@@ -58,7 +58,7 @@ int Ensemble_faces_rayo::contient(int num_face) const
     }
 }
 
-int Ensemble_faces_rayo::is_ok() const
+int Ensemble_faces_rayo_transp::is_ok() const
 {
   if (les_cl_base_.non_nul())
     return 1;
@@ -66,7 +66,7 @@ int Ensemble_faces_rayo::is_ok() const
     return 0;
 }
 
-void Ensemble_faces_rayo::associer_les_cl(Cond_lim_base& la_cl)
+void Ensemble_faces_rayo_transp::associer_les_cl(Cond_lim_base& la_cl)
 {
   la_cl.is_bc_rayo_milieu_transp(la_cond_lim_rayo_);
   les_cl_base_ = la_cl;
@@ -100,7 +100,7 @@ void Ensemble_faces_rayo::associer_les_cl(Cond_lim_base& la_cl)
                   marq++;
                   if (marq != 1)
                     {
-                      Cerr << "Error in Ensemble_faces_rayo::associer_les_cl" << finl;
+                      Cerr << "Error in Ensemble_faces_rayo_transp::associer_les_cl" << finl;
                       Cerr << "Contact TRUST support." << finl;
                       Cerr << fac << " face en double " << finl;
                       Process::exit();

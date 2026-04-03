@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,30 +13,37 @@
 *
 *****************************************************************************/
 
-#include <Frontiere_Ouverte_Rayo_transp.h>
+#include <Modele_Rayonnement_Milieu_Transparent.h>
+#include <Paroi_rayo_transp.h>
 #include <Front_VF.h>
 
-Implemente_instanciable(Frontiere_Ouverte_Rayo_transp, "Frontiere_Ouverte_Rayo_transp", Neumann_sortie_libre);
+Implemente_base(Paroi_rayo_transp, "Paroi_rayo_transp", Neumann_paroi);
 
-Sortie& Frontiere_Ouverte_Rayo_transp::printOn(Sortie& is) const { return is; }
+Sortie& Paroi_rayo_transp::printOn(Sortie& s) const { return s; }
 
-Entree& Frontiere_Ouverte_Rayo_transp::readOn(Entree& s) { return Neumann_sortie_libre::readOn(s); }
+Entree& Paroi_rayo_transp::readOn(Entree& is) { return is; }
 
-void Frontiere_Ouverte_Rayo_transp::completer()
+double Paroi_rayo_transp::flux_impose(int i) const
 {
-  Neumann_sortie_libre::completer();
-  preparer_surface(frontiere_dis(), domaine_Cl_dis());
+  const Front_VF& la_frontiere_VF = ref_cast(Front_VF, frontiere_dis());
+  int ndeb = la_frontiere_VF.num_premiere_face();
+  double flux_radia = le_modele_rayo->flux_radiatif(i + ndeb);
+  if (le_champ_front->valeurs().size() == 1)
+    return le_champ_front->valeurs()(0, 0) - flux_radia;
+  else if (le_champ_front->valeurs().dimension(1) == 1)
+    return le_champ_front->valeurs()(i, 0) - flux_radia;
+  else
+    Cerr << "Paroi_rayo_transp::flux_impose erreur" << finl;
+
+  Process::exit();
+  return 0.;
 }
 
-void Frontiere_Ouverte_Rayo_transp::mettre_a_jour(double temps)
+double Paroi_rayo_transp::flux_impose(int i, int j) const
 {
-  Neumann_sortie_libre::mettre_a_jour(temps);
-  calculer_Teta_i();
-}
-
-void Frontiere_Ouverte_Rayo_transp::calculer_Teta_i()
-{
-  const Front_VF& front_vf = ref_cast(Front_VF, frontiere_dis());
-  for (int numfa = 0; numfa < front_vf.nb_faces(); numfa++)
-    teta_i_[numfa] = val_ext(numfa);
+  const Front_VF& la_frontiere_VF = ref_cast(Front_VF, frontiere_dis());
+  int ndeb = la_frontiere_VF.num_premiere_face();
+  double flux_radia = le_modele_rayo->flux_radiatif(i + ndeb);
+  const int k = (le_champ_front->valeurs().size() == 1) ? 0 : i;
+  return le_champ_front->valeurs()(k, j) - flux_radia;
 }

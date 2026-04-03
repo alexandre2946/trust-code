@@ -225,7 +225,7 @@ void Modele_Rayonnement_Milieu_Transparent::calculer_flux_radiatifs()
 
       for (int i = 0; i < nb_faces_totales(); i++)
         {
-          const Face_Rayonnante& Facei = les_faces_rayonnantes_[i];
+          const Face_rayo_transp& Facei = les_faces_rayonnantes_[i];
           if (Facei.emissivite() != -1)
             {
               //                    secmem(irayo) = Facei.emissivite()*SIGMA*(pow(Facei.T_face_rayo(),4));
@@ -258,7 +258,7 @@ void Modele_Rayonnement_Milieu_Transparent::calculer_flux_radiatifs()
 
   for (int i = 0; i < nb_faces_totales_; i++)
     {
-      Face_Rayonnante& Facei = les_faces_rayonnantes_[i];
+      Face_rayo_transp& Facei = les_faces_rayonnantes_[i];
       if (Facei.emissivite() != -1)
         {
           Facei.mettre_a_jour_flux_radiatif(les_flux_radiatifs_(jrayo));
@@ -338,7 +338,7 @@ double Modele_Rayonnement_Milieu_Transparent::flux_radiatif(int num_face) const
       for (int i = 0; i < nb_faces_totales(); i++)
         if (les_faces_rayonnantes_[i].emissivite() != -1)
           {
-            const Ensemble_faces_rayo& ensemble = les_faces_rayonnantes_[i].ensembles_faces_bord(0);
+            const Ensemble_faces_rayo_transp& ensemble = les_faces_rayonnantes_[i].ensembles_faces_bord(0);
             if (ensemble.nb_faces_bord() != 0)
               {
                 //const IntVect&  num_face_ens= ensemble.Table_faces ();
@@ -470,7 +470,7 @@ void Modele_Rayonnement_Milieu_Transparent::preparer_calcul()
             jrayo = 0;
             for (int j = 0; j < nb_faces_totales(); j++)
               {
-                const Face_Rayonnante& Facej = les_faces_rayonnantes_[j];
+                const Face_rayo_transp& Facej = les_faces_rayonnantes_[j];
                 if (Facej.emissivite() != -1)
                   {
                     for (irayo = 0; irayo < nb_faces_rayonnantes(); irayo++)
@@ -580,7 +580,7 @@ void Modele_Rayonnement_Milieu_Transparent::discretiser(const Discretisation_bas
 {
   for (int i = 0; i < nb_faces_totales(); i++)
     {
-      Face_Rayonnante& face_rayo = face_rayonnante(i);
+      Face_rayo_transp& face_rayo = face_rayonnante(i);
       Nom type("Ensemble_Faces_");
       Nom discr = dis.que_suis_je();
       if (discr == "VEFPreP1B")
@@ -591,7 +591,7 @@ void Modele_Rayonnement_Milieu_Transparent::discretiser(const Discretisation_bas
         {
           if (face_rayo.nom_bord_rayo() != face_rayo.nom_bord_rayo_lu())
             {
-              Ensemble_faces_rayo& faces_j = face_rayo.ensembles_faces_bord(j);
+              Ensemble_faces_rayo_transp& faces_j = face_rayo.ensembles_faces_bord(j);
               faces_j.lire(face_rayo.nom_bord_rayo_lu(), face_rayo.nom_bord_rayo(), domaine);
             }
         }

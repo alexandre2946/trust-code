@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,21 +13,30 @@
 *
 *****************************************************************************/
 
-#ifndef Paroi_flux_impose_Rayo_transp_included
-#define Paroi_flux_impose_Rayo_transp_included
+#include <Frontiere_ouverte_temperature_imposee_rayo_transp.h>
+#include <Front_VF.h>
 
-#include <Paroi_Rayo_transp.h>
-#include <Champ_front_calc.h>
-#include <TRUST_Ref.h>
+Implemente_instanciable(Frontiere_ouverte_temperature_imposee_rayo_transp, "Frontiere_ouverte_temperature_imposee_rayo_transp", Entree_fluide_temperature_imposee);
 
-class Paroi_flux_impose_Rayo_transp: public Paroi_Rayo_transp
+Sortie& Frontiere_ouverte_temperature_imposee_rayo_transp::printOn(Sortie& is) const { return is; }
+
+Entree& Frontiere_ouverte_temperature_imposee_rayo_transp::readOn(Entree& s) { return Entree_fluide_temperature_imposee::readOn(s); }
+
+void Frontiere_ouverte_temperature_imposee_rayo_transp::completer()
 {
-  Declare_base(Paroi_flux_impose_Rayo_transp);
-public:
+  Entree_fluide_temperature_imposee::completer();
+  preparer_surface(frontiere_dis(), domaine_Cl_dis());
+}
 
-  virtual void calculer_Teta_i() = 0;
-  void mettre_a_jour(double temps) override;
-  void completer() override;
-};
+void Frontiere_ouverte_temperature_imposee_rayo_transp::mettre_a_jour(double temps)
+{
+  Entree_fluide_temperature_imposee::mettre_a_jour(temps);
+  calculer_Teta_i();
+}
 
-#endif /* Paroi_flux_impose_Rayo_transp_included */
+void Frontiere_ouverte_temperature_imposee_rayo_transp::calculer_Teta_i()
+{
+  const Front_VF& front_vf = ref_cast(Front_VF, frontiere_dis());
+  for (int numfa = 0; numfa < front_vf.nb_faces(); numfa++)
+    teta_i_[numfa] = val_imp(numfa);
+}

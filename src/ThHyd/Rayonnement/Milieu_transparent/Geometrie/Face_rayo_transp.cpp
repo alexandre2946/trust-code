@@ -13,14 +13,14 @@
 *
 *****************************************************************************/
 
-#include <Face_Rayonnante.h>
+#include <Face_rayo_transp.h>
 #include <Domaine_VF.h>
 #include <Domaine_Cl_dis_base.h>
 #include <EcrFicPartage.h>
 
-Implemente_instanciable(Face_Rayonnante, "Face_Rayonnante", Objet_U);
+Implemente_instanciable(Face_rayo_transp, "Face_rayo_transp", Objet_U);
 
-Entree& Face_Rayonnante::readOn(Entree& is)
+Entree& Face_rayo_transp::readOn(Entree& is)
 {
   is >> nom_bord_rayo_lu_;
   nom_bord_rayo_ = nom_bord_rayo_lu_;
@@ -40,14 +40,14 @@ Entree& Face_Rayonnante::readOn(Entree& is)
   return is;
 }
 
-Sortie& Face_Rayonnante::printOn(Sortie& os) const { return os; }
+Sortie& Face_rayo_transp::printOn(Sortie& os) const { return os; }
 
-double Face_Rayonnante::calculer_temperature()
+double Face_rayo_transp::calculer_temperature()
 {
   // cas particulier ou Ensemble_Faces coincide avec un bord: nb_ensembles_faces() = 1
   for (int j = 0; j < nb_ensembles_faces(); j++)
     {
-      Ensemble_faces_rayo& faces_j = ensembles_faces_bord(j);
+      Ensemble_faces_rayo_transp& faces_j = ensembles_faces_bord(j);
       double sum_surf = 0.;
       double sum_T = 0.;
 
@@ -91,7 +91,7 @@ double Face_Rayonnante::calculer_temperature()
   return T_face_rayo_;
 }
 
-double Face_Rayonnante::imprimer_flux_radiatif(Sortie& os, Sortie& os1, Sortie& os2) const
+double Face_rayo_transp::imprimer_flux_radiatif(Sortie& os, Sortie& os1, Sortie& os2) const
 {
 
   double flux_ = flux_radiatif_ * surface_rayo();
@@ -102,7 +102,7 @@ double Face_Rayonnante::imprimer_flux_radiatif(Sortie& os, Sortie& os1, Sortie& 
   return flux_;
 }
 
-int Face_Rayonnante::chercher_ensemble_faces(const Nom& nom_bord) const
+int Face_rayo_transp::chercher_ensemble_faces(const Nom& nom_bord) const
 {
   // recherche si le nom_bord passe est une face rayonnante.
   if (nom_bord == nom_bord_rayo_)
@@ -115,7 +115,7 @@ int Face_Rayonnante::chercher_ensemble_faces(const Nom& nom_bord) const
   return -1;
 }
 
-void Face_Rayonnante::ecrire_temperature_bord() const
+void Face_rayo_transp::ecrire_temperature_bord() const
 {
   if (emissivite_ == -1)
     return;
@@ -134,7 +134,7 @@ void Face_Rayonnante::ecrire_temperature_bord() const
     {
       // cast en dur a cause de teta_i
       // a nettoyer quand teta_i sera une methode const...
-      Ensemble_faces_rayo& faces_j = ref_cast_non_const(Ensemble_faces_rayo, ensembles_faces_bord(j));
+      Ensemble_faces_rayo_transp& faces_j = ref_cast_non_const(Ensemble_faces_rayo_transp, ensembles_faces_bord(j));
       double T = 0;
       if (faces_j.nb_faces_bord() != 0)
         {

@@ -13,37 +13,26 @@
 *
 *****************************************************************************/
 
-#ifndef Echange_contact_Rayo_transp_VDF_included
-#define Echange_contact_Rayo_transp_VDF_included
+#ifndef Paroi_rayo_transp_included
+#define Paroi_rayo_transp_included
 
-#include <Echange_contact_VDF.h>
 #include <Cond_lim_rayo_milieu_transp.h>
+#include <Neumann_paroi.h>
 
-class Echange_contact_Rayo_transp_VDF: public Cond_lim_rayo_milieu_transp, public Echange_contact_VDF
+class Paroi_rayo_transp: public Cond_lim_rayo_milieu_transp, public Neumann_paroi
 {
-  Declare_instanciable(Echange_contact_Rayo_transp_VDF);
+  Declare_base(Paroi_rayo_transp);
 public:
 
-  void completer() override;
-  void mettre_a_jour(double) override;
-  void calculer_Teta_paroi(DoubleTab& tab_p, const DoubleTab& mon_h, const DoubleTab& autre_h, int is_pb_fluide, double temps) override;
-  void calculer_Teta_equiv(DoubleTab& Teta_equiv, const DoubleTab& mon_h, const DoubleTab& autre_h, int is_pb_fluide, double temps) override;
-
+  double flux_impose(int i) const override;
+  double flux_impose(int i, int j) const override;
   int compatible_avec_eqn(const Equation_base&) const override { return 1; }
+
   inline bool is_bc_rayo_milieu_transp(Cond_lim_rayo_milieu_transp *& la_cl_rayo) override
   {
     la_cl_rayo = static_cast<Cond_lim_rayo_milieu_transp*>(this);
     return true;
   }
-
-protected:
-  int num_premiere_face_dans_pb_fluide_ = -1;
-  double alpha_ = 0.5;
 };
 
-class Echange_contact_Rayo_transp_sans_relax_VDF: public Echange_contact_Rayo_transp_VDF
-{
-  Declare_instanciable(Echange_contact_Rayo_transp_sans_relax_VDF);
-};
-
-#endif /* Echange_contact_Rayo_transp_VDF_included */
+#endif /* Paroi_rayo_transp_included */
