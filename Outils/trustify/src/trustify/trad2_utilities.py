@@ -18,6 +18,11 @@ from trustify.misc_utilities import logger, pretty_error
 _XD_TAG = " XD "
 _XD_PARAM_TAG = " XD_ADD_P "
 
+# Initialize _TRUST_ROOT at module level:
+_TRUST_ROOT = os.environ.get("TRUST_ROOT", None)
+if _TRUST_ROOT is None:
+    raise Exception("TRUST_ROOT environment variable is not defined!")
+
 def convertTyp(typ):
     """ Types declared in XD tags of cpp files might differ from what is officially supported in TRAD_2, so convert:
     """
@@ -26,6 +31,10 @@ def convertTyp(typ):
           "flag": "rien",
           "dico": "chaine(into=[])"}
     return mp.get(typ, typ)
+
+def convert_path_to_relative(fname):
+    fname_short = fname.replace(_TRUST_ROOT, "${TRUST_ROOT}")
+    return fname_short
 
 class TRAD2Attr:
     """ An attribute of a block in the TRAD2 logic """
@@ -67,7 +76,8 @@ class TRAD2Attr:
         if opt not in ["0", "1"]:
             raise Exception(pretty_error(fname, lineno, f"invalid optional flag in 'XD attr' (attribute line) instruction ('{opt}'). It should be 0 or 1!!")) from None
         a.is_opt = (opt == "1")
-        a.info = [fname, lineno+1]
+        tr = os.environ.get("TRUST_ROOT", None) # should be defined, this is checked in main
+        a.info = [convert_path_to_relative(fname), lineno+1]
         return a
 
     def toTRAD2(self):
@@ -114,7 +124,7 @@ class TRAD2Block:
             raise Exception(pretty_error(fname, lineno, f"option for curly braces should be an integer in [-3:1], not '{acco_s}'!!")) from None
         b.mode = a
         b.synos = nam2.split("|")
-        b.info = [fname, lineno+1]
+        b.info = [convert_path_to_relative(fname), lineno+1]
         b._finishBuild(tab[4:])
         return b
 
@@ -497,22 +507,21 @@ def do_main():
     - potentially the file containing the debug info indicating for each line in the TRAD2 the corresponding source line in the C++ code 
     """
     import sys
+    
     if len(sys.argv) > 1:
         outfile = sys.argv[1]
     else:
         outfile = "test/trad2/myTRAD2"
-    tr = os.environ.get("TRUST_ROOT", None)
     pd = os.environ.get("project_directory", None)
     trustify_from_trust = os.environ.get("TRUSTIFY_FROM_TRUST", None)
-    if tr is None:
-        raise Exception("TRUST_ROOT environment variable is not defined!")
-    srcs = [os.path.join(tr, "src")]
+    print("_TRUST_ROOT is ", _TRUST_ROOT)
+    srcs = [os.path.join(_TRUST_ROOT, "src")]
     if not pd is None and trustify_from_trust is None:  # called from a BALTIK
         trad2org = os.path.join(pd, "build", "trustify", "generated", "agg_TRAD_2.org")
         # Append baltik sources:
         srcs.append(os.path.join(pd, "build", "src"))
     else:   # called from TRUST
-        trad2org = os.path.join(tr, "Outils", "trustify", "doc", "TRAD_2.org")
+        trad2org = os.path.join(_TRUST_ROOT, "Outils", "trustify", "doc", "TRAD_2.org")
     tg = TRAD2Content.BuildFromOrgAndSources(trad2org, srcs)
     tg.toTRAD2(outfile)
 
