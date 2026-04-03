@@ -1057,8 +1057,18 @@ Matrice_Morse operator+(const Matrice_Morse& A , const Matrice_Morse& B )
   Matrice_Morse C;
   // PL: avant de dimensionner a nzmax on verifie si A et B n'ont pas la meme structure par hasard...
   // Cela evite un pic memoire provoque par l'addition de matrices dans Equation_base::dimensionner_matrice
-  auto nzmax = A.has_same_morse_matrix_structure(B) ? A.nb_coeff() : A.nb_coeff()+B.nb_coeff();
+  auto nzmax = A.has_same_morse_matrix_structure(B) ? A.nb_coeff() : A.nb_coeff() + B.nb_coeff();
   C.dimensionner(nrow, ncol, nzmax);
+#ifndef TRUST_USE_GPU
+  // Fortran call cause faster on serail version on some Baltik:
+  int job = 1;
+  int ierr = -1;
+  IntVect iw(ncol);
+  F77NAME(APLB)(&nrow, &ncol, &job, A.get_coeff().addr(), A.get_tab2().addr(), A.get_tab1().addr(),
+                B.get_coeff().addr(), B.get_tab2().addr(), B.get_tab1().addr(), C.get_set_coeff().addr(),
+                C.get_set_tab2().addr(), C.get_set_tab1().addr(),
+                &nzmax, iw.addr(), &ierr);
+#else
   // Algorithm (per row i):
   //   1. Collect entries from row i of A and B into a small temporary buffer
   //   2. Sort by column index
@@ -1092,22 +1102,22 @@ Matrice_Morse operator+(const Matrice_Morse& A , const Matrice_Morse& B )
       // Step 1: copy A row i into C, recording each column's position
       for (auto k = a_tab1[i] - 1; k < a_tab1[i + 1] - 1; ++k)
         {
-          c_tab2[nnz_c]      = (int)a_tab2[k];
-          c_coeff[nnz_c]     = a_coeff[k];
-          col_to_pos[(int)a_tab2[k]] = nnz_c;
+          c_tab2[nnz_c] = (int) a_tab2[k];
+          c_coeff[nnz_c] = a_coeff[k];
+          col_to_pos[(int) a_tab2[k]] = nnz_c;
           ++nnz_c;
         }
 
       // Step 2: merge B row i — accumulate if column already in C, else append
       for (auto k = b_tab1[i] - 1; k < b_tab1[i + 1] - 1; ++k)
         {
-          const int col = (int)b_tab2[k];
+          const int col = (int) b_tab2[k];
           auto it = col_to_pos.find(col);
           if (it != col_to_pos.end())
             c_coeff[it->second] += b_coeff[k]; // column shared with A: accumulate
           else
             {
-              c_tab2[nnz_c]  = col;
+              c_tab2[nnz_c] = col;
               c_coeff[nnz_c] = b_coeff[k];
               col_to_pos[col] = nnz_c;
               ++nnz_c;
@@ -1116,6 +1126,7 @@ Matrice_Morse operator+(const Matrice_Morse& A , const Matrice_Morse& B )
 
       c_tab1[i + 1] = nnz_c + 1; // 1-based pointer to start of next row
     }
+#endif
   const auto nnz = C.tab1_[nrow] - 1;
   C.get_set_tab2().resize(nnz);
   C.get_set_coeff().resize(nnz);
