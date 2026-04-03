@@ -20,6 +20,7 @@
 #include <Matrice_Bloc.h>
 #include <Discret_Thyd.h>
 #include <Fluide_base.h>
+#include <EChaine.h>
 #include <Param.h>
 
 Implemente_base(Equation_rayonnement_base, "Equation_rayonnement_base", Equation_base);
@@ -75,88 +76,40 @@ int Equation_rayonnement_base::lire_motcle_non_standard(const Motcle& mot, Entre
 void Equation_rayonnement_base::completer()
 {
   // typage de l'operateur de diffusion
+  Cerr << "Reading and typing of the diffusion operator of equation " << que_suis_je() << finl;
+
   if (sub_type(Fluide_base, fluide()))
     if (fluide().is_rayo_semi_transp())
       {
         if (fluide().is_longueur_rayo_discretised())
-          {
-            const Champ_Don_base& long_rayo = fluide().longueur_rayo();
-            terme_diffusif_.associer_diffusivite(long_rayo);
-          }
+          terme_diffusif_.associer_diffusivite(fluide().longueur_rayo());
         else
           {
-            Cerr << "Error while reading the Radiation equation." << finl;
+            Cerr << "Error in Equation_rayonnement_base::completer." << finl;
             Cerr << "You may not have discretized the problem of type Pb_Couple_rayo_semi_transp." << finl;
-            Cerr << "Remark : The discretization of a coupling problem carries out those of the involved coupled " << finl;
-            Cerr << "         problems therefore it is not useful to keep the discretization of these last ones.  " << finl;
-            Cerr << finl;
             Process::exit();
           }
       }
     else
       {
         Cerr << "Error : the radiative properties of the incompressible fluid have not" << finl;
-        Cerr << "been defined while a semi transparent radiation model is used." << finl;
+        Cerr << "been defined while a semi transparent radiation problem is used." << finl;
         Cerr << "The fields kappa and indice which respectively define the absoption coefficient" << finl;
-        Cerr << "and the refraction index must be added to the luid properties." << finl;
+        Cerr << "and the refraction index must be added to the fluid properties." << finl;
         Process::exit();
       }
   else
     {
-      Cerr << "Error while reading the Radiation equation." << finl;
-      Cerr << "Your fluid is of type " << fluide().que_suis_je() << finl;
-      Cerr << "Currently only fluid of type Fluide_base can be considered " << finl;
-      Cerr << "with the semi transparent radiation model." << finl;
+      Cerr << "Error while reading the Radiation equation. Your fluid is of type " << fluide().que_suis_je() << finl;
+      Cerr << "Currently only fluid of type Fluide_base can be considered with the semi transparent radiation model." << finl;
       Process::exit();
     }
 
-  Nom type = "Op_Diff_";
-  Nom discr = discretisation().que_suis_je();
-  // les operateurs C_D_Turb_T sont communs aux discretisations VEF et VEFP1B
-  if (discr == "VEFPreP1B")
-    discr = "VEF";
-  type += discr;
-
-  Nom nb_inc;
-  if (sub_type(Champ_Uniforme, terme_diffusif_.diffusivite()))
-    nb_inc = "_";
-  else
-    nb_inc = "_Mult_inco_";
-  type += nb_inc;
-
-  Nom type_inco = inconnue().que_suis_je();
-  type += (type_inco.suffix("Champ_"));
-
-  if (axi)
-    type += "_Axi";
-
-  terme_diffusif_.typer(type);
-  terme_diffusif_.l_op_base().associer_eqn(*this);
-
-  if (sub_type(Fluide_base, fluide()))
-    if (fluide().has_kappa())
-      {
-        const Champ_Don_base& long_rayo = fluide().longueur_rayo();
-        terme_diffusif_->associer_diffusivite(long_rayo);
-        terme_diffusif_.completer();
-        terme_diffusif_->dimensionner(la_matrice_);
-      }
-    else
-      {
-        Cerr << "Error : the radiative properties of the incompressible fluid have not" << finl;
-        Cerr << "been defined while a semi transparent radiation model is used." << finl;
-        Cerr << "The fields kappa and indice which respectively define the absoption coefficient" << finl;
-        Cerr << "and the refraction index must be added to the luid properties." << finl;
-        Process::exit();
-      }
-  else
-    {
-      Cerr << "Error while reading the Radiation equation." << finl;
-      Cerr << "Your fluid is of type " << fluide().que_suis_je() << finl;
-      Cerr << "Currently only fluid of type Fluide_base can be considered " << finl;
-      Cerr << "with the semi transparent radiation model." << finl;
-      Process::exit();
-    }
+  EChaine diff("{ }");
+  diff >> terme_diffusif_;
+  terme_diffusif_->associer_diffusivite(fluide().longueur_rayo());
+  terme_diffusif_.completer();
+  terme_diffusif_->dimensionner(la_matrice_);
 
   Equation_base::completer();
 }
@@ -168,7 +121,7 @@ void Equation_rayonnement_base::completer()
 void Equation_rayonnement_base::associer_milieu_base(const Milieu_base& un_milieu)
 {
   if (sub_type(Fluide_base, un_milieu))
-    if (fluide().has_kappa())
+    if (fluide().is_rayo_semi_transp())
       {
         const Fluide_base& un_fluide = ref_cast(Fluide_base, un_milieu);
         associer_fluide(un_fluide);
@@ -177,17 +130,15 @@ void Equation_rayonnement_base::associer_milieu_base(const Milieu_base& un_milie
     else
       {
         Cerr << "Error : the radiative properties of the incompressible fluid have not" << finl;
-        Cerr << "been defined while a semi transparent radiation model is used." << finl;
+        Cerr << "been defined while a semi transparent radiation problem is used." << finl;
         Cerr << "The fields kappa and indice which respectively define the absoption coefficient" << finl;
-        Cerr << "and the refraction index must be added to the luid properties." << finl;
+        Cerr << "and the refraction index must be added to the fluid properties." << finl;
         Process::exit();
       }
   else
     {
-      Cerr << "Error for the method Equation_rayonnement_base::associer_milieu_base" << finl;
-      Cerr << "Your fluid is of type " << un_milieu.que_suis_je() << finl;
-      Cerr << "Currently only fluid of type Fluide_base can be considered " << finl;
-      Cerr << "with the semi transparent radiation model." << finl;
+      Cerr << "Error while reading the Radiation equation. Your fluid is of type " << fluide().que_suis_je() << finl;
+      Cerr << "Currently only fluid of type Fluide_base can be considered with the semi transparent radiation model." << finl;
       Process::exit();
     }
 }
