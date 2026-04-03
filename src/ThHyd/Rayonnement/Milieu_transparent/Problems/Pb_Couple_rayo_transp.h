@@ -13,8 +13,8 @@
 *
 *****************************************************************************/
 
-#ifndef Pb_Couple_Rayonnement_included
-#define Pb_Couple_Rayonnement_included
+#ifndef Pb_Couple_rayo_transp_included
+#define Pb_Couple_rayo_transp_included
 
 #include <Modele_Rayonnement_Milieu_Transparent.h>
 #include <Probleme_Couple.h>
@@ -24,9 +24,9 @@ class Cond_lim_base;
 class Schema_Temps_base;
 class Discretisation_base;
 
-class Pb_Couple_Rayonnement: public Probleme_Couple
+class Pb_Couple_rayo_transp: public Probleme_Couple
 {
-  Declare_instanciable(Pb_Couple_Rayonnement);
+  Declare_instanciable(Pb_Couple_rayo_transp);
 public:
   int associer_(Objet_U&) override;
   int postraiter(int force = 1) override;
@@ -41,4 +41,4 @@ protected:
   OBS_PTR(Modele_Rayonnement_Milieu_Transparent) le_modele_de_rayo_;
 };
 
-#endif /* Pb_Couple_Rayonnement_included */
+#endif /* Pb_Couple_rayo_transp_included */

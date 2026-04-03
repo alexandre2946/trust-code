@@ -14,25 +14,25 @@
 *****************************************************************************/
 
 #include <Modele_Rayonnement_Milieu_Transparent.h>
-#include <Pb_Couple_Rayonnement.h>
+#include <Pb_Couple_rayo_transp.h>
 #include <Paroi_rayo_transp.h>
 #include <Probleme_base.h>
 #include <Fluide_base.h>
 
-Implemente_instanciable(Pb_Couple_Rayonnement, "Pb_Couple_Rayonnement", Probleme_Couple);
+Implemente_instanciable(Pb_Couple_rayo_transp, "Pb_Couple_rayo_transp", Probleme_Couple);
 
-Entree& Pb_Couple_Rayonnement::readOn(Entree& is) { return is; }
+Entree& Pb_Couple_rayo_transp::readOn(Entree& is) { return is; }
 
-Sortie& Pb_Couple_Rayonnement::printOn(Sortie& os) const { return Probleme_Couple::printOn(os); }
+Sortie& Pb_Couple_rayo_transp::printOn(Sortie& os) const { return Probleme_Couple::printOn(os); }
 
-void Pb_Couple_Rayonnement::initialize()
+void Pb_Couple_rayo_transp::initialize()
 {
   completer();
   Probleme_Couple::initialize();
   le_modele_rayo().preparer_calcul();
 }
 
-int Pb_Couple_Rayonnement::associer_(Objet_U& ob)
+int Pb_Couple_rayo_transp::associer_(Objet_U& ob)
 {
   if( sub_type(Modele_Rayonnement_Milieu_Transparent, ob))
     {
@@ -43,7 +43,7 @@ int Pb_Couple_Rayonnement::associer_(Objet_U& ob)
   else return Probleme_Couple::associer_(ob);
 }
 
-int Pb_Couple_Rayonnement::postraiter(int force)
+int Pb_Couple_rayo_transp::postraiter(int force)
 {
   int ok = Probleme_Couple::postraiter(force);
   if (!ok)
@@ -61,13 +61,13 @@ int Pb_Couple_Rayonnement::postraiter(int force)
   return 1;
 }
 
-void Pb_Couple_Rayonnement::validateTimeStep()
+void Pb_Couple_rayo_transp::validateTimeStep()
 {
   Probleme_Couple::validateTimeStep();
   le_modele_rayo().mettre_a_jour(presentTime());
 }
 
-void Pb_Couple_Rayonnement::completer()
+void Pb_Couple_rayo_transp::completer()
 {
   le_modele_de_rayo_->discretiser(ref_cast(Probleme_base,probleme(0)).discretisation(), ref_cast(Probleme_base,probleme(0)).domaine());
   Modele_Rayonnement_Milieu_Transparent& mod_rayo = le_modele_de_rayo_.valeur();
@@ -86,11 +86,11 @@ void Pb_Couple_Rayonnement::completer()
     }
   if (nb_pb_ray > 1)
     {
-      Cerr << "Pb_Couple_Rayonnement::completer - We can only treat 1 transparent medium at present. You defined " << nb_pb_ray << " !!!" << finl;
+      Cerr << "Pb_Couple_rayo_transp::completer - We can only treat 1 transparent medium at present. You defined " << nb_pb_ray << " !!!" << finl;
       Process::exit();
     }
   else if (nb_pb_ray == 0)
-    Process::exit("Pb_Couple_Rayonnement::completer - You should define the transparent medium using the flag transparent_medium_radiation !!!\n");
+    Process::exit("Pb_Couple_rayo_transp::completer - You should define the transparent medium using the flag transparent_medium_radiation !!!\n");
 
   for (int l = 0; l < nb_problemes(); l++)
     {
