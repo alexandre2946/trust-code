@@ -77,7 +77,7 @@ public :
 
   //  Renvoie la longueur de penetration du rayonnement dans le fluide definie comme l = 1/(3*kappa)
   inline Champ_Don_base& longueur_rayo() { return longueur_rayo_.valeur(); }
-  inline const Champ_Don_base& longeur_rayo() const { return longueur_rayo_.valeur(); }
+  inline const Champ_Don_base& longueur_rayo() const { return longueur_rayo_.valeur(); }
   void typer_longeur_rayo(const Nom& typ) { longueur_rayo_.typer(typ); }
 
   bool is_rayo_semi_transp() const override { return (coeff_absorption_.non_nul() && indice_refraction_.non_nul()); }

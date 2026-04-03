@@ -13,24 +13,24 @@
 *
 *****************************************************************************/
 
-#ifndef Flux_radiatif_VDF_included
-#define Flux_radiatif_VDF_included
+#ifndef Rayo_semi_transp_solver_VEF_included
+#define Rayo_semi_transp_solver_VEF_included
 
-#include <Flux_radiatif_base.h>
+#include <Rayo_semi_transp_solver_base.h>
 
-class Champ_Don_base;
-class Domaine_VF;
-
-class Flux_radiatif_VDF : public Flux_radiatif_base
+class Rayo_semi_transp_solver_VEF: public Rayo_semi_transp_solver_base
 {
-  Declare_instanciable(Flux_radiatif_VDF);
+  Declare_instanciable(Rayo_semi_transp_solver_VEF);
+public:
+  int nb_colonnes_tot() override;
+  int nb_colonnes() override;
 
-public :
-  void evaluer_cl_rayonnement(Champ_front_base& Tb, const Champ_Don_base&,
-                              const Champ_Don_base&, const Champ_Don_base&,
-                              const Domaine_VF&, const double, double);
+  void modifier_matrice() override;
+  void assembler_matrice() override;
 
-  void calculer_flux_radiatif(const Equation_base& eq_temp) override;
+  void resoudre(double temps) override;
+  void evaluer_cl_rayonnement(double temps) override;
 };
 
-#endif /* Flux_radiatif_VDF_included */
+#endif /* Rayo_semi_transp_solver_VEF_included */
+

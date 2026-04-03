@@ -13,34 +13,15 @@
 *
 *****************************************************************************/
 
-#ifndef Eq_rayo_semi_transp_VEF_included
-#define Eq_rayo_semi_transp_VEF_included
+#include <Rayo_semi_transp_solver_base.h>
+#include <Eq_rayo_semi_transp.h>
 
-#include <Equation_rayonnement_base.h>
+Implemente_base(Rayo_semi_transp_solver_base, "Rayo_semi_transp_solver_base", Objet_U);
 
-/*! @brief classe Eq_rayo_semi_transp Cette classe represente l'equation de rayonnement pour l'irradiance
- *
- *     dans un milieu semi transparent.
- *     elle est associee au probleme de rayonnement semi transparent
- *     Elle definit la methode resoudre et calcule l'irradiance.
- *
- *
- * @sa Equation_rayonnement
- */
-class Eq_rayo_semi_transp_VEF: public Equation_rayonnement_base
+Sortie& Rayo_semi_transp_solver_base::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
+Entree& Rayo_semi_transp_solver_base::readOn(Entree& is) { return is; }
+
+void Rayo_semi_transp_solver_base::associer_equation_rayo(const Eq_rayo_semi_transp& eq)
 {
-  Declare_instanciable(Eq_rayo_semi_transp_VEF);
-
-public:
-
-  void modifier_matrice() override;
-  void resoudre(double temps) override;
-  void evaluer_cl_rayonnement(double temps) override;
-  void completer() override;
-  void assembler_matrice() override;
-
-  int nb_colonnes_tot() override;
-  int nb_colonnes() override;
-};
-
-#endif /* Eq_rayo_semi_transp_VEF_included */
+  eq_rayo_semi_transp_ = eq;
+}

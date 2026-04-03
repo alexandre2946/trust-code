@@ -13,7 +13,7 @@
 *
 *****************************************************************************/
 
-#include <Equation_rayonnement_base.h>
+#include <Eq_rayo_semi_transp.h>
 #include <Pb_rayo_semi_transp.h>
 #include <Matrice_Morse_Sym.h>
 #include <Champ_Uniforme.h>
@@ -23,31 +23,36 @@
 #include <EChaine.h>
 #include <Param.h>
 
-Implemente_base(Equation_rayonnement_base, "Equation_rayonnement_base", Equation_base);
+Implemente_instanciable(Eq_rayo_semi_transp, "Eq_rayo_semi_transp", Equation_base);
 
-bool Equation_rayonnement_base::initTimeStep(double dt)
+bool Eq_rayo_semi_transp::initTimeStep(double dt)
 {
   schema_temps().set_dt() = dt;
   return Equation_base::initTimeStep(dt);
 }
 
-bool Equation_rayonnement_base::solve()
+void Eq_rayo_semi_transp::resoudre(double temps)
 {
-  resoudre(schema_temps().temps_courant() + schema_temps().pas_de_temps());
+  rayo_solv_->resoudre(temps);
+}
+
+bool Eq_rayo_semi_transp::resoudre()
+{
+  rayo_solv_->resoudre(schema_temps().temps_courant() + schema_temps().pas_de_temps());
   return true;
 }
 
-Sortie& Equation_rayonnement_base::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
+Sortie& Eq_rayo_semi_transp::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
 
-Entree& Equation_rayonnement_base::readOn(Entree& is) { return Equation_base::readOn(is); }
+Entree& Eq_rayo_semi_transp::readOn(Entree& is) { return Equation_base::readOn(is); }
 
-void Equation_rayonnement_base::set_param(Param& param) const
+void Eq_rayo_semi_transp::set_param(Param& param) const
 {
   param.ajouter_non_std("conditions_limites|boundary_conditions", (this), Param::REQUIRED);
   param.ajouter_non_std("solveur", (this), Param::REQUIRED);
 }
 
-int Equation_rayonnement_base::lire_motcle_non_standard(const Motcle& mot, Entree& is)
+int Eq_rayo_semi_transp::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
   int retval = 1;
   if (mot == "conditions_limites|boundary_conditions")
@@ -73,8 +78,15 @@ int Equation_rayonnement_base::lire_motcle_non_standard(const Motcle& mot, Entre
   return retval;
 }
 
-void Equation_rayonnement_base::completer()
+void Eq_rayo_semi_transp::completer()
 {
+  const Domaine_dis_base& dom_dis = domaine_dis();
+  for (int i = 0; i < dom_dis.nb_front_Cl(); i++)
+    {
+      const Frontiere_dis_base& la_fr_dis = dom_dis.frontiere_dis(i);
+      le_dom_Cl_dis->les_conditions_limites(i)->associer_fr_dis_base(la_fr_dis);
+    }
+
   // typage de l'operateur de diffusion
   Cerr << "Reading and typing of the diffusion operator of equation " << que_suis_je() << finl;
 
@@ -85,7 +97,7 @@ void Equation_rayonnement_base::completer()
           terme_diffusif_.associer_diffusivite(fluide().longueur_rayo());
         else
           {
-            Cerr << "Error in Equation_rayonnement_base::completer." << finl;
+            Cerr << "Error in Eq_rayo_semi_transp::completer." << finl;
             Cerr << "You may not have discretized the problem of type Pb_Couple_rayo_semi_transp." << finl;
             Process::exit();
           }
@@ -112,13 +124,17 @@ void Equation_rayonnement_base::completer()
   terme_diffusif_->dimensionner(la_matrice_);
 
   Equation_base::completer();
+
+  // On assemble la matrice une fois pour toute au debut du calcul
+  // XXX Attention, ceci n'est valable que si kappa est constant au cours du temps
+  rayo_solv_->assembler_matrice();
 }
 
 /*! @brief Associe un milieu physique a l'equation
  *
  * @param (Milieu_base& un_milieu) le milieu physique a associer a l'equation
  */
-void Equation_rayonnement_base::associer_milieu_base(const Milieu_base& un_milieu)
+void Eq_rayo_semi_transp::associer_milieu_base(const Milieu_base& un_milieu)
 {
   if (sub_type(Fluide_base, un_milieu))
     if (fluide().is_rayo_semi_transp())
@@ -147,7 +163,7 @@ void Equation_rayonnement_base::associer_milieu_base(const Milieu_base& un_milie
  *
  * @return (Milieu_base&) le Fluide_base de l'equation upcaste en Milieu_base
  */
-const Milieu_base& Equation_rayonnement_base::milieu() const
+const Milieu_base& Eq_rayo_semi_transp::milieu() const
 {
   if (!le_fluide_.non_nul())
     {
@@ -163,7 +179,7 @@ const Milieu_base& Equation_rayonnement_base::milieu() const
  *
  * @return (Milieu_base&) le Fluide_base de l'equation upcaste en Milieu_base
  */
-Milieu_base& Equation_rayonnement_base::milieu()
+Milieu_base& Eq_rayo_semi_transp::milieu()
 {
   if (!le_fluide_.non_nul())
     {
@@ -182,15 +198,15 @@ Milieu_base& Equation_rayonnement_base::milieu()
  * @return (Operateur&) l'operateur specifie
  * @throws l'equation n'a pas plus de 1 operateur
  */
-const Operateur& Equation_rayonnement_base::operateur(int i) const
+const Operateur& Eq_rayo_semi_transp::operateur(int i) const
 {
   switch(i)
     {
     case 0:
       return terme_diffusif_;
     default:
-      Cerr << "Error for Equation_rayonnement_base::operateur(int i)" << finl;
-      Cerr << "Equation_rayonnement_base has " << nombre_d_operateurs() << " operators " << finl;
+      Cerr << "Error for Eq_rayo_semi_transp::operateur(int i)" << finl;
+      Cerr << "Eq_rayo_semi_transp has " << nombre_d_operateurs() << " operators " << finl;
       Cerr << "and you are trying to access the " << i << " th one." << finl;
       Process::exit();
     }
@@ -206,22 +222,22 @@ const Operateur& Equation_rayonnement_base::operateur(int i) const
  * @return (Operateur&) l'operateur specifie
  * @throws l'equation n'a pas plus de 1 operateur
  */
-Operateur& Equation_rayonnement_base::operateur(int i)
+Operateur& Eq_rayo_semi_transp::operateur(int i)
 {
   switch(i)
     {
     case 0:
       return terme_diffusif_;
     default:
-      Cerr << "Error for Equation_rayonnement_base::operateur(int i)" << finl;
-      Cerr << "Equation_rayonnement_base has " << nombre_d_operateurs() << " operators " << finl;
+      Cerr << "Error for Eq_rayo_semi_transp::operateur(int i)" << finl;
+      Cerr << "Eq_rayo_semi_transp has " << nombre_d_operateurs() << " operators " << finl;
       Cerr << "and you are trying to access the " << i << " th one." << finl;
       Process::exit();
     }
   return terme_diffusif_;
 }
 
-void Equation_rayonnement_base::get_noms_champs_postraitables(Noms& noms, Option opt) const
+void Eq_rayo_semi_transp::get_noms_champs_postraitables(Noms& noms, Option opt) const
 {
   if (opt == DESCRIPTION)
     Cerr << que_suis_je() << " : " << champs_compris_.liste_noms_compris() << finl;
@@ -229,7 +245,7 @@ void Equation_rayonnement_base::get_noms_champs_postraitables(Noms& noms, Option
     noms.add(champs_compris_.liste_noms_compris());
 }
 
-void Equation_rayonnement_base::discretiser()
+void Eq_rayo_semi_transp::discretiser()
 {
   // Discretisation de l'equation de rayonnement
   const Discret_Thyd& dis = ref_cast(Discret_Thyd, discretisation());
@@ -238,6 +254,13 @@ void Equation_rayonnement_base::discretiser()
   champs_compris_.ajoute_champ(irradiance_);
 
   Equation_base::discretiser();
+
+  // typing Rayo_semi_transp_solver_base
+  Nom discr = dis.que_suis_je(), type = "Rayo_semi_transp_solver_";
+  if (discr == "VEFPreP1B") discr = "VEF";
+  type += discr;
+  rayo_solv_.typer(type);
+  rayo_solv_->associer_equation_rayo(*this);
 }
 
 /*! @brief Renvoie la discretisation associee a l'equation.
@@ -245,22 +268,22 @@ void Equation_rayonnement_base::discretiser()
  * @return (Discretisation_base&) a discretisation associee a l'equation
  * @throws pas de probleme associe
  */
-const Discretisation_base& Equation_rayonnement_base::discretisation() const
+const Discretisation_base& Eq_rayo_semi_transp::discretisation() const
 {
   return pb_rayo_semi_transp_->discretisation();
 }
 
-void Equation_rayonnement_base::associer_pb_base(const Probleme_base& pb)
+void Eq_rayo_semi_transp::associer_pb_base(const Probleme_base& pb)
 {
   Equation_base::associer_pb_base(pb);
   pb_rayo_semi_transp_ = ref_cast(Pb_rayo_semi_transp, pb);
   associer_sch_tps_base(pb.schema_temps());
 }
 
-void Equation_rayonnement_base::Mat_Morse_to_Mat_Bloc(Matrice& matrice_tmp)
+void Eq_rayo_semi_transp::Mat_Morse_to_Mat_Bloc(Matrice& matrice_tmp)
 {
-  int n1 = nb_colonnes_tot();
-  int n2 = nb_colonnes();
+  const int n1 = rayo_solv_->nb_colonnes_tot();
+  const int n2 = rayo_solv_->nb_colonnes();
 
   Matrice_Bloc& matrice = ref_cast(Matrice_Bloc, matrice_tmp.valeur());
   Matrice_Morse& MBrr = ref_cast(Matrice_Morse, matrice.get_bloc(0, 0).valeur());
@@ -292,10 +315,11 @@ void Equation_rayonnement_base::Mat_Morse_to_Mat_Bloc(Matrice& matrice_tmp)
     }
 }
 
-void Equation_rayonnement_base::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice_tmp)
+void Eq_rayo_semi_transp::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice_tmp)
 {
-  int n1 = nb_colonnes_tot();
-  int n2 = nb_colonnes();
+  const int n1 = rayo_solv_->nb_colonnes_tot();
+  const int n2 = rayo_solv_->nb_colonnes();
+
   int iligne;
   const IntVect& tab1 = la_matrice_.get_set_tab1();
   const IntVect& tab2 = la_matrice_.get_set_tab2();

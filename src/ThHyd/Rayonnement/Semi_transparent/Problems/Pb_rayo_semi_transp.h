@@ -16,7 +16,7 @@
 #ifndef Pb_rayo_semi_transp_included
 #define Pb_rayo_semi_transp_included
 
-#include <Equation_rayonnement_base.h>
+#include <Eq_rayo_semi_transp.h>
 #include <Probleme_base.h>
 
 /*! @brief Le Pb_rayo_semi_transp est un Probleme_base qui a 4 particularites : * Son equation doit etre typee en fonction de la dicretisation.
@@ -30,7 +30,7 @@
  *     maniere intensive.
  *
  *
- * @sa Pb_Couple_rayo_semi_transp Equation_rayonnement_base
+ * @sa Pb_Couple_rayo_semi_transp Eq_rayo_semi_transp
  */
 class Pb_rayo_semi_transp: public Probleme_base
 {
@@ -57,10 +57,8 @@ public:
   void mettre_a_jour(double temps) override { Process::exit(); }
 
   void preparer_calcul() override;
-  void discretiser(Discretisation_base&) override;
   void associer_sch_tps_base(const Schema_Temps_base&) override;
 
-  Champ_Inc_base& put_irradience();
   const Champ_front_base& flux_radiatif(const Nom& nom_bord) const;
   void calculer_flux_radiatif();
 
@@ -72,18 +70,20 @@ public:
   inline const Probleme_base& probleme_fluide() const { return pb_fluide_.valeur(); }
   inline const double& valeur_sigma() const { return sigma_; }
   inline void associer_probleme_fluide(Probleme_base& Pb) { pb_fluide_ = Pb; }
-  void typer_lire_milieu(Entree& is) override { /* Do nothing */ }
+  void typer_lire_milieu(Entree& is) override;
 
   inline const Equation_base& equation(int i) const override
   {
     assert(i==0);
     return eq_rayo_;
   }
+
   inline Equation_base& equation(int i) override
   {
     assert(i==0);
     return eq_rayo_;
   }
+
   inline const Equation_base& get_equation_by_name(const Nom& un_nom) const override
   {
     assert(Motcle(un_nom)==Motcle("Eq_rayo_semi_transp"));
@@ -96,22 +96,13 @@ public:
     return eq_rayo_;
   }
 
-  inline Equation_rayonnement_base& eq_rayo()
-  {
-    assert(eq_rayo_.non_nul());
-    return eq_rayo_.valeur();
-  }
-
-  inline const Equation_rayonnement_base& eq_rayo() const
-  {
-    assert(eq_rayo_.non_nul());
-    return eq_rayo_.valeur();
-  }
+  inline Eq_rayo_semi_transp& eq_rayo() { return eq_rayo_; }
+  inline const Eq_rayo_semi_transp& eq_rayo() const { return eq_rayo_; }
 
 protected :
-  OBS_PTR(Probleme_base) pb_fluide_;
-  OWN_PTR(Equation_rayonnement_base) eq_rayo_;
   static constexpr double sigma_ = 5.67e-8;
+  Eq_rayo_semi_transp eq_rayo_;
+  OBS_PTR(Probleme_base) pb_fluide_;
 };
 
 #endif /* Pb_rayo_semi_transp_included */

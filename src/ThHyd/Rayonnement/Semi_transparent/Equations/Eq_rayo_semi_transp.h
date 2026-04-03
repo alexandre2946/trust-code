@@ -13,21 +13,22 @@
 *
 *****************************************************************************/
 
-#ifndef Equation_rayonnement_base_included
-#define Equation_rayonnement_base_included
+#ifndef Eq_rayo_semi_transp_included
+#define Eq_rayo_semi_transp_included
 
+#include <Rayo_semi_transp_solver_base.h>
 #include <Operateur_Diff.h>
 #include <Matrice_Morse.h>
 #include <TRUST_Ref.h>
 
 class Pb_rayo_semi_transp;
-class Motcle;
 class Milieu_base;
 class Fluide_base;
+class Motcle;
 
-class Equation_rayonnement_base: public Equation_base
+class Eq_rayo_semi_transp: public Equation_base
 {
-  Declare_base(Equation_rayonnement_base);
+  Declare_instanciable(Eq_rayo_semi_transp);
 public:
 
   void set_param(Param& titi) const override;
@@ -38,7 +39,8 @@ public:
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   const Discretisation_base& discretisation() const;
 
-  bool solve();
+  bool resoudre();
+  void resoudre(double temps);
 
   void associer_pb_base(const Probleme_base& pb) override;
   void associer_milieu_base(const Milieu_base&) override;
@@ -63,21 +65,24 @@ public:
   void Mat_Morse_to_Mat_Bloc(Matrice& matrice_tmp);
   void dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice_tmp);
 
-  virtual int nb_colonnes_tot()=0;
-  virtual int nb_colonnes()=0;
-  virtual void resoudre(double temps)=0;
-  virtual void assembler_matrice()=0;
-  virtual void modifier_matrice()=0;
-  virtual void evaluer_cl_rayonnement(double temps)=0;
+  inline Operateur_Diff& terme_diffusif_rayo() { return terme_diffusif_; }
+  inline const Operateur_Diff& terme_diffusif_rayo() const { return terme_diffusif_; }
+
+  inline Matrice_Morse& matrice_rayo() { return la_matrice_; }
+  inline const Matrice_Morse& matrice_rayo() const { return la_matrice_; }
+
+  inline SolveurSys& solveur_rayo() { return solveur_; }
+  inline const SolveurSys& solveur_rayo() const { return solveur_; }
 
 protected:
   OBS_PTR(Fluide_base) le_fluide_;
   OBS_PTR(Pb_rayo_semi_transp) pb_rayo_semi_transp_;
   OWN_PTR(Champ_Inc_base) irradiance_;
+  OWN_PTR(Rayo_semi_transp_solver_base) rayo_solv_;
 
   Operateur_Diff terme_diffusif_;
   Matrice_Morse la_matrice_;
   SolveurSys solveur_;
 };
 
-#endif /* Equation_rayonnement_base_included */
+#endif /* Eq_rayo_semi_transp_included */

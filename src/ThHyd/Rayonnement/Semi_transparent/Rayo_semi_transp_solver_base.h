@@ -13,35 +13,34 @@
 *
 *****************************************************************************/
 
-#ifndef Eq_rayo_semi_transp_VDF_included
-#define Eq_rayo_semi_transp_VDF_included
+#ifndef Rayo_semi_transp_solver_base_included
+#define Rayo_semi_transp_solver_base_included
 
-#include <Equation_rayonnement_base.h>
+#include <TRUST_Ref.h>
+#include <Objet_U.h>
 
+class Eq_rayo_semi_transp;
+class Operateur_Diff;
+class Matrice_Morse;
 
-/*! @brief classe Eq_rayo_semi_transp Cette classe represente l'equation de rayonnement pour l'irradiance
- *
- *     dans un milieu semi transparent.
- *     elle est associee au probleme de rayonnement semi transparent
- *     Elle definit la methode resoudre et calcule l'irradiance.
- *
- *
- * @sa Equation_rayonnement
- */
-class Eq_rayo_semi_transp_VDF: public Equation_rayonnement_base
+class Rayo_semi_transp_solver_base: public Objet_U
 {
-  Declare_instanciable(Eq_rayo_semi_transp_VDF);
-
+  Declare_base(Rayo_semi_transp_solver_base);
 public:
+  void associer_equation_rayo(const Eq_rayo_semi_transp& );
 
-  void modifier_matrice() override;
-  void resoudre(double temps) override;
-  void evaluer_cl_rayonnement(double temps) override;
-  void completer() override;
-  void assembler_matrice() override;
+  virtual int nb_colonnes_tot()=0;
+  virtual int nb_colonnes()=0;
 
-  int nb_colonnes_tot() override;
-  int nb_colonnes() override;
+  virtual void modifier_matrice()=0;
+  virtual void assembler_matrice()=0;
+
+  virtual void resoudre(double temps)=0;
+  virtual void evaluer_cl_rayonnement(double temps)=0;
+
+protected:
+  OBS_PTR(Eq_rayo_semi_transp) eq_rayo_semi_transp_;
 };
 
-#endif /* Eq_rayo_semi_transp_VDF_included */
+#endif /* Rayo_semi_transp_solver_base_included */
+

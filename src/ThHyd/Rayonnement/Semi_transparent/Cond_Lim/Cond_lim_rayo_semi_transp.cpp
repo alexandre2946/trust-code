@@ -28,7 +28,7 @@ void Cond_lim_rayo_semi_transp::recherche_emissivite_et_A()
 {
   int num_cl_rayo=0;
 
-  Equation_rayonnement_base& eq_rayo = pb_rayo_semi_transp().eq_rayo();
+  Eq_rayo_semi_transp& eq_rayo = pb_rayo_semi_transp().eq_rayo();
   Conds_lim& les_cl_rayo = eq_rayo.domaine_Cl_dis().les_conditions_limites();
 
   int test_nom=0;
