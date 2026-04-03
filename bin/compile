@@ -46,7 +46,6 @@ make_tools()
    [ "$TRUST_DISABLE_MPI" = 0 ] && reps=$reps" Outils/ICoCo"
    [ "$TRUST_DISABLE_VALGRIND" != 1 ] && reps=$reps" Outils/valgrind"
    [ "$TRUST_DISABLE_TRUSTIFY" != 1 ] && reps=$reps" Outils/trustify"
-   reps=$reps" Outils/TRIOXDATA"
    [ "$TRUST_DISABLE_DOXYGEN" != 1 ] && reps=$reps" Outils/doxygen"
    [ "$TRUST_WITHOUT_DOC" != 1 ] && reps=$reps" doc"
    [ "$TRUST_DISABLE_GNUPLOT" != 1 ] && reps=$reps" Outils/gnuplot"
@@ -70,13 +69,7 @@ make_tools()
          fi
          if [ $err != 0 ]
          then
-            if [ $rep = Outils/TRIOXDATA ] && [ "$CLEAN" = clean ]
-            then
-               # Pour les exceptions
-               err_tool=$err_tool
-            else
-               err_tool=1
-            fi
+           err_tool=1
          fi
       fi
    done

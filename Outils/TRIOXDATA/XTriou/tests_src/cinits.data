@@ -1,7 +1,0 @@
-
-solv_gcp solv
-lire solv {
-seuil 1e-10
-precond_nul
-
-}

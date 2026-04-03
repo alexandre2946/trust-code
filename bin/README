@@ -17,20 +17,6 @@ Notice first that the reference manual which contains the information needed to 
 a data set is TRUST_Generic_documentation.pdf (located in $TRUST_ROOT/doc/TRUST)
 
 
--EditData : to support user when carrying out a data set by indicating keywords specific to each object
-	    located in $TRUST_ROUT/Outils/TRIOXDATA
-	    
-	syntax : EditData jdd.data
-	      or trust -xedit jdd
-
-
--VerifData : to support user when writing a data by checking keywords specific to each object
-	     located in $TRUST_ROUT/Outils/TRIOXDATA
-	    
-	syntax : VerifData jdd.data
-	      or trust -xcheck jdd
- 
- 
 -cherche.ksh : to identify all the data sets from the no regression data base (Reference, Validation, Verification, ...)
 	       which contain some sepcified keywords (word1 word2...wordn)
 	       located in $TRUST_ROOT/bin/KSH

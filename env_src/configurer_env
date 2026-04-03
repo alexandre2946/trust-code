@@ -506,7 +506,6 @@ then
    rm -f $(find $TRUST_ROOT/Outils/VisIt/ -name visit-install"*" | grep -v 3_3_3)
    rm -f $TRUST_ROOT/doc/TRUST/exercices/Tutorial_solutions/Tutorial_solutions.pdf
    rm -f $TRUST_ROOT/doc/TRUST/Tutorial/*_tutorial.pdf
-   rm -f $TRUST_ROOT/Outils/TRIOXDATA/test_complet/lance_test_modif
 
    exit 0
 else

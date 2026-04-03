@@ -1,6 +1,7 @@
 -------------------------------------------------------------------------------------------------
 Release notes version 1.9.8_beta : Enhancements, modifications and corrected bugs since version 1.9.7 :
 --------------------------------------------------------------------------------------------------
+12/05/26 (TRUST) Change       : TRIOXDATA is now removed from TRUST. Dataset check and keyword documentation now only relies on 'trustify'. See documentation in Outils/trustify/README.md
 06/05/26 (TRUST) New feature  : DG discretisation can now tackle 2D Stokes problem. Possible to choose different order for pressure and velocity. See validation form Stokes_DG.
 06/05/26 (TRUST) New keyword  : Option to reorder mesh nodes/cells/faces to favour data locality thus improving performance: Lire dis { reorder { none|hilbert|morton } }
 05/05/26 (TRUST) New feature  : Restart with PDI can be done wih a different node partition than the one used at checkpoint

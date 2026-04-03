@@ -1,4 +1,5 @@
 * optim/perf
+* chemin relatif dans .nfo
 
 TODO once TRIOXDATA is dead:
 * better formatting of XD tags (support multi-lines)

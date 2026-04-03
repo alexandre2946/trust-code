@@ -512,7 +512,7 @@ def do_main():
         # Append baltik sources:
         srcs.append(os.path.join(pd, "build", "src"))
     else:   # called from TRUST
-        trad2org = os.path.join(tr, "Outils", "TRIOXDATA", "XTriou", "TRAD_2.org")
+        trad2org = os.path.join(tr, "Outils", "trustify", "doc", "TRAD_2.org")
     tg = TRAD2Content.BuildFromOrgAndSources(trad2org, srcs)
     tg.toTRAD2(outfile)
 

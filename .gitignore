@@ -37,29 +37,8 @@ src/MAIN/instancie_appel*
 .idea/
 *egg-info
 
-# XDATA stuff
-Outils/TRIOXDATA/IHMTRIO.sh
-Outils/TRIOXDATA/TRIOU/TRIOU_SRC/src/
-Outils/TRIOXDATA/TRIOU/dist/
-Outils/TRIOXDATA/XDATA.sh
-Outils/TRIOXDATA/XDATA/
-Outils/TRIOXDATA/XTriou/syno.py
-Outils/TRIOXDATA/XTriou/Keywords.txt
-Outils/TRIOXDATA/XTriou/TRAD_1.ver
-Outils/TRIOXDATA/XTriou/TRAD_2
-Outils/TRIOXDATA/XTriou/doc.pdf
-Outils/TRIOXDATA/XTriou/doc/
-Outils/TRIOXDATA/XTriou/existepas.stop
-Outils/TRIOXDATA/XTriou/gencl.py
-Outils/TRIOXDATA/XTriou/menu/
-Outils/TRIOXDATA/XTriou/test
-Outils/TRIOXDATA/XTriou/tests/
-Outils/TRIOXDATA/XTriou/traces
-Outils/TRIOXDATA/XTriou/triou.py
-Outils/TRIOXDATA/XTriou/update_xd
-Outils/TRIOXDATA/XTriou/TRAD_2.mod
+# trustify stuff
 Outils/trustify/install/
-Outils/TRIOXDATA/test_complet/lance_test_modif
 
 # ICoCo
 Outils/ICoCo/ICoCo_src/README.BALTIK

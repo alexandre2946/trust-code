@@ -50,7 +50,7 @@ else
     echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
     echo "@@@ Generating aggregated TRAD2.org"
     echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-    cat $TRUST_ROOT/Outils/TRIOXDATA/XTriou/TRAD_2.org > $agg_trad2
+    cat $TRUST_ROOT/Outils/trustify/doc/TRAD_2.org > $agg_trad2
     ta=$project_directory/share/doc_src/TRAD2_ajout0
     if [ -f $ta ]; then
         cat $ta >> $agg_trad2
