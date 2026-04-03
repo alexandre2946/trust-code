@@ -29,13 +29,14 @@ class Pb_rayo_semi_transp;
 class Source_rayo_semi_transp_base: public Source_base
 {
   Declare_base(Source_rayo_semi_transp_base);
-
 public:
 
-  inline Pb_rayo_semi_transp& pb_rayo_semi_transp() { return pb_rayo_semi_transp_.valeur(); }
-  inline const Pb_rayo_semi_transp& pb_rayo_semi_transp() const { return pb_rayo_semi_transp_.valeur(); }
   virtual void associer_pb_rayo_semi_transp(Pb_rayo_semi_transp& );
   void mettre_a_jour(double temps) override { }
+  void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override { }
+  void associer_pb(const Probleme_base& ) override { }
+
+  DoubleTab& calculer(DoubleTab& resu) const override;
 
 protected:
   OBS_PTR(Pb_rayo_semi_transp) pb_rayo_semi_transp_;

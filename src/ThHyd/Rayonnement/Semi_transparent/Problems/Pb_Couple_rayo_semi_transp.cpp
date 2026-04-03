@@ -71,7 +71,7 @@ void Pb_Couple_rayo_semi_transp::initialize()
       for (int j = 0; j < les_sources.size(); j++)
         {
           Source& la_source = les_sources[j];
-          if (sub_type(Source_rayo_semi_transp_base, la_source.valeur()))   // premier cas
+          if (sub_type(Source_rayo_semi_transp_base, la_source.valeur()))
             {
               Source_rayo_semi_transp_base& source_rayo = ref_cast(Source_rayo_semi_transp_base, la_source.valeur());
               Cerr << "Association pb rayo semi transp au terme source rayo" << finl;

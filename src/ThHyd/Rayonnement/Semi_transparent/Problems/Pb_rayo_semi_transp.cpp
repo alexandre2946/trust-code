@@ -154,13 +154,8 @@ void Pb_rayo_semi_transp::preparer_calcul()
       // Associer le pb au terme source de rayonnement de l'equation de temperature
       Sources& les_sources = pb_fluide_->equation(j).sources();
       for (int num_source = 0; num_source < les_sources.size(); num_source++)
-        {
-          if ((sub_type(Source_rayo_semi_transp_base, les_sources[num_source].valeur())) || (les_sources[num_source]->que_suis_je() == "Source_rayo_semi_transp_QC_VDF_P0_VDF")
-              || (les_sources[num_source]->que_suis_je() == "Source_rayo_semi_transp_QC_VEF_P1NC"))
-            {
-              contient_source_rayo_semi_transp = 1;
-            }
-        }
+        if ((sub_type(Source_rayo_semi_transp_base, les_sources[num_source].valeur())))
+          contient_source_rayo_semi_transp = 1;
     }
 
   if (contient_source_rayo_semi_transp == 0)

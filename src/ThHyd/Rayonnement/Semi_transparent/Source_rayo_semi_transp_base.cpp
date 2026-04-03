@@ -26,3 +26,9 @@ void Source_rayo_semi_transp_base::associer_pb_rayo_semi_transp(Pb_rayo_semi_tra
 {
   pb_rayo_semi_transp_ = pb;
 }
+
+DoubleTab& Source_rayo_semi_transp_base::calculer(DoubleTab& resu) const
+{
+  resu = 0.;
+  return ajouter(resu);
+}
