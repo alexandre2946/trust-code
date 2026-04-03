@@ -26,16 +26,9 @@
 #include <sys/stat.h>
 #include <Param.h>
 
-Implemente_instanciable_sans_constructeur(Modele_Rayonnement_Milieu_Transparent, "Modele_Rayonnement_Milieu_Transparent", Objet_U);
+Implemente_instanciable(Modele_Rayonnement_Milieu_Transparent, "Modele_Rayonnement_Milieu_Transparent", Objet_U);
 
-extern "C" {
-  void F77DECLARE(dgemv)(char *trans, integer *M, integer *N, double *alpha, double *const A, integer *lda, const double *dx, integer *incx, double *beta, double *dy, integer *incy);
-}
-
-Sortie& Modele_Rayonnement_Milieu_Transparent::printOn(Sortie& os) const
-{
-  return os;
-}
+Sortie& Modele_Rayonnement_Milieu_Transparent::printOn(Sortie& os) const { return os; }
 
 Entree& Modele_Rayonnement_Milieu_Transparent::readOn(Entree& is)
 {
@@ -49,6 +42,7 @@ Entree& Modele_Rayonnement_Milieu_Transparent::readOn(Entree& is)
   param.ajouter_flag("format_binaire", &fic_mat_ray_inv_bin_);
   param.lire_avec_accolades_depuis(is);
 
+  Cerr << "Modele_Rayonnement_Milieu_Transparent::lire_fichiers" << finl;
   if (fic_mat_ray_inv_bin_)
     lire_fichiers(fichier_face_rayo, fichier_fij, nom_fic_mat_ray_inv_);
   else
@@ -59,9 +53,6 @@ Entree& Modele_Rayonnement_Milieu_Transparent::readOn(Entree& is)
 
 void Modele_Rayonnement_Milieu_Transparent::lire_fichiers(Nom& fich_faces_rayo, Nom& fich_fij, Nom& fich_mat)
 {
-  Cerr << "Modele_Rayonnement_Milieu_Transparent::lire_fichiers" << finl;
-  Cerr << "fichier_face_rayo = " << fich_faces_rayo << finl;
-  Cerr << "fichier_fij = " << fich_fij << finl;
   Cerr << "fichier_matrice = " << fich_mat << finl;
 
   struct stat f, e, m;
@@ -99,7 +90,6 @@ void Modele_Rayonnement_Milieu_Transparent::lire_fichiers(Nom& fich_faces_rayo, 
 
 void Modele_Rayonnement_Milieu_Transparent::lire_fichiers(Nom& fich_faces_rayo, Nom& fich_fij)
 {
-  Cerr << "Modele_Rayonnement_Milieu_Transparent::lire_fichiers" << finl;
   Cerr << "fichier_face_rayo = " << fich_faces_rayo << finl;
   Cerr << "fichier_fij = " << fich_fij << finl;
 
@@ -112,11 +102,9 @@ void Modele_Rayonnement_Milieu_Transparent::lire_fichiers(Nom& fich_faces_rayo, 
   fic1 >> nb_faces_totales_ >> nb_faces_rayonnantes_;
   Cerr << "Vous avez defini " << nb_faces_rayonnantes_ << " faces rayonnantes sur " << nb_faces_totales_ << " faces en tout" << finl;
   les_faces_rayonnantes_.dimensionner(nb_faces_totales_);
-
   les_flux_radiatifs_.resize(nb_faces_rayonnantes());
 
-  int irayo = 0;
-  int jrayo = 0;
+  int irayo = 0, jrayo = 0;
   for (int i = 0; i < nb_faces_totales_; i++)
     {
       fic1 >> les_faces_rayonnantes_[i];
@@ -124,19 +112,17 @@ void Modele_Rayonnement_Milieu_Transparent::lire_fichiers(Nom& fich_faces_rayo, 
         {
           if (les_faces_rayonnantes_[i].emissivite() < 0.)
             {
-              Cerr << "erreur dans " << fich_faces_rayo << finl;
-              Cerr << "emissivite <0 et != -1 :" << les_faces_rayonnantes_[i].emissivite() << finl;
+              Cerr << "Erreur dans " << fich_faces_rayo << " !!! emissivite <0 et != -1 : " << les_faces_rayonnantes_[i].emissivite() << finl;
               Process::exit();
             }
           if (irayo >= nb_faces_rayonnantes_)
             {
-              Cerr << "erreur dans " << fich_faces_rayo << finl;
-              Cerr << "nb_faces_rayonnantes utilisateur " << nb_faces_rayonnantes_ << finl;
-              Cerr << "nb_faces_rayonnantes deduites des emissivites " << irayo + 1 << finl;
+              Cerr << "Erreur dans " << fich_faces_rayo << finl;
+              Cerr << "   nb_faces_rayonnantes utilisateur " << nb_faces_rayonnantes_ << finl;
+              Cerr << "   nb_faces_rayonnantes deduites des emissivites " << irayo + 1 << finl;
               // G.F.
-              Cerr << "on a corrige emissivite=0 ne veut pas dire pas de rayonnement" << finl;
-              Cerr << "Il faut mettre maintenant l'emissivite a -1" << finl;
-              Cerr << "pour ne pas tenir compte de certains bords " << finl;
+              Cerr << "On a corrige emissivite = 0 ne veut pas dire pas de rayonnement ... " << finl;
+              Cerr << "Il faut mettre maintenant l'emissivite a -1 pour ne pas tenir compte de certains bords " << finl;
               Process::exit();
             }
           irayo++;
@@ -149,9 +135,9 @@ void Modele_Rayonnement_Milieu_Transparent::lire_fichiers(Nom& fich_faces_rayo, 
 
   if (irayo != nb_faces_rayonnantes_)
     {
-      Cerr << "erreur dans " << fich_faces_rayo << finl;
-      Cerr << "nb_faces_rayonnantes utilisateur " << nb_faces_rayonnantes_ << finl;
-      Cerr << "nb_faces_rayonnantes deduites des emissivites " << irayo << finl;
+      Cerr << "Erreur dans " << fich_faces_rayo << finl;
+      Cerr << "   nb_faces_rayonnantes utilisateur " << nb_faces_rayonnantes_ << finl;
+      Cerr << "   nb_faces_rayonnantes deduites des emissivites " << irayo << finl;
       Process::exit();
     }
 
@@ -172,7 +158,7 @@ void Modele_Rayonnement_Milieu_Transparent::lire_fichiers(Nom& fich_faces_rayo, 
       les_facteurs_de_forme_.resize(nb_faces_rayonnantes(), nb_faces_rayonnantes());
       irayo = 0;
       jrayo = 0;
-      double poub;
+      double poub = -123.;
       for (int ii = 0; ii < nb_faces_totales_; ii++)
         {
           if (les_faces_rayonnantes_[ii].emissivite() != -1)
@@ -198,8 +184,7 @@ void Modele_Rayonnement_Milieu_Transparent::lire_fichiers(Nom& fich_faces_rayo, 
   else
     {
       Cerr << "On ne lit pas la matrice des facteurs de forme puisque l'on va " << finl;
-      Cerr << "lire directement la matrice inverse qui a deja ete calculee" << finl;
-      Cerr << "lors d'un calcul precedent." << finl;
+      Cerr << "lire directement la matrice inverse qui a deja ete calculee lors d'un calcul precedent." << finl;
     }
   Cerr << "La lecture des fichiers du prepro est terminee. Fichiers corrects." << finl;
 }
@@ -228,30 +213,19 @@ void Modele_Rayonnement_Milieu_Transparent::calculer_flux_radiatifs()
           const Face_rayo_transp& Facei = les_faces_rayonnantes_[i];
           if (Facei.emissivite() != -1)
             {
-              //                    secmem(irayo) = Facei.emissivite()*SIGMA*(pow(Facei.T_face_rayo(),4));
+              // secmem(irayo) = Facei.emissivite()*SIGMA*(pow(Facei.T_face_rayo(),4));
               secmem[irayo] = (pow(Facei.T_face_rayo(), 4));
               irayo++;
             }
         }
 
-      int ii, jj;
       // La matrice_rayo a ete inversee au debut du calcule dans Modele_Rayonnement_Milieu_Transparent::preparer_calcul.
       // Il ne reste ici qu'a calculer le produit du second membre avec la matrice inverse.
-      if (1 == 1)
+      for (int ii = 0; ii < nb_faces_rayonnantes(); ii++)
         {
-          for (ii = 0; ii < nb_faces_rayonnantes(); ii++)
-            {
-              les_flux_radiatifs_(ii) = 0.;
-              for (jj = 0; jj < nb_faces_rayonnantes(); jj++)
-                les_flux_radiatifs_(ii) += matrice_rayo_(ii, jj) * secmem[jj];
-            }
-        }
-      else
-        {
-          double alpha = 1, beta = 0;
-          integer n = nb_faces_rayonnantes(), inc = 1;
-
-          F77NAME(dgemv)((char*) "T", &n, &n, &alpha, matrice_rayo_.addr(), &n, secmem.addr(), &inc, &beta, les_flux_radiatifs_.addr(), &inc);
+          les_flux_radiatifs_(ii) = 0.;
+          for (int jj = 0; jj < nb_faces_rayonnantes(); jj++)
+            les_flux_radiatifs_(ii) += matrice_rayo_(ii, jj) * secmem[jj];
         }
     }
   envoyer_broadcast(les_flux_radiatifs_, 0);
@@ -321,12 +295,12 @@ double Modele_Rayonnement_Milieu_Transparent::flux_radiatif(int num_face) const
 {
   if (corres_.size() == 0)
     {
-      // on recupere le domaine
+      // on recupere le domaine et on cherche la premiere cond_lim rayo
       int i0 = 0;
-      // on cherche la premiere cond_lim rayo
       while (((les_faces_rayonnantes_[i0].ensembles_faces_bord(0).nb_faces_bord() == 0) || (les_faces_rayonnantes_[i0].emissivite() == -1)) && (i0 < nb_faces_totales()))
         i0++;
-      int nbre_face_de_bord;
+
+      int nbre_face_de_bord = -123;
 
       if (i0 == nb_faces_totales())
         nbre_face_de_bord = 0;
@@ -335,13 +309,13 @@ double Modele_Rayonnement_Milieu_Transparent::flux_radiatif(int num_face) const
 
       corres_.resize(nbre_face_de_bord);
       corres_ = -1;
+
       for (int i = 0; i < nb_faces_totales(); i++)
         if (les_faces_rayonnantes_[i].emissivite() != -1)
           {
             const Ensemble_faces_rayo_transp& ensemble = les_faces_rayonnantes_[i].ensembles_faces_bord(0);
             if (ensemble.nb_faces_bord() != 0)
               {
-                //const IntVect&  num_face_ens= ensemble.Table_faces ();
                 const Frontiere& la_front = ensemble.la_cl_base().frontiere_dis().frontiere();
                 int ndeb = la_front.num_premiere_face();
                 int nbfaces = la_front.nb_faces();
@@ -377,8 +351,7 @@ void Modele_Rayonnement_Milieu_Transparent::preparer_calcul()
   if (je_suis_maitre())
     {
       // dimensionnement de la matrice de rayonnement.
-      int irayo = 0;
-      int jrayo = 0;
+      int irayo = 0, jrayo = 0;
 
       matrice_rayo_.resize(nb_faces_rayonnantes(), nb_faces_rayonnantes());
 
@@ -459,7 +432,7 @@ void Modele_Rayonnement_Milieu_Transparent::preparer_calcul()
                 //calcul de (I-Fij)*M-1
                 for (irayo = 0; irayo < nb_faces_rayonnantes(); irayo++)
                   {
-                    double res = 0;
+                    double res = 0.;
                     for (int krayo = 0; krayo < nb_faces_rayonnantes(); krayo++)
                       res += les_facteurs_de_forme_(irayo, krayo) * sol_tmp(krayo);
                     matrice_rayo_(irayo, jrayo) = res;
@@ -474,7 +447,7 @@ void Modele_Rayonnement_Milieu_Transparent::preparer_calcul()
                 if (Facej.emissivite() != -1)
                   {
                     for (irayo = 0; irayo < nb_faces_rayonnantes(); irayo++)
-                      matrice_rayo_(irayo, jrayo) *= Facej.emissivite() * SIGMA_;
+                      matrice_rayo_(irayo, jrayo) *= Facej.emissivite() * sigma_;
                     jrayo++;
                   }
               }
@@ -484,7 +457,6 @@ void Modele_Rayonnement_Milieu_Transparent::preparer_calcul()
           les_facteurs_de_forme_.resize(0, 0);
 
           // Impression "jolie" de la matrice dans un fichier nom_fic_mat_ray_inv_
-
           if (nom_fic_mat_ray_inv_ != "??")
             {
               if (!fic_mat_ray_inv_bin_)
@@ -528,8 +500,7 @@ void Modele_Rayonnement_Milieu_Transparent::preparer_calcul()
               fic >> ordre_mat_forme_;
               if (ordre_mat_forme_ != nb_faces_rayonnantes())
                 {
-                  Cerr << "L'ordre de la matrice inverse de rayonnement est different" << finl;
-                  Cerr << "du nombre de faces rayonnantes" << finl;
+                  Cerr << "L'ordre de la matrice inverse de rayonnement est different du nombre de faces rayonnantes" << finl;
                   Cerr << "Verifiez votre fichier " << nom_fic_mat_ray_inv_ << finl;
                   Process::exit();
                 }
@@ -556,8 +527,7 @@ void Modele_Rayonnement_Milieu_Transparent::preparer_calcul()
               ordre_mat_forme_ = matrice_rayo_.dimension(0);
               if (ordre_mat_forme_ != nb_faces_rayonnantes())
                 {
-                  Cerr << "L'ordre de la matrice inverse de rayonnement est different" << finl;
-                  Cerr << "du nombre de faces rayonnantes" << finl;
+                  Cerr << "L'ordre de la matrice inverse de rayonnement est different du nombre de faces rayonnantes" << finl;
                   Cerr << "Verifiez votre fichier " << nom_fic_mat_ray_inv_ << finl;
                   Process::exit();
                 }
@@ -581,19 +551,11 @@ void Modele_Rayonnement_Milieu_Transparent::discretiser(const Discretisation_bas
   for (int i = 0; i < nb_faces_totales(); i++)
     {
       Face_rayo_transp& face_rayo = face_rayonnante(i);
-      Nom type("Ensemble_Faces_");
-      Nom discr = dis.que_suis_je();
-      if (discr == "VEFPreP1B")
-        discr = "VEF";
-
-      type += discr;
       for (int j = 0; j < face_rayo.nb_ensembles_faces(); j++)
-        {
-          if (face_rayo.nom_bord_rayo() != face_rayo.nom_bord_rayo_lu())
-            {
-              Ensemble_faces_rayo_transp& faces_j = face_rayo.ensembles_faces_bord(j);
-              faces_j.lire(face_rayo.nom_bord_rayo_lu(), face_rayo.nom_bord_rayo(), domaine);
-            }
-        }
+        if (face_rayo.nom_bord_rayo() != face_rayo.nom_bord_rayo_lu())
+          {
+            Ensemble_faces_rayo_transp& faces_j = face_rayo.ensembles_faces_bord(j);
+            faces_j.lire(face_rayo.nom_bord_rayo_lu(), face_rayo.nom_bord_rayo(), domaine);
+          }
     }
 }

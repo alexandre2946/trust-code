@@ -25,15 +25,10 @@
 class Schema_Temps_base;
 class Discretisation_base;
 
-constexpr double SIGMA_DEFAULT = 5.67e-8;
-
 class Modele_Rayonnement_Milieu_Transparent: public Objet_U
 {
-  Declare_instanciable_sans_constructeur(Modele_Rayonnement_Milieu_Transparent);
+  Declare_instanciable(Modele_Rayonnement_Milieu_Transparent);
 public:
-
-  Modele_Rayonnement_Milieu_Transparent(double Sigma = SIGMA_DEFAULT) { SIGMA_ = Sigma; }
-
   void discretiser(const Discretisation_base&, const Domaine&);
   void mettre_a_jour(double temps);
   void preparer_calcul();
@@ -66,7 +61,8 @@ private:
   DoubleTab les_facteurs_de_forme_, matrice_rayo_, les_flux_radiatifs_;
   mutable IntVect corres_;
 
-  double SIGMA_ = SIGMA_DEFAULT, relaxation_ = 1.;
+  static constexpr double sigma_ = 5.67e-8;
+  double relaxation_ = 1.;
 
   // Par defaut, on suppose qu'il faut inverser la matrice de rayonnement
   bool lire_matrice_inv_ = false, fic_mat_ray_inv_bin_ = false;
