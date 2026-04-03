@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -47,7 +47,7 @@ double Face_Rayonnante::calculer_temperature()
   // cas particulier ou Ensemble_Faces coincide avec un bord: nb_ensembles_faces() = 1
   for (int j = 0; j < nb_ensembles_faces(); j++)
     {
-      Ensemble_Faces_base& faces_j = ensembles_faces_bord(j);
+      Ensemble_faces_rayo& faces_j = ensembles_faces_bord(j);
       double sum_surf = 0.;
       double sum_T = 0.;
 
@@ -134,7 +134,7 @@ void Face_Rayonnante::ecrire_temperature_bord() const
     {
       // cast en dur a cause de teta_i
       // a nettoyer quand teta_i sera une methode const...
-      Ensemble_Faces_base& faces_j = ref_cast_non_const(Ensemble_Faces_base, ensembles_faces_bord(j));
+      Ensemble_faces_rayo& faces_j = ref_cast_non_const(Ensemble_faces_rayo, ensembles_faces_bord(j));
       double T = 0;
       if (faces_j.nb_faces_bord() != 0)
         {

@@ -13,51 +13,42 @@
 *
 *****************************************************************************/
 
-#ifndef Ensemble_Faces_base_included
-#define Ensemble_Faces_base_included
+#ifndef Face_Rayonnante_included
+#define Face_Rayonnante_included
 
-#include <Domaine_forward.h>
-#include <Cond_lim_rayo_milieu_transp.h>
-#include <TRUST_Ref.h>
-#include <Motcle.h>
+#include <Ensemble_faces_rayo.h>
+#include <TRUST_Vector.h>
 
-class Cond_lim_base;
-
-class Ensemble_Faces_base: public Objet_U
+class Face_Rayonnante: public Objet_U
 {
-  Declare_instanciable(Ensemble_Faces_base);
+  Declare_instanciable(Face_Rayonnante);
 public:
 
-  void associer_les_cl(Cond_lim_base&);
-  void lire(const Nom&, const Nom&, const Domaine&);
-  int contient(int) const;
-  int is_ok() const;
+  int chercher_ensemble_faces(const Nom&) const;
+  void ecrire_temperature_bord() const;
 
-  inline const Cond_lim_rayo_milieu_transp& cond_lim_rayo() const
-  {
-    assert(la_cond_lim_rayo_ != 0);
-    return *la_cond_lim_rayo_;
-  }
+  double calculer_temperature();
+  double imprimer_flux_radiatif(Sortie&, Sortie&, Sortie&) const;
 
-  inline Cond_lim_rayo_milieu_transp& cond_lim_rayo()
-  {
-    assert(la_cond_lim_rayo_ != 0);
-    return *la_cond_lim_rayo_;
-  }
+  inline double T_face_rayo() const { return T_face_rayo_; }
+  inline double emissivite() const { return emissivite_; }
+  inline double flux_radiatif() const { return flux_radiatif_; }
+  inline double surface_rayo() const { return surf_; }
+  inline void mettre_a_jour_flux_radiatif(double J) { flux_radiatif_ = J; }
+  inline const Nom& nom_bord_rayo() const { return nom_bord_rayo_; }
+  inline const Nom& nom_bord_rayo_lu() const { return nom_bord_rayo_lu_; }
+  inline const IntVect& num_faces(int j) const { return num_faces_; }
+  inline int nb_ensembles_faces() const { return nb_ensembles_faces_; }
 
-  inline double surface(int numfa) const { return la_cond_lim_rayo_->surface(numfa); }
-  inline double teta_i(int numfa) { return la_cond_lim_rayo_->teta_i(numfa); }
-  inline const Cond_lim_base& la_cl_base() const { return les_cl_base_; }
-  inline Cond_lim_base& la_cl_base() { return les_cl_base_; }
-  inline const IntVect& Table_faces() const { return num_face_Ensemble_; }
-  inline int nb_faces_bord() const { return nb_faces_bord_; }
+  inline const Ensemble_faces_rayo& ensembles_faces_bord(int j) const { return les_ensembles_faces_bord_[j]; }
+  inline Ensemble_faces_rayo& ensembles_faces_bord(int j) { return les_ensembles_faces_bord_[j]; }
 
-protected:
-  int nb_faces_bord_ = 0;
-  OBS_PTR(Cond_lim_base) les_cl_base_;
-  Cond_lim_rayo_milieu_transp *la_cond_lim_rayo_ = nullptr;
-  IntVect num_face_Ensemble_; //contient_;
-  DoubleTab positions_;
+private:
+  VECT(Ensemble_faces_rayo) les_ensembles_faces_bord_;
+  IntVect num_faces_;
+  Nom nom_bord_rayo_, nom_bord_rayo_lu_;
+  double T_face_rayo_ = -123., emissivite_ = -123., surf_ = -123., flux_radiatif_ = 0.;
+  int nb_ensembles_faces_ = 1;
 };
 
-#endif /* Ensemble_Faces_base_included */
+#endif /* Face_Rayonnante_included */

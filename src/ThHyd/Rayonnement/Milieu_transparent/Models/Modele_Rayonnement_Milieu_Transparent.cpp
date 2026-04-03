@@ -338,7 +338,7 @@ double Modele_Rayonnement_Milieu_Transparent::flux_radiatif(int num_face) const
       for (int i = 0; i < nb_faces_totales(); i++)
         if (les_faces_rayonnantes_[i].emissivite() != -1)
           {
-            const Ensemble_Faces_base& ensemble = les_faces_rayonnantes_[i].ensembles_faces_bord(0);
+            const Ensemble_faces_rayo& ensemble = les_faces_rayonnantes_[i].ensembles_faces_bord(0);
             if (ensemble.nb_faces_bord() != 0)
               {
                 //const IntVect&  num_face_ens= ensemble.Table_faces ();
@@ -591,7 +591,7 @@ void Modele_Rayonnement_Milieu_Transparent::discretiser(const Discretisation_bas
         {
           if (face_rayo.nom_bord_rayo() != face_rayo.nom_bord_rayo_lu())
             {
-              Ensemble_Faces_base& faces_j = face_rayo.ensembles_faces_bord(j);
+              Ensemble_faces_rayo& faces_j = face_rayo.ensembles_faces_bord(j);
               faces_j.lire(face_rayo.nom_bord_rayo_lu(), face_rayo.nom_bord_rayo(), domaine);
             }
         }
