@@ -37,8 +37,8 @@ public:
   void associer_milieu_base(const Milieu_base&) override;
   Milieu_base& milieu() override;
   const Milieu_base& milieu() const override;
-  inline const Modele_rayo_semi_transp&  modele() const { return le_modele.valeur(); }
-  inline Modele_rayo_semi_transp& modele() { return le_modele.valeur(); }
+  inline const Modele_rayo_semi_transp&  modele() const { return le_modele_.valeur(); }
+  inline Modele_rayo_semi_transp& modele() { return le_modele_.valeur(); }
   const Operateur& operateur(int) const override;
   Operateur& operateur(int) override;
   void discretiser() override;
@@ -46,9 +46,9 @@ public:
 
   const Champ_Inc_base& inconnue() const override { return irradiance_.valeur(); }
   Champ_Inc_base& inconnue() override { return irradiance_.valeur(); }
-  inline void associer_fluide(const Fluide_base& un_fluide) { le_fluide = un_fluide; }
-  inline Fluide_base& fluide() { return le_fluide.valeur(); }
-  inline const Fluide_base& fluide() const { return le_fluide.valeur(); }
+  inline void associer_fluide(const Fluide_base& un_fluide) { le_fluide_ = un_fluide; }
+  inline Fluide_base& fluide() { return le_fluide_.valeur(); }
+  inline const Fluide_base& fluide() const { return le_fluide_.valeur(); }
   inline int nombre_d_operateurs() const override { return 1; }
 
   // pas de flux calcule correctement par les operateurs...
@@ -72,13 +72,13 @@ public:
   void completer() override;
 
 protected:
-  OBS_PTR(Fluide_base) le_fluide;
-  OBS_PTR(Modele_rayo_semi_transp) le_modele;
+  OBS_PTR(Fluide_base) le_fluide_;
+  OBS_PTR(Modele_rayo_semi_transp) le_modele_;
   OWN_PTR(Champ_Inc_base) irradiance_;
 
-  Operateur_Diff terme_diffusif;
-  Matrice_Morse la_matrice;
-  SolveurSys solveur;
+  Operateur_Diff terme_diffusif_;
+  Matrice_Morse la_matrice_;
+  SolveurSys solveur_;
 };
 
 #endif /* Equation_rayonnement_base_included */

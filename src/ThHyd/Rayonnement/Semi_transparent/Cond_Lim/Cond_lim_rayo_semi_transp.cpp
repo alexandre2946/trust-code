@@ -21,7 +21,7 @@
 
 void Cond_lim_rayo_semi_transp::associer_modele(const Modele_rayo_semi_transp& un_modele)
 {
-  mon_modele=un_modele;
+  mon_modele_=un_modele;
 }
 
 void Cond_lim_rayo_semi_transp::recherche_emissivite_et_A()

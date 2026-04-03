@@ -34,13 +34,13 @@ public:
   virtual void associer_modele(const Modele_rayo_semi_transp&);
   inline const Modele_rayo_semi_transp& modele() const
   {
-    assert(mon_modele.non_nul());
-    return mon_modele.valeur();
+    assert(mon_modele_.non_nul());
+    return mon_modele_.valeur();
   }
   inline Modele_rayo_semi_transp& modele()
   {
-    assert(mon_modele.non_nul());
-    return mon_modele.valeur();
+    assert(mon_modele_.non_nul());
+    return mon_modele_.valeur();
   }
 
   inline Champ_front_base& emissivite() { return emissivite_; }
@@ -53,7 +53,7 @@ public:
   virtual void completer_Cl_opposee_si_contact() { }
 
 protected:
-  OBS_PTR(Modele_rayo_semi_transp) mon_modele;
+  OBS_PTR(Modele_rayo_semi_transp) mon_modele_;
   OWN_PTR(Champ_front_base) emissivite_;
   double A_ = -123.;
 };

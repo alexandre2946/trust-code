@@ -62,9 +62,9 @@ int Equation_rayonnement_base::lire_motcle_non_standard(const Motcle& mot, Entre
       is >> type_solv_sys;
       nom_solveur += type_solv_sys;
       Cerr << "Name of the radiation equation solver : " << nom_solveur << finl;
-      solveur.typer(nom_solveur);
-      is >> solveur.valeur();
-      solveur.nommer("solveur_irradiance");
+      solveur_.typer(nom_solveur);
+      is >> solveur_.valeur();
+      solveur_.nommer("solveur_irradiance");
     }
   else
     retval = -1;
@@ -81,7 +81,7 @@ void Equation_rayonnement_base::completer()
         if (fluide().is_longueur_rayo_discretised())
           {
             const Champ_Don_base& long_rayo = fluide().longueur_rayo();
-            terme_diffusif.associer_diffusivite(long_rayo);
+            terme_diffusif_.associer_diffusivite(long_rayo);
           }
         else
           {
@@ -118,7 +118,7 @@ void Equation_rayonnement_base::completer()
   type += discr;
 
   Nom nb_inc;
-  if (sub_type(Champ_Uniforme, terme_diffusif.diffusivite()))
+  if (sub_type(Champ_Uniforme, terme_diffusif_.diffusivite()))
     nb_inc = "_";
   else
     nb_inc = "_Mult_inco_";
@@ -130,16 +130,16 @@ void Equation_rayonnement_base::completer()
   if (axi)
     type += "_Axi";
 
-  terme_diffusif.typer(type);
-  terme_diffusif.l_op_base().associer_eqn(*this);
+  terme_diffusif_.typer(type);
+  terme_diffusif_.l_op_base().associer_eqn(*this);
 
   if (sub_type(Fluide_base, fluide()))
     if (fluide().has_kappa())
       {
         const Champ_Don_base& long_rayo = fluide().longueur_rayo();
-        terme_diffusif->associer_diffusivite(long_rayo);
-        terme_diffusif.completer();
-        terme_diffusif->dimensionner(la_matrice);
+        terme_diffusif_->associer_diffusivite(long_rayo);
+        terme_diffusif_.completer();
+        terme_diffusif_->dimensionner(la_matrice_);
       }
     else
       {
@@ -172,7 +172,7 @@ void Equation_rayonnement_base::associer_milieu_base(const Milieu_base& un_milie
       {
         const Fluide_base& un_fluide = ref_cast(Fluide_base, un_milieu);
         associer_fluide(un_fluide);
-        le_fluide = un_fluide;
+        le_fluide_ = un_fluide;
       }
     else
       {
@@ -198,12 +198,12 @@ void Equation_rayonnement_base::associer_milieu_base(const Milieu_base& un_milie
  */
 const Milieu_base& Equation_rayonnement_base::milieu() const
 {
-  if (!le_fluide.non_nul())
+  if (!le_fluide_.non_nul())
     {
       Cerr << "You forgot to associate the fluid to the problem named " << probleme().le_nom() << finl;
       Process::exit();
     }
-  return le_fluide.valeur();
+  return le_fluide_.valeur();
 }
 
 /*! @brief Renvoie le milieu physique de l'equation (le Fluide_base upcaste en Milieu_base)
@@ -214,12 +214,12 @@ const Milieu_base& Equation_rayonnement_base::milieu() const
  */
 Milieu_base& Equation_rayonnement_base::milieu()
 {
-  if (!le_fluide.non_nul())
+  if (!le_fluide_.non_nul())
     {
       Cerr << "You forgot to associate the fluid to the problem named " << probleme().le_nom() << finl;
       Process::exit();
     }
-  return le_fluide.valeur();
+  return le_fluide_.valeur();
 }
 
 /*! @brief Renvoie l'operateur specifie par son index: renvoie terme_diffusif si i = 0
@@ -236,14 +236,14 @@ const Operateur& Equation_rayonnement_base::operateur(int i) const
   switch(i)
     {
     case 0:
-      return terme_diffusif;
+      return terme_diffusif_;
     default:
       Cerr << "Error for Equation_rayonnement_base::operateur(int i)" << finl;
       Cerr << "Equation_rayonnement_base has " << nombre_d_operateurs() << " operators " << finl;
       Cerr << "and you are trying to access the " << i << " th one." << finl;
       Process::exit();
     }
-  return terme_diffusif;
+  return terme_diffusif_;
 }
 
 /*! @brief Renvoie l'operateur specifie par son index: renvoie terme_diffusif si i = 0
@@ -260,14 +260,14 @@ Operateur& Equation_rayonnement_base::operateur(int i)
   switch(i)
     {
     case 0:
-      return terme_diffusif;
+      return terme_diffusif_;
     default:
       Cerr << "Error for Equation_rayonnement_base::operateur(int i)" << finl;
       Cerr << "Equation_rayonnement_base has " << nombre_d_operateurs() << " operators " << finl;
       Cerr << "and you are trying to access the " << i << " th one." << finl;
       Process::exit();
     }
-  return terme_diffusif;
+  return terme_diffusif_;
 }
 
 void Equation_rayonnement_base::get_noms_champs_postraitables(Noms& noms, Option opt) const
@@ -296,13 +296,13 @@ void Equation_rayonnement_base::discretiser()
  */
 const Discretisation_base& Equation_rayonnement_base::discretisation() const
 {
-  return le_modele->discretisation();
+  return le_modele_->discretisation();
 }
 
 void Equation_rayonnement_base::associer_pb_base(const Probleme_base& pb)
 {
   Equation_base::associer_pb_base(pb);
-  le_modele = ref_cast(Modele_rayo_semi_transp, pb);
+  le_modele_ = ref_cast(Modele_rayo_semi_transp, pb);
   associer_sch_tps_base(pb.schema_temps());
 }
 
@@ -328,8 +328,8 @@ void Equation_rayonnement_base::Mat_Morse_to_Mat_Bloc(Matrice& matrice_tmp)
       int k;
       // On recopie le premier bloc de la matrice dans un tableau :
       //      ligne_tmp = 0;
-      for (k = la_matrice.get_tab1()(i) - 1; k < la_matrice.get_tab1()(i + 1) - 1; k++)
-        ligne_tmp(la_matrice.get_tab2()(k) - 1) = la_matrice.get_coeff()(k);
+      for (k = la_matrice_.get_tab1()(i) - 1; k < la_matrice_.get_tab1()(i + 1) - 1; k++)
+        ligne_tmp(la_matrice_.get_tab2()(k) - 1) = la_matrice_.get_coeff()(k);
 
       // On complete la partie reelle de la matrice
       for (k = tab1RR(i) - 1; k < tab1RR(i + 1) - 1; k++)
@@ -346,8 +346,8 @@ void Equation_rayonnement_base::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice
   int n1 = nb_colonnes_tot();
   int n2 = nb_colonnes();
   int iligne;
-  const IntVect& tab1 = la_matrice.get_set_tab1();
-  const IntVect& tab2 = la_matrice.get_set_tab2();
+  const IntVect& tab1 = la_matrice_.get_set_tab1();
+  const IntVect& tab2 = la_matrice_.get_set_tab2();
 
   matrice_tmp.typer("Matrice_Bloc");
   Matrice_Bloc& matrice = ref_cast(Matrice_Bloc, matrice_tmp.valeur());

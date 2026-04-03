@@ -83,29 +83,29 @@ void Eq_rayo_semi_transp_VDF::resoudre(double temps)
   // On met a jour les champs associes aux conditions aux limites
   // avant d'evaluer leur contribution dans la matrice de discretisation
   evaluer_cl_rayonnement(temps);
-  terme_diffusif->contribuer_au_second_membre(secmem);
+  terme_diffusif_->contribuer_au_second_membre(secmem);
 
-  if (solveur->que_suis_je() == "Solv_GCP")
+  if (solveur_->que_suis_je() == "Solv_GCP")
     if (sub_type(Champ_Uniforme,fluide().kappa()))
       {
         Matrice matrice_tmp;
         dimensionner_Mat_Bloc_Morse_Sym(matrice_tmp);
         Mat_Morse_to_Mat_Bloc(matrice_tmp);
-        solveur.resoudre_systeme(matrice_tmp.valeur(),secmem,irradiance_->valeurs());
+        solveur_.resoudre_systeme(matrice_tmp.valeur(),secmem,irradiance_->valeurs());
       }
     else
       {
         Cerr<<finl;
         Cerr<<"Erreur dans Eq_rayo_semi_transp_VDF::resoudre()"<<finl;
         Cerr<<"Attention, on ne peut pas resoudre l'equation"<<finl;
-        Cerr<<"de rayonnement semi transparent avec le solveur : "<<solveur.que_suis_je()<<finl;
+        Cerr<<"de rayonnement semi transparent avec le solveur : "<<solveur_.que_suis_je()<<finl;
         Cerr<<"car kappa n'est pas constant, donc, la_matrice"<<finl;
         Cerr<<"n'est pas symetrique"<<finl;
         Process::exit();
       }
-  else if (solveur->que_suis_je() == "Solv_Gmres")
+  else if (solveur_->que_suis_je() == "Solv_Gmres")
     if (Process::nproc() == 1)
-      solveur.resoudre_systeme(la_matrice,secmem,irradiance_->valeurs());
+      solveur_.resoudre_systeme(la_matrice_,secmem,irradiance_->valeurs());
     else
       {
         /*        Matrice matrice_tmp;
@@ -126,7 +126,7 @@ void Eq_rayo_semi_transp_VDF::resoudre(double temps)
     {
       Cerr<<finl;
       Cerr<<"Erreur dans Eq_rayo_semi_transp_VDF::resoudre()"<<finl;
-      Cerr<<"Attention, on ne peut pas utiliser le solveur : "<<solveur.que_suis_je()<<finl;
+      Cerr<<"Attention, on ne peut pas utiliser le solveur : "<<solveur_.que_suis_je()<<finl;
       Cerr<<"pour resoudre l'equation de rayonnement dans un "<<finl;
       Cerr<<"probleme de rayonnement semi transparent"<<finl;
       Process::exit();
@@ -314,7 +314,7 @@ void Eq_rayo_semi_transp_VDF::modifier_matrice()
                   // On rajoute ce coefficient sur la diagonale de la matrice de discretisation
                   if(epsi<DMINFLOAT) { /* rien */ }
                   else
-                    la_matrice(elem,elem) +=  coeff;
+                    la_matrice_(elem,elem) +=  coeff;
                 }
             }
           else
@@ -368,24 +368,24 @@ void Eq_rayo_semi_transp_VDF::assembler_matrice()
 
   int i;
 
-  la_matrice.clean();
+  la_matrice_.clean();
 
   // Prise en compte de la partie div((1/3K)grad(irradiance)) dans la matrice
   // de discretisation.
-  terme_diffusif->contribuer_a_avec(irradi,la_matrice);
+  terme_diffusif_->contribuer_a_avec(irradi,la_matrice_);
 
   // Modification de la matrice pour prendre en compte le second membre en K*irradiance
   const DoubleTab& kappa = fluide().kappa().valeurs();
 
   Cerr<<"On verifie lors du calcul de la matrice de discretisation que "<<finl;
   Cerr<<"l'ordre de la matrice est bien egale au nombre d'elements"<<finl;
-  if(la_matrice.ordre() != nb_elem_tot)
+  if(la_matrice_.ordre() != nb_elem_tot)
     Process::exit();
   Cerr<<"Ordre de la matrice OK"<<finl;
 
   //  int nb_comp = fluide().kappa().nb_comp();
   double k;
-  for (i=0; i<la_matrice.ordre(); i++)
+  for (i=0; i<la_matrice_.ordre(); i++)
     {
       assert(fluide().kappa().nb_comp() == 1);
       if(sub_type(Champ_Uniforme,fluide().kappa()))
@@ -395,7 +395,7 @@ void Eq_rayo_semi_transp_VDF::assembler_matrice()
 
       double vol = domaine_VF.volumes(i);
 
-      la_matrice(i,i) = la_matrice(i,i) + k*vol;
+      la_matrice_(i,i) = la_matrice_(i,i) + k*vol;
     }
 
   // On modifie la matrice pour prendre en compte l'effet des parois

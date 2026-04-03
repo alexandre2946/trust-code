@@ -281,6 +281,6 @@ Echange_contact_rayo_semi_transp_VDF& Echange_contact_rayo_semi_transp_VDF::la_C
 void Echange_contact_rayo_semi_transp_VDF::completer_Cl_opposee_si_contact()
 {
   Echange_contact_rayo_semi_transp_VDF& la_cl_opp = la_Cl_opposee();
-  la_cl_opp.associer_modele(mon_modele.valeur());
+  la_cl_opp.associer_modele(mon_modele_.valeur());
   la_cl_opp.recherche_emissivite_et_A();
 }
