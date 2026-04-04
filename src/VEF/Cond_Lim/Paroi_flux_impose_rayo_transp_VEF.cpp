@@ -13,7 +13,7 @@
 *
 *****************************************************************************/
 
-#include <Modele_Rayonnement_Milieu_Transparent.h>
+#include <Modele_rayo_transp.h>
 #include <Paroi_flux_impose_rayo_transp_VEF.h>
 #include <Schema_Temps_base.h>
 #include <Champ_Uniforme.h>

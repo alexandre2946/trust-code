@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,7 +16,7 @@
 #ifndef Champ_front_contact_rayo_transp_VEF_included
 #define Champ_front_contact_rayo_transp_VEF_included
 
-#include <Modele_Rayonnement_Milieu_Transparent.h>
+#include <Modele_rayo_transp.h>
 #include <Champ_front_contact_VEF.h>
 
 class Champ_front_contact_rayo_transp_VEF: public Champ_front_contact_VEF
@@ -44,12 +44,12 @@ public:
   inline Nom& nom_prob2() { return nom_pb2; }
   inline const Nom& nom_prob2() const { return nom_pb2; }
 
-  inline void associer_modele_rayo(Modele_Rayonnement_Milieu_Transparent& mod) { le_modele_rayo_ = mod; }
-  inline Modele_Rayonnement_Milieu_Transparent& modele_rayo() { return le_modele_rayo_; }
+  inline void associer_modele_rayo(Modele_rayo_transp& mod) { le_modele_rayo_ = mod; }
+  inline Modele_rayo_transp& modele_rayo() { return le_modele_rayo_; }
 
 protected:
   DoubleVect flux_radiatif_;
-  OBS_PTR(Modele_Rayonnement_Milieu_Transparent) le_modele_rayo_;
+  OBS_PTR(Modele_rayo_transp) le_modele_rayo_;
 };
 
 #endif /* Champ_front_contact_rayo_transp_VEF_included */

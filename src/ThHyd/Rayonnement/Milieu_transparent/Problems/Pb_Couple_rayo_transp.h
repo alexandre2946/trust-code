@@ -16,7 +16,7 @@
 #ifndef Pb_Couple_rayo_transp_included
 #define Pb_Couple_rayo_transp_included
 
-#include <Modele_Rayonnement_Milieu_Transparent.h>
+#include <Modele_rayo_transp.h>
 #include <Probleme_Couple.h>
 #include <TRUST_Ref.h>
 
@@ -28,17 +28,19 @@ class Pb_Couple_rayo_transp: public Probleme_Couple
 {
   Declare_instanciable(Pb_Couple_rayo_transp);
 public:
-  int associer_(Objet_U&) override;
+//  int associer_(Objet_U&) override;
   int postraiter(int force = 1) override;
 
   void completer();
   void validateTimeStep() override;
   void initialize() override;
 
-  inline Modele_Rayonnement_Milieu_Transparent& le_modele_rayo() { return le_modele_de_rayo_.valeur(); }
+  inline Modele_rayo_transp& le_modele_rayo() { return le_modele_de_rayo_.valeur(); }
+
+  void associer_modele_rayo_transp(const Modele_rayo_transp& );
 
 protected:
-  OBS_PTR(Modele_Rayonnement_Milieu_Transparent) le_modele_de_rayo_;
+  OBS_PTR(Modele_rayo_transp) le_modele_de_rayo_;
 };
 
 #endif /* Pb_Couple_rayo_transp_included */

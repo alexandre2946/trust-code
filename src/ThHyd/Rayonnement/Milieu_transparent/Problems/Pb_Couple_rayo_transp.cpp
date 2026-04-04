@@ -13,7 +13,7 @@
 *
 *****************************************************************************/
 
-#include <Modele_Rayonnement_Milieu_Transparent.h>
+#include <Modele_rayo_transp.h>
 #include <Pb_Couple_rayo_transp.h>
 #include <Paroi_rayo_transp.h>
 #include <Probleme_base.h>
@@ -32,16 +32,26 @@ void Pb_Couple_rayo_transp::initialize()
   le_modele_rayo().preparer_calcul();
 }
 
-int Pb_Couple_rayo_transp::associer_(Objet_U& ob)
+void Pb_Couple_rayo_transp::associer_modele_rayo_transp(const Modele_rayo_transp& mod)
 {
-  if( sub_type(Modele_Rayonnement_Milieu_Transparent, ob))
+  if (le_modele_de_rayo_.non_nul())
     {
-      Cerr << "association du modele au pbc" << finl;
-      le_modele_de_rayo_ = ref_cast(Modele_Rayonnement_Milieu_Transparent, ob);
-      return 1;
+      Cerr << "Error in Pb_Couple_rayo_transp::associer_modele_rayo_transp. It seems that you have another model associated to the problem " << le_nom() << finl;
+      Process::exit();
     }
-  else return Probleme_Couple::associer_(ob);
+  le_modele_de_rayo_ = mod;
 }
+
+//int Pb_Couple_rayo_transp::associer_(Objet_U& ob)
+//{
+//  if( sub_type(Modele_rayo_transp, ob))
+//    {
+//      Cerr << "association du modele au pbc" << finl;
+//      le_modele_de_rayo_ = ref_cast(Modele_rayo_transp, ob);
+//      return 1;
+//    }
+//  else return Probleme_Couple::associer_(ob);
+//}
 
 int Pb_Couple_rayo_transp::postraiter(int force)
 {
@@ -50,7 +60,7 @@ int Pb_Couple_rayo_transp::postraiter(int force)
     return 0;
 
   // Impression en plus du modele de rayonnement
-  const Modele_Rayonnement_Milieu_Transparent& mod_rayo = le_modele_de_rayo_.valeur();
+  const Modele_rayo_transp& mod_rayo = le_modele_de_rayo_.valeur();
   if (mod_rayo.processeur_rayonnant() != -1)
     if (schema_temps().limpr())
       {
@@ -70,7 +80,7 @@ void Pb_Couple_rayo_transp::validateTimeStep()
 void Pb_Couple_rayo_transp::completer()
 {
   le_modele_de_rayo_->discretiser(ref_cast(Probleme_base,probleme(0)).discretisation(), ref_cast(Probleme_base,probleme(0)).domaine());
-  Modele_Rayonnement_Milieu_Transparent& mod_rayo = le_modele_de_rayo_.valeur();
+  Modele_rayo_transp& mod_rayo = le_modele_de_rayo_.valeur();
 
   int nb_pb_ray = 0;
   int compte_nb_bords_rayo = 0;

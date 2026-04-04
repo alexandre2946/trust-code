@@ -13,7 +13,7 @@
 *
 *****************************************************************************/
 
-#include <Modele_Rayonnement_Milieu_Transparent.h>
+#include <Modele_rayo_transp.h>
 #include <Discretisation_base.h>
 #include <Domaine_Cl_dis_base.h>
 #include <Frontiere_dis_base.h>
@@ -26,11 +26,11 @@
 #include <sys/stat.h>
 #include <Param.h>
 
-Implemente_instanciable(Modele_Rayonnement_Milieu_Transparent, "Modele_Rayonnement_Milieu_Transparent", Objet_U);
+Implemente_instanciable(Modele_rayo_transp, "Modele_rayonnement_milieu_transparent|Transparent_medium_radiation_model", Objet_U);
 
-Sortie& Modele_Rayonnement_Milieu_Transparent::printOn(Sortie& os) const { return os; }
+Sortie& Modele_rayo_transp::printOn(Sortie& os) const { return os; }
 
-Entree& Modele_Rayonnement_Milieu_Transparent::readOn(Entree& is)
+Entree& Modele_rayo_transp::readOn(Entree& is)
 {
   Nom fichier_face_rayo, fichier_fij;
   Cerr << "Reading params of " << que_suis_je() << finl;
@@ -42,7 +42,7 @@ Entree& Modele_Rayonnement_Milieu_Transparent::readOn(Entree& is)
   param.ajouter_flag("format_binaire", &fic_mat_ray_inv_bin_);
   param.lire_avec_accolades_depuis(is);
 
-  Cerr << "Modele_Rayonnement_Milieu_Transparent::lire_fichiers" << finl;
+  Cerr << "Modele_rayo_transp::lire_fichiers" << finl;
   if (fic_mat_ray_inv_bin_)
     lire_fichiers(fichier_face_rayo, fichier_fij, nom_fic_mat_ray_inv_);
   else
@@ -51,7 +51,7 @@ Entree& Modele_Rayonnement_Milieu_Transparent::readOn(Entree& is)
   return is;
 }
 
-void Modele_Rayonnement_Milieu_Transparent::lire_fichiers(Nom& fich_faces_rayo, Nom& fich_fij, Nom& fich_mat)
+void Modele_rayo_transp::lire_fichiers(Nom& fich_faces_rayo, Nom& fich_fij, Nom& fich_mat)
 {
   Cerr << "fichier_matrice = " << fich_mat << finl;
 
@@ -88,7 +88,7 @@ void Modele_Rayonnement_Milieu_Transparent::lire_fichiers(Nom& fich_faces_rayo, 
   lire_fichiers(fich_faces_rayo, fich_fij);
 }
 
-void Modele_Rayonnement_Milieu_Transparent::lire_fichiers(Nom& fich_faces_rayo, Nom& fich_fij)
+void Modele_rayo_transp::lire_fichiers(Nom& fich_faces_rayo, Nom& fich_fij)
 {
   Cerr << "fichier_face_rayo = " << fich_faces_rayo << finl;
   Cerr << "fichier_fij = " << fich_fij << finl;
@@ -189,14 +189,14 @@ void Modele_Rayonnement_Milieu_Transparent::lire_fichiers(Nom& fich_faces_rayo, 
   Cerr << "La lecture des fichiers du prepro est terminee. Fichiers corrects." << finl;
 }
 
-void Modele_Rayonnement_Milieu_Transparent::calculer_temperatures()
+void Modele_rayo_transp::calculer_temperatures()
 {
   for (int i = 0; i < nb_faces_totales(); i++)
     if (les_faces_rayonnantes_[i].emissivite() != -1)
       les_faces_rayonnantes_[i].calculer_temperature();
 }
 
-void Modele_Rayonnement_Milieu_Transparent::calculer_flux_radiatifs()
+void Modele_rayo_transp::calculer_flux_radiatifs()
 {
   int jrayo = 0;
 
@@ -219,7 +219,7 @@ void Modele_Rayonnement_Milieu_Transparent::calculer_flux_radiatifs()
             }
         }
 
-      // La matrice_rayo a ete inversee au debut du calcule dans Modele_Rayonnement_Milieu_Transparent::preparer_calcul.
+      // La matrice_rayo a ete inversee au debut du calcule dans Modele_rayo_transp::preparer_calcul.
       // Il ne reste ici qu'a calculer le produit du second membre avec la matrice inverse.
       for (int ii = 0; ii < nb_faces_rayonnantes(); ii++)
         {
@@ -241,7 +241,7 @@ void Modele_Rayonnement_Milieu_Transparent::calculer_flux_radiatifs()
     }
 }
 
-void Modele_Rayonnement_Milieu_Transparent::imprimer_flux_radiatifs(Sortie& os) const
+void Modele_rayo_transp::imprimer_flux_radiatifs(Sortie& os) const
 {
   if (Process::me()) return; /* seulement maitre qui imprime ! */
 
@@ -291,7 +291,7 @@ void Modele_Rayonnement_Milieu_Transparent::imprimer_flux_radiatifs(Sortie& os) 
   os << "Bilan flux radiatifs : " << flux_tot << " W" << finl;
 }
 
-double Modele_Rayonnement_Milieu_Transparent::flux_radiatif(int num_face) const
+double Modele_rayo_transp::flux_radiatif(int num_face) const
 {
   if (corres_.size() == 0)
     {
@@ -346,7 +346,7 @@ double Modele_Rayonnement_Milieu_Transparent::flux_radiatif(int num_face) const
   return les_faces_rayonnantes_[corres_[num_face]].flux_radiatif();
 }
 
-void Modele_Rayonnement_Milieu_Transparent::preparer_calcul()
+void Modele_rayo_transp::preparer_calcul()
 {
   if (je_suis_maitre())
     {
@@ -539,14 +539,14 @@ void Modele_Rayonnement_Milieu_Transparent::preparer_calcul()
     }
 }
 
-void Modele_Rayonnement_Milieu_Transparent::mettre_a_jour(double temps)
+void Modele_rayo_transp::mettre_a_jour(double temps)
 {
   temps_ = temps;
   calculer_temperatures();
   calculer_flux_radiatifs();
 }
 
-void Modele_Rayonnement_Milieu_Transparent::discretiser(const Discretisation_base& dis, const Domaine& domaine)
+void Modele_rayo_transp::discretiser(const Discretisation_base& dis, const Domaine& domaine)
 {
   for (int i = 0; i < nb_faces_totales(); i++)
     {

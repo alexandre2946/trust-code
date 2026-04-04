@@ -13,7 +13,7 @@
 *
 *****************************************************************************/
 
-#include <Modele_Rayonnement_Milieu_Transparent.h>
+#include <Modele_rayo_transp.h>
 #include <Echange_contact_rayo_transp_VDF.h>
 #include <Champ_front_uniforme.h>
 #include <Champ_front_calc.h>
@@ -174,7 +174,7 @@ void Echange_contact_rayo_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_equiv,
   int ind_fac, elem;
   //DoubleTab& Teta_i=T_ext().valeurs();
   //Teta_equiv.resize(nb_faces_bord,1);
-  Modele_Rayonnement_Milieu_Transparent& modrayo = ref_cast(Modele_Rayonnement_Milieu_Transparent, le_modele_rayo.valeur());
+  Modele_rayo_transp& modrayo = ref_cast(Modele_rayo_transp, le_modele_rayo.valeur());
   if (modrayo.relaxation() == 0)
     alpha_ = 0;
 

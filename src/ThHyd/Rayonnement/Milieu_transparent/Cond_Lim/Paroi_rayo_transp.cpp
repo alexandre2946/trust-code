@@ -13,7 +13,7 @@
 *
 *****************************************************************************/
 
-#include <Modele_Rayonnement_Milieu_Transparent.h>
+#include <Modele_rayo_transp.h>
 #include <Paroi_rayo_transp.h>
 #include <Front_VF.h>
 

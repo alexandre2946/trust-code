@@ -13,8 +13,8 @@
 *
 *****************************************************************************/
 
-#ifndef Modele_Rayonnement_Milieu_Transparent_included
-#define Modele_Rayonnement_Milieu_Transparent_included
+#ifndef Modele_rayo_transp_included
+#define Modele_rayo_transp_included
 
 #include <Face_rayo_transp.h>
 #include <Domaine_forward.h>
@@ -25,9 +25,9 @@
 class Schema_Temps_base;
 class Discretisation_base;
 
-class Modele_Rayonnement_Milieu_Transparent: public Objet_U
+class Modele_rayo_transp: public Objet_U
 {
-  Declare_instanciable(Modele_Rayonnement_Milieu_Transparent);
+  Declare_instanciable(Modele_rayo_transp);
 public:
   void discretiser(const Discretisation_base&, const Domaine&);
   void mettre_a_jour(double temps);
@@ -70,4 +70,4 @@ private:
   int processeur_rayonnant_ = -123;
 };
 
-#endif /* Modele_Rayonnement_Milieu_Transparent_included */
+#endif /* Modele_rayo_transp_included */

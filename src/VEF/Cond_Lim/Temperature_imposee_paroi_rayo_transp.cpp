@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -54,7 +54,7 @@ void Temperature_imposee_paroi_rayo_transp::calculer_Teta_i(double temps)
     }
 }
 
-void Temperature_imposee_paroi_rayo_transp::associer_modele_rayo(Modele_Rayonnement_Milieu_Transparent& mod)
+void Temperature_imposee_paroi_rayo_transp::associer_modele_rayo(Modele_rayo_transp& mod)
 {
   le_modele_rayo = mod;
 

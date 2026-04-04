@@ -24,7 +24,7 @@ class Temperature_imposee_paroi_rayo_transp: public Cond_lim_rayo_milieu_transp,
   Declare_instanciable(Temperature_imposee_paroi_rayo_transp);
 public:
 
-  void associer_modele_rayo(Modele_Rayonnement_Milieu_Transparent&) override;
+  void associer_modele_rayo(Modele_rayo_transp&) override;
   void completer() override;
   void mettre_a_jour(double temps) override;
   void calculer_Teta_i(double temps);

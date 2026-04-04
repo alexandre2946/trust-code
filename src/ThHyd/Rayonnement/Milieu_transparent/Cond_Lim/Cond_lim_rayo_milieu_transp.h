@@ -19,7 +19,7 @@
 #include <Cond_lim_base.h>
 #include <TRUST_Ref.h>
 
-class Modele_Rayonnement_Milieu_Transparent;
+class Modele_rayo_transp;
 
 class Cond_lim_rayo_milieu_transp
 {
@@ -28,17 +28,17 @@ public:
 
   virtual void completer();
   void preparer_surface(const Frontiere_dis_base&, const Domaine_Cl_dis_base&);
-  virtual void associer_modele_rayo(Modele_Rayonnement_Milieu_Transparent&);
+  virtual void associer_modele_rayo(Modele_rayo_transp&);
 
   inline virtual double surface(int numfa) const { return surf_i_[numfa]; }
   inline virtual double teta_i(int numfa) const { return teta_i_[numfa]; }
 
-  inline Modele_Rayonnement_Milieu_Transparent& modele_rayo() { return le_modele_rayo.valeur(); }
-  inline const Modele_Rayonnement_Milieu_Transparent& modele_rayo() const { return le_modele_rayo.valeur(); }
+  inline Modele_rayo_transp& modele_rayo() { return le_modele_rayo.valeur(); }
+  inline const Modele_rayo_transp& modele_rayo() const { return le_modele_rayo.valeur(); }
 
 protected:
   DoubleVect surf_i_, teta_i_;
-  OBS_PTR(Modele_Rayonnement_Milieu_Transparent) le_modele_rayo;
+  OBS_PTR(Modele_rayo_transp) le_modele_rayo;
 };
 
 #endif /* Cond_lim_rayo_milieu_transp_included */
