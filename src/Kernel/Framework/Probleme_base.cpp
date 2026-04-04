@@ -219,14 +219,23 @@ Entree& Probleme_base::lire_equations(Entree& is, Motcle& mot)
   if (nb_eq == 0)
     return is;
 
-  Cerr << "Reading of the equations" << finl;
   bool already_read = true;
 
   if (mot == "correlations")
     {
+      Cerr << "Reading of the correlations ..." << finl;
       lire_correlations(is);
       already_read = false;
     }
+
+  if (mot == "Modele_rayonnement_milieu_transparent" || mot == "Transparent_medium_radiation_model")
+    {
+      Cerr << "Reading of the radiation model ..." << finl;
+      lire_radiation_models(is, mot);
+      already_read = false;
+    }
+
+  Cerr << "Reading of the equations ..." << finl;
 
   for (int i = 0; i < nb_eq; i++)
     {
@@ -239,6 +248,14 @@ Entree& Probleme_base::lire_equations(Entree& is, Motcle& mot)
 
   read_optional_equations(is, mot);
 
+  return is;
+}
+
+Entree& Probleme_base::lire_radiation_models(Entree& is, Motcle& mot)
+{
+  Cerr << "The use of a transparent radiation model is not authorized for your problem " << que_suis_je() << " !!!" << finl;
+  Cerr << "This model should only be used with a fluid problem. Update your data file." << finl;
+  Process::exit();
   return is;
 }
 
@@ -256,8 +273,7 @@ void Probleme_base::associer()
 /*! @brief surcharge Objet_U::associer_(Objet_U& ob) Associe differents objets au probleme en controlant
  *
  *      le type de l'objet a associer a l'execution.
- *      On peut ainsi associer: un schema en temps, un domaine de calcul ou
- *      un milieu physique.
+ *      On peut ainsi associer: un schema en temps, un domaine de calcul.
  *      Utilise les routine de la classe Type_Info (Utilitaires)
  *
  * @param (Objet_U& ob) l'objet a associer
@@ -266,7 +282,6 @@ void Probleme_base::associer()
  */
 int Probleme_base::associer_(Objet_U& ob)
 {
-  // Schema_Temps_base Domaine Milieu_base
   if (sub_type(Schema_Temps_base, ob))
     {
       associer_sch_tps_base(ref_cast(Schema_Temps_base, ob));
@@ -315,10 +330,7 @@ void Probleme_base::completer()
     equation(i).completer();
 
   for (auto& itr : liste_loi_fermeture_)
-    {
-      Loi_Fermeture_base& loi = itr.valeur();
-      loi.completer();
-    }
+    itr->completer();
 
   les_postraitements_.completer();
 
@@ -385,10 +397,7 @@ void Probleme_base::discretiser(Discretisation_base& une_discretisation)
   le_domaine_dis_->associer_domaine(le_domaine_);
 
   for (auto& itr : liste_loi_fermeture_)
-    {
-      Loi_Fermeture_base& loi = itr.valeur();
-      loi.discretiser(une_discretisation);
-    }
+    itr->discretiser(une_discretisation);
 }
 
 /*! @brief Flag le premier et le dernier postraitement pour chaque fichier Et initialise les postraitements

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,12 +13,68 @@
 *
 *****************************************************************************/
 
+#include <Pb_Couple_rayo_transp.h>
 #include <Pb_Fluide_base.h>
+#include <Fluide_base.h>
 
-Implemente_base(Pb_Fluide_base,"Pb_Fluide_base",Probleme_base);
+Implemente_base(Pb_Fluide_base, "Pb_Fluide_base", Probleme_base);
 
 Sortie& Pb_Fluide_base::printOn(Sortie& os) const { return Probleme_base::printOn(os); }
 Entree& Pb_Fluide_base::readOn(Entree& is) { return Probleme_base::readOn(is); }
+
+Entree& Pb_Fluide_base::lire_radiation_models(Entree& is, Motcle& mot)
+{
+  assert (mot == "Modele_rayonnement_milieu_transparent" || mot == "Transparent_medium_radiation_model");
+
+  // TODO FIXME do better here ...
+  if (!(Motcle(que_suis_je()).debute_par("Pb_HYDRAULIQUE") || Motcle(que_suis_je()).debute_par("Pb_THERMOHYDRAULIQUE") ))
+    {
+      Cerr << "The transparent medium radiation model is not yet tested with a problem of type " << que_suis_je() << finl;
+      Cerr << "Please contact the TRUST team." << finl;
+      Process::exit();
+    }
+
+  // test si c'est un pb couple et si c'est Pb_Couple_rayo_transp !
+  if (!is_coupled())
+    {
+      Cerr << "You asked for using a transparent medium radiation model with a problem of type " << que_suis_je() << finl;
+      Cerr << "However, an instance of Pb_Couple_rayo_transp is missing in your data file ... And this is mandatory to solve a radiation problem !" << finl;
+      Cerr << "Please update your data file by adding an instance of Pb_Couple_rayo_transp, associate correctly the problem " << le_nom() << " to it and make sure to solve it at the end !!!" << finl;
+      Process::exit();
+    }
+  else if (!sub_type(Pb_Couple_rayo_transp, pbc_.valeur()))
+    {
+      Cerr << "You asked for using a transparent medium radiation model with a problem of type " << que_suis_je() << finl;
+      Cerr << "However, an instance of Pb_Couple_rayo_transp is missing in your data file ... And this is mandatory to solve a radiation problem !" << finl;
+      Cerr << "Please update your data file by replacing the problem " << que_suis_je() << " of name " << le_nom() << " by the problem Pb_Couple_rayo_transp !!!" << finl;
+      Process::exit();
+    }
+
+  // set flag is_rad_transp_med_ in Fluide_base
+  bool flag_set = false;
+  for (auto& itr : le_milieu_)
+    {
+      if (sub_type(Fluide_base, itr.valeur()))
+        {
+          ref_cast(Fluide_base, itr.valeur()).set_rayo_transp_flag();
+          flag_set = true;
+          break;
+        }
+    }
+
+  if (!flag_set)
+    {
+      Cerr << "Using a transparent medium radiation model with a problem of type " << que_suis_je() << " that dont have a fluid medium is forbidden !!!" << finl;
+      Process::exit();
+    }
+
+  // si bon on type et on lit !
+  mod_rayo_transp_.typer(mot.getChar());
+  is >> mod_rayo_transp_.valeur();
+  ref_cast(Pb_Couple_rayo_transp, pbc_.valeur()).associer_modele_rayo_transp(mod_rayo_transp_.valeur());
+
+  return is;
+}
 
 int Pb_Fluide_base::expression_predefini(const Motcle& motlu, Nom& expression)
 {

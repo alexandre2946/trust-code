@@ -80,9 +80,10 @@ public :
   inline const Champ_Don_base& longueur_rayo() const { return longueur_rayo_.valeur(); }
   void typer_longeur_rayo(const Nom& typ) { longueur_rayo_.typer(typ); }
 
-  bool is_rayo_semi_transp() const override { return (coeff_absorption_.non_nul() && indice_refraction_.non_nul()); }
-  bool is_rayo_transp() const override { return is_rad_transp_med_; }
-  bool is_longueur_rayo_discretised() const { return longueur_rayo_.non_nul(); }
+  inline bool is_rayo_semi_transp() const override { return (coeff_absorption_.non_nul() && indice_refraction_.non_nul()); }
+  inline bool is_rayo_transp() const override { return is_rad_transp_med_; }
+  inline void set_rayo_transp_flag() { is_rad_transp_med_ = true; }
+  inline bool is_longueur_rayo_discretised() const { return longueur_rayo_.non_nul(); }
 
 protected :
   void creer_e_int() const; // creation sur demande de e_int / h

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,6 +16,7 @@
 #ifndef Pb_Fluide_base_included
 #define Pb_Fluide_base_included
 
+#include <Modele_rayo_transp.h>
 #include <Probleme_base.h>
 
 /*! @brief classe  Pb_Fluide_base Cette classe a pour but de disposer d une classe amont pour
@@ -29,6 +30,14 @@ class Pb_Fluide_base : public Probleme_base
   Declare_base(Pb_Fluide_base);
 public:
   int expression_predefini(const Motcle& motlu, Nom& expression) override;
+  Entree& lire_radiation_models(Entree& is, Motcle& mot) override;
+
+  inline bool has_mod_rayo_transp() const { return mod_rayo_transp_.non_nul(); }
+  inline Modele_rayo_transp& get_mod_rayo_transp() { assert (mod_rayo_transp_.non_nul()); return mod_rayo_transp_.valeur(); }
+  inline const Modele_rayo_transp& get_mod_rayo_transp() const { assert (mod_rayo_transp_.non_nul()); return mod_rayo_transp_.valeur(); }
+
+protected:
+  OWN_PTR(Modele_rayo_transp) mod_rayo_transp_;
 };
 
 #endif /* Pb_Fluide_base_included */

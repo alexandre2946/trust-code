@@ -138,7 +138,7 @@ public:
 
   virtual void addInputField(Field_base& f) { addInputField_impl(*this, f); }
 
-  int is_coupled() const { return (int)pbc_.non_nul(); }
+  bool is_coupled() const { return pbc_.non_nul(); }
 
   int postraiter(int force = 1) override;
   int limpr() const override;
@@ -213,6 +213,7 @@ protected :
   virtual void lire_solved_equations(Entree& is) { /* Do nothing */ }
   Entree& read_optional_equations(Entree& is, Motcle& mot);
   virtual Entree& lire_correlations(Entree& is);
+  virtual Entree& lire_radiation_models(Entree& is, Motcle& mot);
 
   Save_Restart save_restart_;
   std::vector<OWN_PTR(Milieu_base)> le_milieu_;
@@ -237,7 +238,7 @@ protected :
  */
 inline const Discretisation_base& Probleme_base::discretisation() const
 {
-  if(!la_discretisation_.non_nul())
+  if(la_discretisation_.est_nul())
     {
       Cerr << que_suis_je() << " has not been discretized!" << finl;
       exit();

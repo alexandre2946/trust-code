@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -46,7 +46,7 @@ void Pb_Dilatable_base::associer_sch_tps_base(const Schema_Temps_base& sch)
       Cerr << "TRUST can't solve a " << que_suis_je() << " with a " << sch.que_suis_je() << " time scheme." << finl;
       Process::exit();
     }
-  if ( sub_type(Schema_Euler_Implicite,sch) && is_coupled() == 1 )
+  if ( sub_type(Schema_Euler_Implicite,sch) && is_coupled())
     {
       Cerr << finl;
       Cerr << "Coupled problem with unique Euler implicit time scheme with " << que_suis_je() <<  "fluid are not allowed!" << finl;
