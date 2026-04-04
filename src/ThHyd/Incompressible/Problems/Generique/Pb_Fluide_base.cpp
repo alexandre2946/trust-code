@@ -71,6 +71,7 @@ Entree& Pb_Fluide_base::lire_radiation_models(Entree& is, Motcle& mot)
   // si bon on type et on lit !
   mod_rayo_transp_.typer(mot.getChar());
   is >> mod_rayo_transp_.valeur();
+  mod_rayo_transp_->associer_pb_fluide_rayo(*this);
   ref_cast(Pb_Couple_rayo_transp, pbc_.valeur()).associer_modele_rayo_transp(mod_rayo_transp_.valeur());
 
   return is;

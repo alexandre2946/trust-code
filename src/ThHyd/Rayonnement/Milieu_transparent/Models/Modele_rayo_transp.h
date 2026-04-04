@@ -17,31 +17,27 @@
 #define Modele_rayo_transp_included
 
 #include <Face_rayo_transp.h>
-#include <Domaine_forward.h>
-#include <Matrice_Morse.h>
 #include <TRUST_Vector.h>
-#include <Cond_lim_base.h>
 
-class Schema_Temps_base;
-class Discretisation_base;
+class Pb_Fluide_base;
 
 class Modele_rayo_transp: public Objet_U
 {
   Declare_instanciable(Modele_rayo_transp);
 public:
-  void discretiser(const Discretisation_base&, const Domaine&);
+  void associer_pb_fluide_rayo(const Pb_Fluide_base& );
   void mettre_a_jour(double temps);
   void preparer_calcul();
   void calculer_temperatures();
   void calculer_flux_radiatifs();
   void imprimer_flux_radiatifs(Sortie&) const;
+  int postraiter();
   double flux_radiatif(int num_face_global) const; // 0 < face < nb_faces_de_bord
 
   inline void associer_processeur_rayonnant(int proc) { processeur_rayonnant_ = proc; }
   inline Face_rayo_transp& face_rayonnante(int j) { return les_faces_rayonnantes_[j]; }
   inline const Face_rayo_transp& face_rayonnante(int j) const { return les_faces_rayonnantes_[j]; }
   inline const Nom& nom_pb_rayonnant() const { return nom_pb_rayonnant_; }
-  inline void set_nom_pb_rayonnant(const Nom& pb) { nom_pb_rayonnant_ = pb; }
   inline double relaxation() const { return relaxation_; }
   inline int processeur_rayonnant() { return processeur_rayonnant_; }
   inline int processeur_rayonnant() const { return processeur_rayonnant_; }
@@ -52,7 +48,9 @@ public:
 private:
   void lire_fichiers(Nom& nom1, Nom& nom2);
   void lire_fichiers(Nom& nom1, Nom& nom2, Nom& nom3);
+  void init_matrice_rayo();
 
+  OBS_PTR(Pb_Fluide_base) pb_fluide_rayo_;
   VECT(Face_rayo_transp) les_faces_rayonnantes_;
   int nb_faces_rayonnantes_ = -123, nb_faces_totales_ = -123, ordre_mat_forme_ = -123;
   double temps_ = -123.; // on garde le temps pour les impressions

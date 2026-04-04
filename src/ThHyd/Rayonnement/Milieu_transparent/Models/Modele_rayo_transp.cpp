@@ -17,8 +17,9 @@
 #include <Discretisation_base.h>
 #include <Domaine_Cl_dis_base.h>
 #include <Frontiere_dis_base.h>
+#include <Schema_Temps_base.h>
 #include <communications.h>
-#include <Probleme_base.h>
+#include <Pb_Fluide_base.h>
 #include <SFichierBin.h>
 #include <EFichierBin.h>
 #include <Fluide_base.h>
@@ -127,7 +128,6 @@ void Modele_rayo_transp::lire_fichiers(Nom& fich_faces_rayo, Nom& fich_fij)
             }
           irayo++;
           jrayo++;
-
         }
       else
         jrayo++;
@@ -189,6 +189,17 @@ void Modele_rayo_transp::lire_fichiers(Nom& fich_faces_rayo, Nom& fich_fij)
   Cerr << "La lecture des fichiers du prepro est terminee. Fichiers corrects." << finl;
 }
 
+void Modele_rayo_transp::associer_pb_fluide_rayo(const Pb_Fluide_base& pb)
+{
+  nom_pb_rayonnant_ = pb.le_nom();
+  Cerr << "The fluid radiation problem found : " << nom_pb_rayonnant_ << finl;
+
+  if (sub_type(Pb_Fluide_base, pb))
+    pb_fluide_rayo_ = ref_cast(Pb_Fluide_base, pb);
+  else
+    Process::exit("Error in Modele_rayo_transp::associer_pb_fluide_rayo ! You try to associate a non-fluid problem !!! \n");
+}
+
 void Modele_rayo_transp::calculer_temperatures()
 {
   for (int i = 0; i < nb_faces_totales(); i++)
@@ -239,6 +250,20 @@ void Modele_rayo_transp::calculer_flux_radiatifs()
           jrayo++;
         }
     }
+}
+
+int Modele_rayo_transp::postraiter()
+{
+  // Impression en plus du modele de rayonnement
+  if (processeur_rayonnant() != -1)
+    if (pb_fluide_rayo_->schema_temps().limpr())
+      {
+        Cout << "Impression des flux radiatifs sur les bords de rayonnement" << finl;
+        Cout << "----------------------------------------------------------------" << finl;
+        imprimer_flux_radiatifs(Cout);
+      }
+
+  return 1;
 }
 
 void Modele_rayo_transp::imprimer_flux_radiatifs(Sortie& os) const
@@ -341,12 +366,110 @@ double Modele_rayo_transp::flux_radiatif(int num_face) const
       for (int i = 0; i < nbre_face_de_bord; i++)
         if (corres_[i] == -1)
           Cout << "Face " << i << " sans groupes " << finl;
-
     }
   return les_faces_rayonnantes_[corres_[num_face]].flux_radiatif();
 }
 
 void Modele_rayo_transp::preparer_calcul()
+{
+  // Lire Ensemble_faces_rayo_transp
+  for (int i = 0; i < nb_faces_totales(); i++)
+    {
+      Face_rayo_transp& face_rayo = face_rayonnante(i);
+      for (int j = 0; j < face_rayo.nb_ensembles_faces(); j++)
+        if (face_rayo.nom_bord_rayo() != face_rayo.nom_bord_rayo_lu())
+          {
+            Ensemble_faces_rayo_transp& faces_j = face_rayo.ensembles_faces_bord(j);
+            faces_j.lire(face_rayo.nom_bord_rayo_lu(), face_rayo.nom_bord_rayo(), pb_fluide_rayo_->domaine());
+          }
+    }
+
+  int compte_nb_bords_rayo = 0;
+
+  for (int j = 0; j < pb_fluide_rayo_->nombre_d_equations(); j++)
+    {
+      Domaine_Cl_dis_base& la_zcl = pb_fluide_rayo_->equation(j).domaine_Cl_dis();
+      for (int num_cl = 0; num_cl < la_zcl.nb_cond_lim(); num_cl++)
+        {
+          Cond_lim_base& la_cl = la_zcl.les_conditions_limites(num_cl).valeur();
+
+          Cond_lim_rayo_milieu_transp *la_cl_rayo;
+          if (la_cl.is_bc_rayo_milieu_transp(la_cl_rayo))
+            {
+
+              // on associe la cl liee au pb fluide
+              int ok = 0;
+              for (int i = 0; i < nb_faces_totales(); i++)
+                {
+                  if (face_rayonnante(i).nom_bord_rayo() == la_cl.frontiere_dis().le_nom())
+                    {
+                      if (face_rayonnante(i).emissivite() != -1)
+                        ok = 1;
+                      face_rayonnante(i).ensembles_faces_bord(0).associer_les_cl(la_cl);
+                      compte_nb_bords_rayo += 1;
+                    }
+                }
+              if (ok == 0)
+                {
+                  Cerr << "La condition limite de nom " << la_cl.frontiere_dis().le_nom() << " est definie comme rayonnante" << finl;
+                  Cerr<< "mais n'est pas dans la liste des faces rayonnantes ou son emissivite vaut -1" << finl;
+                  Process::exit();
+                }
+            }
+        }
+    }
+
+  for (int i = 0; i < nb_faces_totales(); i++)
+    if (!face_rayonnante(i).ensembles_faces_bord(0).is_ok() && (face_rayonnante(i).emissivite() != -1))
+      {
+        Cerr << "Le bord " << face_rayonnante(i).nom_bord_rayo_lu() << " n'a pas ete asssocie a une condition limite rayonnante." << finl;
+        Cerr << "Soit vous mettez une condition limite rayonnante pour " << face_rayonnante(i).nom_bord_rayo() << finl;
+        Cerr << "Soit vous affectez une emissivite de -1 a ce bord." << finl;
+        Cerr << finl;
+      }
+
+  if (compte_nb_bords_rayo != nb_faces_rayonnantes())
+    Process::exit("Error in Modele_rayo_transp::preparer_calcul -- compte_nb_bords_rayo != nb_faces_rayonnantes()");
+
+  if (Process::is_sequential())
+    associer_processeur_rayonnant(me());
+  else
+    {
+      if (compte_nb_bords_rayo != 0)
+        {
+          LIST(Nom) collectnoms;
+          for (int i = 0; i < nb_faces_rayonnantes(); i++)
+            if (face_rayonnante(i).ensembles_faces_bord(0).nb_faces_bord() != 0)
+              collectnoms.add(face_rayonnante(i).nom_bord_rayo_lu());
+
+          Cerr << me() << collectnoms << finl;
+
+          // on verifie que l'on a bien tous les noms
+          if (me() == 0)
+            associer_processeur_rayonnant(me());
+          else
+            associer_processeur_rayonnant(-1);
+        }
+      else //tout est ok
+        {
+          Cerr << "On redimenssionne le tableau de faces de bord" << finl;
+          Cerr << "   compte_nb_bords_rayo = " << compte_nb_bords_rayo << finl;
+          Cerr << "   mod_rayo.nb_faces_rayonnantes() = " << nb_faces_rayonnantes() << finl;
+          associer_processeur_rayonnant(-1);
+        }
+    }
+
+  init_matrice_rayo();
+}
+
+void Modele_rayo_transp::mettre_a_jour(double temps)
+{
+  temps_ = temps;
+  calculer_temperatures();
+  calculer_flux_radiatifs();
+}
+
+void Modele_rayo_transp::init_matrice_rayo()
 {
   if (je_suis_maitre())
     {
@@ -536,26 +659,5 @@ void Modele_rayo_transp::preparer_calcul()
           Cerr << "La lecture de la matrice de rayonnement inverse dans le fichier " << finl;
           Cerr << nom_fic_mat_ray_inv_ << " est terminee. Fichier correct " << finl;
         }
-    }
-}
-
-void Modele_rayo_transp::mettre_a_jour(double temps)
-{
-  temps_ = temps;
-  calculer_temperatures();
-  calculer_flux_radiatifs();
-}
-
-void Modele_rayo_transp::discretiser(const Discretisation_base& dis, const Domaine& domaine)
-{
-  for (int i = 0; i < nb_faces_totales(); i++)
-    {
-      Face_rayo_transp& face_rayo = face_rayonnante(i);
-      for (int j = 0; j < face_rayo.nb_ensembles_faces(); j++)
-        if (face_rayo.nom_bord_rayo() != face_rayo.nom_bord_rayo_lu())
-          {
-            Ensemble_faces_rayo_transp& faces_j = face_rayo.ensembles_faces_bord(j);
-            faces_j.lire(face_rayo.nom_bord_rayo_lu(), face_rayo.nom_bord_rayo(), domaine);
-          }
     }
 }

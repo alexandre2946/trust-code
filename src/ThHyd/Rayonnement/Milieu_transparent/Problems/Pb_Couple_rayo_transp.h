@@ -20,23 +20,14 @@
 #include <Probleme_Couple.h>
 #include <TRUST_Ref.h>
 
-class Cond_lim_base;
-class Schema_Temps_base;
-class Discretisation_base;
-
 class Pb_Couple_rayo_transp: public Probleme_Couple
 {
   Declare_instanciable(Pb_Couple_rayo_transp);
 public:
-//  int associer_(Objet_U&) override;
   int postraiter(int force = 1) override;
-
-  void completer();
+  void assoscier_rayo_model_CL();
   void validateTimeStep() override;
   void initialize() override;
-
-  inline Modele_rayo_transp& le_modele_rayo() { return le_modele_de_rayo_.valeur(); }
-
   void associer_modele_rayo_transp(const Modele_rayo_transp& );
 
 protected:
