@@ -76,7 +76,14 @@ void VEF_discretisation::check_param()
   if (dimension != 3 && alphaA_)
     Process::exit("Pa support is only available in 3D.");
   if (!alphaE_ && !alphaS_ && !alphaA_)
-    Process::exit("You must choose at least one support among P0, P1, Pa.");
+    {
+      // P0P1Bulle par defaut avec CL pression forte
+      alphaE_ = true;
+      alphaS_ = true;
+      P1Bulle_ = true;
+      cl_pression_sommet_faible_ = 0;
+      //Process::exit("You must choose at least one support among P0, P1, Pa.");
+    }
   if (alphaA_ && !alphaE_)
     Process::exit("Discretisations Pa or P1+Pa are not yet supported.");
   if (P1Bulle_)

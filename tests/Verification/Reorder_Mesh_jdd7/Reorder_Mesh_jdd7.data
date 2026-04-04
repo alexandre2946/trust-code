@@ -31,7 +31,7 @@ Mailler dom
 
 tetraedriser dom 
 VEFPreP1b dis 
-read dis { P0 P1 changement_de_base_P1bulle 1 
+read dis { 
    reorder { algo Morton
              dump }
 }
