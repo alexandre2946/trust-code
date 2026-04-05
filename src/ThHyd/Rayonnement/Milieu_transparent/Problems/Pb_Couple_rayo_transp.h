@@ -24,14 +24,7 @@ class Pb_Couple_rayo_transp: public Probleme_Couple
 {
   Declare_instanciable(Pb_Couple_rayo_transp);
 public:
-  int postraiter(int force = 1) override;
-  void assoscier_rayo_model_CL();
-  void validateTimeStep() override;
   void initialize() override;
-  void associer_modele_rayo_transp(const Modele_rayo_transp& );
-
-protected:
-  OBS_PTR(Modele_rayo_transp) le_modele_de_rayo_;
 };
 
 #endif /* Pb_Couple_rayo_transp_included */

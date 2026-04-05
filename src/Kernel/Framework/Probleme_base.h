@@ -139,6 +139,7 @@ public:
   virtual void addInputField(Field_base& f) { addInputField_impl(*this, f); }
 
   bool is_coupled() const { return pbc_.non_nul(); }
+  virtual inline bool has_mod_rayo_transp() const { return false; }
 
   int postraiter(int force = 1) override;
   int limpr() const override;

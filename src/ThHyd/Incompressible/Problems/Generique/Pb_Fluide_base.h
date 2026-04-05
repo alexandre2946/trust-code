@@ -30,11 +30,32 @@ class Pb_Fluide_base : public Probleme_base
   Declare_base(Pb_Fluide_base);
 public:
   int expression_predefini(const Motcle& motlu, Nom& expression) override;
-  Entree& lire_radiation_models(Entree& is, Motcle& mot) override;
 
-  inline bool has_mod_rayo_transp() const { return mod_rayo_transp_.non_nul(); }
-  inline Modele_rayo_transp& get_mod_rayo_transp() { assert (mod_rayo_transp_.non_nul()); return mod_rayo_transp_.valeur(); }
-  inline const Modele_rayo_transp& get_mod_rayo_transp() const { assert (mod_rayo_transp_.non_nul()); return mod_rayo_transp_.valeur(); }
+  /* Transparent radiation model */
+  void preparer_calcul() override;
+  int postraiter(int force = 1) override;
+  void validateTimeStep() override;
+
+  Entree& lire_radiation_models(Entree& is, Motcle& mot) override;
+  void assoscier_rayo_model_CL();
+
+  inline bool has_mod_rayo_transp() const override { return mod_rayo_transp_.non_nul(); }
+
+  inline Modele_rayo_transp& get_mod_rayo_transp()
+  {
+    if(mod_rayo_transp_.est_nul())
+      Process::exit("Pb_Fluide_base::get_mod_rayo_transp() -- No transparent radiation model is associated for your problem !!! ");
+
+    return mod_rayo_transp_.valeur();
+  }
+
+  inline const Modele_rayo_transp& get_mod_rayo_transp() const
+  {
+    if(mod_rayo_transp_.est_nul())
+      Process::exit("Pb_Fluide_base::get_mod_rayo_transp() -- No transparent radiation model is associated for your problem !!! ");
+
+    return mod_rayo_transp_.valeur();
+  }
 
 protected:
   OWN_PTR(Modele_rayo_transp) mod_rayo_transp_;

@@ -13,11 +13,8 @@
 *
 *****************************************************************************/
 
-#include <Modele_rayo_transp.h>
 #include <Pb_Couple_rayo_transp.h>
-#include <Paroi_rayo_transp.h>
-#include <Probleme_base.h>
-#include <Fluide_base.h>
+#include <Pb_Fluide_base.h>
 
 Implemente_instanciable(Pb_Couple_rayo_transp, "Pb_Couple_rayo_transp", Probleme_Couple);
 
@@ -27,53 +24,22 @@ Sortie& Pb_Couple_rayo_transp::printOn(Sortie& os) const { return Probleme_Coupl
 
 void Pb_Couple_rayo_transp::initialize()
 {
-  assoscier_rayo_model_CL();
-  le_modele_de_rayo_->preparer_calcul();
-  Probleme_Couple::initialize();
-}
-
-void Pb_Couple_rayo_transp::associer_modele_rayo_transp(const Modele_rayo_transp& mod)
-{
-  if (le_modele_de_rayo_.non_nul())
-    {
-      Cerr << "Error in Pb_Couple_rayo_transp::associer_modele_rayo_transp. It seems that you have another model associated to the problem " << le_nom() << finl;
-      Process::exit();
-    }
-  le_modele_de_rayo_ = mod;
-}
-
-int Pb_Couple_rayo_transp::postraiter(int force)
-{
-  int ok = Probleme_Couple::postraiter(force);
-  if (!ok)
-    return 0;
-
-  return le_modele_de_rayo_->postraiter();
-}
-
-void Pb_Couple_rayo_transp::validateTimeStep()
-{
-  Probleme_Couple::validateTimeStep();
-  le_modele_de_rayo_->mettre_a_jour(presentTime());
-}
-
-void Pb_Couple_rayo_transp::assoscier_rayo_model_CL()
-{
+  int nb_ray_mod_associated = 0;
   for (int l = 0; l < nb_problemes(); l++)
     {
-      Probleme_base& le_pb = ref_cast(Probleme_base, probleme(l));
+      Probleme_base& pb = ref_cast(Probleme_base, probleme(l));
 
-      for (int j = 0; j < le_pb.nombre_d_equations(); j++)
+      if (pb.has_mod_rayo_transp())
         {
-          Domaine_Cl_dis_base& la_zcl = le_pb.equation(j).domaine_Cl_dis();
-          for (int num_cl = 0; num_cl < la_zcl.nb_cond_lim(); num_cl++)
-            {
-              Cond_lim_base& la_cl = la_zcl.les_conditions_limites(num_cl).valeur();
+          nb_ray_mod_associated++;
 
-              Cond_lim_rayo_milieu_transp *la_cl_rayo;
-              if (la_cl.is_bc_rayo_milieu_transp(la_cl_rayo))
-                la_cl_rayo->associer_modele_rayo(le_modele_de_rayo_.valeur());
-            }
+          if (nb_ray_mod_associated > 1)
+            Process::exit("We can not treat at present several associated radiation models ... \n");
+
+          assert (sub_type(Pb_Fluide_base, pb));
+          ref_cast(Pb_Fluide_base, pb).assoscier_rayo_model_CL();
         }
     }
+
+  Probleme_Couple::initialize();
 }

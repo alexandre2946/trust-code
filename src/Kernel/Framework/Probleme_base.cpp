@@ -115,13 +115,10 @@ Sortie& Probleme_base::printOn(Sortie& os) const
 Entree& Probleme_base::readOn(Entree& is)
 {
   Cerr << "Reading of the problem " << le_nom() << finl;
-  Motcle accolade_ouverte("{"), motlu;
+  Motcle motlu;
   is >> motlu;
-  if (motlu != accolade_ouverte)
-    {
-      Cerr << "We expected { to start to read the problem" << finl;
-      Process::exit();
-    }
+  if (motlu != "{")
+    Process::exit("We expected { to start to read the problem !!! \n");
 
   /* 1 : solved_equations + milieu : NEW SYNTAX */
   lire_solved_equations(is);
@@ -146,7 +143,7 @@ Entree& Probleme_base::readOn(Entree& is)
   Cerr << "The read data are coherent" << finl;
 
   /* 6 : gestion sauvegarde/reprise ... */
-  save_restart_.lire_sauvegarde_reprise(is,motlu);
+  save_restart_.lire_sauvegarde_reprise(is, motlu);
 
   return is ;
 }

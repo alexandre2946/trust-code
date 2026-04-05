@@ -13,6 +13,7 @@
 *
 *****************************************************************************/
 
+#include <Cond_lim_rayo_milieu_transp.h>
 #include <Pb_Couple_rayo_transp.h>
 #include <Pb_Fluide_base.h>
 #include <Fluide_base.h>
@@ -34,19 +35,11 @@ Entree& Pb_Fluide_base::lire_radiation_models(Entree& is, Motcle& mot)
       Process::exit();
     }
 
-  // test si c'est un pb couple et si c'est Pb_Couple_rayo_transp !
-  if (!is_coupled())
+  // test si c'est un pb couple de type Pb_Couple_rayo_transp ou pas !
+  if (is_coupled() && !sub_type(Pb_Couple_rayo_transp, pbc_.valeur()))
     {
-      Cerr << "You asked for using a transparent medium radiation model with a problem of type " << que_suis_je() << finl;
-      Cerr << "However, an instance of Pb_Couple_rayo_transp is missing in your data file ... And this is mandatory to solve a radiation problem !" << finl;
-      Cerr << "Please update your data file by adding an instance of Pb_Couple_rayo_transp, associate correctly the problem " << le_nom() << " to it and make sure to solve it at the end !!!" << finl;
-      Process::exit();
-    }
-  else if (!sub_type(Pb_Couple_rayo_transp, pbc_.valeur()))
-    {
-      Cerr << "You asked for using a transparent medium radiation model with a problem of type " << que_suis_je() << finl;
-      Cerr << "However, an instance of Pb_Couple_rayo_transp is missing in your data file ... And this is mandatory to solve a radiation problem !" << finl;
-      Cerr << "Please update your data file by replacing the problem " << que_suis_je() << " of name " << le_nom() << " by the problem Pb_Couple_rayo_transp !!!" << finl;
+      Cerr << "You asked for using a transparent medium radiation model with a coupled problem of type " << pbc_->que_suis_je() << finl;
+      Cerr << "Please update your data file by using instead a coupled problem of type Pb_Couple_rayo_transp ..." << finl;
       Process::exit();
     }
 
@@ -72,9 +65,65 @@ Entree& Pb_Fluide_base::lire_radiation_models(Entree& is, Motcle& mot)
   mod_rayo_transp_.typer(mot.getChar());
   is >> mod_rayo_transp_.valeur();
   mod_rayo_transp_->associer_pb_fluide_rayo(*this);
-  ref_cast(Pb_Couple_rayo_transp, pbc_.valeur()).associer_modele_rayo_transp(mod_rayo_transp_.valeur());
 
   return is;
+}
+
+void Pb_Fluide_base::preparer_calcul()
+{
+  if (mod_rayo_transp_.non_nul() && !is_coupled()) // sinon c'est fait dans Pb_Couple_rayo_transp ...
+    assoscier_rayo_model_CL();
+
+  Probleme_base::preparer_calcul();
+}
+
+int Pb_Fluide_base::postraiter(int force)
+{
+  int ok = Probleme_base::postraiter(force);
+
+  if (!ok)
+    return 0;
+
+  if (mod_rayo_transp_.non_nul())
+    mod_rayo_transp_->postraiter();
+
+  return ok;
+}
+
+void Pb_Fluide_base::validateTimeStep()
+{
+  Probleme_base::validateTimeStep();
+
+  if (mod_rayo_transp_.non_nul())
+    mod_rayo_transp_->mettre_a_jour(presentTime());
+}
+
+void Pb_Fluide_base::assoscier_rayo_model_CL()
+{
+  if (mod_rayo_transp_.est_nul()) return; /* rien a faire */
+
+  // TODO FIXME for now we suppose that we have only one radiation model in the coupled pb ...
+  // see test in Pb_Couple_rayo_transp::initialize
+  const int nb_pbs = is_coupled() ? pbc_->nb_problemes() : 1;
+  for (int l = 0; l < nb_pbs; l++)
+    {
+      Probleme_base& le_pb = is_coupled() ? ref_cast(Probleme_base, pbc_->probleme(l)) : *this;
+
+      for (int j = 0; j < le_pb.nombre_d_equations(); j++)
+        {
+          Domaine_Cl_dis_base& la_zcl = le_pb.equation(j).domaine_Cl_dis();
+          for (int num_cl = 0; num_cl < la_zcl.nb_cond_lim(); num_cl++)
+            {
+              Cond_lim_base& la_cl = la_zcl.les_conditions_limites(num_cl).valeur();
+
+              Cond_lim_rayo_milieu_transp *la_cl_rayo;
+              if (la_cl.is_bc_rayo_milieu_transp(la_cl_rayo))
+                la_cl_rayo->associer_modele_rayo(mod_rayo_transp_.valeur());
+            }
+        }
+    }
+
+  mod_rayo_transp_->preparer_calcul();
 }
 
 int Pb_Fluide_base::expression_predefini(const Motcle& motlu, Nom& expression)
