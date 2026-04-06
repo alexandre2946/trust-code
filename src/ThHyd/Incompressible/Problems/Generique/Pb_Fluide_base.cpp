@@ -91,27 +91,6 @@ void Pb_Fluide_base::assoscier_rayo_model_CL()
 {
   if (mod_rayo_transp_.est_nul()) return; /* rien a faire */
 
-  // TODO FIXME for now we suppose that we have only one radiation model in the coupled pb ...
-  // see test in Probleme_Couple::initialize
-  const int nb_pbs = is_coupled() ? pbc_->nb_problemes() : 1;
-  for (int l = 0; l < nb_pbs; l++)
-    {
-      Probleme_base& le_pb = is_coupled() ? ref_cast(Probleme_base, pbc_->probleme(l)) : *this;
-
-      for (int j = 0; j < le_pb.nombre_d_equations(); j++)
-        {
-          Domaine_Cl_dis_base& la_zcl = le_pb.equation(j).domaine_Cl_dis();
-          for (int num_cl = 0; num_cl < la_zcl.nb_cond_lim(); num_cl++)
-            {
-              Cond_lim_base& la_cl = la_zcl.les_conditions_limites(num_cl).valeur();
-
-              Cond_lim_rayo_milieu_transp *la_cl_rayo;
-              if (la_cl.is_bc_rayo_milieu_transp(la_cl_rayo))
-                la_cl_rayo->associer_modele_rayo(mod_rayo_transp_.valeur());
-            }
-        }
-    }
-
   mod_rayo_transp_->preparer_calcul();
 }
 

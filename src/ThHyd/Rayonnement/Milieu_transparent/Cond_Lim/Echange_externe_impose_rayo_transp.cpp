@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,6 +14,7 @@
 *****************************************************************************/
 
 #include <Echange_externe_impose_rayo_transp.h>
+#include <Pb_Fluide_base.h>
 #include <Front_VF.h>
 
 Implemente_instanciable(Echange_externe_impose_rayo_transp, "Paroi_Echange_externe_impose_rayo_transp", Echange_externe_impose);
@@ -68,6 +69,23 @@ Entree& Echange_externe_impose_rayo_transp::readOn(Entree& is)
     }
 
   return is;
+}
+
+int Echange_externe_impose_rayo_transp::initialiser(double temps)
+{
+  assert(le_modele_rayo_.est_nul());
+
+  // on recupere le modele rayo ... !
+  const Probleme_base& this_pb = domaine_Cl_dis().equation().probleme();
+  if (this_pb.milieu().is_rayo_transp())
+    {
+      assert(sub_type(Pb_Fluide_base, this_pb));
+      le_modele_rayo_ = ref_cast(Pb_Fluide_base, this_pb).get_mod_rayo_transp();
+    }
+  else
+    Process::exit("Big issue in Echange_externe_impose_rayo_transp::initialiser \n");
+
+  return Echange_externe_impose::initialiser(temps);
 }
 
 void Echange_externe_impose_rayo_transp::completer()

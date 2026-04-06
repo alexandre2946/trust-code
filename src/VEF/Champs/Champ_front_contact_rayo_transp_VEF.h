@@ -49,7 +49,6 @@ public:
 private:
   DoubleVect flux_radiatif_;
   OBS_PTR(Modele_rayo_transp) le_modele_rayo_;
-
   inline const Modele_rayo_transp& modele_rayo() const { return le_modele_rayo_; }
 };
 

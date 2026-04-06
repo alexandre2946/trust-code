@@ -24,6 +24,7 @@ class Echange_contact_rayo_transp_VDF: public Cond_lim_rayo_milieu_transp, publi
   Declare_instanciable(Echange_contact_rayo_transp_VDF);
 public:
 
+  int initialiser(double temps) override;
   void completer() override;
   void mettre_a_jour(double) override;
   void calculer_Teta_paroi(DoubleTab& tab_p, const DoubleTab& mon_h, const DoubleTab& autre_h, int is_pb_fluide, double temps) override;

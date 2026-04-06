@@ -422,14 +422,17 @@ void Modele_rayo_transp::preparer_calcul()
   for (int i = 0; i < nb_faces_totales(); i++)
     if (!face_rayonnante(i).ensembles_faces_bord(0).is_ok() && (face_rayonnante(i).emissivite() != -1))
       {
-        Cerr << "Le bord " << face_rayonnante(i).nom_bord_rayo_lu() << " n'a pas ete asssocie a une condition limite rayonnante." << finl;
-        Cerr << "Soit vous mettez une condition limite rayonnante pour " << face_rayonnante(i).nom_bord_rayo() << finl;
-        Cerr << "Soit vous affectez une emissivite de -1 a ce bord." << finl;
+        Cerr << finl << "ATTENTION !!! ERROR !!! The boundary " << face_rayonnante(i).nom_bord_rayo_lu() << " is not associated to a radiation boundary condition !!!" << finl;
+        Cerr << "You have two options : either use a radiation BC for the boundary " << face_rayonnante(i).nom_bord_rayo() << " or specify the emissivity to -1 at this boundary ..." << finl;
         Cerr << finl;
       }
 
   if (compte_nb_bords_rayo != nb_faces_rayonnantes())
-    Process::exit("Error in Modele_rayo_transp::preparer_calcul -- compte_nb_bords_rayo != nb_faces_rayonnantes()");
+    {
+      Cerr << finl << "Error in Modele_rayo_transp::preparer_calcul -- compte_nb_bords_rayo != nb_faces_rayonnantes() !!!" << finl;
+      Cerr << "Verify the boundary conditions you use in the problem " << pb_fluide_rayo_->le_nom() << " !!!" << finl;
+      Process::exit("It is a radiation problem and it seems you are using a non-radiation BC ... \n");
+    }
 
   if (Process::is_sequential())
     associer_processeur_rayonnant(me());

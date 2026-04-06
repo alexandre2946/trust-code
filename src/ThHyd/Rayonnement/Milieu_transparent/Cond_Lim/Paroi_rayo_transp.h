@@ -24,6 +24,7 @@ class Paroi_rayo_transp: public Cond_lim_rayo_milieu_transp, public Neumann_paro
   Declare_base(Paroi_rayo_transp);
 public:
 
+  int initialiser(double temps) override;
   double flux_impose(int i) const override;
   double flux_impose(int i, int j) const override;
   int compatible_avec_eqn(const Equation_base&) const override { return 1; }

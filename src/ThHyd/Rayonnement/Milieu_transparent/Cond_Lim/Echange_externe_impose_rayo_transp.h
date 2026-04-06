@@ -24,6 +24,7 @@ class Echange_externe_impose_rayo_transp : public Cond_lim_rayo_milieu_transp, p
   Declare_instanciable(Echange_externe_impose_rayo_transp);
 public :
 
+  int initialiser(double temps) override;
   void completer() override;
   void mettre_a_jour(double ) override;
   void calculer_Teta_i();

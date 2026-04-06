@@ -15,6 +15,7 @@
 
 #include <Temperature_imposee_paroi_rayo_transp.h>
 #include <Champ_front_contact_rayo_transp_VEF.h>
+#include <Pb_Fluide_base.h>
 #include <Equation_base.h>
 #include <Domaine_VEF.h>
 
@@ -23,6 +24,21 @@ Implemente_instanciable(Temperature_imposee_paroi_rayo_transp, "Paroi_temperatur
 Sortie& Temperature_imposee_paroi_rayo_transp::printOn(Sortie& is) const { return is; }
 
 Entree& Temperature_imposee_paroi_rayo_transp::readOn(Entree& s) { return Temperature_imposee_paroi::readOn(s); }
+
+int Temperature_imposee_paroi_rayo_transp::initialiser(double temps)
+{
+  assert(le_modele_rayo_.est_nul());
+
+  // on recupere le modele rayo seulement si pb fluide et rayo ... !
+  const Probleme_base& this_pb = domaine_Cl_dis().equation().probleme();
+  if (this_pb.milieu().is_rayo_transp())
+    {
+      assert(sub_type(Pb_Fluide_base, this_pb));
+      le_modele_rayo_ = ref_cast(Pb_Fluide_base, this_pb).get_mod_rayo_transp();
+    }
+
+  return Temperature_imposee_paroi::initialiser(temps);
+}
 
 void Temperature_imposee_paroi_rayo_transp::completer()
 {
@@ -49,18 +65,5 @@ void Temperature_imposee_paroi_rayo_transp::calculer_Teta_i(double temps)
 
   const Front_VF& front_vf = ref_cast(Front_VF, frontiere_dis());
   for (int numfa = 0; numfa < front_vf.nb_faces(); numfa++)
-    {
-      teta_i_[numfa] = val_imp(numfa);
-    }
-}
-
-void Temperature_imposee_paroi_rayo_transp::associer_modele_rayo(const Modele_rayo_transp& mod)
-{
-  le_modele_rayo_ = mod;
-
-  if (sub_type(Champ_front_contact_rayo_transp_VEF, le_champ_front.valeur()))
-    {
-      Champ_front_contact_rayo_transp_VEF& Ch_contact = ref_cast(Champ_front_contact_rayo_transp_VEF, le_champ_front.valeur());
-      Ch_contact.associer_modele_rayo(le_modele_rayo_.valeur());
-    }
+    teta_i_[numfa] = val_imp(numfa);
 }

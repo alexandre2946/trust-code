@@ -28,7 +28,6 @@ public:
 
   virtual void completer();
   void preparer_surface(const Frontiere_dis_base&, const Domaine_Cl_dis_base&);
-  virtual void associer_modele_rayo(const Modele_rayo_transp&);
 
   inline virtual double surface(int numfa) const { return surf_i_[numfa]; }
   inline virtual double teta_i(int numfa) const { return teta_i_[numfa]; }

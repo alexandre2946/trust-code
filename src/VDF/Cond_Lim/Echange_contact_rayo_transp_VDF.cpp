@@ -13,25 +13,52 @@
 *
 *****************************************************************************/
 
-#include <Modele_rayo_transp.h>
 #include <Echange_contact_rayo_transp_VDF.h>
+#include <Modele_rayo_transp.h>
 #include <Champ_front_uniforme.h>
 #include <Champ_front_calc.h>
 #include <Champ_Uniforme.h>
-#include <Probleme_base.h>
+#include <Pb_Fluide_base.h>
 #include <Domaine_VDF.h>
 #include <Debog.h>
 
 Implemente_instanciable(Echange_contact_rayo_transp_VDF, "Echange_contact_rayo_transp_VDF", Echange_contact_VDF);
 
-Sortie& Echange_contact_rayo_transp_VDF::printOn(Sortie& is) const
-{
-  return is;
-}
+Sortie& Echange_contact_rayo_transp_VDF::printOn(Sortie& is) const { return is; }
 
-Entree& Echange_contact_rayo_transp_VDF::readOn(Entree& s)
+Entree& Echange_contact_rayo_transp_VDF::readOn(Entree& s) { return Echange_contact_VDF::readOn(s); }
+
+int Echange_contact_rayo_transp_VDF::initialiser(double temps)
 {
-  return Echange_contact_VDF::readOn(s);
+  assert (le_modele_rayo_.est_nul());
+
+  // on recupere le modele rayo ... mais faut le bon probleme !
+  // XXX pas encore entrer dans Echange_contact_VDF::initialiser ... donc faut faire des choses a la main ici ...
+  const Probleme_base& this_pb = domaine_Cl_dis().equation().probleme();
+  if (this_pb.milieu().is_rayo_transp()) // c'est bon on est côte fluide !!
+    {
+      assert (sub_type(Pb_Fluide_base, this_pb));
+      le_modele_rayo_ =ref_cast(Pb_Fluide_base, this_pb).get_mod_rayo_transp();
+    }
+  else // l'autre pb !
+    {
+      // const Probleme_base& other_pb = ref_cast(Champ_front_calc, T_autre_pb()).inconnue().equation().probleme(); // encore tot deso ...
+      const Probleme_base& other_pb = ref_cast(Probleme_base, Interprete::objet(nom_autre_pb_));
+      if (other_pb.milieu().is_rayo_transp()) // pb fluide trouve !!
+        {
+          assert (sub_type(Pb_Fluide_base, other_pb));
+          le_modele_rayo_ = ref_cast(Pb_Fluide_base, other_pb).get_mod_rayo_transp();
+        }
+      else
+        {
+          Cerr << finl << "Big issue in Echange_contact_rayo_transp_VDF::initialiser !!!" << finl;
+          Cerr << "It seems that you defined a radiation contact BC between the boundaries " << frontiere_dis().frontiere().le_nom() << " and " << nom_bord << finl;
+          Cerr << "of problems " << this_pb.le_nom() << " and " << nom_autre_pb_ << " , but neither is a fluid radiation problem !!!" << finl;
+          Process::exit("Please fix your data file and use a classical paroi_contact BC for these boundaries ... \n");
+        }
+    }
+
+  return Echange_contact_VDF::initialiser(temps);
 }
 
 void Echange_contact_rayo_transp_VDF::completer()
@@ -40,20 +67,16 @@ void Echange_contact_rayo_transp_VDF::completer()
   preparer_surface(frontiere_dis(), domaine_Cl_dis());
 
   // calcul de teta_i_ 0
-
   const Equation_base& mon_eqn = domaine_Cl_dis().equation();
   const DoubleTab& mon_inco = mon_eqn.inconnue().valeurs();
   const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF, domaine_Cl_dis().domaine_dis());
   const Front_VF& ma_front_vf = ref_cast(Front_VF, frontiere_dis());
-
-  int ndeb = ma_front_vf.num_premiere_face();
-
-  int nb_faces_bord = ma_front_vf.nb_faces();
+  const int ndeb = ma_front_vf.num_premiere_face();
+  const int nb_faces_bord = ma_front_vf.nb_faces();
 
   for (int numfa = 0; numfa < nb_faces_bord; numfa++)
     {
-
-      int ind_fac = numfa + ndeb;
+      const int ind_fac = numfa + ndeb;
       int elem;
       if (ma_zvdf.face_voisins(ind_fac, 0) != -1)
         elem = ma_zvdf.face_voisins(ind_fac, 0);
@@ -63,7 +86,6 @@ void Echange_contact_rayo_transp_VDF::completer()
       teta_i_(numfa) = mon_inco(elem);
     }
   return;
-
 }
 
 void Echange_contact_rayo_transp_VDF::mettre_a_jour(double temps)
@@ -71,7 +93,7 @@ void Echange_contact_rayo_transp_VDF::mettre_a_jour(double temps)
   //  Echange_contact_VDF::mettre_a_jour(temps);
   Champ_front_calc& ch = ref_cast(Champ_front_calc, T_autre_pb());
   const Milieu_base& le_milieu = ch.milieu();
-  int nb_comp = le_milieu.conductivite().nb_comp();
+  const int nb_comp = le_milieu.conductivite().nb_comp();
 
   if (num_premiere_face_dans_pb_fluide_ == -1)
     {
@@ -100,15 +122,11 @@ void Echange_contact_rayo_transp_VDF::mettre_a_jour(double temps)
       if (m != 1)
         {
           Cerr << "gros pb " << que_suis_je() << finl;
-          assert(0);
           Process::exit();
         }
 
       if (frontiere_dis().le_nom() != chcal.front_dis().le_nom())
-        {
-          Cerr << "Le nom de bord doit etre le meme pour les deux domaines au niveau du raccord" << finl;
-          Process::exit();
-        }
+          Process::exit("Le nom de bord doit etre le meme pour les deux domaines au niveau du raccord");
 
       const Front_VF& frontvf = ref_cast(Front_VF, eqn->domaine_dis().frontiere_dis(frontiere_dis().le_nom()));
       num_premiere_face_dans_pb_fluide_ = frontvf.num_premiere_face();

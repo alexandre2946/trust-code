@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,12 +14,12 @@
 *****************************************************************************/
 
 #include <Champ_front_contact_rayo_transp_VEF.h>
-#include <Champ_Inc_base.h>
-#include <Equation_base.h>
 #include <Schema_Temps_base.h>
-#include <Domaine_VEF.h>
-#include <Probleme_base.h>
+#include <Pb_Fluide_base.h>
+#include <Champ_Inc_base.h>
 #include <Pb_Conduction.h>
+#include <Equation_base.h>
+#include <Domaine_VEF.h>
 
 Implemente_instanciable(Champ_front_contact_rayo_transp_VEF, "Champ_front_contact_rayo_transp_VEF", Champ_front_contact_VEF);
 
@@ -33,10 +33,36 @@ Entree& Champ_front_contact_rayo_transp_VEF::readOn(Entree& is)
 
 int Champ_front_contact_rayo_transp_VEF::initialiser(double temps, const Champ_Inc_base& inco)
 {
+  assert (le_modele_rayo_.est_nul());
+
+  // on recupere le modele rayo ... mais faut le bon probleme !
+  // XXX pas encore entrer dans Champ_front_contact_VEF::initialiser ... donc faut faire des choses a la main ici ...
+  const Probleme_base& pb1 = ref_cast(Probleme_base, Interprete::objet(nom_pb1));
+  if (pb1.milieu().is_rayo_transp()) // c'est bon on est côte fluide !!
+    {
+      assert (sub_type(Pb_Fluide_base, pb1));
+      le_modele_rayo_ =ref_cast(Pb_Fluide_base, pb1).get_mod_rayo_transp();
+    }
+  else // l'autre pb ...
+    {
+      const Probleme_base& pb2 = ref_cast(Probleme_base, Interprete::objet(nom_pb2));
+      if (pb2.milieu().is_rayo_transp()) // pb fluide trouve !!
+        {
+          assert (sub_type(Pb_Fluide_base, pb2));
+          le_modele_rayo_ =ref_cast(Pb_Fluide_base, pb2).get_mod_rayo_transp();
+        }
+      else
+        {
+          Cerr << finl << "Big issue in Champ_front_contact_rayo_transp_VEF::initialiser !!!" << finl;
+          Cerr << "It seems that you defined a radiation contact BC between the boundaries " << nom_bord1 << " and " << nom_bord2 << finl;
+          Cerr << "of problems " << nom_pb1 << " and " << nom_pb2 << " , but neither is a fluid radiation problem !!!" << finl;
+          Process::exit("Please fix your data file and use a classical paroi_contact BC for these boundaries ... \n");
+        }
+    }
+
   int nb_faces = frontiere_dis().frontiere().nb_faces();
   flux_radiatif_.resize(nb_faces);
-  int ok = Champ_front_contact_VEF::initialiser(temps, inco);
-  return ok;
+  return Champ_front_contact_VEF::initialiser(temps, inco);
 }
 
 Champ_front_base& Champ_front_contact_rayo_transp_VEF::affecter_(const Champ_front_base& ch)
@@ -48,14 +74,13 @@ void Champ_front_contact_rayo_transp_VEF::mettre_a_jour_flux_radiatif()
 {
   if (is_conduction)   // Le modele est connu par l'autre probleme
     {
-      Champ_front_contact_rayo_transp_VEF& ch_fr_rayo = ref_cast(Champ_front_contact_rayo_transp_VEF, ch_fr_autre_pb.valeur());
       // Calcul du flux radiatif sur la frontiere de l'autre probleme
       DoubleTab flux_radiatif_autre_pb;
       int nb_faces = fr_vf_autre_pb->frontiere().nb_faces();
       int ndeb = fr_vf_autre_pb->frontiere().num_premiere_face();
       flux_radiatif_autre_pb.resize(nb_faces);
       for (int fac_front = 0; fac_front < nb_faces; fac_front++)
-        flux_radiatif_autre_pb(fac_front) = ch_fr_rayo.modele_rayo().flux_radiatif(fac_front + ndeb);
+        flux_radiatif_autre_pb(fac_front) = le_modele_rayo_->flux_radiatif(fac_front + ndeb);
       // Le rapatrier
       trace_face_raccord(fr_vf_autre_pb.valeur(), flux_radiatif_autre_pb, flux_radiatif_);
     }
@@ -77,23 +102,21 @@ void Champ_front_contact_rayo_transp_VEF::mettre_a_jour(double temps)
 void Champ_front_contact_rayo_transp_VEF::calculer_coeffs_echange(double temps)
 {
   Champ_front_contact_VEF::calculer_coeffs_echange(temps);
+
   // on verifie que le couplage est bien rayonnant
-  int est_rayonnant = 1;
   const Nom& nom_pb_rayonnant = le_modele_rayo_->nom_pb_rayonnant();
 
   // le pb rayonnant est aucun des 2 problemes le couplage est non rayonnant
   if ((nom_pb_rayonnant != nom_pb1) && (nom_pb_rayonnant != nom_pb2))
-    est_rayonnant = 0;
+    Process::exit("Error in Champ_front_contact_rayo_transp_VEF::calculer_coeffs_echange !! You should not be here since the problem is not a radiation problem !!!");
 
-  if (est_rayonnant)
-    {
-      // Calcul et stockage du flux radiatif
-      mettre_a_jour_flux_radiatif();
-      // On modifiee les gradients pour prendre en compte le flux radiatif
-      DoubleVect gradient_num_transf_autre_pb(gradient_num_transf);
-      modifie_gradients_pour_rayonnement(gradient_num_transf, gradient_num_transf_autre_pb);
-    }
+  // Calcul et stockage du flux radiatif
+  mettre_a_jour_flux_radiatif();
+  // On modifiee les gradients pour prendre en compte le flux radiatif
+  DoubleVect gradient_num_transf_autre_pb(gradient_num_transf);
+  modifie_gradients_pour_rayonnement(gradient_num_transf, gradient_num_transf_autre_pb);
 }
+
 void Champ_front_contact_rayo_transp_VEF::calculer_temperature_bord(double temps)
 {
   // codage priche de Champ_front_contact_VEF::mettre_a_jour
