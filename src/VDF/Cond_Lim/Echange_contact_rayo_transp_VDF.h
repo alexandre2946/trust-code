@@ -30,7 +30,6 @@ public:
   void calculer_Teta_paroi(DoubleTab& tab_p, const DoubleTab& mon_h, const DoubleTab& autre_h, int is_pb_fluide, double temps) override;
   void calculer_Teta_equiv(DoubleTab& Teta_equiv, const DoubleTab& mon_h, const DoubleTab& autre_h, int is_pb_fluide, double temps) override;
 
-  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
   inline bool is_bc_rayo_milieu_transp(Cond_lim_rayo_milieu_transp *& la_cl_rayo) override
   {
     la_cl_rayo = static_cast<Cond_lim_rayo_milieu_transp*>(this);

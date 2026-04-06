@@ -26,9 +26,8 @@ public:
 
   int initialiser(double temps) override;
   void completer() override;
-  void mettre_a_jour(double temps) override;
+  void mettre_a_jour(double temps) override { calculer_Teta_i(temps); }
   void calculer_Teta_i(double temps);
-  int compatible_avec_eqn(const Equation_base&) const override { return 1; }
 
   inline bool is_bc_rayo_milieu_transp(Cond_lim_rayo_milieu_transp *& la_cl_rayo) override
   {

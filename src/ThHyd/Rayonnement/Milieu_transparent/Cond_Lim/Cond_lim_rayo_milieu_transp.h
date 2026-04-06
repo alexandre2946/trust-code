@@ -35,6 +35,9 @@ public:
 protected:
   DoubleVect surf_i_, teta_i_;
   OBS_PTR(Modele_rayo_transp) le_modele_rayo_;
+
+  void error_pb_name(const Nom& nom_class, const Nom& nom_pb, const Nom& nom_pb_ray);
+  void error_non_rad_bc(const Nom& nom_class, const Nom& nom_pb, const Nom& nom_bord, const Nom& other_type);
 };
 
 #endif /* Cond_lim_rayo_milieu_transp_included */

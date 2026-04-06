@@ -29,13 +29,23 @@ int Frontiere_ouverte_temperature_imposee_rayo_transp::initialiser(double temps)
 
   // on recupere le modele rayo ... !
   const Probleme_base& this_pb = domaine_Cl_dis().equation().probleme();
-  if (this_pb.milieu().is_rayo_transp())
+  if (sub_type(Pb_Fluide_base, this_pb))
     {
-      assert(sub_type(Pb_Fluide_base, this_pb));
-      le_modele_rayo_ = ref_cast(Pb_Fluide_base, this_pb).get_mod_rayo_transp();
+      if (this_pb.milieu().is_rayo_transp())
+        {
+          le_modele_rayo_ = ref_cast(Pb_Fluide_base, this_pb).get_mod_rayo_transp();
+
+          if (le_modele_rayo_->nom_pb_rayonnant() != this_pb.le_nom())
+            error_pb_name(que_suis_je(), this_pb.le_nom(), le_modele_rayo_->nom_pb_rayonnant());
+        }
+      else
+        error_non_rad_bc(que_suis_je(), this_pb.le_nom(), frontiere_dis().frontiere().le_nom(), "frontiere_ouverte_temperature_imposee");
     }
   else
-    Process::exit("Big issue in Frontiere_ouverte_temperature_imposee_rayo_transp::initialiser \n");
+    {
+      Cerr << "The BC " << que_suis_je() << " should be associated to a fluid problem and not a a one of type " << this_pb.que_suis_je() << " !!!" << finl;
+      Process::exit();
+    }
 
   return Entree_fluide_temperature_imposee::initialiser(temps);
 }

@@ -31,10 +31,17 @@ int Temperature_imposee_paroi_rayo_transp::initialiser(double temps)
 
   // on recupere le modele rayo seulement si pb fluide et rayo ... !
   const Probleme_base& this_pb = domaine_Cl_dis().equation().probleme();
-  if (this_pb.milieu().is_rayo_transp())
+  if (sub_type(Pb_Fluide_base, this_pb)) // sinon Pb_conduction par exemple ;)
     {
-      assert(sub_type(Pb_Fluide_base, this_pb));
-      le_modele_rayo_ = ref_cast(Pb_Fluide_base, this_pb).get_mod_rayo_transp();
+      if (this_pb.milieu().is_rayo_transp())
+        {
+          le_modele_rayo_ = ref_cast(Pb_Fluide_base, this_pb).get_mod_rayo_transp();
+
+          if (le_modele_rayo_->nom_pb_rayonnant() != this_pb.le_nom())
+            error_pb_name(que_suis_je(), this_pb.le_nom(), le_modele_rayo_->nom_pb_rayonnant());
+        }
+      else
+        error_non_rad_bc(que_suis_je(), this_pb.le_nom(), frontiere_dis().frontiere().le_nom(), "temperature_imposee_paroi");
     }
 
   return Temperature_imposee_paroi::initialiser(temps);
@@ -44,11 +51,6 @@ void Temperature_imposee_paroi_rayo_transp::completer()
 {
   Temperature_imposee_paroi::completer();
   preparer_surface(frontiere_dis(), domaine_Cl_dis());
-}
-
-void Temperature_imposee_paroi_rayo_transp::mettre_a_jour(double temps)
-{
-  calculer_Teta_i(temps);
 }
 
 void Temperature_imposee_paroi_rayo_transp::calculer_Teta_i(double temps)

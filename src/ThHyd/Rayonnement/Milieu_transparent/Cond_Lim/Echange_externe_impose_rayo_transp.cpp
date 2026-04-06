@@ -23,6 +23,9 @@ Sortie& Echange_externe_impose_rayo_transp::printOn(Sortie& is) const { return i
 
 Entree& Echange_externe_impose_rayo_transp::readOn(Entree& is)
 {
+  if (app_domains.size() == 0)
+    app_domains = { Motcle("Thermique"), Motcle("indetermine") };
+
   Motcle motlu;
   Motcles les_motcles(2);
   {
@@ -77,13 +80,18 @@ int Echange_externe_impose_rayo_transp::initialiser(double temps)
 
   // on recupere le modele rayo ... !
   const Probleme_base& this_pb = domaine_Cl_dis().equation().probleme();
-  if (this_pb.milieu().is_rayo_transp())
+  if (sub_type(Pb_Fluide_base, this_pb)) // sinon Pb_conduction par exemple ;)
     {
-      assert(sub_type(Pb_Fluide_base, this_pb));
-      le_modele_rayo_ = ref_cast(Pb_Fluide_base, this_pb).get_mod_rayo_transp();
+      if (this_pb.milieu().is_rayo_transp())
+        {
+          le_modele_rayo_ = ref_cast(Pb_Fluide_base, this_pb).get_mod_rayo_transp();
+
+          if (le_modele_rayo_->nom_pb_rayonnant() != this_pb.le_nom())
+            error_pb_name(que_suis_je(), this_pb.le_nom(), le_modele_rayo_->nom_pb_rayonnant());
+        }
+      else
+        error_non_rad_bc(que_suis_je(), this_pb.le_nom(), frontiere_dis().frontiere().le_nom(), "paroi_echange_externe_impose");
     }
-  else
-    Process::exit("Big issue in Echange_externe_impose_rayo_transp::initialiser \n");
 
   return Echange_externe_impose::initialiser(temps);
 }

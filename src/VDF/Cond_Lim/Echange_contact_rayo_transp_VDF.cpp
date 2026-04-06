@@ -54,7 +54,7 @@ int Echange_contact_rayo_transp_VDF::initialiser(double temps)
           Cerr << finl << "Big issue in Echange_contact_rayo_transp_VDF::initialiser !!!" << finl;
           Cerr << "It seems that you defined a radiation contact BC between the boundaries " << frontiere_dis().frontiere().le_nom() << " and " << nom_bord << finl;
           Cerr << "of problems " << this_pb.le_nom() << " and " << nom_autre_pb_ << " , but neither is a fluid radiation problem !!!" << finl;
-          Process::exit("Please fix your data file and use a classical paroi_contact BC for these boundaries ... \n");
+          Process::exit("Please fix your data file and use the classical paroi_contact BC for these boundaries ... \n");
         }
     }
 
@@ -126,7 +126,7 @@ void Echange_contact_rayo_transp_VDF::mettre_a_jour(double temps)
         }
 
       if (frontiere_dis().le_nom() != chcal.front_dis().le_nom())
-          Process::exit("Le nom de bord doit etre le meme pour les deux domaines au niveau du raccord");
+        Process::exit("Le nom de bord doit etre le meme pour les deux domaines au niveau du raccord");
 
       const Front_VF& frontvf = ref_cast(Front_VF, eqn->domaine_dis().frontiere_dis(frontiere_dis().le_nom()));
       num_premiere_face_dans_pb_fluide_ = frontvf.num_premiere_face();

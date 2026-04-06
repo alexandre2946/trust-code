@@ -20,8 +20,7 @@
 
 void Cond_lim_rayo_milieu_transp::completer()
 {
-  Cerr << "Cond_lim_rayo_milieu_transp::doit etre surchargee" << finl;
-  Process::exit();
+  Process::exit("Cond_lim_rayo_milieu_transp::doit etre surchargee !!! \n");
 }
 
 void Cond_lim_rayo_milieu_transp::preparer_surface(const Frontiere_dis_base& fr, const Domaine_Cl_dis_base& zcl)
@@ -37,4 +36,20 @@ void Cond_lim_rayo_milieu_transp::preparer_surface(const Frontiere_dis_base& fr,
   const Domaine_VF& domaine = ref_cast(Domaine_VF, zcl.domaine_dis());
   for (int numfa = 0; numfa < nb_faces_bord; numfa++)
     surf_i_[numfa] = domaine.face_surfaces(numfa + ndeb);
+}
+
+void Cond_lim_rayo_milieu_transp::error_pb_name(const Nom& nom_class, const Nom& nom_pb, const Nom& nom_pb_ray)
+{
+  Cerr << finl << "Big issue in " << nom_class << "::initialiser !!!" << finl;
+  Cerr << "The problem " << nom_pb << " is not the one assosciated to the model !!! It should be " << nom_pb_ray << " !!!" << finl;
+  Process::exit();
+}
+
+void Cond_lim_rayo_milieu_transp::error_non_rad_bc(const Nom& nom_class, const Nom& nom_pb, const Nom& nom_bord, const Nom& other_type)
+{
+  Cerr << finl << "Big issue in " << nom_class << "::initialiser !!!" << finl;
+  Cerr << "It seems that you defined a radiation contact BC at the boundary " << nom_bord << finl;
+  Cerr << "of the problem " << nom_pb << ", but this problem is not a radiation problem !!!" << finl;
+  Cerr << "Please fix your data file and use the " << other_type << " BC ..." << finl;
+  Process::exit();
 }
