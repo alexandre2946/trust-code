@@ -36,10 +36,9 @@ public:
   int postraiter(int force = 1) override;
   void validateTimeStep() override;
 
-  Entree& lire_radiation_models(Entree& is, Motcle& mot) override;
-  void assoscier_rayo_model_CL();
-
-  inline bool has_mod_rayo_transp() const override { return mod_rayo_transp_.non_nul(); }
+  Entree& lire_radiation_models(Entree& is, Motcle& mot) override final;
+  void assoscier_rayo_model_CL() override final;
+  inline bool has_mod_rayo_transp() const override final { return mod_rayo_transp_.non_nul(); }
 
   inline Modele_rayo_transp& get_mod_rayo_transp()
   {

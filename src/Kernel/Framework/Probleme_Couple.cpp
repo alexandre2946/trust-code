@@ -71,8 +71,6 @@ double Probleme_Couple::computeTimeStep(bool& stop) const
   return dt_;
 }
 
-
-
 bool Probleme_Couple::solveTimeStep()
 {
   // Trigger domain-specific time step logic at most once per distinct domain,
@@ -187,7 +185,6 @@ bool Probleme_Couple_Point_Fixe::solveTimeStep()
   return true;
 }
 
-
 bool Probleme_Couple::iterateTimeStep(bool& converged)
 {
   bool ok=true;
@@ -220,15 +217,11 @@ bool Probleme_Couple::iterateTimeStep(bool& converged)
   return ok;
 }
 
-
-
 ////////////////////////////////////////////////////////
 //                                                    //
 // Fin de l'implementation de l'interface de Problem  //
 //                                                    //
 ////////////////////////////////////////////////////////
-
-
 
 Entree& Probleme_Couple::readOn(Entree& is)
 {
@@ -284,7 +277,6 @@ Entree& Probleme_Couple::readOn(Entree& is)
   return is;
 }
 
-
 /*! @brief Surcharge Objet_U::printOn(Sortie&) Imprime les problemes couples sur un flot de sortie.
  *
  * @param (Sortie& os) le flot de sortie sur lequel imprimer
@@ -303,14 +295,10 @@ Sortie& Probleme_Couple_Point_Fixe::printOn(Sortie& os) const { return Probleme_
 
 bool Probleme_Couple::updateGivenFields()
 {
-
   // Pas de champs provenant de l'exterieur du couplage.
   // Les echanges internes se font pendant iterateTimeStep.
-
   return true;
-
 }
-
 
 /*! @brief Ajoute un probleme a la liste des problemes couples.
  *
@@ -346,18 +334,27 @@ void Probleme_Couple::ajouter(Probleme_base& pb)
 }
 void Probleme_Couple::initialize()
 {
-  for (int i=0; i<nb_problemes(); i++)
+  // On attribue la valeur 1 a schema_impr_ pour le schema du probleme 0 et 0 pour les autres. Un seul schema doit imprimer.
+  // on initialise aussi les CL rayo si c'est un probleme de rayonnement transparent ...
+  int nb_ray_mod_associated = 0;
+  for (int i = 0; i < nb_problemes(); i++)
     {
-      Probleme_base& pb=ref_cast(Probleme_base,probleme(i));
-      //On attribue la valeur 1 a schema_impr_ pour le schema du probleme 0
-      //et 0 pour les autres. Un seul schema doit imprimer.
-      pb.schema_temps().schema_impr()=(i==0);
+      Probleme_base& pb = ref_cast(Probleme_base, probleme(i));
+      pb.schema_temps().schema_impr() = (i == 0);
+
+      if (pb.has_mod_rayo_transp())
+        {
+          nb_ray_mod_associated++;
+
+          if (nb_ray_mod_associated > 1)
+            Process::exit("We can not treat at present several associated radiation models ... \n");
+
+          pb.assoscier_rayo_model_CL();
+        }
     }
 
   Couplage_U::initialize();
-
 }
-
 
 /*! @brief Surcharge Objet_U::associer_(Objet_U&) Associe un objet au probleme couple, en verifiant le type
  *
@@ -385,7 +382,6 @@ int Probleme_Couple::associer_(Objet_U& ob)
   else
     return 0;
 }
-
 
 /*! @brief Associe une copie du schema en temps a chaque probleme du Probleme couple.
  *
@@ -421,7 +417,6 @@ const Schema_Temps_base& Probleme_Couple::schema_temps() const
   return pb.schema_temps();
 }
 
-
 /*! @brief Renvoie le schema en temps associe aux problemes couples.
  *
  * @return (Schema_Temps_base&) le schema en temps associe
@@ -455,7 +450,6 @@ void Probleme_Couple::discretiser(Discretisation_base& dis)
       pb.discretiser(dis);
     }
 }
-
 
 void Probleme_Couple::sauver() const
 {

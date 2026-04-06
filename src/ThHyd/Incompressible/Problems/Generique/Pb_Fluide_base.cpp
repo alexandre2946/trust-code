@@ -14,7 +14,6 @@
 *****************************************************************************/
 
 #include <Cond_lim_rayo_milieu_transp.h>
-#include <Pb_Couple_rayo_transp.h>
 #include <Pb_Fluide_base.h>
 #include <Fluide_base.h>
 
@@ -35,25 +34,15 @@ Entree& Pb_Fluide_base::lire_radiation_models(Entree& is, Motcle& mot)
       Process::exit();
     }
 
-  // test si c'est un pb couple de type Pb_Couple_rayo_transp ou pas !
-  if (is_coupled() && !sub_type(Pb_Couple_rayo_transp, pbc_.valeur()))
-    {
-      Cerr << "You asked for using a transparent medium radiation model with a coupled problem of type " << pbc_->que_suis_je() << finl;
-      Cerr << "Please update your data file by using instead a coupled problem of type Pb_Couple_rayo_transp ..." << finl;
-      Process::exit();
-    }
-
   // set flag is_rad_transp_med_ in Fluide_base
   bool flag_set = false;
   for (auto& itr : le_milieu_)
-    {
-      if (sub_type(Fluide_base, itr.valeur()))
-        {
-          ref_cast(Fluide_base, itr.valeur()).set_rayo_transp_flag();
-          flag_set = true;
-          break;
-        }
-    }
+    if (sub_type(Fluide_base, itr.valeur()))
+      {
+        ref_cast(Fluide_base, itr.valeur()).set_rayo_transp_flag();
+        flag_set = true;
+        break;
+      }
 
   if (!flag_set)
     {
@@ -71,7 +60,7 @@ Entree& Pb_Fluide_base::lire_radiation_models(Entree& is, Motcle& mot)
 
 void Pb_Fluide_base::preparer_calcul()
 {
-  if (mod_rayo_transp_.non_nul() && !is_coupled()) // sinon c'est fait dans Pb_Couple_rayo_transp ...
+  if (mod_rayo_transp_.non_nul() && !is_coupled()) // sinon c'est fait dans Pb_Couple ...
     assoscier_rayo_model_CL();
 
   Probleme_base::preparer_calcul();
@@ -103,7 +92,7 @@ void Pb_Fluide_base::assoscier_rayo_model_CL()
   if (mod_rayo_transp_.est_nul()) return; /* rien a faire */
 
   // TODO FIXME for now we suppose that we have only one radiation model in the coupled pb ...
-  // see test in Pb_Couple_rayo_transp::initialize
+  // see test in Probleme_Couple::initialize
   const int nb_pbs = is_coupled() ? pbc_->nb_problemes() : 1;
   for (int l = 0; l < nb_pbs; l++)
     {
