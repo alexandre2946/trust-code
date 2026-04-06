@@ -370,7 +370,7 @@ double Modele_rayo_transp::flux_radiatif(int num_face) const
   return les_faces_rayonnantes_[corres_[num_face]].flux_radiatif();
 }
 
-void Modele_rayo_transp::preparer_calcul()
+void Modele_rayo_transp::completer()
 {
   // Lire Ensemble_faces_rayo_transp
   for (int i = 0; i < nb_faces_totales(); i++)

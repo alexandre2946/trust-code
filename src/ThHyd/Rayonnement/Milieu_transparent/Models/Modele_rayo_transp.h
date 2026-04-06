@@ -27,7 +27,7 @@ class Modele_rayo_transp: public Objet_U
 public:
   void associer_pb_fluide_rayo(const Pb_Fluide_base& );
   void mettre_a_jour(double temps);
-  void preparer_calcul();
+  void completer();
   void calculer_temperatures();
   void calculer_flux_radiatifs();
   void imprimer_flux_radiatifs(Sortie&) const;

@@ -140,7 +140,6 @@ public:
 
   bool is_coupled() const { return pbc_.non_nul(); }
   virtual inline bool has_mod_rayo_transp() const { return false; }
-  virtual void assoscier_rayo_model_CL() { /* Do nothing */ }
 
   int postraiter(int force = 1) override;
   int limpr() const override;

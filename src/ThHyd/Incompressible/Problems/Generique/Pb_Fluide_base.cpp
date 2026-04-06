@@ -58,12 +58,12 @@ Entree& Pb_Fluide_base::lire_radiation_models(Entree& is, Motcle& mot)
   return is;
 }
 
-void Pb_Fluide_base::preparer_calcul()
+void Pb_Fluide_base::completer()
 {
-  if (mod_rayo_transp_.non_nul() && !is_coupled()) // sinon c'est fait dans Pb_Couple ...
-    assoscier_rayo_model_CL();
+  Probleme_base::completer();
 
-  Probleme_base::preparer_calcul();
+  if (mod_rayo_transp_.non_nul())
+    mod_rayo_transp_->completer();
 }
 
 int Pb_Fluide_base::postraiter(int force)
@@ -85,13 +85,6 @@ void Pb_Fluide_base::validateTimeStep()
 
   if (mod_rayo_transp_.non_nul())
     mod_rayo_transp_->mettre_a_jour(presentTime());
-}
-
-void Pb_Fluide_base::assoscier_rayo_model_CL()
-{
-  if (mod_rayo_transp_.est_nul()) return; /* rien a faire */
-
-  mod_rayo_transp_->preparer_calcul();
 }
 
 int Pb_Fluide_base::expression_predefini(const Motcle& motlu, Nom& expression)

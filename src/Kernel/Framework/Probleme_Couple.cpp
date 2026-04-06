@@ -335,22 +335,10 @@ void Probleme_Couple::ajouter(Probleme_base& pb)
 void Probleme_Couple::initialize()
 {
   // On attribue la valeur 1 a schema_impr_ pour le schema du probleme 0 et 0 pour les autres. Un seul schema doit imprimer.
-  // on initialise aussi les CL rayo si c'est un probleme de rayonnement transparent ...
-  int nb_ray_mod_associated = 0;
   for (int i = 0; i < nb_problemes(); i++)
     {
       Probleme_base& pb = ref_cast(Probleme_base, probleme(i));
       pb.schema_temps().schema_impr() = (i == 0);
-
-      if (pb.has_mod_rayo_transp())
-        {
-          nb_ray_mod_associated++;
-
-          if (nb_ray_mod_associated > 1)
-            Process::exit("We can not treat at present several associated radiation models ... \n");
-
-          pb.assoscier_rayo_model_CL();
-        }
     }
 
   Couplage_U::initialize();

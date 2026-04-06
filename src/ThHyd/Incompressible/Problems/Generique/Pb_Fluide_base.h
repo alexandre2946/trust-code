@@ -32,12 +32,11 @@ public:
   int expression_predefini(const Motcle& motlu, Nom& expression) override;
 
   /* Transparent radiation model */
-  void preparer_calcul() override;
+  void completer() override;
   int postraiter(int force = 1) override;
   void validateTimeStep() override;
 
   Entree& lire_radiation_models(Entree& is, Motcle& mot) override final;
-  void assoscier_rayo_model_CL() override final;
   inline bool has_mod_rayo_transp() const override final { return mod_rayo_transp_.non_nul(); }
 
   inline Modele_rayo_transp& get_mod_rayo_transp()
