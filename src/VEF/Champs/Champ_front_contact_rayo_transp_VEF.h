@@ -44,12 +44,13 @@ public:
   inline Nom& nom_prob2() { return nom_pb2; }
   inline const Nom& nom_prob2() const { return nom_pb2; }
 
-  inline void associer_modele_rayo(Modele_rayo_transp& mod) { le_modele_rayo_ = mod; }
-  inline Modele_rayo_transp& modele_rayo() { return le_modele_rayo_; }
+  inline void associer_modele_rayo(const Modele_rayo_transp& mod) { le_modele_rayo_ = mod; }
 
-protected:
+private:
   DoubleVect flux_radiatif_;
   OBS_PTR(Modele_rayo_transp) le_modele_rayo_;
+
+  inline const Modele_rayo_transp& modele_rayo() const { return le_modele_rayo_; }
 };
 
 #endif /* Champ_front_contact_rayo_transp_VEF_included */

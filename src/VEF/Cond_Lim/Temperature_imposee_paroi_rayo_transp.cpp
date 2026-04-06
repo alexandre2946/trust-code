@@ -54,13 +54,13 @@ void Temperature_imposee_paroi_rayo_transp::calculer_Teta_i(double temps)
     }
 }
 
-void Temperature_imposee_paroi_rayo_transp::associer_modele_rayo(Modele_rayo_transp& mod)
+void Temperature_imposee_paroi_rayo_transp::associer_modele_rayo(const Modele_rayo_transp& mod)
 {
-  le_modele_rayo = mod;
+  le_modele_rayo_ = mod;
 
   if (sub_type(Champ_front_contact_rayo_transp_VEF, le_champ_front.valeur()))
     {
       Champ_front_contact_rayo_transp_VEF& Ch_contact = ref_cast(Champ_front_contact_rayo_transp_VEF, le_champ_front.valeur());
-      Ch_contact.associer_modele_rayo(modele_rayo());
+      Ch_contact.associer_modele_rayo(le_modele_rayo_.valeur());
     }
 }

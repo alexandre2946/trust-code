@@ -49,7 +49,7 @@ void Paroi_flux_impose_rayo_transp_VEF::calculer_Teta_i()
   int ndeb = la_frontiere_VF.num_premiere_face();
   int nb_faces_bord = la_frontiere_VF.nb_faces();
   int is_relax = 1;
-  if (le_modele_rayo->relaxation() == 0)
+  if (le_modele_rayo_->relaxation() == 0)
     is_relax = 0;
   for (int numfa = 0; numfa < nb_faces_bord; numfa++)
     {

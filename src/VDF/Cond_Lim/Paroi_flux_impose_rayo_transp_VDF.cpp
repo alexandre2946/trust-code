@@ -93,7 +93,7 @@ void Paroi_flux_impose_rayo_transp_VDF::calculer_Teta_i()
   double dt = sch.pas_de_temps();
 
   int is_relax = 1;
-  if (le_modele_rayo->relaxation() == 0)
+  if (le_modele_rayo_->relaxation() == 0)
     is_relax = 0;
 
   for (int numfa = 0; numfa < nb_faces_bord; numfa++)
@@ -121,7 +121,7 @@ void Paroi_flux_impose_rayo_transp_VDF::calculer_Teta_i()
       else
         omega = 1.;
 
-      double flux_radia = le_modele_rayo->flux_radiatif(numfa + ndeb);
+      double flux_radia = le_modele_rayo_->flux_radiatif(numfa + ndeb);
 
       if (le_champ_front->valeurs().size() == 1)
         teta_i_(numfa) = omega * ((le_champ_front->valeurs()(0, 0) - flux_radia) / (d_Lambda / e) + T_f(elem)) + (1 - omega) * teta_i_(numfa);

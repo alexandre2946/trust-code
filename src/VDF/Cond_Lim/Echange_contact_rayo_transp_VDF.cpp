@@ -174,7 +174,7 @@ void Echange_contact_rayo_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_equiv,
   int ind_fac, elem;
   //DoubleTab& Teta_i=T_ext().valeurs();
   //Teta_equiv.resize(nb_faces_bord,1);
-  Modele_rayo_transp& modrayo = ref_cast(Modele_rayo_transp, le_modele_rayo.valeur());
+  Modele_rayo_transp& modrayo = ref_cast(Modele_rayo_transp, le_modele_rayo_.valeur());
   if (modrayo.relaxation() == 0)
     alpha_ = 0;
 

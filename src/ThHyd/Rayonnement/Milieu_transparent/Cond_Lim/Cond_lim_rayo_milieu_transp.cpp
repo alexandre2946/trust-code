@@ -18,9 +18,9 @@
 #include <Cond_lim_rayo_milieu_transp.h>
 #include <Domaine_VF.h>
 
-void Cond_lim_rayo_milieu_transp::associer_modele_rayo(Modele_rayo_transp& mod)
+void Cond_lim_rayo_milieu_transp::associer_modele_rayo(const Modele_rayo_transp& mod)
 {
-  le_modele_rayo = mod;
+  le_modele_rayo_ = mod;
 }
 
 void Cond_lim_rayo_milieu_transp::completer()
