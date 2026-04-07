@@ -593,7 +593,8 @@ do
    then
       # Proper include files for EOS are managed by script bin/cree_include
       export TRUST_USE_EOS=1
-      export TRUST_EOS_HOME_DIR=${1#-with-eos=}
+      TRUST_EOS_HOME_DIR_=${1#-with-eos=}
+      export TRUST_EOS_HOME_DIR=$(cd $TRUST_EOS_HOME_DIR_; pwd)
       if [ ! -f $TRUST_EOS_HOME_DIR/lib/libeos.a ]
       then
          echo ""
@@ -606,7 +607,8 @@ do
    then
       # Proper include files for CoolProp are managed by script bin/cree_include
       export TRUST_USE_COOLPROP=1
-      export TRUST_COOLPROP_HOME_DIR=${1#-with-coolprop=}
+      TRUST_COOLPROP_HOME_DIR_=${1#-with-coolprop=}
+      export TRUST_COOLPROP_HOME_DIR=$(cd $TRUST_COOLPROP_HOME_DIR_; pwd)
       if [ ! -f $TRUST_COOLPROP_HOME_DIR/build/libCoolProp.a ]
       then
          echo "You specified to use the CoolProp library in your TRUST configuration. However, we can not find the static library $TRUST_COOLPROP_HOME_DIR/build/libCoolProp.a !!"
@@ -627,7 +629,8 @@ do
    elif [ "${1#-with-refprop}" != "$1" ]
    then
       export TRUST_USE_REFPROP=1
-      export TRUST_REFPROP_HOME_DIR=${1#-with-refprop=}
+      TRUST_REFPROP_HOME_DIR_=${1#-with-refprop=}
+      export TRUST_REFPROP_HOME_DIR=$(cd $TRUST_REFPROP_HOME_DIR_; pwd)
 
    elif [ "${1#-with-32-bit-indices}" != "$1" ]
    then

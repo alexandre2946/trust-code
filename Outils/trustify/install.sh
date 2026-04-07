@@ -42,6 +42,8 @@ if [ "$from_TRUST" = "1" ]; then
     echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
     echo "@@@ Installing trustify Python module"
     echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+    # on debian with system python, trustify is installed in $install_dir/local instead of $install_dir
+    # see https://discuss.python.org/t/linux-distro-patches-to-sysconfig-are-changing-pip-install-prefix-outside-virtual-environments/18240
     pip install .. --prefix $install_dir --no-build-isolation
     echo "OK"
 else

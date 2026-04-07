@@ -356,6 +356,7 @@ do
 	[ "`grep 'configure called with options' $CR | grep ' -disable-petsc'`" != "" ] 	&& [ "`grep PETSC=KO $CR`" != "" ] 	 && PETSC=$NOT
 	[ "`grep 'Disabling MPI' $CR`" != "" ] 		&& [ "`grep ICoCo:OK $CR`" = "" ] 	 && ICOCO=$NOT	
 	[ "`grep 'configure called with options' $CR | grep ' -disable-mpi'`" != "" ] 		&& [ "`grep ICoCo:OK $CR`" = "" ] 	 && ICOCO=$NOT	
+	[ "`grep 'Outils/ICoCo:' $CR`" = "" ]  	 && ICOCO=$NOT	# Ajoute pour la partie GPU
 	[ "`grep 'Disabling GMSH' $CR`" != "" ]         && [ "`grep Gmsh:OK $CR`" = "" ] 	 && GMSH=$NOT	
 	[ "`grep 'configure called with options' $CR | grep ' -disable-gmsh'`" != "" ]         && [ "`grep Gmsh:OK $CR`" = "" ] 	 && GMSH=$NOT
 	[ "`grep 'Disabling VISIT' $CR`" != "" ]        && [ "`grep VisIt:OK $CR`" = "" ] 	 && VISIT=$NOT
