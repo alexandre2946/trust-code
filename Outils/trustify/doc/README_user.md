@@ -31,6 +31,20 @@ The allowed types for attributes are:
 - `rien`: a void item - this type is usually used for flags, where just the presence/absence of the attribute suffices to indicate whether it is turned on or off
 
 
+If you need to write really long lines, you can also use the `// XD_CONT` tag to continue your comment. This works with both the simple `XD` tag and the `XD_ADD_P` tag.
+For example:
+
+```
+// XD  the_kw  base_kw  synonym_for_the_kw  with_brace A really long and verbose description, that you need to write on 
+// XD_CONT several lines because you want to be expressive and this requires
+// XD_CONT more space etc etc
+...
+param.ajouter("tutu", &tutu);  // XD_ADD_P double A also very long description for tutu attribute which also
+                               // XD_CONT requires writing stuff on several lines 
+
+```
+
+
 Finally, note that you may use `// 2XD` or even `// 3XD ` tags if you want to nest keyword declarations, like in this example:
 
 ```

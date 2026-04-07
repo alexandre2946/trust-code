@@ -13,7 +13,7 @@ Thus, the generated Python modules provide:
 - the basis for the automatic generation of Graphical User Interfaces compliant with this data model.
 
 
-If you seek more information on the syntax to be used inside the C++ source code to document a keyword take a look at doc/README_user.md
+If you seek more information on the syntax to be used inside the C++ source code to document a keyword take a look at `doc/README_user.md`
 
 
 If you need to develop or fix a bug in `trustify` itself, take a look at `doc/README_dev.md`

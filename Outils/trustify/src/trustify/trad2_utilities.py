@@ -173,7 +173,10 @@ class TRAD2Content:
     A TRAD2Content is made of a list of TRAD2Block, each containing a list of TRAD2Attr.
     """
     def __init__(self):
+        import re
         self.data = []  #: A list of TRAD2Block
+        self.re_comment = re.compile(r"^\s*//") #: RegExp to match simple one line comment
+        self.re_cont = re.compile(r"^\s*//\s*XD_CONT") #: RegExp to match an XD continuation line 
 
     @classmethod
     def BuildContentFromTRAD2(cls, trad2, trad2_nfo=None):
@@ -388,6 +391,58 @@ class TRAD2Content:
                 raise Exception(pretty_error(f_name, lin_n, "'XD_ADD_DICO' read, but no preceding 'XD_ADD_P dico ...' instruction found!!"))
             last_attr.type = typ.replace(']', f'"{nam1}",]')
 
+    def extractAndGroupXDLines(self, f_name, lins):
+        """ Group multi-lines (XD comments expanding on several lines).
+        @return a list of sub-lists, each sub-list having exactly 3 items: line number / (joined) original lines / (joined) stripped, lower-case lines 
+        """        
+        grouped_lines = []   # triplet: line number / original line / stripped, lower-case line
+        curr_block = [-1, "", ""]
+        in_block = False
+        for lin_n, lin in enumerate(lins):
+            lin = lin.strip()
+            is_cont = self.re_cont.match(lin)
+            # Remove '// XD_CONT' part:
+            if is_cont:
+                start, end = is_cont.span()
+                lin = (lin[:start] + lin[end:]).strip()
+            l_low = lin.lower()
+            is_comment = self.re_comment.match(l_low)
+            if is_cont and not in_block:
+                raise Exception(pretty_error(f_name, lin_n, "'XD_CONT' improperly used! It should be placed just after a line with XD or XD_ADD_P."))
+            # Those macros are always on one line:
+            cond1 = not is_comment and "implemente_instanciable" in l_low
+            cond2 = not is_comment and "add_synonym(" in l_low
+            if cond1 or cond2:
+                in_block= False
+                if curr_block[0] >= 0:
+                    grouped_lines.append(curr_block)
+                curr_block = [lin_n, lin, l_low]
+                continue
+            # Multi-line XD blocks: 
+            cond3 = False
+            for lvl, lvl_s in enumerate(["","2","3"]):
+                if f"{lvl_s}XD" in lin and not is_cont:
+                    if is_comment and len(lin) > 260:
+                        print("WARNING - This file has really long XD line(s) - use tag 'XD_CONT': ", f_name)
+                    cond3 = True
+            if cond3:
+                # Save previously accumulated block:
+                if curr_block[0] >= 0:
+                    grouped_lines.append(curr_block)
+                curr_block = [lin_n, lin, l_low]  # Start new block
+                in_block = True
+            else:
+                # Ignore the irrelevant lines: 
+                if not (in_block and is_cont):
+                    in_block = False  # Mark the end of the block (it will be registered at the next new block or at the end)
+                    continue
+                # Otherwise accumulate in the current block (without the XD_CONT tag!)
+                curr_block[1] = " ".join([curr_block[1], lin])
+                curr_block[2] = " ".join([curr_block[2], l_low])
+        # Save last block (if any)
+        if curr_block[0] >= 0:
+            grouped_lines.append(curr_block)
+        return grouped_lines
 
     def scanOneCppFile(self, f_name):
         """ Scan one C++ file for the XD tags. Also extract the synonyms given by the
@@ -405,26 +460,24 @@ class TRAD2Content:
         with open(f_name, "r") as f:
             ll = f.readlines()
 
-        for lin_n, lin in enumerate(ll):
-            lin = lin.strip()
-            l2 = lin.lower().strip()
+        grouped_lines = self.extractAndGroupXDLines(f_name, ll)
+
+        for lin_n, lin, l_low in grouped_lines:
             # For each possible instruction, an example is provided:
 
             #
             # The first two cases handle synonyms
             #
-            if "implemente_instanciable" in l2:
-                if lin.startswith("//"): continue
+            if "implemente_instanciable" in l_low:
                 # "Implemente_instanciable(Terme_Boussinesq_VEF_Face,"Boussinesq_VEF_P1NC",Terme_Boussinesq_base);"
-                cls_nam, kw = self._parseMacro("implemente_instanciable", l2)
+                cls_nam, kw = self._parseMacro("implemente_instanciable", l_low)
                 kwt = kw.split("|")  # we might have several synos there already...
                 impl[cls_nam] = kwt[0]
                 for k in kwt[1:]:
                     self.synos.setdefault(kwt[0], []).append(k)
-            if "add_synonym(" in l2:
+            if "add_synonym(" in l_low:
                 #  "Add_synonym(Terme_Boussinesq_VEF_Face,"Boussinesq_temperature_VEF_Face");"
-                if lin.startswith("//"): continue
-                cls_nam, s = self._parseMacro("add_synonym", l2)
+                cls_nam, s = self._parseMacro("add_synonym", l_low)
                 if cls_nam.endswith("_64"):
                   cls_nam = cls_nam[:-len("_64")]
                 if cls_nam not in impl:
