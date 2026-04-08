@@ -403,13 +403,14 @@ ArrOfDouble Terme_Source_Canal_perio::source() const
               // si = [ 2*(Q(0)-Q(t(n))) - (Q(0)-Q(t(n-1))) ] / [ coeff * dt * aire(bord) ]
               if( dt_locaux.size()>0)
                 {
-                  Cerr << "Periodic BC plus source term not validated yet for steady option." << finl;
-                  Cerr << "Contact TRUST support." << finl;
-                  exit();
-
-                  //du au fait que ce calcul implique une division par dt, dans le cas ou le dt est variable par face,
-                  // calculer_debit(debit_e) renvoye [ 2*(Q(0)-Q(t(n))) - (Q(0)-Q(t(n-1))) ]/dt_locaux
-                  si = debit_e/(coeff*surface_bord_);
+                  // Steady mode: dt varies per face. Use the mean of dt_locaux as representative
+                  // time scale for the flow rate correction formula.
+                  // At convergence (Q_n = Q_{n-1} = Q_ref), si = 0 regardless of dt_eff.
+                  double local_sum = 0.;
+                  for (int i = 0; i < dt_locaux.size(); i++) local_sum += dt_locaux[i];
+                  double dt_eff = mp_sum(local_sum) / mp_sum((double)dt_locaux.size());
+                  si = (2.*(debit_ref_-debit_e)-(debit_ref_-debnm1_))/(coeff*dt_eff*surface_bord_);
+                  debnm1_ = debit_e;
                 }
               else
                 {
