@@ -34,8 +34,8 @@ Mailler box
     }
 }
 Tetraedriser_homogene box
-Corriger_frontiere_periodique { domaine box bord perio }
-Corriger_frontiere_periodique { domaine box bord Perioz }
+Declarer_bord_perio { domaine box bord perio }
+Declarer_bord_perio { domaine box bord Perioz }
 
 Mailler dom
 {
@@ -55,7 +55,7 @@ Mailler dom
     }
 }
 Tetraedriser_homogene dom
-Corriger_frontiere_periodique { domaine dom bord Perioz }
+Declarer_bord_perio { domaine dom bord Perioz }
 # END MESH #
 
 # BEGIN PARTITION

@@ -22,8 +22,8 @@ Mailler dom
     }
 }
 Tetraedriser dom
-Corriger_frontiere_periodique { Domaine dom Bord Perio }
-Corriger_frontiere_periodique { Domaine dom Bord Perio2 }
+Declarer_bord_perio { Domaine dom Bord Perio }
+Declarer_bord_perio { Domaine dom Bord Perio2 }
 # END MESH #
 # BEGIN PARTITION
 Partition dom

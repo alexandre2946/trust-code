@@ -36,7 +36,7 @@ Postraiter_domaine { domaine dom format lata fichier avant }
 
 ExtrudeParoi { domaine dom nom_bord paroi epaisseur 2 0.5 0.2 }
 
-Corriger_frontiere_periodique { Domaine dom Bord perio direction 3 1 0.4 0 }
+Declarer_bord_perio { Domaine dom Bord perio direction 3 1 0.4 0 }
 
 Postraiter_domaine { domaine dom format lata fichier apres }
 

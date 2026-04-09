@@ -11,7 +11,7 @@ Read_MED {
 Tetraedriser_homogene_fin dom
 Regroupebord dom section { INLET OUTLET }
 Regroupebord dom wall { INNER_WALL OUTER_WALL }
-Corriger_frontiere_periodique { domaine dom bord section }
+Declarer_bord_perio { domaine dom bord section }
 # End MAILLAGE #
 
 # BEGIN PARTITION

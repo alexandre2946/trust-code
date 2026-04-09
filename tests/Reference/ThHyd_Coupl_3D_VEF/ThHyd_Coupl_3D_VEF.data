@@ -61,11 +61,11 @@ Mailler parois
 
 
 Tetraedriser_homogene dom
-Corriger_frontiere_periodique { Domaine dom Bord periox }
-Corriger_frontiere_periodique { Domaine dom Bord perioz }
+Declarer_bord_perio { Domaine dom Bord periox }
+Declarer_bord_perio { Domaine dom Bord perioz }
 Tetraedriser_homogene parois
-Corriger_frontiere_periodique { Domaine parois Bord periox }
-Corriger_frontiere_periodique { Domaine parois Bord perioz }
+Declarer_bord_perio { Domaine parois Bord periox }
+Declarer_bord_perio { Domaine parois Bord perioz }
 Sous_Zone sous_zone1
 Associate sous_zone1 dom
 

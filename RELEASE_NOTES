@@ -1,6 +1,7 @@
 -------------------------------------------------------------------------------------------------
 Release notes version 1.9.8_beta : Enhancements, modifications and corrected bugs since version 1.9.7 :
 --------------------------------------------------------------------------------------------------
+08/04/26 (TRUST) Change       : 'corriger_frontiere_periodique' becomes 'declarer_bord_perio'. Old keyword remains valid as a synonym. A periodic boundary must now **always** be declared with this keyword. The 'periodic' option in Partitioners is no longer necessary.
 20/04/26 (TRUST) Change       : Warning, VEF VerifierCoin keyword algorithm has been rewritten which possibly change the numerotation of the mesh and the partitioned mesh 
 20/04/26 (TRUST) Solver       : Sparskit based solver "solveur gen { solv_elem bicgstab|gmres ... }" removed. It can be replaced by more efficient PETSc equivalent solvers
 20/04/26 (TRUST) Tool         : trust -energy JOB_ID returns now on well-configured cluster the energy consumption of your job
@@ -11,6 +12,8 @@ Release notes version 1.9.8_beta : Enhancements, modifications and corrected bug
 14/04/26 (TRUST) Tools        : Upgrade MED to 6.0.1
 09/04/26 (TRUST) Major change : TrioCFD radiation models (transparent and semi-transparent media) are re-written completely so that they can be used in basic classes of TRUST. See examples and validations in TrioCFD code. For transparent medium, it is possible to define now more than one model in a coupled problem; ie: a model in each fluid problem. It is also possible to use it with a distant problem; ie: without a coupled problem.
 31/03/26 (TRUST) Change       : Change the diffusive time step computation in multiphase VDF. Less restrictive, similar as in PolyMAC now.
+31/03/26 (TRUST) Change       : Change the diffusive time step computation in multiphase VDF. Less restrictive, similar
+as in PolyMAC now. 
 30/03/26 (TRUST) Performance  : Computation overlapped by communication in VEF convective schemes. Convection operator duration reduced by 20% on 128 GPU case on Adastra. 
 12/03/26 (TRUST) New keyword  : Analyse_angle_64 version of Analyse_angle keyword for large mesh to compute angles histogram especially for tetraedras to detect too much obtuse angles
 24/02/26 (TRUST) GPU          : Single GPU performance on MI250X (adastra, lumi) and MI300A (adastra) improved by 30% after ROCm update (6.4.x)

@@ -21,7 +21,7 @@ Mailler dom
 }
 
 trianguler_fin dom
-Corriger_frontiere_periodique { domaine dom bord periox }
+Declarer_bord_perio { domaine dom bord periox }
 
 Sous_zone zone_tout
 Associate zone_tout dom

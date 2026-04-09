@@ -23,8 +23,8 @@ Mailler dom
 }
 
 tetraedriser_homogene_fin dom
-Corriger_frontiere_periodique { domaine dom bord periox }
-Corriger_frontiere_periodique { domaine dom bord perioy }
+Declarer_bord_perio { domaine dom bord periox }
+Declarer_bord_perio { domaine dom bord perioy }
 
 Sous_zone zone_tout
 Associate zone_tout dom

@@ -22,7 +22,7 @@ Mailler dom
 }
 Trianguler_H dom
 Transformer dom X Y+X*0.5
-Corriger_frontiere_periodique { Domaine dom Bord Perio direction 2 2. 1. }
+Declarer_bord_perio { Domaine dom Bord Perio direction 2 2. 1. }
 # END MESH #
 
 # BEGIN PARTITION

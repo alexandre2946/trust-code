@@ -28,7 +28,7 @@ Mailler dom_boite
     }
 }
 Tetraedriser_homogene dom_boite
-Corriger_frontiere_periodique { Domaine dom_boite Bord periox }
+Declarer_bord_perio { Domaine dom_boite Bord periox }
 
 Mailler dom_tube
 {

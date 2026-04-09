@@ -54,7 +54,7 @@ Reorienter_tetraedres dom_solide
 
 VEFPRep1B dis
 
-Corriger_frontiere_periodique
+Declarer_bord_perio
 {   domaine dom_fluide
     bord  PerioX
     direction 3 0.5 0. 0.

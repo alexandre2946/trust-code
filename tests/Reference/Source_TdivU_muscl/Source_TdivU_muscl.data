@@ -20,8 +20,8 @@ Mailler dom
     }
 }
 Trianguler_H dom
-Corriger_frontiere_periodique { Domaine dom Bord periox }
-Corriger_frontiere_periodique { Domaine dom Bord perioy }
+Declarer_bord_perio { Domaine dom Bord periox }
+Declarer_bord_perio { Domaine dom Bord perioy }
 
 # END MESH #
 # BEGIN PARTITION

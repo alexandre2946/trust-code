@@ -26,8 +26,8 @@ Mailler dom
 
 Tetraedriser_homogene_fin dom
 
-Corriger_frontiere_periodique { Domaine dom Bord periox }
-Corriger_frontiere_periodique { Domaine dom Bord perioz }
+Declarer_bord_perio { Domaine dom Bord periox }
+Declarer_bord_perio { Domaine dom Bord perioz }
 
 # END MESH #
 # BEGIN PARTITION

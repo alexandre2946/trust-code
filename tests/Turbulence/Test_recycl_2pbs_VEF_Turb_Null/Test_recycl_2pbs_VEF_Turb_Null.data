@@ -25,7 +25,7 @@ Mailler dom1
     }
 }
 Tetraedriser_homogene dom1
-Corriger_frontiere_periodique { domaine dom1 bord periox }
+Declarer_bord_perio { domaine dom1 bord periox }
 
 
 Mailler dom2

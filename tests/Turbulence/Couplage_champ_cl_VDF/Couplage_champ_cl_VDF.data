@@ -43,12 +43,12 @@ Mailler THI
     }
 }
 
-Corriger_frontiere_periodique { Domaine DOM Bord perioxx }
-Corriger_frontiere_periodique { Domaine DOM Bord perioyy }
+Declarer_bord_perio { Domaine DOM Bord perioxx }
+Declarer_bord_perio { Domaine DOM Bord perioyy }
 
-Corriger_frontiere_periodique { Domaine THI Bord perioX }
-Corriger_frontiere_periodique { Domaine THI Bord perioY }
-Corriger_frontiere_periodique { Domaine THI Bord perioZ }
+Declarer_bord_perio { Domaine THI Bord perioX }
+Declarer_bord_perio { Domaine THI Bord perioY }
+Declarer_bord_perio { Domaine THI Bord perioZ }
 
 Postraiter_domaine { domaines { DOM THI } format lata fichier DOM.lata }
 # END MESH #

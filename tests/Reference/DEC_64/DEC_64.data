@@ -41,7 +41,7 @@ Raffiner_simplexes_64 dom
 
 Analyse_Angle_64 dom 10
 
-Corriger_frontiere_periodique_64 { domaine dom bord paroiY }
+Declarer_bord_perio_64 { domaine dom bord paroiY }
 
 Decouper_64 dom	{
 	partitionneur metis_64 { Nb_parts 3 }

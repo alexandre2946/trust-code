@@ -58,7 +58,7 @@ ExtrudeBord {
 RegroupeBord box perio { devant derriere }
 
 # Check the boundary is periodic and fix otherwise #
-Corriger_frontiere_periodique { domaine box bord perio }
+Declarer_bord_perio { domaine box bord perio }
 
 # Partition the box #
 Partition box

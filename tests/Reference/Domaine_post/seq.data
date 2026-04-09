@@ -43,12 +43,12 @@ Mailler domaine_post
     }
 }
 Tetraedriser_homogene dom
-Corriger_frontiere_periodique { Domaine dom Bord periox }
-Corriger_frontiere_periodique { Domaine dom Bord perioz }
+Declarer_bord_perio { Domaine dom Bord periox }
+Declarer_bord_perio { Domaine dom Bord perioz }
 
 Tetraedriser_homogene domaine_post
-Corriger_frontiere_periodique { Domaine domaine_post Bord periox }
-Corriger_frontiere_periodique { Domaine domaine_post Bord perioz }
+Declarer_bord_perio { Domaine domaine_post Bord periox }
+Declarer_bord_perio { Domaine domaine_post Bord perioz }
 # END MESH #
 # BEGIN PARTITION
 Partition dom

@@ -26,7 +26,7 @@ Transformer dom
 (x+4*x*(1-x)*y*(1-y)*z*(1-z)*(0.5-y))*(1+atan(x))
 y+4*x*(1-x)*y*(1-y)*z*(1-z)*(0.5+x)*(1+atan(y))
 tanh(z)/tanh(1)
-Corriger_frontiere_periodique { domaine dom bord paroiY }
+Declarer_bord_perio { domaine dom bord paroiY }
 # END MESH #
 
 # BEGIN PARTITION

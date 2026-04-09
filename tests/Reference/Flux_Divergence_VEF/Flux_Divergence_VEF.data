@@ -22,7 +22,7 @@ Mailler dom
     }
 }
 Tetraedriser_homogene dom
-Corriger_frontiere_periodique { domaine dom bord perio }
+Declarer_bord_perio { domaine dom bord perio }
 # END MESH #
 
 # BEGIN PARTITION

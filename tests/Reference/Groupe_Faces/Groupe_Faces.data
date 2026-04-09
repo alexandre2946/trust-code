@@ -10,7 +10,7 @@ Read_MED {
     include_additional_face_groups 1 groupes_faces_interf
 }
 Raffiner_isotrope dom
-Corriger_frontiere_periodique { domaine dom bord perioy }
+Declarer_bord_perio { domaine dom bord perioy }
 # END MESH #
 
 # BEGIN PARTITION

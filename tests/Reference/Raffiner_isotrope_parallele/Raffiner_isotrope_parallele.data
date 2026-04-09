@@ -33,11 +33,11 @@ Ecrire_fichier initial_dom initial_dom.geom
 
 Read_file dom initial_dom.geom
 Raffiner_isotrope dom
-Corriger_frontiere_periodique { domaine dom bord Perio }
+Declarer_bord_perio { domaine dom bord Perio }
 # END MESH #
 
 # BEGIN PARTITION
-Corriger_frontiere_periodique { domaine initial_dom bord Perio }
+Declarer_bord_perio { domaine initial_dom bord Perio }
 Partition initial_dom
 {
     Partition_tool metis { Nb_parts 4 }

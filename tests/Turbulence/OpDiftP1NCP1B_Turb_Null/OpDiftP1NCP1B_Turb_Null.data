@@ -8,8 +8,8 @@ Domaine dom
 
 # BEGIN MESH #
 Lire_Tgrid dom Canal_plan_bi_periodique_M1.msh
-Corriger_frontiere_periodique { Domaine dom Bord Periox }
-Corriger_frontiere_periodique { Domaine dom Bord Perioz }
+Declarer_bord_perio { Domaine dom Bord Periox }
+Declarer_bord_perio { Domaine dom Bord Perioz }
 # END MESH #
 
 # BEGIN PARTITION
