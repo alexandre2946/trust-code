@@ -29,7 +29,7 @@ class Scatter : public Interprete
   Declare_instanciable(Scatter);
 public:
   Entree& interpreter(Entree&) override;
-  virtual void lire_domaine(Nom&, Noms& liste_bords_periodiques);
+  virtual void lire_domaine(Nom& fil);
   Domaine& domaine();
 
   static int Chercher_Correspondance(const DoubleTab& sommets1, const DoubleTab& sommets2, ArrOfInt& correspondance, const double epsilon);
@@ -37,7 +37,7 @@ public:
   static void construire_correspondance_aretes_par_coordonnees(Domaine_VF& zvf);
   static void construire_correspondance_items_par_coordonnees(Joints& joints, const JOINT_ITEM type_item, const DoubleTab& coord_items, bool allow_resize=false);
 
-  static void construire_structures_paralleles(Domaine& dom, const Noms& liste_bords_perio);
+  static void construire_structures_paralleles(Domaine& dom);
 
   //static void rechercher_elems_joints(Domaine & domaine);
 
@@ -54,9 +54,9 @@ public:
   static void calculer_espace_distant_aretes(Domaine& domaine, const int nb_aretes_reelles, const IntTab& elem_aretes);
 
   static void calculer_espace_distant_elements(Domaine& dom);
-  static void corriger_espace_distant_elements_perio(Domaine& dom, const Noms& liste_bords_periodiques);
+  static void corriger_espace_distant_elements_perio(Domaine& dom);
 
-  static void calculer_espace_distant_sommets(Domaine& dom, const Noms& liste_bords_periodiques);
+  static void calculer_espace_distant_sommets(Domaine& dom);
   static void construire_espace_virtuel_traduction(const MD_Vector& md_indice, const MD_Vector& md_valeur, IntTab& tableau, const int error_is_fatal = 1);
 
   static void reordonner_faces_de_joint(Domaine& dom);
@@ -77,7 +77,7 @@ public:
 protected:
   OBS_PTR(Domaine) le_domaine;
 
-  void read_domain_no_comm(Entree& fic );
+  void read_domain_no_comm(Entree& fic, bool& read_perio);
 };
 
 #endif

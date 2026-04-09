@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -41,7 +41,6 @@ public:
 
   template <typename _SIZE_>
   void construire_graph_elem_elem(const Domaine_32_64<_SIZE_>& dom,
-                                  const Noms& liste_bords_periodiques,
                                   bool use_weights,
                                   Static_Int_Lists_32_64<_SIZE_>& graph_elements_perio);
 

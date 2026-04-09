@@ -432,19 +432,15 @@ void Reorder_Mesh::reorder_domain(Domaine_32_64<_SIZE_>& dom) const
 
               // Then update joints by exchanging with neighbor procs to recompute correspondances
               // Logic here is the same as what is done in Raffiner_isotrope_parallele:
-
-
               Scatter::uninit_sequential_domain(this32);
 
               // Remove virtual parts from sommets and elems, they will be recomputed by construire_structures_paralleles()
               this32.les_sommets().resize(nb_som, this32.les_sommets().dimension(1));  // cut virtual
               this32.les_elems().resize(nb_elem, this32.les_elems().dimension(1));  // cut virtual
 
-
               Scatter::trier_les_joints(this32.faces_joint());
               Scatter::construire_correspondance_sommets_par_coordonnees(this32, false /* does not allow resize of items_communs */);
-              Noms liste_bords_periodiques; // TODO!
-              Scatter::construire_structures_paralleles(this32, liste_bords_periodiques);
+              Scatter::construire_structures_paralleles(this32);
             }
         }
     }

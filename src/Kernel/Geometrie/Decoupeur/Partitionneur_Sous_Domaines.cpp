@@ -181,8 +181,8 @@ void Partitionneur_Sous_Domaines::construire_partition(IntVect& elem_part, int& 
       Cerr << "Check, your partition strategy." << finl;
       Process::exit();
     } */
-  if (liste_bords_periodiques_.size() > 0)
-    corriger_bords_avec_liste(dom, liste_bords_periodiques_, 0, elem_part);
+  if (ref_domaine_->bords_perio().size() > 0)
+    corriger_bords_avec_liste(dom, 0, elem_part);
 
   // On ne corrige pas elem0 sur proc0 (cas test CouplageFluide_Pb1Pb2_VEF_CN)
 }

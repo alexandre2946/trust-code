@@ -22,6 +22,7 @@
 #include <Array_tools.h>
 #include <Static_Int_Lists.h>
 #include <Connectivite_som_elem.h>
+#include <Declarer_bord_perio.h>
 #include <Faces_builder.h>
 #include <Synonyme_info.h>
 
@@ -1073,6 +1074,8 @@ void Raffiner_Simplexes_32_64<_SIZE_>::refine_domain(const Domaine_t& src, Domai
         }
       }
   }
+  // Copy periodic boundaries:
+  dest.bords_perio() = src.bords_perio();
 }
 
 template<typename _SIZE_>
@@ -1085,6 +1088,18 @@ Entree& Raffiner_Simplexes_32_64<_SIZE_>::interpreter_(Entree& is)
 
   Domaine_t initial_domain(domain);
   refine_domain(initial_domain,domain);
+
+  const Noms& list_bord_perio = domain.bords_perio();
+
+  // Fix vertex and face ordering:
+  for(const auto& b: list_bord_perio)
+    {
+      Declarer_bord_perio_32_64<_SIZE_> dec;
+      dec.associer_domaine(domain);
+      dec.nom_bord() = b;
+      dec.adapt_som_and_faces();
+    }
+
   Scatter::init_sequential_domain(domain);
 
   return is;

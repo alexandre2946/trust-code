@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,10 +20,9 @@
 #include <TRUSTTabs_forward.h>
 #include <Domaine_forward.h>
 
-/*! @brief Cet interprete permet de reordonner les faces d'un bord periodique selon la convention utilisee dans le decoupeur (d'abord les faces d'une extremite du domaine, puis dans le
+/*! @brief Cet interprete permet de reordonner les faces d'un bord periodique selon la convention utilisee dans le decoupeur.
  *
- *   meme ordre, les faces jumelles sur le bord oppose).
- *
+ * D'abord les faces d'une extremite du domaine, puis dans le meme ordre, les faces jumelles sur le bord oppose.
  */
 template <typename _SIZE_>
 class Reordonner_faces_periodiques_32_64 : public Interprete_geometrique_base_32_64<_SIZE_>
@@ -36,7 +35,7 @@ public:
   static int check_faces_periodiques(const Frontiere_32_64<_SIZE_>& frontiere, ArrOfDouble& vecteur_delta, ArrOfDouble& erreur,
                                      bool verbose=false);
 
-  static void renum_som_perio(const Domaine_32_64<_SIZE_>& dom, const Noms& liste_bords_periodiques,
+  static void renum_som_perio(const Domaine_32_64<_SIZE_>& dom,
                               ArrOfInt_T<_SIZE_>& renum_som_perio, bool calculer_espace_virtuel);
 
   static void chercher_direction_perio(ArrOfDouble& direction_perio, const Domaine_32_64<_SIZE_>& dom, const Nom& bord);

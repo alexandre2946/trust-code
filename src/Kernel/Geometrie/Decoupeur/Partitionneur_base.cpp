@@ -126,10 +126,11 @@ void chercher_elems_voisins_faces(const Static_Int_Lists_32_64<_SIZE_>& som_elem
  */
 template <typename _SIZE_>
 typename Partitionneur_base_32_64<_SIZE_>::int_t
-Partitionneur_base_32_64<_SIZE_>::calculer_graphe_connexions_periodiques(const Domaine_t& domaine, const Noms& liste_bords_periodiques,
+Partitionneur_base_32_64<_SIZE_>::calculer_graphe_connexions_periodiques(const Domaine_t& domaine,
                                                                          const Static_Int_Lists_t& som_elem, const int_t my_offset,
                                                                          Static_Int_Lists_t& graph)
 {
+  const Noms& liste_bords_periodiques = domaine.bords_perio();
   const int_t nb_elem = domaine.nb_elem();
 
   // Pour chaque element, combient a-t-il de faces periodiques ?
@@ -234,7 +235,6 @@ Partitionneur_base_32_64<_SIZE_>::calculer_graphe_connexions_periodiques(const D
 template <typename _SIZE_>
 typename Partitionneur_base_32_64<_SIZE_>::int_t
 Partitionneur_base_32_64<_SIZE_>::corriger_sommets_bord(const Domaine_t& domaine,
-                                                        const Noms& liste_bords_perio,
                                                         const ArrOfInt_t& renum_som_perio,
                                                         const Static_Int_Lists_t& som_elem,
                                                         BigIntVect_& elem_part)
@@ -244,6 +244,7 @@ Partitionneur_base_32_64<_SIZE_>::corriger_sommets_bord(const Domaine_t& domaine
   const int_t nb_som_tot = domaine.nb_som_tot();
   const int_t nb_elem = domaine.nb_elem();
   const int_t nb_elem_tot = domaine.nb_elem_tot();
+  const Noms& liste_bords_perio = domaine.bords_perio();
 
   // Premiere etape :
   // Marquage des sommets de bord :
@@ -394,13 +395,13 @@ Partitionneur_base_32_64<_SIZE_>::corriger_sommets_bord(const Domaine_t& domaine
 template <typename _SIZE_>
 typename Partitionneur_base_32_64<_SIZE_>::int_t
 Partitionneur_base_32_64<_SIZE_>::corriger_multiperiodique(const Domaine_t& domaine,
-                                                           const Noms& liste_bords_perio,
                                                            const ArrOfInt_t& renum_som_perio,
                                                            const Static_Int_Lists_t& som_elem,
                                                            BigIntVect_& elem_part)
 {
   const int_t nb_som = domaine.nb_som();
   const int_t nb_elem = domaine.nb_elem();
+  const Noms& liste_bords_perio = domaine.bords_perio();
 
   // Pour chaque sommet periodique, selectionner une partie a laquelle il appartient
   // (la plus petite parmi les parties des elements periodiques adjacents)
@@ -603,13 +604,13 @@ typename Partitionneur_base_32_64<_SIZE_>::int_t
 Partitionneur_base_32_64<_SIZE_>::corriger_bords_avec_graphe(const Static_Int_Lists_t& graph_elements_perio,
                                                              const Static_Int_Lists_t& som_elem,
                                                              const Domaine_t& domaine,
-                                                             const Noms& liste_bords_perio,
                                                              BigIntVect_& elem_part)
 {
   // Algorithme: parcours de tous les elements dans l'ordre.
   //  Pour chaque element, associer aux autres elements lies la partie a laquelle appartient
   //  l'element courant. Comme le graphe est symetrique, si un element a deja ete traite,
   //  on ne change rien les fois suivantes. Donc un seul passage suffit.
+  const Noms& liste_bords_periodiques = domaine.bords_perio();
   const int_t n = graph_elements_perio.get_nb_lists(); //elem_part.size_array();
   //assert(n == graph_elements_perio.get_nb_lists());
   int_t count = 0;
@@ -636,12 +637,12 @@ Partitionneur_base_32_64<_SIZE_>::corriger_bords_avec_graphe(const Static_Int_Li
   for (int_t i = 0; i < nb_sommets_reels; i++)
     renum_som_perio[i] = i;
   bool parallel_algo = Process::is_parallel();
-  Reordonner_faces_periodiques_32_64<_SIZE_>::renum_som_perio(domaine, liste_bords_perio, renum_som_perio,
+  Reordonner_faces_periodiques_32_64<_SIZE_>::renum_som_perio(domaine, renum_som_perio,
                                                               parallel_algo /* pas d'espace virtuel en sequentiel */);
 
-  if (liste_bords_perio.size() > 1)
-    count += corriger_multiperiodique(domaine, liste_bords_perio, renum_som_perio, som_elem, elem_part);
-  count += corriger_sommets_bord(domaine, liste_bords_perio, renum_som_perio, som_elem, elem_part);
+  if (liste_bords_periodiques.size() > 1)
+    count += corriger_multiperiodique(domaine, renum_som_perio, som_elem, elem_part);
+  count += corriger_sommets_bord(domaine, renum_som_perio, som_elem, elem_part);
   return count;
 }
 
@@ -654,7 +655,6 @@ Partitionneur_base_32_64<_SIZE_>::corriger_bords_avec_graphe(const Static_Int_Li
  */
 template <typename _SIZE_>
 void Partitionneur_base_32_64<_SIZE_>::corriger_bords_avec_liste(const Domaine_t& dom,
-                                                                 const Noms& liste_bords_periodiques,
                                                                  const int_t my_offset,
                                                                  BigIntVect_& elem_part)
 {
@@ -668,14 +668,12 @@ void Partitionneur_base_32_64<_SIZE_>::corriger_bords_avec_liste(const Domaine_t
   Cerr << " Construction of graph connectivity for periodic elements" << finl;
   Static_Int_Lists_t graph_elements_perio;
   calculer_graphe_connexions_periodiques(dom,
-                                         liste_bords_periodiques,
                                          som_elem,
                                          my_offset,
                                          graph_elements_perio);
   const int_t count = corriger_bords_avec_graphe(graph_elements_perio,
                                                  som_elem,
                                                  dom,
-                                                 liste_bords_periodiques,
                                                  elem_part);
   Cerr << "corriger_bords_avec_liste : we have corrected " << count << " elements all in all." << finl;
 }

@@ -46,7 +46,7 @@ public:
   void associer_domaine(const Domaine_t& domaine) override;
   void initialiser(const ArrOfInt& nb_tranches);
   void construire_partition(BigIntVect_& elem_part, int& nb_parts_tot) const override;
-  static void chercher_direction_perio(const Domaine_t& domaine, const Noms& liste_bords_perio, ArrOfInt& directions_perio);
+  static void chercher_direction_perio(const Domaine_t& domaine, ArrOfInt& directions_perio);
 
 private:
   // Parametres du partitionneur

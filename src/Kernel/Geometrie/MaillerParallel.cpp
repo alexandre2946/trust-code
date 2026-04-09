@@ -558,9 +558,9 @@ Entree& MaillerParallel::interpreter(Entree& is)
   param.ajouter("nb_nodes", &nb_noeuds, Param::REQUIRED); // XD_ADD_P listentier dimension defines the spatial dimension (currently only dimension=3 is supported), and nX, nY and nZ defines the total number of nodes in the mesh in each direction.
   param.ajouter("splitting", &decoupage, Param::REQUIRED); // XD_ADD_P listentier dimension is the spatial dimension and npartsX, npartsY and npartsZ are the number of parts created. The product of the number of parts must be equal to the number of processors used for the computation.
   param.ajouter("ghost_thickness", &epaisseur_joint, Param::REQUIRED); // XD_ADD_P entier the number of ghost cells (equivalent to the epaisseur_joint parameter of Decouper.
-  param.ajouter_flag("perio_x", &perio[0]); // XD_ADD_P rien change the splitting method to provide a valid mesh for periodic boundary conditions.
-  param.ajouter_flag("perio_y", &perio[1]); // XD_ADD_P rien change the splitting method to provide a valid mesh for periodic boundary conditions.
-  param.ajouter_flag("perio_z", &perio[2]); // XD_ADD_P rien change the splitting method to provide a valid mesh for periodic boundary conditions.
+  param.ajouter_flag("perio_x", &perio[0]); // XD_ADD_P rien change the splitting method to provide a valid mesh for periodic boundary conditions. Register the corresponding boundary in the list of periodic boundaries for the domain.
+  param.ajouter_flag("perio_y", &perio[1]); // XD_ADD_P rien change the splitting method to provide a valid mesh for periodic boundary conditions. Register the corresponding boundary in the list of periodic boundaries for the domain.
+  param.ajouter_flag("perio_z", &perio[2]); // XD_ADD_P rien change the splitting method to provide a valid mesh for periodic boundary conditions. Register the corresponding boundary in the list of periodic boundaries for the domain.
   param.ajouter("function_coord_x", &fonctions_coord[0]); // XD_ADD_P chaine By default, the meshing algorithm creates nX nY nZ coordinates ranging between 0 and 1 (eg a unity size box). If function_coord_x} is specified, it is used to transform the [0,1] segment to the coordinates of the nodes. funcX must be a function of the x variable only.
   param.ajouter("function_coord_y", &fonctions_coord[1]); // XD_ADD_P chaine like function_coord_x for y
   param.ajouter("function_coord_z", &fonctions_coord[2]); // XD_ADD_P chaine like function_coord_x for z
@@ -732,7 +732,6 @@ Entree& MaillerParallel::interpreter(Entree& is)
   elem->associer_domaine(domaine);
 
   BlocData data;
-  Noms liste_bords_perio;
   Bords& bords = domaine.faces_bord();
   data.bord_xmin_ = nom_bords_min;
   data.bord_xmax_ = nom_bords_max;
@@ -744,8 +743,11 @@ Entree& MaillerParallel::interpreter(Entree& is)
       else nomdir = "z";
       if (perio[dir])
         {
+          // In case of a periodic boundary only 'min' should be named:
           data.bord_xmax_[dir] = data.bord_xmin_[dir];
           bords.add(Bord()).nommer(data.bord_xmin_[dir]);
+          // And the name is added to the list of periodic boundaries in the domain:
+          domaine.bords_perio().add(data.bord_xmin_[dir]);
         }
       else
         {
@@ -837,7 +839,7 @@ Entree& MaillerParallel::interpreter(Entree& is)
       Cerr << "Scatter::construire_correspondance_sommets_par_coordonnees fin, time:"
            << maxtime << finl;
       statistics().begin_count(STD_COUNTERS::parallel_meshing,statistics().get_last_opened_counter_level()+1);
-      Scatter::construire_structures_paralleles(domaine, liste_bords_perio);
+      Scatter::construire_structures_paralleles(domaine);
 
       maxtime = mp_max(statistics().get_time_since_last_open(STD_COUNTERS::parallel_meshing));
       statistics().end_count(STD_COUNTERS::parallel_meshing);

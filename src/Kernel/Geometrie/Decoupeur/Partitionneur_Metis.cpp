@@ -158,7 +158,7 @@ void Partitionneur_Metis_32_64<_SIZE_>::construire_partition(BigIntVect_& elem_p
   //const Domaine& dom = ref_domaine_.valeur();
   Domain_Graph graph;
   if (!use_segment_to_build_connectivite_elem_elem_)
-    graph.construire_graph_elem_elem<_SIZE_>(ref_domaine_.valeur(), this->liste_bords_periodiques_,
+    graph.construire_graph_elem_elem<_SIZE_>(ref_domaine_.valeur(),
                                              use_weights_,
                                              graph_elements_perio);
   else
@@ -258,7 +258,7 @@ void Partitionneur_Metis_32_64<_SIZE_>::construire_partition(BigIntVect_& elem_p
   if (graph_elements_perio.get_nb_lists() > 0)
     {
       Cerr << "Correction of the partition for the periodicity" << finl;
-      this->corriger_bords_avec_liste(ref_domaine_.valeur(), this->liste_bords_periodiques_, 0, elem_part);
+      this->corriger_bords_avec_liste(ref_domaine_.valeur(), 0, elem_part);
       Cerr << "  If this number is high, you can improve the splitting with the option use_weights\n"
            << "  but it takes more memory)" << finl;
     }

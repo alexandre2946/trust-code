@@ -179,7 +179,6 @@ void Domain_Graph::construire_graph_from_segment(const Domaine_32_64<_SIZE_>& do
 // de corrections a faire ensuite (voir (***))
 template<typename _SIZE_>
 void Domain_Graph::construire_graph_elem_elem(const Domaine_32_64<_SIZE_>& dom,
-                                              const Noms& liste_bords_periodiques,
                                               bool use_weights,
                                               Static_Int_Lists_32_64<_SIZE_>& graph_elements_perio)
 {
@@ -188,6 +187,7 @@ void Domain_Graph::construire_graph_elem_elem(const Domaine_32_64<_SIZE_>& dom,
   using SmallArrOfTID_t = SmallArrOfTID_T<_SIZE_>;
   using Poly_geom_base_t = Poly_geom_base_32_64<_SIZE_>;
 
+  const Noms& liste_bords_periodiques = dom.bords_perio();
   Static_Int_Lists_32_64<_SIZE_> som_elem;
   const Elem_geom_base_32_64<_SIZE_>& type_elem = dom.type_elem().valeur();
   IntTab faces_element_reference;
@@ -233,7 +233,6 @@ void Domain_Graph::construire_graph_elem_elem(const Domaine_32_64<_SIZE_>& dom,
     {
       Cerr << " Construction of graph connectivity for periodic boundaries" << finl;
       nb_connexions_perio = Partitionneur_base_32_64<_SIZE_>::calculer_graphe_connexions_periodiques(dom,
-                                                                                                     liste_bords_periodiques,
                                                                                                      som_elem,
                                                                                                      my_offset,
                                                                                                      graph_elements_perio);
@@ -484,11 +483,11 @@ void Domain_Graph::construire_graph_elem_elem(const Domaine_32_64<_SIZE_>& dom,
 
 // Explicit instanciations:
 template void Domain_Graph::construire_graph_from_segment(const Domaine_32_64<int>& dom, bool use_weights );
-template void Domain_Graph::construire_graph_elem_elem(const Domaine_32_64<int>& dom, const Noms& liste_bords_periodiques,
+template void Domain_Graph::construire_graph_elem_elem(const Domaine_32_64<int>& dom,
                                                        bool use_weights, Static_Int_Lists_32_64<int>& graph_elements_perio);
 
 #if INT_is_64_ == 2
 template void Domain_Graph::construire_graph_from_segment(const Domaine_32_64<trustIdType>& dom, bool use_weights );
-template void Domain_Graph::construire_graph_elem_elem(const Domaine_32_64<trustIdType>& dom, const Noms& liste_bords_periodiques,
+template void Domain_Graph::construire_graph_elem_elem(const Domaine_32_64<trustIdType>& dom,
                                                        bool use_weights, Static_Int_Lists_32_64<trustIdType>& graph_elements_perio);
 #endif

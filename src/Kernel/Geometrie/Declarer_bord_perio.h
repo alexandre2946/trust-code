@@ -57,7 +57,7 @@ public:
   using Domaine_t = Domaine_32_64<_SIZE_>;
 
   Entree& interpreter_(Entree& is) override;
-  void declare_and_adapt();
+  void adapt_som_and_faces();
 
   Nom& nom_bord() { return nom_bord_; }
   const Nom& nom_bord() const { return nom_bord_; }

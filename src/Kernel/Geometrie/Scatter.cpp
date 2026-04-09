@@ -27,7 +27,6 @@
 #include <MD_Vector_tools.h>
 #include <MD_Vector_std.h>
 #include <MD_Vector_seq.h>
-#include <unistd.h> // PGI
 #include <Poly_geom_base.h>
 #include <Entree_Brute.h>
 #include <Comm_Group_MPI.h>
@@ -215,8 +214,7 @@ Entree& Scatter::interpreter(Entree& is)
   if (Process::je_suis_maitre())
     Cerr << "Reading the domain" << finl;
 
-  Noms liste_bords_periodiques;
-  lire_domaine(nomentree, liste_bords_periodiques);
+  lire_domaine(nomentree);
 
   barrier();
   Cerr << "Calculation of renum_items_communs for the nodes" << finl;
@@ -228,7 +226,7 @@ Entree& Scatter::interpreter(Entree& is)
 
   barrier();
   Cerr << "Construire_structures_paralleles" << finl;
-  construire_structures_paralleles(dom, liste_bords_periodiques);
+  construire_structures_paralleles(dom);
 
   if (0)
     dump_lata(dom);
@@ -391,7 +389,7 @@ void Scatter::check_consistancy_remote_items(Domaine& dom, const ArrOfInt& merge
  *
  *  Necessary when the processors don't have the same numbers of file to read
  */
-void Scatter::read_domain_no_comm(Entree& fic)
+void Scatter::read_domain_no_comm(Entree& fic, bool& read_perio)
 {
   Domaine& dom = le_domaine.valeur();
 
@@ -409,7 +407,7 @@ void Scatter::read_domain_no_comm(Entree& fic)
     {
       if (nom!=accouverte)
         Process::exit("Error: Scatter::read_domain_no_comm() -- One expected an opened bracket { to start.");
-      domaine_read.read_former_domaine(fic);
+      domaine_read.read_former_domaine(fic, read_perio);
     }
   else
     Process::exit("Error: Scatter::read_domain_no_comm() -- Empty list ?! Should not happen?");
@@ -465,7 +463,7 @@ void Scatter::read_domain_no_comm(Entree& fic)
  *
  *   Format attendu : Domaine::ReadOn
  */
-void Scatter::lire_domaine(Nom& nomentree, Noms& liste_bords_periodiques)
+void Scatter::lire_domaine(Nom& nomentree)
 {
   // On determine si le fichier est au nouveau format ou a l'ancien
   if (Process::je_suis_maitre())
@@ -473,13 +471,14 @@ void Scatter::lire_domaine(Nom& nomentree, Noms& liste_bords_periodiques)
   barrier(); // Attendre que le message soit affiche
 
   Domaine& dom = domaine();
+  Noms& liste_bords_periodiques = dom.bords_perio();
+
   // Just in case - some dataset improperly build a Domain and then try to Scatter on it ...:
   dom.clear();
 
   Nom copy(nomentree);
   copy = copy.nom_me(Process::nproc(), "p", 1);
 
-  //bool is_hdf = FichierHDF::is_hdf5(copy);
   LecFicDiffuse test;
   bool is_hdf = test.ouvrir(copy) && FichierHDF::is_hdf5(copy);
   if (test.ouvrir(nomentree) && FichierHDF::is_hdf5(nomentree))
@@ -493,10 +492,11 @@ void Scatter::lire_domaine(Nom& nomentree, Noms& liste_bords_periodiques)
   ArrOfInt mergedDomaines(Process::nproc());
   mergedDomaines = 0;
   bool domain_not_built = true;
+  bool read_perio = false;
   if (is_hdf)
     {
       FichierHDFPar fic_hdf;
-      //FichierHDF fic_hdf;
+
       nomentree = copy;
       fic_hdf.open(nomentree, true);
 
@@ -514,12 +514,14 @@ void Scatter::lire_domaine(Nom& nomentree, Noms& liste_bords_periodiques)
               if(exists)
                 {
                   Nom dataset_name(dname);
+
                   fic_hdf.read_dataset(dataset_name, i, data_part);
-                  read_domain_no_comm(data_part);
+                  read_domain_no_comm(data_part, read_perio);
 
                   // Renseigne dans quel fichier le domaine a ete lu
                   dom.set_fichier_lu(nomentree);
-                  data_part >> liste_bords_periodiques;
+                  if (!read_perio)  // are the periodic boundaries read from the Domain (new format) or after it?
+                    data_part >> liste_bords_periodiques;
                   domain_not_built = false;
                 }
               else
@@ -533,9 +535,10 @@ void Scatter::lire_domaine(Nom& nomentree, Noms& liste_bords_periodiques)
           fic_hdf.read_dataset("/zone", Process::me(), data);
 
           // Feed TRUST objects:
-          read_domain_no_comm(data);
+          read_domain_no_comm(data, read_perio);
           dom.set_fichier_lu(nomentree);
-          data >> liste_bords_periodiques;
+          if (!read_perio)  // are the periodic boundaries read from the Domain (new format) or after it?
+            data >> liste_bords_periodiques;
           domain_not_built = false;
         }
 
@@ -560,11 +563,12 @@ void Scatter::lire_domaine(Nom& nomentree, Noms& liste_bords_periodiques)
               int ok = fichier_binaire_part.ouvrir(nomentree_part);
               if(ok)
                 {
-                  read_domain_no_comm(fichier_binaire_part);
+                  read_domain_no_comm(fichier_binaire_part, read_perio);
 
                   // Renseigne dans quel fichier le domaine a ete lu
                   dom.set_fichier_lu(nomentree);
-                  fichier_binaire_part >> liste_bords_periodiques;
+                  if (!read_perio)  // are the periodic boundaries read from the Domain (new format) or after it?
+                    fichier_binaire_part >> liste_bords_periodiques;
                   fichier_binaire_part.close();
                   domain_not_built = false;
                 }
@@ -574,11 +578,12 @@ void Scatter::lire_domaine(Nom& nomentree, Noms& liste_bords_periodiques)
         }
       else
         {
-          read_domain_no_comm(fichier_binaire);
+          read_domain_no_comm(fichier_binaire, read_perio);
 
           // Renseigne dans quel fichier le domaine a ete lu
           dom.set_fichier_lu(nomentree);
-          fichier_binaire >> liste_bords_periodiques;
+          if (!read_perio)  // are the periodic boundaries read from the Domain (new format) or after it?
+            fichier_binaire >> liste_bords_periodiques;
           fichier_binaire.close();
           domain_not_built = false;
         }
@@ -662,7 +667,7 @@ void Scatter::lire_domaine(Nom& nomentree, Noms& liste_bords_periodiques)
  *    creation des sommets et des elements virtuels)
  *
  */
-void Scatter::construire_structures_paralleles(Domaine& dom, const Noms& liste_bords_periodiques)
+void Scatter::construire_structures_paralleles(Domaine& dom)
 {
   // D'abord: supprimer les structures "sequentielles" associees aux sommets et elements lors de la lecture:
   {
@@ -671,16 +676,18 @@ void Scatter::construire_structures_paralleles(Domaine& dom, const Noms& liste_b
     dom.les_elems().set_md_vector(md_nul);
   }
 
+  const Noms& liste_bords_periodiques = dom.bords_perio();
+
   // L'ordre d'appel est important:
   calculer_espace_distant_elements(dom);
 
   if (liste_bords_periodiques.size() > 0)
-    corriger_espace_distant_elements_perio(dom, liste_bords_periodiques);
+    corriger_espace_distant_elements_perio(dom);
 
   calculer_nb_items_virtuels(dom.faces_joint(), JOINT_ITEM::ELEMENT);
 
   // Determination des sommets distants en fonction des elements distants
-  calculer_espace_distant_sommets(dom, liste_bords_periodiques);
+  calculer_espace_distant_sommets(dom);
 
   // Creation des espaces distants virtuels et items communs pour les tableaux
   // sommets et elements:
@@ -1145,7 +1152,7 @@ static void calculer_espace_distant_item(Domaine& le_dom,
  *    dom.faces_joint(i).joint_item(JOINT_ITEM::SOMMET).items_distants();
  *
  */
-void Scatter::calculer_espace_distant_sommets(Domaine& dom, const Noms& liste_bords_perio)
+void Scatter::calculer_espace_distant_sommets(Domaine& dom)
 {
   if (Process::je_suis_maitre())
     Cerr << "Scatter::calculer_espace_distant_sommets : start" << finl;
@@ -1157,7 +1164,7 @@ void Scatter::calculer_espace_distant_sommets(Domaine& dom, const Noms& liste_bo
   // Initialisation du tableau renum_som_perio
   for (int i = 0; i < nb_sommets_reels; i++)
     renum_som_perio[i] = i;
-  Reordonner_faces_periodiques::renum_som_perio(dom, liste_bords_perio, renum_som_perio,
+  Reordonner_faces_periodiques::renum_som_perio(dom, renum_som_perio,
                                                 0 /* ne pas calculer pour les sommets virtuels */);
 
   calculer_espace_distant_item(dom,
@@ -1899,11 +1906,12 @@ static void calculer_liste_complete_items_joint(const Joint& joint, const JOINT_
  *   on ajoute a l'espace distant l'element adjacent a la face opposee.
  *
  */
-void Scatter::corriger_espace_distant_elements_perio(Domaine& dom,
-                                                     const Noms& liste_bords_periodiques)
+void Scatter::corriger_espace_distant_elements_perio(Domaine& dom)
 {
   if (Process::je_suis_maitre())
     Cerr << "Correction of remote spaces of the elements for the periodic faces" << finl;
+
+  const Noms& liste_bords_periodiques = dom.bords_perio();
 
   const int nb_elem = dom.nb_elem();
   const IntTab& les_elems = dom.les_elems();

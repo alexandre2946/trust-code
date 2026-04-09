@@ -97,6 +97,7 @@ public:
   // General
   //
   Domaine_32_64() { clear(); }
+  Entree& readOn_has_perio(Entree& s, bool& has_perio);
   inline void typer(const Nom&);
   inline const OWN_PTR(Elem_geom_base_32_64<_SIZE_>)& type_elem() const { return elem_; }
   inline OWN_PTR(Elem_geom_base_32_64<_SIZE_>)& type_elem() {  return elem_; }
@@ -274,6 +275,8 @@ public:
   ///
   /// Periodicity
   ///
+  inline const Noms& bords_perio() const { return bords_perio_; }
+  inline Noms& bords_perio() { return bords_perio_; }
   void init_renum_perio();
   inline int_t get_renum_som_perio(int_t i) const { return renum_som_perio_[i]; }
   void construire_renum_som_perio(const Conds_lim&, const Domaine_dis_base&);
@@ -331,7 +334,7 @@ public:
   void check_domaine();
   void imprimer() const;
   int comprimer();
-  void read_former_domaine(Entree& s);  // used in Scatter
+  void read_former_domaine(Entree& s, bool& read_perio);   // used in Scatter
   void merge_wo_vertices_with(Domaine_32_64& z);
   void fill_from_list(std::list<Domaine_32_64*>& lst);
 
@@ -418,6 +421,8 @@ protected:
   Joints_t mes_faces_joint_;
 
   LIST(OBS_PTR(Domaine_32_64)) domaines_frontieres_;
+
+  Noms bords_perio_;  ///< List of periodic boundaries - this is filled by Interprete 'Declarer_bord_perio'
 
 #ifdef MEDCOUPLING_
   ///! MEDCoupling version of the domain:

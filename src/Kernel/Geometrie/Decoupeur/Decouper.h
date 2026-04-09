@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -63,7 +63,6 @@ protected:
   // The actual tool used for partitioning (Metis, Tranche, etc.):
   OWN_PTR(Partitionneur_base_t) deriv_partitionneur_;
   int nb_parts_tot_ = -1;
-  Noms liste_bords_periodiques_;
   // Result of the partitionning process:
   BigIntVect_t elem_part_;
 

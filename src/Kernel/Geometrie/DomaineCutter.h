@@ -51,7 +51,7 @@ public:
   using Decouper_t = Decouper_32_64<_SIZE_>;
 
   void initialiser(const Domaine_t& domaine_global, const BigIntVect_t& elem_part, const int nb_parts, const int epaisseur_joint,
-                   const Noms& bords_periodiques, const bool permissif=false);
+                   const bool permissif=false);
   void reset();
 
   // NOTE: in the API below we use both
@@ -94,8 +94,6 @@ private:
   // Reference au tableau de decoupage
   //  (pour chaque element du domaine global, numero de sous-domaine)
   OBS_PTR(BigIntVect_t) ref_elem_part_;
-  // Liste des noms des bords periodiques
-  Noms liste_bords_periodiques_;
   // Nombre total de parties (>= a max_array(elem_part) + 1)
   int nb_parties_ = -1;
   // Epaisseur du joint

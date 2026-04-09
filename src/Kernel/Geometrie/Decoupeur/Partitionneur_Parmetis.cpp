@@ -115,7 +115,7 @@ void Partitionneur_Parmetis::construire_partition(IntVect& elem_part, int& nb_pa
   Static_Int_Lists graph_elements_perio;
   //const Domaine& dom = ref_domaine_.valeur();
   Domain_Graph graph;
-  graph.construire_graph_elem_elem(ref_domaine_.valeur(), liste_bords_periodiques_,
+  graph.construire_graph_elem_elem(ref_domaine_.valeur(),
                                    use_weights_,
                                    graph_elements_perio);
 
@@ -163,7 +163,6 @@ void Partitionneur_Parmetis::construire_partition(IntVect& elem_part, int& nb_pa
     {
       Cerr << "Correction of the partition for the periodicity" << finl;
       corriger_bords_avec_liste(ref_domaine_.valeur(),
-                                liste_bords_periodiques_,
                                 0,
                                 elem_part);
       Cerr << "  If this number is high, we can improve the splitting with the option use_weights\n"

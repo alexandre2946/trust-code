@@ -46,7 +46,7 @@ Entree& ScatterMED::readOn(Entree& is)
  *   le Domaine est renomme comme le domaine (pour lance_test_seq_par)
  *
  */
-void ScatterMED::lire_domaine(Nom& nomentree, Noms& liste_bords_periodiques)
+void ScatterMED::lire_domaine(Nom& nomentree)
 {
   Nom fichiermed(nomentree);
   fichiermed.prefix(".med");
@@ -69,9 +69,6 @@ void ScatterMED::lire_domaine(Nom& nomentree, Noms& liste_bords_periodiques)
   const Nom& nom_dom = dom.le_nom();
   dom.nommer(nom_dom);
 
-  //fichier >> liste_bords_periodiques;
-
-  //fichier.close();
   if (0)
     {
       Nom org=("debug.Zones");

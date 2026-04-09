@@ -1142,7 +1142,6 @@ void DomaineCutter_32_64<_SIZE_>::initialiser(const Domaine_t&   domaine_global,
                                               const BigIntVect_t& elem_part,
                                               const int     nb_parts,
                                               const int     epaisseur_joint,
-                                              const Noms&      liste_bords_periodiques,
                                               const bool permissif)
 {
   assert(nb_parts >= 0);
@@ -1162,7 +1161,6 @@ void DomaineCutter_32_64<_SIZE_>::initialiser(const Domaine_t&   domaine_global,
   ref_elem_part_ = elem_part;
   nb_parties_ = nb_parts;
   epaisseur_joint_ = epaisseur_joint;
-  liste_bords_periodiques_ = liste_bords_periodiques;
 
   const IntTab_t& elems = domaine_global.les_elems();
   const int_t nb_som = domaine_global.nb_som_tot();
@@ -1221,6 +1219,9 @@ void DomaineCutter_32_64<_SIZE_>::construire_sous_domaine(const int part, Domain
     }
   sous_domain.type_elem()->associer_domaine(sous_domain);
 
+  // Copy names of periodic boundaries:
+  sous_domain.bords_perio() = domain.bords_perio();
+
   construire_liste_sommets_sousdomaine(domain.nb_som_tot(), domain.les_elems(), elements_sous_partie, part,
                                        som_raccord, correspondance.liste_sommets_ /* write */,
                                        correspondance.liste_inverse_sommets_ /* write */);
@@ -1228,16 +1229,14 @@ void DomaineCutter_32_64<_SIZE_>::construire_sous_domaine(const int part, Domain
   remplir_coordsommets_sous_domaine(domain.coord_sommets(), correspondance.liste_sommets_, sous_domain.les_sommets() /* write */);
   construire_elems_sous_domaine(domain.les_elems(), elements_sous_partie, correspondance.liste_inverse_sommets_, sous_domain.les_elems() /* write */,
                                 correspondance.liste_inverse_elements_ /* write */);
-  {
-    const SmallArrOfTID_t& l_som = correspondance.liste_sommets_;
-    const BigArrOfInt_t& l_inv_som = correspondance.liste_inverse_sommets_;
-    construire_faces_bords_ssdom(l_inv_som, part, sous_domain);
-    construire_faces_raccords_ssdom(l_inv_som, part, sous_domain);
-    construire_frontieres_internes_ssdom(l_inv_som, part, sous_domain);
-    construire_groupe_faces_ssdom(l_inv_som, part, sous_domain);
-    construire_sommets_joints_ssdom(l_som, l_inv_som, part, som_raccord, sous_domain);
-  }
 
+  const SmallArrOfTID_t& l_som = correspondance.liste_sommets_;
+  const BigArrOfInt_t& l_inv_som = correspondance.liste_inverse_sommets_;
+  construire_faces_bords_ssdom(l_inv_som, part, sous_domain);
+  construire_faces_raccords_ssdom(l_inv_som, part, sous_domain);
+  construire_frontieres_internes_ssdom(l_inv_som, part, sous_domain);
+  construire_groupe_faces_ssdom(l_inv_som, part, sous_domain);
+  construire_sommets_joints_ssdom(l_som, l_inv_som, part, som_raccord, sous_domain);
   construire_faces_joints_ssdom(part, correspondance, sous_domain);
 
   //if som_raccord is used (for DecouperMulti), then construire_elements_distants_ssdom()
@@ -1267,10 +1266,6 @@ template<typename _SIZE_>
 void DomaineCutter_32_64<_SIZE_>::writeData(const Domaine& sous_domaine, Sortie& os) const
 {
   os << sous_domaine;
-  // Benoit Mathieu: Scatter a besoin de la liste des bords periodiques pour le
-  // calcul des elements distants. Je l'ecris apres le domaine dans le fichier .Zones.
-  // Pas genial mais c'est pour depanner en attendant mieux.
-  os << liste_bords_periodiques_;
 }
 
 /*! @brief Generation de tous les sous-domaines du calcul et ecriture sur disque des fichiers basename_000n.

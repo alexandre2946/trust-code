@@ -23,7 +23,7 @@ class ScatterMED : public Scatter
 {
   Declare_instanciable(ScatterMED);
 public:
-  void    lire_domaine(Nom&, Noms& liste_bords_periodiques) override;
+  void    lire_domaine(Nom&) override;
 
 };
 

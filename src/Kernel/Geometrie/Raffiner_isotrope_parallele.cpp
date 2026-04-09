@@ -49,12 +49,14 @@ Entree&  Raffiner_isotrope_parallele::interpreter(Entree& is)
   bool format_hdf = false;
   Nom org,newd;
   Param param(que_suis_je());
-// XD Raffiner_isotrope_parallele interprete Raffiner_isotrope_parallele 1 Refine parallel mesh in parallel
+
+  // XD Raffiner_isotrope_parallele interprete Raffiner_isotrope_parallele 1 Refine parallel mesh in parallel
   param.ajouter("name_of_initial_domaines|name_of_initial_zones",&org,Param::REQUIRED); // XD_ADD_P chaine name of initial Domaines
   param.ajouter("name_of_new_domaines|name_of_new_zones",&newd,Param::REQUIRED); // XD_ADD_P chaine name of new Domaines
   param.ajouter("ascii",&form);  // XD_ADD_P flag writing Domaines in ascii format
   param.ajouter_flag("single_hdf",&format_hdf); // XD_ADD_P rien writing Domaines in hdf format
   param.lire_avec_accolades(is);
+
   // Force un fichier unique au dela d'un certain nombre de rangs MPI:
   if (Process::force_single_file(Process::nproc(), org+".Zones"))
     format_hdf = true;
@@ -65,7 +67,8 @@ Entree&  Raffiner_isotrope_parallele::interpreter(Entree& is)
       Process::exit(1);
     }
   Domaine dom_org;
-  Noms liste_bords_periodiques;
+  Noms& liste_bords_periodiques = dom_org.bords_perio();
+
   org+=".Zones";
 
   Nom copy(org);
@@ -73,34 +76,37 @@ Entree&  Raffiner_isotrope_parallele::interpreter(Entree& is)
   //bool is_hdf = FichierHDF::is_hdf5(copy);
   LecFicDiffuse test;
   bool is_hdf = test.ouvrir(copy) && FichierHDF::is_hdf5(copy);
+  bool has_perio = false;
 
   if (!is_hdf)
     {
       LecFicDistribue  fichier;
       fichier.set_bin(binaire);
       fichier.ouvrir(org);
-      fichier >> dom_org;
+      dom_org.readOn_has_perio(fichier, has_perio);
       dom_org.set_fichier_lu(org);
-      fichier >> liste_bords_periodiques;
+      if (!has_perio) // Old (pre TRUST 1.9.8) Domain format - periodic boundaries stored after:
+        fichier >> liste_bords_periodiques;
     }
   else
     {
       FichierHDFPar fic_hdf;
-      //FichierHDF fic_hdf;
       org = copy;
       fic_hdf.open(org, true);
       Entree_Brute data;
       fic_hdf.read_dataset("//zone", Process::me(), data);
       // Feed TRUST objects:
-      data >> dom_org;
+      dom_org.readOn_has_perio(data, has_perio);
       dom_org.set_fichier_lu(org);
-      data >> liste_bords_periodiques;
+      if (!has_perio) // Old (pre TRUST 1.9.8) Domain format - periodic boundaries stored after:
+        data >> liste_bords_periodiques;
       fic_hdf.close();
     }
 
   Scatter::uninit_sequential_domain(dom_org);
   Domaine dom_new(dom_org);
   dom_new.typer(dom_org.type_elem()->que_suis_je());
+
   refine_domain(dom_org,dom_new);
 
   // After spliting the mesh and the boundaries, we reorder perdiodic faces:
@@ -136,7 +142,7 @@ Entree&  Raffiner_isotrope_parallele::interpreter(Entree& is)
            << finl;
 
       statistics().begin_count(STD_COUNTERS::parallel_meshing,statistics().get_last_opened_counter_level()+1);
-      Scatter::construire_structures_paralleles(dom_new, liste_bords_periodiques);
+      Scatter::construire_structures_paralleles(dom_new);
       maxtime = mp_max(statistics().get_time_since_last_open(STD_COUNTERS::parallel_meshing));
       statistics().end_count(STD_COUNTERS::parallel_meshing);
       Cerr << "Scatter::construire_structures_paralleles, time:" << maxtime << finl;
@@ -148,7 +154,6 @@ Entree&  Raffiner_isotrope_parallele::interpreter(Entree& is)
           Scatter::uninit_sequential_domain(dom_new);
           dom_new.les_elems().resize( nb_elem_reel,dom_new.les_elems().dimension(1));
           dom_new.les_sommets().resize(nb_sommet_avant_completion,dimension);
-
 
           Scatter::uninit_sequential_domain(dom_new);
           newd+=".Zones";
@@ -164,13 +169,11 @@ Entree&  Raffiner_isotrope_parallele::interpreter(Entree& is)
                   os.precision(Objet_U::format_precision_geom);
                 }
               os << dom_new;
-              os << liste_bords_periodiques;
             }
           else
             {
               Sortie_Brute os_hdf;
               os_hdf << dom_new;
-              os_hdf << liste_bords_periodiques;
               FichierHDFPar fic_hdf;
               newd = newd.nom_me(Process::nproc(), "p", 1);
               fic_hdf.create(newd);

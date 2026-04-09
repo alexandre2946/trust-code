@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -93,7 +93,6 @@ Entree& Decouper_multi::interpreter(Entree& is)
       off.push_back(off.back() + coord.dimension(0));
 
       Partitionneur_base& partitionneur = dec.deriv_partitionneur_.valeur();
-      partitionneur.declarer_bords_periodiques(dec.liste_bords_periodiques_);
       partitionneur.construire_partition(dec.elem_part_, dec.nb_parts_tot_);
       if (dec.nom_fichier_med_ != "?")
         dec.postraiter_decoupage(dec.nom_fichier_med_);

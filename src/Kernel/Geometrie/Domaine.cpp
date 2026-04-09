@@ -128,6 +128,8 @@ void Domaine_32_64<_SZ_>::clear()
   bords_a_imprimer_.vide();
   bords_a_imprimer_sum_.vide();
 
+  bords_perio_.clear();
+
   epsilon_ = Objet_U::precision_geom;
   fichier_lu_ = Nom();
 
@@ -175,9 +177,23 @@ Sortie& Domaine_32_64<_SZ_>::printOn(Sortie& s) const
       s << finl << "groupes_faces" << finl;
       s << mes_groupes_faces_;
     }
+
+  // New in TRUST 1.9.8 - list of periodic boundaries are directly stored in Domain class
+  s << finl << "bords_perio" << finl;
+  s << bords_perio_;
+
   s << "}" << finl;
 
   return s;
+}
+
+/*! @brief See readOn_has_perio()
+ */
+template<typename _SZ_>
+Entree& Domaine_32_64<_SZ_>::readOn(Entree& s)
+{
+  bool dnu;
+  return readOn_has_perio(s, dnu);
 }
 
 /*! @brief Lit les objets constituant un Domaine a partir d'un flot d'entree.
@@ -186,15 +202,17 @@ Sortie& Domaine_32_64<_SZ_>::printOn(Sortie& s) const
  *     lus on les associe au domaine.
  *
  * @param (Entree& s) un flot d'entree
+ * @param (bool& has_perio) set to True if periodic boundaries were read, false otherwise.
  * @return (Entree&) le flot d'entree modifie
  */
 template<typename _SZ_>
-Entree& Domaine_32_64<_SZ_>::readOn(Entree& s)
+Entree& Domaine_32_64<_SZ_>::readOn_has_perio(Entree& s, bool& has_perio)
 {
 #ifdef SORT_POUR_DEBOG
   s.setf(ios::scientific);
   s.precision(20);
 #endif
+  has_perio = false;
   // Ajout BM: reset de la structure (a pour effet de debloquer la structure parallele)
   sommets_.reset();
   renum_som_perio_.reset();
@@ -215,7 +233,7 @@ Entree& Domaine_32_64<_SZ_>::readOn(Entree& s)
   Nom acc;
   s >> acc;
   assert (acc == "{");
-  read_former_domaine(s);
+  read_former_domaine(s, has_perio);
   check_domaine();
 
   if (Process::is_sequential() && (NettoieNoeuds_32_64<_SZ_>::NettoiePasNoeuds==0) )
@@ -234,11 +252,14 @@ Entree& Domaine_32_64<_SZ_>::readOn(Entree& s)
 
 /*! @brief read what was (before TRUST 1.9.2) the "domaine" part from the input stream
  * i.e. (roughly) the element description.
+ *
+ * @param read_perio set to True if periodic boundaries were read in the domain (from TRUST 1.9.8)
  */
 template<typename _SZ_>
-void Domaine_32_64<_SZ_>::read_former_domaine(Entree& s)
+void Domaine_32_64<_SZ_>::read_former_domaine(Entree& s, bool& read_perio)
 {
   Nom dnu, acc;
+  read_perio = false;
   Cerr << " Reading part of domain " << le_nom() << finl;
   s >> dnu; // Name of the Domaine, now unused ...
   s >> elem_;
@@ -258,6 +279,14 @@ void Domaine_32_64<_SZ_>::read_former_domaine(Entree& s)
     {
       s >> mes_groupes_faces_;
       s >> acc;
+    }
+  // Tries to read list of periodic boundaries:
+  bords_perio_.clear();
+  if (acc == "bords_perio")
+    {
+      s >> bords_perio_;
+      s >> acc;
+      read_perio = true;
     }
   if (acc != "}")
     Process::exit( "misformatted domain file : One expected a closing bracket } to end. ");
@@ -1243,6 +1272,15 @@ void Domaine_32_64<_SZ_>::merge_wo_vertices_with(Domaine_32_64<_SZ_>& dom2)
   dom2.groupes_faces().associer_domaine(*this);
   groupes_faces().add(dom2.groupes_faces());
 
+  // Add periodic boundary names if not already there:
+  auto& bp = bords_perio();
+  const auto& bp2 = dom2.bords_perio();
+  for (const auto &b : bp2)
+    {
+      if (bp.rang(b) < 0)
+        bp.add(b);
+    }
+
   correct_type_of_borders_after_merge();
   comprimer();
   comprimer_joints();
@@ -2171,6 +2209,7 @@ void Domaine_32_64<_SIZE_>::renum(const IntVect_t& Les_Nums)
 template<>
 void Domaine_32_64<int>::construire_renum_som_perio(const Conds_lim& les_cl, const Domaine_dis_base& domaine_dis)
 {
+  // TODO - check this
   Noms bords_perio;
   const int nb_bords = les_cl.size();
   for (int n_bord = 0; n_bord < nb_bords; n_bord++)
@@ -2179,7 +2218,7 @@ void Domaine_32_64<int>::construire_renum_som_perio(const Conds_lim& les_cl, con
         bords_perio.add(les_cl[n_bord]->frontiere_dis().frontiere().le_nom());
     }
 
-  Reordonner_faces_periodiques::renum_som_perio(*this, bords_perio, renum_som_perio_,
+  Reordonner_faces_periodiques::renum_som_perio(*this, renum_som_perio_,
                                                 1 /* Calculer les valeurs pour les sommets virtuels */);
 }
 

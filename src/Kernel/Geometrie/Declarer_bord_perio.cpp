@@ -23,17 +23,14 @@
 
 Implemente_instanciable_32_64(Declarer_bord_perio_32_64,"Declarer_bord_perio",Interprete_geometrique_base_32_64<_T_>);
 Add_synonym(Declarer_bord_perio,"Corriger_frontiere_periodique");
-Add_synonym(Declarer_bord_perio_64,"Corriger_frontiere_periodique_64");
 
-// XD declarer_bord_perio_64 declarer_bord_perio corriger_frontiere_periodique_64 -1 The Declarer_bord_perio_64 did the same thing as Declarer_bord_perio for big (64b) domain.
+// XD declarer_bord_perio_64 interprete corriger_frontiere_periodique_64 -1 The Declarer_bord_perio_64 did the same thing as Declarer_bord_perio for big (64b) domain.
 
 // XD declarer_bord_perio interprete corriger_frontiere_periodique 1 The Declarer_bord_perio keyword is mandatory to first define the periodic boundaries, to reorder the faces and eventually fix unaligned nodes of these boundaries. Faces on one side of the periodic domain are put first, then the faces on the opposite side, in the same order. It must be run in sequential before mesh splitting.
 //  XD attr domaine chaine domaine 0 Name of domain.
 //  XD attr bord chaine bord 0 the name of the boundary (which must contain two opposite sides of the domain)
 //  XD attr direction list direction 1 defines the periodicity direction vector (a vector that points from one node on one side to the opposite node on the other side). This vector must be given if the automatic algorithm fails, that is:NL2 - when the node coordinates are not perfectly periodic NL2 - when the periodic direction is not aligned with the normal vector of the boundary faces
 //  XD attr fichier_post chaine fichier_post 1 .
-
-
 
 template <typename _SIZE_>
 Entree& Declarer_bord_perio_32_64<_SIZE_>::readOn(Entree& is)
@@ -50,7 +47,7 @@ Sortie& Declarer_bord_perio_32_64<_SIZE_>::printOn(Sortie& os) const
 /*! @brief Main routine recording the periodic boundaries in the domain and performing the appropriate reordering of the faces
  */
 template <typename _SIZE_>
-void Declarer_bord_perio_32_64<_SIZE_>::declare_and_adapt()
+void Declarer_bord_perio_32_64<_SIZE_>::adapt_som_and_faces()
 {
   Domaine_t& dom = this->domaine();
   const int_t dim = dom.coord_sommets().dimension(1);
@@ -87,9 +84,6 @@ void Declarer_bord_perio_32_64<_SIZE_>::declare_and_adapt()
       Cerr << "Declarer_bord_perio { Domaine " << dom.le_nom() << " Bord " << nom_bord_ << " } " << finl;
       this->exit();
     }
-
-  // Register 'bord' in the list of periodic boundary of the domain:
-  dom.bords_perio().add(nom_bord_);
 }
 
 template <typename _SIZE_>
@@ -113,7 +107,11 @@ Entree& Declarer_bord_perio_32_64<_SIZE_>::interpreter_(Entree& is)
 
   this->associer_domaine(nom_dom);
 
-  declare_and_adapt();
+  adapt_som_and_faces();
+
+  // Register 'bord' in the list of periodic boundary of the domain:
+  Domaine_t& dom = this->domaine();
+  dom.bords_perio().add(nom_bord_);
 
   return is;
 }
@@ -124,18 +122,13 @@ Entree& Declarer_bord_perio_32_64<_SIZE_>::interpreter_(Entree& is)
  *   Parmi le couple de sommets forme, on deplace celui qui se trouve en +vecteur_perio
  *   pour le mettre en face de l'autre sommet.
  *   Exit en cas d'erreur (si les sommets sont trop eloignes de leur sommet associe)
- *
- * @param (dom) le domaine a modifier. On deplace les coordonnees des sommets periodiques.
- * @param (nom_bord) le nom du bord periodique du domaine a traiter
- * @param (vecteur_perio) un vecteur de taille "dimension" qui contient le delta entre deux sommets periodiques associes (voir methode chercher_direction_perio())
- * @param (nom_fichier_post) si different de "??", on cree un fichier de postraitement contenant les faces du bord initial et un vecteur qui indique le deplacement applique aux sommets.
  */
 template <typename _SIZE_>
 void Declarer_bord_perio_32_64<_SIZE_>::corriger_coordonnees_sommets_perio()
 {
   if (Process::nproc() > 1)
     {
-      Cerr << "Error in Reordonner_faces_periodiques::corriger_coordonnees_sommets_perio\n"
+      Cerr << "Error in Declarer_bord_perio_32_64::corriger_coordonnees_sommets_perio\n"
            << " this algorithm is sequential (use it before Decouper)" << finl;
       Process::barrier();
       Process::exit();
@@ -152,7 +145,7 @@ void Declarer_bord_perio_32_64<_SIZE_>::corriger_coordonnees_sommets_perio()
   const double epsilon_initial = dom.epsilon();
   if (epsilon_initial == 0.)
     {
-      Cerr << "Error in Declarer_bord_perio::corriger_coordonnees_sommets_perio\n"
+      Cerr << "Error in Declarer_bord_perio_32_64::corriger_coordonnees_sommets_perio\n"
            << " dom.epsilon = 0." << finl;
       Process::exit();
     }
@@ -200,7 +193,7 @@ void Declarer_bord_perio_32_64<_SIZE_>::corriger_coordonnees_sommets_perio()
       while (1);
       if (marker.testsetbit(som2))
         {
-          Cerr << "Error in corriger_coordonnees_sommets_perio\n"
+          Cerr << "Error in Declarer_bord_perio_32_64::corriger_coordonnees_sommets_perio\n"
                << " Coordinate    " << coord
                << " Closest point [ " << som_bord(som2, 0) << " " << som_bord(som2, 0) << " "
                << ((dim==3)?som_bord(som2, 0):0.) << " ] already used for another point" << finl;

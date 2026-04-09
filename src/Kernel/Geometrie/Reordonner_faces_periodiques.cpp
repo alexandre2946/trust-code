@@ -320,12 +320,13 @@ int Reordonner_faces_periodiques_32_64<_SIZE_>::check_faces_periodiques(const Fr
 }
 
 template<typename _SIZE_>
-void Reordonner_faces_periodiques_32_64<_SIZE_>::renum_som_perio(const Domaine_32_64<_SIZE_>& domaine, const Noms& liste_bords_periodiques,
+void Reordonner_faces_periodiques_32_64<_SIZE_>::renum_som_perio(const Domaine_32_64<_SIZE_>& domaine,
                                                                  ArrOfInt_T<_SIZE_>& renum_som_perio, bool calculer_espace_virtuel)
 {
   using IntTab_t = IntTab_T<_SIZE_>;
   using DoubleTab_t = DoubleTab_T<_SIZE_>;
 
+  const Noms& liste_bords_periodiques = domaine.bords_perio();
   const int_t nb_som = domaine.nb_som();
   IntTab_t renum(nb_som);
   for (int_t i = 0; i < nb_som; i++)

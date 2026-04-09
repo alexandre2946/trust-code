@@ -203,7 +203,7 @@ template <typename _SIZE_>
 void Decouper_32_64<_SIZE_>::ecrire_sous_domaines(const int nb_parties, const Static_Int_Lists_t* som_raccord) const
 {
   DomaineCutter_32_64<_SIZE_> cutter;
-  cutter.initialiser(this->domaine(), elem_part_, nb_parties, epaisseur_joint_, liste_bords_periodiques_);
+  cutter.initialiser(this->domaine(), elem_part_, nb_parties, epaisseur_joint_);
   // Reflexion provisoire:
   // Les joints sont construits dans ecrire_domaines -> construire_sous_domaine
   // Donc apres renumerotation des PEs et donc de elem_part_, il faudrait
@@ -230,7 +230,6 @@ template<> int Decouper_32_64<trustIdType>::print_more_infos_ = 0;
 // XD attr ecrire_lata chaine ecrire_lata 1 Save the partition field in a LATA format file for visualization
 // XD attr ecrire_med chaine ecrire_med 1 Save the partition field in a MED format file for visualization
 // XD attr nb_parts_tot entier nb_parts_tot 1 Keyword to generates N .Domaine files, instead of the default number M obtained after the partitionning algorithm. N must be greater or equal to M. This option might be used to perform coupled parallel computations. Supplemental empty domaines from M to N-1 are created. This keyword is used when you want to run a parallel calculation on several domains with for example, 2 processors on a first domain and 10 on the second domain because the first domain is very small compare to second one. You will write Nb_parts 2 and Nb_parts_tot 10 for the first domain and Nb_parts 10 for the second domain.
-// XD attr periodique listchaine periodique 1 N BOUNDARY_NAME_1 BOUNDARY_NAME_2 ... : N is the number of boundary names given. Periodic boundaries must be declared by this method. The partitionning algorithm will ensure that facing nodes and faces in the periodic boundaries are located on the same processor.
 // XD attr reorder entier reorder 1 If this option is set to 1 (0 by default), the partition is renumbered in order that the processes which communicate the most are nearer on the network. This may slighlty improves parallel performance.
 // XD attr single_hdf rien single_hdf 1 Optional keyword to enable you to write the partitioned domaines in a single file in hdf5 format.
 // XD attr print_more_infos entier print_more_infos 1 If this option is set to 1 (0 by default), print infos about number of remote elements (ghosts) and additional infos about the quality of partitionning. Warning, it slows down the cutting operations.
@@ -243,7 +242,6 @@ Entree& Decouper_32_64<_SIZE_>::interpreter(Entree& is)
 
   // Generating partition
   Partitionneur_base_t& partitionneur = deriv_partitionneur_.valeur();
-  partitionneur.declarer_bords_periodiques(liste_bords_periodiques_);
   partitionneur.construire_partition(elem_part_,nb_parts_tot_);
 
   // Writing out various files (including .zones)
@@ -261,7 +259,10 @@ Entree& Decouper_32_64<_SIZE_>::lire(Entree& is)
   Cerr << " Domain name to split : " << nom_domaine_ << finl;
   this->associer_domaine(nom_domaine_);
   // Avant de decouper on imprime des infos
-  this->domaine().imprimer();
+  const auto& dom = this->domaine();
+  dom.imprimer();
+
+  Noms liste_bords_perio;
 
   Param param(this->que_suis_je());
   bool hdf = false;
@@ -276,9 +277,17 @@ Entree& Decouper_32_64<_SIZE_>::lire(Entree& is)
   param.ajouter("nb_parts_tot",&nb_parts_tot_);
   param.ajouter("reorder",&reorder_);
   param.ajouter_flag("single_hdf",&hdf);
-  param.ajouter("periodique",&liste_bords_periodiques_);
+  param.ajouter("periodique",&liste_bords_perio);   // should not be used anymore ... keeping it to have a nice error message.
   param.ajouter("print_more_infos",&print_more_infos_);
   param.lire_avec_accolades_depuis(is);
+
+  // TRUST 1.9.8, attribute 'periodique' is now deprecated:
+  if (liste_bords_perio.size() > 0)
+    {
+      Cerr << finl << "ERROR: Option 'periodique' in Decouper/Partition keyword is now obsolete! It must be removed." << finl;
+      Cerr << "Your periodic boundaries in the domain now only needs to be declared once using the 'Declarer_bord_perio' keyword." << finl << finl;
+      Process::exit();
+    }
 
   if (hdf) format_ = DomainesFileOutputType::HDF5_SINGLE;
 

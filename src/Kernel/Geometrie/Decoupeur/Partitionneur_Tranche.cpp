@@ -96,11 +96,12 @@ void Partitionneur_Tranche_32_64<_SIZE_>::initialiser(const ArrOfInt& nb_tranche
  */
 template <typename _SIZE_>
 void Partitionneur_Tranche_32_64<_SIZE_>::chercher_direction_perio(const Domaine_t& domaine,
-                                                                   const Noms& liste_bords_perio,
                                                                    ArrOfInt& directions_perio)
 {
   Cerr << "Search of periodic directions of domain " << domaine.le_nom() << finl;
   const int dim = Objet_U::dimension;
+  const Noms& liste_bords_perio = domaine.bords_perio();
+
   directions_perio.resize_array(dim);
   directions_perio = 0;
   for (auto& itr : liste_bords_perio)
@@ -167,7 +168,7 @@ void Partitionneur_Tranche_32_64<_SIZE_>::construire_partition(BigIntVect_& elem
   // Pour chaque dimension d'espace, cette direction est-elle
   // une direction de periodicite
   ArrOfInt directions_perio;
-  this->chercher_direction_perio(dom, this->liste_bords_periodiques_, directions_perio);
+  this->chercher_direction_perio(dom, directions_perio);
 
   // Centre de gravite des elements:
   Cerr << "Calculation of centers of gravity of the elements" << finl;
@@ -307,8 +308,8 @@ void Partitionneur_Tranche_32_64<_SIZE_>::construire_partition(BigIntVect_& elem
         }
     }
 
-  if (this->liste_bords_periodiques_.size() > 0)
-    this->corriger_bords_avec_liste(dom, this->liste_bords_periodiques_, 0, elem_part);
+  if (ref_domaine_->bords_perio().size() > 0)
+    this->corriger_bords_avec_liste(dom, 0, elem_part);
 
   Cerr << "Correction elem0 on processor 0" << finl;
   this->corriger_elem0_sur_proc0(elem_part);

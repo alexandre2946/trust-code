@@ -21,7 +21,6 @@
 /*! @brief Refine the mesh once it has been partitionned, in a parallel fashion
  *
  * This interprete is to be called in a parallel context, after a Scatter instruction.
- *
  */
 class Raffiner_isotrope_parallele : public Raffiner_Simplexes
 {

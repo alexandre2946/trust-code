@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -71,7 +71,6 @@ Entree& Create_domain_from_sub_domain::interpreter_(Entree& is)
   const Domaine& domaine_org=ref_cast(Domaine, objet(nom_dom_org));
 
   DomaineCutter cutter;
-  Noms vide;
 
   IntTab index(domaine_org.nb_elem()); //0 -> 1er domaine, ..., n_dom + 1 -> le reste
   int nb_dom = noms_doms.size();
@@ -87,7 +86,7 @@ Entree& Create_domain_from_sub_domain::interpreter_(Entree& is)
         }
     }
 
-  cutter.initialiser(domaine_org, index, noms_doms.size() + 1,1,vide,1);
+  cutter.initialiser(domaine_org, index, noms_doms.size() + 1,1, true);
   for (int i = 0; i < nb_dom; i++)
     {
       Domaine& dom = ref_cast(Domaine, objet(noms_doms[i]));

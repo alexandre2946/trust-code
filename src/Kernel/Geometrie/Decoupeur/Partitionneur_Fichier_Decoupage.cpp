@@ -93,9 +93,8 @@ void Partitionneur_Fichier_Decoupage::construire_partition(IntVect& elem_part, i
   if (corriger_partition_)
     {
       Cerr << " Correction of the partition." << finl;
-      if (liste_bords_periodiques_.size() > 0)
+      if (ref_domaine_->bords_perio().size() > 0)
         corriger_bords_avec_liste(ref_domaine_.valeur(),
-                                  liste_bords_periodiques_,
                                   0,
                                   elem_part);
       corriger_elem0_sur_proc0(elem_part);
