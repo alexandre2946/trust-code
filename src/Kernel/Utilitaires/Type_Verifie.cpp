@@ -133,7 +133,7 @@ void verifie(const Nom& type)
       nouvelle_syntaxe[i++] = "1.5.2, on doit utiliser Resoudre a la place";
       nouvelle_syntaxe[i++] = "1.5.2, on doit utiliser Resoudre a la place";
       nouvelle_syntaxe[i++] = "1.5.3, on doit utiliser le mot cle Periodique dans le decoupeur pour specifier les bords periodiques.";
-      nouvelle_syntaxe[i++] = "1.5.5, on doit utiliser Corriger_frontiere_periodique { ... corriger_coordonnees }";
+      nouvelle_syntaxe[i++] = "1.5.5, on doit utiliser Declarer_bord_perio { ... }";
       nouvelle_syntaxe[i++] = "1.5.7, il n'est plus necessaire pour paralleliser certaines conditions limites.";
       nouvelle_syntaxe[i++] = "1.5.7, you should use Extruder_en3 keyword and after RegroupeBord keyword to create periodic boundary.";
       nouvelle_syntaxe[i++] = "1.6.0, you should use Extruder keyword and after RegroupeBord keyword to create periodic boundary.";
@@ -164,7 +164,7 @@ void verifie(const Nom& type)
       nouvelle_syntaxe[i++] = "1.6.8, you should use now: Boussinesq_temperature { ... } , Boussinesq_concentration { ... }";
       nouvelle_syntaxe[i++] = "1.6.9.";
       nouvelle_syntaxe[i++] = "1.7.6, never use that keyword!!!";
-      nouvelle_syntaxe[i++] = "1.8.1, use corriger_frontiere_periodique keyword instead";
+      nouvelle_syntaxe[i++] = "1.8.1, use declarer_bord_perio keyword instead";
       nouvelle_syntaxe[i++] = "1.8.4, you should use gaz_parfait_QC";
       nouvelle_syntaxe[i++] = "1.8.4, you should use rhoT_gaz_reel_QC";
       nouvelle_syntaxe[i++] = "1.8.4, you should use multi_gaz_parfait_QC";

@@ -159,8 +159,8 @@ Sortie& Domaine_32_64<_SZ_>::printOn(Sortie& s) const
   s << nom_ << finl;
   s << sommets_;
 
-  // Now write what was formerly the domaines (before TRUST 1.9.2):
-  // Write them in the form of a list with a single element, for backward compat (Domains used to contain a list of Zons)
+  // Now write what was formerly the "Zon-e-s" (before TRUST 1.9.2):
+  // Write them in the form of a list with a single element, for backward compat (Domains used to contain a list of Zon-e-s)
   s << "{" << finl;
   Cerr << "Writing of " << nb_elem() << " elements." << finl;
   s << "DUMMY_ZONE" << finl; // really just to keep a name here for backward compat

@@ -12,83 +12,71 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-#include <Corriger_frontiere_periodique.h>
 #include <Reordonner_faces_periodiques.h>
+#include <Declarer_bord_perio.h>
 #include <Format_Post_base.h>
+#include <Synonyme_info.h>
 #include <Octree_Double.h>
 #include <Domaine_bord.h>
 #include <ArrOfBit.h>
 #include <Param.h>
 
-Implemente_instanciable_32_64(Corriger_frontiere_periodique_32_64,"Corriger_frontiere_periodique",Interprete_geometrique_base_32_64<_T_>);
+Implemente_instanciable_32_64(Declarer_bord_perio_32_64,"Declarer_bord_perio",Interprete_geometrique_base_32_64<_T_>);
+Add_synonym(Declarer_bord_perio,"Corriger_frontiere_periodique");
+Add_synonym(Declarer_bord_perio_64,"Corriger_frontiere_periodique_64");
 
-template <typename _SIZE_>
-Entree& Corriger_frontiere_periodique_32_64<_SIZE_>::readOn(Entree& is)
-{
-  return is;
-}
+// XD declarer_bord_perio_64 declarer_bord_perio corriger_frontiere_periodique_64 -1 The Declarer_bord_perio_64 did the same thing as Declarer_bord_perio for big (64b) domain.
 
-template <typename _SIZE_>
-Sortie& Corriger_frontiere_periodique_32_64<_SIZE_>::printOn(Sortie& os) const
-{
-  return os;
-}
-
-// XD corriger_frontiere_periodique_64 corriger_frontiere_periodique corriger_frontiere_periodique_64 -1 The Corriger_frontiere_periodique_64 did the same thing as Corriger_frontiere_periodique for big (64b) domain.
-
-// XD corriger_frontiere_periodique interprete corriger_frontiere_periodique 1 The Corriger_frontiere_periodique keyword is mandatory to first define the periodic boundaries, to reorder the faces and eventually fix unaligned nodes of these boundaries. Faces on one side of the periodic domain are put first, then the faces on the opposite side, in the same order. It must be run in sequential before mesh splitting.
+// XD declarer_bord_perio interprete corriger_frontiere_periodique 1 The Declarer_bord_perio keyword is mandatory to first define the periodic boundaries, to reorder the faces and eventually fix unaligned nodes of these boundaries. Faces on one side of the periodic domain are put first, then the faces on the opposite side, in the same order. It must be run in sequential before mesh splitting.
 //  XD attr domaine chaine domaine 0 Name of domain.
 //  XD attr bord chaine bord 0 the name of the boundary (which must contain two opposite sides of the domain)
 //  XD attr direction list direction 1 defines the periodicity direction vector (a vector that points from one node on one side to the opposite node on the other side). This vector must be given if the automatic algorithm fails, that is:NL2 - when the node coordinates are not perfectly periodic NL2 - when the periodic direction is not aligned with the normal vector of the boundary faces
 //  XD attr fichier_post chaine fichier_post 1 .
 
 
+
 template <typename _SIZE_>
-Entree& Corriger_frontiere_periodique_32_64<_SIZE_>::interpreter_(Entree& is)
+Entree& Declarer_bord_perio_32_64<_SIZE_>::readOn(Entree& is)
 {
-  if (this->nproc() > 1)
-    {
-      Cerr << "Error in Corriger_frontiere_periodique::interpreter():\n"
-           << " this function must be run in sequential before mesh splitting." << finl;
-      this->barrier();
-      this->exit();
-    }
-  Nom nom_bord;
-  ArrOfDouble direction_perio;
-  Nom nom_dom, nom_fichier_post;
-  Param param(this->que_suis_je());
-  param.ajouter("domaine", &nom_dom, Param::REQUIRED);
-  param.ajouter("bord", &nom_bord, Param::REQUIRED);
-  param.ajouter("direction", &direction_perio);
-  param.ajouter("fichier_post", &nom_fichier_post);
-  param.lire_avec_accolades_depuis(is);
-  this->associer_domaine(nom_dom);
+  return is;
+}
+
+template <typename _SIZE_>
+Sortie& Declarer_bord_perio_32_64<_SIZE_>::printOn(Sortie& os) const
+{
+  return os;
+}
+
+/*! @brief Main routine recording the periodic boundaries in the domain and performing the appropriate reordering of the faces
+ */
+template <typename _SIZE_>
+void Declarer_bord_perio_32_64<_SIZE_>::declare_and_adapt()
+{
   Domaine_t& dom = this->domaine();
   const int_t dim = dom.coord_sommets().dimension(1);
   int direction_perio_set;
-  if (direction_perio.size_array() == 0)
+  if (direction_perio_.size_array() == 0)
     {
       direction_perio_set=0;
       Cerr << "No direction given, searching periodicity direction automatically:" << finl;
-      Reordonner_faces_periodiques_32_64<_SIZE_>::chercher_direction_perio(direction_perio, dom, nom_bord);
+      Reordonner_faces_periodiques_32_64<_SIZE_>::chercher_direction_perio(direction_perio_, dom, nom_bord_);
     }
   else
     {
       direction_perio_set=1;
-      if (direction_perio.size_array() != dim)
+      if (direction_perio_.size_array() != dim)
         {
-          Cerr << "Error in Corriger_frontiere_periodique::interpreter: direction should be of size "
+          Cerr << "Error in Declarer_bord_perio::interpreter: direction should be of size "
                << dim << finl;
           this->exit();
         }
     }
-  Cerr << "Searching and moving periodicity nodes for domain " << nom_dom << " boundary "
-       << nom_bord << finl;
-  corriger_coordonnees_sommets_perio(dom, nom_bord, direction_perio, nom_fichier_post);
-  Bord_t& bord = dom.bord(nom_bord);
+  Cerr << "Searching and moving periodicity nodes for domain " << dom.le_nom() << " boundary " << nom_bord_ << finl;
+  corriger_coordonnees_sommets_perio();
+  Bord_t& bord = dom.bord(nom_bord_);
   IntTab_t& faces = bord.faces().les_sommets();
   const double epsilon = Objet_U::precision_geom;
-  const int ok = Reordonner_faces_periodiques_32_64<_SIZE_>::reordonner_faces_periodiques(dom, faces, direction_perio, epsilon);
+  const int ok = Reordonner_faces_periodiques_32_64<_SIZE_>::reordonner_faces_periodiques(dom, faces, direction_perio_, epsilon);
   if (!ok)
     {
       if (direction_perio_set)
@@ -96,9 +84,37 @@ Entree& Corriger_frontiere_periodique_32_64<_SIZE_>::interpreter_(Entree& is)
       else
         Cerr << "May be you could use the DIRECTION option to specify the vector of periodicity" << finl;
       Cerr << "for the keyword:" << finl;
-      Cerr << "Corriger_frontiere_periodique { Domaine " << nom_dom << " Bord " << nom_bord << " } " << finl;
+      Cerr << "Declarer_bord_perio { Domaine " << dom.le_nom() << " Bord " << nom_bord_ << " } " << finl;
       this->exit();
     }
+
+  // Register 'bord' in the list of periodic boundary of the domain:
+  dom.bords_perio().add(nom_bord_);
+}
+
+template <typename _SIZE_>
+Entree& Declarer_bord_perio_32_64<_SIZE_>::interpreter_(Entree& is)
+{
+  Nom nom_dom;
+  Param param(this->que_suis_je());
+  param.ajouter("domaine", &nom_dom, Param::REQUIRED);
+  param.ajouter("bord", &nom_bord_, Param::REQUIRED);
+  param.ajouter("direction", &direction_perio_);
+  param.ajouter("fichier_post", &nom_fichier_post_);
+  param.lire_avec_accolades_depuis(is);
+
+  if (this->nproc() > 1)
+    {
+      Cerr << "Error in Declarer_bord_perio::interpreter():\n"
+           << " this function must be run in sequential before mesh splitting." << finl;
+      this->barrier();
+      this->exit();
+    }
+
+  this->associer_domaine(nom_dom);
+
+  declare_and_adapt();
+
   return is;
 }
 
@@ -115,10 +131,7 @@ Entree& Corriger_frontiere_periodique_32_64<_SIZE_>::interpreter_(Entree& is)
  * @param (nom_fichier_post) si different de "??", on cree un fichier de postraitement contenant les faces du bord initial et un vecteur qui indique le deplacement applique aux sommets.
  */
 template <typename _SIZE_>
-void Corriger_frontiere_periodique_32_64<_SIZE_>::corriger_coordonnees_sommets_perio(Domaine_t& dom,
-                                                                                     const Nom& nom_bord,
-                                                                                     const ArrOfDouble& vecteur_perio,
-                                                                                     const Nom& nom_fichier_post)
+void Declarer_bord_perio_32_64<_SIZE_>::corriger_coordonnees_sommets_perio()
 {
   if (Process::nproc() > 1)
     {
@@ -128,8 +141,9 @@ void Corriger_frontiere_periodique_32_64<_SIZE_>::corriger_coordonnees_sommets_p
       Process::exit();
     }
 
+  Domaine_t& dom = this->domaine();
   Domaine_bord_t domaine_bord;
-  domaine_bord.construire_domaine_bord(dom, nom_bord);
+  domaine_bord.construire_domaine_bord(dom, nom_bord_);
   const ArrOfInt_t& renum_som = domaine_bord.get_renum_som();
   const DoubleTab_t& som_bord = domaine_bord.les_sommets();
   Octree_Double_t octree;
@@ -138,7 +152,7 @@ void Corriger_frontiere_periodique_32_64<_SIZE_>::corriger_coordonnees_sommets_p
   const double epsilon_initial = dom.epsilon();
   if (epsilon_initial == 0.)
     {
-      Cerr << "Error in Corriger_frontiere_periodique::corriger_coordonnees_sommets_perio\n"
+      Cerr << "Error in Declarer_bord_perio::corriger_coordonnees_sommets_perio\n"
            << " dom.epsilon = 0." << finl;
       Process::exit();
     }
@@ -172,7 +186,7 @@ void Corriger_frontiere_periodique_32_64<_SIZE_>::corriger_coordonnees_sommets_p
           for (facteur = -1.; facteur < 1.5; facteur += 2.)
             {
               for (int i = 0; i < dim; i++)
-                coord[i] = som_bord(som, i) + facteur * vecteur_perio[i];
+                coord[i] = som_bord(som, i) + facteur * direction_perio_[i];
               octree.search_elements_box(coord, epsilon, nodes_list);
               som2 = octree.search_nodes_close_to(coord, som_bord, nodes_list, epsilon);
               if (som2 >= 0)
@@ -203,27 +217,27 @@ void Corriger_frontiere_periodique_32_64<_SIZE_>::corriger_coordonnees_sommets_p
           for (int i = 0; i < dim; i++)
             {
               double old_x = som_bord(som_deplace, i);
-              double new_x = som_bord(som_ref, i) + facteur * vecteur_perio[i];
+              double new_x = som_bord(som_ref, i) + facteur * direction_perio_[i];
               sommets_src(s, i) = new_x;
               delta(som_deplace, i) = new_x - old_x;
             }
         }
     }
 
-  if (nom_fichier_post != "??")
+  if (nom_fichier_post_ != "??")
     {
       if (!std::is_same<_SIZE_, int>::value)
         {
-          Cerr << "Corriger_frontiere_periodique_64 - option 'fichier_post' is not implemented yet for 64b domains!" << finl;
+          Cerr << "Declarer_bord_perio_64 - option 'fichier_post' is not implemented yet for 64b domains!" << finl;
           Cerr << "Remove the attribute or contact TRUST support." << finl;
           Process::exit(-1);
         }
 #if INT_is_64_ != 2
       //Domaine dom2;
-      Cerr << "Writing node displacement into file: " << nom_fichier_post << finl;
+      Cerr << "Writing node displacement into file: " << nom_fichier_post_ << finl;
       OWN_PTR(Format_Post_base) fichier_post;
       fichier_post.typer("FORMAT_POST_LATA");
-      fichier_post->initialize(nom_fichier_post, 1 /* binaire */, "SIMPLE");
+      fichier_post->initialize(nom_fichier_post_, 1 /* binaire */, "SIMPLE");
       Format_Post_base& post = fichier_post.valeur();
       post.ecrire_entete(0., 0 /*reprise*/, 1 /* premier post */);
       post.ecrire_domaine(domaine_bord, 1 /* premier_post */);
@@ -253,7 +267,7 @@ void Corriger_frontiere_periodique_32_64<_SIZE_>::corriger_coordonnees_sommets_p
     }
 }
 
-template class Corriger_frontiere_periodique_32_64<int>;
+template class Declarer_bord_perio_32_64<int>;
 #if INT_is_64_ == 2
-template class Corriger_frontiere_periodique_32_64<trustIdType>;
+template class Declarer_bord_perio_32_64<trustIdType>;
 #endif

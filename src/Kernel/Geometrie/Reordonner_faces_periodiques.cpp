@@ -22,7 +22,7 @@ namespace
 {
 inline void message()
 {
-  Cerr << "You need to use the Corriger_frontiere_periodique keyword on the periodic boundaries." << finl;
+  Cerr << "You need to use the Declarer_bord_perio keyword on the periodic boundaries." << finl;
   Cerr << "See the reference manual to use this keyword on your data file." << finl;
 }
 

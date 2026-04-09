@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,8 +12,8 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-#ifndef Corriger_frontiere_periodique_included
-#define Corriger_frontiere_periodique_included
+#ifndef Declarer_bord_perio_included
+#define Declarer_bord_perio_included
 
 #include <Interprete_geometrique_base.h>
 #include <Connectivite_som_elem.h>
@@ -32,7 +32,7 @@
  *      et toutes les faces [0 .. n/2-1] du meme cote et [n/2 .. n-1] de l'autre cote
  *    - deplacer les sommets des faces periodiques si besoin (si la CAO est fausse)
  *  Syntaxe:
- *   Corriger_frontiere_periodique {
+ *   Declarer_bord_perio {
  *      domaine NOMDOMAINE
  *      bord    NOMBORDPERIO
  *      [ direction DIMENSION dx dy [ dz ] ]
@@ -40,9 +40,9 @@
  *   }
  */
 template <typename _SIZE_>
-class Corriger_frontiere_periodique_32_64 : public Interprete_geometrique_base_32_64<_SIZE_>
+class Declarer_bord_perio_32_64 : public Interprete_geometrique_base_32_64<_SIZE_>
 {
-  Declare_instanciable_32_64(Corriger_frontiere_periodique_32_64);
+  Declare_instanciable_32_64(Declarer_bord_perio_32_64);
 public:
   using int_t = _SIZE_;
   using IntTab_t = IntTab_T<_SIZE_>;
@@ -57,10 +57,20 @@ public:
   using Domaine_t = Domaine_32_64<_SIZE_>;
 
   Entree& interpreter_(Entree& is) override;
-  static void corriger_coordonnees_sommets_perio(Domaine_t& dom, const Nom& nom_bord, const ArrOfDouble& vecteur_perio, const Nom& nom_fichier_post);
+  void declare_and_adapt();
+
+  Nom& nom_bord() { return nom_bord_; }
+  const Nom& nom_bord() const { return nom_bord_; }
+
+protected:
+  void corriger_coordonnees_sommets_perio();
+
+  Nom nom_bord_;
+  ArrOfDouble direction_perio_;
+  Nom nom_fichier_post_;
 };
 
-using Corriger_frontiere_periodique = Corriger_frontiere_periodique_32_64<int>;
-using Corriger_frontiere_periodique_64 = Corriger_frontiere_periodique_32_64<trustIdType>;
+using Declarer_bord_perio = Declarer_bord_perio_32_64<int>;
+using Declarer_bord_perio_64 = Declarer_bord_perio_32_64<trustIdType>;
 
 #endif

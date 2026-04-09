@@ -159,7 +159,7 @@ Partitionneur_base_32_64<_SIZE_>::calculer_graphe_connexions_periodiques(const D
         Cerr << finl;
         if (!ok)
           {
-            Cerr << "You need to use the Corriger_frontiere_periodique keyword on the periodic boundaries." << finl;
+            Cerr << "You need to use the Declarer_bord_perio keyword on the periodic boundaries." << finl;
             Cerr << "See the reference manual to use this keyword on your data file." << finl;
             exit();
           }
