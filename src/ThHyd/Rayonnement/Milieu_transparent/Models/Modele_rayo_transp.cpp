@@ -38,11 +38,11 @@ Entree& Modele_rayo_transp::readOn(Entree& is)
   Nom fichier_face_rayo, fichier_fij;
   Cerr << "Reading params of " << que_suis_je() << finl;
   Param param(que_suis_je());
-  param.ajouter("fichier_face_rayo", &fichier_face_rayo, Param::REQUIRED); // XD_ADD_P chaine Face radiation file (bds, surface & emisivity)
+  param.ajouter("fichier_face_rayo", &fichier_face_rayo, Param::REQUIRED); // XD_ADD_P chaine Face radiation file (boundaries, surface and emisivity)
   param.ajouter("fichier_fij", &fichier_fij, Param::REQUIRED); // XD_ADD_P chaine View factor file matrix
   param.ajouter("fichier_matrice", &nom_fic_mat_ray_inv_); // XD_ADD_P chaine File name to dump matrix
   param.ajouter("relaxation", &relaxation_); // XD_ADD_P double Relaxation parameter
-  param.ajouter_flag("format_binaire", &fic_mat_ray_inv_bin_); // XD_ADD_P rien Flag to dump matrix in a binary file. By default it i ASCII
+  param.ajouter_flag("format_binaire", &fic_mat_ray_inv_bin_); // XD_ADD_P rien Flag to dump matrix in a binary file. By default it it ASCII
   param.lire_avec_accolades_depuis(is);
 
   Cerr << "Modele_rayo_transp::lire_fichiers" << finl;

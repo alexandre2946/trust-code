@@ -31,10 +31,10 @@ check_components()
          if [[ "$Composant" == "module3D" ]]
          then
            # module3D is a symlink, we use cd -P to go to the directory and remove C3_LIB.tar.gz to regenerate it
-           echo "Cleaning InterfaceC3/archives/C3_LIB.tar.gz, local, InterfaceC3/local and InterfaceC3/build_C3_LIB from $Composant"
+           echo "Cleaning LibC3/archives/C3_LIB.tar.gz, local and LibC3/build_C3_LIB from $Composant"
            cd -P $TRUST_ROOT/../Composants/$Composant
-           rm -f InterfaceC3/archives/C3_LIB.tar.gz
-           rm -rf local InterfaceC3/build_C3_LIB InterfaceC3/local
+           rm -f LibC3/archives/C3_LIB.tar.gz
+           rm -rf local LibC3/build_C3_LIB
          fi
          rm -rf build/portability
          rm -f $Composant*.log

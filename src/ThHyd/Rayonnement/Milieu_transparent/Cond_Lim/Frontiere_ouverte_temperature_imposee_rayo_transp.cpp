@@ -19,7 +19,7 @@
 
 Implemente_instanciable(Frontiere_ouverte_temperature_imposee_rayo_transp, "Frontiere_ouverte_temperature_imposee_rayo_transp", Entree_fluide_temperature_imposee);
 
-// XD frontiere_ouverte_temperature_imposee_rayo_transp frontiere_ouverte_temperature_imposee frontiere_ouverte_temperature_imposee_rayo_transp -1 Radiation imposed temperature condition at the open boundary called bord (edge) (in the case of fluid inlet). This condition must be associated with an imposed inlet velocity condition. The imposed temperature value is expressed in oC or K.
+// XD frontiere_ouverte_temperature_imposee_rayo_transp frontiere_ouverte_temperature_imposee frontiere_ouverte_temperature_imposee_rayo_transp -1 Radiation imposed temperature condition at the open boundary called bord (edge) (in the case of fluid inlet). This condition must be associated with an imposed inlet velocity condition. The imposed temperature value is expressed in C or K.
 
 Sortie& Frontiere_ouverte_temperature_imposee_rayo_transp::printOn(Sortie& is) const { return is; }
 
