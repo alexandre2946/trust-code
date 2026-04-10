@@ -51,9 +51,6 @@ if [ "x$TRUST_USE_EXTERNAL_MED" = "x" ]; then
   sed -i "s/extern MEDC_EXPORT const char \* const  MEDget/extern MEDC_EXPORT const char *  MEDget/g"  include/med.h.in   || exit -1
   sed -i "s/const char \* const  MEDget/const char * MEDget/g"  $(find . -name MEDiterators.c)   || exit -1
 
-  echo "Patching to support hdf5 1.14 ..."
-  patch -p1 < $curr_dir/med-hdf5_1_14.patch  || exit -1
-
   # fPIC is not there by default in MED autotools ...
   Wno="-Wno-error -Wno-implicit-function-declaration"
   CFLAGS="${CFLAGS} -fPIC $Wno"
@@ -127,7 +124,7 @@ if [ "x$TRUST_USE_EXTERNAL_MED" = "x" ]; then
   fi
 
   # patch MEDFileConfig.cmake to not have absolute paths for HDF5 and MPI inside it
-  sed -i "s@$TRUST_ROOT@\${PACKAGE_PREFIX_DIR}/../../../..@g" $actual_install_dir/share/cmake/medfile-4.2.0/MEDFileConfig.cmake || exit -1
+  sed -i "s@$TRUST_ROOT@\${PACKAGE_PREFIX_DIR}/../../../..@g" $actual_install_dir/share/cmake/medfile-6.0.1/MEDFileConfig.cmake || exit -1
 
 else  
   if ! [ -d "$TRUST_USE_EXTERNAL_MED" ]; then
