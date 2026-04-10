@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -29,7 +29,7 @@ Entree& Source_PDF_base::readOn(Entree& s)
   Param param(que_suis_je());
   param.ajouter("aire", &champ_aire_lu_,Param::REQUIRED);
   param.ajouter("rotation", &champ_rotation_lu_,Param::REQUIRED);
-  param.ajouter_flag("transpose_rotation", &transpose_rotation_,Param::OPTIONAL);
+  param.ajouter_flag("transpose_rotation", &transpose_rotation_);
   param.ajouter("modele",&modele_lu_,Param::REQUIRED);
   temps_relax_ = modele_lu_.temps_relax_;
   echelle_relax_ =  modele_lu_.echelle_relax_;

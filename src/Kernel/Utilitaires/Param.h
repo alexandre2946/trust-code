@@ -49,7 +49,9 @@ public:
   void ajouter_arr_size_predefinie(const char *, const ArrOfInt* ,Param::Nature nat = Param::OPTIONAL);
   void ajouter_arr_size_predefinie(const char *, const ArrOfDouble* ,Param::Nature nat = Param::OPTIONAL);
 
-  void ajouter_flag(const char *, const bool* ,Param::Nature nat = Param::OPTIONAL);
+
+
+  void ajouter_flag(const char *, const bool* );
   Param& ajouter_param(const char *, Param::Nature nat = Param::OPTIONAL);
   void ajouter_non_std(const char *,const Objet_U* ,Param::Nature nat = Param::OPTIONAL);
   void ajouter_condition(const char* condition, const char* message,const char*  name=0);

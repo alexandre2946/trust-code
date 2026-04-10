@@ -411,7 +411,9 @@ void Param::ajouter_arr_size_predefinie(const char *mot, const ArrOfDouble *quoi
   obj.set_arrofdouble(const_cast<ArrOfDouble*>(quoi));
 }
 
-void Param::ajouter_flag(const char *mot, const bool *quoi, Param::Nature nat)
+
+
+void Param::ajouter_flag(const char *mot, const bool *quoi)
 {
 
   if (*quoi)
@@ -423,7 +425,7 @@ void Param::ajouter_flag(const char *mot, const bool *quoi, Param::Nature nat)
     }
 
   Objet_a_lire& obj = create_or_get_objet_a_lire(mot);
-  obj.set_nature(convert_nature(nat));
+  obj.set_nature(convert_nature(Param::OPTIONAL));
   obj.set_flag(const_cast<bool*>(quoi));
 }
 void Param::ajouter_non_std(const char *mot, const Objet_U *quoi, Param::Nature nat)
