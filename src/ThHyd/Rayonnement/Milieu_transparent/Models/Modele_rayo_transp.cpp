@@ -273,12 +273,17 @@ void Modele_rayo_transp::imprimer_flux_radiatifs(Sortie& os) const
   if (Process::me()) return; /* seulement maitre qui imprime ! */
 
   Nom fichier1(nom_du_cas());
+  fichier1 += "_";
+  fichier1 += nom_pb_rayonnant_;
   fichier1 += "_Flux_radiatif.out";
-  Nom fichier2(nom_du_cas());
 
   Nom espace = "\t\t";
 
+  Nom fichier2(nom_du_cas());
+  fichier2 += "_";
+  fichier2 += nom_pb_rayonnant_;
   fichier2 += "_Temperature_rayonnante.out";
+
   if (deja_imprime_ == 0)
     {
       SFichier os1(fichier1);
