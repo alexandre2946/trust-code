@@ -41,6 +41,7 @@
  Canal_RANS_LES_VDF_Face Terme_Source_Canal_RANS_LES_VDF_Face Terme_Source_Canal_RANS_LES_VDF_Face.h
  Canal_RANS_LES_VDF_P0_VDF Terme_Source_Canal_RANS_LES_VDF_Elem Terme_Source_Canal_RANS_LES_VDF_Elem.h
  Carman_Kozeny ModPerm_Carman_Kozeny Source_Permeabilite_VDF.h
+ CGNS_to_lata|CGNS_2_Lata CGNS_2_Lata CGNS_2_Lata.h
  Champs_Fonc Champs_Fonc Champs_Fonc.h
  Champ_base Champ_base Champ_base.h
  Champ_Composite Champ_Composite Champ_Composite.h
@@ -537,7 +538,6 @@
  Lecture_Champ Lecture_Champ Lecture_Champ.h
  Lecture_Table Lecture_Table Lecture_Table.h
  Lec_Diffuse_base Lec_Diffuse_base Lec_Diffuse_base.h
- Link_CGNS_Files Link_CGNS_Files Link_CGNS_Files.h
  Lire_Fichier_Bin|Read_File_Binary Lire_Fichier_Bin Lire_Fichier_Bin.h
  Lire_Fichier|Read_file Lire_Fichier Lire_Fichier.h
  Lire_Ideas Lire_Ideas Lire_Ideas.h
