@@ -20,6 +20,7 @@
 #include <Schema_Temps_base.h>
 #include <communications.h>
 #include <Pb_Fluide_base.h>
+#include <LecFicDiffuse.h>
 #include <SFichierBin.h>
 #include <EFichierBin.h>
 #include <Fluide_base.h>
@@ -96,8 +97,8 @@ void Modele_rayo_transp::lire_fichiers(Nom& fich_faces_rayo, Nom& fich_fij)
   Cerr << "fichier_face_rayo = " << fich_faces_rayo << finl;
   Cerr << "fichier_fij = " << fich_fij << finl;
 
-  EFichier fic1(fich_faces_rayo);
-  EFichier fic2(fich_fij);
+  LecFicDiffuse fic1(fich_faces_rayo);
+  LecFicDiffuse fic2(fich_fij);
 
   // lecture du nombre de face rayonnante et des faces rayonnantes dans fic1
   Cerr << "Lecture du fichier : " << fich_faces_rayo << finl;
