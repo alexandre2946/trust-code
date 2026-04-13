@@ -24,6 +24,56 @@
 
 #ifdef HAS_CGNS
 
+namespace
+{
+#ifdef MPI_
+bool is_comm_group_mode(const bool postraiter_domaine)
+{
+  return (Option_CGNS::LINKED_FILES_PER_COMM_GROUP || Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)
+         && Process::is_parallel() && PE_Groups::has_user_defined_group() && !postraiter_domaine;
+}
+
+void allgather_int_on_active_comm(const int local_value, std::vector<int>& global_values, const bool by_comm_grp)
+{
+  if (by_comm_grp)
+    {
+      const Comm_Group_MPI& comm_loc = ref_cast(Comm_Group_MPI, PE_Groups::get_user_defined_group());
+      MPI_Allgather(&local_value, 1, MPI_ENTIER, global_values.data(), 1, MPI_ENTIER, comm_loc.get_mpi_comm());
+    }
+  else
+    MPI_Allgather(&local_value, 1, MPI_ENTIER, global_values.data(), 1, MPI_ENTIER, MPI_COMM_WORLD);
+}
+
+void compute_global_min_max(const std::vector<int>& global_counts, std::vector<int>& global_min, std::vector<int>& global_max, int& total)
+{
+  const int nb_procs = static_cast<int>(global_counts.size());
+  global_min.assign(nb_procs, -123);
+  global_max.assign(nb_procs, -123);
+  total = 0;
+
+  for (int i = 0; i < nb_procs; i++)  // now we fill global incremented min/max stuff
+    {
+      global_min[i] = total + 1; // 1 : min
+      total += global_counts[i]; // 2 : increment
+      global_max[i] = total; // 3 : max
+    }
+}
+
+void compute_global_max_only(const std::vector<int>& global_counts, std::vector<int>& global_max, int& total)
+{
+  const int nb_procs = static_cast<int>(global_counts.size());
+  global_max.assign(nb_procs, -123);
+  total = 0;
+
+  for (int i = 0; i < nb_procs; i++)
+    {
+      total += global_counts[i]; // 1 : increment
+      global_max[i] = total; // 2 : max
+    }
+}
+#endif
+}
+
 Motcle TRUST_2_CGNS::modify_field_name_for_post(const Nom& id_du_champ, const Nom& id_du_domaine, const std::string& LOC, int& fieldId_som, int& fieldId_elem, int& fieldId_faces)
 {
   Motcle id_du_champ_modifie(id_du_champ), iddomaine(id_du_domaine);
@@ -259,11 +309,7 @@ void TRUST_2_CGNS::fill_global_infos()
 #ifdef MPI_
   assert (sommets_.non_nul() && elems_.non_nul());
 
-  const bool by_comm_grp = (Process::is_parallel()
-                            && (Option_CGNS::LINKED_FILES_PER_COMM_GROUP ||
-                                Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)
-                            && PE_Groups::has_user_defined_group()
-                            && !postraiter_domaine_ );
+  const bool by_comm_grp = is_comm_group_mode(postraiter_domaine_);
 
   if (by_comm_grp)
     {
@@ -289,42 +335,13 @@ void TRUST_2_CGNS::fill_global_infos()
   global_nb_elem_.assign(nb_procs, -123 /* default */);
   global_nb_som_.assign(nb_procs, -123 /* default */);
 
-//  grp.all_gather(&nb_elem, global_nb_elem_.data(), 1); // Elie : pas MPI_CHAR desole
-  if (by_comm_grp)
-    {
-      const Comm_Group_MPI& comm_loc = ref_cast(Comm_Group_MPI, PE_Groups::get_user_defined_group());
-      MPI_Allgather(&nb_elem, 1, MPI_ENTIER, global_nb_elem_.data(), 1, MPI_ENTIER, comm_loc.get_mpi_comm());
-      MPI_Allgather(&nb_som, 1, MPI_ENTIER, global_nb_som_.data(), 1, MPI_ENTIER, comm_loc.get_mpi_comm());
-    }
-  else
-    {
-      MPI_Allgather(&nb_elem, 1, MPI_ENTIER, global_nb_elem_.data(), 1, MPI_ENTIER, MPI_COMM_WORLD);
-      MPI_Allgather(&nb_som, 1, MPI_ENTIER, global_nb_som_.data(), 1, MPI_ENTIER, MPI_COMM_WORLD);
-    }
+  allgather_int_on_active_comm(nb_elem, global_nb_elem_, by_comm_grp);
+  allgather_int_on_active_comm(nb_som, global_nb_som_, by_comm_grp);
 
   if (!Option_CGNS::PARALLEL_OVER_ZONE && !postraiter_domaine_)
     {
-      global_incr_min_elem_.assign(nb_procs, -123 /* default */);
-      global_incr_max_elem_.assign(nb_procs, -123 /* default */);
-      global_incr_min_som_.assign(nb_procs, -123 /* default */);
-      global_incr_max_som_.assign(nb_procs, -123 /* default */);
-
-      global_incr_min_elem_[0] = 1, global_incr_min_som_[0] = 1; // start from 1 !
-      ns_tot_ = 0, ne_tot_ = 0;
-
-      // now we fill global incremented min/max stuff
-      for (int i = 0; i < nb_procs; i++)
-        {
-          // 1 : min
-          global_incr_min_elem_[i] = ne_tot_ + 1;
-          global_incr_min_som_[i] = ns_tot_ + 1;
-          // 2 : increment
-          ne_tot_ += global_nb_elem_[i];
-          ns_tot_ += global_nb_som_[i];
-          // 3 : max
-          global_incr_max_elem_[i] = ne_tot_;
-          global_incr_max_som_[i] = ns_tot_;
-        }
+      compute_global_min_max(global_nb_elem_, global_incr_min_elem_, global_incr_max_elem_, ne_tot_);
+      compute_global_min_max(global_nb_som_, global_incr_min_som_, global_incr_max_som_, ns_tot_);
     }
 
   const auto min_nb_elem = std::min_element(global_nb_elem_.begin(), global_nb_elem_.end());
@@ -377,11 +394,7 @@ void TRUST_2_CGNS::fill_global_infos_poly(const bool is_polyedre)
 #ifdef MPI_
   assert(dom_trust_.non_nul());
 
-  const bool by_comm_grp = (Process::is_parallel()
-                            && (Option_CGNS::LINKED_FILES_PER_COMM_GROUP ||
-                                Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)
-                            && PE_Groups::has_user_defined_group()
-                            && !postraiter_domaine_ );
+  const bool by_comm_grp = is_comm_group_mode(postraiter_domaine_);
 
   int decal = 0; // a modifier plus tard !!!
   const int nb_procs = by_comm_grp ? nb_proc_local_comm_ : Process::nproc();
@@ -401,43 +414,13 @@ void TRUST_2_CGNS::fill_global_infos_poly(const bool is_polyedre)
       global_nb_face_som_.assign(nb_procs, -123 /* default */);
       global_nb_elem_face_.assign(nb_procs, -123 /* default */);
 
-      if (by_comm_grp)
-        {
-          const Comm_Group_MPI& comm_loc = ref_cast(Comm_Group_MPI, PE_Groups::get_user_defined_group());
-          MPI_Allgather(&nb_fs, 1, MPI_ENTIER, global_nb_face_som_.data(), 1, MPI_ENTIER, comm_loc.get_mpi_comm());
-          MPI_Allgather(&nb_ef, 1, MPI_ENTIER, global_nb_elem_face_.data(), 1, MPI_ENTIER, comm_loc.get_mpi_comm());
-        }
-      else
-        {
-          MPI_Allgather(&nb_fs, 1, MPI_ENTIER, global_nb_face_som_.data(), 1, MPI_ENTIER, MPI_COMM_WORLD);
-          MPI_Allgather(&nb_ef, 1, MPI_ENTIER, global_nb_elem_face_.data(), 1, MPI_ENTIER, MPI_COMM_WORLD);
-        }
+      allgather_int_on_active_comm(nb_fs, global_nb_face_som_, by_comm_grp);
+      allgather_int_on_active_comm(nb_ef, global_nb_elem_face_, by_comm_grp);
 
       if (!Option_CGNS::PARALLEL_OVER_ZONE && !postraiter_domaine_)
         {
-          // incr sur nb_faces tot
-          global_incr_min_face_som_.assign(nb_procs, -123 /* default */);
-          global_incr_max_face_som_.assign(nb_procs, -123 /* default */);
-          // incr sur nb_elem tot
-          global_incr_min_elem_face_.assign(nb_procs, -123 /* default */);
-          global_incr_max_elem_face_.assign(nb_procs, -123 /* default */);
-
-          global_incr_min_face_som_[0] = 1, global_incr_min_elem_face_[0] = 1; // start from 1 !
-          nfs_tot_ = 0, nef_tot_ = 0;
-
-          // now we fill global incremented min/max stuff
-          for (int i = 0; i < nb_procs; i++)
-            {
-              // 1 : min
-              global_incr_min_face_som_[i] = nfs_tot_ + 1;
-              global_incr_min_elem_face_[i] = nef_tot_ + 1;
-              // 2 : increment
-              nfs_tot_ += global_nb_face_som_[i];
-              nef_tot_ += global_nb_elem_face_[i];
-              // 3 : max
-              global_incr_max_face_som_[i] = nfs_tot_;
-              global_incr_max_elem_face_[i] = nef_tot_;
-            }
+          compute_global_min_max(global_nb_face_som_, global_incr_min_face_som_, global_incr_max_face_som_, nfs_tot_);
+          compute_global_min_max(global_nb_elem_face_, global_incr_min_elem_face_, global_incr_max_elem_face_, nef_tot_);
         }
 
       // face_sommets : local vectors + offset
@@ -458,37 +441,15 @@ void TRUST_2_CGNS::fill_global_infos_poly(const bool is_polyedre)
       global_nb_face_som_offset_.assign(nb_procs, -123 /* default */);
       global_nb_elem_face_offset_.assign(nb_procs, -123 /* default */);
 
-      if (by_comm_grp)
-        {
-          const Comm_Group_MPI& comm_loc = ref_cast(Comm_Group_MPI, PE_Groups::get_user_defined_group());
-          MPI_Allgather(&nb_fs_offset, 1, MPI_ENTIER, global_nb_face_som_offset_.data(), 1, MPI_ENTIER, comm_loc.get_mpi_comm());
-          MPI_Allgather(&nb_ef_offset, 1, MPI_ENTIER, global_nb_elem_face_offset_.data(), 1, MPI_ENTIER, comm_loc.get_mpi_comm());
-        }
-      else
-        {
-          MPI_Allgather(&nb_fs_offset, 1, MPI_ENTIER, global_nb_face_som_offset_.data(), 1, MPI_ENTIER, MPI_COMM_WORLD);
-          MPI_Allgather(&nb_ef_offset, 1, MPI_ENTIER, global_nb_elem_face_offset_.data(), 1, MPI_ENTIER, MPI_COMM_WORLD);
-        }
+      allgather_int_on_active_comm(nb_fs_offset, global_nb_face_som_offset_, by_comm_grp);
+      allgather_int_on_active_comm(nb_ef_offset, global_nb_elem_face_offset_, by_comm_grp);
 
       if (!Option_CGNS::PARALLEL_OVER_ZONE && !postraiter_domaine_)
         {
           // incr sur nb_faces et nb_elem tot offset
           std::vector<int> global_incr_max_face_som_offset, global_incr_max_elem_face_offset;
-          global_incr_max_face_som_offset.assign(nb_procs, -123 /* default */);
-          global_incr_max_elem_face_offset.assign(nb_procs, -123 /* default */);
-
-          nfs_offset_tot_ = 0, nef_offset_tot_ = 0;
-
-          // now we fill global incremented min/max stuff
-          for (int i = 0; i < nb_procs; i++)
-            {
-              // 1 : increment
-              nfs_offset_tot_ += global_nb_face_som_offset_[i];
-              nef_offset_tot_ += global_nb_elem_face_offset_[i];
-              // 2 : max
-              global_incr_max_face_som_offset[i] = nfs_offset_tot_;
-              global_incr_max_elem_face_offset[i] = nef_offset_tot_;
-            }
+          compute_global_max_only(global_nb_face_som_offset_, global_incr_max_face_som_offset, nfs_offset_tot_);
+          compute_global_max_only(global_nb_elem_face_offset_, global_incr_max_elem_face_offset, nef_offset_tot_);
 
           decal = compute_shift(global_incr_max_face_som_offset); // shift by faces offset !!
           for (auto &itr : local_fs_offset_) itr += decal;
@@ -509,26 +470,12 @@ void TRUST_2_CGNS::fill_global_infos_poly(const bool is_polyedre)
       // incr sur nb_elem tot offset
       global_nb_elem_som_offset_.assign(nb_procs, -123 /* default */);
 
-      if (by_comm_grp)
-        {
-          const Comm_Group_MPI& comm_loc = ref_cast(Comm_Group_MPI, PE_Groups::get_user_defined_group());
-          MPI_Allgather(&nb_es_offset, 1, MPI_ENTIER, global_nb_elem_som_offset_.data(), 1, MPI_ENTIER, comm_loc.get_mpi_comm());
-        }
-      else
-        MPI_Allgather(&nb_es_offset, 1, MPI_ENTIER, global_nb_elem_som_offset_.data(), 1, MPI_ENTIER, MPI_COMM_WORLD);
+      allgather_int_on_active_comm(nb_es_offset, global_nb_elem_som_offset_, by_comm_grp);
 
       if (!Option_CGNS::PARALLEL_OVER_ZONE && !postraiter_domaine_)
         {
           std::vector<int> global_incr_max_elem_som_offset;
-          global_incr_max_elem_som_offset.assign(nb_procs, -123 /* default */);
-          nes_offset_tot_ = 0;
-
-          // now we fill global incremented min/max stuff
-          for (int i = 0; i < nb_procs; i++)
-            {
-              nes_offset_tot_ += global_nb_elem_som_offset_[i]; // 1 : increment
-              global_incr_max_elem_som_offset[i] = nes_offset_tot_;  // 2 : max
-            }
+          compute_global_max_only(global_nb_elem_som_offset_, global_incr_max_elem_som_offset, nes_offset_tot_);
 
           decal = compute_shift(global_incr_max_elem_som_offset); // shift by elem offset !!
           for (auto &itr : local_es_offset_) itr += decal;
@@ -542,11 +489,7 @@ int TRUST_2_CGNS::compute_shift(const std::vector<int>& vect_incr_max) const
 #ifdef MPI_
   assert(par_in_zone_);
 
-  const bool by_comm_grp = (Process::is_parallel()
-                            && (Option_CGNS::LINKED_FILES_PER_COMM_GROUP ||
-                                Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)
-                            && PE_Groups::has_user_defined_group()
-                            && !postraiter_domaine_ );
+  const bool by_comm_grp = is_comm_group_mode(postraiter_domaine_);
 
   int proc_me = by_comm_grp ? proc_me_local_comm_ : Process::me();
 
