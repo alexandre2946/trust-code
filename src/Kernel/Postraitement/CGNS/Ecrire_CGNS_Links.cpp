@@ -28,6 +28,20 @@
  * ***************** *
  */
 
+/**
+ * This file implements the CGNS modes where mesh/support data and solution data are split across several files.
+ *
+ * Current design choices:
+ * - the grid/support file is written once and reused by links,
+ * - one solution file is written per post-processing time,
+ * - the final link file is rebuilt at each post time so the result stays
+ *   directly visualizable while the simulation is still running.
+ *
+ * The final link file behaves like a small index/manifest file. Rebuilding it
+ * is intentionally preferred over incremental in-place updates because CGNS
+ * iterative nodes can be fragile to modify and the robustness/readability
+ * trade-off is better with full reconstruction.
+ */
 void Ecrire_CGNS::init_proc_maitre_local_comm()
 {
   assert(is_comm_group_mode());

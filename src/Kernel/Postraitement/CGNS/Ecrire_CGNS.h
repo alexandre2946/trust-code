@@ -23,6 +23,38 @@
 
 class Nom;
 
+/**
+ * @brief Writer TRUST -> CGNS for post-processing outputs.
+ *
+ * This class centralizes all CGNS writing strategies used by TRUST postprocessing.
+ * The implementation supports several execution contexts and file layouts:
+ * - sequential single file,
+ * - parallel single file,
+ * - parallel over-zone output,
+ * - linked files (`grid + one solution file per post time + one final link file`),
+ * - communicator-group outputs.
+ *
+ * The current design intentionally keeps some filename construction and mode
+ * dispatch explicit in the implementation. For this code, readability of the
+ * different CGNS workflows is preferred over a stronger abstraction layer.
+ *
+ * High-level behavior:
+ * - In single-file modes, the main CGNS file stays open as long as possible and
+ *   is flushed and/or closed according to `Option_CGNS::FLUSH_EVERY_N` and
+ *   `Option_CGNS::CLOSE_EVERY_N`.
+ * - In linked-file modes, the mesh file is separated from solution files. A
+ *   final link file is rebuilt at each post time so the result remains directly
+ *   visualizable during the simulation.
+ * - For deformable or lagrangian cases, additional constraints apply because
+ *   coordinates and/or topology evolve with time.
+ *
+ * Important design note about the final link file:
+ * the file is currently rebuilt at each post time instead of being incrementally
+ * updated. This is a deliberate trade-off. In practice, CGNS/HDF5 append-style
+ * updates on iterative nodes (`BaseIterativeData_t`, `ZoneIterativeData_t`) were
+ * found to be more fragile and not clearly faster than rebuilding this small
+ * `index` file.
+ */
 class Ecrire_CGNS
 {
 #ifdef HAS_CGNS

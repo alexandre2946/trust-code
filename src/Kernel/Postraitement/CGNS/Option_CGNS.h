@@ -20,6 +20,24 @@
 
 class Motcle;
 
+/**
+ * @brief Global CGNS post-processing options.
+ *
+ * This interpreter configures the file layout used by `Ecrire_CGNS`.
+ * The options intentionally describe families of workflows rather than low-level CGNS calls.
+ *
+ * Main families:
+ * - single file: one CGNS file stores all written times and fields,
+ * - linked files: one mesh file, one solution file per post time, and one
+ *   final link file used as the visualization entry point,
+ * - communicator-group output: the same two strategies, but replicated on
+ *   user-defined MPI communicator groups.
+ *
+ * Compatibility rules:
+ * - `PARALLEL_OVER_ZONE` and `SINGLE_FILE_PER_COMM_GROUP` belong to the single-file family,
+ * - `USE_LINKS` and `LINKED_FILES_PER_COMM_GROUP` belong to the linked-file family,
+ * - mixing both families is rejected explicitly.
+ */
 class Option_CGNS: public Interprete
 {
   Declare_instanciable(Option_CGNS);
