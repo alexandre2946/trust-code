@@ -105,8 +105,7 @@ void Ecrire_CGNS::cgns_associer_domaine_dis(const Domaine_dis_base& domaine_dis_
 void Ecrire_CGNS::cgns_init_MPI()
 {
 #ifdef MPI_
-  if ((Option_CGNS::LINKED_FILES_PER_COMM_GROUP || Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)
-      && PE_Groups::has_user_defined_group() && !postraiter_domaine_)
+  if (is_comm_group_mode())
     {
       const Comm_Group_MPI& comm_loc = ref_cast(Comm_Group_MPI, PE_Groups::get_user_defined_group());
       if (cgp_mpi_comm(comm_loc.get_mpi_comm()) != CG_OK)
@@ -145,7 +144,7 @@ void Ecrire_CGNS::cgns_open_file()
 
   if (Process::is_parallel())
     {
-      if (Option_CGNS::SINGLE_FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group() && !postraiter_domaine_)
+      if (is_single_file_comm_group_mode())
         {
           fn = (Nom(baseFile_name_)).nom_me(proc_maitre_local_comm_).getString() + ".cgns"; // file name
           unlink(fn.c_str());
@@ -230,9 +229,7 @@ void Ecrire_CGNS::finir_ecriture(double temps)
           /* single but SAFE file => update iterateurs + close to force flush on disc so you can visualize during simulation !!! */
           if (will_flush || will_close)
             {
-              if (!first_time_post_ && !(Process::is_parallel() &&
-                                         Option_CGNS::SINGLE_FILE_PER_COMM_GROUP &&
-                                         PE_Groups::has_user_defined_group()) ) /* write iters */
+              if (!first_time_post_ && !is_single_file_comm_group_mode()) /* write iters */
                 cgns_write_iters();
 
               if (!will_close)
@@ -251,7 +248,7 @@ void Ecrire_CGNS::finir_ecriture(double temps)
         }
     }
 
-  if (Process::is_parallel() && Option_CGNS::SINGLE_FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
+  if (is_single_file_comm_group_mode())
     cgns_write_final_link_file_for_single_file_comm_group();
 }
 
@@ -263,7 +260,7 @@ void Ecrire_CGNS::cgns_finir()
   if (Option_CGNS::USE_LINKS && !postraiter_domaine_)
     return; /* All done */
 
-  if (!(Process::is_parallel() && Option_CGNS::SINGLE_FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group()))
+  if (!is_single_file_comm_group_mode())
     if (!postraiter_domaine_ && !first_time_post_)
       cgns_write_iters();
 
@@ -273,7 +270,7 @@ void Ecrire_CGNS::cgns_finir()
 
   if (Process::is_parallel())
     {
-      if ( Option_CGNS::SINGLE_FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group() && !postraiter_domaine_)
+      if (is_single_file_comm_group_mode())
         {
           cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::PAR>(fn /* inutile */, fileId_, false);
           Cerr << "**** Multiple parallel CGNS files " << baseFile_name_ << "_XXXX.cgns closed !" << finl;
@@ -310,7 +307,7 @@ void Ecrire_CGNS::cgns_add_time(const double t)
 
               if (Process::is_parallel())
                 {
-                  if (Option_CGNS::SINGLE_FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
+                  if (is_single_file_comm_group_mode())
                     {
                       fn = (Nom(baseFile_name_)).nom_me(proc_maitre_local_comm_).getString() + ".cgns"; // file name
                       cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR, TYPE_MODE_CGNS::MODIFY>(fn, fileId_, false);
@@ -361,7 +358,7 @@ void Ecrire_CGNS::ensure_modify_open_singlefile()
   /* Reopen file for first time with MODIFY mode */
   if (Process::is_parallel())
     {
-      if (Option_CGNS::SINGLE_FILE_PER_COMM_GROUP && PE_Groups::has_user_defined_group())
+      if (is_single_file_comm_group_mode())
         {
           fn = (Nom(baseFile_name_)).nom_me(proc_maitre_local_comm_).getString() + ".cgns"; // file name
           cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::PAR, TYPE_MODE_CGNS::MODIFY>(fn, fileId_, false);
@@ -1112,8 +1109,7 @@ void Ecrire_CGNS::cgns_write_domaine_par_in_zone(const Domaine * domaine,const N
 
   TRUST2CGNS.fill_global_infos(); // XXX
 
-  const bool enter_group_comm = (Option_CGNS::LINKED_FILES_PER_COMM_GROUP || Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)
-                                && PE_Groups::has_user_defined_group() && !postraiter_domaine_;
+  const bool enter_group_comm = is_comm_group_mode();
 
   const int proc_me = enter_group_comm ? TRUST2CGNS.get_proc_me_local_comm() : Process::me();
 
@@ -1237,8 +1233,7 @@ void Ecrire_CGNS::cgns_write_connectivity_par_in_zone(const CGNS_TYPE cgns_type_
                                                       const TRUST_2_CGNS& TRUST2CGNS, const int ind_base_zone,
                                                       const int sectionId, const int sectionId2) const
 {
-  const bool enter_group_comm = (Option_CGNS::LINKED_FILES_PER_COMM_GROUP || Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)
-                                && PE_Groups::has_user_defined_group() && !postraiter_domaine_;
+  const bool enter_group_comm = is_comm_group_mode();
 
   const int proc_me = enter_group_comm ? TRUST2CGNS.get_proc_me_local_comm() : Process::me();
   cgsize_t min, max;
@@ -1335,8 +1330,7 @@ void Ecrire_CGNS::cgns_write_field_par_in_zone(const int comp, const double temp
   if (nb_vals > 0) // this proc will write !
     {
       const TRUST_2_CGNS& TRUST2CGNS = T2CGNS_[ind_base];
-      const bool enter_group_comm = (Option_CGNS::LINKED_FILES_PER_COMM_GROUP || Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)
-                                    && PE_Groups::has_user_defined_group() && !postraiter_domaine_;
+      const bool enter_group_comm = is_comm_group_mode();
 
       const int proc_me = enter_group_comm ? TRUST2CGNS.get_proc_me_local_comm() : Process::me();
 
@@ -1405,7 +1399,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
     }
 
   const int ns_tot = TRUST2CGNS.get_ns_tot(), ne_tot = TRUST2CGNS.get_ne_tot();
-  const bool enter_group_comm = Option_CGNS::LINKED_FILES_PER_COMM_GROUP && PE_Groups::has_user_defined_group() && !postraiter_domaine_;
+  const bool enter_group_comm = is_linked_files_comm_group_mode();
   const int proc_me = enter_group_comm ? TRUST2CGNS.get_proc_me_local_comm() : Process::me();
 
   int coordsIdx = -123, coordsIdy = -123, coordsIdz = -123;

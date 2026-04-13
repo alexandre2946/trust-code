@@ -49,6 +49,24 @@ private:
 
   void fill_infos_loc();
   void update_grid_name();
+  inline bool is_comm_group_mode() const
+  {
+    return (Option_CGNS::LINKED_FILES_PER_COMM_GROUP || Option_CGNS::SINGLE_FILE_PER_COMM_GROUP)
+           && Process::is_parallel() && PE_Groups::has_user_defined_group() && !postraiter_domaine_;
+  }
+
+  inline bool is_linked_files_comm_group_mode() const
+  {
+    return Process::is_parallel() && Option_CGNS::LINKED_FILES_PER_COMM_GROUP
+           && PE_Groups::has_user_defined_group() && !postraiter_domaine_;
+  }
+
+  inline bool is_single_file_comm_group_mode() const
+  {
+    return Process::is_parallel() && Option_CGNS::SINGLE_FILE_PER_COMM_GROUP
+           && PE_Groups::has_user_defined_group() && !postraiter_domaine_;
+  }
+
   Ecrire_CGNS_helper cgns_helper_;
   OBS_PTR(Domaine_dis_base) domaine_dis_;
   OBS_PTR(std::vector<std::string>) loc_vect_;
