@@ -49,14 +49,10 @@ class_name  parent_class_name  class_name_synonym  with_brace  description
 ```
 
 The `with_brace` flag can take one of the following values:
-- (-1) like the parent class
-- (0) keyword does not expect braces when read in the dataset. Names of the attributes are not used for reading or writing.  Example : `Champ_Uniforme 3 0. 0. 0.`
-- (1) keyword expects curly braces, the name of the attributes is explicitly provided. Example: `Lire sch { tinit 0. tmax 0. }`
-- (-2) like 0 but wait after discretisation to write free part
-- (-3) like 1 but wait after discretisation to write free part
-    - example: all problems, discretisation must have been done before reading them.
+- 'INHERITS_BRACE' - the rule will be the same as the the parent class
+- 'NO_BRACE' keyword does not expect braces when read in the dataset. Names of the attributes are not used for reading or writing.  Example : `Champ_Uniforme 3 0. 0. 0.`
+- 'BRACE' keyword expects curly braces, the name of the attributes is explicitly provided. Example: `Lire sch { tinit 0. tmax 0. }`
 
-NB: mode -2 and -3 are not used in `trustify`.
 
 ### Attributes
 
@@ -66,7 +62,7 @@ The format of an attribute line is as follows:
 <space><space>attr  nam|nam_syno1  type  nam_syno2  opt  description
 ```
 where:
-- `opt` can take the value 0 (mandatory attribute) or 1 (optional attribute) indicating whether the attribute must be provided or is optional.
+- `opt` can take the value 'REQ' (required attribute) or 'OPT' (optional attribute) indicating whether the attribute must be provided or is optional.
 - `type` is the class name describing the type of the attribute.
 
 When `attr` is followed by `ref type_name` the class must be associated with a class of type `type_name` (keyword `associer` in the dataset). This is not checked currently in `trustify` logic.
@@ -80,12 +76,12 @@ Some pecularities:
 If the name of the parent class is `listobj`, syntax is
 
 ```
-class_name  listobj  class_name_synonym  with_brace  classe_type  virgule  description
+class_name  listobj  class_name_synonym  with_brace  classe_type  comma  description
 ```
 
 This expresses the creation of a list of objects of type `class_type`
 
-The flag `virgule` (0|1) tells whether a comma is expected to separate list elements or not.
+The flag `comma` can take the values 'INHERITS_COMMA', 'NO_COMMA' or 'COMMA'  tells whether a comma is expected to separate list elements or not.
 
 
 ### Base types
@@ -222,3 +218,12 @@ In the `test`subfolder:
 - `test_rw_elementary.py` : testing read and write of small pieces of datasets. For those tests a dummy, reduced version of a TRAD2 is used: TRAD_2_adr_simple.
 - `test_rw_full_datasets.py` : testing read and write of complete datasets using a typical (and complete) TRUST TRAD2 file (TRAD2_trustify).
 - `test_rw_all_datasets.py` : for **all** TRUST datasets, load each of them in `trustify`, and write them back. If the output differs from the input, an error is raised.
+
+If you need to run a single unit test in Debug mode, the easiest is to :
+- source env_dev.sh
+- invoke Python unittest like this
+
+```
+TRUSTIFY_DEBUG=1 python -m unittest test.test_rw_full_datasets.TestCase.test_ds_diff_impl
+```
+

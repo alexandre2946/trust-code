@@ -73,16 +73,18 @@ class TRAD2Attr:
             a.type = convertTyp(a.type)
 
         a.desc = ' '.join(tab[4:])
-        if opt not in ["0", "1"]:
-            raise Exception(pretty_error(fname, lineno, f"invalid optional flag in 'XD attr' (attribute line) instruction ('{opt}'). It should be 0 or 1!!")) from None
-        a.is_opt = (opt == "1")
+        # Flag for the optionality of an attribute : legacy codes (0 for 'REQ' and 1 for 'OPT') are still supported:
+        opt = opt.upper()
+        if opt not in ["0", "1", "REQ", "OPT"]:
+            raise Exception(pretty_error(fname, lineno, f"invalid optional flag in 'XD attr' (attribute line) instruction ('{opt}'). It should be 'OPT' or 'REQ'!!")) from None
+        a.is_opt = (opt == "OPT" or opt == "1")
         tr = os.environ.get("TRUST_ROOT", None) # should be defined, this is checked in main
         a.info = [convert_path_to_relative(fname), lineno+1]
         return a
 
     def toTRAD2(self):
         """ Output the attribute in the 'TRAD2' format """
-        opt = 1 if self.is_opt else 0
+        opt = "OPT" if self.is_opt else "REQ"
         if len(self.synos) == 0:
             synos = [self.name]
         else:
@@ -98,7 +100,7 @@ class TRAD2Block:
         self.name = ""        #: Keyword main name
         self.name_base = ""  #: Parent class for the keyword
         self.synos = []      #: List of synonyms
-        self.mode = -123     #: Mode of the keyword (with braces, etc... see doc/README.md
+        self.mode = -123     #: Mode of the keyword (with braces, etc... see doc/README_user.md)
         self.desc = ""       #: Description
         self.info = ["", -1]    #: Filename / Lineno where the keyword was defined
         self.attrs = []         #: A list of TRAD2Attr = the attributes expected for the keyword
@@ -115,13 +117,22 @@ class TRAD2Block:
         if b.name == b.name_base:
             raise Exception(pretty_error(fname, lineno, f"Keyword/class '{b.name}' inherits from itself!! You should put a parent class as second parameter in the XD line.")) from None
         a = None
-        try:
-            a = int(acco_s)
-            if a not in [-3,-2,-1,0,1]:a = None
-        except:
-            pass
+        # Tag for usage of braces : legacy mode is supported: "INHERITS_BRACE" (-1), "NO_BRACE" (0), "BRACE" (1)
+        acco_s = acco_s.upper()
+        if acco_s in ["INHERITS_BRACE", "NO_BRACE", "BRACE"]:
+            a = acco_s
+        else:
+            try:
+                a = int(acco_s)
+                a = {-3: "BRACE", # -3 (resp) -2:  Historically like 1 (resp 0) but also needs to be put after Discretisation (e.g. for all Problems, discretisation must be done before reading them)
+                     -2: "NO_BRACE",
+                     -1 : "INHERITS_BRACE",
+                     0: "NO_BRACE",
+                     1:"BRACE"}.get(a, None)
+            except:
+                pass
         if a is None:
-            raise Exception(pretty_error(fname, lineno, f"option for curly braces should be an integer in [-3:1], not '{acco_s}'!!")) from None
+            raise Exception(pretty_error(fname, lineno, f"option for curly braces should either 'INHERITS_BRACE', or 'NO_BRACE', or 'BRACE', not '{acco_s}'!!")) from None
         b.mode = a
         b.synos = nam2.split("|")
         b.info = [convert_path_to_relative(fname), lineno+1]
@@ -153,10 +164,13 @@ class TRAD2BlockList(TRAD2Block):
     def _finishBuild(self, tab):
         """ Override to extract list-relevant data """
         self.itemtype = tab[0].lower()
-        if tab[1] not in ["-1", "0", "1"]:
+        comma_dict = {"-1":"INHERITS_COMMA", "0": "NO_COMMA", "1": "COMMA"}
+        v = tab[1].upper()
+        if v not in (list(comma_dict.keys()) + list(comma_dict.values())):
             raise Exception(pretty_error(self.info[0], self.info[1],
-                            f"option for comma (for a list) should be -1, 0 or 1, not '{tab[1]}'!!")) from None
-        self.comma = int(tab[1])
+                            f"option for comma (for a list) should be in {comma_dict.values()}, not '{tab[1]}'!!")) from None
+        # Flag for comma in lists: either INHERITS_COMMA (formerly -1), 'NO_COMMA' (formerly 0), or 'COMMA' (formerly 1)
+        self.comma = comma_dict.get(v, v)
         self.desc = ' '.join(tab[2:])
 
     def toTRAD2(self):
@@ -176,7 +190,7 @@ class TRAD2Content:
         import re
         self.data = []  #: A list of TRAD2Block
         self.re_comment = re.compile(r"^\s*//") #: RegExp to match simple one line comment
-        self.re_cont = re.compile(r"^\s*//\s*XD_CONT") #: RegExp to match an XD continuation line 
+        self.re_cont = re.compile(r"^\s*//\s*XD_CONT") #: RegExp to match an XD continuation line
 
     @classmethod
     def BuildContentFromTRAD2(cls, trad2, trad2_nfo=None):
@@ -394,7 +408,7 @@ class TRAD2Content:
     def extractAndGroupXDLines(self, f_name, lins):
         """ Group multi-lines (XD comments expanding on several lines).
         @return a list of sub-lists, each sub-list having exactly 3 items: line number / (joined) original lines / (joined) stripped, lower-case lines 
-        """        
+        """
         grouped_lines = []   # triplet: line number / original line / stripped, lower-case line
         curr_block = [-1, "", ""]
         in_block = False
@@ -418,7 +432,7 @@ class TRAD2Content:
                     grouped_lines.append(curr_block)
                 curr_block = [lin_n, lin, l_low]
                 continue
-            # Multi-line XD blocks: 
+            # Multi-line XD blocks:
             cond3 = False
             for lvl, lvl_s in enumerate(["","2","3"]):
                 if f"{lvl_s}XD" in lin and not is_cont:
@@ -432,7 +446,7 @@ class TRAD2Content:
                 curr_block = [lin_n, lin, l_low]  # Start new block
                 in_block = True
             else:
-                # Ignore the irrelevant lines: 
+                # Ignore the irrelevant lines:
                 if not (in_block and is_cont):
                     in_block = False  # Mark the end of the block (it will be registered at the next new block or at the end)
                     continue
@@ -560,7 +574,7 @@ def do_main():
     - potentially the file containing the debug info indicating for each line in the TRAD2 the corresponding source line in the C++ code 
     """
     import sys
-    
+
     if len(sys.argv) > 1:
         outfile = sys.argv[1]
     else:

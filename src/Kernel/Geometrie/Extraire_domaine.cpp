@@ -26,7 +26,7 @@
 #include <ParserView.h>
 
 Implemente_instanciable(Extraire_domaine,"Extraire_Domaine",Interprete_geometrique_base);
-// XD extraire_domaine interprete extraire_domaine -3 Keyword to create a new domain built with the domain elements of the pb_name problem verifying the two conditions given by Condition_elements. The problem pb_name should have been discretized.
+// XD extraire_domaine interprete extraire_domaine 1 Keyword to create a new domain built with the domain elements of the pb_name problem verifying the two conditions given by Condition_elements. The problem pb_name should have been discretized.
 
 Sortie& Extraire_domaine::printOn(Sortie& os) const { return Interprete::printOn(os); }
 Entree& Extraire_domaine::readOn(Entree& is) { return Interprete::readOn(is); }

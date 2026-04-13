@@ -268,7 +268,7 @@ def write_pars_block(block, pars_file, all_blocks):
     for attr in block.attrs:
         info_attr[valid_variable_name(attr.name)] = tuple(attr.info)
 
-    lines += [f'    _braces: int = {block.mode}']
+    lines += [f'    _braces: str = "{block.mode}"']
 
     # The XXX_base class (and similar) will need to read their type directly in the dataset, so need this:
     if is_base_or_deriv(block.name):
@@ -277,7 +277,7 @@ def write_pars_block(block, pars_file, all_blocks):
     # Lists need extra information:
     if block.name_base == "listobj":
         assert isinstance(block, tu.TRAD2BlockList)
-        lines += [f'    _comma: int = {block.comma}',
+        lines += [f'    _comma: str = "{block.comma}"',
                   f'    _itemType: Objet_u = {ClassFactory.ToPydName(block.itemtype)}']
 
     lines += [

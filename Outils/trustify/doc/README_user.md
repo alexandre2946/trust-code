@@ -13,14 +13,9 @@ param.ajouter("tutu", &tutu);  // XD_ADD_P double A description for tutu attribu
 ```
 
 The `with_brace` flag can take one of the following values:
-- (-1) like the parent class
-- (0) keyword does not expect braces when read in the dataset. Names of the attributes are not used for reading or writing.  Example : `Champ_Uniforme 3 0. 0. 0.`
-- (1) keyword expects curly braces, the name of the attributes is explicitly provided. Example: `Lire sch { tinit 0. tmax 0. }`
-- (-2) like 0 but wait after discretisation to write free part
-- (-3) like 1 but wait after discretisation to write free part
-
-NB: mode -2 and -3 are not used in `trustify` and are inherited from the former tool.
-
+- 'INHERITS_BRACE' - the rule will be the same as the the parent class
+- 'NO_BRACE' keyword does not expect braces when read in the dataset. Names of the attributes are not used for reading or writing.  Example : `Champ_Uniforme 3 0. 0. 0.`
+- 'BRACE' keyword expects curly braces, the name of the attributes is explicitly provided. Example: `Lire sch { tinit 0. tmax 0. }`
 
 It is important to place the attribute tags on the same line as the `param.ajouter` calls so that the name of the parameter used in the C++ code can be extracted.
 

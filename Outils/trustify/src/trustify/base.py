@@ -18,7 +18,7 @@ class Abstract_Parser:
     """ Root class for all parsers 
     The main instance attribute is self._pyd_value which stores the actual value being parsed.
     """
-    _braces = 1           #: whether we expect braces when reading the class - see doc of TRAD2 format - by default, expect braces.
+    _braces = "BRACE"     #: whether we expect braces when reading the class - see doc of TRAD2 format - by default, expect braces.
     _read_type = False    #: whether to read the actual type before instanciating the class (typically for *_base or *_deriv classes) - By default we do *not* read the type
     _infoMain = []        #: a tuple giving the C++ source file and the line where the type was defined
 
@@ -180,14 +180,12 @@ class Abstract_Parser:
     def WithBraces(cls):
         """
         Get brace style for the keyword when reading it from the data file (with braces or without). What a mess... :
-        -1: like the parent class
-        0: no braces, no attribute names
-        1: with braces, attributes explicitly named
-        -2: like 0, but should come after 'discretize' (not checked here)
-        -3: like 1, but should come after 'discretize' (not checked here)
+        'INHERITS_BRACE': like the parent class
+        'NO_BRACE': no braces, no attribute names
+        'BRACE': with braces, attributes explicitly named
         """
-        mp = {0: False, 1: True, -2: False, -3: True}
-        if cls._braces in [0, 1, -2, -3]:
+        mp = {"NO_BRACE": False, "BRACE": True}
+        if cls._braces in mp.keys():
             return mp[cls._braces]
         # Need to look at the parent
         for c in cls.__bases__:
@@ -303,7 +301,7 @@ class BaseCommon_Parser(Abstract_Parser):
       ReadFromTokens() - which instanciate a class from a stream of tokens (i.e. from the .data file)
       toDatasetTokens() - inherited from parent class, which does the inverse operation and serializes the content of the instance as a stream of tokens
     """
-    _braces = 1           #: whether we expect braces when reading the class - see doc_TRAD2 - by default, expect braces.
+    _braces = "BRACE"     #: whether we expect braces when reading the class - see doc_TRAD2 - by default, expect braces.
     _read_type = False    #: whether to read the actual type before instanciating the class (typically for *_base or *_deriv classes) - By default we do *not* read the type
                           # In the Python code generation this attribute is overloaded when hitting _base or _deriv.
     _infoAttr = {}        #: same thing for class attributes (dictionnary indexed by main attr name)
@@ -710,7 +708,7 @@ class ListOfBase_Parser(Builtin_Parser):
     This is a child of Builtin_Parser because on the pydantic side, such an attribute will be annotated as a standard 
     Python list 'List[XXX]' 
     """
-    _comma = 1             #:  1: with comma to separate items, 0: without, -1: like parent
+    _comma = "COMMA"       #:  'COMMA': with comma to separate items, 'NO_COMMA': without, 'INHERITS_COMMA': like parent
     _itemType = None       #: The (single) pydantic (or builtin) type of the items in the list - overriden in derived classes
     _itemParserType = None #: The associated Parser class - will be set by readFromTokensBuiltin_impl
 
@@ -732,12 +730,12 @@ class ListOfBase_Parser(Builtin_Parser):
     def _WithComma(cls):
         """ Private.
         Tell whether list items are separated by a comma.
-        -1: like the parent class
-        0: no comma to separate items
-        1: with comma
+        'INHERITS_COMMA': like the parent class
+        'NO_COMMA': no comma to separate items
+        'COMMA': using a comma to separate list items
         """
-        mp = {0: False, 1: True}
-        if cls._comma in [0, 1]:
+        mp = {"NO_COMMA": False, "COMMA": True}
+        if cls._comma in mp.keys():
             return mp[cls._comma]
         # Need to look at the parent
         for c in cls.__bases__:
@@ -901,8 +899,8 @@ class ListOfBuiltin_Parser(ListOfBase_Parser):
     """ Base class for all lists with items of builtin types (like list of floats, but not list of Source) 
     For those lists we need to save the parser objects too since they can not be attached to the values themselves.
     """
-    _braces = 0        #: No braces for those simple lists
-    _comma = 0         #: No comma either
+    _braces = "NO_BRACE"        #: No braces for those simple lists
+    _comma = "NO_COMMA"         #: No comma either
 
     def __init__(self, pyd_value=None):
         ListOfBase_Parser.__init__(self, pyd_value)
@@ -1002,13 +1000,13 @@ class Interprete_Parser(ConstrainBase_Parser):
     So force its definition here, and hence avoid its automatic generation from the
     TRAD2 file.
     """
-    _braces = 0   #: By default, 'interprete' does not need braces
+    _braces = "NO_BRACE"   #: By default, 'interprete' does not need braces
 
 class Read_Parser(Interprete_Parser):
     """ Class to parse the 'read' keyword.
     Its main specificity is to turn off the type reading of the object that will be read, since the type was provided in the forward declaration. 
     """
-    _braces = 0       #: The 'Read' keyword behaves like an object expecting no braces: "read <identifier> <obj>" where 'identifier' and 'obj' are two mandatory attr
+    _braces = "NO_BRACE"  #: The 'Read' keyword behaves like an object expecting no braces: "read <identifier> <obj>" where 'identifier' and 'obj' are two mandatory attr
     _read_type = True
     _ze_type = None   #: The actual (parser) class that the 'read' instruction will parse. This is set in Dataset_Parser._Handle_Read_instruction()
     _infoMain = ["<trustify builtin>", -1]
@@ -1429,7 +1427,7 @@ class Fin_Parser(Interprete_Parser):
     """ The 'end' keyword at the end of the dataset. It is an 'interprete'.
     It has its own class because the main parsing loop in Dataset needs to spot it specifically :-)
     """
-    _braces = 0
+    _braces = "NO_BRACE"
     _read_type = False
 
 class Int_Parser(Builtin_Parser):
