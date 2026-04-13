@@ -865,6 +865,17 @@ void Ecrire_CGNS::cgns_write_domaine_par_over_zone(const Domaine * domaine,const
   const int nb_zones_to_write = TRUST2CGNS.nb_procs_writing();
   const bool all_write = TRUST2CGNS.all_procs_write(); // all procs will write !
 
+  zoneId_.reserve(nb_zones_to_write);
+  coordsIdx.reserve(nb_zones_to_write);
+  coordsIdy.reserve(nb_zones_to_write);
+
+  if (Objet_U::dimension > 2)
+    coordsIdz.reserve(nb_zones_to_write);
+
+  sectionId.reserve(nb_zones_to_write);
+  if (cgns_type_elem == CGNS_ENUMV(NGON_n) && is_polyedre)
+    sectionId2.reserve(nb_zones_to_write);
+
   // on boucle seulement sur les procs qui n'ont pas des nb_elem 0
   zoneId_.clear(); // XXX commencons par ca
   const std::vector<int>& global_nb_elem = TRUST2CGNS.get_global_nb_elem(),

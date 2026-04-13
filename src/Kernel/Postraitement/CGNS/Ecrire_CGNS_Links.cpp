@@ -157,6 +157,8 @@ void Ecrire_CGNS::gather_local_sizeId_for_comm_group()
       unique_vec_proc_maitre_local_comm_.push_back(val); // si val pas dedans
 
   std::vector<std::vector<cgsize_t>> sizeId_som_local_comm_tmp, sizeId_elem_local_comm_tmp;
+  sizeId_som_local_comm_tmp.reserve(sizeId_.size());
+  sizeId_elem_local_comm_tmp.reserve(sizeId_.size());
 
   MPI_Datatype CGNS_MPI_SIZE;
   MPI_Type_match_size(MPI_TYPECLASS_INTEGER, sizeof(cgsize_t), &CGNS_MPI_SIZE);
@@ -173,6 +175,8 @@ void Ecrire_CGNS::gather_local_sizeId_for_comm_group()
     }
 
   const int nb_grps = static_cast<int>(unique_vec_proc_maitre_local_comm_.size());
+  sizeId_som_local_comm_.reserve(sizeId_.size());
+  sizeId_elem_local_comm_.reserve(sizeId_.size());
 
   for (int i = 0; i < static_cast<int>(sizeId_.size()); i++)
     {
