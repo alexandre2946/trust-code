@@ -18,7 +18,7 @@ cmake_minimum_required(VERSION 3.22)
 #
 # Definitions of the various TRUST modules
 #
-SPATIAL_DISCRET = ['src/EF', 'src/IJK', 'src/PolyMAC_family', 'src/VDF', 'src/VEF', 'src/DG']
+SPATIAL_DISCRET = ['src/EF', 'src/IJK', 'src/PolyMAC_family', 'src/VDF', 'src/VEF', 'src/DG', 'src/Coloc']
 PHYSICAL_MODULES = ['src/ThHyd', 'src/ThSol', 'src/Meca']
 
 def add_library_for_dir(libnam):
