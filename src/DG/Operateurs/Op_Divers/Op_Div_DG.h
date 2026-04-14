@@ -16,6 +16,7 @@
 #ifndef Op_Div_DG_included
 #define Op_Div_DG_included
 
+#include <Op_Diff_DG_base.h>
 #include <Domaine_DG.h>
 #include <Operateur_Div.h>
 #include <TRUST_Ref.h>
@@ -36,6 +37,7 @@ class Op_Div_DG: public Operateur_Div_base
 public:
 
   void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&, const Champ_Inc_base&) override;
+  void completer() override;
   DoubleTab& calculer(const DoubleTab&, DoubleTab&) const override;
   //DoubleTab& ajouter(const DoubleTab&, DoubleTab&) const override;
   //void contribuer_a_avec(const DoubleTab&, Matrice_Morse& matrice) const override;
@@ -49,6 +51,7 @@ public:
 protected:
   OBS_PTR(Domaine_DG) le_dom_DG;
   OBS_PTR(Domaine_Cl_DG) le_dcl_DG;
+  OBS_PTR(Op_Diff_DG_base) op_diff_;
 };
 
 #endif /* Op_Div_DG_included */

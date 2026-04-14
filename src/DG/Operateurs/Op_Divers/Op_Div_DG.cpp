@@ -43,6 +43,12 @@ void Op_Div_DG::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_d
   le_dcl_DG = ref_cast(Domaine_Cl_DG, domaine_Cl_dis);
 }
 
+void Op_Div_DG::completer()
+{
+  Operateur_base::completer();
+  op_diff_ = ref_cast(Op_Diff_DG_base, equation().operateur(0).l_op_base());
+}
+
 void Op_Div_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
 
@@ -204,10 +210,10 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
 
   Matrice_Morse *matv = matrices.count("vitesse") ? matrices["vitesse"] : nullptr;
 
-  //bool stabilisation = ((order_v == order_p) && matrices.count("pression")); // Calculate the stabilization term if the same order is used for velocity and pressure, and if the matrix for pressure is allocated
-  //Matrice_Morse *matp = matrices.count("pression") ? (stabilisation ? matrices["pression"] : nullptr) : nullptr;
-  //const DoubleTab& inco_p = semi_impl.count("pression") ? semi_impl.at("pression") :  ref_cast(Navier_Stokes_std, equation()).pression().valeurs(); // NB : is this working ?
-
+  /*bool stabilisation = ((order_v == order_p) && matrices.count("pression")); // Calculate the stabilization term if the same order is used for velocity and pressure, and if the matrix for pressure is allocated
+  Matrice_Morse *matp = matrices.count("pression") ? (stabilisation ? matrices["pression"] : nullptr) : nullptr;
+  const DoubleTab& inco_p = semi_impl.count("pression") ? semi_impl.at("pression") : ref_cast(Navier_Stokes_std, equation()).pression().valeurs();
+  */
   const Domaine_DG& domaine = le_dom_DG.valeur();
   const IntTab& face_voisins = domaine.face_voisins();
 
@@ -457,6 +463,8 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
   /*if (!matp) return; // No matrix allocated for the stabilization term, we skip the calculation
   {
     //stabilization part
+    op_diff_->update_nu();
+
     int premiere_face_int = domaine.premiere_face_int();
 
     const DoubleVect& face_surfaces = domaine.face_surfaces();
@@ -483,22 +491,24 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
         bfunc_p.eval_bfunc_on_facets(quad, elem0, face, f_base_p0);
         bfunc_p.eval_bfunc_on_facets(quad, elem1, face, f_base_p1);
 
+        double nu0 = op_diff_->nu(elem0, 0);
+        double nu1 = op_diff_->nu(elem1, 0);
+        double nu_f = 2. * nu0 * nu1 / (nu0 + nu1); // harmonic mean
+
         for (int pressure_index_l = 0; pressure_index_l < nb_bfunc_p; pressure_index_l++) // Loop for basis function
           {
             for (int pressure_index_r = 0; pressure_index_r < nb_bfunc_p; pressure_index_r++) // Loop for test function
               {
                 // elem 0 with elem 0
-                //eval_jump_on_facet00 = 0.;
                 for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
-                  eval_jump_on_facet00(k) = +f_base_p0(pressure_index_l, k) * f_base_p0(pressure_index_r, k) / sur_f;
+                  eval_jump_on_facet00(k) = nu_f * f_base_p0(pressure_index_l, k) * f_base_p0(pressure_index_r, k) * sur_f;
                 coeff00 = quad.compute_integral_on_facet(face, eval_jump_on_facet00);
                 (*matp)(ind_elem0_p + pressure_index_l, ind_elem0_p + pressure_index_r) += coeff00;
                 secmem(elem0, pressure_index_l) -= coeff00 * inco_p(elem0, pressure_index_r);
 
                 // elem 0 with elem 1
-                //eval_jump_on_facet01 = 0.;
                 for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
-                  eval_jump_on_facet01(k) = -f_base_p0(pressure_index_l, k) * f_base_p1(pressure_index_r, k) / sur_f;
+                  eval_jump_on_facet01(k) = -nu_f * f_base_p0(pressure_index_l, k) * f_base_p1(pressure_index_r, k) * sur_f;
                 coeff01 = quad.compute_integral_on_facet(face, eval_jump_on_facet01);
                 (*matp)(ind_elem0_p + pressure_index_l, ind_elem1_p + pressure_index_r) += coeff01;
                 secmem(elem0, pressure_index_l) -= coeff01 * inco_p(elem1, pressure_index_r);
@@ -507,9 +517,8 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
                 secmem(elem1, pressure_index_r) -= coeff01 * inco_p(elem0, pressure_index_l);
 
                 // elem 1 with elem 1
-                //eval_jump_on_facet11 = 0.;
                 for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
-                  eval_jump_on_facet11(k) = +f_base_p1(pressure_index_l, k) * f_base_p1(pressure_index_r, k) / sur_f;
+                  eval_jump_on_facet11(k) = nu_f * f_base_p1(pressure_index_l, k) * f_base_p1(pressure_index_r, k) * sur_f;
                 coeff11 = quad.compute_integral_on_facet(face, eval_jump_on_facet11);
                 (*matp)(ind_elem1_p + pressure_index_l, ind_elem1_p + pressure_index_r) += coeff11;
                 secmem(elem1, pressure_index_r) -= coeff11 * inco_p(elem1, pressure_index_r);
