@@ -59,6 +59,7 @@ public :
   Saturation_base& get_saturation(int k, int l) const;
 
   const Fluide_base& get_fluid(const int i) const;
+   Fluide_base& get_fluid(const int i) ;
   inline const Noms& noms_phases() const { return noms_phases_; }
 
   inline bool are_fluid_properties_initialised() const { return fluid_properties_initialised_; }
@@ -75,7 +76,7 @@ protected :
   OWN_PTR(Interface_base) sat_lu_, inter_lu_;
 
   std::pair<std::string, int> check_fluid_name(const Nom& name);
-  void mettre_a_jour_tabs();
+  virtual void mettre_a_jour_tabs();
   static void calculer_masse_volumique(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);
   static void calculer_energie_interne(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);
   static void calculer_enthalpie(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);

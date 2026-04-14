@@ -185,7 +185,13 @@ Saturation_base& Milieu_composite::get_saturation(int k, int l) const
 
 const Fluide_base& Milieu_composite::get_fluid(const int i) const
 {
-  assert(i > 0 && i < (int )fluides_.size());
+  assert(i >= 0 && i < (int )fluides_.size());
+  return fluides_[i].valeur();
+}
+
+ Fluide_base& Milieu_composite::get_fluid(const int i)
+{
+  assert(i >= 0 && i < (int )fluides_.size());
   return fluides_[i].valeur();
 }
 
