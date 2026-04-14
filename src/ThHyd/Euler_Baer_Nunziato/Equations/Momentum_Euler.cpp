@@ -86,7 +86,7 @@ Entree& Momentum_Euler::readOn(Entree& is)
   return is;
 }
 
-void Momentum_Euler::set_param(Param& param)
+void Momentum_Euler::set_param(Param& param) const
 {
   Equation_base::set_param(param);
   param.ajouter_non_std("diffusion", (this));

@@ -16,11 +16,26 @@
 #ifndef Masse_Coloc_Elem_included
 #define Masse_Coloc_Elem_included
 
-#include <Masse_PolyMAC_HFV_Elem.h>
+#include <Solveur_Masse_Elem_proto.h>
+#include <Solveur_Masse_base.h>
+#include <Domaine_Coloc.h>
 
-class Masse_Coloc_Elem : public Masse_PolyMAC_HFV_Elem
+class Masse_Coloc_Elem : public Solveur_Masse_base, public Solveur_Masse_Elem_proto
 {
   Declare_instanciable(Masse_Coloc_Elem);
+public:
+  int has_interface_blocs() const override { return 1; }
+  void associer_domaine_cl_dis_base(const Domaine_Cl_dis_base& ) override {}
+  void check_multiphase_compatibility() const override { }
+  void completer() override { }
+  void associer_domaine_dis_base(const Domaine_dis_base& ) override;
+  void preparer_calcul() override;
+  DoubleTab& appliquer_impl(DoubleTab& ) const override;
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, double dt, const tabs_t& semi_impl, int resoudre_en_increments) const override;
+
+protected:
+  OBS_PTR(Domaine_Coloc) le_dom_coloc_;
 };
 
 #endif /* Masse_Coloc_Elem_included */

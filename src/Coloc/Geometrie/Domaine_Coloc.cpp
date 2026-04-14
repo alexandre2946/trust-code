@@ -56,58 +56,6 @@ void Domaine_Coloc::calculer_h_carre()
     }
 }
 
-void Domaine_Coloc::calculer_volumes_entrelaces()
-{
-  const DoubleVect& fs = face_surfaces();
-
-  for (int num_face=0; num_face<nb_faces(); num_face++)
-    for (int dir=0; dir<2; dir++)
-      {
-        int elem = face_voisins_(num_face,dir);
-        if (elem!=-1)
-          {
-            volumes_entrelaces_dir_(num_face, dir) = sqrt(dot(&xp_(elem, 0), &xp_(elem, 0), &xv_(num_face, 0), &xv_(num_face, 0))) * fs[num_face];
-            volumes_entrelaces_[num_face] += volumes_entrelaces_dir_(num_face, dir);
-          }
-      }
-  volumes_entrelaces_.echange_espace_virtuel();
-  volumes_entrelaces_dir_.echange_espace_virtuel();
-}
-
-void Domaine_Coloc::calculer_volumes_entrelaces()
-{
-  const double tol_r = 1e-12;
-  const IntTab& fsom = face_sommets();
-  const DoubleTab& xs = domaine().coord_sommets();
-
-  //volumes_entrelaces_ et volumes_entrelaces_dir : par projection de l'amont/aval sur la normale a la face
-  for (int f = 0, e; f < nb_faces(); f++)
-    {
-      const bool axis_face = bidim_axi && (face_voisins_(f, 0) < 0 || face_voisins_(f, 1) < 0) && std::fabs(xv_(f, 0)) <= tol_r;
-      double axis_length = 0.;
-
-      if (axis_face)
-        {
-          assert(fsom.dimension(1) == 2);
-          const int s0 = fsom(f, 0);
-          const int s1 = fsom(f, 1);
-          const double dr = xs(s1, 0) - xs(s0, 0);
-          const double dz = xs(s1, 1) - xs(s0, 1);
-          axis_length = std::sqrt(dr * dr + dz * dz);
-        }
-
-      for (int i = 0; i < 2 && (e = face_voisins_(f, i)) >= 0; i++)
-        {
-          volumes_entrelaces_dir_(f, i) = axis_face
-                                          ? volume_entrelace_axi(std::fabs(xv_(f, 0)), std::fabs(xp_(e, 0)), axis_length)
-                                          : std::fabs(dot(&xp_(e, 0), &face_normales_(f, 0), &xv_(f, 0)));
-
-          volumes_entrelaces_(f) += volumes_entrelaces_dir_(f, i);
-        }
-    }
-  volumes_entrelaces_.echange_espace_virtuel(), volumes_entrelaces_dir_.echange_espace_virtuel();
-}
-
 void Domaine_Coloc::modifier_pour_Cl(const Conds_lim& conds_lim)
 {
   Cerr << "Le Domaine_PolyMAC_CDO a ete rempli avec succes" << finl;

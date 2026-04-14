@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,7 +18,7 @@
 #include <Equation_base.h>
 #include <Schema_Implicite_base.h>
 
-Implemente_instanciable(Coloc_discretisation, "Coloc", PolyMAC_MPFA_discretisation);
+Implemente_instanciable(Coloc_discretisation, "Coloc", Discret_Thyd);
 
 Entree& Coloc_discretisation::readOn(Entree& s) { return s;}
 
@@ -101,6 +101,22 @@ void Coloc_discretisation::discretiser_champ(const Motcle& directive, const Doma
 
 }
 
+void Coloc_discretisation::discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps,
+                                             OWN_PTR(Champ_Fonc_base)& champ) const
+{
+  discretiser_champ_fonc_don(directive, z, nature, noms, unites, nb_comp, temps, champ);
+}
+
+/*! @brief Idem que PolyMAC_CDO_discretisation::discretiser_champ(.
+ *
+ * .. , Champ_Inc)
+ *
+ */
+void Coloc_discretisation::discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps,
+                                             OWN_PTR(Champ_Don_base)& champ) const
+{
+  discretiser_champ_fonc_don(directive, z, nature, noms, unites, nb_comp, temps, champ);
+}
 
 
 

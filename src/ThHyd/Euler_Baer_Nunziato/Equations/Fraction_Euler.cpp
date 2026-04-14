@@ -79,7 +79,7 @@ void Fraction_Euler::discretiser()
   Cerr << "Fraction_Euler::discretiser() ok" << finl;
 }
 
-void Fraction_Euler::set_param(Param& param)
+void Fraction_Euler::set_param(Param& param) const
 {
   Equation_base::set_param(param);
   param.ajouter_non_std("termes_non_conservatifs", (this));

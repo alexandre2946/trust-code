@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -31,7 +31,7 @@ public:
     Process::exit("Dont call Interface_Baer_Nunziato::sigma_h_ !! \n");
   }
   void mettre_a_jour(double ) override { }
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   int id_phase_vitesse_inter() const { return id_vitesse_interface_; }
   int id_phase_pression_inter() const { return id_pression_interface_; }
 

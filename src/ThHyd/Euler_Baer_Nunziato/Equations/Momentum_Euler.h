@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -48,7 +48,7 @@ public :
   int nombre_d_operateurs() const override {return 3; }
   const Operateur& operateur(int) const override;
   Operateur& operateur(int) override;
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   void completer() override;
   void discretiser_vitesse() override;

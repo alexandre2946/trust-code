@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@ Entree& Interface_Baer_Nunziato::readOn(Entree& is)
   return is;
 }
 
-void Interface_Baer_Nunziato::set_param(Param& param)
+void Interface_Baer_Nunziato::set_param(Param& param) const
 {
   param.ajouter("vitesse", &id_vitesse_interface_ , Param::REQUIRED);
   param.ajouter("pression", &id_pression_interface_, Param::REQUIRED);

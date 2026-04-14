@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -28,16 +28,16 @@
 #include <Milieu_composite_Euler.h>
 #include <Neumann_paroi_flux_nul.h>
 
-Implemente_instanciable(Op_Conv_Coloc_base,"Op_Conv_Coloc_base",Op_Conv_PolyMAC_base);
+Implemente_instanciable(Op_Conv_Coloc_base,"Op_Conv_Coloc_base",Operateur_Conv_base);
 Implemente_instanciable(Op_Conv_Coloc_base_Elem,"Op_Conv_Coloc_base_Elem",Op_Conv_Coloc_base);
 Implemente_instanciable(Op_Conv_Coloc_base_Vect,"Op_Conv_Coloc_base_Vect",Op_Conv_Coloc_base);
 
-Sortie& Op_Conv_Coloc_base::printOn(Sortie& os) const { return Op_Conv_PolyMAC_base::printOn(os); }
-Entree& Op_Conv_Coloc_base::readOn(Entree& is) { Op_Conv_PolyMAC_base::readOn(is);  return is; }
-Sortie& Op_Conv_Coloc_base_Elem::printOn(Sortie& os) const { return Op_Conv_PolyMAC_base::printOn(os); }
-Entree& Op_Conv_Coloc_base_Elem::readOn(Entree& is) { Op_Conv_PolyMAC_base::readOn(is);  return is; }
-Sortie& Op_Conv_Coloc_base_Vect::printOn(Sortie& os) const { return Op_Conv_PolyMAC_base::printOn(os); }
-Entree& Op_Conv_Coloc_base_Vect::readOn(Entree& is) { Op_Conv_PolyMAC_base::readOn(is);  return is; }
+Sortie& Op_Conv_Coloc_base::printOn(Sortie& os) const { return Operateur_Conv_base::printOn(os); }
+Entree& Op_Conv_Coloc_base::readOn(Entree& is) { Operateur_Conv_base::readOn(is);  return is; }
+Sortie& Op_Conv_Coloc_base_Elem::printOn(Sortie& os) const { return Operateur_Conv_base::printOn(os); }
+Entree& Op_Conv_Coloc_base_Elem::readOn(Entree& is) { Operateur_Conv_base::readOn(is);  return is; }
+Sortie& Op_Conv_Coloc_base_Vect::printOn(Sortie& os) const { return Operateur_Conv_base::printOn(os); }
+Entree& Op_Conv_Coloc_base_Vect::readOn(Entree& is) { Operateur_Conv_base::readOn(is);  return is; }
 void Op_Conv_Coloc_base::completer()
 {
   Operateur_base::completer();

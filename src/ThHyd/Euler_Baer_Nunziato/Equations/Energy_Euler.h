@@ -24,7 +24,7 @@ class Energy_Euler : public Conservation_Euler
 public :
   void discretiser() override;
   int verif_Cl() const override { return 1; } // TODO
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   int nombre_d_operateurs() const override { return 2; }
   const Operateur& operateur(int) const override;
   Operateur& operateur(int) override;

@@ -15,8 +15,35 @@
 
 #include <Masse_Coloc_Elem.h>
 
-Implemente_instanciable(Masse_Coloc_Elem, "Masse_Coloc_Elem", Masse_PolyMAC_HFV_Elem);
+Implemente_instanciable(Masse_Coloc_Elem, "Masse_Coloc_Elem", Solveur_Masse_base);
 
 Sortie& Masse_Coloc_Elem::printOn(Sortie& s) const { return s << que_suis_je() << " " << le_nom(); }
 
 Entree& Masse_Coloc_Elem::readOn(Entree& s) { return s ; }
+
+void Masse_Coloc_Elem::preparer_calcul()
+{
+  associer_masse_proto(*this, le_dom_coloc_.valeur());
+  preparer_calcul_proto();
+}
+
+DoubleTab& Masse_Coloc_Elem::appliquer_impl(DoubleTab& sm) const
+{
+  return appliquer_impl_proto(sm);
+}
+
+void Masse_Coloc_Elem::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
+{
+  dimensionner_blocs_proto(matrices,semi_impl);
+}
+
+void Masse_Coloc_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, double dt, const tabs_t& semi_impl, int resoudre_en_increments) const
+{
+  ajouter_blocs_proto(matrices, secmem, dt, semi_impl, resoudre_en_increments);
+}
+
+void Masse_Coloc_Elem::associer_domaine_dis_base(const Domaine_dis_base& le_dom_dis_base)
+{
+  le_dom_coloc_ = ref_cast(Domaine_Coloc, le_dom_dis_base);
+}
+

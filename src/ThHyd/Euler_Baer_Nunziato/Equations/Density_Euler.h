@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -31,7 +31,7 @@ public :
   Champ_Inc_base& densite() { return densite_.valeur(); }
   void mettre_a_jour_champs_conserves(double temps, int reset) override;
   void init_alpha_rho();
-  void set_param(Param& param) override;
+  void set_param(Param& param) const override;
   int nombre_d_operateurs() const override { return 1; }
   const Operateur& operateur(int) const override;
   Operateur& operateur(int) override;

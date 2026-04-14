@@ -170,7 +170,7 @@ Operateur& Density_Euler::operateur(int i)
   return terme_convectif;
 }
 
-void Density_Euler::set_param(Param& param)
+void Density_Euler::set_param(Param& param) const
 {
   Equation_base::set_param(param);
   //param.ajouter_non_std("diffusion",(this));
