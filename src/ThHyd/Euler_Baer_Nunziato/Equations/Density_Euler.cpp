@@ -1,0 +1,164 @@
+
+
+#include <EcritureLectureSpecial.h>
+//#include <Pb_Multiphase_HEM.h>
+#include <Pb_Euler.h>
+#include <Density_Euler.h>
+#include <Champ_Uniforme.h>
+#include <Matrice_Morse.h>
+#include <Discret_Thyd.h>
+#include <Fluide_base.h>
+#include <Domaine_VF.h>
+#include <TRUSTTrav.h>
+#include <Domaine.h>
+#include <EChaine.h>
+#include <Param.h>
+#include <Momentum_Euler.h>
+//#include <Op_Conv_Rusanov_Coloc_Elem.h>
+
+Implemente_instanciable(Density_Euler, "Masse_Euler|Density_Euler", Conservation_Euler);
+// XD Density_Euler eqn_base Density_Euler -1 Mass consevation equation for a multi-phase problem where the unknown is the alpha (void fraction)
+
+Sortie& Density_Euler::printOn(Sortie& is) const { return Equation_base::printOn(is); }
+
+Entree& Density_Euler::readOn(Entree& is)
+{
+  Conservation_Euler::readOn(is);
+  assert(densite_.non_nul());
+  terme_convectif.associer_eqn(*this);
+  terme_convectif.set_fichier("Debit");
+  terme_convectif.set_description((Nom)"Mass flow rate=Integral(-rho*u*ndS) [kg/s] if SI units used");
+  return is;
+}
+
+void Density_Euler::discretiser()
+{
+  int nb_valeurs_temp = schema_temps().nb_valeurs_temporelles();
+  double temps = schema_temps().temps_courant();
+  const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
+  const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
+
+  Cerr << "Density discretization" << finl;
+
+  dis.discretiser_champ("temperature",domaine_dis(),"alpha_rho","kg/m3", pb.nb_phases(),nb_valeurs_temp,temps,l_inco_ch_);
+  l_inco_ch_->fixer_nature_du_champ(pb.nb_phases() == 1 ? scalaire : pb.nb_phases() == dimension ? vectoriel : multi_scalaire); //pfft
+  for (int i = 0; i < pb.nb_phases(); i++) l_inco_ch_->fixer_nom_compo(i, Nom("alpha_rho_") + pb.nom_phase(i));
+  champs_compris_.ajoute_champ(l_inco_ch_);
+
+  dis.discretiser_champ("temperature",domaine_dis(),"densite","kg/m3", pb.nb_phases(),nb_valeurs_temp,temps,densite_);
+  l_inco_ch_->fixer_nature_du_champ(pb.nb_phases() == 1 ? scalaire : pb.nb_phases() == dimension ? vectoriel : multi_scalaire); //pfft
+  for (int i = 0; i < pb.nb_phases(); i++) densite_->fixer_nom_compo(i, Nom("densite_") + pb.nom_phase(i));
+  champs_compris_.ajoute_champ(densite_);
+
+  Equation_base::discretiser();
+  Cerr << "Density_Euler::discretiser() ok" << finl;
+}
+
+Entree& Density_Euler::lire_cond_init(Entree& is)
+{
+  Cerr << "Reading of initial conditions\n";
+  Nom nom;
+  Motcle motlu;
+  is >> nom;
+  motlu = nom;
+  if(motlu!=Motcle("{"))
+    {
+      Cerr << "We expected a { while reading " << que_suis_je() << finl;
+      Cerr << "and not : " << nom << finl;
+      exit();
+    }
+  is >> nom;
+  motlu = nom;
+  if (motlu != Motcle(densite().le_nom()))
+    {
+      Cerr << que_suis_je() << " : expected "<< densite().le_nom()
+           <<" instead of " << nom << finl;
+      exit();
+    }
+  OWN_PTR(Champ_Don_base) ch_init;
+  is >> ch_init;
+  const int nb_comp = ch_init->nb_comp();
+  verifie_ch_init_nb_comp(densite(),nb_comp);
+
+  densite().affecter(ch_init.valeur());
+  is >> nom;
+  motlu = nom;
+  if(motlu!=Motcle("}"))
+    {
+      Cerr << "We expected a } while reading " << que_suis_je() << finl;
+      Cerr << "and not : " << nom << finl;
+      exit();
+    }
+  return is;
+}
+
+void Density_Euler::init_alpha_rho()
+{
+  const DoubleTab& alpha = ref_cast(Pb_Euler,probleme()).equation_fraction().inconnue().valeurs();
+  const DoubleTab& rho = densite().valeurs();
+  DoubleTab& alpha_rho = inconnue().valeurs();
+  alpha_rho = rho;
+  tab_multiply_any_shape(alpha_rho, alpha);
+
+//  for (int n=0; n< rhp.lie_size )
+//  for (int i = 0; i < rho.size(); i++)  alpha_rho(i) = alpha(i) *rho(i);
+}
+
+void Density_Euler::mettre_a_jour_champs_conserves(double temps, int reset)
+{
+  Equation_base::mettre_a_jour_champs_conserves(temps);
+  const DoubleTab& alpha = ref_cast(Pb_Euler,probleme()).equation_fraction().inconnue().valeurs();
+  const DoubleTab& alpha_rho = inconnue().valeurs();
+  DoubleTab& rho = densite().valeurs();
+  rho = alpha_rho;
+  tab_divide_any_shape(rho, alpha);
+//  for (int i = 0; i < rho.size(); i++)  rho(i) = alpha_rho(i) / alpha(i);
+}
+
+inline DoubleTab Density_Euler::flux(const int& f, const int& left_or_right) const
+{
+  //left_or_right = 0 : left et 1 right;
+  const Domaine_Coloc& dom = ref_cast(Domaine_Coloc,domaine_dis());
+  const DoubleTab& vit_normale = ref_cast(Momentum_Euler, probleme().equation(0)).vitesse_normale();
+  const DoubleTab& alpha_rho = inconnue().valeurs();
+  const int e = dom.face_voisins(f,left_or_right);
+  const int nb_phases = ref_cast(Pb_Euler,probleme()).nb_phases();
+  DoubleTab flux_(nb_phases);
+  for (int n = 0; n < nb_phases; n++) flux_(n) = alpha_rho(e, n) * vit_normale (f, n + left_or_right * nb_phases );
+  return flux_;
+}
+
+inline double Density_Euler::flux_bord(const double& alpha_rho_bord, const double& vit_n_bord, const double& p_bord ) const
+{
+
+  return alpha_rho_bord * vit_n_bord;
+}
+
+const Operateur& Density_Euler::operateur(int i) const
+{
+  if (i)
+    {
+      Cerr << que_suis_je() <<" : wrong operator number " << i << finl;
+      Process::exit();
+    }
+  return terme_convectif;
+}
+
+Operateur& Density_Euler::operateur(int i)
+{
+  if (i)
+    {
+      Cerr << que_suis_je() <<" : wrong operator number " << i << finl;
+      Process::exit();
+    }
+  return terme_convectif;
+}
+
+void Density_Euler::set_param(Param& param)
+{
+  Equation_base::set_param(param);
+  //param.ajouter_non_std("diffusion",(this));
+  param.ajouter_non_std("convection",(this));
+}
+
+
