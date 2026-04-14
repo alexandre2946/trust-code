@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -36,11 +36,19 @@ public:
   void set_rho(const DoubleVect& rho);
   template <typename _TYPE_, typename _TYPE_ARRAY_>
   void set_rho(const IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& rho);
+  void set_rho_NoSym(const DoubleVect& rho);
+  template <typename _TYPE_, typename _TYPE_ARRAY_>
+  void set_rho_NoSym(const IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& rho);
   void reset_rho();
   template <typename _TYPE_, typename _TYPE_ARRAY_>
   void set_inv_rho(const IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& inv_rho);
+  template <typename _TYPE_, typename _TYPE_ARRAY_>
+  void set_inv_rho_NoSym(const IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& inv_rho);
+  template <typename _TYPE_FUNC_, typename _TYPE_, typename _TYPE_ARRAY_>
+  void set_inv_rho_NoSym_template(const IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& rho, bool set_coarse_matrix_flag, bool use_coeffs_from_double);
   template <typename _TYPE_FUNC_, typename _TYPE_, typename _TYPE_ARRAY_>
   void set_inv_rho_template(const IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& rho, bool set_coarse_matrix_flag, bool use_coeffs_from_double);
+
 
   inline void prepare_secmem(IJK_Field_float& x) const override
   {
@@ -82,6 +90,8 @@ protected:
                             const int grid_level) const;
   template <typename _TYPE_FUNC_, typename _TYPE_, typename _TYPE_ARRAY_>
   void set_rho_template(const IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& rho, bool set_coarse_matrix, bool use_coeffs_from_double);
+  template <typename _TYPE_FUNC_, typename _TYPE_, typename _TYPE_ARRAY_>
+  void set_rho_template_NoSym(const IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& rho, bool set_coarse_matrix, bool use_coeffs_from_double);
 
   void completer_double_for_residue(const Domaine_IJK& splitting);
 

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,6 +16,7 @@
 #ifndef Multigrille_Adrien_TPP_H
 #define Multigrille_Adrien_TPP_H
 
+#include <Multigrille_Adrien.h>
 #include <SSE_kernels.h>
 #include <Perf_counters.h>
 using namespace SSE_Kernels;
@@ -57,6 +58,21 @@ void Multigrille_Adrien::set_rho(const IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& 
 }
 
 template <typename _TYPE_, typename _TYPE_ARRAY_>
+void Multigrille_Adrien::set_rho_NoSym(const IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& rho)
+{
+  if (solver_precision_ == precision_double_)
+    set_rho_template_NoSym<double,_TYPE_,_TYPE_ARRAY_>(rho, true, false);
+  else if (solver_precision_ == precision_float_)
+    set_rho_template_NoSym<float,_TYPE_,_TYPE_ARRAY_>(rho, true, false);
+  else
+    {
+      set_rho_template_NoSym<double,_TYPE_,_TYPE_ARRAY_>(rho, false, false);
+      set_rho_template_NoSym<float,_TYPE_,_TYPE_ARRAY_>(rho, true, true);
+    }
+}
+
+
+template <typename _TYPE_, typename _TYPE_ARRAY_>
 void Multigrille_Adrien::set_inv_rho(const IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& inv_rho)
 {
   if (solver_precision_ == precision_double_)
@@ -67,6 +83,20 @@ void Multigrille_Adrien::set_inv_rho(const IJK_Field_template<_TYPE_,_TYPE_ARRAY
     {
       set_inv_rho_template<double,_TYPE_,_TYPE_ARRAY_>(inv_rho, false, false);
       set_inv_rho_template<float,_TYPE_,_TYPE_ARRAY_>(inv_rho, true, true);
+    }
+}
+
+template <typename _TYPE_, typename _TYPE_ARRAY_>
+void Multigrille_Adrien::set_inv_rho_NoSym(const IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& inv_rho)
+{
+  if (solver_precision_ == precision_double_)
+    set_inv_rho_NoSym_template<double,_TYPE_,_TYPE_ARRAY_>(inv_rho, true, false);
+  else if (solver_precision_ == precision_float_)
+    set_inv_rho_NoSym_template<float,_TYPE_,_TYPE_ARRAY_>(inv_rho, true, false);
+  else
+    {
+      set_inv_rho_NoSym_template<double,_TYPE_,_TYPE_ARRAY_>(inv_rho, false, false);
+      set_inv_rho_NoSym_template<float,_TYPE_,_TYPE_ARRAY_>(inv_rho, true, true);
     }
 }
 
@@ -88,10 +118,9 @@ void Multigrille_Adrien::set_rho_template(const IJK_Field_template<_TYPE_,_TYPE_
           int ni = r.ni();
           int nj = r.nj();
           int nk = r.nk();
-          int i, j, k;
-          for (k = 0; k < nk; k++)
-            for (j = 0; j < nj; j++)
-              for (i = 0; i < ni; i++)
+          for (int k = 0; k < nk; k++)
+            for (int j = 0; j < nj; j++)
+              for (int i = 0; i < ni; i++)
                 r(i,j,k) = (_TYPE_FUNC_)rho(i,j,k);
 
           // echange espace virtuel sur rho sans passer par IJK_Field --> mauvais remplissage des coeffs de la matrice pour le shear periodique
@@ -130,17 +159,86 @@ void Multigrille_Adrien::set_rho_template(const IJK_Field_template<_TYPE_,_TYPE_
 }
 
 template <typename _TYPE_FUNC_, typename _TYPE_, typename _TYPE_ARRAY_>
+void Multigrille_Adrien::set_rho_template_NoSym(const IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& rho, bool set_coarse_matrix_flag, bool use_coeffs_from_double)
+{
+  constexpr bool IS_DOUBLE = std::is_same<_TYPE_FUNC_, double>::value;
+
+  // size might be 1 for mixed precision solver if updating the double precision part:
+  const int nlevels = get_grid_data_size<_TYPE_FUNC_>();
+  const int ghost = get_grid_data<_TYPE_FUNC_>(0).get_rho().ghost();
+
+  int monophasique = 1;
+  const double test_mono = (_TYPE_FUNC_)rho(0,0,0);
+
+  for (int l = 0; l < nlevels; l++)
+    {
+      // Fill the "rho" field
+      if (l == 0)
+        {
+          IJK_Field_template<_TYPE_FUNC_,TRUSTArray<_TYPE_FUNC_>>& r = set_grid_data<_TYPE_FUNC_>(l).get_update_rho();
+          int ni = r.ni();
+          int nj = r.nj();
+          int nk = r.nk();
+          for (int k = 0; k < nk; k++)
+            {
+              for (int j = 0; j < nj; j++)
+                {
+                  for (int i = 0; i < ni; i++)
+                    {
+                      r(i,j,k) = (_TYPE_FUNC_)rho(i,j,k);
+                      if (r(i,j,k) != test_mono)
+                        monophasique = 0;
+                    }
+                }
+            }
+
+          // echange espace virtuel sur rho sans passer par IJK_Field --> mauvais remplissage des coeffs de la matrice pour le shear periodique
+          // modif pour shear-periodicite, que lechange_espace_virtuel soit bien fait pour rho ou inv_rho dans le solveur de Pousson
+          if (IJK_Shear_Periodic_helpler::defilement_==1 && (!monophasique))
+            {
+              set_grid_data<_TYPE_FUNC_>(l).get_update_rho().get_shear_BC_helpler().set_indicatrice_ghost_zmin_(rho.get_shear_BC_helpler().get_indicatrice_ghost_zmin_());
+              set_grid_data<_TYPE_FUNC_>(l).get_update_rho().get_shear_BC_helpler().set_indicatrice_ghost_zmax_(rho.get_shear_BC_helpler().get_indicatrice_ghost_zmax_());
+            }
+        }
+      else
+        coarsen_operators_[l-1].valeur().coarsen(set_grid_data<_TYPE_FUNC_>(l-1).get_rho(),
+                                                 set_grid_data<_TYPE_FUNC_>(l).get_update_rho(),
+                                                 1 /* compute average, not sum */);
+
+      set_grid_data<_TYPE_FUNC_>(l).get_update_rho().echange_espace_virtuel(ghost);
+
+      // Compute matrix coefficients at faces
+      if(IS_DOUBLE)
+        grids_data_double_[l].compute_faces_coefficients_from_rho();
+      else
+        {
+          if (use_coeffs_from_double && l < grids_data_double_.size())
+            grids_data_float_[l].compute_faces_coefficients_from_double_coeffs(grids_data_double_[l]);
+          else
+            grids_data_float_[l].compute_faces_coefficients_from_rho();
+        }
+    }
+
+  // Update coarse problem matrix:
+  if (set_coarse_matrix_flag)
+    {
+      const int coarse_level = nlevels - 1;
+      set_coarse_matrix().build_matrix_test(set_grid_data<_TYPE_FUNC_>(coarse_level).get_faces_coefficients());
+    }
+}
+
+template <typename _TYPE_FUNC_, typename _TYPE_, typename _TYPE_ARRAY_>
 void Multigrille_Adrien::set_inv_rho_template(const IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& rho, bool set_coarse_matrix_flag, bool use_coeffs_from_double)
 {
   constexpr bool IS_DOUBLE = std::is_same<_TYPE_FUNC_, double>::value;
 
   // size might be 1 for mixed precision solver if updating the double precision part:
   const int nlevels = get_grid_data_size<_TYPE_FUNC_>();
-  int i;
+
 
   const int ghost = get_grid_data<_TYPE_FUNC_>(0).get_rho().ghost();
 
-  for (i = 0; i < nlevels; i++)
+  for (int i = 0; i < nlevels; i++)
     {
       // Fill the "rho" field
       if (i == 0)
@@ -149,10 +247,9 @@ void Multigrille_Adrien::set_inv_rho_template(const IJK_Field_template<_TYPE_,_T
           int ni = r.ni();
           int nj = r.nj();
           int nk = r.nk();
-          int i2, j, k;
-          for (k = 0; k < nk; k++)
-            for (j = 0; j < nj; j++)
-              for (i2 = 0; i2 < ni; i2++)
+          for (int k = 0; k < nk; k++)
+            for (int j = 0; j < nj; j++)
+              for (int i2 = 0; i2 < ni; i2++)
                 r(i2,j,k) = (_TYPE_FUNC_)rho(i2,j,k);
           // modif pour shear-periodicite, que lechange_espace_virtuel soit bien fait pour rho ou inv_rho dans le solveur de Poisson
           // on ajoute ca pour le shear perio, uniquement sur le premier niveau de multigrille pour l'instant
@@ -190,6 +287,68 @@ void Multigrille_Adrien::set_inv_rho_template(const IJK_Field_template<_TYPE_,_T
     {
       const int coarse_level = nlevels - 1;
       set_coarse_matrix().build_matrix(set_grid_data<_TYPE_FUNC_>(coarse_level).get_faces_coefficients());
+    }
+}
+
+template <typename _TYPE_FUNC_, typename _TYPE_, typename _TYPE_ARRAY_>
+void Multigrille_Adrien::set_inv_rho_NoSym_template(const IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& rho, bool set_coarse_matrix_flag, bool use_coeffs_from_double)
+{
+  constexpr bool IS_DOUBLE = std::is_same<_TYPE_FUNC_, double>::value;
+
+  // size might be 1 for mixed precision solver if updating the double precision part:
+  const int nlevels = get_grid_data_size<_TYPE_FUNC_>();
+
+  const int ghost = get_grid_data<_TYPE_FUNC_>(0).get_rho().ghost();
+
+  for (int i = 0; i < nlevels; i++)
+    {
+      // Fill the "rho" field
+      if (i == 0)
+        {
+          IJK_Field_template<_TYPE_FUNC_,TRUSTArray<_TYPE_FUNC_>>& r = set_grid_data<_TYPE_FUNC_>(i).get_update_rho();
+          int ni = r.ni();
+          int nj = r.nj();
+          int nk = r.nk();
+          for (int k = 0; k < nk; k++)
+            for (int j = 0; j < nj; j++)
+              for (int i2 = 0; i2 < ni; i2++)
+                r(i2,j,k) = (_TYPE_FUNC_)rho(i2,j,k);
+          // modif pour shear-periodicite, que lechange_espace_virtuel soit bien fait pour rho ou inv_rho dans le solveur de Poisson
+          // on ajoute ca pour le shear perio, uniquement sur le premier niveau de multigrille pour l'instant
+          if (IJK_Shear_Periodic_helpler::defilement_==1)
+            {
+              set_grid_data<_TYPE_FUNC_>(i).get_update_rho().get_shear_BC_helpler().set_indicatrice_ghost_zmin_(rho.get_shear_BC_helpler().get_indicatrice_ghost_zmin_());
+              set_grid_data<_TYPE_FUNC_>(i).get_update_rho().get_shear_BC_helpler().set_indicatrice_ghost_zmax_(rho.get_shear_BC_helpler().get_indicatrice_ghost_zmax_());
+            }
+        }
+      else
+        {
+          coarsen_operators_[i-1].valeur().coarsen(set_grid_data<_TYPE_FUNC_>(i-1).get_rho(),
+                                                   set_grid_data<_TYPE_FUNC_>(i).get_update_rho(),
+                                                   1 /* compute average, not sum */);
+        }
+
+      set_grid_data<_TYPE_FUNC_>(i).get_update_rho().echange_espace_virtuel(ghost);
+
+      if(IS_DOUBLE)
+        {
+          grids_data_double_[i].compute_faces_coefficients_from_inv_rho();
+        }
+      else
+        {
+          // Compute matrix coefficients at faces
+          if (use_coeffs_from_double && i < grids_data_double_.size())
+            grids_data_float_[i].compute_faces_coefficients_from_double_coeffs(grids_data_double_[i]);
+          else
+            grids_data_float_[i].compute_faces_coefficients_from_inv_rho();
+        }
+    }
+
+  // Update coarse problem matrix:
+  if (set_coarse_matrix_flag)
+    {
+      const int coarse_level = nlevels - 1;
+      set_coarse_matrix().build_matrix_test(set_grid_data<_TYPE_FUNC_>(coarse_level).get_faces_coefficients());
     }
 }
 
@@ -282,13 +441,12 @@ void Multigrille_Adrien::completer_template(const Domaine_IJK& split)
 
   set_grid_data<_TYPE_>(0).initialize(split, ghost_size_, nsweeps_jacobi_residu(0));
 
-  int i;
-  for (i = 0; i < nb_operators; i++)
+  for (int i = 0; i < nb_operators; i++)
     {
       coarsen_operators_[i]->initialize_grid_data(set_grid_data<_TYPE_>(i), set_grid_data<_TYPE_>(i+1),
                                                   nsweeps_jacobi_residu(i+1));
     }
-  for (i = 0; i < nb_grids; i++)
+  for (int i = 0; i < nb_grids; i++)
     {
       const IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& g = get_grid_data<_TYPE_>(i).get_rho();
       Journal() << "Grid level " << i << " local size: " << g.ni() << "x" << g.nj() << "x" << g.nk() << finl;
@@ -306,9 +464,8 @@ void Multigrille_Adrien::alloc_field_( IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& 
       Cerr << "Fatal: wrong level in alloc_field" << finl;
       Process::exit();
     }
-  int n = 0;
-  if (with_additional_layers)
-    n = ghost_size_;
+  const int n = with_additional_layers ? ghost_size_ : 0;
+
   field.allocate(get_grid_data<_TYPE_>(level).get_domaine(), Domaine_IJK::ELEM, ghost_size_, n);
 }
 

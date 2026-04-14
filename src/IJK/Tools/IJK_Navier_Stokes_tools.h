@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -46,13 +46,13 @@ void pressure_projection_with_rho(const IJK_Field_double& rho,
                                   IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz,
                                   IJK_Field_double& pressure, double dt,
                                   IJK_Field_double& pressure_rhs,
-                                  Multigrille_Adrien& poisson_solver);
+                                  Multigrille_Adrien& poisson_solver, int NoSym);
 
 void pressure_projection_with_inv_rho(const IJK_Field_double& rho,
                                       IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz,
                                       IJK_Field_double& pressure, double dt,
                                       IJK_Field_double& pressure_rhs,
-                                      Multigrille_Adrien& poisson_solver);
+                                      Multigrille_Adrien& poisson_solver, int NoSym);
 
 void forward_euler_update(const IJK_Field_double& dv, IJK_Field_double& v,
                           const int k_layer, double dt_tot);

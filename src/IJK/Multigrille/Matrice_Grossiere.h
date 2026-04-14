@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,9 @@ public:
   template <typename _TYPE_, typename _TYPE_ARRAY_>
   void build_matrix(const IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& coeffs_face);
 
+  template <typename _TYPE_, typename _TYPE_ARRAY_>
+  void build_matrix_test(const IJK_Field_template<_TYPE_,_TYPE_ARRAY_>& coeffs_face);
+
   const int& renum(int i, int j, int k) const
   {
     return renum_(k+1, j+1, i+1);
@@ -52,6 +55,13 @@ protected:
   void ajoute_coeff(int i, int j, int k,
                     int i_voisin, int j_voisin, int k_voisin,
                     const double coeff);
+
+  void ajoute_coeff2(int i, int j, int k,
+                     int i_voisin, int j_voisin, int k_voisin,
+                     const double coeff, const double shear_perio);
+  void ajoute_coeff2(int i, int j, int k,
+                     int i_voisin, int j_voisin, int k_voisin,
+                     const double coeff);
 
   int& renum(int i, int j, int k)
   {
@@ -93,6 +103,13 @@ protected:
 
   IntLists voisins_virt_;
   DoubleLists coeffs_virt_;
+
+  // Pour la matrice complète de pression (trop rigolo)
+  IntLists voisins_2_;
+  DoubleLists coeffs_2_;
+
+  IntLists voisins_virt_2_;
+  DoubleLists coeffs_virt_2_;
 };
 
 #include <Matrice_Grossiere.tpp>

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -29,11 +29,9 @@ void Matrice_Grossiere::add_virt_bloc(int pe, int& count, int imin, int jmin, in
         for (int j = jmin; j < jmax; j++)
           for (int i = imin; i < imax; i++)
             {
-              int jj ;
-              int kk ;
               int ii = (i + ni ) % ni;
-              jj = (j + nj) % nj;
-              kk = (k + nk) % nk;
+              int jj = (j + nj) % nj;
+              int kk = (k + nk) % nk;
               renum(i, j, k) = renum(ii, jj, kk);
             }
 
@@ -78,7 +76,7 @@ void Matrice_Grossiere::interpolation_for_shear_periodicity(const int i, const i
                                                             const int real_size_i /*ni*/, const double shear_perio)
 {
   // renvoi la valeur interpolee pour la condition de shear-periodicity
-  int nb_points = order_interpolation_poisson_solver_+1;
+  const int nb_points = order_interpolation_poisson_solver_+1;
   ArrOfInt x;
   ArrOfDouble a;
   x.resize_array(nb_points);
@@ -177,13 +175,13 @@ void Matrice_Grossiere::ajoute_coeff(int i, int j, int k,
                                      int i_voisin, int j_voisin, int k_voisin,
                                      const double coeff, const double shear_perio)
 {
-  int indice=renum(i, j, k);
-  int indice_voisin = renum(i_voisin, j_voisin, k_voisin);
+  const int indice=renum(i, j, k);
+  const int indice_voisin = renum(i_voisin, j_voisin, k_voisin);
 
-  bool voisin_shear = !(shear_perio == 0.);
+  const bool voisin_shear = !(shear_perio == 0.);
 
   // coefficient extra diagonal (- surface_face / distance_centres_elements)
-  double x = -coeff;
+  const double x = -coeff;
   if (indice_voisin > indice)
     {
       // Coefficient dans la partie triangulaire superieure, a stocker.
@@ -253,15 +251,95 @@ void Matrice_Grossiere::ajoute_coeff(int i, int j, int k,
   coeff_diag_[indice] -= x;
 }
 
+/*! @brief ajoute deux coefficients diagonal/extra-diagonal a la matrice
+ *
+ */
+void Matrice_Grossiere::ajoute_coeff2(int i, int j, int k,
+                                      int i_voisin, int j_voisin, int k_voisin,
+                                      const double coeff, const double shear_perio)
+{
+  const int indice=renum(i, j, k);
+  const int indice_voisin = renum(i_voisin, j_voisin, k_voisin);
+
+  const bool voisin_shear = !(shear_perio == 0.);
+
+  // coefficient extra diagonal (- surface_face / distance_centres_elements)
+  const double x = -coeff;
+
+  const int nreels = coeff_diag_.size_array();
+  if ( (0 <= indice_voisin) && ( indice_voisin < nreels ) )
+    {
+      // Element reel
+
+      if(voisin_shear)
+        {
+          if(shear_perio>0.)
+            {
+              for (int interp = 0; interp < order_interpolation_poisson_solver_+1; interp++)
+                {
+                  voisins_2_[indice].add(indice_voisin - i + ii_p_[interp]);
+                  coeffs_2_[indice].add(x*ponderation_shear_p_[interp]);
+                }
+            }
+          else if (shear_perio<0.)
+            {
+              for (int interp = 0; interp < order_interpolation_poisson_solver_+1; interp++)
+                {
+                  voisins_2_[indice].add( indice_voisin - i + ii_m_[interp] );
+                  coeffs_2_[indice].add(x*ponderation_shear_p_[interp]);
+                }
+            }
+        }
+      else
+        {
+          voisins_2_[indice].add(indice_voisin);
+          coeffs_2_[indice].add(x);
+        }
+    }
+  else
+    {
+      // Element virtuel
+
+      if(voisin_shear)
+        {
+          if(shear_perio>0.)
+            {
+              for (int interp = 0; interp < order_interpolation_poisson_solver_+1; interp++)
+                {
+                  voisins_virt_2_[indice].add( ((indice_voisin%nreels)+nreels)%nreels - i + ii_p_[interp] );
+                  coeffs_virt_2_[indice].add(x*ponderation_shear_p_[interp]);
+                }
+            }
+          else if(shear_perio<0.)
+            {
+              for (int interp = 0; interp < order_interpolation_poisson_solver_+1; interp++)
+                {
+                  voisins_virt_2_[indice].add( ((indice_voisin%nreels)+nreels)%nreels - i + ii_m_[interp]);
+                  coeffs_virt_2_[indice].add(x*ponderation_shear_p_[interp]);
+                }
+            }
+        }
+      else
+        {
+          voisins_virt_2_[indice].add(((indice_voisin%nreels)+nreels)%nreels);
+          coeffs_virt_2_[indice].add(x);
+        }
+
+    }
+
+  // Contribution a la diagonale
+  coeff_diag_[indice] -= x;
+}
+
 void Matrice_Grossiere::ajoute_coeff(int i, int j, int k,
                                      int i_voisin, int j_voisin, int k_voisin,
                                      const double coeff)
 {
-  int indice=renum(i, j, k);
-  int indice_voisin = renum(i_voisin, j_voisin, k_voisin);
+  const int indice=renum(i, j, k);
+  const int indice_voisin = renum(i_voisin, j_voisin, k_voisin);
 
   // coefficient extra diagonal (- surface_face / distance_centres_elements)
-  double x = -coeff;
+  const double x = -coeff;
   if (indice_voisin > indice)
     {
       // Coefficient dans la partie triangulaire superieure, a stocker.
@@ -282,6 +360,33 @@ void Matrice_Grossiere::ajoute_coeff(int i, int j, int k,
   coeff_diag_[indice] -= x;
 }
 
+void Matrice_Grossiere::ajoute_coeff2(int i, int j, int k,
+                                      int i_voisin, int j_voisin, int k_voisin,
+                                      const double coeff)
+{
+  const int indice=renum(i, j, k);
+  const int indice_voisin = renum(i_voisin, j_voisin, k_voisin);
+
+  // coefficient extra diagonal (- surface_face / distance_centres_elements)
+  const double x = -coeff;
+
+  const int nreels = coeff_diag_.size_array();
+  if ( (0 <= indice_voisin) && ( indice_voisin < nreels ) )
+    {
+      voisins_2_[indice].add(indice_voisin);
+      coeffs_2_[indice].add(x);
+    }
+  else
+    {
+      voisins_virt_2_[indice].add(((indice_voisin%nreels)+nreels)%nreels);
+      coeffs_virt_2_[indice].add(x);
+    }
+
+  // Contribution a la diagonale
+  coeff_diag_[indice] -= x;
+
+
+}
 
 
 
