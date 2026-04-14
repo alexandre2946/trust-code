@@ -1,26 +1,32 @@
+/****************************************************************************
+* Copyright (c) 2022, CEA
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+* 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*****************************************************************************/
 
-#include <Pb_Euler.h>
-#include <Discretisation_base.h>
 #include <Milieu_composite_Euler.h>
-#include <Loi_Fermeture_base.h>
-#include <Interprete_bloc.h>
+#include <Discretisation_base.h>
+#include <Pb_Euler.h>
 #include <Domaine.h>
-#include <EChaine.h>
-#include <Debog.h>
 #include <SETS.h>
-
-//#include <Fluide_Incompressible.h>
-
 
 Implemente_instanciable(Pb_Euler, "Pb_Euler", Pb_Fluide_base);
 
-Sortie& Pb_Euler::printOn(Sortie& os) const
+Sortie& Pb_Euler::printOn(Sortie &os) const
 {
-
   return Pb_Fluide_base::printOn(os);
 }
 
-Entree& Pb_Euler::readOn(Entree& is)
+Entree& Pb_Euler::readOn(Entree &is)
 {
   if (!discretisation().is_coloc())
     {
@@ -30,7 +36,7 @@ Entree& Pb_Euler::readOn(Entree& is)
   return Pb_Fluide_base::readOn(is);
 }
 
-void Pb_Euler::typer_lire_milieu(Entree& is)
+void Pb_Euler::typer_lire_milieu(Entree &is)
 {
   le_milieu_.resize(1);
   is >> le_milieu_[0];
@@ -48,14 +54,12 @@ void Pb_Euler::typer_lire_milieu(Entree& is)
   equation(0).milieu().discretiser((*this), la_discretisation_.valeur());
 }
 
-Entree& Pb_Euler::lire_equations(Entree& is, Motcle& mot)
+Entree& Pb_Euler::lire_equations(Entree &is, Motcle &mot)
 {
-  bool already_read {true};
+  bool already_read { true };
   is >> mot;
   if (mot == "correlations" || mot == "models")
     lire_correlations(is), already_read = false;
-
-  // typer_lire_correlation_hem(); // enforce an interfacial flux correlation with constant coefficient if HEM
 
   Cerr << "Reading of the equations" << finl;
   for (int i = 0; i < nombre_d_equations(); i++, already_read = false)
@@ -110,24 +114,11 @@ Equation_base& Pb_Euler::equation(int i)
   return eq_qdm_; //pour renvoyer quelque chose
 }
 
-
-void Pb_Euler::associer_milieu_base(const Milieu_base& mil)
+void Pb_Euler::associer_milieu_base(const Milieu_base &mil)
 {
-  /* controler le type de milieu ici */
-  equation_qdm().associer_milieu_base(mil);
-  equation_energie().associer_milieu_base(mil);
-  equation_masse().associer_milieu_base(mil);
-  equation_fraction().associer_milieu_base(mil);
+  for (int i = 0; i < nombre_d_equations(); i++)
+    equation(i).associer_milieu_base(mil);
 }
-
-
-//int Pb_Euler::verifier()
-//{
-//  // const Domaine_Cl_dis_base& domaine_Cl_hydr = equation_qdm().domaine_Cl_dis();
-//  // const Domaine_Cl_dis_base& domaine_Cl_th = equation_energie().domaine_Cl_dis();
-//  return 1; // tester_compatibilite_hydr_thermique(domaine_Cl_hydr, domaine_Cl_th);
-//}
-
 
 void Pb_Euler::preparer_calcul()
 {
@@ -141,8 +132,3 @@ void Pb_Euler::mettre_a_jour(double temps)
   Probleme_base::mettre_a_jour(temps);
   equation_qdm().mettre_a_jour_p_c();
 }
-
-
-
-
-
