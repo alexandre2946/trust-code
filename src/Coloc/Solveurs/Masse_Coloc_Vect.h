@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,13 +15,12 @@
 
 #ifndef Masse_Coloc_Vect_included
 #define Masse_Coloc_Vect_included
+
 #include <Masse_Coloc_Elem.h>
 
 class Masse_Coloc_Vect : public Masse_Coloc_Elem
 {
   Declare_instanciable(Masse_Coloc_Vect);
-public:
-
 };
 
 #endif /* Masse_Coloc_Vect_included */

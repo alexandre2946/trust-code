@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -21,12 +21,12 @@
 
 Implemente_instanciable(Pb_Euler, "Pb_Euler", Pb_Fluide_base);
 
-Sortie& Pb_Euler::printOn(Sortie &os) const
+Sortie& Pb_Euler::printOn(Sortie& os) const
 {
   return Pb_Fluide_base::printOn(os);
 }
 
-Entree& Pb_Euler::readOn(Entree &is)
+Entree& Pb_Euler::readOn(Entree& is)
 {
   if (!discretisation().is_coloc())
     {
@@ -36,7 +36,7 @@ Entree& Pb_Euler::readOn(Entree &is)
   return Pb_Fluide_base::readOn(is);
 }
 
-void Pb_Euler::typer_lire_milieu(Entree &is)
+void Pb_Euler::typer_lire_milieu(Entree& is)
 {
   le_milieu_.resize(1);
   is >> le_milieu_[0];
@@ -54,7 +54,7 @@ void Pb_Euler::typer_lire_milieu(Entree &is)
   equation(0).milieu().discretiser((*this), la_discretisation_.valeur());
 }
 
-Entree& Pb_Euler::lire_equations(Entree &is, Motcle &mot)
+Entree& Pb_Euler::lire_equations(Entree& is, Motcle& mot)
 {
   bool already_read { true };
   is >> mot;
@@ -114,7 +114,7 @@ Equation_base& Pb_Euler::equation(int i)
   return eq_qdm_; //pour renvoyer quelque chose
 }
 
-void Pb_Euler::associer_milieu_base(const Milieu_base &mil)
+void Pb_Euler::associer_milieu_base(const Milieu_base& mil)
 {
   for (int i = 0; i < nombre_d_equations(); i++)
     equation(i).associer_milieu_base(mil);

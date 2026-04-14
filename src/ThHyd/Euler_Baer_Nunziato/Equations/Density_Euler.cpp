@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -30,12 +30,12 @@
 Implemente_instanciable(Density_Euler, "Masse_Euler|Density_Euler", Conservation_Euler);
 // XD Density_Euler eqn_base Density_Euler -1 Mass consevation equation for a multi-phase problem where the unknown is the alpha (void fraction)
 
-Sortie& Density_Euler::printOn(Sortie &is) const
+Sortie& Density_Euler::printOn(Sortie& is) const
 {
   return Equation_base::printOn(is);
 }
 
-Entree& Density_Euler::readOn(Entree &is)
+Entree& Density_Euler::readOn(Entree& is)
 {
   Conservation_Euler::readOn(is);
   assert(densite_.non_nul());
@@ -49,8 +49,8 @@ void Density_Euler::discretiser()
 {
   int nb_valeurs_temp = schema_temps().nb_valeurs_temporelles();
   double temps = schema_temps().temps_courant();
-  const Discret_Thyd &dis = ref_cast(Discret_Thyd, discretisation());
-  const Pb_Euler &pb = ref_cast(Pb_Euler, probleme());
+  const Discret_Thyd& dis = ref_cast(Discret_Thyd, discretisation());
+  const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
 
   Cerr << "Density discretization" << finl;
 
@@ -70,7 +70,7 @@ void Density_Euler::discretiser()
   Cerr << "Density_Euler::discretiser() ok" << finl;
 }
 
-Entree& Density_Euler::lire_cond_init(Entree &is)
+Entree& Density_Euler::lire_cond_init(Entree& is)
 {
   Cerr << "Reading of initial conditions\n";
   Nom nom;
@@ -109,9 +109,9 @@ Entree& Density_Euler::lire_cond_init(Entree &is)
 
 void Density_Euler::init_alpha_rho()
 {
-  const DoubleTab &alpha = ref_cast(Pb_Euler,probleme()).equation_fraction().inconnue().valeurs();
-  const DoubleTab &rho = densite().valeurs();
-  DoubleTab &alpha_rho = inconnue().valeurs();
+  const DoubleTab& alpha = ref_cast(Pb_Euler,probleme()).equation_fraction().inconnue().valeurs();
+  const DoubleTab& rho = densite().valeurs();
+  DoubleTab& alpha_rho = inconnue().valeurs();
   alpha_rho = rho;
   tab_multiply_any_shape(alpha_rho, alpha);
 
@@ -122,20 +122,20 @@ void Density_Euler::init_alpha_rho()
 void Density_Euler::mettre_a_jour_champs_conserves(double temps, int reset)
 {
   Equation_base::mettre_a_jour_champs_conserves(temps);
-  const DoubleTab &alpha = ref_cast(Pb_Euler,probleme()).equation_fraction().inconnue().valeurs();
-  const DoubleTab &alpha_rho = inconnue().valeurs();
-  DoubleTab &rho = densite().valeurs();
+  const DoubleTab& alpha = ref_cast(Pb_Euler,probleme()).equation_fraction().inconnue().valeurs();
+  const DoubleTab& alpha_rho = inconnue().valeurs();
+  DoubleTab& rho = densite().valeurs();
   rho = alpha_rho;
   tab_divide_any_shape(rho, alpha);
 //  for (int i = 0; i < rho.size(); i++)  rho(i) = alpha_rho(i) / alpha(i);
 }
 
-inline DoubleTab Density_Euler::flux(const int &f, const int &left_or_right) const
+inline DoubleTab Density_Euler::flux(const int& f, const int& left_or_right) const
 {
   //left_or_right = 0 : left et 1 right;
-  const Domaine_Coloc &dom = ref_cast(Domaine_Coloc, domaine_dis());
-  const DoubleTab &vit_normale = ref_cast(Momentum_Euler, probleme().equation(0)).vitesse_normale();
-  const DoubleTab &alpha_rho = inconnue().valeurs();
+  const Domaine_Coloc& dom = ref_cast(Domaine_Coloc, domaine_dis());
+  const DoubleTab& vit_normale = ref_cast(Momentum_Euler, probleme().equation(0)).vitesse_normale();
+  const DoubleTab& alpha_rho = inconnue().valeurs();
   const int e = dom.face_voisins(f, left_or_right);
   const int nb_phases = ref_cast(Pb_Euler,probleme()).nb_phases();
   DoubleTab flux_(nb_phases);
@@ -144,7 +144,7 @@ inline DoubleTab Density_Euler::flux(const int &f, const int &left_or_right) con
   return flux_;
 }
 
-inline double Density_Euler::flux_bord(const double &alpha_rho_bord, const double &vit_n_bord, const double &p_bord) const
+inline double Density_Euler::flux_bord(const double& alpha_rho_bord, const double& vit_n_bord, const double& p_bord) const
 {
 
   return alpha_rho_bord * vit_n_bord;
@@ -170,7 +170,7 @@ Operateur& Density_Euler::operateur(int i)
   return terme_convectif;
 }
 
-void Density_Euler::set_param(Param &param)
+void Density_Euler::set_param(Param& param)
 {
   Equation_base::set_param(param);
   //param.ajouter_non_std("diffusion",(this));

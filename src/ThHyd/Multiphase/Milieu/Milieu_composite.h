@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -59,7 +59,7 @@ public :
   Saturation_base& get_saturation(int k, int l) const;
 
   const Fluide_base& get_fluid(const int i) const;
-   Fluide_base& get_fluid(const int i) ;
+  Fluide_base& get_fluid(const int i) ;
   inline const Noms& noms_phases() const { return noms_phases_; }
 
   inline bool are_fluid_properties_initialised() const { return fluid_properties_initialised_; }

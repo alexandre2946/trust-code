@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -24,21 +24,21 @@ class Energy_Euler : public Conservation_Euler
 public :
   void discretiser() override;
   int verif_Cl() const override { return 1; } // TODO
-  void set_param(Param &param) override;
+  void set_param(Param& param) override;
   int nombre_d_operateurs() const override { return 2; }
   const Operateur& operateur(int) const override;
   Operateur& operateur(int) override;
-  Entree& lire_cond_init(Entree &is) override;
-   double flux_bord(const double &rhoE_bord, const double &vit_n_bord, const double &p_bord) const override;
-   DoubleTab flux(const int &f, const int &left_or_right) const override;
-  inline double termes_NonConservatif(const double &alpha_bord, const double &vitesse_normale_interieur, const double &p_inter) const override
+  Entree& lire_cond_init(Entree& is) override;
+  double flux_bord(const double& rhoE_bord, const double& vit_n_bord, const double& p_bord) const override;
+  DoubleTab flux(const int& f, const int& left_or_right) const override;
+  inline double termes_NonConservatif(const double& alpha_bord, const double& vitesse_normale_interieur, const double& p_inter) const override
   {
     return -alpha_bord * vitesse_normale_interieur * p_inter;
   }
 
   inline void init_energie_tot()
   {
-    const Milieu_composite_Euler &mil = ref_cast(Milieu_composite_Euler, milieu());
+    const Milieu_composite_Euler& mil = ref_cast(Milieu_composite_Euler, milieu());
     mil.init_energie_tot(inconnue().valeurs());
   }
 

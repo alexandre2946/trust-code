@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -28,12 +28,12 @@
 
 Implemente_instanciable(Conservation_Euler, "Conservation_Euler", Convection_Diffusion_std);
 
-Sortie& Conservation_Euler::printOn(Sortie &is) const
+Sortie& Conservation_Euler::printOn(Sortie& is) const
 {
   return Equation_base::printOn(is);
 }
 
-Entree& Conservation_Euler::readOn(Entree &is)
+Entree& Conservation_Euler::readOn(Entree& is)
 {
   assert(l_inco_ch_.non_nul());
   assert(le_fluide_.non_nul());
@@ -42,7 +42,7 @@ Entree& Conservation_Euler::readOn(Entree &is)
   return is;
 }
 
-int Conservation_Euler::lire_motcle_non_standard(const Motcle &mot, Entree &is)
+int Conservation_Euler::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
   if (mot == "diffusion")
     {
@@ -55,7 +55,7 @@ int Conservation_Euler::lire_motcle_non_standard(const Motcle &mot, Entree &is)
   else if (mot == "convection")
     {
       Cerr << "Reading and typing of the convection operator : " << finl;
-      const Champ_base &ch_vitesse_transportante = vitesse_pour_transport();
+      const Champ_base& ch_vitesse_transportante = vitesse_pour_transport();
       associer_vitesse(ch_vitesse_transportante);
       terme_convectif.associer_vitesse(ch_vitesse_transportante);
       is >> terme_convectif;
@@ -73,9 +73,9 @@ int Conservation_Euler::lire_motcle_non_standard(const Motcle &mot, Entree &is)
     return Equation_base::lire_motcle_non_standard(mot, is);
 }
 
-void Conservation_Euler::associer_milieu_base(const Milieu_base &un_milieu) //ok
+void Conservation_Euler::associer_milieu_base(const Milieu_base& un_milieu) //ok
 {
-  const Fluide_base &un_fluide = ref_cast(Fluide_base, un_milieu);
+  const Fluide_base& un_fluide = ref_cast(Fluide_base, un_milieu);
   associer_fluide(un_fluide);
 }
 
@@ -105,7 +105,7 @@ Fluide_base& Conservation_Euler::fluide()
   return le_fluide_.valeur();
 }
 
-void Conservation_Euler::associer_fluide(const Fluide_base &un_fluide)
+void Conservation_Euler::associer_fluide(const Fluide_base& un_fluide)
 {
   assert(sub_type(Fluide_base,un_fluide));
   le_fluide_ = ref_cast(Fluide_base, un_fluide);

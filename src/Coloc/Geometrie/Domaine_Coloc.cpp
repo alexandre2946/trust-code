@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,9 +15,9 @@
 
 #include <Domaine_Coloc.h>
 
-Implemente_instanciable(Domaine_Coloc, "Domaine_Coloc", Domaine_PolyMAC_P0);
+Implemente_instanciable(Domaine_Coloc, "Domaine_Coloc", Domaine_PolyMAC_MPFA);
 
-Sortie& Domaine_Coloc::printOn(Sortie& os) const { return Domaine_PolyMAC_P0::printOn(os); }
+Sortie& Domaine_Coloc::printOn(Sortie& os) const { return Domaine_PolyMAC_MPFA::printOn(os); }
 
-Entree& Domaine_Coloc::readOn(Entree& is) { return Domaine_PolyMAC_P0::readOn(is); }
+Entree& Domaine_Coloc::readOn(Entree& is) { return Domaine_PolyMAC_MPFA::readOn(is); }
 

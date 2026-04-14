@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -62,7 +62,7 @@ public:
   virtual inline double termes_NonConservatif(const double& alpha_bord, const double& vitesse_n_inter, const double& p_bord) const {return 0; Process::exit();};
   // TODO
 
-  void dimensionner_matrice_sans_mem(Matrice_Morse &matrice) override
+  void dimensionner_matrice_sans_mem(Matrice_Morse& matrice) override
   {
     Process::exit("Conservation_Euler::dimensionner_matrice_sans_mem !!!  \n");
   }
@@ -71,12 +71,12 @@ public:
     Process::exit("Conservation_Euler::has_interface_blocs !!!  \n");
     return -1;
   }
-  void dimensionner_blocs(matrices_t matrices, const tabs_t &semi_impl = { }) const override
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = { }) const override
   {
     Process::exit("Conservation_Euler::dimensionner_blocs !!!  \n");
   }
   ;
-  void assembler_blocs_avec_inertie(matrices_t matrices, DoubleTab &secmem, const tabs_t &semi_impl = { }) override
+  void assembler_blocs_avec_inertie(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = { }) override
   {
     Process::exit("Conservation_Euler::assembler_blocs_avec_inertie !!!  \n");
   }

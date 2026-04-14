@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -33,12 +33,12 @@
 Implemente_instanciable(Energy_Euler, "Energy_Euler|Energie_Euler", Conservation_Euler);
 // XD Energy_Euler eqn_base Energy_Euler -1 Internal energy conservation equation for a multi-phase problem where the unknown is the temperature
 
-Sortie& Energy_Euler::printOn(Sortie &is) const
+Sortie& Energy_Euler::printOn(Sortie& is) const
 {
   return Equation_base::printOn(is);
 }
 
-Entree& Energy_Euler::readOn(Entree &is)
+Entree& Energy_Euler::readOn(Entree& is)
 {
   Conservation_Euler::readOn(is);
   return is;
@@ -48,10 +48,10 @@ void Energy_Euler::discretiser()
 {
   int nb_valeurs_temp = schema_temps().nb_valeurs_temporelles();
   double temps = schema_temps().temps_courant();
-  const Discret_Thyd &dis = ref_cast(Discret_Thyd, discretisation());
+  const Discret_Thyd& dis = ref_cast(Discret_Thyd, discretisation());
   Cerr << "Energy discretization" << finl;
   //On utilise temperature pour la directive car discretisation identique
-  const Pb_Euler &pb = ref_cast(Pb_Euler, probleme());
+  const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
   dis.discretiser_champ("temperature", domaine_dis(), "alpha_energie_tot", "J/m3", pb.nb_phases(), nb_valeurs_temp, temps, l_inco_ch_);
   l_inco_ch_->fixer_nature_du_champ(pb.nb_phases() == 1 ? scalaire : pb.nb_phases() == dimension ? vectoriel : multi_scalaire); //pfft
   for (int i = 0; i < pb.nb_phases(); i++)
@@ -62,15 +62,15 @@ void Energy_Euler::discretiser()
   Cerr << "Energy_Euler::discretiser() ok" << finl;
 }
 
-inline DoubleTab Energy_Euler::flux(const int &f, const int &left_or_right) const
+inline DoubleTab Energy_Euler::flux(const int& f, const int& left_or_right) const
 {
-  const Pb_Euler &pb = ref_cast(Pb_Euler, probleme());
-  const Domaine_Coloc &dom = ref_cast(Domaine_Coloc, domaine_dis());
-  const DoubleTab &vit_normale = ref_cast(Momentum_Euler, probleme().equation(0)).vitesse_normale();
-  const DoubleTab &alpha_rhoE = inconnue().valeurs();
+  const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
+  const Domaine_Coloc& dom = ref_cast(Domaine_Coloc, domaine_dis());
+  const DoubleTab& vit_normale = ref_cast(Momentum_Euler, probleme().equation(0)).vitesse_normale();
+  const DoubleTab& alpha_rhoE = inconnue().valeurs();
   const int nb_phases = pb.nb_phases();
-  const DoubleTab &p = pb.equation_qdm().pression().valeurs();
-  const DoubleTab &alpha = pb.equation_fraction().inconnue().valeurs();
+  const DoubleTab& p = pb.equation_qdm().pression().valeurs();
+  const DoubleTab& alpha = pb.equation_fraction().inconnue().valeurs();
   const int e = dom.face_voisins(f, left_or_right);
   DoubleTab flux_(nb_phases);
 
@@ -79,12 +79,12 @@ inline DoubleTab Energy_Euler::flux(const int &f, const int &left_or_right) cons
   return flux_;
 }
 
-inline double Energy_Euler::flux_bord(const double &alpha_rhoE_bord, const double &vit_n_bord, const double &alpha_p_bord) const
+inline double Energy_Euler::flux_bord(const double& alpha_rhoE_bord, const double& vit_n_bord, const double& alpha_p_bord) const
 {
   return (alpha_rhoE_bord + alpha_p_bord) * vit_n_bord;
 }
 
-Entree& Energy_Euler::lire_cond_init(Entree &is)
+Entree& Energy_Euler::lire_cond_init(Entree& is)
 {
   Cerr << "Reading of initial conditions\n";
   Nom nom;
@@ -153,7 +153,7 @@ Operateur& Energy_Euler::operateur(int i)
   return terme_convectif;
 }
 
-void Energy_Euler::set_param(Param &param)
+void Energy_Euler::set_param(Param& param)
 {
   Equation_base::set_param(param);
   param.ajouter_non_std("termes_non_conservatifs", (this));

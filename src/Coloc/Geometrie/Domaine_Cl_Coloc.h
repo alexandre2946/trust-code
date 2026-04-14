@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,13 +18,13 @@
 
 //  Cette classe porte les tableaux qui servent a mettre en oeuvre
 //  les condition aux limites dans la formulation Coloc
-#include <Domaine_Cl_PolyMAC.h>
+#include <Domaine_Cl_PolyMAC_family.h>
 
 
 
 class Domaine_VF;
 
-class Domaine_Cl_Coloc : public Domaine_Cl_PolyMAC
+class Domaine_Cl_Coloc : public Domaine_Cl_PolyMAC_family
 {
 
   Declare_instanciable(Domaine_Cl_Coloc);

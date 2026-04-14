@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -105,7 +105,7 @@ public :
   virtual bool is_PolyMAC_MPFA() const { return false; }
   virtual bool is_PolyMAC_HFV() const { return false; }
   virtual bool is_poly_family() const { return false; }
-virtual bool is_coloc() const { return false; }
+  virtual bool is_coloc() const { return false; }
 
   const Reorder_Mesh& get_reorder() const { return reorder_; }
 

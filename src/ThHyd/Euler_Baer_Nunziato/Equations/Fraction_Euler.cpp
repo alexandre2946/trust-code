@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -30,12 +30,12 @@
 
 Implemente_instanciable(Fraction_Euler, "Fraction_Euler", Conservation_Euler);
 
-Sortie& Fraction_Euler::printOn(Sortie &is) const
+Sortie& Fraction_Euler::printOn(Sortie& is) const
 {
   return Equation_base::printOn(is);
 }
 
-Entree& Fraction_Euler::readOn(Entree &is)
+Entree& Fraction_Euler::readOn(Entree& is)
 {
   Conservation_Euler::readOn(is);
   terme_nconserv_.associer_eqn(*this);
@@ -66,10 +66,10 @@ void Fraction_Euler::discretiser()
 {
   int nb_valeurs_temp = schema_temps().nb_valeurs_temporelles();
   double temps = schema_temps().temps_courant();
-  const Discret_Thyd &dis = ref_cast(Discret_Thyd, discretisation());
+  const Discret_Thyd& dis = ref_cast(Discret_Thyd, discretisation());
   Cerr << "Volume fraction discretization" << finl;
 
-  const Pb_Euler &pb = ref_cast(Pb_Euler, probleme());
+  const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
   dis.discretiser_champ("temperature", domaine_dis(), "alpha", "sans_dimension", pb.nb_phases(), nb_valeurs_temp, temps, l_inco_ch_);
   l_inco_ch_->fixer_nature_du_champ(pb.nb_phases() == 1 ? scalaire : pb.nb_phases() == dimension ? vectoriel : multi_scalaire); //pfft
   for (int i = 0; i < pb.nb_phases(); i++)
@@ -79,7 +79,7 @@ void Fraction_Euler::discretiser()
   Cerr << "Fraction_Euler::discretiser() ok" << finl;
 }
 
-void Fraction_Euler::set_param(Param &param)
+void Fraction_Euler::set_param(Param& param)
 {
   Equation_base::set_param(param);
   param.ajouter_non_std("termes_non_conservatifs", (this));

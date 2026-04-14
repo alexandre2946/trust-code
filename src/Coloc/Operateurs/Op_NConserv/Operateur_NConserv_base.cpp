@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,10 +14,8 @@
 *****************************************************************************/
 
 #include <Operateur_NConserv_base.h>
-#include <TRUSTTrav.h>
 
-Implemente_base(Operateur_NConserv_base,"Operateur_NConserv_base",Operateur_base);
-
+Implemente_base(Operateur_NConserv_base, "Operateur_NConserv_base", Operateur_base);
 
 Sortie& Operateur_NConserv_base::printOn(Sortie& os) const
 {
@@ -28,7 +26,3 @@ Entree& Operateur_NConserv_base::readOn(Entree& is)
 {
   return is;
 }
-
-
-
-

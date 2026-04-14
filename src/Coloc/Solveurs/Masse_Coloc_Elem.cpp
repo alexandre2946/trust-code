@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,10 +13,9 @@
 *
 *****************************************************************************/
 
-
 #include <Masse_Coloc_Elem.h>
 
-Implemente_instanciable(Masse_Coloc_Elem, "Masse_Coloc_Elem", Masse_PolyMAC_P0P1NC_Elem);
+Implemente_instanciable(Masse_Coloc_Elem, "Masse_Coloc_Elem", Masse_PolyMAC_HFV_Elem);
 
 Sortie& Masse_Coloc_Elem::printOn(Sortie& s) const { return s << que_suis_je() << " " << le_nom(); }
 

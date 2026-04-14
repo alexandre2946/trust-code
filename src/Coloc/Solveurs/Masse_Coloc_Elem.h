@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,10 +16,9 @@
 #ifndef Masse_Coloc_Elem_included
 #define Masse_Coloc_Elem_included
 
-#include <Masse_PolyMAC_P0P1NC_Elem.h>
+#include <Masse_PolyMAC_HFV_Elem.h>
 
-
-class Masse_Coloc_Elem : public Masse_PolyMAC_P0P1NC_Elem
+class Masse_Coloc_Elem : public Masse_PolyMAC_HFV_Elem
 {
   Declare_instanciable(Masse_Coloc_Elem);
 };

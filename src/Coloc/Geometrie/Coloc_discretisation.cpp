@@ -18,7 +18,7 @@
 #include <Equation_base.h>
 #include <Schema_Implicite_base.h>
 
-Implemente_instanciable(Coloc_discretisation, "Coloc", PolyMAC_P0_discretisation);
+Implemente_instanciable(Coloc_discretisation, "Coloc", PolyMAC_MPFA_discretisation);
 
 Entree& Coloc_discretisation::readOn(Entree& s) { return s;}
 
@@ -238,13 +238,3 @@ void Coloc_discretisation::discretiser_champ_fonc_don(const Motcle& directive, c
       exit();
     }
 }
-
-
-
-
-
-
-
-
-
-

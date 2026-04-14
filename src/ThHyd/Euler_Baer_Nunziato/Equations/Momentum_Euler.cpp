@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -43,7 +43,7 @@ Implemente_instanciable(Momentum_Euler,"Momentum_Euler|QDM_Euler",Navier_Stokes_
 // attr alpha_res_min flottant alpha_res_min 0 Activation threshold for full replacement of vanishing phase equation (default value : 0)
 // attr alpha_res flottant alpha_res 0 Activation threshold for gradual replacement of vanishing phase equation (tends to full replacement when alpha tends to alpha_res_min)
 
-Sortie& Momentum_Euler::printOn(Sortie &is) const
+Sortie& Momentum_Euler::printOn(Sortie& is) const
 {
   return Equation_base::printOn(is);
 }
@@ -63,7 +63,7 @@ Sortie& Momentum_Euler::printOn(Sortie &is) const
  * @throws solveur pression non defini dans jeu de donnees
  */
 
-Entree& Momentum_Euler::readOn(Entree &is)
+Entree& Momentum_Euler::readOn(Entree& is)
 {
   evanescence_.associer_eqn(*this);
   terme_nconserv_.associer_eqn(*this);
@@ -86,7 +86,7 @@ Entree& Momentum_Euler::readOn(Entree &is)
   return is;
 }
 
-void Momentum_Euler::set_param(Param &param)
+void Momentum_Euler::set_param(Param& param)
 {
   Equation_base::set_param(param);
   param.ajouter_non_std("diffusion", (this));
@@ -97,9 +97,9 @@ void Momentum_Euler::set_param(Param &param)
   param.ajouter_non_std("termes_non_conservatifs|non_conservative_terms", (this));
 }
 
-int Momentum_Euler::lire_motcle_non_standard(const Motcle &mot, Entree &is)
+int Momentum_Euler::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
-if (mot == "termes_non_conservatifs|non_conservative_terms")
+  if (mot == "termes_non_conservatifs|non_conservative_terms")
     {
       Cerr << "Reading and typing of the termes_non_conservatifs operator : " << finl;
       is >> terme_nconserv_;
@@ -122,10 +122,10 @@ void Momentum_Euler::mettre_a_jour(double temps)
 
 bool Momentum_Euler::initTimeStep(double dt)
 {
-  Schema_Temps_base &sch = schema_temps();
+  Schema_Temps_base& sch = schema_temps();
   ConstDoubleTab_parts ppart(pression().valeurs());
   /* si pression_pa() est plus petit que pression() (ex. : variables auxiliaires PolyMAC_P0P1NC), alors on ne copie que la 1ere partie */
-  const DoubleTab &p_red = pression_pa().valeurs().dimension_tot(0) < pression().valeurs().dimension_tot(0) ? ppart[0] : pression().valeurs();
+  const DoubleTab& p_red = pression_pa().valeurs().dimension_tot(0) < pression().valeurs().dimension_tot(0) ? ppart[0] : pression().valeurs();
   for (int i = 1; i <= sch.nb_valeurs_futures(); i++)
     {
       // Mise a jour du temps dans la pression
@@ -144,8 +144,8 @@ void Momentum_Euler::abortTimeStep()
 
 void Momentum_Euler::discretiser_vitesse()
 {
-  const Discret_Thyd &dis = ref_cast(Discret_Thyd, discretisation());
-  const Pb_Euler &pb = ref_cast(Pb_Euler, probleme());
+  const Discret_Thyd& dis = ref_cast(Discret_Thyd, discretisation());
+  const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
 
   dis.vitesse(schema_temps(), domaine_dis(), la_vitesse, ref_cast(Pb_Euler, probleme()).nb_phases());
 
@@ -200,8 +200,8 @@ void Momentum_Euler::completer()
   Cerr << "unknow field name  " << inconnue().le_nom() << finl;
   Cerr << "equation type " << inconnue().equation().que_suis_je() << finl;
 
-  const Domaine_VF &dom = ref_cast(Domaine_VF, domaine_dis());
-  const Pb_Euler &pb = ref_cast(Pb_Euler, probleme());
+  const Domaine_VF& dom = ref_cast(Domaine_VF, domaine_dis());
+  const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
 
   vitesse_son_.resize(dom.nb_elem_tot(), pb.nb_phases());
 
@@ -209,12 +209,12 @@ void Momentum_Euler::completer()
 
 }
 
-void Momentum_Euler::get_noms_champs_postraitables(Noms &noms, Option opt) const
+void Momentum_Euler::get_noms_champs_postraitables(Noms& noms, Option opt) const
 {
   Navier_Stokes_std::get_noms_champs_postraitables(noms, opt);
 
   Noms noms_compris;
-  const Pb_Euler &pb = ref_cast(Pb_Euler, probleme());
+  const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
   for (int i = 0; i < pb.nb_phases(); i++)
     {
       noms_compris.add(noms_vit_phases_[i]);
@@ -225,7 +225,7 @@ void Momentum_Euler::get_noms_champs_postraitables(Noms &noms, Option opt) const
     noms.add(noms_compris);
 }
 
-void Momentum_Euler::creer_champ(const Motcle &motlu)
+void Momentum_Euler::creer_champ(const Motcle& motlu)
 {
   Navier_Stokes_std::creer_champ(motlu);
 //  if (la_vorticite.non_nul())
@@ -239,7 +239,7 @@ void Momentum_Euler::creer_champ(const Motcle &motlu)
 
 }
 
-Entree& Momentum_Euler::lire_cond_init(Entree &is)
+Entree& Momentum_Euler::lire_cond_init(Entree& is)
 {
   Cerr << "Reading of initial conditions\n";
   Nom nom;
@@ -314,7 +314,7 @@ int Momentum_Euler::preparer_calcul()
 
 double Momentum_Euler::alpha_res() const
 {
-  const Pb_Euler &pb = ref_cast(Pb_Euler, probleme());
+  const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
   if (pb.nb_phases() == 1)
     return 0.;
   return -1.;
@@ -322,8 +322,8 @@ double Momentum_Euler::alpha_res() const
 
 void Momentum_Euler::discretiser()
 {
-  const Discret_Thyd &dis = ref_cast(Discret_Thyd, discretisation());
-  const Pb_Euler &pb = ref_cast(Pb_Euler, probleme());
+  const Discret_Thyd& dis = ref_cast(Discret_Thyd, discretisation());
+  const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
   int nb_valeurs_temp = schema_temps().nb_valeurs_temporelles();
   double temps = schema_temps().temps_courant();
 
@@ -358,7 +358,7 @@ void Momentum_Euler::discretiser()
   Equation_base::discretiser();
 }
 
-int Momentum_Euler::sauvegarder(Sortie &os) const
+int Momentum_Euler::sauvegarder(Sortie& os) const
 {
   int bytes = 0;
   bytes += Equation_base::sauvegarder(os);
@@ -371,12 +371,12 @@ int Momentum_Euler::sauvegarder(Sortie &os) const
 
 }
 
-DoubleTab& Momentum_Euler::corriger_derivee_expl(DoubleTab &derivee)
+DoubleTab& Momentum_Euler::corriger_derivee_expl(DoubleTab& derivee)
 {
   return derivee;
 }
 
-DoubleTab& Momentum_Euler::corriger_derivee_impl(DoubleTab &derivee)
+DoubleTab& Momentum_Euler::corriger_derivee_impl(DoubleTab& derivee)
 {
   return derivee;
 }
@@ -398,14 +398,14 @@ void Momentum_Euler::mettre_a_jour_p_c()
 
 double Momentum_Euler::calculer_pas_de_temps() const
 {
-  const Schema_Temps_base &sh = schema_temps();
-  const Domaine_Coloc &dom = ref_cast(Domaine_Coloc, domaine_dis());
-  const IntTab &elem_faces = dom.elem_faces();
-  const DoubleVect &surf = dom.face_surfaces();
-  const DoubleVect &vol = dom.volumes();
+  const Schema_Temps_base& sh = schema_temps();
+  const Domaine_Coloc& dom = ref_cast(Domaine_Coloc, domaine_dis());
+  const IntTab& elem_faces = dom.elem_faces();
+  const DoubleVect& surf = dom.face_surfaces();
+  const DoubleVect& vol = dom.volumes();
   const int nb_phases = ref_cast(Pb_Euler,probleme()).nb_phases();
-  const DoubleTab &c = vitesse_son();
-  const DoubleTab &u_n = vitesse_normale();
+  const DoubleTab& c = vitesse_son();
+  const DoubleTab& u_n = vitesse_normale();
   double dt = sh.pas_temps_max();
 
   DoubleTab dt_e(dom.nb_elem());
@@ -428,8 +428,8 @@ double Momentum_Euler::calculer_pas_de_temps() const
 
 void Momentum_Euler::init_alpha_rho_u()
 {
-  const DoubleTab &alpha_rho = ref_cast(Pb_Euler,probleme()).equation_masse().inconnue().valeurs();
-  DoubleTab &alpha_rhoU = inconnue().valeurs();
+  const DoubleTab& alpha_rho = ref_cast(Pb_Euler,probleme()).equation_masse().inconnue().valeurs();
+  DoubleTab& alpha_rhoU = inconnue().valeurs();
 
   int i, j, n, Nb_phase = ref_cast(Pb_Euler, probleme()).nb_phases(), d, D = dimension;
   for (n = 0; n < Nb_phase; n++)
@@ -438,7 +438,7 @@ void Momentum_Euler::init_alpha_rho_u()
       DoubleTab_parts psrc(vitesse().valeurs()), pdst(vit_phases_[n]->valeurs());
       for (i = 0; i < std::min(psrc.size(), pdst.size()); i++)
         {
-          DoubleTab &src = psrc[i], &dst = pdst[i];
+          DoubleTab& src = psrc[i], &dst = pdst[i];
           assert(src.line_size() == Nb_phase * D);
           for (j = 0; j < src.dimension_tot(0); j++)
             for (d = 0; d < D; d++)
@@ -452,8 +452,8 @@ void Momentum_Euler::init_alpha_rho_u()
 
 void Momentum_Euler::calculer_vitesse()
 {
-  const DoubleTab &alpha_rho = ref_cast(Pb_Euler,probleme()).equation_masse().inconnue().valeurs();
-  DoubleTab &U = vitesse().valeurs();
+  const DoubleTab& alpha_rho = ref_cast(Pb_Euler,probleme()).equation_masse().inconnue().valeurs();
+  DoubleTab& U = vitesse().valeurs();
   int i, j, n, Nb_phase = ref_cast(Pb_Euler, probleme()).nb_phases(), d, D = dimension;
 
   for (n = 0; n < Nb_phase; n++)
@@ -462,7 +462,7 @@ void Momentum_Euler::calculer_vitesse()
 
       for (i = 0; i < std::min(psrc.size(), pdst.size()); i++)
         {
-          DoubleTab &src = psrc[i], &dst = pdst[i];
+          DoubleTab& src = psrc[i], &dst = pdst[i];
           assert(src.line_size() == Nb_phase * D);
           for (j = 0; j < src.dimension_tot(0); j++)
             for (d = 0; d < D; d++)
@@ -489,10 +489,10 @@ Champ_Inc_base& Momentum_Euler::vitesse_phase(const int i)
 void Momentum_Euler::calculer_vitesse_normale()
 {
   const int Nb_phase = ref_cast(Pb_Euler, probleme()).nb_phases();
-  const Domaine_Coloc &dom = ref_cast(Domaine_Coloc, domaine_dis());
-  const DoubleTab &U = vitesse().valeurs();
-  const IntTab &f_e = dom.face_voisins();
-  DoubleTab &u_n = vitesse_normale();
+  const Domaine_Coloc& dom = ref_cast(Domaine_Coloc, domaine_dis());
+  const DoubleTab& U = vitesse().valeurs();
+  const IntTab& f_e = dom.face_voisins();
+  DoubleTab& u_n = vitesse_normale();
   assert(dimension == 2);
   for (int n = 0; n < Nb_phase; n++)
     {
@@ -509,15 +509,15 @@ void Momentum_Euler::calculer_vitesse_normale()
     }
 }
 
-DoubleTab Momentum_Euler::flux_(const int &f, const int &left_or_right) const
+DoubleTab Momentum_Euler::flux_(const int& f, const int& left_or_right) const
 {
   //left_or_right = 0 : left et 1 right;
-  const Pb_Euler &pb = ref_cast(Pb_Euler, probleme());
-  const Domaine_Coloc &dom = ref_cast(Domaine_Coloc, domaine_dis());
-  const DoubleTab &vit_normale = vitesse_normale();
-  const DoubleTab &p = pression().valeurs();
-  const DoubleTab &alpha_rhoU = inconnue().valeurs();
-  const DoubleTab &alpha = pb.equation_fraction().inconnue().valeurs();
+  const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
+  const Domaine_Coloc& dom = ref_cast(Domaine_Coloc, domaine_dis());
+  const DoubleTab& vit_normale = vitesse_normale();
+  const DoubleTab& p = pression().valeurs();
+  const DoubleTab& alpha_rhoU = inconnue().valeurs();
+  const DoubleTab& alpha = pb.equation_fraction().inconnue().valeurs();
   const int nb_phases = pb.nb_phases();
   const int e = dom.face_voisins(f, left_or_right);
   DoubleTab res_(alpha_rhoU.line_size());

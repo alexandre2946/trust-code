@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -71,19 +71,19 @@ void Milieu_composite_Euler::discretiser(const Probleme_base& pb, const  Discret
   inter_lu_->assoscier_pb(pb);
 }
 
-void Milieu_composite_Euler::init_energie_tot(DoubleTab &alpha_energie_tot_jdd) const
+void Milieu_composite_Euler::init_energie_tot(DoubleTab& alpha_energie_tot_jdd) const
 {
-  const Momentum_Euler &qdm = ref_cast(Momentum_Euler, equation("alpha_rho_u"));
-  const DoubleTab &rho = ref_cast(Density_Euler,equation("alpha_rho")).densite().valeurs();
-  const DoubleTab &alpha = equation("alpha").inconnue().valeurs();
-  const DoubleTab &p = qdm.pression().valeurs();
+  const Momentum_Euler& qdm = ref_cast(Momentum_Euler, equation("alpha_rho_u"));
+  const DoubleTab& rho = ref_cast(Density_Euler,equation("alpha_rho")).densite().valeurs();
+  const DoubleTab& alpha = equation("alpha").inconnue().valeurs();
+  const DoubleTab& p = qdm.pression().valeurs();
   const int Nb_phase = (int) fluides_.size();
   const int Nb_elem = qdm.domaine_dis().nb_elem_tot();
 
   for (int n = 0; n < Nb_phase; n++)
     {
-      const DoubleTab &U = qdm.vitesse_phase(n).valeurs();
-      const Fluide_reel_base &phase = ref_cast(Fluide_reel_base, get_fluid(n));
+      const DoubleTab& U = qdm.vitesse_phase(n).valeurs();
+      const Fluide_reel_base& phase = ref_cast(Fluide_reel_base, get_fluid(n));
       for (int i = 0; i < Nb_elem; i++)
         {
           double nom_u2 = 0;
@@ -94,21 +94,21 @@ void Milieu_composite_Euler::init_energie_tot(DoubleTab &alpha_energie_tot_jdd) 
     }
 }
 
-void Milieu_composite_Euler::calculer_pression(DoubleTab &p) const
+void Milieu_composite_Euler::calculer_pression(DoubleTab& p) const
 {
-  const Momentum_Euler &qdm = ref_cast(Momentum_Euler, equation("alpha_rho_u"));
-  const DoubleTab &rho = ref_cast(Density_Euler,equation("alpha_rho")).densite().valeurs();
-  const DoubleTab &alpha = equation("alpha").inconnue().valeurs();
-  const DoubleTab &alpha_rhoE = equation("alpha_energie_tot").inconnue().valeurs();
+  const Momentum_Euler& qdm = ref_cast(Momentum_Euler, equation("alpha_rho_u"));
+  const DoubleTab& rho = ref_cast(Density_Euler,equation("alpha_rho")).densite().valeurs();
+  const DoubleTab& alpha = equation("alpha").inconnue().valeurs();
+  const DoubleTab& alpha_rhoE = equation("alpha_energie_tot").inconnue().valeurs();
   DoubleTab rhoE = alpha_rhoE;
   tab_divide_any_shape(rhoE, alpha); // @suppress("Function cannot be resolved")
-  const int &Nb_phase = (int) fluides_.size();
-  const int &Nb_elem = qdm.domaine_dis().nb_elem_tot();
+  const int& Nb_phase = (int) fluides_.size();
+  const int& Nb_elem = qdm.domaine_dis().nb_elem_tot();
 
   for (int n = 0; n < Nb_phase; n++)
     {
-      const DoubleTab &U = qdm.vitesse_phase(n).valeurs();
-      const Fluide_reel_base &phase = ref_cast(Fluide_reel_base, get_fluid(n));
+      const DoubleTab& U = qdm.vitesse_phase(n).valeurs();
+      const Fluide_reel_base& phase = ref_cast(Fluide_reel_base, get_fluid(n));
       for (int i = 0; i < Nb_elem; i++)
         {
           double nom_u2 = 0;
@@ -120,17 +120,17 @@ void Milieu_composite_Euler::calculer_pression(DoubleTab &p) const
     }
 }
 
-void Milieu_composite_Euler::calculer_vitesse_son(DoubleTab &c) const
+void Milieu_composite_Euler::calculer_vitesse_son(DoubleTab& c) const
 {
-  const Momentum_Euler &qdm = ref_cast(Momentum_Euler, equation("alpha_rho_u"));
-  const DoubleTab &rho = ref_cast(Density_Euler,equation("alpha_rho")).densite().valeurs();
-  const DoubleTab &p = qdm.pression().valeurs();
+  const Momentum_Euler& qdm = ref_cast(Momentum_Euler, equation("alpha_rho_u"));
+  const DoubleTab& rho = ref_cast(Density_Euler,equation("alpha_rho")).densite().valeurs();
+  const DoubleTab& p = qdm.pression().valeurs();
 
-  const int &Nb_phase = (int) fluides_.size();
-  const int &Nb_elem = qdm.domaine_dis().nb_elem_tot();
+  const int& Nb_phase = (int) fluides_.size();
+  const int& Nb_elem = qdm.domaine_dis().nb_elem_tot();
   for (int n = 0; n < Nb_phase; n++)
     {
-      const Fluide_reel_base &phase = ref_cast(Fluide_reel_base, get_fluid(n));
+      const Fluide_reel_base& phase = ref_cast(Fluide_reel_base, get_fluid(n));
       for (int i = 0; i < Nb_elem; i++)
         c(i, n) = phase.calculer_vitesse_son(rho(i, n), p(i, n));
     }

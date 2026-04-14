@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -29,10 +29,6 @@ public :
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override {};
 
   int has_interface_blocs() const override {  return 1; }
-
-//protected:
-//  mutable SFichier Flux_NConserv, Flux_NConserv_moment, Flux_NConserv_sum;
-
 
 };
 

@@ -16,13 +16,13 @@
 #ifndef Coloc_discretisation_included
 #define Coloc_discretisation_included
 
-#include <PolyMAC_P0_discretisation.h>
+#include <PolyMAC_MPFA_discretisation.h>
 
-class Coloc_discretisation: public PolyMAC_P0_discretisation
+class Coloc_discretisation: public PolyMAC_MPFA_discretisation
 {
   Declare_instanciable(Coloc_discretisation);
 public:
-  using PolyMAC_P0_discretisation::discretiser_champ;
+  using PolyMAC_MPFA_discretisation::discretiser_champ;
   bool is_coloc() const override { return true; }
   bool is_polymac_p0() const override { return false; }
   Nom domaine_cl_dis_type() const override { return "Domaine_Cl_Coloc"; }
