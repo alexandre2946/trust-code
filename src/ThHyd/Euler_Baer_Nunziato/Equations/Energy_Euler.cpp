@@ -28,31 +28,31 @@
 #include <Param.h>
 #include <Momentum_Euler.h>
 #include <Milieu_composite_Euler.h>
-//#include <Op_Conv_Rusanov_Coloc_Elem.h>
 #include <Operateur_Conv.h>
+
 Implemente_instanciable(Energy_Euler, "Energy_Euler|Energie_Euler", Conservation_Euler);
 // XD Energy_Euler eqn_base Energy_Euler -1 Internal energy conservation equation for a multi-phase problem where the unknown is the temperature
 
-Sortie& Energy_Euler::printOn(Sortie& is) const { return Equation_base::printOn(is); }
-
-Entree& Energy_Euler::readOn(Entree& is)
+Sortie& Energy_Euler::printOn(Sortie &is) const
 {
-  Conservation_Euler::readOn(is);
-  //terme_convectif.set_fichier("Convection_energie_totale");
-  //terme_convectif.set_description((Nom)"Energy flow rate=Integral( TBA.....) [ TBA.....] if SI units used");
-  return is;
+  return Equation_base::printOn(is);
 }
 
+Entree& Energy_Euler::readOn(Entree &is)
+{
+  Conservation_Euler::readOn(is);
+  return is;
+}
 
 void Energy_Euler::discretiser()
 {
   int nb_valeurs_temp = schema_temps().nb_valeurs_temporelles();
   double temps = schema_temps().temps_courant();
-  const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
+  const Discret_Thyd &dis = ref_cast(Discret_Thyd, discretisation());
   Cerr << "Energy discretization" << finl;
   //On utilise temperature pour la directive car discretisation identique
-  const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
-  dis.discretiser_champ("temperature",domaine_dis(),"alpha_energie_tot","J/m3", pb.nb_phases(),nb_valeurs_temp,temps,l_inco_ch_);
+  const Pb_Euler &pb = ref_cast(Pb_Euler, probleme());
+  dis.discretiser_champ("temperature", domaine_dis(), "alpha_energie_tot", "J/m3", pb.nb_phases(), nb_valeurs_temp, temps, l_inco_ch_);
   l_inco_ch_->fixer_nature_du_champ(pb.nb_phases() == 1 ? scalaire : pb.nb_phases() == dimension ? vectoriel : multi_scalaire); //pfft
   for (int i = 0; i < pb.nb_phases(); i++)
     l_inco_ch_->fixer_nom_compo(i, Nom("alpha_energie_tot_") + pb.nom_phase(i));
@@ -62,70 +62,36 @@ void Energy_Euler::discretiser()
   Cerr << "Energy_Euler::discretiser() ok" << finl;
 }
 
-
-
-
-//inline DoubleTab Energy_Euler::Flux(const int& f, const double& un_l, const double& un_r ) const
-//{
-//  const Domaine_Coloc& dom = ref_cast(Domaine_Coloc,domaine_dis());
-//  const int& el=dom.face_voisins(f,0), &er = dom.face_voisins(f,1);
-//  const DoubleTab& rhoE = inconnue().valeurs();
-//  const DoubleTab& p= ref_cast(Momentum_Euler,probleme().equation(0)).pression().valeurs();
-//
-//  double rhoEl=rhoE(el), rhoEr=rhoE(er), pl=p(el), pr=p(er);
-//
-//  DoubleTab F(2);
-//  F(0)= (rhoEl+pl )*un_l;
-//  F(1)= (rhoEr+pr )*un_r;
-//
-//  return F;
-//}
-
-
-inline DoubleTab Energy_Euler::flux(const int& f, const int& left_or_right) const
+inline DoubleTab Energy_Euler::flux(const int &f, const int &left_or_right) const
 {
-  const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
-  const Domaine_Coloc& dom = ref_cast(Domaine_Coloc,domaine_dis());
-  const DoubleTab& vit_normale = ref_cast(Momentum_Euler, probleme().equation(0)).vitesse_normale();
-  const DoubleTab& alpha_rhoE = inconnue().valeurs();
+  const Pb_Euler &pb = ref_cast(Pb_Euler, probleme());
+  const Domaine_Coloc &dom = ref_cast(Domaine_Coloc, domaine_dis());
+  const DoubleTab &vit_normale = ref_cast(Momentum_Euler, probleme().equation(0)).vitesse_normale();
+  const DoubleTab &alpha_rhoE = inconnue().valeurs();
   const int nb_phases = pb.nb_phases();
-  const DoubleTab& p = pb.equation_qdm().pression().valeurs();
-  const DoubleTab& alpha = pb.equation_fraction().inconnue().valeurs();
-  const int e = dom.face_voisins(f,left_or_right);
+  const DoubleTab &p = pb.equation_qdm().pression().valeurs();
+  const DoubleTab &alpha = pb.equation_fraction().inconnue().valeurs();
+  const int e = dom.face_voisins(f, left_or_right);
   DoubleTab flux_(nb_phases);
 
-  for (int n = 0; n < nb_phases; n++) flux_(n) = ( alpha_rhoE(e, n) + alpha(e,n) * p(e, n) ) * vit_normale (f, n + left_or_right * nb_phases );
+  for (int n = 0; n < nb_phases; n++)
+    flux_(n) = (alpha_rhoE(e, n) + alpha(e, n) * p(e, n)) * vit_normale(f, n + left_or_right * nb_phases);
   return flux_;
 }
 
-
-//inline double Energy_Euler::Flux_bord(const int& f) const
-//{
-//  const Domaine_Coloc& dom = ref_cast(Domaine_Coloc,domaine_dis());
-//  const DoubleTab& rhoE = inconnue().valeurs();
-//  const DoubleTab& p= ref_cast(Momentum_Euler,probleme().equation(0)).pression().valeurs();
-//  const int& e_f = 1-(dom.face_voisins(f,0) >= 0);
-//  const int& e = dom.face_voisins(f,0) >= 0 ? dom.face_voisins(f,0) : dom.face_voisins(f,1); // pas besoin
-//
-//  const DoubleTab& u_n= ref_cast(Momentum_Euler, probleme().equation(0)).vitesse_normale();
-//
-//  return (rhoE(e)+p(e))*u_n(f,e_f);
-//}
-
-
-inline double Energy_Euler::flux_bord(const double& alpha_rhoE_bord, const double& vit_n_bord, const double& alpha_p_bord ) const
+inline double Energy_Euler::flux_bord(const double &alpha_rhoE_bord, const double &vit_n_bord, const double &alpha_p_bord) const
 {
-  return (alpha_rhoE_bord + alpha_p_bord ) * vit_n_bord;
+  return (alpha_rhoE_bord + alpha_p_bord) * vit_n_bord;
 }
 
-Entree& Energy_Euler::lire_cond_init(Entree& is)
+Entree& Energy_Euler::lire_cond_init(Entree &is)
 {
   Cerr << "Reading of initial conditions\n";
   Nom nom;
   Motcle motlu;
   is >> nom;
   motlu = nom;
-  if(motlu!=Motcle("{"))
+  if (motlu != Motcle("{"))
     {
       Cerr << "We expected a { while reading " << que_suis_je() << finl;
       Cerr << "and not : " << nom << finl;
@@ -133,21 +99,20 @@ Entree& Energy_Euler::lire_cond_init(Entree& is)
     }
   is >> nom;
   motlu = nom;
-  if (motlu != Motcle(inconnue().le_nom())  && motlu != "Energie_tot" )
+  if (motlu != Motcle(inconnue().le_nom()) && motlu != "Energie_tot")
     {
-      Cerr << nom << " is not the name of the unknown "
-           << inconnue().le_nom() << finl;
+      Cerr << nom << " is not the name of the unknown " << inconnue().le_nom() << finl;
       exit();
     }
   OWN_PTR(Champ_Don_base) ch_init;
   is >> ch_init;
 
   const int nb_comp = ch_init->nb_comp();
-  verifie_ch_init_nb_comp(inconnue(),nb_comp);
+  verifie_ch_init_nb_comp(inconnue(), nb_comp);
 
   is >> nom;
   motlu = nom;
-  if(motlu!=Motcle("}"))
+  if (motlu != Motcle("}"))
     {
       Cerr << "We expected a } while reading " << que_suis_je() << finl;
       Cerr << "and not : " << nom << finl;
@@ -155,7 +120,6 @@ Entree& Energy_Euler::lire_cond_init(Entree& is)
     }
   return is;
 }
-
 
 const Operateur& Energy_Euler::operateur(int i) const
 {
@@ -165,8 +129,8 @@ const Operateur& Energy_Euler::operateur(int i) const
       return terme_convectif;
     case 1:
       return terme_nconserv_;
-    default :
-      Cerr << que_suis_je() <<" : wrong operator number " << i << finl;
+    default:
+      Cerr << que_suis_je() << " : wrong operator number " << i << finl;
       Process::exit();
     }
   // Pour les compilos!!
@@ -181,19 +145,19 @@ Operateur& Energy_Euler::operateur(int i)
       return terme_convectif;
     case 1:
       return terme_nconserv_;
-    default :
-      Cerr << que_suis_je() <<" : wrong operator number " << i << finl;
+    default:
+      Cerr << que_suis_je() << " : wrong operator number " << i << finl;
       Process::exit();
     }
   // Pour les compilos!!
   return terme_convectif;
 }
 
-void Energy_Euler::set_param(Param& param)
+void Energy_Euler::set_param(Param &param)
 {
   Equation_base::set_param(param);
-  param.ajouter_non_std("termes_non_conservatifs",(this));
-  param.ajouter_non_std("non_conservative_terms",(this));
-  param.ajouter_non_std("convection",(this));
+  param.ajouter_non_std("termes_non_conservatifs", (this));
+  param.ajouter_non_std("non_conservative_terms", (this));
+  param.ajouter_non_std("convection", (this));
 }
 

@@ -14,7 +14,6 @@
 *****************************************************************************/
 
 #include <EcritureLectureSpecial.h>
-//#include <Pb_Multiphase_HEM.h>
 #include <Pb_Euler.h>
 #include <Conservation_Euler.h>
 #include <Champ_Uniforme.h>
@@ -29,9 +28,12 @@
 
 Implemente_instanciable(Conservation_Euler, "Conservation_Euler", Convection_Diffusion_std);
 
-Sortie& Conservation_Euler::printOn(Sortie& is) const { return Equation_base::printOn(is); }
+Sortie& Conservation_Euler::printOn(Sortie &is) const
+{
+  return Equation_base::printOn(is);
+}
 
-Entree& Conservation_Euler::readOn(Entree& is)
+Entree& Conservation_Euler::readOn(Entree &is)
 {
   assert(l_inco_ch_.non_nul());
   assert(le_fluide_.non_nul());
@@ -40,9 +42,9 @@ Entree& Conservation_Euler::readOn(Entree& is)
   return is;
 }
 
-int Conservation_Euler::lire_motcle_non_standard(const Motcle& mot, Entree& is)
+int Conservation_Euler::lire_motcle_non_standard(const Motcle &mot, Entree &is)
 {
-  if (mot=="diffusion")
+  if (mot == "diffusion")
     {
       Cerr << "Reading and typing of the diffusion operator : " << finl;
       terme_diffusif.associer_diffusivite(diffusivite_pour_transport());
@@ -50,17 +52,17 @@ int Conservation_Euler::lire_motcle_non_standard(const Motcle& mot, Entree& is)
       terme_diffusif.associer_diffusivite_pour_pas_de_temps(diffusivite_pour_pas_de_temps());
       return 1;
     }
-  else if (mot=="convection")
+  else if (mot == "convection")
     {
       Cerr << "Reading and typing of the convection operator : " << finl;
-      const Champ_base& ch_vitesse_transportante = vitesse_pour_transport();
+      const Champ_base &ch_vitesse_transportante = vitesse_pour_transport();
       associer_vitesse(ch_vitesse_transportante);
       terme_convectif.associer_vitesse(ch_vitesse_transportante);
       is >> terme_convectif;
       terme_convectif.associer_eqn(*this);
       return 1;
     }
-  else if (mot=="termes_non_conservatifs|non_conservative_terms")
+  else if (mot == "termes_non_conservatifs|non_conservative_terms")
     {
       Cerr << "Reading and typing of the non_conservative_terms operator : " << finl;
       is >> terme_nconserv_;
@@ -68,14 +70,12 @@ int Conservation_Euler::lire_motcle_non_standard(const Motcle& mot, Entree& is)
       return 1;
     }
   else
-    return Equation_base::lire_motcle_non_standard(mot,is);
+    return Equation_base::lire_motcle_non_standard(mot, is);
 }
 
-
-
-void Conservation_Euler::associer_milieu_base(const Milieu_base& un_milieu) //ok
+void Conservation_Euler::associer_milieu_base(const Milieu_base &un_milieu) //ok
 {
-  const Fluide_base& un_fluide = ref_cast(Fluide_base,un_milieu);
+  const Fluide_base &un_fluide = ref_cast(Fluide_base, un_milieu);
   associer_fluide(un_fluide);
 }
 
@@ -88,7 +88,6 @@ Milieu_base& Conservation_Euler::milieu()
 {
   return fluide();
 }
-
 
 const Fluide_base& Conservation_Euler::fluide() const
 {
@@ -106,9 +105,9 @@ Fluide_base& Conservation_Euler::fluide()
   return le_fluide_.valeur();
 }
 
-void Conservation_Euler::associer_fluide(const Fluide_base& un_fluide)
+void Conservation_Euler::associer_fluide(const Fluide_base &un_fluide)
 {
   assert(sub_type(Fluide_base,un_fluide));
-  le_fluide_ = ref_cast(Fluide_base,un_fluide);
+  le_fluide_ = ref_cast(Fluide_base, un_fluide);
 }
 

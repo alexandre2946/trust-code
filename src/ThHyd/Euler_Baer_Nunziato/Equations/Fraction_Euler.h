@@ -22,8 +22,8 @@ class Fraction_Euler : public Conservation_Euler
 {
   Declare_instanciable(Fraction_Euler);
 public :
-  void discretiser() override; //ok
-  int verif_Cl() const override {return 1;}; // TODO
+  void discretiser() override;
+  int verif_Cl() const override {return 1;} // TODO
   void set_param(Param& param) override;
   int nombre_d_operateurs() const override { return 1; }
   const Operateur& operateur(int) const override;
