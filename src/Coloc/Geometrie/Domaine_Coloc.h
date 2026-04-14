@@ -16,14 +16,15 @@
 #ifndef Domaine_Coloc_included
 #define Domaine_Coloc_included
 
-#include <Domaine_PolyMAC_MPFA.h>
+#include <Domaine_Poly_base.h>
 
-class Domaine_Coloc : public Domaine_PolyMAC_MPFA
+class Domaine_Coloc : public Domaine_Poly_base
 {
   Declare_instanciable(Domaine_Coloc);
-
+public:
+  void discretiser() override;
+  void modifier_pour_Cl(const Conds_lim& ) override;
+  void calculer_volumes_entrelaces() override;
+  void calculer_h_carre() override;
 };
-
-
-
 #endif /* Domaine_Coloc_included */
