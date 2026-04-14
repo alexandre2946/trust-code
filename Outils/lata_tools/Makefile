@@ -27,7 +27,7 @@ $(trg): Makefile $(tools_src)/CMakeLists.txt $(tools_src)/tools/CMakeLists.txt $
 	(cd $(TRUST_ROOT)/exec;ln -sf lata_tools/bin/lata_analyzer .)
 	(cd $(TRUST_ROOT)/exec;ln -sf lata_tools/bin/compare_lata .)
 	(cd $(TRUST_ROOT)/exec;ln -sf lata_tools/bin/compare_lata compare_cgns)
-	(cd $(TRUST_ROOT)/exec;ln -sf $(TRUST_ROOT)/bin/KSH/compare_lata_gz compare_cgns_gz)
+	(cd $(TRUST_ROOT)/exec;ln -sf ../bin/KSH/compare_lata_gz compare_cgns_gz)
 	(cd $(TRUST_ROOT)/exec/lata_tools/;ln -sf ../../Outils/lata_tools/src/tools/env.sh .)
 
 clean:

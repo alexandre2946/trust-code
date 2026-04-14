@@ -77,6 +77,9 @@ void Format_Post_CGNS::set_param(Param& param) const
 
 void Format_Post_CGNS::resetTime(double t, const std::string dirname)
 {
+  if (dirname.empty())
+    Process::exit("\nError in Format_Post_CGNS::resetTime. The name of the directory is empty. This is forbidden !!! \n");
+
 #ifdef HAS_CGNS
   cgns_writer_.cgns_resetTime(t, dirname, cgns_basename_);
 #endif

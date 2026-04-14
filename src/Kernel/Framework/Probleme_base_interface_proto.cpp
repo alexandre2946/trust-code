@@ -208,8 +208,6 @@ void Probleme_base_interface_proto::resetTimeWithDir_impl(Probleme_base& pb, dou
       Sortie_Fichier_base::set_root(dirname); // Create a new directory
       pb.schema_temps().initialize(); // Initialize the time scheme (.dt_ev file)
     }
-  else
-    Process::exit("\nError in Probleme_base_interface_proto::resetTimeWithDir_impl. The name of the directory is empty !!! \n");
 
   // [ABN] Warning: when dealing with input data (like Champ_Don), resetTime() can be mapped to 'mettre_a_jour()' (we really
   // want the input data at the given time)
