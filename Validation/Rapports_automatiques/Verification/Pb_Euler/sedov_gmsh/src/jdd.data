@@ -1,0 +1,162 @@
+# PARALLEL OK 8 #
+# GPU NOT #
+dimension 2
+Domaine dom
+
+# BEGIN MESH #
+Read_MED { domain dom mesh 2D_tetra_boite_cote_1m file $mesh convertalltopoly }
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+        /* Choose Nb_parts so to have ~ 25000 cells per processor */
+        Partition_tool metis { nb_parts 4 }
+        Larg_joint 2
+        zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+
+Scheme_euler_explicit sch
+Read sch
+
+{
+   tinit 0
+    dt_min 5.e-40
+    dt_max  0.8
+    tmax 0.1
+    seuil_statio -1
+    facsec 0.8
+}
+
+
+
+Coloc dis
+
+Pb_Euler pb
+
+Associate  pb dom
+Associate  pb sch
+Discretize pb dis
+
+Read pb
+{   Milieu_composite_Euler
+    {     gas StiffenedGas { gamma 1.4 pinf 0 }
+          interface Interface_Baer_Nunziato { vitesse -1 pression -1 }
+    } 
+    
+    Fraction_Euler
+    {
+        termes_non_conservatifs { negligeable }
+        initial_conditions
+        {
+            alpha Champ_composite 1
+            {
+               Champ_Uniforme 1 1
+            } 
+        }
+        boundary_conditions
+        {
+            left Sortie_supersonique
+            up Sortie_supersonique
+            right Sortie_supersonique
+            down Sortie_supersonique
+        }
+    }
+    
+    Masse_Euler
+    {
+        convection { hll }
+        initial_conditions
+        {
+            densite Champ_composite 1
+            {
+                Champ_Uniforme 1 1
+            } 
+        }
+        boundary_conditions
+        {
+           left Sortie_supersonique
+            up Sortie_supersonique
+            right Sortie_supersonique
+            down Sortie_supersonique
+        }
+    }
+       
+    QDM_Euler
+    {
+        # evanescence { homogene { alpha_res 1 alpha_res_min 0.5 } } #
+        solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg }  
+        convection { hll }
+        termes_non_conservatifs { negligeable }
+        diffusion  { negligeable }
+        initial_conditions
+        {
+            vitesse Champ_composite 1
+            {   
+                 Champ_Uniforme 2 0 0 
+            }
+
+            pression Champ_composite 1
+            {
+                Champ_fonc_xyz dom 1 40./3.14*(((x-0.)^2+(y-0.)^2)[0.1^2)+1.e-5*(((x-0.)^2+(y-0.)^2)>0.1^2)
+            }
+        }
+        boundary_conditions
+        {
+            left Sortie_supersonique
+            up Sortie_supersonique
+            right Sortie_supersonique
+            down Sortie_supersonique
+        }
+    }
+    
+        Energie_Euler
+    {
+        convection { hll }
+        termes_non_conservatifs { negligeable }
+        initial_conditions
+        {
+            Energie_tot Champ_composite 1
+            {
+                 Champ_Uniforme 1 -800
+            }
+        } 
+        boundary_conditions
+        {
+            left Sortie_supersonique
+            up Sortie_supersonique
+            right Sortie_supersonique
+            down Sortie_supersonique
+        }
+    }
+
+    
+    Post_processing
+    {
+
+	probes
+	{
+		rho_x grav densite periode 1e8 segment $nb -0.5 0. 0.5 0.
+		rho_y grav densite periode 1e8 segment $nb 0. -0.5 0. 0.5
+		rho_xy grav densite periode 1e8 segment $nb 0 0 0.35 0.35
+		
+	}
+		
+        Format cgns
+        fields dt_post 1e-2
+        {
+            densite elem
+            vitesse elem
+            pression elem
+        }
+    }
+}
+Solve pb
+End

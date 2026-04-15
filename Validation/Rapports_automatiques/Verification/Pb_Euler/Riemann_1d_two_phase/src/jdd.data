@@ -1,0 +1,197 @@
+# PARALLEL OK 8 #
+# GPU NOT #
+dimension 2
+Domaine dom
+
+# BEGIN MESH #
+mailler dom
+{
+    pave tube
+    {
+        origine  0.0  0.0
+        nombre_de_noeuds  __n__ 2
+        longueurs 1 1
+    }
+    {
+        bord  bas       Y = 0.0    0.0 <= X <= 1.0
+        bord  haut      Y = 1.0    0.0 <= X <= 1.0
+        bord  gauche    X = 0.0    0.0 <= Y <= 1.0
+        bord  droite    X = 1.0    0.0 <= Y <= 1.0
+    }
+}
+
+
+Scheme_euler_explicit sch
+Read sch
+
+{
+    tinit 0
+    dt_min 5.e-40
+    dt_max  0.5
+    tmax __tmax__
+    seuil_statio -1
+    facsec 0.4
+}
+
+
+
+__dis__ dis 
+
+Pb_Euler pb
+
+Associate  pb dom
+Associate  pb sch
+Discretize pb dis
+
+Read pb
+{   Milieu_composite_Euler
+    {     
+         solide StiffenedGas { gamma __gammaS__ pinf __pinfS__ }
+         gaz StiffenedGas { gamma __gammaG__ pinf 0. }
+         interface Interface_Baer_Nunziato { vitesse 0 pression 1 }
+         # liquide_sodium Fluide_sodium_liquide { P_ref 1e5 T_ref 800  } # 
+         # gaz_sodium Fluide_sodium_gaz { P_ref 1e5 T_ref $__Tsat__ } 
+         saturation_sodium saturation_sodium { P_ref 1e5 T_ref $__Tsat__ } #
+    } 
+    
+    Fraction_Euler
+    {
+        termes_non_conservatifs { hll }
+        initial_conditions
+        {
+            alpha Champ_composite 2
+            {
+               Champ_fonc_xyz dom 1 __alphaSl__*(x[__x__)+__alphaSr__*(x>__x__)
+               Champ_fonc_xyz dom 1 __alphaGl__*(x[__x__)+__alphaGr__*(x>__x__)
+            } 
+        }
+        boundary_conditions
+        {
+            gauche Sortie_supersonique
+            droite Sortie_supersonique
+            bas Sortie_supersonique
+            haut Sortie_supersonique
+        }
+    }
+    
+    # correlations
+    {
+        flux_interfacial coef_constant { liquide_sodium 1e10 gaz_sodium 1e10 }
+    }
+    #
+    
+    Masse_Euler
+    {
+        convection { hll }
+        initial_conditions
+        {
+            densite Champ_composite 2
+            {
+                # Champ_Uniforme 1 1 #
+                Champ_fonc_xyz dom 1 __rSl__*(x[__x__)+__rSr__*(x>__x__)
+                Champ_fonc_xyz dom 1 __rGl__*(x[__x__)+__rGr__*(x>__x__)
+            } 
+        }
+       boundary_conditions
+        {
+            gauche Sortie_supersonique
+            droite Sortie_supersonique
+            bas Sortie_supersonique
+            haut Sortie_supersonique
+        }
+    }
+       
+    QDM_Euler
+    {
+        # evanescence { homogene { alpha_res 1 alpha_res_min 0.5 } } #
+        solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg }  
+        convection { hll }
+        termes_non_conservatifs { hll }
+        diffusion  { negligeable }
+        initial_conditions
+        {
+            vitesse Champ_composite 2
+            {   
+                # Champ_Uniforme 2 0 0 #
+                Champ_fonc_xyz dom 2 __vSl__*(x[__x__)+(__vSr__)*(x>__x__) 0
+                Champ_fonc_xyz dom 2 __vGl__*(x[__x__)+(__vGr__)*(x>__x__) 0
+            }
+
+            pression Champ_composite 2
+            {
+                Champ_fonc_xyz dom 1 __pSl__*(x[__x__)+__pSr__*(x>__x__)
+                Champ_fonc_xyz dom 1 __pGl__*(x[__x__)+__pGr__*(x>__x__)
+            }
+        }
+        boundary_conditions
+        {
+        gauche Sortie_supersonique
+            droite Sortie_supersonique
+            bas Sortie_supersonique
+            haut Sortie_supersonique
+    }
+    }
+        Energie_Euler
+    {
+        # diffusion { negligeable } #
+        convection { hll }
+        termes_non_conservatifs { hll }
+         initial_conditions
+        {
+            Energie_tot Champ_composite 2
+            {
+                 Champ_Uniforme 1 -800
+                 Champ_Uniforme 1 -800
+                 # champ_Uniforme 1 $__Tsat__ # 
+            }
+        } 
+        boundary_conditions
+        {
+            gauche Sortie_supersonique
+            droite Sortie_supersonique
+            bas Sortie_supersonique
+            haut Sortie_supersonique
+        }
+         # sources
+        {
+            puissance_thermique Champ_composite 2
+            {
+                champ_uniforme 1 1e8
+                champ_uniforme 1 0
+            } ,
+            flux_interfacial
+        } #
+    }
+
+    
+    Post_processing
+    {
+       probes
+        {   
+             alpha_Solide grav alpha_solide periode 1e8 segment 1000 0 0.5 1 0.5 
+             alpha_Gaz grav alpha_gaz periode 1e8 segment 1000 0 0.5 1 0.5 
+             rho_Solide grav densite_solide periode 1e8 segment 1000 0 0.5 1 0.5
+             rho_Gaz grav densite_gaz periode 1e8 segment 1000 0 0.5 1 0.5 
+             v_Solide grav  vitesse_solide  periode 1e8 segment 1000 0 0.5 1 0.5 
+             v_Gaz grav  vitesse_gaz  periode 1e8 segment 1000 0 0.5 1 0.5
+             p_Solide grav pression_solide periode 1e8 segment 1000 0 0.5 1 0.5 
+             p_Gaz grav  pression_gaz periode 1e8 segment 1000 0 0.5 1 0.5 
+            
+        }
+        
+
+        Format cgns
+        fields dt_post 1e-2
+        {   
+            alpha elem 
+            densite elem
+            alpha_rho_u elem
+            vitesse_gaz elem
+            vitesse_solide elem
+            # Energie_tot_gaz elem #
+            pression elem
+        }
+    }
+}
+Solve pb
+End
