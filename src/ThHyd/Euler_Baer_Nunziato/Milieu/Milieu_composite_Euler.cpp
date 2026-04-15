@@ -28,7 +28,7 @@
 #include <Momentum_Euler.h>
 
 Implemente_instanciable(Milieu_composite_Euler, "Milieu_composite_Euler", Milieu_composite);
-// XD Milieu_composite_Euler listobj Milieu_composite_Euler -1 milieu_base 0 Composite medium made of several sub mediums.
+// XD Milieu_composite_Euler Milieu_composite Milieu_composite_Euler -1 Composite medium made of several sub mediums.
 
 Sortie& Milieu_composite_Euler::printOn(Sortie& os) const { return os; }
 Entree& Milieu_composite_Euler::readOn(Entree& is) { return Milieu_composite::readOn(is); }

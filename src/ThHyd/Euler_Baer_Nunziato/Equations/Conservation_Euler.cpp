@@ -13,33 +13,20 @@
 *
 *****************************************************************************/
 
-#include <EcritureLectureSpecial.h>
 #include <Conservation_Euler.h>
-#include <Champ_Uniforme.h>
-#include <Matrice_Morse.h>
-#include <Discret_Thyd.h>
 #include <Fluide_base.h>
-#include <Domaine_VF.h>
-#include <TRUSTTrav.h>
 #include <Pb_Euler.h>
-#include <Domaine.h>
-#include <EChaine.h>
-#include <Param.h>
 
-Implemente_instanciable(Conservation_Euler, "Conservation_Euler", Convection_Diffusion_std);
+Implemente_base(Conservation_Euler, "Conservation_Euler", Convection_Diffusion_std);
 
-Sortie& Conservation_Euler::printOn(Sortie& is) const
-{
-  return Equation_base::printOn(is);
-}
+Sortie& Conservation_Euler::printOn(Sortie& is) const { return Equation_base::printOn(is); }
 
 Entree& Conservation_Euler::readOn(Entree& is)
 {
   assert(l_inco_ch_.non_nul());
   assert(le_fluide_.non_nul());
   champs_compris_.ajoute_champ(l_inco_ch_);
-  Equation_base::readOn(is);
-  return is;
+  return Equation_base::readOn(is);
 }
 
 int Conservation_Euler::lire_motcle_non_standard(const Motcle& mot, Entree& is)
@@ -110,4 +97,3 @@ void Conservation_Euler::associer_fluide(const Fluide_base& un_fluide)
   assert(sub_type(Fluide_base,un_fluide));
   le_fluide_ = ref_cast(Fluide_base, un_fluide);
 }
-

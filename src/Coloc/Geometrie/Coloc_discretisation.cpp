@@ -20,6 +20,8 @@
 
 Implemente_instanciable(Coloc_discretisation, "Coloc", Discret_Thyd);
 
+// XD coloc discretisation_base coloc -1 Co-localised cell-center discretization
+
 Entree& Coloc_discretisation::readOn(Entree& s) { return s;}
 
 Sortie& Coloc_discretisation::printOn(Sortie& s) const { return s;}
@@ -27,36 +29,32 @@ Sortie& Coloc_discretisation::printOn(Sortie& s) const { return s;}
 void Coloc_discretisation::discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, int nb_pas_dt,
                                              double temps, OWN_PTR(Champ_Inc_base)& champ, const Nom& sous_type) const
 {
-  //PolyMAC_discretisation::discretiser_champ(directive,z, nature,noms, unites, nb_comp, nb_pas_dt, temps, champ, sous_type);
-
-  //const Domaine_Coloc& domaine_Coloc = ref_cast(Domaine_Coloc, z);
-
-  Motcles motcles(7);
+  Motcles motcles(6);
   motcles[0] = "vitesse";     // Choix standard pour la vitesse
   motcles[1] = "pression";    // Choix standard pour la pression
   motcles[2] = "temperature"; // Choix standard pour la temperature
   motcles[3] = "divergence_vitesse"; // Le type de champ obtenu en calculant div v
   motcles[4] = "gradient_pression";  // Le type de champ obtenu en calculant grad P
   motcles[5] = "champ_elem";    // Creer un champ aux elements (de type P0)
-  motcles[6] = "champ_sommets"; // Creer un champ aux sommets (type P1)
 
-  Nom type_champ_vitesse("Champ_Vect_Elem_Coloc");
-  Nom type_elem("Champ_Elem_Coloc");
+  Nom type_champ_vec("Champ_Vect_Elem_Coloc");
+  Nom type_champ_elem("Champ_Elem_Coloc");
   Nom type;
   int default_nb_comp = 0; // Valeur par defaut du nombre de composantes
   int rang = motcles.search(directive);
+
   switch(rang)
     {
     case 0:
     case 4:
-      type = type_champ_vitesse;
+      type = type_champ_vec;
       default_nb_comp = 3;
       break;
     case 1:
     case 2:
     case 3:
     case 5:
-      type = type_elem;
+      type = type_champ_elem;
       default_nb_comp = 1;
       break;
     default:
@@ -77,13 +75,10 @@ void Coloc_discretisation::discretiser_champ(const Motcle& directive, const Doma
       Discret_Thyd::discretiser_champ(directive, z, nature, noms, unites, nb_comp, nb_pas_dt, temps, champ);
       return;
     }
+
   int nb_ddl = 0;
-  if (type.debute_par(type_elem) || type.debute_par(type_champ_vitesse))
+  if (type.debute_par(type_champ_elem) || type.debute_par(type_champ_vec))
     nb_ddl = z.nb_elem() ;
-//	   else if (type.debute_par(type_champ_vitesse))
-//	     nb_ddl = (dimension < 3 ? domaine_PolyMAC.nb_som() : domaine_PolyMAC.domaine().nb_aretes());
-//	   else if (type.debute_par("Champ_Som_PolyMAC"))
-//	     nb_ddl = domaine_PolyMAC.nb_som();
   else
     assert(0);
 
@@ -98,7 +93,6 @@ void Coloc_discretisation::discretiser_champ(const Motcle& directive, const Doma
       champ->fixer_unites(unites);
       champ->fixer_noms_compo(noms);
     }
-
 }
 
 void Coloc_discretisation::discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps,
@@ -107,11 +101,6 @@ void Coloc_discretisation::discretiser_champ(const Motcle& directive, const Doma
   discretiser_champ_fonc_don(directive, z, nature, noms, unites, nb_comp, temps, champ);
 }
 
-/*! @brief Idem que PolyMAC_CDO_discretisation::discretiser_champ(.
- *
- * .. , Champ_Inc)
- *
- */
 void Coloc_discretisation::discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps,
                                              OWN_PTR(Champ_Don_base)& champ) const
 {
@@ -126,12 +115,6 @@ Nom Coloc_discretisation::get_name_of_type_for(const Nom& class_operateur, const
   Nom type_ch = eqn.inconnue().que_suis_je();
   if (type_ch.debute_par("Champ_Elem"))  type_ch = "_Elem";
   else if (type_ch.debute_par("Champ_Vect")) type_ch = "_Vect";
-//  else if (type_ch.debute_par("Champ_Vect"))
-//    type_ch = "_Vect";
-//  else if (type_ch.debute_par("Champ_Face"))
-//    type_ch = "_Face";
-//  else if (type_ch.debute_par("Champ_Arete"))
-//    type_ch = "_Arete";
 
   if (class_operateur == "Source")
     type = type_operateur + type_ch + "_" + que_suis_je();
@@ -139,16 +122,12 @@ Nom Coloc_discretisation::get_name_of_type_for(const Nom& class_operateur, const
     type = Nom("Masse_") + que_suis_je() + type_ch;
   else if (class_operateur == "Operateur_Grad")
     type = Nom("Op_Grad_") + type_operateur + "_" + que_suis_je() + type_ch;
-//  else if (class_operateur == "Operateur_Div")
-//    type = Nom("Op_Div_") + que_suis_je();
   else if (class_operateur == "Operateur_Diff")
     type = Nom("Op_Diff") + (type_operateur != "" ? "_" : "") + type_operateur + "_" + que_suis_je() + type_ch;
   else if (class_operateur == "Operateur_Conv")
     type = Nom("Op_Conv_") + type_operateur + "_" + que_suis_je() + type_ch;
   else if (class_operateur == "Operateur_NConserv")
     type = Nom("Op_NConserv_") + type_operateur + "_" + que_suis_je() + type_ch;
-//  else if (class_operateur == "Operateur_Evanescence")
-//    type = Nom("Op_Evanescence") + (type_operateur != "" ? "_" : "") + type_operateur + "_" + que_suis_je() + type_ch;
   else
     return Discret_Thyd::get_name_of_type_for(class_operateur, type_operateur, eqn);
 
@@ -162,45 +141,34 @@ void Coloc_discretisation::discretiser_champ_fonc_don(const Motcle& directive, c
   OWN_PTR(Champ_Fonc_base) *champ_fonc = dynamic_cast<OWN_PTR(Champ_Fonc_base)*>(&champ);
   OWN_PTR(Champ_Don_base) *champ_don = dynamic_cast<OWN_PTR(Champ_Don_base)*>(&champ);
 
-  //const Domaine_Coloc domaine_Coloc = ref_cast(Domaine_Coloc, z);
-
-  Motcles motcles(8);
+  Motcles motcles(6);
   motcles[0] = "pression";    // Choix standard pour la pression
   motcles[1] = "temperature"; // Choix standard pour la temperature
   motcles[2] = "divergence_vitesse"; // Le type de champ obtenu en calculant div v
   motcles[3] = "champ_elem";  // Creer un champ aux elements (de type P0)
   motcles[4] = "vitesse";     // Choix standard pour la vitesse
   motcles[5] = "gradient_pression";  // Le type de champ obtenu en calculant grad P
-  motcles[6] = "champ_sommets";  // Creer un champ aux elements (de type P1)
-  motcles[7] = "champ_face";     // Choix standard pour la vitesse
 
 // Le type de champ de vitesse depend du type d'element :
-  int zp1 = false, default_nb_comp = 0, rang = motcles.search(directive);
-  Nom type_elem("Champ_Fonc_Elem_Coloc"), type_champ_vitesse("Champ_Fonc_Vect_Coloc"),type;
-  Nom type_som("Champ_Fonc_Som_PolyMAC"), type_scal = zp1 ? type_som : type_elem; // pas besoin
+  int default_nb_comp = 0,
+      rang = motcles.search(directive);
+
+  Nom type_champ_elem("Champ_Fonc_Elem_Coloc"),
+      type_champ_vect("Champ_Fonc_Vect_Coloc"),
+      type;
+
   switch(rang)
     {
     case 0:
     case 1:
     case 2:
-      type = type_scal;
+    case 3:
+      type = type_champ_elem;
       default_nb_comp = 1;
       break;
     case 4:
     case 5:
-      type = type_champ_vitesse;
-      default_nb_comp = 3;
-      break;
-    case 3:
-      type = type_elem;
-      default_nb_comp = 1;
-      break;
-    case 6:
-      type = type_som;
-      default_nb_comp = 1;
-      break;
-    case 7:
-      type = "Champ_Fonc_Face_PolyMAC"; //Pas besoin
+      type = type_champ_vect;
       default_nb_comp = 3;
       break;
     default:
@@ -226,12 +194,6 @@ void Coloc_discretisation::discretiser_champ_fonc_don(const Motcle& directive, c
   int nb_ddl = 0;
   if ((type == "Champ_Fonc_Elem_Coloc") || (type == "Champ_Fonc_Vect_Coloc"))    // a remplacer par debute_par("Champ_Elem")
     nb_ddl = z.nb_elem();
-// else if (type == "Champ_Fonc_Face_PolyMAC")
-//   nb_ddl = domaine_PolyMAC_P0P1NC.nb_faces();
-// else if (type == "Champ_Fonc_Som_PolyMAC")
-//   nb_ddl = domaine_PolyMAC_P0P1NC.nb_som();
-// else if (type == "Champ_Fonc_Arete_PolyMAC_P0P1NC")
-//   nb_ddl = domaine_PolyMAC_P0P1NC.domaine().nb_aretes();
   else
     assert(0);
 

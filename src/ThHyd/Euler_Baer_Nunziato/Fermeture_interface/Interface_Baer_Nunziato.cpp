@@ -33,4 +33,3 @@ void Interface_Baer_Nunziato::set_param(Param& param) const
   param.ajouter("vitesse", &id_vitesse_interface_ , Param::REQUIRED);
   param.ajouter("pression", &id_pression_interface_, Param::REQUIRED);
 }
-

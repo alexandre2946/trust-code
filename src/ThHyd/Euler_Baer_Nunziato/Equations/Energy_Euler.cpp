@@ -13,36 +13,20 @@
 *
 *****************************************************************************/
 
-//#include <EcritureLectureSpecial.h>
-//#include <Pb_Multiphase_HEM.h>
-#include <Pb_Euler.h>
-#include <Energy_Euler.h>
-#include <Champ_Uniforme.h>
-#include <Matrice_Morse.h>
-#include <Discret_Thyd.h>
-#include <Fluide_base.h>
-#include <Domaine_VF.h>
-#include <TRUSTTrav.h>
-#include <Domaine.h>
-#include <EChaine.h>
-#include <Param.h>
 #include <Momentum_Euler.h>
-#include <Milieu_composite_Euler.h>
-#include <Operateur_Conv.h>
+#include <Energy_Euler.h>
+#include <Discret_Thyd.h>
+#include <Domaine_VF.h>
+#include <Pb_Euler.h>
+#include <Domaine.h>
+#include <Param.h>
 
 Implemente_instanciable(Energy_Euler, "Energy_Euler|Energie_Euler", Conservation_Euler);
-// XD Energy_Euler eqn_base Energy_Euler -1 Internal energy conservation equation for a multi-phase problem where the unknown is the temperature
+// XD energy_euler eqn_base energie_euler -1 Internal energy conservation equation for a multi-phase Euler problem where the unknown is the temperature
 
-Sortie& Energy_Euler::printOn(Sortie& is) const
-{
-  return Equation_base::printOn(is);
-}
+Sortie& Energy_Euler::printOn(Sortie& is) const { return Equation_base::printOn(is); }
 
-Entree& Energy_Euler::readOn(Entree& is)
-{
-  Conservation_Euler::readOn(is);
-  return is;
-}
+Entree& Energy_Euler::readOn(Entree& is) { return Conservation_Euler::readOn(is); }
 
 void Energy_Euler::discretiser()
 {
@@ -62,7 +46,7 @@ void Energy_Euler::discretiser()
   Cerr << "Energy_Euler::discretiser() ok" << finl;
 }
 
-inline DoubleTab Energy_Euler::flux(const int& f, const int& left_or_right) const
+inline DoubleTab Energy_Euler::flux(const int f, const int left_or_right) const
 {
   const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
   const Domaine_VF& dom = ref_cast(Domaine_VF, domaine_dis());
@@ -72,16 +56,11 @@ inline DoubleTab Energy_Euler::flux(const int& f, const int& left_or_right) cons
   const DoubleTab& p = pb.equation_qdm().pression().valeurs();
   const DoubleTab& alpha = pb.equation_fraction().inconnue().valeurs();
   const int e = dom.face_voisins(f, left_or_right);
-  DoubleTab flux_(nb_phases);
+  DoubleTrav flux_(nb_phases);
 
   for (int n = 0; n < nb_phases; n++)
     flux_(n) = (alpha_rhoE(e, n) + alpha(e, n) * p(e, n)) * vit_normale(f, n + left_or_right * nb_phases);
   return flux_;
-}
-
-inline double Energy_Euler::flux_bord(const double& alpha_rhoE_bord, const double& vit_n_bord, const double& alpha_p_bord) const
-{
-  return (alpha_rhoE_bord + alpha_p_bord) * vit_n_bord;
 }
 
 Entree& Energy_Euler::lire_cond_init(Entree& is)
@@ -160,4 +139,3 @@ void Energy_Euler::set_param(Param& param) const
   param.ajouter_non_std("non_conservative_terms", (this));
   param.ajouter_non_std("convection", (this));
 }
-

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -21,8 +21,6 @@
 class Champ_Fonc_Elem_Coloc: public Champ_Fonc_P0_base
 {
   Declare_instanciable(Champ_Fonc_Elem_Coloc);
-public :
-  //Champ_base& affecter_(const Champ_base& ch) override;
 };
 
 #endif /* Champ_Fonc_Elem_Coloc_included */

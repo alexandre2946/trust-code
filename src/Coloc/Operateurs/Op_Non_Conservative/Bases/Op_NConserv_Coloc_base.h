@@ -17,10 +17,10 @@
 #define Op_NConserv_Coloc_base_included
 
 #include <Operateur_NConserv_base.h>
-#include <Domaine_Cl_Coloc.h>
-#include <Domaine_Coloc.h>
 #include <TRUST_Ref.h>
-#include <SFichier.h>
+
+class Domaine_Cl_Coloc;
+class Domaine_Coloc;
 
 class Op_NConserv_Coloc_base : public Operateur_NConserv_base
 {
@@ -29,13 +29,22 @@ public:
   void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&, const Champ_Inc_base&) override;
   void associer_domaine_cl_dis(const Domaine_Cl_dis_base& zcl) override;
   void mettre_a_jour(double temps) override {};
-  int has_interface_blocs() const override {  return 1; }
   void completer() override;
-  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override {Process::exit();};
-  virtual void Abgral_scheme(DoubleTab& num_flux_left, DoubleTab& num_flux_right) const {Process::exit();};
+  int has_interface_blocs() const override { return 1; }
+
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = { }) const override
+  {
+    Process::exit("Op_NConserv_Coloc_base::ajouter_blocs not coded ! \n");
+  }
+
+  virtual void Abgral_scheme(DoubleTab& num_flux_left, DoubleTab& num_flux_right) const
+  {
+    Process::exit("Op_NConserv_Coloc_base::Abgral_scheme not coded ! \n");
+  }
+
 protected:
-  OBS_PTR(Domaine_Coloc) le_dom_poly_;
-  OBS_PTR(Domaine_Cl_Coloc) la_zcl_poly_;
+  OBS_PTR(Domaine_Coloc) le_dom_coloc_;
+  OBS_PTR(Domaine_Cl_Coloc) le_dcl_coloc_;
 };
 
 #endif /*Op_NConserv_Coloc_base_included*/

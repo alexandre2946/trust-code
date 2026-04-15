@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,24 +16,11 @@
 #ifndef Champ_Fonc_Vect_Coloc_included
 #define Champ_Fonc_Vect_Coloc_included
 
-#include <TRUST_Ref.h>
 #include <Champ_Fonc_Elem_Coloc.h>
-
 
 class Champ_Fonc_Vect_Coloc: public Champ_Fonc_Elem_Coloc
 {
   Declare_instanciable(Champ_Fonc_Vect_Coloc);
-public :
-//  void associer_champ(const Champ_Fonc_Elem_Coloc& ch) { la_vitesse_coloc_ = ch; }
-//  void me_calculer(double ) { /* Don nothing for now */ }
-//  void mettre_a_jour(double tps) override
-//  {
-//    me_calculer(tps);
-//    changer_temps(tps);
-//    Champ_Fonc_base::mettre_a_jour(tps);
-//  }
-
-//  OBS_PTR(Champ_Fonc_Elem_Coloc) la_vitesse_coloc_ ;
 };
 
 #endif /* Champ_Fonc_Vect_Coloc_included */

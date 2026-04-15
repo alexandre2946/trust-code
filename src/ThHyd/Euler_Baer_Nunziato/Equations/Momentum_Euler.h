@@ -40,9 +40,7 @@
  */
 class Momentum_Euler : public Navier_Stokes_std
 {
-
   Declare_instanciable(Momentum_Euler);
-
 public :
   void discretiser() override;
   int nombre_d_operateurs() const override {return 3; }
@@ -94,7 +92,6 @@ public :
   void mettre_a_jour_champs_conserves(double temps, int reset) override;
 
 protected:
-
   OWN_PTR(Champ_Inc_base) l_inco_ch_;
   DoubleTab vitesse_son_, vitesse_normale_;
   Entree& lire_cond_init(Entree&) override; //pour lire la pression

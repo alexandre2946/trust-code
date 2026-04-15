@@ -14,39 +14,30 @@
 *****************************************************************************/
 
 #include <Op_NConserv_Coloc_base.h>
-#include <Domaine_Coloc.h>
+#include <Champ_Inc_base.h>
 #include <Domaine_Cl_Coloc.h>
-#include <Champ_Inc_P0_base.h>
-#include <Conservation_Euler.h>
-#include <Pb_Euler.h>
-#include <Momentum_Euler.h>
-#include <Milieu_composite_Euler.h>
-#include <Fluide_reel_base.h>
+#include <Domaine_Coloc.h>
 
 Implemente_base(Op_NConserv_Coloc_base, "Op_NConserv_Coloc_base", Operateur_NConserv_base);
 
-Sortie& Op_NConserv_Coloc_base::printOn(Sortie& os) const
-{
-  return Operateur_NConserv_base::printOn(os);
-}
-Entree& Op_NConserv_Coloc_base::readOn(Entree& is)
-{
-  return Operateur_NConserv_base::readOn(is);
-}
+Sortie& Op_NConserv_Coloc_base::printOn(Sortie& os) const { return Operateur_NConserv_base::printOn(os); }
+
+Entree& Op_NConserv_Coloc_base::readOn(Entree& is) { return Operateur_NConserv_base::readOn(is); }
+
 void Op_NConserv_Coloc_base::completer()
 {
+  assert(le_dom_coloc_.non_nul());
   Operateur_base::completer();
-  assert(le_dom_poly_.non_nul());
 }
 
 void Op_NConserv_Coloc_base::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& zcl, const Champ_Inc_base& inc)
 {
-  le_dom_poly_ = ref_cast(Domaine_Coloc, domaine_dis);
-  la_zcl_poly_ = ref_cast(Domaine_Cl_Coloc, zcl);
+  le_dom_coloc_ = ref_cast(Domaine_Coloc, domaine_dis);
+  le_dcl_coloc_ = ref_cast(Domaine_Cl_Coloc, zcl);
   le_champ_inco = ref_cast(Champ_Inc_base, inc);
 }
 
 void Op_NConserv_Coloc_base::associer_domaine_cl_dis(const Domaine_Cl_dis_base& zcl)
 {
-  la_zcl_poly_ = ref_cast(Domaine_Cl_Coloc, zcl);
+  le_dcl_coloc_ = ref_cast(Domaine_Cl_Coloc, zcl);
 }

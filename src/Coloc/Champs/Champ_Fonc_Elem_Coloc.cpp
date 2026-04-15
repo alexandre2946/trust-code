@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,17 +15,7 @@
 
 #include <Champ_Fonc_Elem_Coloc.h>
 
-#include <Domaine_VF.h>
-
 Implemente_instanciable(Champ_Fonc_Elem_Coloc, "Champ_Fonc_Elem_Coloc", Champ_Fonc_P0_base);
 
 Sortie& Champ_Fonc_Elem_Coloc::printOn(Sortie& s) const { return s << que_suis_je() << " " << le_nom(); }
-
 Entree& Champ_Fonc_Elem_Coloc::readOn(Entree& s) { return s; }
-
-//Champ_base& Champ_Fonc_Elem_Coloc::affecter_(const Champ_base& ch)
-//{
-//  const Domaine_VF& domaine = ref_cast(Domaine_VF, le_dom_VF.valeur());
-//  ch.valeur_aux(domaine.xp(), valeurs());
-//  return *this;
-//}

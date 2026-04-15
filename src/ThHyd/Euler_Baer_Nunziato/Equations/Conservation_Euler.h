@@ -18,34 +18,37 @@
 
 #include <Convection_Diffusion_std.h>
 #include <Operateur_NConserv.h>
-#include <TRUST_Ref.h>
 
 class Fluide_base;
 
 class Conservation_Euler : public Convection_Diffusion_std
 {
-  Declare_instanciable(Conservation_Euler);
+  Declare_base(Conservation_Euler);
 public:
   int nombre_d_operateurs() const override
   {
     Process::exit("Conservation_Euler::nombre_d_operateurs !!!  \n");
     return 1;
   }
+
   const Operateur& operateur(int) const override
   {
     Process::exit("Conservation_Euler::operateur !!!  \n");
     return terme_convectif;
   }
+
   Operateur& operateur(int) override
   {
     Process::exit("Conservation_Euler::operateur !!!  \n");
     return terme_convectif;
   }
+
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
   void completer() override { Equation_base::completer(); }
+
   inline const Champ_Inc_base& inconnue() const override { return l_inco_ch_; }
   inline Champ_Inc_base& inconnue() override { return l_inco_ch_; }
-  int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  double calculer_pas_de_temps() const override { return 1e10; }
+  inline double calculer_pas_de_temps() const override { return 1e10; }
 
   void associer_milieu_base(const Milieu_base&) override;
   void associer_fluide(const Fluide_base&);
@@ -54,25 +57,40 @@ public:
   const Fluide_base& fluide() const;
   Fluide_base& fluide();
 
-  virtual inline DoubleTab flux(const int& f, const int& elem)  const {return 0; Process::exit();}
-  virtual inline double flux_bord(const double& inco_bord, const double& vit_n_bord, const double& p_bord) const {return 0; Process::exit();};
-  virtual inline double termes_NonConservatif(const double& alpha_bord, const double& vitesse_n_inter, const double& p_bord) const {return 0; Process::exit();};
-  // TODO
+  virtual DoubleTab flux(const int f, const int elem) const
+  {
+    Process::exit("Conservation_Euler::flux !!!  \n");
+    return DoubleTab();
+  }
+
+  virtual double flux_bord(const double inco_bord, const double vit_n_bord, const double p_bord) const
+  {
+    Process::exit("Conservation_Euler::flux_bord !!!  \n");
+    return 0;
+  }
+
+  virtual double termes_NonConservatif(const double alpha_bord, const double vitesse_n_inter, const double p_bord) const
+  {
+    Process::exit("Conservation_Euler::termes_NonConservatif !!!  \n");
+    return 0;
+  }
 
   void dimensionner_matrice_sans_mem(Matrice_Morse& matrice) override
   {
     Process::exit("Conservation_Euler::dimensionner_matrice_sans_mem !!!  \n");
   }
+
   int has_interface_blocs() const override
   {
     Process::exit("Conservation_Euler::has_interface_blocs !!!  \n");
     return -1;
   }
+
   void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = { }) const override
   {
     Process::exit("Conservation_Euler::dimensionner_blocs !!!  \n");
   }
-  ;
+
   void assembler_blocs_avec_inertie(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = { }) override
   {
     Process::exit("Conservation_Euler::assembler_blocs_avec_inertie !!!  \n");

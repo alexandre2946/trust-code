@@ -16,7 +16,6 @@
 #ifndef Op_Conv_HLL_Coloc_Vect_included
 #define Op_Conv_HLL_Coloc_Vect_included
 
-
 #include <Op_Conv_Coloc_Vect_base.h>
 
 class Op_Conv_HLL_Coloc_Vect : public Op_Conv_Coloc_Vect_base

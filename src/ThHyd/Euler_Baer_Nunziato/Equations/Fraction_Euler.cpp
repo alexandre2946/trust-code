@@ -13,27 +13,16 @@
 *
 *****************************************************************************/
 
-
-#include <EcritureLectureSpecial.h>
-#include <Pb_Euler.h>
 #include <Fraction_Euler.h>
-#include <Champ_Uniforme.h>
-#include <Matrice_Morse.h>
 #include <Discret_Thyd.h>
-#include <Fluide_base.h>
-#include <Domaine_VF.h>
-#include <TRUSTTrav.h>
+#include <Pb_Euler.h>
 #include <Domaine.h>
-#include <EChaine.h>
 #include <Param.h>
-#include <Momentum_Euler.h>
 
 Implemente_instanciable(Fraction_Euler, "Fraction_Euler", Conservation_Euler);
+// XD fraction_euler eqn_base fraction_euler -1 Void fraction conservation equation for a multi-phase Euler problem where the unknown is the temperature
 
-Sortie& Fraction_Euler::printOn(Sortie& is) const
-{
-  return Equation_base::printOn(is);
-}
+Sortie& Fraction_Euler::printOn(Sortie& is) const { return Equation_base::printOn(is); }
 
 Entree& Fraction_Euler::readOn(Entree& is)
 {

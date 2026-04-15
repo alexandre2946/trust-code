@@ -15,9 +15,7 @@
 
 #include <Op_NConserv_Coloc_Elem_base.h>
 
-
-Implemente_base(Op_NConserv_Coloc_Elem_base,"Op_NConserv_Coloc_Elem_base",Op_NConserv_Coloc_base);
+Implemente_base(Op_NConserv_Coloc_Elem_base, "Op_NConserv_Coloc_Elem_base", Op_NConserv_Coloc_base);
 
 Sortie& Op_NConserv_Coloc_Elem_base::printOn(Sortie& os) const { return Op_NConserv_Coloc_base::printOn(os); }
 Entree& Op_NConserv_Coloc_Elem_base::readOn(Entree& is) { Op_NConserv_Coloc_base::readOn(is);  return is; }
-

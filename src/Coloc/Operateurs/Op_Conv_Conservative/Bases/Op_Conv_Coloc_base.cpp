@@ -14,9 +14,9 @@
 *****************************************************************************/
 
 #include <Op_Conv_Coloc_base.h>
-#include <Domaine_Coloc.h>
 #include <Domaine_Cl_Coloc.h>
-#include <Champ_Inc_P0_base.h>
+#include <Champ_Inc_base.h>
+#include <Domaine_Coloc.h>
 
 Implemente_base(Op_Conv_Coloc_base,"Op_Conv_Coloc_base",Operateur_Conv_base);
 
@@ -25,44 +25,41 @@ Entree& Op_Conv_Coloc_base::readOn(Entree& is) { Operateur_Conv_base::readOn(is)
 
 void Op_Conv_Coloc_base::completer()
 {
+  assert(le_dom_coloc_.non_nul());
   Operateur_base::completer();
-  assert(le_dom_poly_.non_nul());
 }
 
 void Op_Conv_Coloc_base::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& zcl, const Champ_Inc_base& inc)
 {
-  le_dom_poly_ = ref_cast(Domaine_Coloc, domaine_dis);
-  la_zcl_poly_ = ref_cast(Domaine_Cl_Coloc, zcl);
+  le_dom_coloc_ = ref_cast(Domaine_Coloc, domaine_dis);
+  le_dcl_coloc_ = ref_cast(Domaine_Cl_Coloc, zcl);
   le_champ_inco = ref_cast(Champ_Inc_base,inc);
-
 }
 
 void Op_Conv_Coloc_base::associer_domaine_cl_dis(const Domaine_Cl_dis_base& zcl)
 {
-  la_zcl_poly_ = ref_cast(Domaine_Cl_Coloc, zcl);
+  le_dcl_coloc_ = ref_cast(Domaine_Cl_Coloc, zcl);
 }
 
 void Op_Conv_Coloc_base::ajouter_blocs(matrices_t mats, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
 
-  const Domaine_Coloc& domaine = ref_cast(Domaine_Coloc,le_dom_poly_.valeur());
+  const Domaine_Coloc& domaine = ref_cast(Domaine_Coloc, le_dom_coloc_.valeur());
   const DoubleVect& fs = domaine.face_surfaces();
   const IntTab& f_e = domaine.face_voisins();
   const int n = secmem.line_size();
   const int N = domaine.nb_faces_tot();
-  DoubleTab num_flux(N,n);
+  DoubleTrav num_flux(N, n);
   Riemann_solver(num_flux);
 
   for (int f = 0; f < N; f++)
-    {
-      for (int i = 0; i < 2; i++)
-        {
-          int e = f_e(f, i);
-          if ( e >= 0 && e < domaine.nb_elem())
-            {
-              for ( int k = 0; k < n; k++)
-                secmem(e,k) -= (i ? -1 : 1) * num_flux(f,k) * fs(f);
-            }
-        }
-    }
+    for (int i = 0; i < 2; i++)
+      {
+        const int e = f_e(f, i);
+        if (e >= 0 && e < domaine.nb_elem())
+          {
+            for (int k = 0; k < n; k++)
+              secmem(e, k) -= (i ? -1 : 1) * num_flux(f, k) * fs(f);
+          }
+      }
 }

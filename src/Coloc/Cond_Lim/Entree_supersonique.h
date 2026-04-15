@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -23,4 +23,4 @@ class Entree_supersonique  : public Entree_fluide_alpha_impose
   Declare_instanciable(Entree_supersonique);
 };
 
-#endif
+#endif /* Entree_supersonique_included */

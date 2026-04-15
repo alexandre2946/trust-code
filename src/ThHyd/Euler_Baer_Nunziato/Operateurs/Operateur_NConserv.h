@@ -21,62 +21,19 @@
 #include <Operateur.h>
 #include <TRUST_Ref.h>
 
-class Champ_base;
-
-/*! @brief classe Operateur_Conv Classe generique de la hierarchie des operateurs representant un terme
- *
- *     de convection. Un objet Operateur_Conv peut referencer n'importe quel
- *     objet derivant de Operateur_Conv_base.
- *
- * @sa Operateur_Conv_base Operateur
- */
 class Operateur_NConserv  : public Operateur, public OWN_PTR(Operateur_NConserv_base)
 {
   Declare_instanciable(Operateur_NConserv);
 public :
 
-  inline Operateur_base& l_op_base() override;
-  inline const Operateur_base& l_op_base() const override;
+  inline void typer(const Nom& a_type) { OWN_PTR(Operateur_NConserv_base)::typer(a_type); }
+  inline Operateur_base& l_op_base() override { return valeur(); }
+  inline const Operateur_base& l_op_base() const override { return valeur(); }
+  inline int op_non_nul() const override { return non_nul(); }
+
   DoubleTab& ajouter(const DoubleTab&, DoubleTab& ) const override;
   DoubleTab& calculer(const DoubleTab&, DoubleTab& ) const override;
   void typer() override;
-  inline void typer(const Nom&);
-  inline int op_non_nul() const override;
-
 };
 
-/*! @brief Renvoie l'objet sous-jacent upcaste en Operateur_base
- *
- * @return (Operateur_base&) l'objet sous-jacent upcaste en Operateur_base
- */
-inline Operateur_base& Operateur_NConserv::l_op_base()
-{
-  return valeur();
-}
-/*! @brief Renvoie l'objet sous-jacent upcaste en Operateur_base (version const)
- *
- * @return (Operateur_base&) l'objet sous-jacent upcaste en Operateur_base
- */
-inline const Operateur_base& Operateur_NConserv::l_op_base() const
-{
-  return valeur();
-}
-
-
-/*! @brief Type l'operateur.
- *
- * @param (Nom& typ) le nom representant le type de l'operateur
- */
-inline void Operateur_NConserv::typer(const Nom& a_type)
-{
-  OWN_PTR(Operateur_NConserv_base)::typer(a_type);
-}
-
-inline int Operateur_NConserv::op_non_nul() const
-{
-  if (non_nul())
-    return 1;
-  else
-    return 0;
-}
-#endif
+#endif /* Operateur_NConserv_included */

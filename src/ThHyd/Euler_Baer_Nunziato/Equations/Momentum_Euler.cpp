@@ -13,54 +13,21 @@
 *
 *****************************************************************************/
 
-#include <Operateur_Diff_base.h>
-#include <Discretisation_base.h>
+#include <Milieu_composite_Euler.h>
 #include <Schema_Temps_base.h>
-#include <Pb_Multiphase_HEM.h>
 #include <Champ_Composite.h>
 #include <TRUSTTab_parts.h>
 #include <Momentum_Euler.h>
 #include <Discret_Thyd.h>
 #include <Fluide_base.h>
-#include <EChaine.h>
+#include <Pb_Euler.h>
 #include <Param.h>
 #include <vector>
-#include <Nom.h>
-#include <Pb_Euler.h>
-#include <Milieu_composite_Euler.h>
 
 Implemente_instanciable(Momentum_Euler,"Momentum_Euler|QDM_Euler",Navier_Stokes_std);
-// XD Momentum_Euler eqn_base Momentum_Euler -1 Momentum conservation equation for a multi-phase problem where the unknown is the velocity
-// XD attr solveur_pression solveur_sys_base solveur_pression 1 Linear pressure system resolution method.
-// XD attr evanescence bloc_lecture evanescence 1 Management of the vanishing phase (when alpha tends to 0 or 1)
+// XD momentum_euler eqn_base qdm_euler -1 Momentum conservation equation for a multi-phase Euler problem where the unknown is the velocity
 
-// evanescence interprete evanescence 1 Management of the vanishing phase (when alpha tends to 0 or 1)
-// attr homogene chaine homogene 1 Vanishing phases management : tends to homogeneous model when a phase vanishes (vl = vg)
-// attr bloc_val bloc_lecture bloc_val 1 not set
-
-// bloc_lecture interprete nul 1 not set
-// attr alpha_res_min flottant alpha_res_min 0 Activation threshold for full replacement of vanishing phase equation (default value : 0)
-// attr alpha_res flottant alpha_res 0 Activation threshold for gradual replacement of vanishing phase equation (tends to full replacement when alpha tends to alpha_res_min)
-
-Sortie& Momentum_Euler::printOn(Sortie& is) const
-{
-  return Equation_base::printOn(is);
-}
-
-/*! @brief Appel Equation_base::readOn(Entree& is) En sortie verifie que l'on a bien lu:
- *
- *         - le terme diffusif,
- *         - le terme convectif,
- *         - le solveur en pression
- *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws terme diffusif non specifie dans jeu de donnees, specifier
- * un type negligeable pour l'operateur si il est a negliger
- * @throws terme convectif non specifie dans jeu de donnees, specifier
- * un type negligeable pour l'operateur si il est a negliger
- * @throws solveur pression non defini dans jeu de donnees
- */
+Sortie& Momentum_Euler::printOn(Sortie& is) const { return Equation_base::printOn(is); }
 
 Entree& Momentum_Euler::readOn(Entree& is)
 {
@@ -204,7 +171,6 @@ void Momentum_Euler::completer()
   vitesse_son_.resize(dom.nb_elem_tot(), pb.nb_phases());
 
   vitesse_normale_.resize(dom.nb_faces_tot(), 2 * pb.nb_phases()); // dimension du tab à changer pour 3 pahses
-
 }
 
 void Momentum_Euler::get_noms_champs_postraitables(Noms& noms, Option opt) const
@@ -226,15 +192,12 @@ void Momentum_Euler::get_noms_champs_postraitables(Noms& noms, Option opt) const
 void Momentum_Euler::creer_champ(const Motcle& motlu)
 {
   Navier_Stokes_std::creer_champ(motlu);
-//  if (la_vorticite.non_nul())
-//    if (grad_u.est_nul()) creer_champ("gradient_vitesse");
   int i = noms_vit_phases_.rang(motlu);
   if (i >= 0 && vit_phases_[i].est_nul())
     {
       discretisation().discretiser_champ("vitesse", domaine_dis(), noms_vit_phases_[i], "m/s", dimension, 1, 0, vit_phases_[i]);
       champs_compris_.ajoute_champ(vit_phases_[i]);
     }
-
 }
 
 Entree& Momentum_Euler::lire_cond_init(Entree& is)
@@ -357,13 +320,9 @@ int Momentum_Euler::sauvegarder(Sortie& os) const
 {
   int bytes = 0;
   bytes += Equation_base::sauvegarder(os);
-  //bytes += la_pression->sauvegarder(os);
-  //La methode sauver() assurant la sauvegarde pour le traitement particulier
-  //est maintenant appelee ici au lieu d etre appelee dans des problemes particuliers
   sauver();
 
   return bytes;
-
 }
 
 DoubleTab& Momentum_Euler::corriger_derivee_expl(DoubleTab& derivee)
@@ -388,7 +347,6 @@ void Momentum_Euler::mettre_a_jour_p_c()
 {
   ref_cast(Milieu_composite_Euler,milieu()).calculer_pression(pression().valeurs());
   ref_cast(Milieu_composite_Euler,milieu()).calculer_vitesse_son(vitesse_son());
-  //vitesse_son : doubleTab vers champ_Inc_ TODO
 }
 
 double Momentum_Euler::calculer_pas_de_temps() const
@@ -426,17 +384,17 @@ void Momentum_Euler::init_alpha_rho_u()
   const DoubleTab& alpha_rho = ref_cast(Pb_Euler,probleme()).equation_masse().inconnue().valeurs();
   DoubleTab& alpha_rhoU = inconnue().valeurs();
 
-  int i, j, n, Nb_phase = ref_cast(Pb_Euler, probleme()).nb_phases(), d, D = dimension;
-  for (n = 0; n < Nb_phase; n++)
+  const int Nb_phase = ref_cast(Pb_Euler, probleme()).nb_phases(), D = Objet_U::dimension;
+  for (int n = 0; n < Nb_phase; n++)
     {
       assert(vit_phases_[n].non_nul());
       DoubleTab_parts psrc(vitesse().valeurs()), pdst(vit_phases_[n]->valeurs());
-      for (i = 0; i < std::min(psrc.size(), pdst.size()); i++)
+      for (int i = 0; i < std::min(psrc.size(), pdst.size()); i++)
         {
           DoubleTab& src = psrc[i], &dst = pdst[i];
           assert(src.line_size() == Nb_phase * D);
-          for (j = 0; j < src.dimension_tot(0); j++)
-            for (d = 0; d < D; d++)
+          for (int j = 0; j < src.dimension_tot(0); j++)
+            for (int d = 0; d < D; d++)
               {
                 dst(j, d) = src(j, Nb_phase * d + n);
                 alpha_rhoU(j, Nb_phase * d + n) = src(j, Nb_phase * d + n) * alpha_rho(j, n);
@@ -449,18 +407,18 @@ void Momentum_Euler::calculer_vitesse()
 {
   const DoubleTab& alpha_rho = ref_cast(Pb_Euler,probleme()).equation_masse().inconnue().valeurs();
   DoubleTab& U = vitesse().valeurs();
-  int i, j, n, Nb_phase = ref_cast(Pb_Euler, probleme()).nb_phases(), d, D = dimension;
+  const int Nb_phase = ref_cast(Pb_Euler, probleme()).nb_phases(), D = Objet_U::dimension;
 
-  for (n = 0; n < Nb_phase; n++)
+  for (int n = 0; n < Nb_phase; n++)
     {
       DoubleTab_parts psrc(inconnue().valeurs()), pdst(vit_phases_[n]->valeurs());
 
-      for (i = 0; i < std::min(psrc.size(), pdst.size()); i++)
+      for (int i = 0; i < std::min(psrc.size(), pdst.size()); i++)
         {
           DoubleTab& src = psrc[i], &dst = pdst[i];
           assert(src.line_size() == Nb_phase * D);
-          for (j = 0; j < src.dimension_tot(0); j++)
-            for (d = 0; d < D; d++)
+          for (int j = 0; j < src.dimension_tot(0); j++)
+            for (int d = 0; d < D; d++)
               {
                 dst(j, d) = src(j, Nb_phase * d + n) / alpha_rho(j, n);
                 U(j, Nb_phase * d + n) = src(j, Nb_phase * d + n) / alpha_rho(j, n);
@@ -488,7 +446,7 @@ void Momentum_Euler::calculer_vitesse_normale()
   const DoubleTab& U = vitesse().valeurs();
   const IntTab& f_e = dom.face_voisins();
   DoubleTab& u_n = vitesse_normale();
-  assert(dimension == 2);
+  assert(Objet_U::dimension == 2);
   for (int n = 0; n < Nb_phase; n++)
     {
       for (int f = 0; f < dom.nb_faces_tot(); f++)
@@ -516,11 +474,11 @@ DoubleTab Momentum_Euler::flux_(const int& f, const int& left_or_right) const
   const int nb_phases = pb.nb_phases();
   const int e = dom.face_voisins(f, left_or_right);
   DoubleTab res_(alpha_rhoU.line_size());
-  assert(dimension == 2);
+  assert(Objet_U::dimension == 2);
 
   for (int n = 0; n < nb_phases; n++)
     {
-      for (int d = 0; d < dimension; d++)
+      for (int d = 0; d < Objet_U::dimension; d++)
         {
           double vect_n_compo = dom.face_normales(f, d) / dom.face_surfaces(f);
           res_(n + nb_phases * d) = vect_n_compo * alpha(e, n) * p(e, n) + alpha_rhoU(e, n + nb_phases * d) * vit_normale(f, n + left_or_right * nb_phases);

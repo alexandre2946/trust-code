@@ -24,7 +24,7 @@ class Domaine_Coloc : public Domaine_Poly_base
 public:
   void discretiser() override;
   void modifier_pour_Cl(const Conds_lim& ) override;
-  void calculer_volumes_entrelaces() override { /* hahaah */}
+  void calculer_volumes_entrelaces() override { /* hahaah */ }
   void calculer_h_carre() override;
   void init_equiv() const override { }
 };

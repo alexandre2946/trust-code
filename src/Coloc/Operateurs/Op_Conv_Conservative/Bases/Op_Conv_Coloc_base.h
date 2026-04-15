@@ -17,8 +17,9 @@
 #define Op_Conv_Coloc_base_included
 
 #include <Operateur_Conv_base.h>
-#include <Domaine_Cl_Coloc.h>
-#include <Domaine_Coloc.h>
+
+class Domaine_Cl_Coloc;
+class Domaine_Coloc;
 
 class Op_Conv_Coloc_base : public Operateur_Conv_base
 {
@@ -35,13 +36,13 @@ public:
   virtual void Riemann_solver(DoubleTab& num_flux) const = 0;
   virtual void scheme(DoubleTab&, const int&) const = 0;
 
-  double calculer_dt_stab() const override { return 1e8; }
+  double calculer_dt_stab() const override { return 1.e8; }
 
   int impr(Sortie& os) const override { return 1; }
 
 protected:
-  OBS_PTR(Domaine_Coloc) le_dom_poly_;
-  OBS_PTR(Domaine_Cl_Coloc) la_zcl_poly_;
+  OBS_PTR(Domaine_Coloc) le_dom_coloc_;
+  OBS_PTR(Domaine_Cl_Coloc) le_dcl_coloc_;
 };
 
 #endif /*Op_Conv_Coloc_base_included*/

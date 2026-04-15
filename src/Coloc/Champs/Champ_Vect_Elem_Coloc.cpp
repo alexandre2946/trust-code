@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,16 +14,6 @@
 *****************************************************************************/
 
 #include <Champ_Vect_Elem_Coloc.h>
-//#include <Domaine_Cl_dis_base.h>
-//#include <Dirichlet_homogene.h>
-//#include <Neumann_homogene.h>
-//#include <Pb_Euler.h>
-//#include <Periodique.h>
-//#include <Dirichlet.h>
-//#include <Symetrie.h>
-//#include <Neumann.h>
-//#include <Navier.h>
-
 #include <Domaine_Cl_dis_base.h>
 #include <Dirichlet_homogene.h>
 #include <Neumann_homogene.h>
@@ -36,12 +26,6 @@
 Implemente_instanciable(Champ_Vect_Elem_Coloc, "Champ_Vect_Elem_Coloc", Champ_Elem_Coloc);
 Sortie& Champ_Vect_Elem_Coloc::printOn(Sortie& s) const { return s << que_suis_je() << " " << le_nom(); }
 Entree& Champ_Vect_Elem_Coloc::readOn(Entree& s) { return s; }
-
-//void Champ_Vect_Elem_Coloc::init_fcl() const
-//{
-//  Champ_Inc_P0_base::init_fcl();
-//
-//}
 
 void Champ_Vect_Elem_Coloc::init_fcl() const
 {
@@ -68,61 +52,3 @@ void Champ_Vect_Elem_Coloc::init_fcl() const
     }
   fcl_init_ = 1;
 }
-
-
-
-//
-//const Domaine_Coloc& Champ_Vect_Elem_Coloc::domaine_Coloc() const
-//{
-//  return ref_cast(Domaine_Coloc, le_dom_VF.valeur());
-//}
-//
-//int Champ_Vect_Elem_Coloc::nb_valeurs_nodales() const
-//{
-//  return domaine_Coloc().nb_elem()*nb_compo_; //// pas nb d elem
-//}
-//
-//int Champ_Vect_Elem_Coloc::reprendre(Entree& fich)
-//{
-//  if (! via_ch_fonc_reprise()) return Champ_Inc_base::reprendre(fich); /* ie: resume last time ! */
-//  ////////////////
-//  const Pb_Euler * pbm = mon_equation_non_nul() ? (sub_type(Pb_Euler, equation().probleme()) ? &ref_cast(Pb_Euler, equation().probleme()) : nullptr) : nullptr; // pourquoi cela ?????
-//  if (pbm) return Champ_Inc_base::reprendre(fich);
-//
-//  // sinon on fait ca ...
-//  const Domaine_Coloc* domaine = le_dom_VF.non_nul() ? &ref_cast( Domaine_Coloc,le_dom_VF.valeur()) : nullptr;
-//  valeurs().set_md_vector(MD_Vector()); //on enleve le MD_Vector...
-//  valeurs().resize(0);
-//  int ret = Champ_Inc_base::reprendre(fich);
-//  //et on remet le bon si on peut
-//  //if (domaine) valeurs().set_md_vector(valeurs().dimension_tot(0) > domaine->nb_elem_tot() ? domaine->mdv_elems_faces : domaine->domaine().md_vector_elements()); // pas besoin de ce test
-//  if (domaine) valeurs().set_md_vector(domaine->domaine().md_vector_elements());
-//  return ret;
-//}
-//
-////int Champ_Vect_Elem_Coloc::fixer_nb_valeurs_nodales(int n)
-////{
-////  //// Non : pas correcte ; tab dim=1
-////  assert(n == domaine_dis_base().domaine().nb_elem());
-////
-////  // Probleme: nb_comp vaut dimension mais on ne veut qu'une dimension !!!
-////  // HACK :
-////  int old_nb_compo = nb_compo_;
-////  if(nb_compo_ != 1) nb_compo_ /= dimension;
-////
-////  /* variables : valeurs normales aux faces, puis valeurs aux elements par blocs -> pour que line_size() marche */
-////  creer_tableau_distribue(domaine_dis_base().domaine().md_vector_elements());
-////  nb_compo_ = old_nb_compo;
-////  return n;
-////}
-//
-//
-//int Champ_Vect_Elem_Coloc::fixer_nb_valeurs_nodales(int n)
-//{
-//  assert (n == domaine_dis_base().domaine().nb_elem()*nb_compo_); /// a modifier comp$*n
-//  creer_tableau_distribue(domaine_dis_base().domaine().md_vector_elements());
-//  return n;
-//}
-
-
-

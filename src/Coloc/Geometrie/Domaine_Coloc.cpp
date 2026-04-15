@@ -26,7 +26,7 @@ void Domaine_Coloc::discretiser()
 {
   Domaine_Poly_base::discretiser();
   calculer_h_carre();
-  discretiser_aretes();
+// discretiser_aretes();
 }
 
 void Domaine_Coloc::calculer_h_carre()
@@ -58,79 +58,12 @@ void Domaine_Coloc::calculer_h_carre()
 
 void Domaine_Coloc::modifier_pour_Cl(const Conds_lim& conds_lim)
 {
-  Cerr << "Le Domaine_PolyMAC_CDO a ete rempli avec succes" << finl;
-  //      calculer_h_carre();
-
-  Journal() << "Domaine_PolyMAC_CDO::Modifier_pour_Cl" << finl;
-  int nb_cond_lim=conds_lim.size();
-  int num_cond_lim=0;
-  for (; num_cond_lim<nb_cond_lim; num_cond_lim++)
+  Cerr << "Le Domaine_Coloc a ete rempli avec succes" << finl;
+  for (int num_cond_lim=0; num_cond_lim<conds_lim.size(); num_cond_lim++)
     {
-      //for cl
       const Cond_lim_base& cl = conds_lim[num_cond_lim].valeur();
       if (sub_type(Periodique, cl))
-        {
-          //if Perio
-          const Periodique& la_cl_period = ref_cast(Periodique,cl);
-          int nb_faces_elem = domaine().nb_faces_elem();
-          const Front_VF& la_front_dis = ref_cast(Front_VF,cl.frontiere_dis());
-          int ndeb = 0;
-          int nfin = la_front_dis.nb_faces_tot();
-#ifndef NDEBUG
-          int num_premiere_face = la_front_dis.num_premiere_face();
-          int num_derniere_face = num_premiere_face+nfin;
-#endif
-          int nbr_faces_bord = la_front_dis.nb_faces();
-          assert((nb_faces()==0)||(ndeb<nb_faces()));
-          assert(nfin>=ndeb);
-          int elem1,elem2,k;
-          int face;
-          // Modification des tableaux face_voisins_ , face_normales_ , volumes_entrelaces_
-          // On change l'orientation de certaines normales
-          // de sorte que les normales aux faces de periodicite soient orientees
-          // de face_voisins(la_face_en_question,0) vers face_voisins(la_face_en_question,1)
-          // comme le sont les faces internes d'ailleurs
-
-          DoubleVect C1C2(dimension);
-          double vol,psc=0;
-
-          for (int ind_face=ndeb; ind_face<nfin; ind_face++)
-            {
-              //for ind_face
-              face = la_front_dis.num_face(ind_face);
-              if  ( (face_voisins_(face,0) == -1) || (face_voisins_(face,1) == -1) )
-                {
-                  int faassociee = la_front_dis.num_face(la_cl_period.face_associee(ind_face));
-                  if (ind_face<nbr_faces_bord)
-                    {
-                      assert(faassociee>=num_premiere_face);
-                      assert(faassociee<num_derniere_face);
-                    }
-
-                  elem1 = face_voisins_(face,0);
-                  elem2 = face_voisins_(faassociee,0);
-                  vol = (volumes_[elem1] + volumes_[elem2])/nb_faces_elem;
-                  volumes_entrelaces_[face] = vol;
-                  volumes_entrelaces_[faassociee] = vol;
-                  face_voisins_(face,1) = elem2;
-                  face_voisins_(faassociee,0) = elem1;
-                  face_voisins_(faassociee,1) = elem2;
-                  psc = 0;
-                  for (k=0; k<dimension; k++)
-                    {
-                      C1C2[k] = xv_(face,k) - xp_(face_voisins_(face,0),k);
-                      psc += face_normales_(face,k)*C1C2[k];
-                    }
-
-                  if (psc < 0)
-                    for (k=0; k<dimension; k++)
-                      face_normales_(face,k) *= -1;
-
-                  for (k=0; k<dimension; k++)
-                    face_normales_(faassociee,k) = face_normales_(face,k);
-                }
-            }
-        }
+        Process::exit("Domaine_Coloc::modifier_pour_Cl not coded for Periodic BC \n");
     }
 
   // PQ : 10/10/05 : les faces periodiques etant a double contribution

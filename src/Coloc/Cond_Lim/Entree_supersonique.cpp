@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,16 +15,9 @@
 
 #include <Entree_supersonique.h>
 
-Implemente_instanciable(Entree_supersonique,"Entree_supersonique",Entree_fluide_alpha_impose);
+Implemente_instanciable(Entree_supersonique, "Entree_supersonique", Entree_fluide_alpha_impose);
 
-Sortie& Entree_supersonique::printOn(Sortie& s ) const
-{
-  return s << que_suis_je() << finl;
-}
+// XD entree_supersonique frontiere_ouverte_alpha_impose entree_supersonique -1 Supersonic inlet boundary condition.
 
-Entree& Entree_supersonique::readOn(Entree& s )
-{
-  Entree_fluide_alpha_impose::readOn(s);
-  return s ;
-}
-
+Sortie& Entree_supersonique::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
+Entree& Entree_supersonique::readOn(Entree& s) { return Entree_fluide_alpha_impose::readOn(s); }

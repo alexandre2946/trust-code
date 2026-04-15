@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,5 +20,3 @@ Implemente_instanciable(Masse_Coloc_Vect, "Masse_Coloc_Vect", Masse_Coloc_Elem);
 Sortie& Masse_Coloc_Vect::printOn(Sortie& s) const { return s << que_suis_je() << " " << le_nom(); }
 
 Entree& Masse_Coloc_Vect::readOn(Entree& s) { return s ; }
-
-

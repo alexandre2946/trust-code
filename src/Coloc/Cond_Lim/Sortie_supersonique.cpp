@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,17 +15,19 @@
 
 #include <Sortie_supersonique.h>
 
-Implemente_instanciable(Sortie_supersonique,"Sortie_supersonique",Symetrie);
+Implemente_instanciable(Sortie_supersonique, "Sortie_supersonique", Symetrie);
 
-Sortie& Sortie_supersonique::printOn(Sortie& s ) const
+// XD sortie_supersonique symetrie sortie_supersonique -1 Outlet supersonic boundary condition
+
+Sortie& Sortie_supersonique::printOn(Sortie& s) const
 {
   return s << que_suis_je() << finl;
 }
 
-Entree& Sortie_supersonique::readOn(Entree& s )
+Entree& Sortie_supersonique::readOn(Entree& s)
 {
   le_champ_front.typer("Champ_front_uniforme");
   le_champ_front->fixer_nb_comp(0);
-  return s ;
+  return s;
 }
 

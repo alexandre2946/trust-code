@@ -13,9 +13,7 @@
 *
 *****************************************************************************/
 
-#include <Discretisation_base.h>
 #include <Operateur_NConserv.h>
-#include <Champ_base.h>
 
 Implemente_instanciable(Operateur_NConserv, "Operateur_NConserv", OWN_PTR(Operateur_NConserv_base));
 
