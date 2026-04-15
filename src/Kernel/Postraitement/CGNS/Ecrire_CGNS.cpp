@@ -156,6 +156,8 @@ void Ecrire_CGNS::cgns_open_file()
     }
   else
     cgns_helper_.cgns_open_file<TYPE_RUN_CGNS::SEQ>(fn, fileId_);
+
+  singlefile_open_ = true;
 }
 
 void Ecrire_CGNS::fill_infos_loc()
