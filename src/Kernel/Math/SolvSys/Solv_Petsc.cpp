@@ -1456,7 +1456,25 @@ void Solv_Petsc::create_solver(Entree& entree)
 
                   PCShellGetContext(pc_apply,(void**) &pcstruct);
                   OWN_PTR(PCShell_base)& pcs=pcstruct->pc_shell;
-                  return pcs->computePC(pc_apply,x,y);
+                  return pcs->computePC_(pc_apply,x,y);
+                };
+
+                auto PCShellUserPreSolve =  [](PC pc_apply, KSP ksp_apply, Vec x, Vec y)
+                {
+                  PCstruct *pcstruct;
+
+                  PCShellGetContext(pc_apply,(void**) &pcstruct);
+                  OWN_PTR(PCShell_base)& pcs=pcstruct->pc_shell;
+                  return pcs->preSolve_(pc_apply, ksp_apply, x, y);
+                };
+
+                auto PCShellUserPostSolve =  [](PC pc_apply, KSP ksp_apply, Vec x, Vec y)
+                {
+                  PCstruct *pcstruct;
+
+                  PCShellGetContext(pc_apply,(void**) &pcstruct);
+                  OWN_PTR(PCShell_base)& pcs=pcstruct->pc_shell;
+                  return pcs->postSolve_(pc_apply, ksp_apply, x, y);
                 };
 
                 auto PCShellUserDestroy =  [](PC pc_apply)
@@ -1465,13 +1483,14 @@ void Solv_Petsc::create_solver(Entree& entree)
 
                   PCShellGetContext(pc_apply,(void**) &pcstruct);
                   OWN_PTR(PCShell_base)& pcs=pcstruct->pc_shell;
-                  return pcs->destroyPC(pc_apply);
+                  return pcs->destroyPC_(pc_apply);
                 };
 
                 PCShellSetApply(PreconditionneurPetsc_, PCShellUserApply);
                 PCShellSetContext(PreconditionneurPetsc_, &pc_user_);
                 PCShellSetDestroy(PreconditionneurPetsc_, PCShellUserDestroy);
-
+                PCShellSetPreSolve(PreconditionneurPetsc_, PCShellUserPreSolve); //to apply action on operators before the kspsolve
+                PCShellSetPostSolve(PreconditionneurPetsc_, PCShellUserPostSolve); //to apply action on operators after the kspsolve
                 break;
               }
             case 16:
@@ -2231,7 +2250,7 @@ int Solv_Petsc::solve(ArrOfDouble& residu)
       if (type_pc_ == "shell" && !reuse_preconditioner())
         {
           OWN_PTR(PCShell_base)& pcs=pc_user_.pc_shell;
-          pcs->setUpPC(PreconditionneurPetsc_, MatricePetsc_, SolutionPetsc_);
+          pcs->setUpPC_(PreconditionneurPetsc_, SolveurPetsc_, MatricePetsc_, SecondMembrePetsc_);
         }
       else
         KSPSetReusePreconditioner(SolveurPetsc_, (PetscBool) reuse_preconditioner()); // Default PETSC_FALSE

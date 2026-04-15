@@ -29,9 +29,11 @@ class PCShell_base : public Objet_U
 public :
 #ifdef PETSCKSP_H
 
-  virtual PetscErrorCode setUpPC(PC, Mat, Vec) = 0;
-  virtual PetscErrorCode computePC(PC, Vec, Vec) = 0;
-  virtual PetscErrorCode destroyPC(PC) = 0;
+  virtual PetscErrorCode setUpPC_(PC, KSP, Mat, Vec) = 0;
+  virtual PetscErrorCode computePC_(PC, Vec, Vec) = 0;
+  virtual PetscErrorCode destroyPC_(PC) = 0;
+  virtual PetscErrorCode preSolve_(PC, KSP, Vec, Vec) = 0;
+  virtual PetscErrorCode postSolve_(PC, KSP, Vec, Vec) = 0;
 #endif
 };
 
