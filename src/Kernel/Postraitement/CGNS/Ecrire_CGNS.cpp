@@ -1191,6 +1191,7 @@ void Ecrire_CGNS::cgns_build_connectivity_sections_par_in_zone(const CGNS_TYPE c
                                                                const TRUST_2_CGNS& TRUST2CGNS, const int ind_base_zone,
                                                                const int ne_tot, int& sectionId, int& sectionId2 ) const
 {
+#ifdef MPI_
   cgsize_t start = -123, end = -123;
   if (cgns_type_elem == CGNS_ENUMV(NGON_n)) // cas polyedre
     {
@@ -1238,12 +1239,14 @@ void Ecrire_CGNS::cgns_build_connectivity_sections_par_in_zone(const CGNS_TYPE c
       if (cgp_section_write(fileId_, baseId_[ind_base_zone], zoneId_[ind_base_zone], "Elem", cgns_type_elem, start, end, 0, &sectionId) != CG_OK)
         Cerr << "Error Ecrire_CGNS::cgns_write_domaine_par_in_zone : cgp_section_write !" << finl, TRUST_CGNS_ERROR();
     }
+#endif
 }
 
 void Ecrire_CGNS::cgns_write_connectivity_par_in_zone(const CGNS_TYPE cgns_type_elem, const bool is_polyedre,
                                                       const TRUST_2_CGNS& TRUST2CGNS, const int ind_base_zone,
                                                       const int sectionId, const int sectionId2) const
 {
+#ifdef MPI_
   const bool enter_group_comm = is_comm_group_mode();
 
   const int proc_me = enter_group_comm ? TRUST2CGNS.get_proc_me_local_comm() : Process::me();
@@ -1307,6 +1310,7 @@ void Ecrire_CGNS::cgns_write_connectivity_par_in_zone(const CGNS_TYPE cgns_type_
       if (cgp_elements_write_data(fileId_, baseId_[ind_base_zone], zoneId_[ind_base_zone], sectionId, min, max, elems.data()) != CG_OK)
         Cerr << "Error Ecrire_CGNS::cgns_write_domaine_par_in_zone : cgp_elements_write_data !" << finl, TRUST_CGNS_ERROR();
     }
+#endif
 }
 
 void Ecrire_CGNS::cgns_write_field_par_in_zone(const int comp, const double temps, const Nom& id_du_champ, const Nom& id_du_domaine, const Nom& localisation, const Nom& nom_dom, const DoubleTab& valeurs)
