@@ -73,6 +73,23 @@ public :
   virtual std::map<std::string, std::array<double, 2>> unknown_range() const { return {}; }
   virtual std::map<std::string, std::array<double, 2>> unknown_range_h() const { return {}; }
 
+  // Methodes utilisees uniquement dans Pb_Euler
+  inline virtual double calculer_vitesse_son(const double& rho, const double& p) const
+  {
+    Process::exit("Fluide_reel_base::calculer_vitesse_son is not implemented for your fluid !!! To call only for Pb_Euler also ... \n");
+    return 0.;
+  }
+  inline virtual double calculer_pression(const double& rho, const double& rhou, const double& rhoE) const
+  {
+    Process::exit("Fluide_reel_base::calculer_vitesse_son is not implemented for your fluid !!! To call only for Pb_Euler also ... \n");
+    return 0.;
+  }
+  inline virtual double init_energie_tot(const double& rho, const double& norm_U, const double& u) const
+  {
+    Process::exit("Fluide_reel_base::calculer_vitesse_son is not implemented for your fluid !!! To call only for Pb_Euler also ... \n");
+    return 0.;
+  }
+
 protected :
   double T_ref_ = -1., P_ref_ = -1., h_ref_ = -1., t_init_ = -1.;
   int first_maj_ = 1;

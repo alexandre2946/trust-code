@@ -33,41 +33,10 @@ Implemente_instanciable(Milieu_composite_Euler, "Milieu_composite_Euler", Milieu
 Sortie& Milieu_composite_Euler::printOn(Sortie& os) const { return os; }
 Entree& Milieu_composite_Euler::readOn(Entree& is) { return Milieu_composite::readOn(is); }
 
-int Milieu_composite_Euler::initialiser(const double temps)
-{
-  for (auto &itr : fluides_) itr->initialiser(temps);
-
-  const bool res_en_T = equation_.count("alpha_energie_tot") ? true : false;
-
-  //const Equation_base& eqn = res_en_T ? equation("temperature") : equation("enthalpie");
-  const Equation_base& eqn = equation("alpha_energie_tot");
-  Champ_Inc_base& ch_rho = ref_cast(Champ_Inc_base, ch_rho_.valeur()),
-                  &ch_e = ref_cast(Champ_Inc_base, ch_e_int_.valeur()),
-                   &ch_h_ou_T = ref_cast(Champ_Inc_base, ch_h_ou_T_.valeur());
-
-  ch_rho.associer_eqn(eqn);
-  ch_rho.init_champ_calcule(*this, calculer_masse_volumique);
-
-  ch_e.associer_eqn(eqn);
-  ch_e.init_champ_calcule(*this, calculer_energie_interne);
-
-  ch_h_ou_T.associer_eqn(eqn);
-  res_en_T ? ch_h_ou_T.init_champ_calcule(*this, calculer_enthalpie) : ch_h_ou_T.init_champ_calcule(*this, calculer_temperature_multiphase);
-
-  t_init_ = temps;
-
-  // XXX Elie Saikali : utile pour cas reprise !
-  ch_rho_->changer_temps(temps);
-  ch_e_int_->changer_temps(temps);
-  ch_h_ou_T_->changer_temps(temps);
-  return 1;
-  //return Milieu_base::initialiser_porosite(temps);
-}
-
 void Milieu_composite_Euler::discretiser(const Probleme_base& pb, const  Discretisation_base& dis)
 {
   Milieu_composite::discretiser(pb, dis);
-  res_en_T_ = sub_type(Pb_Euler,pb) ? ref_cast(Pb_Euler,pb).resolution_en_T() : true;
+  res_en_T_ = true;
   inter_lu_->assoscier_pb(pb);
 }
 

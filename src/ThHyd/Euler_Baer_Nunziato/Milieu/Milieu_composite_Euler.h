@@ -22,7 +22,7 @@ class Milieu_composite_Euler: public Milieu_composite
 {
   Declare_instanciable(Milieu_composite_Euler);
 public :
-  int initialiser(const double temps) override;
+  int initialiser(const double temps) override {  return 1; }
   void discretiser(const Probleme_base& pb, const  Discretisation_base& dis) override;
   void mettre_a_jour(double temps) override { /* Do nothing */ }
 

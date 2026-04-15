@@ -55,6 +55,22 @@ protected :
   void beta_h_(const SpanD H, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
   void mu_h_(const SpanD H, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
   void lambda_h_(const SpanD H, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
+
+  // Methodes utilisees uniquement dans Pb_Euler
+  inline double init_energie_tot(const double& rho, const double& norm_U, const double& p) const override
+  {
+    return 0.5*rho*norm_U + (p+gamma_*pinf_)/(gamma_-1);
+  }
+
+  inline double calculer_pression(const double& rho, const double&  normU , const double& rhoE) const override
+  {
+    return (gamma_-1)*( rhoE- 0.5 * rho* normU) - gamma_*pinf_;
+  }
+
+  inline double calculer_vitesse_son(const double& rho,const double& p ) const override
+  {
+    return sqrt(gamma_*(p+pinf_)/rho);
+  }
 };
 
 #endif /* Fluide_stiffened_gas_included */
