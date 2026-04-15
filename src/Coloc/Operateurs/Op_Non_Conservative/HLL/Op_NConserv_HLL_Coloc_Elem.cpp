@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -26,7 +26,7 @@
 #include <Sortie_supersonique.h>
 #include <Entree_supersonique.h>
 #include <Neumann_paroi_flux_nul.h>
-Implemente_instanciable(Op_NConserv_HLL_Coloc_Elem,"Op_NConserv_HLL_Coloc_Elem",Op_NConserv_Coloc_base_Elem);
+Implemente_instanciable(Op_NConserv_HLL_Coloc_Elem,"Op_NConserv_HLL_Coloc_Elem",Op_NConserv_Coloc_Elem_base);
 
 Sortie& Op_NConserv_HLL_Coloc_Elem::printOn(Sortie& os) const { return Op_NConserv_Coloc_base::printOn(os); }
 Entree& Op_NConserv_HLL_Coloc_Elem::readOn(Entree& is) { Op_NConserv_Coloc_base::readOn(is); return is;}

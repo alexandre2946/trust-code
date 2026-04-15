@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,39 +13,15 @@
 *
 *****************************************************************************/
 
-#include <Op_NConserv_negligeable.h>
-#include <Champ_base.h>
+#ifndef Op_NConserv_Coloc_Vect_base_included
+#define Op_NConserv_Coloc_Vect_base_included
 
-Implemente_instanciable(Op_NConserv_negligeable,"Op_NConserv_negligeable",Operateur_NConserv_base);
+#include <Op_NConserv_Coloc_base.h>
 
-Sortie& Op_NConserv_negligeable::printOn(Sortie& os) const { return os; }
-
-Entree& Op_NConserv_negligeable::readOn(Entree& is) { return is; }
-
-/*! @brief Associe la vitesse a l'operateur.
- *
- * @param (Champ_Inc_base& ch) le champ inconnue representant la vitesse
- */
-//void Op_NConserv_negligeable::associer_vitesse(const Champ_base& ch)
-//{
-//  la_vitesse = ch;
-//}
-
-/*! @brief Renvoie le champ inconnue representant la vitesse
- *
- * @return (Champ_Inc_base&) le champ inconnue representant la vitesse
- */
-const Champ_base& Op_NConserv_negligeable::vitesse() const
+class Op_NConserv_Coloc_Vect_base : public Op_NConserv_Coloc_base
 {
-  return la_vitesse.valeur();
-}
+  Declare_base(Op_NConserv_Coloc_Vect_base) ;
+};
 
-void Op_NConserv_negligeable::ajouter_flux(const DoubleTab& inconnue, DoubleTab& contribution) const
-{
-  // nothing to do
-}
+#endif /* Op_NConserv_Coloc_Vect_base_included*/
 
-void Op_NConserv_negligeable::calculer_flux(const DoubleTab& inconnue, DoubleTab& flux) const
-{
-  flux = 0.0;
-}

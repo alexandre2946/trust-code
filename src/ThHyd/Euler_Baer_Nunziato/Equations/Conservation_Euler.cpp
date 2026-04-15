@@ -14,7 +14,6 @@
 *****************************************************************************/
 
 #include <EcritureLectureSpecial.h>
-#include <Pb_Euler.h>
 #include <Conservation_Euler.h>
 #include <Champ_Uniforme.h>
 #include <Matrice_Morse.h>
@@ -22,6 +21,7 @@
 #include <Fluide_base.h>
 #include <Domaine_VF.h>
 #include <TRUSTTrav.h>
+#include <Pb_Euler.h>
 #include <Domaine.h>
 #include <EChaine.h>
 #include <Param.h>

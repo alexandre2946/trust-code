@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,18 +13,17 @@
 *
 *****************************************************************************/
 
-#ifndef Op_Conv_Rusanov_Coloc_Vect_included
-#define Op_Conv_Rusanov_Coloc_Vect_included
+#ifndef Op_Conv_Rusanov_Coloc_Elem_included
+#define Op_Conv_Rusanov_Coloc_Elem_included
 
+#include <Op_Conv_Coloc_Elem_base.h>
 
-#include <Op_Conv_Coloc_base.h>
-
-class Op_Conv_Rusanov_Coloc_Vect : public Op_Conv_Coloc_base_Vect
+class Op_Conv_Rusanov_Coloc_Elem : public Op_Conv_Coloc_Elem_base
 {
-  Declare_instanciable( Op_Conv_Rusanov_Coloc_Vect ) ;
+  Declare_instanciable( Op_Conv_Rusanov_Coloc_Elem ) ;
 public:
-  inline void scheme(DoubleTab&, const int&) const override;
+  inline void scheme(DoubleTab& num_flux, const int& f) const override ;
 };
 
-#endif /*Op_Conv_Rusanov_Coloc_Vect_included*/
+#endif /*Op_Conv_Rusanov_Coloc_Elem_included*/
 

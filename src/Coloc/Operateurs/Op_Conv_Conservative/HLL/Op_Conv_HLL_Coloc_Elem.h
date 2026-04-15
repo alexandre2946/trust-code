@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,18 +13,17 @@
 *
 *****************************************************************************/
 
-#ifndef Op_NConserv_HLL_Coloc_Vect_included
-#define Op_NConserv_HLL_Coloc_Vect_included
+#ifndef Op_Conv_HLL_Coloc_Elem_included
+#define Op_Conv_HLL_Coloc_Elem_included
 
-#include <Op_NConserv_Coloc_base.h>
+#include <Op_Conv_Coloc_Elem_base.h>
 
-class Op_NConserv_HLL_Coloc_Vect : public Op_NConserv_Coloc_base_Vect
+class Op_Conv_HLL_Coloc_Elem : public Op_Conv_Coloc_Elem_base
 {
-  Declare_instanciable( Op_NConserv_HLL_Coloc_Vect ) ;
+  Declare_instanciable( Op_Conv_HLL_Coloc_Elem ) ;
 public:
-  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
-  void Abgral_scheme(DoubleTab& num_flux_left, DoubleTab& num_flux_right) const override;
+  inline void scheme(DoubleTab& num_flux, const int& f) const override ;
 };
 
-#endif /*Op_NConserv_HLL_Coloc_Vect_included*/
+#endif /*Op_Conv_HLL_Coloc_Elem_included*/
 

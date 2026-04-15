@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,42 +13,56 @@
 *
 *****************************************************************************/
 
-#include <Op_Conv_Rusanov_Coloc_Vect.h>
+#include <Op_Conv_Coloc_base.h>
 #include <Domaine_Coloc.h>
 #include <Domaine_Cl_Coloc.h>
 #include <Champ_Inc_P0_base.h>
-#include <Conservation_Euler.h>
-#include <Pb_Euler.h>
-#include <Momentum_Euler.h>
-#include <Milieu_composite_Euler.h>
-#include <Fluide_reel_base.h>
 
+Implemente_base(Op_Conv_Coloc_base,"Op_Conv_Coloc_base",Operateur_Conv_base);
 
-Implemente_instanciable(Op_Conv_Rusanov_Coloc_Vect,"Op_Conv_Rusanov_Coloc_Vect",Op_Conv_Coloc_base_Vect);
+Sortie& Op_Conv_Coloc_base::printOn(Sortie& os) const { return Operateur_Conv_base::printOn(os); }
+Entree& Op_Conv_Coloc_base::readOn(Entree& is) { Operateur_Conv_base::readOn(is);  return is; }
 
-Sortie& Op_Conv_Rusanov_Coloc_Vect::printOn(Sortie& os) const { return Op_Conv_Coloc_base::printOn(os); }
-Entree& Op_Conv_Rusanov_Coloc_Vect::readOn(Entree& is) { Op_Conv_Coloc_base::readOn(is); return is;}
-
-inline void Op_Conv_Rusanov_Coloc_Vect::scheme(DoubleTab& num_flux, const int& f) const
+void Op_Conv_Coloc_base::completer()
 {
-  const Domaine_Coloc& domaine = ref_cast(Domaine_Coloc,le_dom_poly_.valeur());
-  const DoubleTab& w = le_champ_inco->valeurs();
-  const IntTab& f_e = domaine.face_voisins();
-  const Momentum_Euler& eq = ref_cast(Momentum_Euler,equation());
-  const DoubleTab& vit_n= eq.vitesse_normale();
-  const DoubleTab& c = eq.vitesse_son();
-  const int nb_phase = ref_cast(Pb_Euler,eq.probleme()).nb_phases();
-  const int el = f_e(f,0), er = f_e(f,1);
-  const DoubleTab flux_l = eq.flux_(f,0), flux_r = eq.flux_(f,1);
-
-  for (int n =0 ; n< nb_phase; n++)
-    {
-      double un_l = vit_n(f,n), un_r = vit_n(f, n + nb_phase), c_l = c(el,n), c_r = c(er,n);
-      double s = std::max(fabs(un_l-c_l),fabs(un_l+c_l));
-      s = std::max(s,std::max(fabs(un_r-c_r),fabs(un_r+c_r)));
-      for (int d = 0; d< dimension; d++)
-        num_flux(f, n + nb_phase * d ) = 0.5* (flux_l(n + nb_phase * d) + flux_r(n + nb_phase*d)) - s *0.5 * (w(er,n + nb_phase * d)-w(el,n + nb_phase * d));
-    }
+  Operateur_base::completer();
+  assert(le_dom_poly_.non_nul());
 }
 
+void Op_Conv_Coloc_base::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& zcl, const Champ_Inc_base& inc)
+{
+  le_dom_poly_ = ref_cast(Domaine_Coloc, domaine_dis);
+  la_zcl_poly_ = ref_cast(Domaine_Cl_Coloc, zcl);
+  le_champ_inco = ref_cast(Champ_Inc_base,inc);
 
+}
+
+void Op_Conv_Coloc_base::associer_domaine_cl_dis(const Domaine_Cl_dis_base& zcl)
+{
+  la_zcl_poly_ = ref_cast(Domaine_Cl_Coloc, zcl);
+}
+
+void Op_Conv_Coloc_base::ajouter_blocs(matrices_t mats, DoubleTab& secmem, const tabs_t& semi_impl) const
+{
+
+  const Domaine_Coloc& domaine = ref_cast(Domaine_Coloc,le_dom_poly_.valeur());
+  const DoubleVect& fs = domaine.face_surfaces();
+  const IntTab& f_e = domaine.face_voisins();
+  const int n = secmem.line_size();
+  const int N = domaine.nb_faces_tot();
+  DoubleTab num_flux(N,n);
+  Riemann_solver(num_flux);
+
+  for (int f = 0; f < N; f++)
+    {
+      for (int i = 0; i < 2; i++)
+        {
+          int e = f_e(f, i);
+          if ( e >= 0 && e < domaine.nb_elem())
+            {
+              for ( int k = 0; k < n; k++)
+                secmem(e,k) -= (i ? -1 : 1) * num_flux(f,k) * fs(f);
+            }
+        }
+    }
+}

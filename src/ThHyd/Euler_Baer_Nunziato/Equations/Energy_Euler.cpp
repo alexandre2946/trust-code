@@ -65,7 +65,7 @@ void Energy_Euler::discretiser()
 inline DoubleTab Energy_Euler::flux(const int& f, const int& left_or_right) const
 {
   const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
-  const Domaine_Coloc& dom = ref_cast(Domaine_Coloc, domaine_dis());
+  const Domaine_VF& dom = ref_cast(Domaine_VF, domaine_dis());
   const DoubleTab& vit_normale = ref_cast(Momentum_Euler, probleme().equation(0)).vitesse_normale();
   const DoubleTab& alpha_rhoE = inconnue().valeurs();
   const int nb_phases = pb.nb_phases();

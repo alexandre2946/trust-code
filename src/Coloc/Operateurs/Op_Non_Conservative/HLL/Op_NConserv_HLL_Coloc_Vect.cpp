@@ -26,7 +26,7 @@
 #include <Interface_Baer_Nunziato.h>
 #include <Dirichlet.h>
 
-Implemente_instanciable(Op_NConserv_HLL_Coloc_Vect,"Op_NConserv_HLL_Coloc_Vect",Op_NConserv_Coloc_base_Vect);
+Implemente_instanciable(Op_NConserv_HLL_Coloc_Vect,"Op_NConserv_HLL_Coloc_Vect",Op_NConserv_Coloc_Vect_base);
 
 Sortie& Op_NConserv_HLL_Coloc_Vect::printOn(Sortie& os) const { return Op_NConserv_Coloc_base::printOn(os); }
 Entree& Op_NConserv_HLL_Coloc_Vect::readOn(Entree& is) { Op_NConserv_Coloc_base::readOn(is); return is;}

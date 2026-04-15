@@ -28,7 +28,6 @@
 #include <Nom.h>
 #include <Pb_Euler.h>
 #include <Milieu_composite_Euler.h>
-#include <Op_Conv_Rusanov_Coloc_Elem.h>
 
 Implemente_instanciable(Momentum_Euler,"Momentum_Euler|QDM_Euler",Navier_Stokes_std);
 // XD Momentum_Euler eqn_base Momentum_Euler -1 Momentum conservation equation for a multi-phase problem where the unknown is the velocity
@@ -65,7 +64,6 @@ Sortie& Momentum_Euler::printOn(Sortie& is) const
 
 Entree& Momentum_Euler::readOn(Entree& is)
 {
-  evanescence_.associer_eqn(*this);
   terme_nconserv_.associer_eqn(*this);
   Equation_base::readOn(is);
 
@@ -306,9 +304,6 @@ int Momentum_Euler::preparer_calcul()
   pression().changer_temps(temps);
   //pression_pa().changer_temps(temps);
 
-//  if (evanescence_.non_nul())
-//    evanescence_->preparer_calcul();
-
   return 1;
 }
 
@@ -399,7 +394,7 @@ void Momentum_Euler::mettre_a_jour_p_c()
 double Momentum_Euler::calculer_pas_de_temps() const
 {
   const Schema_Temps_base& sh = schema_temps();
-  const Domaine_Coloc& dom = ref_cast(Domaine_Coloc, domaine_dis());
+  const Domaine_VF& dom = ref_cast(Domaine_VF, domaine_dis());
   const IntTab& elem_faces = dom.elem_faces();
   const DoubleVect& surf = dom.face_surfaces();
   const DoubleVect& vol = dom.volumes();
@@ -489,7 +484,7 @@ Champ_Inc_base& Momentum_Euler::vitesse_phase(const int i)
 void Momentum_Euler::calculer_vitesse_normale()
 {
   const int Nb_phase = ref_cast(Pb_Euler, probleme()).nb_phases();
-  const Domaine_Coloc& dom = ref_cast(Domaine_Coloc, domaine_dis());
+  const Domaine_VF& dom = ref_cast(Domaine_VF, domaine_dis());
   const DoubleTab& U = vitesse().valeurs();
   const IntTab& f_e = dom.face_voisins();
   DoubleTab& u_n = vitesse_normale();
@@ -513,7 +508,7 @@ DoubleTab Momentum_Euler::flux_(const int& f, const int& left_or_right) const
 {
   //left_or_right = 0 : left et 1 right;
   const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
-  const Domaine_Coloc& dom = ref_cast(Domaine_Coloc, domaine_dis());
+  const Domaine_VF& dom = ref_cast(Domaine_VF, domaine_dis());
   const DoubleTab& vit_normale = vitesse_normale();
   const DoubleTab& p = pression().valeurs();
   const DoubleTab& alpha_rhoU = inconnue().valeurs();

@@ -17,11 +17,8 @@
 #define Conservation_Euler_included
 
 #include <Convection_Diffusion_std.h>
-//#include <Operateur_Evanescence.h>
-//#include <Operateur_Grad.h>
-#include <TRUST_Ref.h>
-#include <Domaine_Coloc.h>
 #include <Operateur_NConserv.h>
+#include <TRUST_Ref.h>
 
 class Fluide_base;
 

@@ -133,7 +133,7 @@ void Density_Euler::mettre_a_jour_champs_conserves(double temps, int reset)
 inline DoubleTab Density_Euler::flux(const int& f, const int& left_or_right) const
 {
   //left_or_right = 0 : left et 1 right;
-  const Domaine_Coloc& dom = ref_cast(Domaine_Coloc, domaine_dis());
+  const Domaine_VF& dom = ref_cast(Domaine_VF, domaine_dis());
   const DoubleTab& vit_normale = ref_cast(Momentum_Euler, probleme().equation(0)).vitesse_normale();
   const DoubleTab& alpha_rho = inconnue().valeurs();
   const int e = dom.face_voisins(f, left_or_right);

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,17 +13,36 @@
 *
 *****************************************************************************/
 
-#ifndef Op_Conv_Rusanov_Coloc_Elem_included
-#define Op_Conv_Rusanov_Coloc_Elem_included
+#ifndef Op_Conv_Coloc_base_included
+#define Op_Conv_Coloc_base_included
 
-#include <Op_Conv_Coloc_base.h>
+#include <Operateur_Conv_base.h>
+#include <Domaine_Cl_Coloc.h>
+#include <Domaine_Coloc.h>
 
-class Op_Conv_Rusanov_Coloc_Elem : public Op_Conv_Coloc_base_Elem
+class Op_Conv_Coloc_base : public Operateur_Conv_base
 {
-  Declare_instanciable( Op_Conv_Rusanov_Coloc_Elem ) ;
+  Declare_base(Op_Conv_Coloc_base) ;
 public:
-  inline void scheme(DoubleTab& num_flux, const int& f) const override ;
+  void associer_vitesse(const Champ_base& vit ) override {}
+  void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&, const Champ_Inc_base&) override;
+  void associer_domaine_cl_dis(const Domaine_Cl_dis_base& zcl) override;
+  void mettre_a_jour(double temps) override {};
+  int has_interface_blocs() const override {  return 1; }
+  void completer() override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
+
+  virtual void Riemann_solver(DoubleTab& num_flux) const = 0;
+  virtual void scheme(DoubleTab&, const int&) const = 0;
+
+  double calculer_dt_stab() const override { return 1e8; }
+
+  int impr(Sortie& os) const override { return 1; }
+
+protected:
+  OBS_PTR(Domaine_Coloc) le_dom_poly_;
+  OBS_PTR(Domaine_Cl_Coloc) la_zcl_poly_;
 };
 
-#endif /*Op_Conv_Rusanov_Coloc_Elem_included*/
+#endif /*Op_Conv_Coloc_base_included*/
 

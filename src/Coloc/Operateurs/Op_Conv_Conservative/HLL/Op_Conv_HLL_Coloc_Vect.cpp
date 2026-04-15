@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -25,7 +25,7 @@
 #include <Fluide_reel_base.h>
 
 
-Implemente_instanciable(Op_Conv_HLL_Coloc_Vect,"Op_Conv_HLL_Coloc_Vect",Op_Conv_Coloc_base_Vect);
+Implemente_instanciable(Op_Conv_HLL_Coloc_Vect,"Op_Conv_HLL_Coloc_Vect",Op_Conv_Coloc_Vect_base);
 
 Sortie& Op_Conv_HLL_Coloc_Vect::printOn(Sortie& os) const { return Op_Conv_Coloc_base::printOn(os); }
 Entree& Op_Conv_HLL_Coloc_Vect::readOn(Entree& is) { Op_Conv_Coloc_base::readOn(is); return is;}

@@ -13,55 +13,30 @@
 *
 *****************************************************************************/
 
-#ifndef Op_Conv_Coloc_base_included
-#define Op_Conv_Coloc_base_included
+#ifndef Op_NConserv_Coloc_base_included
+#define Op_NConserv_Coloc_base_included
 
-#include <Operateur_Conv_base.h>
+#include <Operateur_NConserv_base.h>
 #include <Domaine_Cl_Coloc.h>
 #include <Domaine_Coloc.h>
+#include <TRUST_Ref.h>
+#include <SFichier.h>
 
-
-class Op_Conv_Coloc_base : public Operateur_Conv_base
+class Op_NConserv_Coloc_base : public Operateur_NConserv_base
 {
-
-  Declare_instanciable(Op_Conv_Coloc_base) ;
+  Declare_base(Op_NConserv_Coloc_base) ;
 public:
-  void associer_vitesse(const Champ_base& vit ) override {}
   void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&, const Champ_Inc_base&) override;
   void associer_domaine_cl_dis(const Domaine_Cl_dis_base& zcl) override;
   void mettre_a_jour(double temps) override {};
   int has_interface_blocs() const override {  return 1; }
   void completer() override;
-  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
-  virtual void Riemann_solver(DoubleTab& num_flux) const { Process::exit(); };
-  virtual void scheme(DoubleTab&, const int&) const {Process::exit();};
-
-  double calculer_dt_stab() const override { return 1e8; }
-
-  int impr(Sortie& os) const override { return 1; }
-
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override {Process::exit();};
+  virtual void Abgral_scheme(DoubleTab& num_flux_left, DoubleTab& num_flux_right) const {Process::exit();};
 protected:
   OBS_PTR(Domaine_Coloc) le_dom_poly_;
   OBS_PTR(Domaine_Cl_Coloc) la_zcl_poly_;
 };
 
-
-class Op_Conv_Coloc_base_Elem : public Op_Conv_Coloc_base
-{
-  Declare_instanciable(Op_Conv_Coloc_base_Elem) ;
-public:
-  void Riemann_solver(DoubleTab& num_flux) const override;
-};
-
-
-class Op_Conv_Coloc_base_Vect : public Op_Conv_Coloc_base
-{
-  Declare_instanciable(Op_Conv_Coloc_base_Vect) ;
-public:
-  void Riemann_solver(DoubleTab& num_flux) const override;
-};
-
-
-
-#endif /*Op_Conv_Coloc_base_included*/
+#endif /*Op_NConserv_Coloc_base_included*/
 
