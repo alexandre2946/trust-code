@@ -2209,13 +2209,22 @@ void Domaine_32_64<_SIZE_>::renum(const IntVect_t& Les_Nums)
 template<>
 void Domaine_32_64<int>::construire_renum_som_perio(const Conds_lim& les_cl, const Domaine_dis_base& domaine_dis)
 {
-  // TODO - check this
-  Noms bords_perio;
+  // Sanity check - make sure that the periodic BC are put on a periodic boundary
+  // (the opposite is allowed, eventhough it is probably stupid: a non periodic BC on a periodic boundary)
   const int nb_bords = les_cl.size();
+  const Noms& bords_per = this->bords_perio();
   for (int n_bord = 0; n_bord < nb_bords; n_bord++)
     {
       if (sub_type(Periodique, les_cl[n_bord].valeur()))
-        bords_perio.add(les_cl[n_bord]->frontiere_dis().frontiere().le_nom());
+        {
+          const Nom& nom_b =les_cl[n_bord]->frontiere_dis().frontiere().le_nom();
+          if(bords_per.rang(nom_b) < 0)
+            {
+              Cerr << "ERROR: you have put a periodic boundary condition on a boundary ('" << nom_b << "') which is not periodic." << finl;
+              Cerr << "Use the keyword 'declarer_bord_perio' after the loading of the domain to declare this boundary as being periodic." << finl;
+              Process::exit();
+            }
+        }
     }
 
   Reordonner_faces_periodiques::renum_som_perio(*this, renum_som_perio_,
