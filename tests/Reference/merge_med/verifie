@@ -64,4 +64,10 @@ then
   else
     echo "All OK for the CGNS/LATA diff !"
   fi
+  
+  
+  # test python loader
+  source $TRUST_ROOT/env_for_python.sh
+  
+  python script_loader.py || exit -1
 fi
