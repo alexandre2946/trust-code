@@ -28,21 +28,22 @@ Entree& CGNS_2_Lata::readOn(Entree& is) { return Interprete::readOn(is); }
 
 Entree& CGNS_2_Lata::interpreter(Entree& is)
 {
+  if (!Process::me())
+    {
+      Cerr << finl << "Syntax CGNS_to_lata nom_cgns||NOM_DU_CAS nom_fichier_sortie_lata||NOM_DU_CAS   " << finl;
 
-  Cerr << finl << "Syntax CGNS_to_lata nom_cgns||NOM_DU_CAS nom_fichier_sortie_lata||NOM_DU_CAS   " << finl;
+      Nom nom_lml, nom_lata;
+      is >> nom_lml >> nom_lata;
 
-  Nom nom_lml, nom_lata;
-  is >> nom_lml >> nom_lata;
+      if (Motcle(nom_lml) == "NOM_DU_CAS") nom_lml = nom_du_cas() + ".cgns";
+      if (Motcle(nom_lata) == "NOM_DU_CAS") nom_lata = nom_du_cas() + ".lata";
 
-  if (Motcle(nom_lml) == "NOM_DU_CAS") nom_lml = nom_du_cas() + ".cgns";
-  if (Motcle(nom_lata) == "NOM_DU_CAS") nom_lata = nom_du_cas() + ".lata";
+      if (!Motcle(nom_lml).finit_par(".cgns")) nom_lml += Nom(".cgns");
+      if (!Motcle(nom_lata).finit_par(".lata")) nom_lata += Nom(".lata");
 
-  if (!Motcle(nom_lml).finit_par(".cgns")) nom_lml += Nom(".cgns");
-  if (!Motcle(nom_lata).finit_par(".lata")) nom_lata += Nom(".lata");
+      cgns_to_lata(nom_lml, nom_lata, 0 /* binaire */, 1 /* fortran_blocs */, 0 /* pas fortran_ordering */, 1 /* fortran_indexing */);
 
-  cgns_to_lata(nom_lml, nom_lata, 0 /* binaire */, 1 /* fortran_blocs */, 0 /* pas fortran_ordering */, 1 /* fortran_indexing */);
-
-  Cerr << finl;
-
+      Cerr << finl;
+    }
   return is;
 }
