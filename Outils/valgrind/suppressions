@@ -191,6 +191,54 @@
 }
 
 ######
+###### Ecrire_CGNS::cgns_flush_to_disk() calls ADFH_Flush_to_Disk. Issue with MPI + hdf5 : 
+###### Uninitialised value was created by a stack allocation ADFH_Set_Label ... 
+######
+{
+   <insert_a_suppression_name_here>
+   Memcheck:User
+   fun:check_mem_is_defined_untyped
+   fun:walk_type_array
+   fun:check_mem_is_defined
+   fun:PMPI_Bcast
+   fun:H5C_protect
+   fun:H5AC_protect
+   fun:H5O_protect
+   fun:H5O_msg_exists
+   fun:H5G__obj_get_linfo
+   fun:H5G__obj_lookup
+   fun:H5G__traverse_real
+   fun:H5G_traverse
+   fun:H5L_link_object
+   fun:H5G__create_named
+   fun:H5VL__native_group_create
+   fun:H5VL_group_create
+   fun:H5G__create_api_common
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:User
+   fun:check_mem_is_defined_untyped
+   fun:walk_type_array
+   fun:check_mem_is_defined
+   fun:PMPI_Bcast
+   fun:H5C_protect
+   fun:H5AC_protect
+   fun:H5O__chunk_protect
+   fun:H5O__alloc
+   fun:H5O__msg_alloc
+   fun:H5O__msg_append_real
+   fun:H5O_msg_append_oh
+   fun:H5O_msg_create
+   fun:H5G__compact_insert
+   fun:H5G_obj_insert
+   fun:H5L__link_cb
+   fun:H5G__traverse_real
+   fun:H5G_traverse
+}
+
+
+######
 ###### Cas test PETSC_SA-AMG en parallele utilisant PETSc 3.20
 ######
 {
