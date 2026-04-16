@@ -18,4 +18,50 @@ then
   else
     echo "All OK for the med merge !"
   fi
+  
+  compare_cgns post_cgns_par.cgns post_cgns_seq.cgns 1>verifie_cgns.log 2>&1 || exit -1
+
+  numb_diff=`awk '$1=="Number"{print $5}' verifie.log`
+  if [[ "$numb_diff" -gt "0" ]]
+  then
+    echo "Error ! CGNS files are not identical !"
+    exit -1
+  else
+    echo "All OK for the CGNS diff !"
+  fi
+  
+  compare_cgns post_cgns_par.cgns post_lata_par.lata 1>verifie_lata.log 2>&1 || exit -1
+
+  numb_diff=`awk '$1=="Number"{print $5}' verifie.log`
+  if [[ "$numb_diff" -gt "0" ]]
+  then
+    echo "Error ! CGNS/LATA files are not identical !"
+    exit -1
+  else
+    echo "All OK for the CGNS/LATA diff !"
+  fi
+  
+  trust par_cgns.data 4 1>par_cgns.out 2>par_cgns.err
+  
+  compare_cgns post_cgns_par.cgns par_cgns.cgns 1>verifie_cgns2.log 2>&1 || exit -1
+
+  numb_diff=`awk '$1=="Number"{print $5}' verifie.log`
+  if [[ "$numb_diff" -gt "0" ]]
+  then
+    echo "Error ! CGNS files are not identical !"
+    exit -1
+  else
+    echo "All OK for the CGNS diff !"
+  fi
+  
+  compare_cgns par_cgns.cgns par_cgns.lata 1>verifie_lata2.log 2>&1 || exit -1
+
+  numb_diff=`awk '$1=="Number"{print $5}' verifie.log`
+  if [[ "$numb_diff" -gt "0" ]]
+  then
+    echo "Error ! CGNS/LATA files are not identical !"
+    exit -1
+  else
+    echo "All OK for the CGNS/LATA diff !"
+  fi
 fi
