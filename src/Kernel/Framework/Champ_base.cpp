@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -466,7 +466,7 @@ void Champ_base::calculer_valeurs_elem_post(DoubleTab& les_valeurs,int nb_elem,N
     }
 
 
-  bool isChamp_basis_function_DG = (que_suis_je() == ("Champ_Elem_DG") || que_suis_je() == ("Champ_Fonc_P1_DG"));
+  bool isChamp_basis_function_DG = (que_suis_je() == ("Champ_Elem_DG") || que_suis_je() == ("Champ_Fonc_Quad_DG"));
   if (isChamp_basis_function_DG)
     les_valeurs.resize(nb_elem, 1);
   else

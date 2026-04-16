@@ -24,6 +24,11 @@ class Champ_Fonc_Quad_DG: public Champ_Fonc_P0_base
 public :
   Champ_base& affecter_(const Champ_base& ch) override;
 
+  inline DoubleTab& valeur_aux_centres_de_gravite(const Domaine& dom, DoubleTab& tab_valeurs) const override
+  {
+    return Champ_base::valeur_aux_centres_de_gravite(dom, tab_valeurs);
+  }
+
   DoubleTab& valeur_aux_elems(const DoubleTab& positions, const IntVect& les_polys, DoubleTab& valeurs) const override;
 
 };
