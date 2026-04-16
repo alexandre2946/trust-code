@@ -15,6 +15,11 @@ set(TRUST_ARCH $ENV{TRUST_ARCH})
 set(OPT $ENV{OPT})
 set(CMAKE_INSTALL_LIBDIR $ENV{TRUST_LATAFILTER})
 
+# CGNSReader in case used from interprets as CGNS_2_Lata !
+if (NOT "${TRUST_CGNS_ROOT}" STREQUAL "")
+  add_definitions(-DWITH_CGNSLOADER)
+endif()
+
 # TRUST_DEFINES (NEEDED WHEN LINKING $exec)
 add_definitions(${TRUST_DEFINES})
 
