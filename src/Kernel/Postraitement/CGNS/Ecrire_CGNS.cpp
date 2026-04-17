@@ -1416,7 +1416,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
     }
 
   const int ns_tot = TRUST2CGNS.get_ns_tot(), ne_tot = TRUST2CGNS.get_ne_tot();
-  const bool enter_group_comm = is_linked_files_comm_group_mode();
+  const bool enter_group_comm = is_comm_group_mode();
   const int proc_me = enter_group_comm ? TRUST2CGNS.get_proc_me_local_comm() : Process::me();
 
   int coordsIdx = -123, coordsIdy = -123, coordsIdz = -123;
@@ -1424,7 +1424,12 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
   /* If deformable only and single_file, connectivity is already seen in same file. we just write new coords */
   if (!Option_CGNS::USE_LINKS && !is_lagrangian_)
     {
+      // XXX Elie Saikali : zone vide, rien a ecrire (base aussi !) ... (cas SINGLE_FILE_PER_COMM_GROUP !!!)
+      if (ne_tot == 0 && ns_tot == 0)
+        return;
+
       int G = -1;
+
       if (cg_grid_write(fileId_, baseId_[ind], zoneId_[ind], grid_name_loc_.c_str(), &G) != CG_OK)
         Cerr << "Error Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone : cg_grid_write !" << finl, TRUST_CGNS_ERROR();
 

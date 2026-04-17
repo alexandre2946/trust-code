@@ -574,11 +574,11 @@ void Ecrire_CGNS::link_multi_loc_support_pb_deformable()
       return;
     }
 
-  const bool enter_group_comm = is_linked_files_comm_group_mode();
-
   // loop and write linked supports !
   if (Option_CGNS::USE_LINKS)
     {
+      const bool enter_group_comm = is_linked_files_comm_group_mode();
+
       for (auto &itr : fld_loc_map_)
         {
           const std::string& LOC = itr.first;
