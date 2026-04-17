@@ -1,0 +1,27 @@
+#!/bin/bash
+
+test_name=$1
+
+# Si seq, on sort
+if [[ "$test_name" != PAR_* ]]; then
+    exit 0
+fi
+
+# sinon
+seq_name=${test_name#PAR_}
+
+[ ! -f "${seq_name}.cgns" ] && echo "File ${seq_name}.cgns is missing. Test Failed" && exit 1
+[ ! -f "${test_name}.cgns" ] && echo "File ${test_name}.cgns is missing. Test Failed" && exit 1
+
+# comparison
+echo "======================================================="
+echo CGNS comparison : files ${seq_name}.cgns vs ${test_name}.cgns
+if compare_cgns ${seq_name}.cgns ${test_name}.cgns --max_delta
+then
+    echo "CGNS comparison : OK"
+    echo "======================================================="
+    exit 0
+else
+    echo "Error ! CGNS files are not identical !"
+    exit 1   
+fi
