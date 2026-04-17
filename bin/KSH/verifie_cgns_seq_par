@@ -1,27 +1,43 @@
 #!/bin/bash
 
+compare_files()
+{
+    file1="$1"
+    file2="$2"
+
+    [ ! -f "$file1" ] && echo "File $file1 is missing. Test Failed" && exit 1
+    [ ! -f "$file2" ] && echo "File $file2 is missing. Test Failed" && exit 1
+
+    echo "======================================================="
+    echo "CGNS comparison : files $file1 vs $file2"
+
+    if compare_cgns "$file1" "$file2" --max_delta
+    then
+        echo "CGNS comparison : OK"
+        echo "======================================================="
+        exit 0
+    else
+        echo "Error ! CGNS files are not identical !"
+        exit 1
+    fi
+}
+
+# Comparaison directe si $2 est fourni
+if [ -n "$2" ]; then
+    file1="${1%.cgns}.cgns"
+    file2="${2%.cgns}.cgns"
+    compare_files "$file1" "$file2"
+fi
+
+# Sinon PAR vs SEQ
 test_name=$1
 
-# Si seq, on sort
+# Si SEQ, on sort
 if [[ "$test_name" != PAR_* ]]; then
     exit 0
 fi
 
-# sinon
+# SEQ
 seq_name=${test_name#PAR_}
 
-[ ! -f "${seq_name}.cgns" ] && echo "File ${seq_name}.cgns is missing. Test Failed" && exit 1
-[ ! -f "${test_name}.cgns" ] && echo "File ${test_name}.cgns is missing. Test Failed" && exit 1
-
-# comparison
-echo "======================================================="
-echo CGNS comparison : files ${seq_name}.cgns vs ${test_name}.cgns
-if compare_cgns ${seq_name}.cgns ${test_name}.cgns --max_delta
-then
-    echo "CGNS comparison : OK"
-    echo "======================================================="
-    exit 0
-else
-    echo "Error ! CGNS files are not identical !"
-    exit 1   
-fi
+compare_files "${seq_name}.cgns" "${test_name}.cgns"
