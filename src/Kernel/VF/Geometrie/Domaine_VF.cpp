@@ -1219,7 +1219,7 @@ void Domaine_VF::get_position(DoubleTab& positions) const
   // positions = zvf.xp();
 }
 
-double Domaine_VF::compute_L1_norm(const DoubleVect& val_source) const
+double Domaine_VF::compute_L1_norm(const DoubleVect& val_source, const Nature_du_champ nature_source) const
 {
   double sum = 0.;
   const int ne = nb_elem();
@@ -1230,7 +1230,7 @@ double Domaine_VF::compute_L1_norm(const DoubleVect& val_source) const
   return sum;
 }
 
-double Domaine_VF::compute_L2_norm(const DoubleVect& val_source) const
+double Domaine_VF::compute_L2_norm(const DoubleVect& val_source, const Nature_du_champ nature_source) const
 {
   double sum = 0.;
   const int ne = nb_elem();
@@ -1239,6 +1239,36 @@ double Domaine_VF::compute_L2_norm(const DoubleVect& val_source) const
       sum+=val_source(i)*val_source(i)*volumes(i);
     }
   return sum;
+}
+
+void Domaine_VF::compute_average(const DoubleVect& val_source, double& sum, double& volume, const Nature_du_champ nature_source) const
+{
+  const int ne = nb_elem();
+  CDoubleArrView vol = volumes().view_ro();
+  CDoubleArrView val = val_source.view_ro();
+  Kokkos::parallel_reduce(start_gpu_timer(__KERNEL_NAME__), ne, KOKKOS_LAMBDA(const int i, double & sum_tmp, double & volume_tmp)
+  {
+    double v = vol(i);
+    sum_tmp += val(i) * v;
+    volume_tmp += v;
+  }, sum, volume);
+  end_gpu_timer(__KERNEL_NAME__);
+}
+
+void Domaine_VF::compute_average_porosity(const DoubleVect& val_source, const DoubleVect& porosity, double& sum, double& volume, const Nature_du_champ nature_source) const
+{
+  const int ne = nb_elem();
+  CDoubleArrView vol = volumes().view_ro();
+  CDoubleArrView poro = porosity.view_ro();
+  CDoubleArrView val = val_source.view_ro();
+  Kokkos::parallel_reduce(start_gpu_timer(__KERNEL_NAME__), ne, KOKKOS_LAMBDA(const int i, double & sum_tmp, double & volume_tmp)
+  {
+    double v = vol(i);
+    double p = poro(i);
+    sum_tmp += val(i) * v * p;
+    volume_tmp += v * p;
+  }, sum, volume);
+  end_gpu_timer(__KERNEL_NAME__);
 }
 
 void Domaine_VF::get_nb_integ_points(IntTab& ) const

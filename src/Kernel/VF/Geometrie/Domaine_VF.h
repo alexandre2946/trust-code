@@ -163,8 +163,10 @@ public :
   DoubleTab calculer_xgr() const;
 
   virtual void get_position(DoubleTab& positions) const;
-  virtual double compute_L1_norm(const DoubleVect& val_source) const;
-  virtual double compute_L2_norm(const DoubleVect& val_source) const;
+  virtual double compute_L1_norm(const DoubleVect& val_source, const Nature_du_champ nature_source) const;
+  virtual double compute_L2_norm(const DoubleVect& val_source, const Nature_du_champ nature_source) const;
+  virtual void compute_average(const DoubleVect& val_source, double& sum, double& volume, const Nature_du_champ nature_source) const;
+  virtual void compute_average_porosity(const DoubleVect& val_source, const DoubleVect& porosity, double& sum, double& volume, const Nature_du_champ nature_source) const;
   virtual void get_nb_integ_points(IntTab& nelem) const;
   virtual void get_ind_integ_points(IntTab& nelem) const;
 

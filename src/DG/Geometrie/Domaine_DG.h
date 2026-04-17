@@ -54,8 +54,10 @@ public :
 
   void set_default_order(int order);
   void get_position(DoubleTab& positions) const override;
-  double compute_L1_norm(const DoubleVect& val_source) const override;
-  double compute_L2_norm(const DoubleVect& val_source) const override;
+  double compute_L1_norm(const DoubleVect& val_source, const Nature_du_champ nature_source) const override;
+  double compute_L2_norm(const DoubleVect& val_source, const Nature_du_champ nature_source) const override;
+  void compute_average(const DoubleVect& val_source, double& sum, double& average, const Nature_du_champ nature_source) const override;
+  void compute_average_porosity(const DoubleVect& val_source, const DoubleVect& porosity, double& sum, double& average, const Nature_du_champ nature_source) const override;
   void get_nb_integ_points(IntTab& nb_integ_points) const override;
   void get_ind_integ_points(IntTab& ind_integ_points) const override;
 

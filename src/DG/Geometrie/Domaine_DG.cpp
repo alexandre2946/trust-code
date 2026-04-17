@@ -166,21 +166,42 @@ const BasisFunction& Domaine_DG::get_basisFunction(int order) const
 /*! @brief Compute L_1 norm
  *
  */
-double Domaine_DG::compute_L1_norm(const DoubleVect& val_source) const
+double Domaine_DG::compute_L1_norm(const DoubleVect& val_source, const Nature_du_champ nature_source) const
 {
+  //In case of Champ_Fonc_Quad, the values are on the quadrature point
   const Quadrature_base& quad = get_quadrature(5);
   int nb_pts_integ_max = quad.nb_pts_integ_max();
   int nelem = nb_elem();
 
+  //In case of Champ_Inc_Elem, the values are the coefficient of the basis function
+  bool basis_function = Field_base::is_basis_function(nature_source);
+  const int order = Field_base::order(nature_source);
+
+  const BasisFunction& bfunc = get_basisFunction(order);
+  const int nb_bfunc = bfunc.nb_bfunc();
+  DoubleTab fbase(nb_bfunc, nb_pts_integ_max);
+
   DoubleTab val_elem(nb_pts_integ_max);
-
   double sum = 0.;
-
   for (int i = 0; i < nelem; i++)
     {
-      for (int k = 0; k < quad.nb_pts_integ(i) ; k++)
-        val_elem(k) = std::fabs(val_source(i*nb_pts_integ_max+k));
+      if (basis_function)
+        {
+          bfunc.eval_bfunc(quad, i, fbase);
+          for (int k = 0; k < quad.nb_pts_integ(i) ; k++)
+            {
+              for (int l =0; l<nb_bfunc; l++)
+                val_elem(k) += val_source(i*nb_bfunc+l)*fbase(i,k);
 
+              val_elem(k) = std::fabs(val_elem(k));
+            }
+        }
+      else
+        {
+
+          for (int k = 0; k < quad.nb_pts_integ(i) ; k++)
+            val_elem(k) = std::fabs(val_source(i*nb_pts_integ_max+k));
+        }
       sum += quad.compute_integral_on_elem(i, val_elem);
     }
 
@@ -189,25 +210,125 @@ double Domaine_DG::compute_L1_norm(const DoubleVect& val_source) const
 /*! @brief Compute L_2 norm
  *
  */
-double Domaine_DG::compute_L2_norm(const DoubleVect& val_source) const
+double Domaine_DG::compute_L2_norm(const DoubleVect& val_source, const Nature_du_champ nature_source) const
 {
+  //In case of Champ_Fonc_Quad, the values are on the quadrature point
   const Quadrature_base& quad = get_quadrature(5);
   int nb_pts_integ_max = quad.nb_pts_integ_max();
   int nelem = nb_elem();
 
+  //In case of Champ_Inc_Elem, the values are the coefficient of the basis function
+  bool basis_function = Field_base::is_basis_function(nature_source);
+  const int order = Field_base::order(nature_source);
+
+  const BasisFunction& bfunc = get_basisFunction(order);
+  const int nb_bfunc = bfunc.nb_bfunc();
+  DoubleTab fbase(nb_bfunc, nb_pts_integ_max);
+
   DoubleTab val_elem(nb_pts_integ_max);
-
   double sum = 0.;
-
   for (int i = 0; i < nelem; i++)
     {
-      for (int k = 0; k < quad.nb_pts_integ(i) ; k++)
-        val_elem(k) = val_source(i*nb_pts_integ_max+k)*val_source(i*nb_pts_integ_max+k);
+      if (basis_function)
+        {
+          bfunc.eval_bfunc(quad, i, fbase);
+          for (int k = 0; k < quad.nb_pts_integ(i) ; k++)
+            {
+              for (int l =0; l<nb_bfunc; l++)
+                val_elem(k) += val_source(i*nb_bfunc+l)*fbase(i,k);
 
+              val_elem(k) = val_elem(k)*val_elem(k);
+            }
+        }
+      else
+        {
+          for (int k = 0; k < quad.nb_pts_integ(i) ; k++)
+            val_elem(k) = val_source(i*nb_pts_integ_max+k)*val_source(i*nb_pts_integ_max+k);
+        }
       sum += quad.compute_integral_on_elem(i, val_elem);
     }
 
   return sum;
+}
+/*! @brief Compute average
+ *
+ */
+void Domaine_DG::compute_average(const DoubleVect& val_source, double& sum, double& volume, const Nature_du_champ nature_source) const
+{
+  //In case of Champ_Fonc_Quad, the values are on the quadrature point
+  const Quadrature_base& quad = get_quadrature(5);
+  int nb_pts_integ_max = quad.nb_pts_integ_max();
+  int nelem = nb_elem();
+
+  //In case of Champ_Inc_Elem, the values are the coefficient of the basis function
+  bool basis_function = Field_base::is_basis_function(nature_source);
+  const int order = Field_base::order(nature_source);
+
+  const BasisFunction& bfunc = get_basisFunction(order);
+  const int nb_bfunc = bfunc.nb_bfunc();
+  DoubleTab fbase(nb_bfunc, nb_pts_integ_max);
+
+  DoubleTab val_elem(nb_pts_integ_max);
+  for (int i = 0; i < nelem; i++)
+    {
+      if (nature_source>=basis_function_order_0_scalar;)
+        {
+          bfunc.eval_bfunc(quad, i, fbase);
+          for (int k = 0; k < quad.nb_pts_integ(i) ; k++)
+            {
+              for (int l =0; l<nb_bfunc; l++)
+                val_elem(k) += val_source(i*nb_bfunc+l)*fbase(i,k);
+            }
+        }
+      else
+        {
+
+          for (int k = 0; k < quad.nb_pts_integ(i) ; k++)
+            val_elem(k) = val_source(i*nb_pts_integ_max+k);
+        }
+      sum += quad.compute_integral_on_elem(i, val_elem);
+      volume += volumes(i);
+    }
+}
+/*! @brief Compute average with porosity
+ *
+ */
+void Domaine_DG::compute_average_porosity(const DoubleVect& val_source, const DoubleVect& porosity, double& sum, double& volume, const Nature_du_champ nature_source) const
+{
+  //In case of Champ_Fonc_Quad, the values are on the quadrature point
+  const Quadrature_base& quad = get_quadrature(5);
+  int nb_pts_integ_max = quad.nb_pts_integ_max();
+  int nelem = nb_elem();
+
+  //In case of Champ_Inc_Elem, the values are the coefficient of the basis function
+  bool basis_function = Field_base::is_basis_function(nature_source);
+  const int order = Field_base::order(nature_source);
+
+  const BasisFunction& bfunc = get_basisFunction(order);
+  const int nb_bfunc = bfunc.nb_bfunc();
+  DoubleTab fbase(nb_bfunc, nb_pts_integ_max);
+
+  DoubleTab val_elem(nb_pts_integ_max);
+  for (int i = 0; i < nelem; i++)
+    {
+      if (basis_function)
+        {
+          bfunc.eval_bfunc(quad, i, fbase);
+          for (int k = 0; k < quad.nb_pts_integ(i) ; k++)
+            {
+              for (int l =0; l<nb_bfunc; l++)
+                val_elem(k) += val_source(i*nb_bfunc+l)*fbase(i,k);
+              val_elem(k) *= porosity(i);
+            }
+        }
+      else
+        {
+          for (int k = 0; k < quad.nb_pts_integ(i) ; k++)
+            val_elem(k) = val_source(i*nb_pts_integ_max+k)*porosity(i);
+        }
+      sum += quad.compute_integral_on_elem(i, val_elem);
+      volume += volumes(i)*porosity(i);
+    }
 }
 /*! @brief Compute geometric quantities used for the computation
  *  TODO :: Put this in the Domain_Poly_base and delete h_carre

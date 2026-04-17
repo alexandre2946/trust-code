@@ -226,12 +226,13 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ(OWN_PTR(Champ_base)&) 
 
   if (nb_comp==1)
     {
-      extraire(val_extraite,valeurs_source);
+      extraire(val_extraite,valeurs_source, nature_source);
       espace_valeurs = val_extraite;
     }
   else if (domaine_dis.que_suis_je() == "Domaine_DG")
     {
-      extraire(val_extraite,valeurs_source);
+	  //bool is_vectorial = Field_base::is_vectorial(nature_source);TODO DG vectorial case
+      extraire(val_extraite,valeurs_source,nature_source);
       int size_vect = valeurs_source.dimension(0);
       ToDo_Kokkos("critical");
       for (int i=0; i<size_vect; i++)
@@ -301,7 +302,7 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ(OWN_PTR(Champ_base)&) 
                   }
             }
           // Passage si necessaire de la composante pour les Champ_face
-          extraire(val_extraite,vect_source,(nb_dim==nb_comp?-1:comp));
+          extraire(val_extraite,vect_source,nature_source,(nb_dim==nb_comp?-1:comp));
 
           if (nb_dim==nb_comp)
             {
@@ -327,13 +328,14 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ(OWN_PTR(Champ_base)&) 
 }
 
 //Extrait la valeur du vecteur val_source dans val_extraite
-void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVect& val_source, const int composante_VDF) const
+void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVect& val_source, const Nature_du_champ nature_source, const int composante_VDF) const
 {
 
   // TODO DG
   // for DG, sometimes, the reduction 0D have to be a value for the cell, but sometimes if there is additional postreatment, it has to be a Champ_Fonc_Quad_elem type,
   // how to discriminate the two possibilities
   // For now, the norm reductions are consider to be cell values, but for the reductions weighted average and weighted sum are probably have to give values on quadrature points
+  // the composante_VDF for DG discriminates if this is a basis function or a champ_fonc with a value on each quadrature point
 
   if (methode_=="min")
     {
@@ -382,11 +384,11 @@ void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVec
         {
           if (methode_ =="L1_norm")
             {
-              sum = zvf.compute_L1_norm(val_source);
+              sum = zvf.compute_L1_norm(val_source,nature_source);
             }
           else if (methode_ =="L2_norm")
             {
-              sum = zvf.compute_L2_norm(val_source);
+              sum = zvf.compute_L2_norm(val_source,nature_source);
             }
           else
             {
@@ -544,16 +546,7 @@ void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVec
       // au ELEM
       if (get_localisation()==Entity::ELEMENT)
         {
-          int nb_elem = zvf.nb_elem();
-          CDoubleArrView volumes = zvf.volumes().view_ro();
-          CDoubleArrView val = val_source.view_ro();
-          Kokkos::parallel_reduce(start_gpu_timer(__KERNEL_NAME__), nb_elem, KOKKOS_LAMBDA(const int i, double & sum_tmp, double & volume_tmp)
-          {
-            double v = volumes(i);
-            sum_tmp += val(i) * v;
-            volume_tmp += v;
-          }, sum, volume);
-          end_gpu_timer(__KERNEL_NAME__);
+          zvf.compute_average(val_source, sum, volume, nature_source);
         }
 
       // au FACE
@@ -675,13 +668,8 @@ void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVec
             }
           const DoubleVect& poro= source2.valeurs();
           assert(volumes.size_array()==poro.size_array());
-          int nb_elem = zvf.nb_elem();
           ToDo_Kokkos("Code but check test!");
-          for (int i=0; i<nb_elem; i++)
-            {
-              sum+=val_source(i)*volumes(i)*poro(i);
-              volume+=volumes(i)*poro(i);
-            }
+          zvf.compute_average_porosity(val_source,poro,sum,volume,nature_source);
         }
       else
         {
