@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -249,7 +249,7 @@ void Raccord_distant_homogene_32_64<_SIZE_>::completer()
   recv_pe_list_.ordonne_array();
 }
 
-/*! @brief Initialise le raccord distant avec la frontiere et le domaine discretisee opposees au raccord distant, et le domaine discretisee du raccord distant
+/*! @brief Initialise le raccord distant avec la frontiere et le domaine discretise opposes au raccord distant, et le domaine discretise du raccord distant
  * Only called from Champ_front* instances, so can remain 32 bits only.
  */
 template <>

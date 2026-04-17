@@ -120,8 +120,10 @@ case ${Mpirun} in
             echo "gdb.sh ${exec} --quiet -x ${gdb_options}" >"${gdb}"
             chmod +x "${gdb}"
             if [[ -z "${Xterm}" ]]; then
+                echo "######################################################################################"
                 echo "Xterm is not set."
                 echo "Warning: gdb will not work in parallel unless you install xterm and export Xterm=xterm"
+                echo "######################################################################################"
             fi
 
             # Attention xterm -e sur Mandriva 2008 n'accepte plus qu'une seule commande derriere -e

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -155,25 +155,25 @@ int Domaine_Cl_dis_base::contient_Cl(const Nom& type)
   return 0;
 }
 
-/*! @brief Renvoie une reference sur le domaine discretisee associee aux conditions aux limites.
+/*! @brief Renvoie une reference sur le domaine discretise associe aux conditions aux limites.
  *
- * Cette Domaine_dis est associee au travers de l'equation
+ * Ce Domaine_dis est associe au travers de l'equation
  *     associee et pas directement a l'objet Domaine_Cl_dis_base.
  *
- * @return (Domaine_dis_base&) le domaine discretisee associee a l'equation associe aux conditions aux limites.
+ * @return (Domaine_dis_base&) le domaine discretise associe a l'equation associe aux conditions aux limites.
  */
 Domaine_dis_base& Domaine_Cl_dis_base::domaine_dis()
 {
   return equation().domaine_dis();
 }
 
-/*! @brief Renvoie une reference sur le domaine discretisee associee aux conditions aux limites.
+/*! @brief Renvoie une reference sur le domaine discretise associe aux conditions aux limites.
  *
- * Cette Domaine_dis est associee au travers de l'equation
+ * Cet Domaine_dis est associe au travers de l'equation
  *     associee et pas directement a l'objet Domaine_Cl_dis_base.
  *     (version const)
  *
- * @return (Domaine_dis_base&) le domaine discretisee associee a l'equation associe aux conditions aux limites.
+ * @return (Domaine_dis_base&) le domaine discretise associe a l'equation associe aux conditions aux limites.
  */
 const Domaine_dis_base& Domaine_Cl_dis_base::domaine_dis() const
 {

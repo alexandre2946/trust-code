@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -212,20 +212,20 @@ const Milieu_base& Champ_front_calc::milieu() const
   return equation().milieu();
 }
 
-/*! @brief Renvoie le domaine discretisee associee a l'equation qui porte le champ inconnue dont on prend la trace.
+/*! @brief Renvoie le domaine discretise associe a l'equation qui porte le champ inconnue dont on prend la trace.
  *
- * @return (Domaine_dis_base&) le domaine discretisee associee a l'equation qui porte le champ inconnue dont on prend la trace
+ * @return (Domaine_dis_base&) le domaine discretise associe a l'equation qui porte le champ inconnue dont on prend la trace
  */
 const Domaine_dis_base& Champ_front_calc::domaine_dis() const
 {
   return inconnue().domaine_dis_base();
 }
 
-/*! @brief Renvoie le domaine des conditions au limites discretisees portee par l'equation qui porte le champ inconnue
+/*! @brief Renvoie le domaine des conditions au limites discretisees porte par l'equation qui porte le champ inconnue
  *
  *     dont on prend la trace
  *
- * @return (Domaine_Cl_dis_base&) le domaine des conditions au limites discretisees portee par l'equation qui porte le champ inconnue dont on prend la trace
+ * @return (Domaine_Cl_dis_base&) le domaine des conditions au limites discretisees porte par l'equation qui porte le champ inconnue dont on prend la trace
  */
 const Domaine_Cl_dis_base& Champ_front_calc::domaine_Cl_dis() const
 {

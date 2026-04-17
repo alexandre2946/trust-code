@@ -416,7 +416,7 @@ void Domaine_VF::discretiser_no_face()
 {
   Domaine& dom = domaine();
   typer_elem(dom);
-  // Calcul du volume du domaine discretisee
+  // Calcul du volume du domaine discretise
   dom.calculer_volumes(volumes(), inverse_volumes());
 }
 

@@ -239,7 +239,7 @@ void Champ_Generique_Transformation::completer(const Postraitement_base& post)
         }
     }
   //Si aucun champ source n a ete specifie on en ajoute une
-  //pour donner acces au domaine discretisee ...
+  //pour donner acces au domaine discretise ...
 
   Noms sources_location;
 

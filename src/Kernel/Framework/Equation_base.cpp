@@ -83,10 +83,10 @@ int Equation_base::equation_non_resolue() const
     }
 }
 
-/*! @brief Renvoie le domaine discretisee associee a l'equation.
+/*! @brief Renvoie le domaine discretise associe a l'equation.
  *
- * @return (Domaine_dis_base&) le domaine discretisee asscoiee a l'equation
- * @throws l'objet domaine discretisee (Domaine_dis) est invalide,
+ * @return (Domaine_dis_base&) le domaine discretise asscoie a l'equation
+ * @throws l'objet domaine discretise (Domaine_dis) est invalide,
  * probleme associe non discretise.
  */
 Domaine_dis_base& Equation_base::domaine_dis()
@@ -101,12 +101,12 @@ Domaine_dis_base& Equation_base::domaine_dis()
   return le_dom_dis.valeur();
 }
 
-/*! @brief Renvoie le domaine discretisee associee a l'equation.
+/*! @brief Renvoie le domaine discretise associe a l'equation.
  *
  * (version const)
  *
- * @return (Domaine_dis_base&) le domaine discretisee asssociee a l'equation
- * @throws l'objet domaine discretisee (Domaine_dis) est invalide,
+ * @return (Domaine_dis_base&) le domaine discretise asssocie a l'equation
+ * @throws l'objet domaine discretise (Domaine_dis) est invalide,
  * probleme associe non discretise.
  */
 const Domaine_dis_base& Equation_base::domaine_dis() const
@@ -785,7 +785,7 @@ void Equation_base::associer_pb_base(const Probleme_base& pb)
 /*! @brief Discretise l'equation.
  *
  * Type le domaine_Cl_dis, la formatte, l'associe a l'equation.
- *     Type le solveur masse, lui associe le domaine discretisee et
+ *     Type le solveur masse, lui associe le domaine discretise et
  *     le domaine des conditions aux limites discretisees.
  *
  */
@@ -874,9 +874,9 @@ const Schema_Temps_base& Equation_base::schema_temps() const
   return le_schema_en_temps.valeur();
 }
 
-/*! @brief Associe le domaine discretisee a l'equation.
+/*! @brief Associe le domaine discretise a l'equation.
  *
- * @param (Domaine_dis_base& z) le domaine discretisee a associee
+ * @param (Domaine_dis_base& z) le domaine discretise a associer
  */
 void Equation_base::associer_domaine_dis(const Domaine_dis_base& z)
 {

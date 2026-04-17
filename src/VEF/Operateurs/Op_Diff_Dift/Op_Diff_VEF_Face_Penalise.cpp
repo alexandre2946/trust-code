@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -354,7 +354,7 @@ signe(const int Face1, const int Face2) const
   int numero_local;
 
   /* On recupere le nombre de sommets des faces
-   * des elements constituant le domaine discretisee.
+   * des elements constituant le domaine discretise.
    * REM: on exclut le prisme par convention.
    */
   const int nb_sommets_par_face = domaine_vef().nb_som_face();

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -37,7 +37,7 @@ void Op_Correlation::completer(const Probleme_base& Pb, const Nom& prefix)
   integrale_tps_a_ = la_moyenne_a().integrale();
   integrale_tps_b_ = la_moyenne_b().integrale();
 
-  // On recupere le domaine discretisee
+  // On recupere le domaine discretise
   const Domaine_dis_base& domaine = a->get_ref_domaine_dis_base();
 
   // Dimensionnement du champ integrale_champ a la meme taille que mon_champ
