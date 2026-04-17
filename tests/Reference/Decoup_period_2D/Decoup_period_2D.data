@@ -21,6 +21,8 @@ Mailler dom
 }
 
 Trianguler dom
+declarer_bord_perio { domaine dom bord Perio }
+declarer_bord_perio { domaine dom bord Perio2 }
 # END MESH #
 
 # BEGIN PARTITION
@@ -37,7 +39,6 @@ Partition dom
 {
     Partition_tool sous_zones { sous_zones 1 processeur_0 }
     zones_name nom_zone
-    Periodique 2 Perio Perio2
     Larg_joint 2
 }
 End

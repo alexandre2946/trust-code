@@ -27,6 +27,8 @@ Mailler dom
 }
 
 Trianguler_H dom
+declarer_bord_perio { domaine dom bord periox }
+
 Sous_Zone zone1
 Associate zone1 dom
 Read zone1 {

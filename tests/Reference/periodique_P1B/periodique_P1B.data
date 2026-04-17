@@ -20,6 +20,8 @@ Mailler dom
     }
 }
 Trianguler_H dom
+declarer_bord_perio { domaine dom bord Gauche }
+declarer_bord_perio { domaine dom bord Haut }
 # END MESH #
 
 # BEGIN PARTITION
@@ -28,7 +30,6 @@ Partition dom
     Partition_tool tranche { tranches 2 2 }
     Larg_joint 2
     zones_name DOM
-    Periodique 2 Gauche Haut
 }
 End
 END PARTITION #

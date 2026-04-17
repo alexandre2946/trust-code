@@ -20,6 +20,9 @@ Mailler dom
         Bord haut    	Y = 1    	0. <= X <= 1     	0. <= Z <= 1
     }
 }
+Declarer_bord_perio { domaine dom bord perioX }
+Declarer_bord_perio { domaine dom bord perioZ }
+
 VDF dis
 
 Scheme_euler_implicit implicite

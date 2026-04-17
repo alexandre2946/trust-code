@@ -27,6 +27,8 @@ Mailler dom
 }
 
 
+declarer_bord_perio { domaine dom bord periox }
+declarer_bord_perio { domaine dom bord perioz }
 # END MESH #
 
 # BEGIN PARTITION
@@ -35,7 +37,6 @@ Partition dom
     Partitionneur tranche { tranches 1 4 1 }
     Larg_joint 2
     Nom_Zones canalQCdt20K
-    Periodique 2 periox perioz
 }
 Fin
 END PARTITION #

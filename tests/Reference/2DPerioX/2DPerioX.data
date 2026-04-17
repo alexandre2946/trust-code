@@ -19,10 +19,13 @@ Mailler dom
         Bord paroiY   Y =  1.  0. <= X <= 1.
     }
 }
+
 Trianguler_h dom
 Transformer dom
-x+4*x*(1-x)*y*(1-y)*(0.5-y)
-y+4*x*(1-x)*y*(1-y)*(0.5+x)
+    x+4*x*(1-x)*y*(1-y)*(0.5-y)
+    y+4*x*(1-x)*y*(1-y)*(0.5+x)
+
+declarer_bord_perio { domaine dom bord paroiY }
 # END MESH #
 # BEGIN PARTITION
 Partition dom

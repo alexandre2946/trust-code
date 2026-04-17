@@ -56,7 +56,6 @@ Partition dom1
     Nb_parts_tot 2
     Larg_joint 2
     Nom_Zones DOM_1
-    Periodique 1 periox
 }
 
 Partition dom2

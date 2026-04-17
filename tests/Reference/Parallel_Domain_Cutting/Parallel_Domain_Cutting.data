@@ -23,6 +23,8 @@ Mailler dom
         Bord perioz  Z = 2.            0. <= X <= 6.283185307            0. <= Y <= 2.0
     }
 }
+declarer_bord_perio { domaine dom bord periox }
+declarer_bord_perio { domaine dom bord perioz }
 # END MESH #
 # BEGIN PARTITION
 Partition dom
@@ -30,7 +32,6 @@ Partition dom
     Partitionneur metis { nb_parts 4 use_weights }
     Larg_joint 1
     zones_name DOM
-    periodique 2 periox perioz
 }
 End
 END PARTITION #

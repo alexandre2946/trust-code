@@ -39,7 +39,6 @@ Partition dom
     Partitionneur tranche { tranches 1 4 1 }
     Larg_joint 2
     Nom_Zones canalQCdt20K
-    Periodique 2 periox perioz
 }
 Fin
 END PARTITION #

@@ -35,7 +35,6 @@ Partition dom
     Partition_tool Metis { nb_parts 4 }
     Larg_joint 2
     zones_name DOM
-    periodique 1 paroiY
 }
 End
 END PARTITION #

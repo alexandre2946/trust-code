@@ -23,6 +23,8 @@ Mailler dom
         Bord haut     Y = 2.            0. <= X <= 12.56637061   0. <= Z <= 3.141592653
     }
 }
+declarer_bord_perio { domaine dom bord periox }
+declarer_bord_perio { domaine dom bord perioz }
 # END MESH #
 # BEGIN PARTITION
 Partition dom

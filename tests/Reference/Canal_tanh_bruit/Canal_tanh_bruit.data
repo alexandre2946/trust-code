@@ -24,6 +24,8 @@ Mailler Canal
         Bord Perio X = 5.   -0.5 <= Y <= 0.5
     }
 }
+declarer_bord_perio { domaine Canal bord Perio }
+
 # END MESH #
 # BEGIN PARTITION
 Partition Canal

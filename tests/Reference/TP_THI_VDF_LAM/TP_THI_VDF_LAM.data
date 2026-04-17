@@ -24,6 +24,9 @@ Mailler dom
 
     }
 }
+declarer_bord_perio { domaine dom bord periox }
+declarer_bord_perio { domaine dom bord perioy }
+declarer_bord_perio { domaine dom bord perioz }
 # END MESH #
 # BEGIN PARTITION
 Partition dom
@@ -31,7 +34,6 @@ Partition dom
     Partition_tool tranche { tranches 2 2 2 }
     Larg_joint 1
     zones_name DOM
-    Periodique 3 periox perioy perioz
 }
 End
 END PARTITION #

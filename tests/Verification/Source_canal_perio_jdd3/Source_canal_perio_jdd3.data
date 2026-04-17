@@ -23,13 +23,16 @@ Mailler dom
     }
 }
 Trianguler_Fin dom
+declarer_bord_perio { domaine dom bord periox }
+declarer_bord_perio { domaine dom bord haut }
+/* balise transfo */
 # END MESH #
+
 # BEGIN PARTITION
 Partition dom
 {
     Partition_tool metis { nb_parts 4 }
     zones_name DOM
-    Periodique 2 periox haut
     Larg_joint 2
 }
 End
@@ -75,7 +78,7 @@ Read pb
             vitesse champ_uniforme 2 2. 1.
         }
         sources {
-            Canal_perio {  bord periox debit_impose 2. }
+            Canal_perio { bord periox debit_impose 2. }
             , Canal_perio {  bord haut debit_impose 0 }
         }
         boundary_conditions {

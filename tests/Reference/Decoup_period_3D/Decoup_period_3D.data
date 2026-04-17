@@ -30,7 +30,6 @@ Partition dom
 {
     Partition_tool tranche { tranches 1 1 2 }
     zones_name nom_zone
-    Periodique 2 Perio Perio2
     Larg_joint 2
 }
 End

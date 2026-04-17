@@ -29,7 +29,6 @@ Partition_64 dom
     single_hdf
     Larg_joint 2
     zones_name DOM
-    periodique 1 paroiY
 }
 
 # VEF domain #
@@ -48,6 +47,5 @@ Decouper_64 dom	{
 	larg_joint 2
 	single_hdf
 	nom_Zones dom
-	periodique 1 paroiY
 }
 Fin

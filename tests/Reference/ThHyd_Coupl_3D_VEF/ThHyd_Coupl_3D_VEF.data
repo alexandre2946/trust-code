@@ -94,7 +94,6 @@ Partition dom
 {
     Partition_tool sous_zones { sous_zones 1 sous_zone1 }
     zones_name DOM
-    Periodique 2 perioz periox
     Larg_joint 2
 }
 Partition parois
@@ -102,7 +101,6 @@ Partition parois
     Partition_tool sous_zones { sous_zones 1 sous_zone2 }
     Larg_joint 1
     zones_name PAROIS
-    Periodique 2 perioz periox
 }
 End
 END PARTITION #

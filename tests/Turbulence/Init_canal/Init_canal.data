@@ -25,6 +25,8 @@ Mailler canal0
         Bord haut0     Y = 1.   -15. <= X <= -5.   2. <= Z <= 4.
     }
 }
+declarer_bord_perio { domaine canal0 bord periox0 }
+declarer_bord_perio { domaine canal0 bord perioz0 }
 
 Mailler canal1
 {
@@ -43,6 +45,8 @@ Mailler canal1
         Bord perioy1   Y = 13.    2. <= X <= 4.    5. <= Z <= 7.
     }
 }
+declarer_bord_perio { domaine canal1 bord perioy1 }
+declarer_bord_perio { domaine canal1 bord perioz1 }
 
 Mailler canal2
 {
@@ -61,6 +65,8 @@ Mailler canal2
         Bord haut2     Y = -5.   5. <= X <= 7.   -10. <= Z <= 0.
     }
 }
+declarer_bord_perio { domaine canal2 bord periox2 }
+declarer_bord_perio { domaine canal2 bord perioz2 }
 # END MESH #
 # BEGIN PARTITION
 Partition canal0
@@ -68,21 +74,18 @@ Partition canal0
     Partitionneur tranche { tranches 1 2 1 }
     Larg_joint 1
     Nom_Zones DOM0
-    Periodique 2 periox0 perioz0
 }
 Partition canal1
 {
     Partitionneur tranche { tranches 2 1 1 }
     Larg_joint 1
     Nom_Zones DOM1
-    Periodique 2 perioy1 perioz1
 }
 Partition canal2
 {
     Partitionneur tranche { tranches 1 2 1 }
     Larg_joint 1
     Nom_Zones DOM2
-    Periodique 2 periox2 perioz2
 }
 Fin
 END PARTITION #

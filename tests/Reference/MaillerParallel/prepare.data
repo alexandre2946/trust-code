@@ -18,6 +18,8 @@ Mailler dom2
         Bord PerioZ Z = 0.01 0. <= X <= 0.01	0. <= Y <= 0.01
     }
 }
+declarer_bord_perio { domaine dom2 bord PerioZ }
+
 ecrire_fichier_formatte dom2 dom2.geom
 discretiser_domaine dom2
 postraiter_domaine { domaine dom2 fichier dom2.lml format lml }
@@ -38,6 +40,8 @@ MaillerParallel
     boundary_ymax		Haut
     boundary_zmin		PerioZ
 }
+declarer_bord_perio { domaine dom bord PerioZ }
+
 ecrire_fichier_formatte dom dom.geom
 discretiser_domaine dom
 postraiter_domaine { domaine dom fichier dom.lml format lml }

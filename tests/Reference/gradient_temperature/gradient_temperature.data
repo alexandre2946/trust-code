@@ -52,12 +52,12 @@ Mailler dom
         Bord Paroi_Haut		Y = 0.2		0.15 <= X <= 0.2
     }
 }
+declarer_bord_perio { domaine dom bord PerioX }
 # END MESH #
 # BEGIN PARTITION
 Partition dom
 {
     Partition_tool Metis { Nb_parts 6 }
-    periodique 1 PerioX
     Larg_joint 2
     zones_name dom
 }

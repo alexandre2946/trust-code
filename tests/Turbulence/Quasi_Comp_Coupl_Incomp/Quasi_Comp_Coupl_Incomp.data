@@ -60,7 +60,6 @@ Partition dom_boite
     Larg_joint 2
     Nom_Zones DOM_BOITE
     Nb_parts_tot 4
-    Periodique 1 periox
 }
 Partition dom_tube
 {

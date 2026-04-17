@@ -46,7 +46,6 @@ Partition dom
 {
     Partition_tool Metis { Nb_parts 2 }
     zones_name DOM
-    Periodique 1 perio
     Larg_joint 2
 }
 End

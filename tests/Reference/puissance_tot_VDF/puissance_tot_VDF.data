@@ -25,6 +25,8 @@ Mailler dom
         Bord periox  X = 1.  0. <= Y <= 0.8
     }
 }
+declarer_bord_perio { domaine dom bord periox }
+
 Sous_Zone zone1
 Associate zone1 dom
 Read zone1 {

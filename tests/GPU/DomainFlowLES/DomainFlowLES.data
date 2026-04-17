@@ -65,14 +65,12 @@ Partition box
     Partition_tool Metis { Nb_parts 2 }
     Larg_joint 2
     zones_name BOX
-    periodique 2 perio Perioz
 }
 Partition dom
 {
     Partition_tool Metis { Nb_parts 2 }
     Larg_joint 2
     zones_name DOM
-    periodique 1 Perioz
 }
 End
 END PARTITION #

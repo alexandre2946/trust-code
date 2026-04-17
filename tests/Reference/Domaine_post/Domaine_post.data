@@ -55,14 +55,12 @@ Partition dom
 {
     Partition_tool tranche { tranches 1 2 1 }
     zones_name DOM
-    Periodique 2 periox perioz
     Larg_joint 2
 }
 Partition domaine_post
 {
     Partition_tool tranche { tranches 1 2 1 }
     zones_name DOM_post
-    Periodique 2 periox perioz
     Larg_joint 2
 }
 End

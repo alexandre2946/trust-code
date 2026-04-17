@@ -24,16 +24,17 @@ Mailler initial_dom
         Bord Perio  	Z = 1 	0. <= X <= 1.   0. <= Y <= 1.
     }
 }
+
 Tetraedriser_par_prisme initial_dom
 Transformer initial_dom
-x+4*x*(1-x)*y*(1-y)*z*(1-z)*(0.5-y)
-y+4*x*(1-x)*y*(1-y)*z*(1-z)*(0.5+x)
-z
+    x+4*x*(1-x)*y*(1-y)*z*(1-z)*(0.5-y)
+    y+4*x*(1-x)*y*(1-y)*z*(1-z)*(0.5+x)
+    z
+Declarer_bord_perio { domaine initial_dom bord Perio }
 Ecrire_fichier initial_dom initial_dom.geom
 
 Read_file dom initial_dom.geom
 Raffiner_isotrope dom
-Declarer_bord_perio { domaine dom bord Perio }
 # END MESH #
 
 # BEGIN PARTITION
@@ -44,7 +45,6 @@ Partition initial_dom
     Larg_joint 2
     zones_name DOM
     single_hdf
-    periodique 1 Perio
 }
 End
 END PARTITION #

@@ -5,6 +5,7 @@ Domaine DOM_EXTR
 
 # BEGIN MESH #
 Read_file DOM_EXTR DOM_EXTR.geom
+declarer_bord_perio { domaine DOM_EXTR bord PERIO }
 # END MESH #
 
 # BEGIN PARTITION
@@ -13,7 +14,6 @@ Partition DOM_EXTR
     Partition_tool Tranche { Tranches 1 2 1 }
     Larg_joint 2
     zones_name DOM
-    periodique 1 PERIO
 }
 End
 END PARTITION #

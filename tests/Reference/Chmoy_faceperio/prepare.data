@@ -32,7 +32,6 @@ Declarer_bord_perio { domaine dom bord perio }
 Partition dom
 {
     Partition_tool Tranche { tranches 1 2 1 }
-    periodique 1 perio
     Larg_joint 2
     zones_name DOM
 }

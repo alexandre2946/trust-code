@@ -21,6 +21,7 @@ Mailler dom_pbF1
     }
 }
 trianguler dom_pbF1
+declarer_bord_perio { domaine dom_pbF1 bord perio }
 # END MESH #
 
 # BEGIN PARTITION
@@ -29,7 +30,6 @@ Partition dom_pbF1
     Partition_tool tranche { tranches 1 4 }
     Larg_joint 2
     zones_name DOM
-    periodique 1 perio
 }
 End
 END PARTITION #

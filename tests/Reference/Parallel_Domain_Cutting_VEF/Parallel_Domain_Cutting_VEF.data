@@ -22,11 +22,11 @@ Mailler dom
     }
 }
 Tetraedriser_homogene dom
+Declarer_bord_perio { domaine dom bord paroiY } /* should be put after tetraedriser */
 Transformer dom
-x+4*x*(1-x)*y*(1-y)*z*(1-z)*(0.5-y)
-y+4*x*(1-x)*y*(1-y)*z*(1-z)*(0.5+x)
-z
-Declarer_bord_perio { domaine dom bord paroiY }
+    x+4*x*(1-x)*y*(1-y)*z*(1-z)*(0.5-y)
+    y+4*x*(1-x)*y*(1-y)*z*(1-z)*(0.5+x)
+    z
 # END MESH #
 
 # BEGIN PARTITION
@@ -35,7 +35,6 @@ Partition dom
     Partitionneur metis { nb_parts 8 }
     Larg_joint 2
     zones_name DOM
-    periodique 1 paroiY
 }
 End
 END PARTITION #

@@ -30,7 +30,6 @@ Declarer_bord_perio { domaine dom bord perioz }
 Partition dom
 {
     Partition_tool Metis { Nb_parts 2 }
-    Periodique 2 periox perioz
     Larg_joint 2
     zones_name DOM
 }

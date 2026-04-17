@@ -23,6 +23,7 @@ Mailler dom
     }
 }
 Trianguler_Fin dom
+declarer_bord_perio { domaine dom bord periox }
 Transformer dom x+1*y y
 # END MESH #
 # BEGIN PARTITION
@@ -30,7 +31,6 @@ Partition dom
 {
     Partition_tool tranche { tranches 2 2 }
     zones_name DOM
-    Periodique 1 periox
     Larg_joint 2
 }
 End

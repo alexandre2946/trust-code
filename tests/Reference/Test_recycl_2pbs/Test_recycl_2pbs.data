@@ -26,6 +26,7 @@ Mailler dom_pb1
         Bord lateral1 Z = 0.01  0. <= X <= 0.01 0. <= Y <= 0.01
     }
 }
+declarer_bord_perio { domaine dom_pb1 bord entree1 }
 
 Mailler dom_pb2
 {
@@ -51,7 +52,6 @@ Partition dom_pb1
 {
     Partition_tool tranche { tranches 1 2 1 }
     Larg_joint 2
-    periodique 1 entree1
     zones_name DOM1
 }
 

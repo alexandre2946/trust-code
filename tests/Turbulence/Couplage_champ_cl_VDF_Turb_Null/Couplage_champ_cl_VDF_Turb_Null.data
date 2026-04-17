@@ -57,7 +57,6 @@ Postraiter_domaine { domaines { DOM THI } format lata fichier DOM.lata }
 Partition DOM
 {
     Partitionneur Tranche { Tranches 2 1 1 }
-    Periodique 2 perioxx perioyy
     Larg_joint 2
     Nom_Zones DOM
     nb_parts_tot 2
@@ -66,7 +65,6 @@ Partition DOM
 Partition THI
 {
     Partitionneur Tranche { Tranches 1 2 1 }
-    Periodique 3 perioX perioY perioZ
     Larg_joint 2
     Nom_Zones THI
     nb_parts_tot 2

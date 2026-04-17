@@ -18,7 +18,6 @@ Partition dom
     Partitionneur Tranche { Tranches 2 1 1 }
     Larg_joint 2
     Nom_Zones DOM
-    periodique 2 Periox Perioz
 }
 End
 END PARTITION #

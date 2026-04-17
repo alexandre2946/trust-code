@@ -34,7 +34,6 @@ Partition dom
     Partitionneur tranche { tranches 3 1 1 }
     Larg_joint 2
     Nom_Zones DOM
-    Periodique 2 periox perioz
 }
 Fin
 END PARTITION #

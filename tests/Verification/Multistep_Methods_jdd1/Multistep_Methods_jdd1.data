@@ -22,13 +22,13 @@ Mailler dom
 
 Trianguler dom
 
+declarer_bord_perio { domaine dom bord periox }
 # END MESH #
 # BEGIN PARTITION
 Partition dom
 {
     Partition_tool metis { Nb_parts 2 }
     zones_name DOM
-    Periodique 1 periox
     Larg_joint 2
 }
 End

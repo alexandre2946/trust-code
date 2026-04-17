@@ -24,6 +24,7 @@ Mailler initial_dom
         Bord cote2   Z = 10.  	  0. <= X <= 10. 0. <= Y <= 10.
     }
 }
+
 Ecrire_fichier initial_dom initial_dom.geom
 Read_file dom initial_dom.geom
 Raffiner_isotrope dom

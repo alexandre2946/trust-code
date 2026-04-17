@@ -20,12 +20,13 @@ Mailler dom
     }
 }
 Trianguler_h dom
+declarer_bord_perio { domaine dom bord perio }
+declarer_bord_perio { domaine dom bord perioy }
 # END MESH #
 # BEGIN PARTITION
 Partition dom
 {
     Partition_tool Tranche { tranches 2 2 }
-    periodique 2 perio perioy
     Larg_joint 2
     zones_name DOM
 }

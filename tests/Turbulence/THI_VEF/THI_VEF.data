@@ -44,7 +44,6 @@ Partition dom
     Partitionneur metis { nb_parts 9 }
     Larg_joint 2
     Nom_Zones DOM
-    Periodique 3 periox perioy perioz
 }
 Fin
 END PARTITION #

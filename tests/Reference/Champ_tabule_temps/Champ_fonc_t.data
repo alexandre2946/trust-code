@@ -22,6 +22,7 @@ Mailler dom
 }
 
 
+declarer_bord_perio { domaine dom bord Perio }
 # END MESH #
 
 # BEGIN PARTITION
@@ -30,7 +31,6 @@ Partition dom
     Partition_tool tranche { tranches 1 2 }
     Larg_joint 2
     zones_name dom
-    periodique 1 Perio
 }
 End
 END PARTITION #

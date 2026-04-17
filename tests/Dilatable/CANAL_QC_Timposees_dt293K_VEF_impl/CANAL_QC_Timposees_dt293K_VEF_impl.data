@@ -39,7 +39,6 @@ Partition dom
     Larg_joint 2
     reorder 0
     zones_name canalQCdt20K
-    Periodique 2 periox perioz
 }
 End
 END PARTITION #

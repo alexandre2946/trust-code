@@ -17,7 +17,6 @@ Declarer_bord_perio { domaine dom bord section }
 # BEGIN PARTITION
 Partition dom
 {
-    Periodique 1 section
     Partition_tool Metis { nb_parts 6 }
     larg_joint 2
     zones_name DOM

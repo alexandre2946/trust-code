@@ -21,6 +21,7 @@ Mailler dom
         Bord haut    Y = 2.            0. <= X <= 6.283185307
     }
 }
+declarer_bord_perio { domaine dom bord periox }
 END MESH #
 # BEGIN PARTITION
 Partition dom
@@ -28,7 +29,6 @@ Partition dom
     Partition_tool tranche { tranches 1 2 }
     Larg_joint 1
     zones_name DOM
-    Periodique 1 periox
 }
 End
 END PARTITION #

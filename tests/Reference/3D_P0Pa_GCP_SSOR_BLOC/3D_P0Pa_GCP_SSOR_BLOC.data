@@ -30,7 +30,6 @@ Declarer_bord_perio { domaine dom bord perioz }
 Partition dom
 {
     Partition_tool Tranche { tranches 1 1 2 }
-    periodique 3 periox perioy perioz
     Larg_joint 2
     zones_name DOM
 }
