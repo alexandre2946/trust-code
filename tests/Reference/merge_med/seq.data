@@ -192,4 +192,6 @@ Read pb
 }
 Solve pb
 
+cgns_to_lata post_cgns_seq.cgns post_lata_seq.lata
+
 End

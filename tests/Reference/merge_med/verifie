@@ -6,7 +6,10 @@
 # verifie compares sequential med with merged med
 if [ -f merge_med_ALL.med ]
 then	
+
+  # Run serial simulation
   trust seq.data 1>seq.out 2>seq.err
+
   # Comparisions seq & // med merging
   compare_lata seq_0000.med merge_med_ALL.med 1>verifie.log 2>&1 || exit -1
 
@@ -19,6 +22,7 @@ then
     echo "All OK for the med merge !"
   fi
   
+  # Compare seq & // cgns
   compare_cgns post_cgns_par.cgns post_cgns_seq.cgns 1>verifie_cgns.log 2>&1 || exit -1
 
   numb_diff=`awk '$1=="Number"{print $5}' verifie.log`
@@ -30,7 +34,8 @@ then
     echo "All OK for the CGNS diff !"
   fi
   
-  compare_cgns post_cgns_par.cgns post_lata_par.lata 1>verifie_lata.log 2>&1 || exit -1
+  # Compare cgns & converted to lata 
+  compare_cgns post_cgns_par.cgns post_lata_seq.lata 1>verifie_lata.log 2>&1 || exit -1
 
   numb_diff=`awk '$1=="Number"{print $5}' verifie.log`
   if [[ "$numb_diff" -gt "0" ]]
@@ -41,8 +46,10 @@ then
     echo "All OK for the CGNS/LATA diff !"
   fi
   
+  # Run // simulation with other cgns option
   trust par_cgns.data 4 1>par_cgns.out 2>par_cgns.err
   
+  # compare cgns with different options
   compare_cgns post_cgns_par.cgns par_cgns.cgns 1>verifie_cgns2.log 2>&1 || exit -1
 
   numb_diff=`awk '$1=="Number"{print $5}' verifie.log`
@@ -54,7 +61,8 @@ then
     echo "All OK for the CGNS diff !"
   fi
   
-  compare_cgns par_cgns.cgns par_cgns.lata 1>verifie_lata2.log 2>&1 || exit -1
+  # Compare cgns (other option) & converted to lata 
+  compare_cgns par_cgns.cgns post_lata_seq.lata 1>verifie_lata2.log 2>&1 || exit -1
 
   numb_diff=`awk '$1=="Number"{print $5}' verifie.log`
   if [[ "$numb_diff" -gt "0" ]]
@@ -67,6 +75,7 @@ then
   
   
   # test python loader
+  echo "Testing python loader on cgns"
   source $TRUST_ROOT/env_for_python.sh
   
   python script_loader.py || exit -1

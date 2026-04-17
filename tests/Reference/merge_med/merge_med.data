@@ -215,6 +215,5 @@ Read pb
 Solve pb
 
 Merge_MED merge_med_ALL all_times /* last_time */
-cgns_to_lata post_cgns_par.cgns post_lata_par.lata
 
 End

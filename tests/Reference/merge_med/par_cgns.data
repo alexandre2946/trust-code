@@ -97,6 +97,4 @@ Read pb
 }
 Solve pb
 
-cgns_to_lata NOM_DU_CAS NOM_DU_CAS
-
 End
