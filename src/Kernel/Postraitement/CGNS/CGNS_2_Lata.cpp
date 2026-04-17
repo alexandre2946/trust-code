@@ -28,22 +28,27 @@ Entree& CGNS_2_Lata::readOn(Entree& is) { return Interprete::readOn(is); }
 
 Entree& CGNS_2_Lata::interpreter(Entree& is)
 {
-  if (!Process::me())
-    {
-      Cerr << finl << "Syntax CGNS_to_lata nom_cgns||NOM_DU_CAS nom_fichier_sortie_lata||NOM_DU_CAS   " << finl;
+  Cerr << "Syntax CGNS_to_lata nom_cgns||NOM_DU_CAS nom_fichier_sortie_lata||NOM_DU_CAS   " << finl;
+  Nom nom_lml, nom_lata;
+  is >> nom_lml >> nom_lata;
 
-      Nom nom_lml, nom_lata;
-      is >> nom_lml >> nom_lata;
+  if (Motcle(nom_lml) == "NOM_DU_CAS")
+    nom_lml = nom_du_cas() + ".cgns";
 
-      if (Motcle(nom_lml) == "NOM_DU_CAS") nom_lml = nom_du_cas() + ".cgns";
-      if (Motcle(nom_lata) == "NOM_DU_CAS") nom_lata = nom_du_cas() + ".lata";
+  if (Motcle(nom_lata) == "NOM_DU_CAS")
+    nom_lata = nom_du_cas() + ".lata";
 
-      if (!Motcle(nom_lml).finit_par(".cgns")) nom_lml += Nom(".cgns");
-      if (!Motcle(nom_lata).finit_par(".lata")) nom_lata += Nom(".lata");
+  if (!Motcle(nom_lml).finit_par(".cgns"))
+    nom_lml += Nom(".cgns");
 
-      cgns_to_lata(nom_lml, nom_lata, 0 /* binaire */, 1 /* fortran_blocs */, 0 /* pas fortran_ordering */, 1 /* fortran_indexing */);
+  if (!Motcle(nom_lata).finit_par(".lata"))
+    nom_lata += Nom(".lata");
 
-      Cerr << finl;
-    }
+  // Elie Saikali : only if not parallel, otherwise nothing
+  if (Process::is_sequential())
+    cgns_to_lata(nom_lml, nom_lata, 0 /* binaire */, 1 /* fortran_blocs */, 0 /* pas fortran_ordering */, 1 /* fortran_indexing */);
+  else
+    Cerr << "ATTENTION : The interpret CGNS_2_Lata does nothing when running in a parallel mode. Use it only in a serial run ... " << finl;
+
   return is;
 }
