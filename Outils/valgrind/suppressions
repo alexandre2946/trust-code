@@ -189,8 +189,29 @@
    fun:H5F__close
    fun:H5VL__native_file_close
 }
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Param
+   pwrite64(buf)
+   fun:pwrite
+   fun:H5FD__sec2_write
+   fun:H5FD_write
+   fun:H5F__accum_write
+   fun:H5PB_write
+   fun:H5F_block_write
+   fun:H5C__flush_single_entry
+   fun:H5C__flush_ring
+   fun:H5C_flush_cache
+   fun:H5AC_flush
+   fun:H5F__flush_phase2
+   fun:H5F__flush
+   fun:H5VL__native_file_specific
+   fun:H5VL_file_specific
+   fun:H5Fflush
+}
 
 ######
+###### See : https://github.com/CGNS/CGNS/discussions/948#discussioncomment-16589073
 ###### Ecrire_CGNS::cgns_flush_to_disk() calls ADFH_Flush_to_Disk. Issue with MPI + hdf5 : 
 ###### Uninitialised value was created by a stack allocation ADFH_Set_Label ... 
 ######
@@ -236,7 +257,6 @@
    fun:H5G__traverse_real
    fun:H5G_traverse
 }
-
 
 ######
 ###### Cas test PETSC_SA-AMG en parallele utilisant PETSc 3.20
