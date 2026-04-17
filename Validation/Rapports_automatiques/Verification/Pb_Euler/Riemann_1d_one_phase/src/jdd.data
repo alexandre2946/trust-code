@@ -9,7 +9,7 @@ mailler dom
     pave carre
     {
         origine  0.0  0.0
-        nombre_de_noeuds  __n__ 2
+        nombre_de_noeuds  $__n__ 2
         longueurs 1 1
     }
     {
@@ -28,7 +28,7 @@ Read sch
    tinit 0
     dt_min 5.e-40
     dt_max  0.8
-    tmax __tmax__
+    tmax $__tmax__
     seuil_statio -1
     facsec 0.8
 }
@@ -45,7 +45,7 @@ Discretize pb dis
 
 Read pb
 {   Milieu_composite_Euler
-    {     gaz StiffenedGas { gamma __gamma__ pinf __pinf__ }
+    {     gaz StiffenedGas { gamma $__gamma__ pinf $__pinf__ }
           interface Interface_Baer_Nunziato { vitesse -1 pression -1 }
     } 
     
@@ -76,7 +76,7 @@ Read pb
         {
             densite Champ_composite 1
             {
-                Champ_fonc_xyz dom 1 __rl__*(x[__x__)+__rr__*(x>__x__)
+                Champ_fonc_xyz dom 1 $__rl__*(x[$__x__)+$__rr__*(x>$__x__)
             } 
         }
         boundary_conditions
@@ -98,12 +98,12 @@ Read pb
         {
             vitesse Champ_composite 1
             { 
-                Champ_fonc_xyz dom 2 __vl__*(x[__x__)+(__vr__)*(x>__x__) 0
+                Champ_fonc_xyz dom 2 $__vl__*(x[$__x__)+($__vr__)*(x>$__x__) 0
             }
 
             pression Champ_composite 1
             {
-                Champ_fonc_xyz dom 1 __pl__*(x[__x__)+__pr__*(x>__x__)
+                Champ_fonc_xyz dom 1 $__pl__*(x[$__x__)+$__pr__*(x>$__x__)
             }
         }
        boundary_conditions

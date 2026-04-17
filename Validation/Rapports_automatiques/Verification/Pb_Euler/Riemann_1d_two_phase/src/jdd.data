@@ -9,7 +9,7 @@ mailler dom
     pave tube
     {
         origine  0.0  0.0
-        nombre_de_noeuds  __n__ 2
+        nombre_de_noeuds  $__n__ 2
         longueurs 1 1
     }
     {
@@ -28,14 +28,14 @@ Read sch
     tinit 0
     dt_min 5.e-40
     dt_max  0.5
-    tmax __tmax__
+    tmax $__tmax__
     seuil_statio -1
     facsec 0.4
 }
 
 
 
-__dis__ dis 
+$__dis__ dis 
 
 Pb_Euler pb
 
@@ -46,12 +46,9 @@ Discretize pb dis
 Read pb
 {   Milieu_composite_Euler
     {     
-         solide StiffenedGas { gamma __gammaS__ pinf __pinfS__ }
-         gaz StiffenedGas { gamma __gammaG__ pinf 0. }
+         solide StiffenedGas { gamma $__gammaS__ pinf $__pinfS__ }
+         gaz StiffenedGas { gamma $__gammaG__ pinf 0. }
          interface Interface_Baer_Nunziato { vitesse 0 pression 1 }
-         # liquide_sodium Fluide_sodium_liquide { P_ref 1e5 T_ref 800  } # 
-         # gaz_sodium Fluide_sodium_gaz { P_ref 1e5 T_ref $__Tsat__ } 
-         saturation_sodium saturation_sodium { P_ref 1e5 T_ref $__Tsat__ } #
     } 
     
     Fraction_Euler
@@ -61,8 +58,8 @@ Read pb
         {
             alpha Champ_composite 2
             {
-               Champ_fonc_xyz dom 1 __alphaSl__*(x[__x__)+__alphaSr__*(x>__x__)
-               Champ_fonc_xyz dom 1 __alphaGl__*(x[__x__)+__alphaGr__*(x>__x__)
+               Champ_fonc_xyz dom 1 $__alphaSl__*(x[$__x__)+$__alphaSr__*(x>$__x__)
+               Champ_fonc_xyz dom 1 $__alphaGl__*(x[$__x__)+$__alphaGr__*(x>$__x__)
             } 
         }
         boundary_conditions
@@ -88,8 +85,8 @@ Read pb
             densite Champ_composite 2
             {
                 # Champ_Uniforme 1 1 #
-                Champ_fonc_xyz dom 1 __rSl__*(x[__x__)+__rSr__*(x>__x__)
-                Champ_fonc_xyz dom 1 __rGl__*(x[__x__)+__rGr__*(x>__x__)
+                Champ_fonc_xyz dom 1 $__rSl__*(x[$__x__)+$__rSr__*(x>$__x__)
+                Champ_fonc_xyz dom 1 $__rGl__*(x[$__x__)+$__rGr__*(x>$__x__)
             } 
         }
        boundary_conditions
@@ -113,14 +110,14 @@ Read pb
             vitesse Champ_composite 2
             {   
                 # Champ_Uniforme 2 0 0 #
-                Champ_fonc_xyz dom 2 __vSl__*(x[__x__)+(__vSr__)*(x>__x__) 0
-                Champ_fonc_xyz dom 2 __vGl__*(x[__x__)+(__vGr__)*(x>__x__) 0
+                Champ_fonc_xyz dom 2 $__vSl__*(x[$__x__)+($__vSr__)*(x>$__x__) 0
+                Champ_fonc_xyz dom 2 $__vGl__*(x[$__x__)+($__vGr__)*(x>$__x__) 0
             }
 
             pression Champ_composite 2
             {
-                Champ_fonc_xyz dom 1 __pSl__*(x[__x__)+__pSr__*(x>__x__)
-                Champ_fonc_xyz dom 1 __pGl__*(x[__x__)+__pGr__*(x>__x__)
+                Champ_fonc_xyz dom 1 $__pSl__*(x[$__x__)+$__pSr__*(x>$__x__)
+                Champ_fonc_xyz dom 1 $__pGl__*(x[$__x__)+$__pGr__*(x>$__x__)
             }
         }
         boundary_conditions
@@ -142,7 +139,6 @@ Read pb
             {
                  Champ_Uniforme 1 -800
                  Champ_Uniforme 1 -800
-                 # champ_Uniforme 1 $__Tsat__ # 
             }
         } 
         boundary_conditions
