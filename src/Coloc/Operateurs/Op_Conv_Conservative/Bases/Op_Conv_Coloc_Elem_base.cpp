@@ -25,6 +25,7 @@
 #include <Momentum_Euler.h>
 #include <Domaine_Coloc.h>
 #include <Pb_Euler.h>
+#include <array>
 
 Implemente_base(Op_Conv_Coloc_Elem_base,"Op_Conv_Coloc_Elem_base",Op_Conv_Coloc_base);
 
@@ -64,9 +65,9 @@ void Op_Conv_Coloc_Elem_base::Riemann_solver(DoubleTab& num_flux) const
           //              6 -> Dirichlet
           //              7 -> Dirichlet_homogene
 
-          DoubleTab normal(Objet_U::dimension);
+          std::array<double, 3> normal { 0., 0., 0. };
           for (int d = 0; d < Objet_U::dimension; d++)
-            normal(d) = domaine.face_normales(f, d) / domaine.face_surfaces(f);
+            normal[d] = domaine.face_normales(f, d) / domaine.face_surfaces(f);
 
           if (sub_type(Sortie_supersonique, cls[fcl(f, 1)].valeur())) //Neumann_val_ext : 5
             {
@@ -87,7 +88,7 @@ void Op_Conv_Coloc_Elem_base::Riemann_solver(DoubleTab& num_flux) const
 
               for (int n = 0; n < nb_phases; n++)
                 {
-                  DoubleTab vitesse_bord(Objet_U::dimension);
+                  std::array<double, 3> vitesse_bord { 0., 0., 0. };
                   double vitesse_normale_bord = 0;
                   double norme_vitesse = 0;
                   const double alpha_bord = ref_cast(Dirichlet, cls_alpha[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), n);
@@ -96,9 +97,9 @@ void Op_Conv_Coloc_Elem_base::Riemann_solver(DoubleTab& num_flux) const
 
                   for (int d = 0; d < Objet_U::dimension; d++)
                     {
-                      vitesse_bord(d) = ref_cast(Dirichlet, cls_qdm[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), n + nb_phases * d);
-                      vitesse_normale_bord += vitesse_bord(d) * normal(d);
-                      norme_vitesse += vitesse_bord(d) * vitesse_bord(d);
+                      vitesse_bord[d] = ref_cast(Dirichlet, cls_qdm[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), n + nb_phases * d);
+                      vitesse_normale_bord += vitesse_bord[d] * normal[d];
+                      norme_vitesse += vitesse_bord[d] * vitesse_bord[d];
                     }
                   /* TODO a refaire */
                   const Fluide_reel_base& phase = ref_cast(Fluide_reel_base, ref_cast(Milieu_composite_Euler,eq.milieu()).get_fluid(n));

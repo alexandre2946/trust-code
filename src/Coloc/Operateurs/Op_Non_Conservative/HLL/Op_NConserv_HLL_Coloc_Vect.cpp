@@ -25,6 +25,7 @@
 #include <Domaine_Coloc.h>
 #include <Dirichlet.h>
 #include <Pb_Euler.h>
+#include <array>
 
 Implemente_instanciable(Op_NConserv_HLL_Coloc_Vect, "Op_NConserv_HLL_Coloc_Vect", Op_NConserv_Coloc_Vect_base);
 
@@ -140,16 +141,16 @@ void Op_NConserv_HLL_Coloc_Vect::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
           const Conds_lim& cls_qdm = pb.equation_qdm().domaine_Cl_dis().les_conditions_limites();
           const Conds_lim& cls_alpha = pb.equation_fraction().domaine_Cl_dis().les_conditions_limites();
 
-          DoubleTab normal(Objet_U::dimension);
+          std::array<double, 3> normal { 0., 0., 0. };
           for (int d = 0; d < Objet_U::dimension; d++)
-            normal(d) = domaine.face_normales(f, d) / domaine.face_surfaces(f);
+            normal[d] = domaine.face_normales(f, d) / domaine.face_surfaces(f);
 
           if (sub_type(Sortie_supersonique, cls_qdm[fcl(f, 1)].valeur()))
             {
               const double alpha_bord = alpha(e, 0);
               for (int d = 0; d < Objet_U::dimension; d++)
                 {
-                  num_flux_left(f, d) = -alpha_bord * p(e, m) * normal(d);
+                  num_flux_left(f, d) = -alpha_bord * p(e, m) * normal[d];
                   num_flux_right(f, d) = 123.123;
                 }
             }
@@ -158,7 +159,7 @@ void Op_NConserv_HLL_Coloc_Vect::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
               const double alpha_bord = ref_cast(Dirichlet, cls_alpha[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), 0);
               for (int d = 0; d < Objet_U::dimension; d++)
                 {
-                  num_flux_left(f, d) = -alpha_bord * p(e, m) * normal(d);
+                  num_flux_left(f, d) = -alpha_bord * p(e, m) * normal[d];
                   num_flux_right(f, d) = 123.123;
                 }
             }
@@ -170,7 +171,7 @@ void Op_NConserv_HLL_Coloc_Vect::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
               const double alpha_bord = alpha(e, 0);
               for (int d = 0; d < Objet_U::dimension; d++)
                 {
-                  num_flux_left(f, d) = -alpha_bord * p(e, m) * normal(d);
+                  num_flux_left(f, d) = -alpha_bord * p(e, m) * normal[d];
                   num_flux_right(f, d) = 123.123;
                 }
             }

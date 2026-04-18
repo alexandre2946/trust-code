@@ -86,10 +86,6 @@ void Op_NConserv_HLL_Coloc_Elem::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
           assert(f_e(f, 0) >= 0 && vit_n(f, 0) != 123.123); //pas besoin
           num_flux_right(f) = 123.123; //pas besoin
 
-          DoubleTab normal(Objet_U::dimension);
-          for (int d = 0; d < Objet_U::dimension; d++)
-            normal(d) = domaine.face_normales(f, d) / domaine.face_surfaces(f);
-
           if (sub_type(Sortie_supersonique, cls[fcl(f, 1)].valeur()))
             {
               num_flux_left(f) = eq.termes_NonConservatif(alpha(e, 0), vit_n(f, n), p(e, m));
@@ -216,4 +212,3 @@ void Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC_energie(DoubleTab& num_flux_l
   num_flux_right(f) = (Sp * alpha(er, 0) - Sm * alpha(el, 0)) * un_l * p(er, m);
   num_flux_right(f) /= -(Sp - Sm);
 }
-
