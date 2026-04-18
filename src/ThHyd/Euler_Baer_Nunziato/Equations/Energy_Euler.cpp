@@ -22,7 +22,7 @@
 #include <Param.h>
 
 Implemente_instanciable(Energy_Euler, "Energy_Euler|Energie_Euler", Conservation_Euler);
-// XD energy_euler eqn_base energie_euler -1 Internal energy conservation equation for a multi-phase Euler problem where the unknown is the temperature
+// XD energy_euler cons_euler energie_euler -1 Internal energy conservation equation for a multi-phase Euler problem where the unknown is the temperature
 
 Sortie& Energy_Euler::printOn(Sortie& is) const { return Equation_base::printOn(is); }
 

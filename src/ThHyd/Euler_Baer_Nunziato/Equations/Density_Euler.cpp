@@ -23,7 +23,7 @@
 #include <Param.h>
 
 Implemente_instanciable(Density_Euler, "Masse_Euler|Density_Euler", Conservation_Euler);
-// XD masse_euler eqn_base density_euler -1 Mass consevation equation for a multi-phase Euler problem where the unknown is the alpha (void fraction)
+// XD masse_euler cons_euler density_euler -1 Mass consevation equation for a multi-phase Euler problem where the unknown is the alpha (void fraction)
 
 Sortie& Density_Euler::printOn(Sortie& is) const { return Equation_base::printOn(is); }
 

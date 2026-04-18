@@ -19,9 +19,9 @@
 Implemente_instanciable(Pb_Euler, "Pb_Euler", Pb_Fluide_base);
 // XD Pb_Euler Pb_base Pb_Euler -1 A problem that allows the resolution of N-phases Euler equations
 // XD attr milieu_composite_Euler bloc_lecture milieu_composite_Euler 1 The composite medium associated with the problem.
-// XD attr momentum_euler momentum_euler momentum_euler 0 Momentum conservation equation for a multi-phase Euler problem where the unknown is the velocity
-// XD attr masse_euler masse_euler masse_euler 0 Mass consevation equation for a multi-phase Euler problem where the unknown is the density
-// XD attr energy_euler energy_euler energy_euler 0 Internal energy conservation equation for a multi-phase Euler problem where the unknown is the temperature
+// XD attr momentum_euler momentum_euler qdm_euler 0 Momentum conservation equation for a multi-phase Euler problem where the unknown is the velocity
+// XD attr masse_euler masse_euler density_euler 0 Mass consevation equation for a multi-phase Euler problem where the unknown is the density
+// XD attr energy_euler energy_euler energie_euler 0 Internal energy conservation equation for a multi-phase Euler problem where the unknown is the temperature
 // XD attr fraction_euler fraction_euler fraction_euler 0 Void fraction conservation equation for a multi-phase Euler problem where the unknown is the alpha
 
 Sortie& Pb_Euler::printOn(Sortie& os) const { return Pb_Fluide_base::printOn(os); }
