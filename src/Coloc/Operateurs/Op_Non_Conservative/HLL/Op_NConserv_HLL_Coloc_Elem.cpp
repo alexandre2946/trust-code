@@ -17,6 +17,7 @@
 #include <Interface_Baer_Nunziato.h>
 #include <Milieu_composite_Euler.h>
 #include <Neumann_paroi_flux_nul.h>
+#include <Euleur_operator_tools.h>
 #include <Entree_supersonique.h>
 #include <Sortie_supersonique.h>
 #include <Conservation_Euler.h>
@@ -133,33 +134,13 @@ void Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC_fraction(DoubleTab& num_flux_
   const int nb_phases = pb.nb_phases();
   const int el = f_e(f, 0), er = f_e(f, 1);
 
-  int k = m;
-  double un_l = vit_n(f, k), un_r = vit_n(f, k + nb_phases), c_l = c(el, k), c_r = c(er, k);
-  double Sm1 = std::min(un_l - c_l, un_r - c_r);
-  double Sp1 = std::max(un_l + c_l, un_r + c_r);
-
-  k = n;
-  un_l = vit_n(f, k), un_r = vit_n(f, k + nb_phases), c_l = c(el, k), c_r = c(er, k);
-
-  double Sm2 = std::min(un_l - c_l, un_r - c_r);
-  double Sp2 = std::max(un_l + c_l, un_r + c_r);
-
-  double Sm = std::min(0.0, std::min(Sm1, Sm2));
-  double Sp = std::max(0.0, std::max(Sp1, Sp2));
+  double Sm = 0., Sp = 0., un_l = 0.;
+  compute_non_conservative_hll_left_bounds(vit_n, c, f, el, er, m, n, nb_phases, Sm, Sp, un_l);
 
   num_flux_left(f) = (Sp * alpha(el, 0) - Sm * alpha(er, 0)) * un_l + Sp * Sm * (alpha(er, 0) - alpha(el, 0));
   num_flux_left(f) /= (Sp - Sm);
 
-  k = m;
-  un_r = -vit_n(f, k), un_l = -vit_n(f, k + nb_phases), c_l = c(er, k), c_r = c(el, k);
-  Sm1 = std::min(un_l - c_l, un_r - c_r);
-  Sp1 = std::max(un_l + c_l, un_r + c_r);
-  k = n;
-  un_r = -vit_n(f, k), un_l = -vit_n(f, k + nb_phases), c_l = c(er, k), c_r = c(el, k);
-  Sm2 = std::min(un_l - c_l, un_r - c_r);
-  Sp2 = std::max(un_l + c_l, un_r + c_r);
-  Sm = std::min(0.0, std::min(Sm1, Sm2));
-  Sp = std::max(0.0, std::max(Sp1, Sp2));
+  compute_non_conservative_hll_right_bounds(vit_n, c, f, el, er, m, n, nb_phases, Sm, Sp, un_l);
 
   num_flux_right(f) = (Sp * alpha(er, 0) - Sm * alpha(el, 0)) * un_l + Sp * Sm * (alpha(el, 0) - alpha(er, 0));
   num_flux_right(f) /= (Sp - Sm);
@@ -182,32 +163,13 @@ void Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC_energie(DoubleTab& num_flux_l
 
   const int el = f_e(f, 0), er = f_e(f, 1);
 
-  int k = m;
-  double un_l = vit_n(f, k), un_r = vit_n(f, k + nb_phases), c_l = c(el, k), c_r = c(er, k);
-  double Sm1 = std::min(un_l - c_l, un_r - c_r);
-  double Sp1 = std::max(un_l + c_l, un_r + c_r);
-
-  k = n;
-  un_l = vit_n(f, k), un_r = vit_n(f, k + nb_phases), c_l = c(el, k), c_r = c(er, k);
-
-  double Sm2 = std::min(un_l - c_l, un_r - c_r);
-  double Sp2 = std::max(un_l + c_l, un_r + c_r);
-  double Sm = std::min(0.0, std::min(Sm1, Sm2));
-  double Sp = std::max(0.0, std::max(Sp1, Sp2));
+  double Sm = 0., Sp = 0., un_l = 0.;
+  compute_non_conservative_hll_left_bounds(vit_n, c, f, el, er, m, n, nb_phases, Sm, Sp, un_l);
 
   num_flux_left(f) = (Sp * alpha(el, 0) - Sm * alpha(er, 0)) * un_l * p(el, m);
   num_flux_left(f) /= -(Sp - Sm);
 
-  k = m;
-  un_r = -vit_n(f, k), un_l = -vit_n(f, k + nb_phases), c_l = c(er, k), c_r = c(el, k);
-  Sm1 = std::min(un_l - c_l, un_r - c_r);
-  Sp1 = std::max(un_l + c_l, un_r + c_r);
-  k = n;
-  un_r = -vit_n(f, k), un_l = -vit_n(f, k + nb_phases), c_l = c(er, k), c_r = c(el, k);
-  Sm2 = std::min(un_l - c_l, un_r - c_r);
-  Sp2 = std::max(un_l + c_l, un_r + c_r);
-  Sm = std::min(0.0, std::min(Sm1, Sm2));
-  Sp = std::max(0.0, std::max(Sp1, Sp2));
+  compute_non_conservative_hll_right_bounds(vit_n, c, f, el, er, m, n, nb_phases, Sm, Sp, un_l);
 
   num_flux_right(f) = (Sp * alpha(er, 0) - Sm * alpha(el, 0)) * un_l * p(er, m);
   num_flux_right(f) /= -(Sp - Sm);

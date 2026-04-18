@@ -16,6 +16,7 @@
 #include <Op_NConserv_HLL_Coloc_Vect.h>
 #include <Interface_Baer_Nunziato.h>
 #include <Milieu_composite_Euler.h>
+#include <Euleur_operator_tools.h>
 #include <Sortie_supersonique.h>
 #include <Conservation_Euler.h>
 #include <Champ_Inc_P0_base.h>
@@ -55,9 +56,8 @@ void Op_NConserv_HLL_Coloc_Vect::ajouter_blocs(matrices_t matrices, DoubleTab& s
             secmem(e, 0) -= val;
             secmem(e, 1) += val;
             val = (i ? num_flux_right(f, 1) : num_flux_left(f, 1)) * fs(f);
-            ;
             secmem(e, 2) -= val;
-            secmem(e, 3) += val; //
+            secmem(e, 3) += val;
           }
       }
 }
@@ -85,38 +85,16 @@ void Op_NConserv_HLL_Coloc_Vect::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
       const int el = f_e(f, 0), er = f_e(f, 1);
       if (fcl(f, 0) == 0)
         {
-          int k = m;
-          double un_l = vit_n(f, k), un_r = vit_n(f, k + nb_phase), c_l = c(el, k), c_r = c(er, k);
-          double Sm1 = std::min(un_l - c_l, un_r - c_r);
-          double Sp1 = std::max(un_l + c_l, un_r + c_r);
-
-          k = n;
-          un_l = vit_n(f, k), un_r = vit_n(f, k + nb_phase), c_l = c(el, k), c_r = c(er, k);
-
-          double Sm2 = std::min(un_l - c_l, un_r - c_r);
-          double Sp2 = std::max(un_l + c_l, un_r + c_r);
-
-          double Sm = std::min(0.0, std::min(Sm1, Sm2));
-          double Sp = std::max(0.0, std::max(Sp1, Sp2));
-          for (int d = 0; d < dimension; d++)
+          double Sm = 0., Sp = 0., un_l = 0.;
+          compute_non_conservative_hll_left_bounds(vit_n, c, f, el, er, m, n, nb_phase, Sm, Sp, un_l);
+          for (int d = 0; d < Objet_U::dimension; d++)
             {
               double n_d = domaine.face_normales(f, d) / domaine.face_surfaces(f);
               num_flux_left(f, d) = (Sp * alpha(el, 0) - Sm * alpha(er, 0)) * p(el, m) * n_d;
               num_flux_left(f, d) /= -(Sp - Sm);
             }
 
-          k = m;
-          un_r = -vit_n(f, k), un_l = -vit_n(f, k + nb_phase), c_l = c(er, k), c_r = c(el, k);
-          Sm1 = std::min(un_l - c_l, un_r - c_r);
-          Sp1 = std::max(un_l + c_l, un_r + c_r);
-
-          k = n;
-          un_r = -vit_n(f, k), un_l = -vit_n(f, k + nb_phase), c_l = c(er, k), c_r = c(el, k);
-
-          Sm2 = std::min(un_l - c_l, un_r - c_r);
-          Sp2 = std::max(un_l + c_l, un_r + c_r);
-          Sm = std::min(0.0, std::min(Sm1, Sm2));
-          Sp = std::max(0.0, std::max(Sp1, Sp2));
+          compute_non_conservative_hll_right_bounds(vit_n, c, f, el, er, m, n, nb_phase, Sm, Sp, un_l);
 
           for (int d = 0; d < Objet_U::dimension; d++)
             {
@@ -167,7 +145,6 @@ void Op_NConserv_HLL_Coloc_Vect::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
           else if ( sub_type(Symetrie,cls_qdm[fcl(f, 1)].valeur()) && !sub_type(Sortie_supersonique, cls_qdm[fcl(f, 1)].valeur()))
             {
               //Slip wall : u_n=-u_n
-
               const double alpha_bord = alpha(e, 0);
               for (int d = 0; d < Objet_U::dimension; d++)
                 {
