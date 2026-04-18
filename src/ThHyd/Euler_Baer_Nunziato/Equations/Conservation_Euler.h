@@ -57,10 +57,9 @@ public:
   const Fluide_base& fluide() const;
   Fluide_base& fluide();
 
-  virtual DoubleTab flux(const int f, const int elem) const
+  virtual void flux(const int f, const int elem, DoubleTab& res) const
   {
     Process::exit("Conservation_Euler::flux !!!  \n");
-    return DoubleTab();
   }
 
   virtual double flux_bord(const double inco_bord, const double vit_n_bord, const double p_bord) const

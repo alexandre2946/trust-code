@@ -45,11 +45,12 @@ void Op_Conv_Coloc_Vect_base::Riemann_solver(DoubleTab& num_flux) const
   const int nb_phase = pb.nb_phases();
   const DoubleTab& rho = pb.equation_masse().densite().valeurs();
   const DoubleTab& alpha = pb.equation_fraction().inconnue().valeurs();
+  DoubleTrav flux_l(num_flux.line_size()), flux_r(num_flux.line_size());
 
   for (int f = 0; f < domaine.nb_faces(); f++)
     {
       if (fcl(f, 0) == 0)
-        scheme(num_flux, f);
+        scheme(num_flux, f, flux_l, flux_r);
       else
         {
           //tableaux de correspondance lies aux CLs : fcl(f, .) = { type de CL, num de la CL, indice de la face dans la CL }

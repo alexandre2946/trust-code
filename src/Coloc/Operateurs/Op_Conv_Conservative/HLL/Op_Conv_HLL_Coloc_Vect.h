@@ -22,7 +22,7 @@ class Op_Conv_HLL_Coloc_Vect : public Op_Conv_Coloc_Vect_base
 {
   Declare_instanciable( Op_Conv_HLL_Coloc_Vect ) ;
 public:
-  inline void scheme(DoubleTab&, const int) const override;
+  inline void scheme(DoubleTab&, const int, DoubleTab& flux_l, DoubleTab& flux_r) const override;
 };
 
 #endif /*Op_Conv_HLL_Coloc_Vect_included*/

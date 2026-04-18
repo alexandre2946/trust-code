@@ -46,7 +46,7 @@ void Energy_Euler::discretiser()
   Cerr << "Energy_Euler::discretiser() ok" << finl;
 }
 
-inline DoubleTab Energy_Euler::flux(const int f, const int left_or_right) const
+inline void Energy_Euler::flux(const int f, const int left_or_right, DoubleTab& res) const
 {
   const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
   const Domaine_VF& dom = ref_cast(Domaine_VF, domaine_dis());
@@ -56,11 +56,10 @@ inline DoubleTab Energy_Euler::flux(const int f, const int left_or_right) const
   const DoubleTab& p = pb.equation_qdm().pression().valeurs();
   const DoubleTab& alpha = pb.equation_fraction().inconnue().valeurs();
   const int e = dom.face_voisins(f, left_or_right);
-  DoubleTrav flux_(nb_phases);
+  assert(res.dimension_tot(0) == nb_phases);
 
   for (int n = 0; n < nb_phases; n++)
-    flux_(n) = (alpha_rhoE(e, n) + alpha(e, n) * p(e, n)) * vit_normale(f, n + left_or_right * nb_phases);
-  return flux_;
+    res(n) = (alpha_rhoE(e, n) + alpha(e, n) * p(e, n)) * vit_normale(f, n + left_or_right * nb_phases);
 }
 
 Entree& Energy_Euler::lire_cond_init(Entree& is)

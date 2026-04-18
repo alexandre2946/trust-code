@@ -118,7 +118,7 @@ void Density_Euler::mettre_a_jour_champs_conserves(double temps, int reset)
   tab_divide_any_shape(rho, alpha);
 }
 
-DoubleTab Density_Euler::flux(const int f, const int left_or_right) const
+void Density_Euler::flux(const int f, const int left_or_right, DoubleTab& res) const
 {
   //left_or_right = 0 : left et 1 right;
   const Domaine_VF& dom = ref_cast(Domaine_VF, domaine_dis());
@@ -126,10 +126,9 @@ DoubleTab Density_Euler::flux(const int f, const int left_or_right) const
   const DoubleTab& alpha_rho = inconnue().valeurs();
   const int e = dom.face_voisins(f, left_or_right);
   const int nb_phases = ref_cast(Pb_Euler,probleme()).nb_phases();
-  DoubleTrav flux_(nb_phases);
+  assert(res.dimension_tot(0) == nb_phases);
   for (int n = 0; n < nb_phases; n++)
-    flux_(n) = alpha_rho(e, n) * vit_normale(f, n + left_or_right * nb_phases);
-  return flux_;
+    res(n) = alpha_rho(e, n) * vit_normale(f, n + left_or_right * nb_phases);
 }
 
 const Operateur& Density_Euler::operateur(int i) const

@@ -28,7 +28,7 @@ Implemente_instanciable(Op_Conv_Rusanov_Coloc_Vect,"Op_Conv_Rusanov_Coloc_Vect",
 Sortie& Op_Conv_Rusanov_Coloc_Vect::printOn(Sortie& os) const { return Op_Conv_Coloc_base::printOn(os); }
 Entree& Op_Conv_Rusanov_Coloc_Vect::readOn(Entree& is) { Op_Conv_Coloc_base::readOn(is); return is;}
 
-inline void Op_Conv_Rusanov_Coloc_Vect::scheme(DoubleTab& num_flux, const int f) const
+inline void Op_Conv_Rusanov_Coloc_Vect::scheme(DoubleTab& num_flux, const int f, DoubleTab& flux_l, DoubleTab& flux_r) const
 {
   const Domaine_Coloc& domaine = ref_cast(Domaine_Coloc, le_dom_coloc_.valeur());
   const DoubleTab& w = le_champ_inco->valeurs();
@@ -38,8 +38,8 @@ inline void Op_Conv_Rusanov_Coloc_Vect::scheme(DoubleTab& num_flux, const int f)
   const DoubleTab& c = eq.vitesse_son();
   const int nb_phase = ref_cast(Pb_Euler,eq.probleme()).nb_phases();
   const int el = f_e(f, 0), er = f_e(f, 1);
-  const DoubleTab& flux_l = eq.flux_(f, 0),
-                   &flux_r = eq.flux_(f, 1);
+  eq.flux(f, 0, flux_l);
+  eq.flux(f, 1, flux_r);
 
   for (int n = 0; n < nb_phase; n++)
     {

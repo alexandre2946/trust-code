@@ -34,7 +34,7 @@ public:
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
 
   virtual void Riemann_solver(DoubleTab& num_flux) const = 0;
-  virtual void scheme(DoubleTab&, const int) const = 0;
+  virtual void scheme(DoubleTab&, const int, DoubleTab& flux_l, DoubleTab& flux_r) const = 0;
 
   double calculer_dt_stab() const override { return 1.e8; }
 

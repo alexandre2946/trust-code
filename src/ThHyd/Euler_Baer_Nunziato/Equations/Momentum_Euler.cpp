@@ -463,7 +463,7 @@ void Momentum_Euler::calculer_vitesse_normale()
     }
 }
 
-DoubleTab Momentum_Euler::flux_(const int f, const int left_or_right) const
+void Momentum_Euler::flux(const int f, const int left_or_right, DoubleTab& res) const
 {
   //left_or_right = 0 : left et 1 right;
   const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
@@ -474,7 +474,7 @@ DoubleTab Momentum_Euler::flux_(const int f, const int left_or_right) const
   const DoubleTab& alpha = pb.equation_fraction().inconnue().valeurs();
   const int nb_phases = pb.nb_phases();
   const int e = dom.face_voisins(f, left_or_right);
-  DoubleTab res_(alpha_rhoU.line_size());
+  assert(res.dimension_tot(0) == alpha_rhoU.line_size());
   assert(Objet_U::dimension == 2);
 
   for (int n = 0; n < nb_phases; n++)
@@ -482,10 +482,9 @@ DoubleTab Momentum_Euler::flux_(const int f, const int left_or_right) const
       for (int d = 0; d < Objet_U::dimension; d++)
         {
           double vect_n_compo = dom.face_normales(f, d) / dom.face_surfaces(f);
-          res_(n + nb_phases * d) = vect_n_compo * alpha(e, n) * p(e, n) + alpha_rhoU(e, n + nb_phases * d) * vit_normale(f, n + left_or_right * nb_phases);
+          res(n + nb_phases * d) = vect_n_compo * alpha(e, n) * p(e, n) + alpha_rhoU(e, n + nb_phases * d) * vit_normale(f, n + left_or_right * nb_phases);
         }
     }
-  return res_;
 }
 
 const Operateur& Momentum_Euler::operateur(int i) const

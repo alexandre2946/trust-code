@@ -24,7 +24,7 @@ class Density_Euler : public Conservation_Euler
 public :
   void discretiser() override;
   Entree& lire_cond_init(Entree& is) override;
-  DoubleTab flux(const int f, const int e ) const override;
+  void flux(const int f, const int e, DoubleTab& res) const override;
 
   inline double flux_bord(const double alpha_rho_bord, const double vit_n_bord, const double p_bord ) const override
   {

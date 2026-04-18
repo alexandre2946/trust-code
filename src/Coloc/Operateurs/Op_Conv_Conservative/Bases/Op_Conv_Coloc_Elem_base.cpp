@@ -45,11 +45,12 @@ void Op_Conv_Coloc_Elem_base::Riemann_solver(DoubleTab& num_flux) const
   const DoubleTab& vit_n = pb.equation_qdm().vitesse_normale();
   const DoubleTab& p = pb.equation_qdm().pression().valeurs();
   const int nb_phases = pb.nb_phases();
+  DoubleTrav flux_l(num_flux.line_size()), flux_r(num_flux.line_size());
 
   for (int f = 0; f < domaine.nb_faces(); f++)
     {
       if (fcl(f, 0) == 0)
-        scheme(num_flux, f);
+        scheme(num_flux, f, flux_l, flux_r);
       else
         {
           const int e = f_e(f, 0) >= 0 ? f_e(f, 0) : f_e(f, 1); //pas besoin
