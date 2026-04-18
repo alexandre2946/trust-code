@@ -25,8 +25,8 @@ Entree& Op_Conv_Coloc_base::readOn(Entree& is) { Operateur_Conv_base::readOn(is)
 
 void Op_Conv_Coloc_base::completer()
 {
-  assert(le_dom_coloc_.non_nul());
   Operateur_base::completer();
+  assert(le_dom_coloc_.non_nul());
 }
 
 void Op_Conv_Coloc_base::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& zcl, const Champ_Inc_base& inc)
@@ -48,7 +48,7 @@ void Op_Conv_Coloc_base::ajouter_blocs(matrices_t mats, DoubleTab& secmem, const
   const DoubleVect& fs = domaine.face_surfaces();
   const IntTab& f_e = domaine.face_voisins();
   const int n = secmem.line_size();
-  const int N = domaine.nb_faces_tot();
+  const int N = domaine.nb_faces();
   DoubleTrav num_flux(N, n);
   Riemann_solver(num_flux);
 

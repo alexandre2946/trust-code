@@ -38,7 +38,7 @@ void Op_NConserv_HLL_Coloc_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& s
   const DoubleVect& fs = domaine.face_surfaces();
   const IntTab& f_e = domaine.face_voisins();
   assert(secmem.line_size() == 2);
-  const int N = domaine.nb_faces_tot();
+  const int N = domaine.nb_faces();
   DoubleTrav num_flux_left(N);
   DoubleTrav num_flux_right(N);
 
@@ -76,7 +76,7 @@ void Op_NConserv_HLL_Coloc_Elem::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
   const Conds_lim& cls = equation().domaine_Cl_dis().les_conditions_limites();
   const Conds_lim& cls_alpha = pb.equation_fraction().domaine_Cl_dis().les_conditions_limites();
 
-  for (int f = 0; f < domaine.nb_faces_tot(); f++)
+  for (int f = 0; f < domaine.nb_faces(); f++)
     {
       if (fcl(f, 0) == 0)
         calculer_terme_NC(num_flux_left, num_flux_right, f);

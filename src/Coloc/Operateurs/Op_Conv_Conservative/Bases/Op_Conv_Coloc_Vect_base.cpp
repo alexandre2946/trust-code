@@ -45,7 +45,7 @@ void Op_Conv_Coloc_Vect_base::Riemann_solver(DoubleTab& num_flux) const
   const DoubleTab& rho = pb.equation_masse().densite().valeurs();
   const DoubleTab& alpha = pb.equation_fraction().inconnue().valeurs();
 
-  for (int f = 0; f < domaine.nb_faces_tot(); f++)
+  for (int f = 0; f < domaine.nb_faces(); f++)
     {
       if (fcl(f, 0) == 0)
         scheme(num_flux, f);

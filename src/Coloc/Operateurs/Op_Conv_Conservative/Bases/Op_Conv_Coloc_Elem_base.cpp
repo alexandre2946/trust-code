@@ -45,7 +45,7 @@ void Op_Conv_Coloc_Elem_base::Riemann_solver(DoubleTab& num_flux) const
   const DoubleTab& p = pb.equation_qdm().pression().valeurs();
   const int nb_phases = pb.nb_phases();
 
-  for (int f = 0; f < domaine.nb_faces_tot(); f++)
+  for (int f = 0; f < domaine.nb_faces(); f++)
     {
       if (fcl(f, 0) == 0)
         scheme(num_flux, f);

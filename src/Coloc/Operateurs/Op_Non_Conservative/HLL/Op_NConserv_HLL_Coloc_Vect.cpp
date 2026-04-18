@@ -38,7 +38,7 @@ void Op_NConserv_HLL_Coloc_Vect::ajouter_blocs(matrices_t matrices, DoubleTab& s
   const IntTab& f_e = domaine.face_voisins();
   assert(secmem.line_size() / Objet_U::dimension == 2);
 
-  const int N = domaine.nb_faces_tot();
+  const int N = domaine.nb_faces();
   DoubleTrav num_flux_left(N, Objet_U::dimension);
   DoubleTrav num_flux_right(N, Objet_U::dimension);
 
@@ -79,7 +79,7 @@ void Op_NConserv_HLL_Coloc_Vect::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
   const DoubleTab& alpha = pb.equation_fraction().inconnue().valeurs();
   const DoubleTab& c = pb.equation_qdm().vitesse_son();
 
-  for (int f = 0; f < domaine.nb_faces_tot(); f++)
+  for (int f = 0; f < domaine.nb_faces(); f++)
     {
       const int el = f_e(f, 0), er = f_e(f, 1);
       if (fcl(f, 0) == 0)

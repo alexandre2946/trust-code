@@ -26,8 +26,8 @@ Entree& Op_NConserv_Coloc_base::readOn(Entree& is) { return Operateur_NConserv_b
 
 void Op_NConserv_Coloc_base::completer()
 {
-  assert(le_dom_coloc_.non_nul());
   Operateur_base::completer();
+  assert(le_dom_coloc_.non_nul());
 }
 
 void Op_NConserv_Coloc_base::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& zcl, const Champ_Inc_base& inc)
