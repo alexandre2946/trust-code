@@ -1,5 +1,4 @@
 # PARALLEL OK 8 #
-# GPU NOT #
 dimension 2
 Domaine dom
 
@@ -24,7 +23,6 @@ mailler  dom
 # BEGIN PARTITION
 Partition dom
 {
-        /* Choose Nb_parts so to have ~ 25000 cells per processor */
         Partition_tool metis { nb_parts 4 }
         Larg_joint 2
         zones_name DOM

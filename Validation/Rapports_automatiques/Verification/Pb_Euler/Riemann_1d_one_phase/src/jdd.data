@@ -1,5 +1,4 @@
 # PARALLEL OK 8 #
-# GPU NOT #
 dimension 2
 Domaine dom
 
@@ -19,7 +18,21 @@ mailler dom
         bord  droite    X = 1.0    0.0 <= Y <= 1.0
     }
 }
+# END MESH #
 
+# BEGIN PARTITION
+Partition dom
+{
+        Partition_tool metis { nb_parts 4 }
+        Larg_joint 2
+        zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
 
 Scheme_euler_explicit sch
 Read sch
