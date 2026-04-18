@@ -71,8 +71,8 @@ void Milieu_composite_Euler::calculer_pression(DoubleTab& p) const
   const DoubleTab& alpha_rhoE = equation("alpha_energie_tot").inconnue().valeurs();
   DoubleTab rhoE = alpha_rhoE;
   tab_divide_any_shape(rhoE, alpha); // @suppress("Function cannot be resolved")
-  const int& Nb_phase = (int) fluides_.size();
-  const int& Nb_elem = qdm.domaine_dis().nb_elem_tot();
+  const int Nb_phase = (int) fluides_.size();
+  const int Nb_elem = qdm.domaine_dis().nb_elem_tot();
 
   for (int n = 0; n < Nb_phase; n++)
     {
@@ -95,8 +95,8 @@ void Milieu_composite_Euler::calculer_vitesse_son(DoubleTab& c) const
   const DoubleTab& rho = ref_cast(Density_Euler,equation("alpha_rho")).densite().valeurs();
   const DoubleTab& p = qdm.pression().valeurs();
 
-  const int& Nb_phase = (int) fluides_.size();
-  const int& Nb_elem = qdm.domaine_dis().nb_elem_tot();
+  const int Nb_phase = (int) fluides_.size();
+  const int Nb_elem = qdm.domaine_dis().nb_elem_tot();
   for (int n = 0; n < Nb_phase; n++)
     {
       const Fluide_reel_base& phase = ref_cast(Fluide_reel_base, get_fluid(n));

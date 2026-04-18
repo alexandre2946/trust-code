@@ -108,7 +108,7 @@ void Op_NConserv_HLL_Coloc_Elem::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
     }
 }
 
-void Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC(DoubleTab& num_flux_left, DoubleTab& num_flux_right, const int& f) const
+void Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC(DoubleTab& num_flux_left, DoubleTab& num_flux_right, const int f) const
 {
   if (sub_type(Fraction_Euler, equation()))
     calculer_terme_NC_fraction(num_flux_left, num_flux_right, f);
@@ -118,7 +118,7 @@ void Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC(DoubleTab& num_flux_left, Dou
     Process::exit("Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC !!! \n");
 }
 
-void Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC_fraction(DoubleTab& num_flux_left, DoubleTab& num_flux_right, const int& f) const
+void Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC_fraction(DoubleTab& num_flux_left, DoubleTab& num_flux_right, const int f) const
 {
   const Domaine_Coloc& domaine = ref_cast(Domaine_Coloc, le_dom_coloc_.valeur());
   const Pb_Euler& pb = ref_cast(Pb_Euler, equation().probleme());
@@ -165,7 +165,7 @@ void Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC_fraction(DoubleTab& num_flux_
   num_flux_right(f) /= (Sp - Sm);
 }
 
-void Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC_energie(DoubleTab& num_flux_left, DoubleTab& num_flux_right, const int& f) const
+void Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC_energie(DoubleTab& num_flux_left, DoubleTab& num_flux_right, const int f) const
 {
   const Domaine_Coloc& domaine = ref_cast(Domaine_Coloc, le_dom_coloc_.valeur());
   const Pb_Euler& pb = ref_cast(Pb_Euler, equation().probleme());

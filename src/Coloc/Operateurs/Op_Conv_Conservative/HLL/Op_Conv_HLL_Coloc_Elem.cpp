@@ -27,7 +27,7 @@ Implemente_instanciable(Op_Conv_HLL_Coloc_Elem,"Op_Conv_HLL_Coloc_Elem",Op_Conv_
 Sortie& Op_Conv_HLL_Coloc_Elem::printOn(Sortie& os) const { return Op_Conv_Coloc_base::printOn(os); }
 Entree& Op_Conv_HLL_Coloc_Elem::readOn(Entree& is) {  Op_Conv_Coloc_base::readOn(is); return is;}
 
-inline void Op_Conv_HLL_Coloc_Elem::scheme(DoubleTab& num_flux, const int& f) const
+inline void Op_Conv_HLL_Coloc_Elem::scheme(DoubleTab& num_flux, const int f) const
 {
   const Domaine_Coloc& domaine = ref_cast(Domaine_Coloc, le_dom_coloc_.valeur());
   const Conservation_Euler& eq = ref_cast(Conservation_Euler, equation());

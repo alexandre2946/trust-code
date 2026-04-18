@@ -463,7 +463,7 @@ void Momentum_Euler::calculer_vitesse_normale()
     }
 }
 
-DoubleTab Momentum_Euler::flux_(const int& f, const int& left_or_right) const
+DoubleTab Momentum_Euler::flux_(const int f, const int left_or_right) const
 {
   //left_or_right = 0 : left et 1 right;
   const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());

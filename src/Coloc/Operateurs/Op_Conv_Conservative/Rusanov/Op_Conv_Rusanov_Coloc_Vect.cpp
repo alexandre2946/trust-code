@@ -28,7 +28,7 @@ Implemente_instanciable(Op_Conv_Rusanov_Coloc_Vect,"Op_Conv_Rusanov_Coloc_Vect",
 Sortie& Op_Conv_Rusanov_Coloc_Vect::printOn(Sortie& os) const { return Op_Conv_Coloc_base::printOn(os); }
 Entree& Op_Conv_Rusanov_Coloc_Vect::readOn(Entree& is) { Op_Conv_Coloc_base::readOn(is); return is;}
 
-inline void Op_Conv_Rusanov_Coloc_Vect::scheme(DoubleTab& num_flux, const int& f) const
+inline void Op_Conv_Rusanov_Coloc_Vect::scheme(DoubleTab& num_flux, const int f) const
 {
   const Domaine_Coloc& domaine = ref_cast(Domaine_Coloc, le_dom_coloc_.valeur());
   const DoubleTab& w = le_champ_inco->valeurs();
@@ -50,4 +50,3 @@ inline void Op_Conv_Rusanov_Coloc_Vect::scheme(DoubleTab& num_flux, const int& f
         num_flux(f, n + nb_phase * d) = 0.5 * (flux_l(n + nb_phase * d) + flux_r(n + nb_phase * d)) - s * 0.5 * (w(er, n + nb_phase * d) - w(el, n + nb_phase * d));
     }
 }
-
