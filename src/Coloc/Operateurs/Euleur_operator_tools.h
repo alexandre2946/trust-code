@@ -13,44 +13,29 @@
 *
 *****************************************************************************/
 
-#include <Op_Conv_HLL_Coloc_Vect.h>
-#include <Milieu_composite_Euler.h>
-#include <Euleur_operator_tools.h>
-#include <Conservation_Euler.h>
-#include <Champ_Inc_P0_base.h>
-#include <Domaine_Cl_Coloc.h>
-#include <Fluide_reel_base.h>
-#include <Momentum_Euler.h>
-#include <Domaine_Coloc.h>
-#include <Pb_Euler.h>
+#ifndef Euleur_operator_tools_included
+#define Euleur_operator_tools_included
 
-Implemente_instanciable(Op_Conv_HLL_Coloc_Vect,"Op_Conv_HLL_Coloc_Vect",Op_Conv_Coloc_Vect_base);
-
-Sortie& Op_Conv_HLL_Coloc_Vect::printOn(Sortie& os) const { return Op_Conv_Coloc_base::printOn(os); }
-Entree& Op_Conv_HLL_Coloc_Vect::readOn(Entree& is) { Op_Conv_Coloc_base::readOn(is); return is;}
-
-inline void Op_Conv_HLL_Coloc_Vect::scheme(DoubleTab& num_flux, const int f, DoubleTab& flux_l, DoubleTab& flux_r) const
+inline void compute_hll_bounds(const DoubleTab& vit_n, const DoubleTab& c, const int f, const int el, const int er, const int nb_phases, double& Sm, double& Sp)
 {
-  const Domaine_Coloc& domaine = ref_cast(Domaine_Coloc, le_dom_coloc_.valeur());
-  const DoubleTab& w = le_champ_inco->valeurs();
-  const IntTab& f_e = domaine.face_voisins();
-  const Momentum_Euler& eq = ref_cast(Momentum_Euler, equation());
-  const DoubleTab& vit_n = eq.vitesse_normale();
-  const DoubleTab& c = eq.vitesse_son();
-  const int nb_phase = ref_cast(Pb_Euler,eq.probleme()).nb_phases();
-  const int el = f_e(f, 0), er = f_e(f, 1);
-  eq.flux(f, 0, flux_l);
-  eq.flux(f, 1, flux_r);
-
-  double Sm = 0., Sp = 0.;
-  compute_hll_bounds(vit_n, c, f, el, er, nb_phase, Sm, Sp);
-
-  for (int n = 0; n < nb_phase; n++)
+  Sm = 0.;
+  Sp = 0.;
+  for (int n = 0; n < nb_phases; n++)
     {
-      for (int d = 0; d < Objet_U::dimension; d++)
-        {
-          num_flux(f, n + nb_phase * d) = (Sp * flux_l(n + nb_phase * d) - Sm * flux_r(n + nb_phase * d) + Sp * Sm * (w(er, n + nb_phase * d) - w(el, n + nb_phase * d)));
-          num_flux(f, n + nb_phase * d) /= (Sp - Sm);
-        }
+      const double un_l = vit_n(f, n), un_r = vit_n(f, n + nb_phases), c_l = c(el, n), c_r = c(er, n);
+      const double Sm_k = std::min(un_l - c_l, un_r - c_r);
+      const double Sp_k = std::max(un_l + c_l, un_r + c_r);
+      Sm = std::min(Sm, std::min(0.0, Sm_k));
+      Sp = std::max(Sp, std::max(0.0, Sp_k));
     }
 }
+
+inline double compute_rusanov_speed(const DoubleTab& vit_n, const DoubleTab& c, const int f, const int el, const int er, const int n, const int nb_phases)
+{
+  const double un_l = vit_n(f, n), un_r = vit_n(f, n + nb_phases), c_l = c(el, n), c_r = c(er, n);
+  double s = std::max(fabs(un_l - c_l), fabs(un_l + c_l));
+  s = std::max(s, std::max(fabs(un_r - c_r), fabs(un_r + c_r)));
+  return s;
+}
+
+#endif /*Euleur_operator_tools_included*/

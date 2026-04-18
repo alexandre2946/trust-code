@@ -15,6 +15,7 @@
 
 #include <Op_Conv_Rusanov_Coloc_Elem.h>
 #include <Milieu_composite_Euler.h>
+#include <Euleur_operator_tools.h>
 #include <Conservation_Euler.h>
 #include <Champ_Inc_P0_base.h>
 #include <Domaine_Cl_Coloc.h>
@@ -44,9 +45,7 @@ inline void Op_Conv_Rusanov_Coloc_Elem::scheme(DoubleTab& num_flux, const int f,
 
   for (int n = 0; n < nb_phases; n++)
     {
-      double un_l = vit_n(f, n), un_r = vit_n(f, n + nb_phases), c_l = c(el, n), c_r = c(er, n);
-      double s = std::max(fabs(un_l - c_l), fabs(un_l + c_l));
-      s = std::max(s, std::max(fabs(un_r - c_r), fabs(un_r + c_r)));
+      const double s = compute_rusanov_speed(vit_n, c, f, el, er, n, nb_phases);
       num_flux(f, n) = 0.5 * (flux_l(n) + flux_r(n)) - s * 0.5 * (w(er, n) - w(el, n));
     }
 }

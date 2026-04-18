@@ -15,6 +15,7 @@
 
 #include <Op_Conv_HLL_Coloc_Elem.h>
 #include <Milieu_composite_Euler.h>
+#include <Euleur_operator_tools.h>
 #include <Conservation_Euler.h>
 #include <Champ_Inc_P0_base.h>
 #include <Fluide_reel_base.h>
@@ -40,16 +41,8 @@ inline void Op_Conv_HLL_Coloc_Elem::scheme(DoubleTab& num_flux, const int f, Dou
   eq.flux(f, 0, flux_l);
   eq.flux(f, 1, flux_r);
 
-  double Sp = 0, Sm = 0;
-
-  for (int n = 0; n < nb_phases; n++)
-    {
-      double un_l = vit_n(f, n), un_r = vit_n(f, n + nb_phases), c_l = c(el, n), c_r = c(er, n);
-      double Sm_k = std::min(un_l - c_l, un_r - c_r);
-      double Sp_k = std::max(un_l + c_l, un_r + c_r);
-      Sm = std::min(Sm, std::min(0.0, Sm_k));
-      Sp = std::max(Sp, std::max(0.0, Sp_k));
-    }
+  double Sm = 0., Sp = 0.;
+  compute_hll_bounds(vit_n, c, f, el, er, nb_phases, Sm, Sp);
 
   for (int n = 0; n < nb_phases; n++)
     {
