@@ -39,13 +39,12 @@ void Op_NConserv_HLL_Coloc_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& s
   const DoubleVect& fs = domaine.face_surfaces();
   const IntTab& f_e = domaine.face_voisins();
   assert(secmem.line_size() == 2);
-  const int N = domaine.nb_faces();
-  DoubleTrav num_flux_left(N);
-  DoubleTrav num_flux_right(N);
+  const int nb_faces = domaine.nb_faces();
+  DoubleTrav num_flux_left(nb_faces), num_flux_right(nb_faces);
 
   Abgral_scheme(num_flux_left, num_flux_right);
 
-  for (int f = 0; f < N; f++)
+  for (int f = 0; f < nb_faces; f++)
     for (int i = 0; i < 2; i++)
       {
         int e = f_e(f, i);
@@ -77,11 +76,18 @@ void Op_NConserv_HLL_Coloc_Elem::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
   const Conds_lim& cls = equation().domaine_Cl_dis().les_conditions_limites();
   const Conds_lim& cls_alpha = pb.equation_fraction().domaine_Cl_dis().les_conditions_limites();
 
+  // faces internes
+  if (sub_type(Fraction_Euler, equation()))
+    calculer_terme_NC_fraction(num_flux_left, num_flux_right);
+  else if (sub_type(Energy_Euler, equation()))
+    calculer_terme_NC_energie(num_flux_left, num_flux_right);
+  else
+    Process::exit("Op_NConserv_HLL_Coloc_Elem::Abgral_scheme !!! \n");
+
+  // faces bords
   for (int f = 0; f < domaine.nb_faces(); f++)
     {
-      if (fcl(f, 0) == 0)
-        calculer_terme_NC(num_flux_left, num_flux_right, f);
-      else
+      if (fcl(f, 0) != 0)
         {
           const int e = f_e(f, 0) >= 0 ? f_e(f, 0) : f_e(f, 1); //pas besoin
           assert(f_e(f, 0) >= 0 && vit_n(f, 0) != 123.123); //pas besoin
@@ -109,17 +115,7 @@ void Op_NConserv_HLL_Coloc_Elem::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
     }
 }
 
-void Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC(DoubleTab& num_flux_left, DoubleTab& num_flux_right, const int f) const
-{
-  if (sub_type(Fraction_Euler, equation()))
-    calculer_terme_NC_fraction(num_flux_left, num_flux_right, f);
-  else if (sub_type(Energy_Euler, equation()))
-    calculer_terme_NC_energie(num_flux_left, num_flux_right, f);
-  else
-    Process::exit("Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC !!! \n");
-}
-
-void Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC_fraction(DoubleTab& num_flux_left, DoubleTab& num_flux_right, const int f) const
+void Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC_fraction(DoubleTab& num_flux_left, DoubleTab& num_flux_right) const
 {
   const Domaine_Coloc& domaine = ref_cast(Domaine_Coloc, le_dom_coloc_.valeur());
   const Pb_Euler& pb = ref_cast(Pb_Euler, equation().probleme());
@@ -131,22 +127,27 @@ void Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC_fraction(DoubleTab& num_flux_
   const DoubleTab& vit_n = pb.equation_qdm().vitesse_normale();
   const DoubleTab& c = pb.equation_qdm().vitesse_son();
 
+  const IntTab& fcl = ref_cast(Champ_Inc_P0_base, equation().inconnue()).fcl();
   const int nb_phases = pb.nb_phases();
-  const int el = f_e(f, 0), er = f_e(f, 1);
 
-  double Sm = 0., Sp = 0., un_l = 0.;
-  compute_non_conservative_hll_left_bounds(vit_n, c, f, el, er, m, n, nb_phases, Sm, Sp, un_l);
+  for (int f = 0; f < domaine.nb_faces(); f++)
+    if (fcl(f, 0) == 0)
+      {
+        const int el = f_e(f, 0), er = f_e(f, 1);
+        double Sm = 0., Sp = 0., un_l = 0.;
+        compute_non_conservative_hll_left_bounds(vit_n, c, f, el, er, m, n, nb_phases, Sm, Sp, un_l);
 
-  num_flux_left(f) = (Sp * alpha(el, 0) - Sm * alpha(er, 0)) * un_l + Sp * Sm * (alpha(er, 0) - alpha(el, 0));
-  num_flux_left(f) /= (Sp - Sm);
+        num_flux_left(f) = (Sp * alpha(el, 0) - Sm * alpha(er, 0)) * un_l + Sp * Sm * (alpha(er, 0) - alpha(el, 0));
+        num_flux_left(f) /= (Sp - Sm);
 
-  compute_non_conservative_hll_right_bounds(vit_n, c, f, el, er, m, n, nb_phases, Sm, Sp, un_l);
+        compute_non_conservative_hll_right_bounds(vit_n, c, f, el, er, m, n, nb_phases, Sm, Sp, un_l);
 
-  num_flux_right(f) = (Sp * alpha(er, 0) - Sm * alpha(el, 0)) * un_l + Sp * Sm * (alpha(el, 0) - alpha(er, 0));
-  num_flux_right(f) /= (Sp - Sm);
+        num_flux_right(f) = (Sp * alpha(er, 0) - Sm * alpha(el, 0)) * un_l + Sp * Sm * (alpha(el, 0) - alpha(er, 0));
+        num_flux_right(f) /= (Sp - Sm);
+      }
 }
 
-void Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC_energie(DoubleTab& num_flux_left, DoubleTab& num_flux_right, const int f) const
+void Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC_energie(DoubleTab& num_flux_left, DoubleTab& num_flux_right) const
 {
   const Domaine_Coloc& domaine = ref_cast(Domaine_Coloc, le_dom_coloc_.valeur());
   const Pb_Euler& pb = ref_cast(Pb_Euler, equation().probleme());
@@ -159,18 +160,22 @@ void Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC_energie(DoubleTab& num_flux_l
   const DoubleTab& vit_n = pb.equation_qdm().vitesse_normale();
   const DoubleTab& c = pb.equation_qdm().vitesse_son();
   const DoubleTab& p = pb.equation_qdm().pression().valeurs();
+  const IntTab& fcl = ref_cast(Champ_Inc_P0_base, equation().inconnue()).fcl();
   const int nb_phases = pb.nb_phases();
 
-  const int el = f_e(f, 0), er = f_e(f, 1);
+  for (int f = 0; f < domaine.nb_faces(); f++)
+    if (fcl(f, 0) == 0)
+      {
+        const int el = f_e(f, 0), er = f_e(f, 1);
+        double Sm = 0., Sp = 0., un_l = 0.;
+        compute_non_conservative_hll_left_bounds(vit_n, c, f, el, er, m, n, nb_phases, Sm, Sp, un_l);
 
-  double Sm = 0., Sp = 0., un_l = 0.;
-  compute_non_conservative_hll_left_bounds(vit_n, c, f, el, er, m, n, nb_phases, Sm, Sp, un_l);
+        num_flux_left(f) = (Sp * alpha(el, 0) - Sm * alpha(er, 0)) * un_l * p(el, m);
+        num_flux_left(f) /= -(Sp - Sm);
 
-  num_flux_left(f) = (Sp * alpha(el, 0) - Sm * alpha(er, 0)) * un_l * p(el, m);
-  num_flux_left(f) /= -(Sp - Sm);
+        compute_non_conservative_hll_right_bounds(vit_n, c, f, el, er, m, n, nb_phases, Sm, Sp, un_l);
 
-  compute_non_conservative_hll_right_bounds(vit_n, c, f, el, er, m, n, nb_phases, Sm, Sp, un_l);
-
-  num_flux_right(f) = (Sp * alpha(er, 0) - Sm * alpha(el, 0)) * un_l * p(er, m);
-  num_flux_right(f) /= -(Sp - Sm);
+        num_flux_right(f) = (Sp * alpha(er, 0) - Sm * alpha(el, 0)) * un_l * p(er, m);
+        num_flux_right(f) /= -(Sp - Sm);
+      }
 }
