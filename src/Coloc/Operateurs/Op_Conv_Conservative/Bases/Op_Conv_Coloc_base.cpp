@@ -48,11 +48,11 @@ void Op_Conv_Coloc_base::ajouter_blocs(matrices_t mats, DoubleTab& secmem, const
   const DoubleVect& fs = domaine.face_surfaces();
   const IntTab& f_e = domaine.face_voisins();
   const int n = secmem.line_size();
-  const int N = domaine.nb_faces();
-  DoubleTrav num_flux(N, n);
+  const int nb_faces = domaine.nb_faces();
+  DoubleTrav num_flux(nb_faces, n);
   Riemann_solver(num_flux);
 
-  for (int f = 0; f < N; f++)
+  for (int f = 0; f < nb_faces; f++)
     for (int i = 0; i < 2; i++)
       {
         const int e = f_e(f, i);

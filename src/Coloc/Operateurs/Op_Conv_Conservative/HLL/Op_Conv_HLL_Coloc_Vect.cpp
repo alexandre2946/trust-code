@@ -39,6 +39,7 @@ inline void Op_Conv_HLL_Coloc_Vect::scheme(DoubleTab& num_flux, const DoubleTab&
   const DoubleTab& vit_n = eq.vitesse_normale();
   const DoubleTab& c = eq.vitesse_son();
   const int nb_phase = ref_cast(Pb_Euler,eq.probleme()).nb_phases();
+
   for (int f = 0; f < domaine.nb_faces(); f++)
     if (fcl(f, 0) == 0)
       {

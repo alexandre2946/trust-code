@@ -68,21 +68,58 @@ void Op_NConserv_HLL_Coloc_Elem::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
   const Interface_Baer_Nunziato& interface = ref_cast(Interface_Baer_Nunziato, ref_cast(Milieu_composite_Euler,pb.milieu()).interface_phase());
   const int n = interface.id_phase_vitesse_inter();
   const int m = interface.id_phase_pression_inter();
+  const int nb_phases = pb.nb_phases();
 
   const DoubleTab& alpha = pb.equation_fraction().inconnue().valeurs();
   const DoubleTab& vit_n = pb.equation_qdm().vitesse_normale();
   const DoubleTab& p = pb.equation_qdm().pression().valeurs();
+  const DoubleTab& c = pb.equation_qdm().vitesse_son();
 
   const Conds_lim& cls = equation().domaine_Cl_dis().les_conditions_limites();
   const Conds_lim& cls_alpha = pb.equation_fraction().domaine_Cl_dis().les_conditions_limites();
 
   // faces internes
   if (sub_type(Fraction_Euler, equation()))
-    calculer_terme_NC_fraction(num_flux_left, num_flux_right);
+    {
+      for (int f = 0; f < domaine.nb_faces(); f++)
+        if (fcl(f, 0) == 0)
+          {
+            const int el = f_e(f, 0), er = f_e(f, 1);
+            double Sm = 0., Sp = 0., un_l = 0.;
+            compute_non_conservative_hll_left_bounds(vit_n, c, f, el, er, m, n, nb_phases, Sm, Sp, un_l);
+
+            num_flux_left(f) = (Sp * alpha(el, 0) - Sm * alpha(er, 0)) * un_l + Sp * Sm * (alpha(er, 0) - alpha(el, 0));
+            num_flux_left(f) /= (Sp - Sm);
+
+            compute_non_conservative_hll_right_bounds(vit_n, c, f, el, er, m, n, nb_phases, Sm, Sp, un_l);
+
+            num_flux_right(f) = (Sp * alpha(er, 0) - Sm * alpha(el, 0)) * un_l + Sp * Sm * (alpha(el, 0) - alpha(er, 0));
+            num_flux_right(f) /= (Sp - Sm);
+          }
+    }
   else if (sub_type(Energy_Euler, equation()))
-    calculer_terme_NC_energie(num_flux_left, num_flux_right);
+    {
+      for (int f = 0; f < domaine.nb_faces(); f++)
+        if (fcl(f, 0) == 0)
+          {
+            const int el = f_e(f, 0), er = f_e(f, 1);
+            double Sm = 0., Sp = 0., un_l = 0.;
+            compute_non_conservative_hll_left_bounds(vit_n, c, f, el, er, m, n, nb_phases, Sm, Sp, un_l);
+
+            num_flux_left(f) = (Sp * alpha(el, 0) - Sm * alpha(er, 0)) * un_l * p(el, m);
+            num_flux_left(f) /= -(Sp - Sm);
+
+            compute_non_conservative_hll_right_bounds(vit_n, c, f, el, er, m, n, nb_phases, Sm, Sp, un_l);
+
+            num_flux_right(f) = (Sp * alpha(er, 0) - Sm * alpha(el, 0)) * un_l * p(er, m);
+            num_flux_right(f) /= -(Sp - Sm);
+          }
+    }
   else
-    Process::exit("Op_NConserv_HLL_Coloc_Elem::Abgral_scheme !!! \n");
+    {
+      Cerr << "Op_NConserv_HLL_Coloc_Elem should not be used for equation " << equation().que_suis_je() << finl;
+      Process::exit();
+    }
 
   // faces bords
   for (int f = 0; f < domaine.nb_faces(); f++)
@@ -113,69 +150,4 @@ void Op_NConserv_HLL_Coloc_Elem::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
             }
         }
     }
-}
-
-void Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC_fraction(DoubleTab& num_flux_left, DoubleTab& num_flux_right) const
-{
-  const Domaine_Coloc& domaine = ref_cast(Domaine_Coloc, le_dom_coloc_.valeur());
-  const Pb_Euler& pb = ref_cast(Pb_Euler, equation().probleme());
-  const Interface_Baer_Nunziato& interface = ref_cast(Interface_Baer_Nunziato, ref_cast(Milieu_composite_Euler,pb.milieu()).interface_phase());
-  const int n = interface.id_phase_vitesse_inter();
-  const int m = interface.id_phase_pression_inter();
-  const IntTab& f_e = domaine.face_voisins();
-  const DoubleTab& alpha = pb.equation_fraction().inconnue().valeurs();
-  const DoubleTab& vit_n = pb.equation_qdm().vitesse_normale();
-  const DoubleTab& c = pb.equation_qdm().vitesse_son();
-
-  const IntTab& fcl = ref_cast(Champ_Inc_P0_base, equation().inconnue()).fcl();
-  const int nb_phases = pb.nb_phases();
-
-  for (int f = 0; f < domaine.nb_faces(); f++)
-    if (fcl(f, 0) == 0)
-      {
-        const int el = f_e(f, 0), er = f_e(f, 1);
-        double Sm = 0., Sp = 0., un_l = 0.;
-        compute_non_conservative_hll_left_bounds(vit_n, c, f, el, er, m, n, nb_phases, Sm, Sp, un_l);
-
-        num_flux_left(f) = (Sp * alpha(el, 0) - Sm * alpha(er, 0)) * un_l + Sp * Sm * (alpha(er, 0) - alpha(el, 0));
-        num_flux_left(f) /= (Sp - Sm);
-
-        compute_non_conservative_hll_right_bounds(vit_n, c, f, el, er, m, n, nb_phases, Sm, Sp, un_l);
-
-        num_flux_right(f) = (Sp * alpha(er, 0) - Sm * alpha(el, 0)) * un_l + Sp * Sm * (alpha(el, 0) - alpha(er, 0));
-        num_flux_right(f) /= (Sp - Sm);
-      }
-}
-
-void Op_NConserv_HLL_Coloc_Elem::calculer_terme_NC_energie(DoubleTab& num_flux_left, DoubleTab& num_flux_right) const
-{
-  const Domaine_Coloc& domaine = ref_cast(Domaine_Coloc, le_dom_coloc_.valeur());
-  const Pb_Euler& pb = ref_cast(Pb_Euler, equation().probleme());
-  const Interface_Baer_Nunziato& interface = ref_cast(Interface_Baer_Nunziato, ref_cast(Milieu_composite_Euler,pb.milieu()).interface_phase());
-  const int n = interface.id_phase_vitesse_inter();
-  const int m = interface.id_phase_pression_inter();
-
-  const IntTab& f_e = domaine.face_voisins();
-  const DoubleTab& alpha = pb.equation_fraction().inconnue().valeurs();
-  const DoubleTab& vit_n = pb.equation_qdm().vitesse_normale();
-  const DoubleTab& c = pb.equation_qdm().vitesse_son();
-  const DoubleTab& p = pb.equation_qdm().pression().valeurs();
-  const IntTab& fcl = ref_cast(Champ_Inc_P0_base, equation().inconnue()).fcl();
-  const int nb_phases = pb.nb_phases();
-
-  for (int f = 0; f < domaine.nb_faces(); f++)
-    if (fcl(f, 0) == 0)
-      {
-        const int el = f_e(f, 0), er = f_e(f, 1);
-        double Sm = 0., Sp = 0., un_l = 0.;
-        compute_non_conservative_hll_left_bounds(vit_n, c, f, el, er, m, n, nb_phases, Sm, Sp, un_l);
-
-        num_flux_left(f) = (Sp * alpha(el, 0) - Sm * alpha(er, 0)) * un_l * p(el, m);
-        num_flux_left(f) /= -(Sp - Sm);
-
-        compute_non_conservative_hll_right_bounds(vit_n, c, f, el, er, m, n, nb_phases, Sm, Sp, un_l);
-
-        num_flux_right(f) = (Sp * alpha(er, 0) - Sm * alpha(el, 0)) * un_l * p(er, m);
-        num_flux_right(f) /= -(Sp - Sm);
-      }
 }

@@ -42,17 +42,18 @@ void Op_Conv_Coloc_Vect_base::Riemann_solver(DoubleTab& num_flux) const
   const DoubleTab& vit = eq.vitesse().valeurs();
   const DoubleTab& p = eq.pression().valeurs();
   const Pb_Euler& pb = ref_cast(Pb_Euler, equation().probleme());
-  const int nb_phase = pb.nb_phases();
   const DoubleTab& rho = pb.equation_masse().densite().valeurs();
   const DoubleTab& alpha = pb.equation_fraction().inconnue().valeurs();
+  const int nb_phase = pb.nb_phases();
+  const int nb_faces = domaine.nb_faces();
 
   // compute left/right fluxes on internal faces
-  DoubleTrav flux_l(domaine.nb_faces(), num_flux.line_size()), flux_r(domaine.nb_faces(), num_flux.line_size());
+  DoubleTrav flux_l(nb_faces, num_flux.line_size()), flux_r(nb_faces, num_flux.line_size());
   eq.compute_fluxes_on_all_faces(flux_l, flux_r);
   scheme(num_flux, flux_l, flux_r);
 
   // Boundary faces treatement
-  for (int f = 0; f < domaine.nb_faces(); f++)
+  for (int f = 0; f < nb_faces; f++)
     {
       if (fcl(f, 0) != 0)
         {

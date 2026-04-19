@@ -38,6 +38,7 @@ inline void Op_Conv_HLL_Coloc_Elem::scheme(DoubleTab& num_flux, const DoubleTab&
   const int nb_phases = ref_cast(Pb_Euler,eq.probleme()).nb_phases();
   const DoubleTab& c = ref_cast(Momentum_Euler,equation().probleme().equation(0)).vitesse_son();
   const DoubleTab& w = le_champ_inco->valeurs();
+
   for (int f = 0; f < domaine.nb_faces(); f++)
     if (fcl(f, 0) == 0)
       {
