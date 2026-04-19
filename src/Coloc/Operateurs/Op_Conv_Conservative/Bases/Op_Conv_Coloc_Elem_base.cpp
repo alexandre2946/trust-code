@@ -57,8 +57,8 @@ void Op_Conv_Coloc_Elem_base::Riemann_solver(DoubleTab& num_flux) const
     {
       if (fcl(f, 0) != 0)
         {
-          const int e = f_e(f, 0) >= 0 ? f_e(f, 0) : f_e(f, 1); //pas besoin
-          // assert(f_e(f,0) >= 0 && vit_n (f,0)!=123.123); //pas besoin
+          assert (f_e(f, 1) < 0 && f_e(f, 0) >= 0 && vit_n(f, 0) != -123.123);
+          const int e = f_e(f, 0);
 
           //tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
           //types de CL : 0 -> pas de CL

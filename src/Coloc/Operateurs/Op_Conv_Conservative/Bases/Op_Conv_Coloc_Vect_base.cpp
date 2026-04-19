@@ -65,8 +65,8 @@ void Op_Conv_Coloc_Vect_base::Riemann_solver(DoubleTab& num_flux) const
           //              4 -> Dirichlet_homogene
           //              5 -> Periodique
 
-          const int e = f_e(f, 0) >= 0 ? f_e(f, 0) : f_e(f, 1); //pas besoin
-          assert(f_e(f, 0) >= 0 && vit_n(f, 0) != 123.123); //pas besoin
+          assert (f_e(f, 1) < 0 && f_e(f, 0) >= 0 && vit_n(f, 0) != -123.123);
+          const int e = f_e(f, 0);
 
           std::array<double, 3> normal { 0., 0., 0. };
           for (int d = 0; d < Objet_U::dimension; d++)

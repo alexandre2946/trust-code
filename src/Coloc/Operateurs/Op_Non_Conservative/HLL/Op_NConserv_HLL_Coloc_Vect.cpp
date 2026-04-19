@@ -73,17 +73,18 @@ void Op_NConserv_HLL_Coloc_Vect::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
   const DoubleTab& p = eq.pression().valeurs();
 
   const Pb_Euler& pb = ref_cast(Pb_Euler, equation().probleme());
+  const DoubleTab& alpha = pb.equation_fraction().inconnue().valeurs();
+  const DoubleTab& c = pb.equation_qdm().vitesse_son();
+
   const Interface_Baer_Nunziato& interface = ref_cast(Interface_Baer_Nunziato, ref_cast(Milieu_composite_Euler,pb.milieu()).interface_phase());
   const int n = interface.id_phase_vitesse_inter();
   const int m = interface.id_phase_pression_inter();
   const int nb_phase = pb.nb_phases();
-  const DoubleTab& alpha = pb.equation_fraction().inconnue().valeurs();
-  const DoubleTab& c = pb.equation_qdm().vitesse_son();
 
   for (int f = 0; f < domaine.nb_faces(); f++)
     {
       const int el = f_e(f, 0), er = f_e(f, 1);
-      if (fcl(f, 0) == 0)
+      if (fcl(f, 0) == 0) // faces internes
         {
           double Sm = 0., Sp = 0., un_l = 0.;
           compute_non_conservative_hll_left_bounds(vit_n, c, f, el, er, m, n, nb_phase, Sm, Sp, un_l);
@@ -103,7 +104,7 @@ void Op_NConserv_HLL_Coloc_Vect::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
               num_flux_right(f, d) /= -(Sp - Sm);
             }
         }
-      else
+      else // faces bords
         {
           //tableaux de correspondance lies aux CLs : fcl(f, .) = { type de CL, num de la CL, indice de la face dans la CL }
           //types de CL : 0 -> pas de CL
@@ -113,8 +114,8 @@ void Op_NConserv_HLL_Coloc_Vect::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
           //              4 -> Dirichlet_homogene
           //              5 -> Periodique
 
-          const int e = f_e(f, 0) >= 0 ? f_e(f, 0) : f_e(f, 1); //pas besoin
-          assert(f_e(f, 0) >= 0 && vit_n(f, 0) != 123.123); //pas besoin
+          assert(er < 0 && el >= 0 && vit_n(f, 0) != -123.123);
+          const int e = el;
 
           const Conds_lim& cls_qdm = pb.equation_qdm().domaine_Cl_dis().les_conditions_limites();
           const Conds_lim& cls_alpha = pb.equation_fraction().domaine_Cl_dis().les_conditions_limites();
@@ -127,34 +128,24 @@ void Op_NConserv_HLL_Coloc_Vect::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
             {
               const double alpha_bord = alpha(e, 0);
               for (int d = 0; d < Objet_U::dimension; d++)
-                {
-                  num_flux_left(f, d) = -alpha_bord * p(e, m) * normal[d];
-                  num_flux_right(f, d) = 123.123;
-                }
+                num_flux_left(f, d) = -alpha_bord * p(e, m) * normal[d];
             }
           else if (sub_type(Dirichlet, cls_qdm[fcl(f, 1)].valeur()))
             {
               const double alpha_bord = ref_cast(Dirichlet, cls_alpha[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), 0);
               for (int d = 0; d < Objet_U::dimension; d++)
-                {
-                  num_flux_left(f, d) = -alpha_bord * p(e, m) * normal[d];
-                  num_flux_right(f, d) = 123.123;
-                }
+                num_flux_left(f, d) = -alpha_bord * p(e, m) * normal[d];
             }
-
           else if ( sub_type(Symetrie,cls_qdm[fcl(f, 1)].valeur()) && !sub_type(Sortie_supersonique, cls_qdm[fcl(f, 1)].valeur()))
             {
               //Slip wall : u_n=-u_n
               const double alpha_bord = alpha(e, 0);
               for (int d = 0; d < Objet_U::dimension; d++)
-                {
-                  num_flux_left(f, d) = -alpha_bord * p(e, m) * normal[d];
-                  num_flux_right(f, d) = 123.123;
-                }
+                num_flux_left(f, d) = -alpha_bord * p(e, m) * normal[d];
             }
           else
             {
-              Cerr << " La CL de type " << fcl(f, 0) << " pour l'equation " << eq.que_suis_je() << " n est pas diponible .....\n";
+              Cerr << " La CL de type " << fcl(f, 0) << " pour l'equation " << eq.que_suis_je() << " n'est pas diponible .....\n";
               Process::exit();
             }
         }

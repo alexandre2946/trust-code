@@ -123,31 +123,24 @@ void Op_NConserv_HLL_Coloc_Elem::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
 
   // faces bords
   for (int f = 0; f < domaine.nb_faces(); f++)
-    {
-      if (fcl(f, 0) != 0)
-        {
-          const int e = f_e(f, 0) >= 0 ? f_e(f, 0) : f_e(f, 1); //pas besoin
-          assert(f_e(f, 0) >= 0 && vit_n(f, 0) != 123.123); //pas besoin
-          num_flux_right(f) = 123.123; //pas besoin
+    if (fcl(f, 0) != 0)
+      {
+        assert(f_e(f, 1) < 0 && f_e(f, 0) >= 0 && vit_n(f, 0) != -123.123); // domaine_poly_base ...
+        const int e = f_e(f, 0);
 
-          if (sub_type(Sortie_supersonique, cls[fcl(f, 1)].valeur()))
-            {
-              num_flux_left(f) = eq.termes_NonConservatif(alpha(e, 0), vit_n(f, n), p(e, m));
-            }
-          else if (sub_type(Entree_supersonique, cls[fcl(f, 1)].valeur())) // Dirichlet  : 6
-            {
-              const double alpha_bord = ref_cast(Dirichlet, cls_alpha[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), 0);
-              num_flux_left(f) = eq.termes_NonConservatif(alpha_bord, vit_n(f, n), p(e, m));
-            }
-          else if (sub_type(Neumann_paroi_flux_nul, cls[fcl(f, 1)].valeur())) //Neumann_homogene : 5
-            {
-              num_flux_left(f) = eq.termes_NonConservatif(alpha(e, 0), vit_n(f, n), p(e, m));
-            }
-          else
-            {
-              Cerr << "The BC of type " << fcl(f, 0) << "for the equation " << eq.que_suis_je() << " is not available \n";
-              Process::exit();
-            }
-        }
-    }
+        if (sub_type(Sortie_supersonique, cls[fcl(f, 1)].valeur()))
+          num_flux_left(f) = eq.termes_NonConservatif(alpha(e, 0), vit_n(f, n), p(e, m));
+        else if (sub_type(Entree_supersonique, cls[fcl(f, 1)].valeur())) // Dirichlet  : 6
+          {
+            const double alpha_bord = ref_cast(Dirichlet, cls_alpha[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), 0);
+            num_flux_left(f) = eq.termes_NonConservatif(alpha_bord, vit_n(f, n), p(e, m));
+          }
+        else if (sub_type(Neumann_paroi_flux_nul, cls[fcl(f, 1)].valeur())) //Neumann_homogene : 5
+          num_flux_left(f) = eq.termes_NonConservatif(alpha(e, 0), vit_n(f, n), p(e, m));
+        else
+          {
+            Cerr << "The BC of type " << fcl(f, 0) << " for the equation " << eq.que_suis_je() << " is not available \n";
+            Process::exit();
+          }
+      }
 }

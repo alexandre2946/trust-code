@@ -457,8 +457,8 @@ void Momentum_Euler::calculer_vitesse_normale()
           int el = f_e(f, 0), er = f_e(f, 1);
           double nx = dom.face_normales(f, 0) / dom.face_surfaces(f);
           double ny = dom.face_normales(f, 1) / dom.face_surfaces(f);
-          u_n(f, n) = (el >= 0) ? U(el, n) * nx + U(el, n + Nb_phase) * ny : 123.123;
-          u_n(f, n + Nb_phase) = (er >= 0) ? U(er, n) * nx + U(er, n + Nb_phase) * ny : 123.123;
+          u_n(f, n) = (el >= 0) ? U(el, n) * nx + U(el, n + Nb_phase) * ny : -123.123;
+          u_n(f, n + Nb_phase) = (er >= 0) ? U(er, n) * nx + U(er, n + Nb_phase) * ny : -123.123;
         }
     }
 }
