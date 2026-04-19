@@ -44,102 +44,126 @@ void Op_Conv_Coloc_Vect_base::Riemann_solver(DoubleTab& num_flux) const
   const Pb_Euler& pb = ref_cast(Pb_Euler, equation().probleme());
   const DoubleTab& rho = pb.equation_masse().densite().valeurs();
   const DoubleTab& alpha = pb.equation_fraction().inconnue().valeurs();
+  const DoubleTab& alpha_rhoU = eq.inconnue().valeurs();
   const int nb_phase = pb.nb_phases();
   const int nb_faces = domaine.nb_faces();
 
   // compute left/right fluxes on internal faces
   DoubleTrav flux_l(nb_faces, num_flux.line_size()), flux_r(nb_faces, num_flux.line_size());
-  eq.compute_fluxes_on_all_faces(flux_l, flux_r);
+  assert(flux_l.line_size() == alpha_rhoU.line_size());
+  assert(flux_r.line_size() == alpha_rhoU.line_size());
+  assert(Objet_U::dimension == 2);
+
+  for (int f = 0; f < nb_faces; f++)
+    if (fcl(f, 0) == 0)
+      {
+        const int el = f_e(f, 0), er = f_e(f, 1);
+        const double nx = domaine.face_normales(f, 0) / domaine.face_surfaces(f);
+        const double ny = domaine.face_normales(f, 1) / domaine.face_surfaces(f);
+
+        for (int n = 0; n < nb_phase; n++)
+          {
+            // left
+            double alpha_p = alpha(el, n) * p(el, n);
+            flux_l(f, n) = nx * alpha_p + alpha_rhoU(el, n) * vit_n(f, n);
+            flux_l(f, n + nb_phase) = ny * alpha_p + alpha_rhoU(el, n + nb_phase) * vit_n(f, n);
+
+            // right
+            alpha_p = alpha(er, n) * p(er, n);
+            flux_r(f, n) = nx * alpha_p + alpha_rhoU(er, n) * vit_n(f, n + nb_phase);
+            flux_r(f, n + nb_phase) = ny * alpha_p + alpha_rhoU(er, n + nb_phase) * vit_n(f, n + nb_phase);
+          }
+      }
+
+  // fill num_fluxe on internal faces
   scheme(num_flux, flux_l, flux_r);
 
   // Boundary faces treatement
   for (int f = 0; f < nb_faces; f++)
-    {
-      if (fcl(f, 0) != 0)
-        {
-          //tableaux de correspondance lies aux CLs : fcl(f, .) = { type de CL, num de la CL, indice de la face dans la CL }
-          //types de CL : 0 -> pas de CL
-          //              1 -> Neumann
-          //              2 -> Navier ou symetrie
-          //              3 -> Dirichlet ou Neumann_homogene
-          //              4 -> Dirichlet_homogene
-          //              5 -> Periodique
+    if (fcl(f, 0) != 0)
+      {
+        //tableaux de correspondance lies aux CLs : fcl(f, .) = { type de CL, num de la CL, indice de la face dans la CL }
+        //types de CL : 0 -> pas de CL
+        //              1 -> Neumann
+        //              2 -> Navier ou symetrie
+        //              3 -> Dirichlet ou Neumann_homogene
+        //              4 -> Dirichlet_homogene
+        //              5 -> Periodique
 
-          assert (f_e(f, 1) < 0 && f_e(f, 0) >= 0 && vit_n(f, 0) != -123.123);
-          const int e = f_e(f, 0);
+        assert (f_e(f, 1) < 0 && f_e(f, 0) >= 0 && vit_n(f, 0) != -123.123);
+        const int e = f_e(f, 0);
 
-          std::array<double, 3> normal { 0., 0., 0. };
-          for (int d = 0; d < Objet_U::dimension; d++)
-            normal[d] = domaine.face_normales(f, d) / domaine.face_surfaces(f);
+        std::array<double, 3> normal { 0., 0., 0. };
+        for (int d = 0; d < Objet_U::dimension; d++)
+          normal[d] = domaine.face_normales(f, d) / domaine.face_surfaces(f);
 
-          if (sub_type(Sortie_supersonique, cls[fcl(f, 1)].valeur())) // 1 -> Neumann
-            {
-              for (int n = 0; n < nb_phase; n++)
-                {
-                  const double p_bord = p(e, n);
-                  const double rho_bord = rho(e, n);
-                  const double alpha_bord = alpha(e, n);
+        if (sub_type(Sortie_supersonique, cls[fcl(f, 1)].valeur())) // 1 -> Neumann
+          {
+            for (int n = 0; n < nb_phase; n++)
+              {
+                const double p_bord = p(e, n);
+                const double rho_bord = rho(e, n);
+                const double alpha_bord = alpha(e, n);
 
-                  for (int d = 0; d < Objet_U::dimension; d++)
-                    {
-                      num_flux(f, n + nb_phase * d) = normal[d] * p_bord + vit(e, n + nb_phase * d) * rho_bord * vit_n(f, n);
-                      num_flux(f, n + nb_phase * d) *= alpha_bord;
-                    }
-                }
-            }
-          else if (sub_type(Entree_fluide_vitesse_imposee, cls[fcl(f, 1)].valeur())) // 3 -> Dirichlet
-            {
-              const Conds_lim& cls_alpha = pb.equation_fraction().domaine_Cl_dis().les_conditions_limites();
-              const Conds_lim& cls_rho = pb.equation_masse().domaine_Cl_dis().les_conditions_limites();
-              const Conds_lim& cls_p = pb.equation_energie().domaine_Cl_dis().les_conditions_limites();
+                for (int d = 0; d < Objet_U::dimension; d++)
+                  {
+                    num_flux(f, n + nb_phase * d) = normal[d] * p_bord + vit(e, n + nb_phase * d) * rho_bord * vit_n(f, n);
+                    num_flux(f, n + nb_phase * d) *= alpha_bord;
+                  }
+              }
+          }
+        else if (sub_type(Entree_fluide_vitesse_imposee, cls[fcl(f, 1)].valeur())) // 3 -> Dirichlet
+          {
+            const Conds_lim& cls_alpha = pb.equation_fraction().domaine_Cl_dis().les_conditions_limites();
+            const Conds_lim& cls_rho = pb.equation_masse().domaine_Cl_dis().les_conditions_limites();
+            const Conds_lim& cls_p = pb.equation_energie().domaine_Cl_dis().les_conditions_limites();
 
-              for (int n = 0; n < nb_phase; n++)
-                {
-                  std::array<double, 3> vitesse_bord { 0., 0., 0. };
-                  double vitesse_normale_bord = 0;
+            for (int n = 0; n < nb_phase; n++)
+              {
+                std::array<double, 3> vitesse_bord { 0., 0., 0. };
+                double vitesse_normale_bord = 0;
 
-                  const double rho_bord = ref_cast(Dirichlet, cls_rho[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), n);
-                  const double p_bord = ref_cast(Dirichlet, cls_p[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), n);
-                  const double alpha_bord = ref_cast(Dirichlet, cls_alpha[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), n);
+                const double rho_bord = ref_cast(Dirichlet, cls_rho[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), n);
+                const double p_bord = ref_cast(Dirichlet, cls_p[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), n);
+                const double alpha_bord = ref_cast(Dirichlet, cls_alpha[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), n);
 
-                  for (int d = 0; d < Objet_U::dimension; d++)
-                    {
-                      vitesse_bord[d] = ref_cast(Dirichlet, cls[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), n + nb_phase * d);
-                      vitesse_normale_bord += vitesse_bord[d] * normal[d];
-                    }
+                for (int d = 0; d < Objet_U::dimension; d++)
+                  {
+                    vitesse_bord[d] = ref_cast(Dirichlet, cls[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), n + nb_phase * d);
+                    vitesse_normale_bord += vitesse_bord[d] * normal[d];
+                  }
 
-                  for (int d = 0; d < Objet_U::dimension; d++)
-                    {
-                      num_flux(f, n + nb_phase * d) = normal[d] * p_bord + vitesse_bord[d] * rho_bord * vitesse_normale_bord;
-                      num_flux(f, n + nb_phase * d) *= alpha_bord;
-                    }
-                }
-            }
-          else if ( sub_type(Symetrie,cls[fcl(f, 1)].valeur()) && !sub_type(Sortie_supersonique, cls[fcl(f, 1)].valeur()))
-            {
-              //Slip wall : u_n=0
-              for (int n = 0; n < nb_phase; n++)
-                {
-                  std::array<double, 3> vitesse_bord { 0., 0., 0. };
+                for (int d = 0; d < Objet_U::dimension; d++)
+                  {
+                    num_flux(f, n + nb_phase * d) = normal[d] * p_bord + vitesse_bord[d] * rho_bord * vitesse_normale_bord;
+                    num_flux(f, n + nb_phase * d) *= alpha_bord;
+                  }
+              }
+          }
+        else if ( sub_type(Symetrie,cls[fcl(f, 1)].valeur()) && !sub_type(Sortie_supersonique, cls[fcl(f, 1)].valeur()))
+          {
+            //Slip wall : u_n=0
+            for (int n = 0; n < nb_phase; n++)
+              {
+                std::array<double, 3> vitesse_bord { 0., 0., 0. };
 
-                  const double p_bord = p(e, n);
-                  const double rho_bord = rho(e, n);
-                  const double alpha_bord = alpha(e, n);
-                  double vitesse_normale_bord = 0;
+                const double p_bord = p(e, n);
+                const double rho_bord = rho(e, n);
+                const double alpha_bord = alpha(e, n);
+                double vitesse_normale_bord = 0;
 
-                  for (int d = 0; d < Objet_U::dimension; d++)
-                    {
-                      num_flux(f, n + nb_phase * d) = normal[d] * p_bord + vitesse_bord[d] * rho_bord * vitesse_normale_bord;
-                      num_flux(f, n + nb_phase * d) *= alpha_bord;
-                    }
-                }
-            }
-          else
-            {
-              Cerr << " La CL de type " << fcl(f, 0) << " pour l'equation " << eq.que_suis_je() << " n est pas diponible .....\n";
-              Process::exit();
-            }
+                for (int d = 0; d < Objet_U::dimension; d++)
+                  {
+                    num_flux(f, n + nb_phase * d) = normal[d] * p_bord + vitesse_bord[d] * rho_bord * vitesse_normale_bord;
+                    num_flux(f, n + nb_phase * d) *= alpha_bord;
+                  }
+              }
+          }
+        else
+          {
+            Cerr << " La CL de type " << fcl(f, 0) << " pour l'equation " << eq.que_suis_je() << " n est pas diponible .....\n";
+            Process::exit();
+          }
 
-        }
-    }
+      }
 }

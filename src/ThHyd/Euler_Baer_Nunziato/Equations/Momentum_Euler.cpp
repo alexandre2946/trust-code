@@ -463,50 +463,6 @@ void Momentum_Euler::calculer_vitesse_normale()
     }
 }
 
-void Momentum_Euler::compute_fluxes_on_all_faces(DoubleTab& flux_left, DoubleTab& flux_right) const
-{
-  const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
-  const Domaine_VF& dom = ref_cast(Domaine_VF, domaine_dis());
-  const IntTab& face_voisins = dom.face_voisins();
-  const DoubleTab& vit_normale = vitesse_normale();
-  const DoubleTab& p = pression().valeurs();
-  const DoubleTab& alpha_rhoU = inconnue().valeurs();
-  const DoubleTab& alpha = pb.equation_fraction().inconnue().valeurs();
-  const int nb_faces = dom.nb_faces();
-  const int nb_phases = pb.nb_phases();
-
-  assert(flux_left.dimension(0) == nb_faces);
-  assert(flux_right.dimension(0) == nb_faces);
-  assert(flux_left.line_size() == alpha_rhoU.line_size());
-  assert(flux_right.line_size() == alpha_rhoU.line_size());
-  assert(Objet_U::dimension == 2);
-
-  flux_left = 0.;
-  flux_right = 0.;
-  for (int f = 0; f < nb_faces; f++)
-    {
-      const int el = face_voisins(f, 0), er = face_voisins(f, 1);
-      const double nx = dom.face_normales(f, 0) / dom.face_surfaces(f);
-      const double ny = dom.face_normales(f, 1) / dom.face_surfaces(f);
-
-      if (el >= 0)
-        for (int n = 0; n < nb_phases; n++)
-          {
-            const double alpha_p = alpha(el, n) * p(el, n);
-            flux_left(f, n) = nx * alpha_p + alpha_rhoU(el, n) * vit_normale(f, n);
-            flux_left(f, n + nb_phases) = ny * alpha_p + alpha_rhoU(el, n + nb_phases) * vit_normale(f, n);
-          }
-
-      if (er >= 0)
-        for (int n = 0; n < nb_phases; n++)
-          {
-            const double alpha_p = alpha(er, n) * p(er, n);
-            flux_right(f, n) = nx * alpha_p + alpha_rhoU(er, n) * vit_normale(f, n + nb_phases);
-            flux_right(f, n + nb_phases) = ny * alpha_p + alpha_rhoU(er, n + nb_phases) * vit_normale(f, n + nb_phases);
-          }
-    }
-}
-
 const Operateur& Momentum_Euler::operateur(int i) const
 {
   if (i == 2)

@@ -22,7 +22,6 @@
 #include <Champ_Inc_P0_base.h>
 #include <Fluide_reel_base.h>
 #include <Domaine_Cl_Coloc.h>
-#include <Momentum_Euler.h>
 #include <Domaine_Coloc.h>
 #include <Pb_Euler.h>
 #include <array>
@@ -49,74 +48,114 @@ void Op_Conv_Coloc_Elem_base::Riemann_solver(DoubleTab& num_flux) const
 
   // compute left/right fluxes on internal faces
   DoubleTrav flux_l(nb_faces, num_flux.line_size()), flux_r(nb_faces, num_flux.line_size());
-  eq.compute_fluxes_on_all_faces(flux_l, flux_r);
+  assert(flux_l.line_size() == nb_phases);
+  assert(flux_r.line_size() == nb_phases);
+
+  if (sub_type(Fraction_Euler, equation()))
+    {
+      /* Do nothing */
+    }
+  else if (sub_type(Energy_Euler, equation()))
+    {
+      const DoubleTab& alpha_rhoE = pb.equation_energie().inconnue().valeurs();
+      for (int f = 0; f < nb_faces; f++)
+        if (fcl(f, 0) == 0)
+          {
+            const int el = f_e(f, 0), er = f_e(f, 1);
+            for (int n = 0; n < nb_phases; n++)
+              {
+                flux_l(f, n) = (alpha_rhoE(el, n) + alpha(el, n) * p(el, n)) * vit_n(f, n);
+                flux_r(f, n) = (alpha_rhoE(er, n) + alpha(er, n) * p(er, n)) * vit_n(f, n + nb_phases);
+              }
+          }
+    }
+  else if (sub_type(Density_Euler, equation()))
+    {
+      const DoubleTab& alpha_rho = pb.equation_masse().inconnue().valeurs();
+      for (int f = 0; f < nb_faces; f++)
+        if (fcl(f, 0) == 0)
+          {
+            const int el = f_e(f, 0), er = f_e(f, 1);
+
+            for (int n = 0; n < nb_phases; n++)
+              {
+                flux_l(f, n) = alpha_rho(el, n) * vit_n(f, n);
+                flux_r(f, n) = alpha_rho(er, n) * vit_n(f, n + nb_phases);
+              }
+          }
+    }
+  else
+    {
+      Cerr << "Op_NConserv_HLL_Coloc_Elem should not be used for equation " << equation().que_suis_je() << finl;
+      Process::exit();
+    }
+
+  // fill num_fluxe on internal faces
   scheme(num_flux, flux_l, flux_r);
 
   // Boundary faces treatement
   for (int f = 0; f < nb_faces; f++)
-    {
-      if (fcl(f, 0) != 0)
-        {
-          assert (f_e(f, 1) < 0 && f_e(f, 0) >= 0 && vit_n(f, 0) != -123.123);
-          const int e = f_e(f, 0);
+    if (fcl(f, 0) != 0)
+      {
+        assert (f_e(f, 1) < 0 && f_e(f, 0) >= 0 && vit_n(f, 0) != -123.123);
+        const int e = f_e(f, 0);
 
-          //tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
-          //types de CL : 0 -> pas de CL
-          //              1 -> Echange_externe_impose
-          //              2 -> Echange_global_impose
-          //              3 -> Echange_contact_Coloc
-          //              4 -> Neumann_paroi
-          //              5 -> Neumann_val_ext ou Neumann_homogene ou Symetrie
-          //              6 -> Dirichlet
-          //              7 -> Dirichlet_homogene
+        //tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
+        //types de CL : 0 -> pas de CL
+        //              1 -> Echange_externe_impose
+        //              2 -> Echange_global_impose
+        //              3 -> Echange_contact_Coloc
+        //              4 -> Neumann_paroi
+        //              5 -> Neumann_val_ext ou Neumann_homogene ou Symetrie
+        //              6 -> Dirichlet
+        //              7 -> Dirichlet_homogene
 
-          std::array<double, 3> normal { 0., 0., 0. };
-          for (int d = 0; d < Objet_U::dimension; d++)
-            normal[d] = domaine.face_normales(f, d) / domaine.face_surfaces(f);
+        std::array<double, 3> normal { 0., 0., 0. };
+        for (int d = 0; d < Objet_U::dimension; d++)
+          normal[d] = domaine.face_normales(f, d) / domaine.face_surfaces(f);
 
-          if (sub_type(Sortie_supersonique, cls[fcl(f, 1)].valeur())) //Neumann_val_ext : 5
-            {
-              for (int n = 0; n < nb_phases; n++)
-                num_flux(f, n) = eq.flux_bord(w(e, n), vit_n(f, n), alpha(e, n) * p(e, n));
-            }
-          else if (sub_type(Neumann_paroi_flux_nul, cls[fcl(f, 1)].valeur())) //Neumann_homogene : 5
-            {
-              for (int n = 0; n < nb_phases; n++)
-                num_flux(f, n) = 0;
-            }
-          else if (sub_type(Entree_supersonique, cls[fcl(f, 1)].valeur())) // Dirichlet  : 6
-            {
-              const Conds_lim& cls_alpha = pb.equation_fraction().domaine_Cl_dis().les_conditions_limites();
-              const Conds_lim& cls_rho = pb.equation_masse().domaine_Cl_dis().les_conditions_limites();
-              const Conds_lim& cls_qdm = pb.equation_qdm().domaine_Cl_dis().les_conditions_limites();
-              const Conds_lim& cls_p = pb.equation_energie().domaine_Cl_dis().les_conditions_limites();
+        if (sub_type(Sortie_supersonique, cls[fcl(f, 1)].valeur())) //Neumann_val_ext : 5
+          {
+            for (int n = 0; n < nb_phases; n++)
+              num_flux(f, n) = eq.flux_bord(w(e, n), vit_n(f, n), alpha(e, n) * p(e, n));
+          }
+        else if (sub_type(Neumann_paroi_flux_nul, cls[fcl(f, 1)].valeur())) //Neumann_homogene : 5
+          {
+            for (int n = 0; n < nb_phases; n++)
+              num_flux(f, n) = 0;
+          }
+        else if (sub_type(Entree_supersonique, cls[fcl(f, 1)].valeur())) // Dirichlet  : 6
+          {
+            const Conds_lim& cls_alpha = pb.equation_fraction().domaine_Cl_dis().les_conditions_limites();
+            const Conds_lim& cls_rho = pb.equation_masse().domaine_Cl_dis().les_conditions_limites();
+            const Conds_lim& cls_qdm = pb.equation_qdm().domaine_Cl_dis().les_conditions_limites();
+            const Conds_lim& cls_p = pb.equation_energie().domaine_Cl_dis().les_conditions_limites();
 
-              for (int n = 0; n < nb_phases; n++)
-                {
-                  std::array<double, 3> vitesse_bord { 0., 0., 0. };
-                  double vitesse_normale_bord = 0;
-                  double norme_vitesse = 0;
-                  const double alpha_bord = ref_cast(Dirichlet, cls_alpha[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), n);
-                  const double p_bord = ref_cast(Dirichlet, cls_p[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), n);
-                  const double rho_bord = ref_cast(Dirichlet, cls_rho[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), n);
+            for (int n = 0; n < nb_phases; n++)
+              {
+                std::array<double, 3> vitesse_bord { 0., 0., 0. };
+                double vitesse_normale_bord = 0;
+                double norme_vitesse = 0;
+                const double alpha_bord = ref_cast(Dirichlet, cls_alpha[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), n);
+                const double p_bord = ref_cast(Dirichlet, cls_p[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), n);
+                const double rho_bord = ref_cast(Dirichlet, cls_rho[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), n);
 
-                  for (int d = 0; d < Objet_U::dimension; d++)
-                    {
-                      vitesse_bord[d] = ref_cast(Dirichlet, cls_qdm[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), n + nb_phases * d);
-                      vitesse_normale_bord += vitesse_bord[d] * normal[d];
-                      norme_vitesse += vitesse_bord[d] * vitesse_bord[d];
-                    }
-                  /* TODO a refaire */
-                  const Fluide_reel_base& phase = ref_cast(Fluide_reel_base, ref_cast(Milieu_composite_Euler,eq.milieu()).get_fluid(n));
-                  const double inco_bord = (!(sub_type(Energy_Euler, equation()))) ? alpha_bord * rho_bord : alpha_bord * phase.init_energie_tot(rho_bord, norme_vitesse, p_bord);
-                  num_flux(f, n) = eq.flux_bord(inco_bord, vitesse_normale_bord, alpha_bord * p_bord);
-                }
-            }
-          else
-            {
-              Cerr << "The BC of type " << fcl(f, 0) << "for the equation " << eq.que_suis_je() << " is not available \n";
-              Process::exit();
-            }
-        }
-    }
+                for (int d = 0; d < Objet_U::dimension; d++)
+                  {
+                    vitesse_bord[d] = ref_cast(Dirichlet, cls_qdm[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), n + nb_phases * d);
+                    vitesse_normale_bord += vitesse_bord[d] * normal[d];
+                    norme_vitesse += vitesse_bord[d] * vitesse_bord[d];
+                  }
+                /* TODO a refaire */
+                const Fluide_reel_base& phase = ref_cast(Fluide_reel_base, ref_cast(Milieu_composite_Euler,eq.milieu()).get_fluid(n));
+                const double inco_bord = (!(sub_type(Energy_Euler, equation()))) ? alpha_bord * rho_bord : alpha_bord * phase.init_energie_tot(rho_bord, norme_vitesse, p_bord);
+                num_flux(f, n) = eq.flux_bord(inco_bord, vitesse_normale_bord, alpha_bord * p_bord);
+              }
+          }
+        else
+          {
+            Cerr << "The BC of type " << fcl(f, 0) << "for the equation " << eq.que_suis_je() << " is not available \n";
+            Process::exit();
+          }
+      }
 }

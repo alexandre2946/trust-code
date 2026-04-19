@@ -88,7 +88,6 @@ public :
   const Champ_Inc_base& inconnue() const override { return l_inco_ch_.valeur();}
   Champ_Inc_base& inconnue() override { return l_inco_ch_.valeur();}
   void init_alpha_rho_u();
-  void compute_fluxes_on_all_faces(DoubleTab& flux_left, DoubleTab& flux_right) const;
   void mettre_a_jour_champs_conserves(double temps, int reset) override;
 
 protected:

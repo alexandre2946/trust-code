@@ -104,8 +104,3 @@ void Conservation_Euler::associer_fluide(const Fluide_base& un_fluide)
   assert(sub_type(Fluide_base,un_fluide));
   le_fluide_ = ref_cast(Fluide_base, un_fluide);
 }
-
-void Conservation_Euler::compute_fluxes_on_all_faces(DoubleTab& flux_left, DoubleTab& flux_right) const
-{
-  Process::exit("Conservation_Euler::compute_fluxes_on_all_faces must be overloaded !!!  \n");
-}

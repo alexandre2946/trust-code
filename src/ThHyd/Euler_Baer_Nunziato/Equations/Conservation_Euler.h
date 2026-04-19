@@ -57,8 +57,6 @@ public:
   const Fluide_base& fluide() const;
   Fluide_base& fluide();
 
-  virtual void compute_fluxes_on_all_faces(DoubleTab& flux_left, DoubleTab& flux_right) const;
-
   virtual double flux_bord(const double inco_bord, const double vit_n_bord, const double p_bord) const
   {
     Process::exit("Conservation_Euler::flux_bord !!!  \n");

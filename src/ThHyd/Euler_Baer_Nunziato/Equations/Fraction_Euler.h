@@ -23,7 +23,6 @@ class Fraction_Euler : public Conservation_Euler
   Declare_instanciable(Fraction_Euler);
 public :
   void discretiser() override;
-  void compute_fluxes_on_all_faces(DoubleTab& flux_left, DoubleTab& flux_right) const override;
   void set_param(Param& param) const override;
   int verif_Cl() const override {return 1;}
   int nombre_d_operateurs() const override { return 1; }
