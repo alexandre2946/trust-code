@@ -15,7 +15,7 @@
 
 #include <Op_Conv_HLL_Coloc_Vect.h>
 #include <Milieu_composite_Euler.h>
-#include <Euleur_operator_tools.h>
+#include <Coloc_Operator_tools.h>
 #include <Conservation_Euler.h>
 #include <Champ_Inc_P0_base.h>
 #include <Domaine_Cl_Coloc.h>
@@ -29,26 +29,28 @@ Implemente_instanciable(Op_Conv_HLL_Coloc_Vect,"Op_Conv_HLL_Coloc_Vect",Op_Conv_
 Sortie& Op_Conv_HLL_Coloc_Vect::printOn(Sortie& os) const { return Op_Conv_Coloc_base::printOn(os); }
 Entree& Op_Conv_HLL_Coloc_Vect::readOn(Entree& is) { Op_Conv_Coloc_base::readOn(is); return is;}
 
-inline void Op_Conv_HLL_Coloc_Vect::scheme(DoubleTab& num_flux, const int f, const DoubleTab& flux_l, const DoubleTab& flux_r) const
+inline void Op_Conv_HLL_Coloc_Vect::scheme(DoubleTab& num_flux, const DoubleTab& flux_l, const DoubleTab& flux_r) const
 {
   const Domaine_Coloc& domaine = ref_cast(Domaine_Coloc, le_dom_coloc_.valeur());
   const DoubleTab& w = le_champ_inco->valeurs();
   const IntTab& f_e = domaine.face_voisins();
+  const IntTab& fcl = ref_cast(Champ_Inc_P0_base, equation().inconnue()).fcl();
   const Momentum_Euler& eq = ref_cast(Momentum_Euler, equation());
   const DoubleTab& vit_n = eq.vitesse_normale();
   const DoubleTab& c = eq.vitesse_son();
   const int nb_phase = ref_cast(Pb_Euler,eq.probleme()).nb_phases();
-  const int el = f_e(f, 0), er = f_e(f, 1);
+  for (int f = 0; f < domaine.nb_faces(); f++)
+    if (fcl(f, 0) == 0)
+      {
+        const int el = f_e(f, 0), er = f_e(f, 1);
+        double Sm = 0., Sp = 0.;
+        compute_hll_bounds(vit_n, c, f, el, er, nb_phase, Sm, Sp);
 
-  double Sm = 0., Sp = 0.;
-  compute_hll_bounds(vit_n, c, f, el, er, nb_phase, Sm, Sp);
-
-  for (int n = 0; n < nb_phase; n++)
-    {
-      for (int d = 0; d < Objet_U::dimension; d++)
-        {
-          num_flux(f, n + nb_phase * d) = (Sp * flux_l(f, n + nb_phase * d) - Sm * flux_r(f, n + nb_phase * d) + Sp * Sm * (w(er, n + nb_phase * d) - w(el, n + nb_phase * d)));
-          num_flux(f, n + nb_phase * d) /= (Sp - Sm);
-        }
-    }
+        for (int n = 0; n < nb_phase; n++)
+          for (int d = 0; d < Objet_U::dimension; d++)
+            {
+              num_flux(f, n + nb_phase * d) = (Sp * flux_l(f, n + nb_phase * d) - Sm * flux_r(f, n + nb_phase * d) + Sp * Sm * (w(er, n + nb_phase * d) - w(el, n + nb_phase * d)));
+              num_flux(f, n + nb_phase * d) /= (Sp - Sm);
+            }
+      }
 }

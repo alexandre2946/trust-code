@@ -46,15 +46,15 @@ void Op_Conv_Coloc_Elem_base::Riemann_solver(DoubleTab& num_flux) const
   const DoubleTab& p = pb.equation_qdm().pression().valeurs();
   const int nb_phases = pb.nb_phases();
 
-  // compute left/right fluxes
+  // compute left/right fluxes on internal faces
   DoubleTrav flux_l(domaine.nb_faces(), num_flux.line_size()), flux_r(domaine.nb_faces(), num_flux.line_size());
   eq.compute_fluxes_on_all_faces(flux_l, flux_r);
+  scheme(num_flux, flux_l, flux_r);
 
+  // Boundary faces treatement
   for (int f = 0; f < domaine.nb_faces(); f++)
     {
-      if (fcl(f, 0) == 0) // face interne
-        scheme(num_flux, f, flux_l, flux_r);
-      else
+      if (fcl(f, 0) != 0)
         {
           const int e = f_e(f, 0) >= 0 ? f_e(f, 0) : f_e(f, 1); //pas besoin
           // assert(f_e(f,0) >= 0 && vit_n (f,0)!=123.123); //pas besoin

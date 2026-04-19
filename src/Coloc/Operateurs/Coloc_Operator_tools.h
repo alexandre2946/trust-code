@@ -13,8 +13,8 @@
 *
 *****************************************************************************/
 
-#ifndef Euleur_operator_tools_included
-#define Euleur_operator_tools_included
+#ifndef Coloc_Operator_tools_included
+#define Coloc_Operator_tools_included
 
 #include <algorithm>
 #include <cmath>
@@ -75,4 +75,4 @@ inline void compute_non_conservative_hll_right_bounds(const DoubleTab& vit_n, co
   un = un_l;
 }
 
-#endif /*Euleur_operator_tools_included*/
+#endif /*Coloc_Operator_tools_included*/

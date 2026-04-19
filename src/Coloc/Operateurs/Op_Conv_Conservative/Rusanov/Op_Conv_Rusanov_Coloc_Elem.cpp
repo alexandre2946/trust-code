@@ -15,7 +15,7 @@
 
 #include <Op_Conv_Rusanov_Coloc_Elem.h>
 #include <Milieu_composite_Euler.h>
-#include <Euleur_operator_tools.h>
+#include <Coloc_Operator_tools.h>
 #include <Conservation_Euler.h>
 #include <Champ_Inc_P0_base.h>
 #include <Domaine_Cl_Coloc.h>
@@ -29,21 +29,24 @@ Implemente_instanciable(Op_Conv_Rusanov_Coloc_Elem,"Op_Conv_Rusanov_Coloc_Elem",
 Sortie& Op_Conv_Rusanov_Coloc_Elem::printOn(Sortie& os) const { return Op_Conv_Coloc_base::printOn(os); }
 Entree& Op_Conv_Rusanov_Coloc_Elem::readOn(Entree& is) {  Op_Conv_Coloc_base::readOn(is); return is;}
 
-inline void Op_Conv_Rusanov_Coloc_Elem::scheme(DoubleTab& num_flux, const int f, const DoubleTab& flux_l, const DoubleTab& flux_r) const
+inline void Op_Conv_Rusanov_Coloc_Elem::scheme(DoubleTab& num_flux, const DoubleTab& flux_l, const DoubleTab& flux_r) const
 {
   const Domaine_Coloc& domaine = ref_cast(Domaine_Coloc, le_dom_coloc_.valeur());
   const Conservation_Euler& eq = ref_cast(Conservation_Euler, equation());
   const IntTab& f_e = domaine.face_voisins();
+  const IntTab& fcl = ref_cast(Champ_Inc_P0_base, equation().inconnue()).fcl();
   const DoubleTab& vit_n = ref_cast(Momentum_Euler, equation().probleme().equation(0)).vitesse_normale();
   const int nb_phases = ref_cast(Pb_Euler,eq.probleme()).nb_phases();
   const DoubleTab& c = ref_cast(Momentum_Euler,equation().probleme().equation(0)).vitesse_son();
   const DoubleTab& w = le_champ_inco->valeurs();
-
-  const int el = f_e(f, 0), er = f_e(f, 1);
-
-  for (int n = 0; n < nb_phases; n++)
-    {
-      const double s = compute_rusanov_speed(vit_n, c, f, el, er, n, nb_phases);
-      num_flux(f, n) = 0.5 * (flux_l(f, n) + flux_r(f, n)) - s * 0.5 * (w(er, n) - w(el, n));
-    }
+  for (int f = 0; f < domaine.nb_faces(); f++)
+    if (fcl(f, 0) == 0)
+      {
+        const int el = f_e(f, 0), er = f_e(f, 1);
+        for (int n = 0; n < nb_phases; n++)
+          {
+            const double s = compute_rusanov_speed(vit_n, c, f, el, er, n, nb_phases);
+            num_flux(f, n) = 0.5 * (flux_l(f, n) + flux_r(f, n)) - s * 0.5 * (w(er, n) - w(el, n));
+          }
+      }
 }

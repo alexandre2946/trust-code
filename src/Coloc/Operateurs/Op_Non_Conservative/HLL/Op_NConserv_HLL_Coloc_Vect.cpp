@@ -16,7 +16,7 @@
 #include <Op_NConserv_HLL_Coloc_Vect.h>
 #include <Interface_Baer_Nunziato.h>
 #include <Milieu_composite_Euler.h>
-#include <Euleur_operator_tools.h>
+#include <Coloc_Operator_tools.h>
 #include <Sortie_supersonique.h>
 #include <Conservation_Euler.h>
 #include <Champ_Inc_P0_base.h>

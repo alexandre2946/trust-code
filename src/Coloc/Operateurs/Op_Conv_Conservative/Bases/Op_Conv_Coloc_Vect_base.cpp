@@ -46,15 +46,15 @@ void Op_Conv_Coloc_Vect_base::Riemann_solver(DoubleTab& num_flux) const
   const DoubleTab& rho = pb.equation_masse().densite().valeurs();
   const DoubleTab& alpha = pb.equation_fraction().inconnue().valeurs();
 
-  // compute left/right fluxes
+  // compute left/right fluxes on internal faces
   DoubleTrav flux_l(domaine.nb_faces(), num_flux.line_size()), flux_r(domaine.nb_faces(), num_flux.line_size());
   eq.compute_fluxes_on_all_faces(flux_l, flux_r);
+  scheme(num_flux, flux_l, flux_r);
 
+  // Boundary faces treatement
   for (int f = 0; f < domaine.nb_faces(); f++)
     {
-      if (fcl(f, 0) == 0) // face interne
-        scheme(num_flux, f, flux_l, flux_r);
-      else
+      if (fcl(f, 0) != 0)
         {
           //tableaux de correspondance lies aux CLs : fcl(f, .) = { type de CL, num de la CL, indice de la face dans la CL }
           //types de CL : 0 -> pas de CL

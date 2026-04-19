@@ -17,7 +17,7 @@
 #include <Interface_Baer_Nunziato.h>
 #include <Milieu_composite_Euler.h>
 #include <Neumann_paroi_flux_nul.h>
-#include <Euleur_operator_tools.h>
+#include <Coloc_Operator_tools.h>
 #include <Entree_supersonique.h>
 #include <Sortie_supersonique.h>
 #include <Conservation_Euler.h>
