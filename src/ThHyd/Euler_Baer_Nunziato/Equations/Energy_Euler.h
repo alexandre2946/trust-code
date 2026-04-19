@@ -32,7 +32,7 @@ public :
   const Operateur& operateur(int) const override;
   Operateur& operateur(int) override;
 
-  void flux(const int f, const int left_or_right, DoubleTab& res) const override;
+  void compute_fluxes_on_all_faces(DoubleTab& flux_left, DoubleTab& flux_right) const override;
 
   inline double termes_NonConservatif(const double alpha_bord, const double vitesse_normale_interieur, const double p_inter) const override
   {

@@ -118,17 +118,34 @@ void Density_Euler::mettre_a_jour_champs_conserves(double temps, int reset)
   tab_divide_any_shape(rho, alpha);
 }
 
-void Density_Euler::flux(const int f, const int left_or_right, DoubleTab& res) const
+void Density_Euler::compute_fluxes_on_all_faces(DoubleTab& flux_left, DoubleTab& flux_right) const
 {
-  //left_or_right = 0 : left et 1 right;
   const Domaine_VF& dom = ref_cast(Domaine_VF, domaine_dis());
+  const IntTab& face_voisins = dom.face_voisins();
   const DoubleTab& vit_normale = ref_cast(Momentum_Euler, probleme().equation(0)).vitesse_normale();
   const DoubleTab& alpha_rho = inconnue().valeurs();
-  const int e = dom.face_voisins(f, left_or_right);
+  const int nb_faces = dom.nb_faces();
   const int nb_phases = ref_cast(Pb_Euler,probleme()).nb_phases();
-  assert(res.dimension_tot(0) == nb_phases);
-  for (int n = 0; n < nb_phases; n++)
-    res(n) = alpha_rho(e, n) * vit_normale(f, n + left_or_right * nb_phases);
+
+  assert(flux_left.dimension(0) == nb_faces);
+  assert(flux_right.dimension(0) == nb_faces);
+  assert(flux_left.line_size() == nb_phases);
+  assert(flux_right.line_size() == nb_phases);
+
+  flux_left = 0.;
+  flux_right = 0.;
+  for (int f = 0; f < nb_faces; f++)
+    {
+      const int el = face_voisins(f, 0), er = face_voisins(f, 1);
+
+      if (el >= 0)
+        for (int n = 0; n < nb_phases; n++)
+          flux_left(f, n) = alpha_rho(el, n) * vit_normale(f, n);
+
+      if (er >= 0)
+        for (int n = 0; n < nb_phases; n++)
+          flux_right(f, n) = alpha_rho(er, n) * vit_normale(f, n + nb_phases);
+    }
 }
 
 const Operateur& Density_Euler::operateur(int i) const

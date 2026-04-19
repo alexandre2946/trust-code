@@ -28,7 +28,7 @@ Implemente_instanciable(Op_Conv_HLL_Coloc_Elem,"Op_Conv_HLL_Coloc_Elem",Op_Conv_
 Sortie& Op_Conv_HLL_Coloc_Elem::printOn(Sortie& os) const { return Op_Conv_Coloc_base::printOn(os); }
 Entree& Op_Conv_HLL_Coloc_Elem::readOn(Entree& is) {  Op_Conv_Coloc_base::readOn(is); return is;}
 
-inline void Op_Conv_HLL_Coloc_Elem::scheme(DoubleTab& num_flux, const int f, DoubleTab& flux_l, DoubleTab& flux_r) const
+inline void Op_Conv_HLL_Coloc_Elem::scheme(DoubleTab& num_flux, const int f, const DoubleTab& flux_l, const DoubleTab& flux_r) const
 {
   const Domaine_Coloc& domaine = ref_cast(Domaine_Coloc, le_dom_coloc_.valeur());
   const Conservation_Euler& eq = ref_cast(Conservation_Euler, equation());
@@ -38,15 +38,13 @@ inline void Op_Conv_HLL_Coloc_Elem::scheme(DoubleTab& num_flux, const int f, Dou
   const DoubleTab& c = ref_cast(Momentum_Euler,equation().probleme().equation(0)).vitesse_son();
   const DoubleTab& w = le_champ_inco->valeurs();
   const int el = f_e(f, 0), er = f_e(f, 1);
-  eq.flux(f, 0, flux_l);
-  eq.flux(f, 1, flux_r);
 
   double Sm = 0., Sp = 0.;
   compute_hll_bounds(vit_n, c, f, el, er, nb_phases, Sm, Sp);
 
   for (int n = 0; n < nb_phases; n++)
     {
-      num_flux(f, n) = (Sp * flux_l(n) - Sm * flux_r(n) + Sp * Sm * (w(er, n) - w(el, n)));
+      num_flux(f, n) = (Sp * flux_l(f, n) - Sm * flux_r(f, n) + Sp * Sm * (w(er, n) - w(el, n)));
       num_flux(f, n) /= (Sp - Sm);
     }
 }

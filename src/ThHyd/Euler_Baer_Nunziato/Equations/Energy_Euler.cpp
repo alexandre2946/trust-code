@@ -46,20 +46,36 @@ void Energy_Euler::discretiser()
   Cerr << "Energy_Euler::discretiser() ok" << finl;
 }
 
-inline void Energy_Euler::flux(const int f, const int left_or_right, DoubleTab& res) const
+void Energy_Euler::compute_fluxes_on_all_faces(DoubleTab& flux_left, DoubleTab& flux_right) const
 {
   const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
   const Domaine_VF& dom = ref_cast(Domaine_VF, domaine_dis());
+  const IntTab& face_voisins = dom.face_voisins();
   const DoubleTab& vit_normale = ref_cast(Momentum_Euler, probleme().equation(0)).vitesse_normale();
   const DoubleTab& alpha_rhoE = inconnue().valeurs();
+  const int nb_faces = dom.nb_faces();
   const int nb_phases = pb.nb_phases();
   const DoubleTab& p = pb.equation_qdm().pression().valeurs();
   const DoubleTab& alpha = pb.equation_fraction().inconnue().valeurs();
-  const int e = dom.face_voisins(f, left_or_right);
-  assert(res.dimension_tot(0) == nb_phases);
+  assert(flux_left.dimension(0) == nb_faces);
+  assert(flux_right.dimension(0) == nb_faces);
+  assert(flux_left.line_size() == nb_phases);
+  assert(flux_right.line_size() == nb_phases);
 
-  for (int n = 0; n < nb_phases; n++)
-    res(n) = (alpha_rhoE(e, n) + alpha(e, n) * p(e, n)) * vit_normale(f, n + left_or_right * nb_phases);
+  flux_left = 0.;
+  flux_right = 0.;
+  for (int f = 0; f < nb_faces; f++)
+    {
+      const int el = face_voisins(f, 0), er = face_voisins(f, 1);
+
+      if (el >= 0)
+        for (int n = 0; n < nb_phases; n++)
+          flux_left(f, n) = (alpha_rhoE(el, n) + alpha(el, n) * p(el, n)) * vit_normale(f, n);
+
+      if (er >= 0)
+        for (int n = 0; n < nb_phases; n++)
+          flux_right(f, n) = (alpha_rhoE(er, n) + alpha(er, n) * p(er, n)) * vit_normale(f, n + nb_phases);
+    }
 }
 
 Entree& Energy_Euler::lire_cond_init(Entree& is)

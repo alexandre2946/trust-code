@@ -22,7 +22,7 @@ class Op_Conv_HLL_Coloc_Elem : public Op_Conv_Coloc_Elem_base
 {
   Declare_instanciable( Op_Conv_HLL_Coloc_Elem ) ;
 public:
-  inline void scheme(DoubleTab& num_flux, const int f, DoubleTab& flux_l, DoubleTab& flux_r) const override ;
+  inline void scheme(DoubleTab& num_flux, const int f, const DoubleTab& flux_l, const DoubleTab& flux_r) const override ;
 };
 
 #endif /*Op_Conv_HLL_Coloc_Elem_included*/

@@ -15,6 +15,7 @@
 
 #include <Fraction_Euler.h>
 #include <Discret_Thyd.h>
+#include <Domaine_VF.h>
 #include <Pb_Euler.h>
 #include <Domaine.h>
 #include <Param.h>
@@ -66,6 +67,15 @@ void Fraction_Euler::discretiser()
   champs_compris_.ajoute_champ(l_inco_ch_);
   Equation_base::discretiser();
   Cerr << "Fraction_Euler::discretiser() ok" << finl;
+}
+
+void Fraction_Euler::compute_fluxes_on_all_faces(DoubleTab& flux_left, DoubleTab& flux_right) const
+{
+  assert(flux_left.line_size() == inconnue().valeurs().line_size());
+  assert(flux_right.line_size() == inconnue().valeurs().line_size());
+
+  flux_left = 0.;
+  flux_right = 0.;
 }
 
 void Fraction_Euler::set_param(Param& param) const
