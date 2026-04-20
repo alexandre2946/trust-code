@@ -30,7 +30,7 @@ Entree& Echange_contact_rayo_transp_VDF::readOn(Entree& s) { return Echange_cont
 
 int Echange_contact_rayo_transp_VDF::initialiser(double temps)
 {
-  assert (le_modele_rayo_.est_nul());
+  assert (!le_modele_rayo_);
 
   // on recupere le modele rayo ... mais faut le bon probleme !
   // XXX pas encore entrer dans Echange_contact_VDF::initialiser ... donc faut faire des choses a la main ici ...

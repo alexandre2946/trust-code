@@ -37,7 +37,7 @@ Entree& Schema_Euler_Implicite::readOn(Entree& s)
   if (facsec_max_ == DMAXFLOAT) /* facsec_max non regle par l'utilisateur -> on demande sa preference au solveur */
     facsec_max_ = le_solveur->get_default_facsec_max();
   dt_gf_ = le_solveur->get_default_growth_factor();
-  if(!le_solveur.non_nul())
+  if(!le_solveur)
     {
       Cerr << "A solver must be selected." << finl;
       Cerr << "Syntax : " << finl

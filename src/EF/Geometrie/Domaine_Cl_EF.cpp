@@ -330,7 +330,7 @@ void Domaine_Cl_EF::remplir_type_elem_Cl(const Domaine_EF& le_dom_EF)
                       Cerr<<som<<" "<<t1[0] << " " <<t1[1]<<" "<<t1[2]<<finl;
                       Cerr<<som<<" "<<n[0] << " " <<n[1]<<" "<<n[2]<<finl;
                       f=nbf;
-                      if (!normales_symetrie_ter_.non_nul())
+                      if (!normales_symetrie_ter_)
                         equation().probleme().discretisation().discretiser_champ("CHAMP_SOMMETS",le_dom_EF,"normales_nodales_bis","1",dimension,0., normales_symetrie_ter_);
                       for (int d=0; d<dimension; d++)
                         normales_symetrie_ter_->valeurs()(som,d)=t2[d];
@@ -362,7 +362,7 @@ void Domaine_Cl_EF::imposer_symetrie(DoubleTab& values,int tous_les_sommets_sym)
   const DoubleTab& n =normales_symetrie_->valeurs();
   const DoubleTab& n_bis =normales_symetrie_bis_->valeurs();
   int dirmax=2;
-  if (normales_symetrie_ter_.non_nul()) dirmax=3;
+  if (normales_symetrie_ter_) dirmax=3;
   for (int som=0; som<nb_som_tot; som++)
     if (( type_sommet_[som]==1)|| ( tous_les_sommets_sym&&(type_sommet_[som]%2==1)))
       {
@@ -387,7 +387,7 @@ void Domaine_Cl_EF::imposer_symetrie_partiellement(DoubleTab& values,const Noms&
   const DoubleTab& n =normales_symetrie_->valeurs();
   const DoubleTab& n_bis =normales_symetrie_bis_->valeurs();
   int dirmax=2;
-  if (normales_symetrie_ter_.non_nul()) dirmax=3;
+  if (normales_symetrie_ter_) dirmax=3;
   int nbcond=nb_cond_lim();
 
   ArrOfInt type_sommet_bis(type_sommet_);
@@ -459,7 +459,7 @@ void Domaine_Cl_EF::modifie_gradient(ArrOfDouble& grad_mod, const ArrOfDouble& g
 
   assert ( type_sommet_[som]>=1);
   int dirmax=2;
-  if (normales_symetrie_ter_.non_nul()) dirmax=3;
+  if (normales_symetrie_ter_) dirmax=3;
   for (int dir=0; dir<dirmax; dir++)
     {
       const DoubleTab& nn=(dir==0?n:(dir==1?n_bis:normales_symetrie_ter_->valeurs()));
@@ -493,7 +493,7 @@ void  Domaine_Cl_EF::imposer_symetrie_matrice_secmem(Matrice_Morse& la_matrice, 
 
   const DoubleTab& champ_inconnue = equation().inconnue().valeurs();
   int dirmax=2;
-  if (normales_symetrie_ter_.non_nul()) dirmax=3;
+  if (normales_symetrie_ter_) dirmax=3;
   for (int som=0; som<nb_som; som++)
     if ( type_sommet_[som]==1)
       {

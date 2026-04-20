@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -35,7 +35,7 @@ Entree& Loi_Etat_GP_WC::readOn(Entree& is)
   Cerr << "Lecture de la loi d'etat gaz parfait pour le WC ... " << finl;
   Loi_Etat_Mono_GP_base::readOn(is);
 
-  if(rho_constant_pour_debug_.non_nul())
+  if(rho_constant_pour_debug_)
     {
       Cerr << "Remove the keyword rho_constant_pour_debug from your data file !" << finl;
       Process::exit();

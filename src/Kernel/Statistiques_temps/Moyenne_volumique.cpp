@@ -463,7 +463,7 @@ Entree& Moyenne_volumique::interpreter(Entree& is)
   OBS_PTR(Champ_base) ref_champ;
   get_champ(nom_pb, noms_champs[0], ref_champ);
   const double temps = ref_champ->temps();
-  if (!fichier_post.non_nul())
+  if (!fichier_post)
     {
       if (nom_fichier_post == "??")
         {

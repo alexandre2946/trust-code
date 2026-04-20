@@ -42,7 +42,7 @@ Entree& Loi_Etat_rhoT_GP_QC::readOn( Entree& is )
   param.ajouter("Tmin_for_exit",&Tmin_for_exit_); // XD_ADD_P double If temperature goes below Tmin_for_exit (default value -1000), computation will stop.
   param.lire_avec_accolades(is);
 
-  if (expression_ == "??" && rho_xyz_.est_nul())
+  if (expression_ == "??" && !rho_xyz_)
     {
       Cerr << "Error in Loi_Etat_rhoT_GP_QC::readOn !" << finl;
       Cerr << "The closure equation of rho is not read in your data file !" << finl;

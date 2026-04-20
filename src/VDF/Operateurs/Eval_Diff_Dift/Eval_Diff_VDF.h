@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -32,7 +32,7 @@ public:
 
   inline virtual const Champ_base& get_diffusivite() const final
   {
-    assert(ref_diffusivite_.non_nul());
+    assert(ref_diffusivite_);
     return ref_diffusivite_.valeur();
   }
 

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -278,7 +278,7 @@ void Pb_MED::creer_champ(const Motcle& motlu)
 
   le_ch_fonc->nommer(motlu);
   chmed.le_champ().nommer(motlu);
-  if (!le_ch_fonc.non_nul())
+  if (!le_ch_fonc)
     {
       Cerr << "Error when reading data for post-processing" << finl;
       Cerr << "The creation of the field " << motlu << " has failed." << finl;

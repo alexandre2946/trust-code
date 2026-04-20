@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -1031,7 +1031,7 @@ void OctreeRoot_32_64<_SIZE_>::rang_elems_sommet(SmallArrOfTID_t& elements, doub
 template <typename _SIZE_>
 int OctreeRoot_32_64<_SIZE_>::construit() const
 {
-  if((le_dom.est_nul())||(valid_!=1))
+  if((!le_dom)||(valid_!=1))
     // L'Octree n'est pas construit ou le domaine est nulle
     return 0;
   else

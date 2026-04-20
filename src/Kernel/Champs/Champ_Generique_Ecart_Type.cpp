@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -102,7 +102,7 @@ const Champ_base& Champ_Generique_Ecart_Type::get_champ(OWN_PTR(Champ_base)&) co
   const Champ_base& source = mon_champ->get_champ(espace_stockage_source);
   Nature_du_champ nature_source = source.nature_du_champ();
   int nb_comp = source.nb_comp();
-  if (espace_stockage_.est_nul())
+  if (!espace_stockage_)
     creer_espace_stockage(nature_source,nb_comp,espace_stockage_);
   else
     espace_stockage_->changer_temps(temps());

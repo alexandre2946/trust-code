@@ -33,7 +33,7 @@ Entree& Champ_front_contact_rayo_transp_VEF::readOn(Entree& is)
 
 int Champ_front_contact_rayo_transp_VEF::initialiser(double temps, const Champ_Inc_base& inco)
 {
-  assert (le_modele_rayo_.est_nul());
+  assert (!le_modele_rayo_);
 
   // on recupere le modele rayo ... mais faut le bon probleme !
   // XXX pas encore entrer dans Champ_front_contact_VEF::initialiser ... donc faut faire des choses a la main ici ...

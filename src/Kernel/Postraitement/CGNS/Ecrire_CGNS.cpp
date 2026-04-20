@@ -170,7 +170,7 @@ void Ecrire_CGNS::fill_infos_loc()
       return;
     }
 
-  assert (loc_vect_.non_nul());
+  assert (loc_vect_);
   assert (static_cast<int>(loc_vect_->size()) <= 3);
 
   if (static_cast<int>(loc_vect_->size()) == 0)
@@ -589,7 +589,7 @@ void Ecrire_CGNS::cgns_write_domaine_seq(const Domaine * domaine,const Nom& nom_
   /* 1 : Instance of TRUST_2_CGNS */
   T2CGNS_.push_back(TRUST_2_CGNS());
   TRUST_2_CGNS& TRUST2CGNS = T2CGNS_.back();
-  TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_.non_nul() ? &(domaine_dis_.valeur()) : nullptr,
+  TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_ ? &(domaine_dis_.valeur()) : nullptr,
                                     les_som, les_elem, postraiter_domaine_, discr_type_);
   if (is_dual_ && Objet_U::dimension == 3)
     {
@@ -716,7 +716,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_seq(const Domaine * domaine,cons
 {
   const int ind = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
   TRUST_2_CGNS& TRUST2CGNS = T2CGNS_[ind];
-  TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_.non_nul() ? &(domaine_dis_.valeur()) : nullptr,
+  TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_ ? &(domaine_dis_.valeur()) : nullptr,
                                     les_som, les_elem, postraiter_domaine_, discr_type_);
 
   CGNS_TYPE cgns_type_elem = TRUST2CGNS.convert_elem_type(type_elem);
@@ -820,7 +820,7 @@ void Ecrire_CGNS::cgns_write_domaine_par_over_zone(const Domaine * domaine,const
   /* 1 : Instance of TRUST_2_CGNS */
   T2CGNS_.push_back(TRUST_2_CGNS());
   TRUST_2_CGNS& TRUST2CGNS = T2CGNS_.back();
-  TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_.non_nul() ? &(domaine_dis_.valeur()) : nullptr,
+  TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_ ? &(domaine_dis_.valeur()) : nullptr,
                                     les_som, les_elem, postraiter_domaine_, discr_type_);
 
   if (is_dual_ && Objet_U::dimension == 3)
@@ -1102,7 +1102,7 @@ void Ecrire_CGNS::cgns_write_domaine_par_in_zone(const Domaine * domaine,const N
   /* 1 : Instance of TRUST_2_CGNS */
   T2CGNS_.push_back(TRUST_2_CGNS());
   TRUST_2_CGNS& TRUST2CGNS = T2CGNS_.back();
-  TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_.non_nul() ? &(domaine_dis_.valeur()) : nullptr,
+  TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_ ? &(domaine_dis_.valeur()) : nullptr,
                                     les_som, les_elem, postraiter_domaine_, discr_type_);
 
   if (is_dual_ && Objet_U::dimension == 3)
@@ -1394,7 +1394,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
 #ifdef MPI_
   const int ind = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
   TRUST_2_CGNS& TRUST2CGNS = T2CGNS_[ind];
-  TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_.non_nul() ? &(domaine_dis_.valeur()) : nullptr,
+  TRUST2CGNS.associer_domaine_TRUST(domaine, domaine_dis_ ? &(domaine_dis_.valeur()) : nullptr,
                                     les_som, les_elem, postraiter_domaine_, discr_type_);
 
   CGNS_TYPE cgns_type_elem = TRUST2CGNS.convert_elem_type(type_elem);
@@ -1538,7 +1538,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
 void Ecrire_CGNS::cgns_write_domaine_dual(const Nom& nom_dom_init, const int est_le_premier_post, const Nom& nom_dom_faces)
 {
   Cerr << "Writing the Dual mesh of " << nom_dom_init << " in a CGNS format ..." << finl;
-  assert(domaine_dis_.non_nul());
+  assert(domaine_dis_);
   if (Objet_U::dimension==0)
     Process::exit("Dimension is not defined. Check your data file.");
   const Domaine_VF& dom_vf = ref_cast(Domaine_VF, domaine_dis_.valeur());

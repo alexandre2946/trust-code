@@ -35,7 +35,7 @@ Solv_GCP::Solv_GCP()
 Sortie& Solv_GCP::printOn(Sortie& s ) const
 {
   s<<" { seuil " << seuil_ ;
-  if (le_precond_.non_nul())
+  if (le_precond_)
     s<<" precond " <<le_precond_;
   else
     s<<" precond_nul ";
@@ -65,7 +65,7 @@ Entree& Solv_GCP::readOn(Entree& is )
   param.ajouter_flag("optimized", &optimized_);  // XD attr optimized rien optimized 1 This keyword triggers a memory and network optimized algorithms useful for strong scaling (when computing less than 100 000 elements per processor). The matrix and the vectors are duplicated, common items removed and only virtual items really used in the matrix are exchanged.NL2 Warning: this is experimental and known to fail in some VEF computations (L2 projection step will not converge). Works well in VDF.
   param.lire_avec_accolades_depuis(is);
   // Obligation de definir un precond
-  if (!le_precond_.non_nul() && precond_nul==0 && precond_diag_==0)
+  if (!le_precond_ && precond_nul==0 && precond_diag_==0)
     {
       Cerr << "You forgot to define a preconditionner with the keyword precond." << finl;
       Cerr << "If you don't want a preconditionner, add for the solver definition:" << finl;
@@ -112,7 +112,7 @@ void Solv_GCP::reinit()
   if (reinit_ > 1) // Si reinit_ = 0, ne pas toucher.
     reinit_ = 1;
   SolveurSys_base::reinit();
-  if (le_precond_.non_nul())
+  if (le_precond_)
     le_precond_->reinit();
 }
 
@@ -415,7 +415,7 @@ int Solv_GCP::resoudre_(const Matrice_Base& matrice,
     nmax = static_cast<int>(std::min<trustIdType>(nmax0, nmaxmax));
   }
 
-  const int avec_precond = le_precond_.non_nul();
+  const int avec_precond = bool(le_precond_);
   const int precond_requires_echange_espace_virtuel =
     avec_precond && (le_precond_->get_flag_updated_input());
 

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -25,7 +25,7 @@ class Champ_Input_P0_Composite : public Champ_Fonc_P0_base
   Declare_instanciable(Champ_Input_P0_Composite);
 public:
   // champ utilise pour l'initialisation
-  bool is_initialized() { return champ_initial_.non_nul(); }
+  bool is_initialized() { return bool(champ_initial_); }
   const DoubleTab& initial_values() { return champ_initial_->valeurs(); }
 
   // champ input classique (faut plus des methodes pt etre ?)

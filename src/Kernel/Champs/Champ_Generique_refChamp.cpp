@@ -376,7 +376,7 @@ const Probleme_base& Champ_Generique_refChamp::get_ref_pb_base() const
  */
 const Champ_base& Champ_Generique_refChamp::get_ref_champ_base() const
 {
-  if (!ref_champ_.non_nul())
+  if (!ref_champ_)
     throw Champ_Generique_erreur("NOT_INITIALIZED");
   return ref_champ_.valeur();
 }
@@ -425,7 +425,7 @@ const Champ_base& Champ_Generique_refChamp::get_champ_without_evaluation(OWN_PTR
  */
 void Champ_Generique_refChamp::set_ref_champ(const Champ_base& champ)
 {
-  assert(!ref_champ_.non_nul());
+  assert(!ref_champ_);
   ref_champ_ = champ;
 
   // Determination de la localisation du champ
@@ -534,7 +534,7 @@ void Champ_Generique_refChamp::nommer_source(const Postraitement_base& post)
     {
       Nom nom_post_source, nom_champ_base, nom_dom_natif;
       nom_champ_base = get_ref_champ_base().le_nom();
-      if (ref_cast_non_const(Postraitement, post).domaine().non_nul())
+      if (ref_cast_non_const(Postraitement, post).domaine())
         {
           nom_post_source =  nom_champ_base + "_natif_" + ref_cast_non_const(Postraitement, post).domaine()->le_nom();
         }

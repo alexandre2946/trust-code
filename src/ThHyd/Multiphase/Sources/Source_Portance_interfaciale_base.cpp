@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -54,7 +54,7 @@ Entree& Source_Portance_interfaciale_base::readOn(Entree& is)
 void Source_Portance_interfaciale_base::creer_champ(const Motcle& motlu)
 {
   if (motlu == "wobble")
-    if (wobble.est_nul())
+    if (!wobble)
       {
         Pb_Multiphase& pb = ref_cast(Pb_Multiphase, equation().probleme());
         int N = pb.nb_phases();
@@ -68,7 +68,7 @@ void Source_Portance_interfaciale_base::creer_champ(const Motcle& motlu)
         champs_compris_.ajoute_champ(wobble);
       }
   if (motlu == "C_lift")
-    if (C_lift.est_nul())
+    if (!C_lift)
       {
         Pb_Multiphase& pb = ref_cast(Pb_Multiphase, equation().probleme());
         int N = pb.nb_phases();
@@ -85,6 +85,6 @@ void Source_Portance_interfaciale_base::creer_champ(const Motcle& motlu)
 
 void Source_Portance_interfaciale_base::completer()
 {
-  if (wobble.non_nul() && !equation().probleme().has_champ("diametre_bulles")) Process::exit(que_suis_je() + " : there must be a bubble diameter field for there to be a wobble number !!") ;
-  if (wobble.non_nul() && !equation().probleme().has_champ("k")) Process::exit(que_suis_je() + " : there must be a turbulent kinetic energy field for there to be a wobble number !!") ;
+  if (wobble && !equation().probleme().has_champ("diametre_bulles")) Process::exit(que_suis_je() + " : there must be a bubble diameter field for there to be a wobble number !!") ;
+  if (wobble && !equation().probleme().has_champ("k")) Process::exit(que_suis_je() + " : there must be a turbulent kinetic energy field for there to be a wobble number !!") ;
 }

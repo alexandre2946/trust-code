@@ -170,7 +170,7 @@ Entree& Solveur_Implicite_base::lire(const Motcle& motlu, Entree& is)
 OWN_PTR(Parametre_equation_base)& Solveur_Implicite_base::get_and_set_parametre_equation(Equation_base& eqn)
 {
   OWN_PTR(Parametre_equation_base)& param = eqn.parametre_equation();
-  if (param.est_nul())
+  if (!param)
     {
       param.typer("Parametre_implicite");
     }
@@ -188,7 +188,7 @@ OWN_PTR(Parametre_equation_base)& Solveur_Implicite_base::get_and_set_parametre_
     param_impl.seuil_verification_solveur() = param_defaut_.seuil_verification_solveur();
   if (param_impl.seuil_test_preliminaire_lu()==0)
     param_impl.seuil_test_preliminaire_solveur() = param_defaut_.seuil_test_preliminaire_solveur();
-  if (param_impl.solveur().est_nul())
+  if (!param_impl.solveur())
     param_impl.solveur() = param_defaut_.solveur();
 
   // Some checks:

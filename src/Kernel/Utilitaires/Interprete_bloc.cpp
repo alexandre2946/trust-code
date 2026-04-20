@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -37,7 +37,7 @@ Interprete_bloc::Interprete_bloc()
 {
   // S'il existe un interprete courant, il devient le pere
   // de l'interprete en cours de construction:
-  if (interprete_courant_.non_nul()) pere_ = interprete_courant_;
+  if (interprete_courant_) pere_ = interprete_courant_;
 
   interprete_courant_ = *this;
 }
@@ -189,7 +189,7 @@ Entree& Interprete_bloc::interpreter_bloc(Entree& is, Bloc_Type bloc_type, int v
                   Nom nom_objet;
                   is >> nom_objet;
                   Journal(jlevel) << " Storing object " << nom_objet << " of type " << motlu << finl;
-                  if (!export_object || !pere_.non_nul())
+                  if (!export_object || !pere_)
                     ajouter(nom_objet, objet);
                   else
                     pere_->ajouter(nom_objet, objet);
@@ -252,7 +252,7 @@ Objet_U& Interprete_bloc::ajouter(const Nom& nom, DerObjU& ob)
 Objet_U& Interprete_bloc::objet_global(const Nom& nom)
 {
   OBS_PTR(Interprete_bloc) ptr(interprete_courant());
-  while (ptr.non_nul())
+  while (ptr)
     {
       Interprete_bloc& interp = ptr.valeur();
       if (interp.objet_local_existant(nom))
@@ -274,7 +274,7 @@ Objet_U& Interprete_bloc::objet_global(const Nom& nom)
 int Interprete_bloc::objet_global_existant(const Nom& nom)
 {
   OBS_PTR(Interprete_bloc) ptr(interprete_courant());
-  while (ptr.non_nul())
+  while (ptr)
     {
       Interprete_bloc& interp = ptr.valeur();
       if (interp.objet_local_existant(nom))

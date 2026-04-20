@@ -1001,7 +1001,7 @@ void SETS::assembler(const std::string inco_p,
 
   /* calc(i) = 1 si on doit remplir les lignes [N * i, (N + 1) * i[ de la matrice */
   ArrOfBit calc(np);
-  if (secmem.get_md_vector().non_nul())
+  if (secmem.get_md_vector())
     secmem.get_md_vector()->get_sequential_items_flags(calc);
   else
     calc = 1;

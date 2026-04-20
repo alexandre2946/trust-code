@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -77,7 +77,7 @@ void Support_Champ_Masse_Volumique::dissocier_champ_masse_volumique()
  */
 int Support_Champ_Masse_Volumique::has_champ_masse_volumique() const
 {
-  int ref_non_nulle = ref_champ_rho_.non_nul();
+  int ref_non_nulle = bool(ref_champ_rho_);
   return ref_non_nulle;
 }
 
@@ -86,7 +86,7 @@ int Support_Champ_Masse_Volumique::has_champ_masse_volumique() const
  */
 const Champ_base& Support_Champ_Masse_Volumique::get_champ_masse_volumique() const
 {
-  assert(ref_champ_rho_.non_nul());
+  assert(ref_champ_rho_);
   const Champ_base& ch = ref_champ_rho_.valeur();
   return ch;
 }

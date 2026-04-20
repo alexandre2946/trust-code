@@ -58,7 +58,7 @@ int Navier_Stokes_Fluide_Dilatable_Proto::impr_impl(const Navier_Stokes_std& eqn
   rho_vitesse_impl(rho,vit,mass_flux);
 
   DoubleTrav array(eqn.div().valeurs());
-  if (tab_W.get_md_vector().non_nul())
+  if (tab_W.get_md_vector())
     {
       operator_egal(array, tab_W ); //, VECT_REAL_ITEMS); // initialise
       array*=-1;
@@ -120,7 +120,7 @@ DoubleTab& Navier_Stokes_Fluide_Dilatable_Proto::derivee_en_temps_inco_impl(Navi
   DoubleTrav inc_pre(press);
   DoubleTrav rhoU(vit);
 
-  if (!tab_W.get_md_vector().non_nul())
+  if (!tab_W.get_md_vector())
     {
       tab_W.copy(secmem, RESIZE_OPTIONS::NOCOPY_NOINIT); // copie la structure
       // initialisation sinon plantage assert lors du remplissage dans EDO_Pression_th_VEF::secmembre_divU_Z_VEFP1B
@@ -131,7 +131,7 @@ DoubleTab& Navier_Stokes_Fluide_Dilatable_Proto::derivee_en_temps_inco_impl(Navi
   OBS_PTR(Champ_base) gradient_pression;
   eqn.has_champ("gradient_pression", gradient_pression);
 
-  if (gradient_pression.est_nul())
+  if (!gradient_pression)
     {
       Cerr<<"l'equation ne comprend pas gradient_pression "<<finl;
       Process::exit();

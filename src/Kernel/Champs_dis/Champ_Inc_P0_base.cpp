@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -62,7 +62,7 @@ Champ_base& Champ_Inc_P0_base::affecter_(const Champ_base& ch)
 
 double Champ_Inc_P0_base::valeur_au_bord(int face) const
 {
-  assert(le_dom_VF.non_nul());
+  assert(le_dom_VF);
   const DoubleTab& val = valeurs();
   double la_val_bord;
 

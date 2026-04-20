@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -106,7 +106,7 @@ int Champ_Face_PolyMAC_MPFA::reprendre(Entree& fich)
   if (pbm) return Champ_Inc_base::reprendre(fich);
 
   // sinon on fait ca ...
-  const Domaine_PolyMAC_MPFA* domaine = le_dom_VF.non_nul() ? &ref_cast( Domaine_PolyMAC_MPFA,le_dom_VF.valeur()) : nullptr;
+  const Domaine_PolyMAC_MPFA* domaine = le_dom_VF ? &ref_cast( Domaine_PolyMAC_MPFA,le_dom_VF.valeur()) : nullptr;
   valeurs().set_md_vector(MD_Vector()); //on enleve le MD_Vector...
   valeurs().resize(0);
   int ret = Champ_Inc_base::reprendre(fich);

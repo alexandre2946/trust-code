@@ -39,7 +39,7 @@ public :
   using DoubleVect_t = DoubleVect_T<_SIZE_>;
   const Champ_base& champ_origine() const {   return champ_orig.valeur(); }
   const Champ_base& champ_origine()  {   return champ_orig.valeur(); }
-  bool has_champ_origine() const  {   return champ_orig.non_nul(); }
+  bool has_champ_origine() const  {   return bool(champ_orig); }
   const DoubleTab_t& origine_repere() {   return ref_origine_.valeur(); }
   const DoubleTab_t& origine_repere() const {   return ref_origine_.valeur(); }
   void associer_origine_repere(const DoubleTab_t& orig) {   ref_origine_ = orig; }
@@ -47,7 +47,7 @@ public :
   inline double origine_repere(int_t i,int j) const { return ref_origine_.valeur()(i,j); }
   void calculer_volumes(DoubleVect_t& volumes, DoubleVect_t& inverse_volumes) const override
   {
-    if (ref_origine_.non_nul())
+    if (ref_origine_)
       Domaine_32_64<_SIZE_>::calculer_volumes(volumes, inverse_volumes);
     else
       Cerr << "DomaineAxi1d should be descritized before computing volumes." << finl;

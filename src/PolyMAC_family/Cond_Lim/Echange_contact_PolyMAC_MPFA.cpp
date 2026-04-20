@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -35,7 +35,7 @@ Entree& Echange_contact_PolyMAC_MPFA::readOn(Entree& s) { return Echange_contact
 
 void Echange_contact_PolyMAC_MPFA::init_op() const
 {
-  if (o_diff.non_nul())
+  if (o_diff)
     return;
   Champ_front_calc ch;
   ch.creer(nom_autre_pb_, nom_bord_, nom_champ_);

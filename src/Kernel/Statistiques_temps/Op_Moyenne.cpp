@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -58,7 +58,7 @@ void Op_Moyenne::completer(const Probleme_base& Pb, const Nom& prefix)
   // de la moyenne. On stocke l'integrale en temps et on postraite la moyenne
   // Copie de la structure du vecteur, initialisation a zero.
   valeurs().copy(tab1, RESIZE_OPTIONS::NOCOPY_NOINIT);
-  if (!ch_moyenne_convergee_.non_nul())
+  if (!ch_moyenne_convergee_)
     valeurs() = 0.;
   int nb_comp = source.nb_comp();
   integrale_champ_.le_champ_calcule().associer_domaine_dis_base(Pb.domaine_dis());

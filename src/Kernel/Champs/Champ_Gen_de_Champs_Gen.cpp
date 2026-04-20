@@ -127,7 +127,7 @@ OWN_PTR(Champ_Fonc_base)& Champ_Gen_de_Champs_Gen::creer_espace_stockage(const N
                                                                          const int nb_comp,
                                                                          OWN_PTR(Champ_Fonc_base)& es_tmp) const
 {
-  if (!es_tmp.est_nul())
+  if (es_tmp)
     {
       ToDo_Kokkos("critical, call to creer_espace_stockage() is expensive on GPU (fields copy on host). Refactor like Champ_Generique_Moyenne and other advanced fields...");
     }
@@ -165,7 +165,7 @@ const Champ_Generique_base& Champ_Gen_de_Champs_Gen::get_source(int i) const
   int n_sources_ref=sources_reference_.size();
   if (i<n_sources_ref)
     {
-      if ( ! sources_reference_[i].non_nul())
+      if ( !sources_reference_[i])
         {
           Cerr << finl;
           Cerr << "Error : The field \"" << noms_sources_ref_[0] << "\" is not recognized in the sources_reference option of the " << que_suis_je() << " keyword." << finl;

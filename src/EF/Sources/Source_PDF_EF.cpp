@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -1886,7 +1886,7 @@ int Source_PDF_EF::impr(Sortie& os) const
 
 void Source_PDF_EF::creer_champ(const Motcle& motlu)
 {
-  if (motlu=="u_star_ibm" && !champ_u_star_ibm_.non_nul() && imm_wall_law_)
+  if (motlu=="u_star_ibm" && !champ_u_star_ibm_ && imm_wall_law_)
     {
       int nb_comp = 1;
       Noms noms(1);
@@ -1898,7 +1898,7 @@ void Source_PDF_EF::creer_champ(const Motcle& motlu)
       discr.discretiser_champ("champ_sommets",equation().domaine_dis(),scalaire,noms,unites,nb_comp,temps,champ_u_star_ibm_);
       champs_compris_.ajoute_champ(champ_u_star_ibm_);
     }
-  else if (motlu=="y_plus_ibm" && !champ_y_plus_ibm_.non_nul() && imm_wall_law_)
+  else if (motlu=="y_plus_ibm" && !champ_y_plus_ibm_ && imm_wall_law_)
     {
       int nb_comp = 1;
       Noms noms(1);
@@ -1914,12 +1914,12 @@ void Source_PDF_EF::creer_champ(const Motcle& motlu)
 
 bool Source_PDF_EF::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const
 {
-  if (nom == "u_star_ibm" && champ_u_star_ibm_.non_nul())
+  if (nom == "u_star_ibm" && champ_u_star_ibm_)
     {
       ref_champ = Source_PDF_EF::get_champ(nom);
       return true;
     }
-  else if (nom == "y_plus_ibm" && champ_y_plus_ibm_.non_nul())
+  else if (nom == "y_plus_ibm" && champ_y_plus_ibm_)
     {
       ref_champ = Source_PDF_EF::get_champ(nom);
       return true;
@@ -1932,9 +1932,9 @@ bool Source_PDF_EF::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ)
 
 bool Source_PDF_EF::has_champ(const Motcle& nom) const
 {
-  if (nom == "u_star_ibm" && champ_u_star_ibm_.non_nul())
+  if (nom == "u_star_ibm" && champ_u_star_ibm_)
     return true;
-  else if (nom == "y_plus_ibm" && champ_y_plus_ibm_.non_nul())
+  else if (nom == "y_plus_ibm" && champ_y_plus_ibm_)
     return true;
   else
     return champs_compris_.has_champ(nom);
@@ -1944,7 +1944,7 @@ const Champ_base& Source_PDF_EF::get_champ(const Motcle& nom) const
 {
   if (nom=="u_star_ibm")
     {
-      if (champ_u_star_ibm_.est_nul())
+      if (!champ_u_star_ibm_)
         throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 
       // Initialisation a 0 du champ volumique u_star
@@ -1964,7 +1964,7 @@ const Champ_base& Source_PDF_EF::get_champ(const Motcle& nom) const
     }
   else if (nom=="y_plus_ibm")
     {
-      if (champ_y_plus_ibm_.est_nul())
+      if (!champ_y_plus_ibm_)
         throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 
       // Initialisation a 0 du champ volumique u_star

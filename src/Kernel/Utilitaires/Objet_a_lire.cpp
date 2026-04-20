@@ -544,7 +544,7 @@ void Objet_a_lire::read(Motcle const& motcle, Entree& is)
             }
           *int_a_lire = dictionnaire_valeurs[rang];
           ptrParam& ptr = dictionnaire_params[rang];
-          if (ptr.non_nul())
+          if (ptr)
             {
               ptr->lire_avec_accolades_depuis(is);
             }

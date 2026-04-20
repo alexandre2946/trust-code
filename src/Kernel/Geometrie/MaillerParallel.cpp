@@ -500,7 +500,7 @@ static void auto_build_joints(Domaine& domaine, const int epaisseur_joint)
                     break;
                   }
               }
-            if (!ref_joint.non_nul())
+            if (!ref_joint)
               {
                 Joint& joint = domaine.faces_joint().add(Joint());
                 joint.nommer("Joint_i");

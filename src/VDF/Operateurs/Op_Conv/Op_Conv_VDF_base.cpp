@@ -73,17 +73,17 @@ void Op_Conv_VDF_base::associer_champ_convecte_elem()
   if (sub_type(Pb_Multiphase, equation().probleme())) equation().init_champ_convecte();
 
   Op_Conv_VDF_base::preparer_calcul();
-  const Champ_Inc_base& cc = equation().has_champ_convecte() ? equation().champ_convecte() : (le_champ_inco.non_nul() ? le_champ_inco.valeur() : equation().inconnue());
+  const Champ_Inc_base& cc = equation().has_champ_convecte() ? equation().champ_convecte() : (le_champ_inco ? le_champ_inco.valeur() : equation().inconnue());
   iter_->associer_champ_convecte_ou_inc(cc, &vitesse());
-  iter_->set_name_champ_inco(le_champ_inco.non_nul() ? nom_inconnue() : cc.le_nom().getString());
+  iter_->set_name_champ_inco(le_champ_inco ? nom_inconnue() : cc.le_nom().getString());
 }
 
 void Op_Conv_VDF_base::associer_champ_convecte_face()
 {
   Op_Conv_VDF_base::preparer_calcul();
-  const Champ_Inc_base& cc = le_champ_inco.non_nul() ? le_champ_inco.valeur() : equation().inconnue();
+  const Champ_Inc_base& cc = le_champ_inco ? le_champ_inco.valeur() : equation().inconnue();
   iter_->associer_champ_convecte_ou_inc(cc, &vitesse());
-  iter_->set_name_champ_inco(le_champ_inco.non_nul() ? nom_inconnue() : cc.le_nom().getString());
+  iter_->set_name_champ_inco(le_champ_inco ? nom_inconnue() : cc.le_nom().getString());
 }
 
 void Op_Conv_VDF_base::associer_champ_temp(const Champ_Inc_base& ch_unite, bool use_base) const
@@ -183,10 +183,10 @@ double Op_Conv_VDF_base::calculer_dt_stab() const
   const DoubleVect& volumes = domaine_VDF.volumes();
   const DoubleVect& face_surfaces = domaine_VDF.face_surfaces();
   const DoubleTab& vit_associe = vitesse().valeurs();
-  const DoubleTab& vit= (vitesse_pour_pas_de_temps_.non_nul()?vitesse_pour_pas_de_temps_->valeurs(): vit_associe);
+  const DoubleTab& vit= (vitesse_pour_pas_de_temps_?vitesse_pour_pas_de_temps_->valeurs(): vit_associe);
   const int N = std::min(vit.line_size(), equation().inconnue().valeurs().line_size());
   const DoubleTab* alp = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()).equation_masse().inconnue().passe() : nullptr;
-  if (!fluent_.get_md_vector().non_nul())
+  if (!fluent_.get_md_vector())
     {
       fluent_.resize(0, N);
       domaine_VDF.domaine().creer_tableau_elements(fluent_);
@@ -449,17 +449,17 @@ void Op_Conv_VDF_base::creer_champ(const Motcle& motlu)
   if (sub_type(Masse_Multiphase, equation())) //convection dans Masse_Multiphase -> champs de debit / titre
     {
       int i = noms_cc_phases_.rang(motlu), j = noms_vd_phases_.rang(motlu), k = noms_x_phases_.rang(motlu);
-      if (i >= 0 && !cc_phases_[i].non_nul())
+      if (i >= 0 && !cc_phases_[i])
         {
           equation().discretisation().discretiser_champ("vitesse", equation().domaine_dis(), noms_cc_phases_[i], "kg/m2/s",dimension, 1, 0, cc_phases_[i]);
           champs_compris_.ajoute_champ(cc_phases_[i]);
         }
-      if (j >= 0 && !vd_phases_[j].non_nul())
+      if (j >= 0 && !vd_phases_[j])
         {
           equation().discretisation().discretiser_champ("vitesse", equation().domaine_dis(), noms_vd_phases_[j], "m/s",dimension, 1, 0, vd_phases_[j]);
           champs_compris_.ajoute_champ(vd_phases_[j]);
         }
-      if (k >= 0 && !x_phases_[k].non_nul())
+      if (k >= 0 && !x_phases_[k])
         {
           equation().discretisation().discretiser_champ("temperature", equation().domaine_dis(), noms_x_phases_[k], "m/s",1, 1, 0, x_phases_[k]);
           champs_compris_.ajoute_champ(x_phases_[k]);
@@ -475,7 +475,7 @@ void Op_Conv_VDF_base::mettre_a_jour(double temps)
     {
       const Domaine_VDF& domaine = iter_->domaine();
       const IntTab& f_e = domaine.face_voisins(), &e_f = domaine.elem_faces();
-      const Champ_Inc_base& cc = le_champ_inco.non_nul() ? le_champ_inco.valeur() : equation().champ_convecte();
+      const Champ_Inc_base& cc = le_champ_inco ? le_champ_inco.valeur() : equation().champ_convecte();
       const DoubleVect& pf = equation().milieu().porosite_face(), &pe = equation().milieu().porosite_elem(), &fs = domaine.face_surfaces(), &ve = domaine.volumes();
       const DoubleTab& vit = vitesse().valeurs(), &vcc = cc.valeurs(), bcc = cc.valeur_aux_bords(), &xv = domaine.xv(), &xp = domaine.xp();
       DoubleTab balp;
@@ -486,7 +486,7 @@ void Op_Conv_VDF_base::mettre_a_jour(double temps)
 
       if (cc_phases_.size())
         for (n = 0, m = 0; n < N; n++, m += (M > 1))
-          if (cc_phases_[n].non_nul()) /* mise a jour des champs de debit */
+          if (cc_phases_[n]) /* mise a jour des champs de debit */
             {
               Champ_Face_VDF& c_ph = ref_cast(Champ_Face_VDF, cc_phases_[n].valeur());
               DoubleTab& v_ph = c_ph.valeurs();
@@ -497,7 +497,7 @@ void Op_Conv_VDF_base::mettre_a_jour(double temps)
 
       if (vd_phases_.size())
         for (n = 0, m = 0; n < N; n++, m += (M > 1))
-          if (vd_phases_[n].non_nul()) /* mise a jour des champs de vitesse debitante */
+          if (vd_phases_[n]) /* mise a jour des champs de vitesse debitante */
             {
               const DoubleTab& alp = equation().inconnue().valeurs();
               Champ_Face_VDF& c_ph = ref_cast(Champ_Face_VDF, vd_phases_[n].valeur());
@@ -519,10 +519,10 @@ void Op_Conv_VDF_base::mettre_a_jour(double temps)
                   v(n, d) += fs(f) * pf(f) * (xv(f, d) - xp(e, d)) * (e == f_e(f, 0) ? 1 : -1) * vit(f, n) / (pe(e) * ve(e));
             for (Gt = 0, n = 0; n < N; Gt += G(n), n++) G(n) = vcc(e, n) * sqrt(domaine.dot(&v(n, 0), &v(n, 0)));
             for (n = 0; n < N; n++)
-              if (x_phases_[n].non_nul()) x_phases_[n]->valeurs()(e) = Gt ? G(n) / Gt : 0;
+              if (x_phases_[n]) x_phases_[n]->valeurs()(e) = Gt ? G(n) / Gt : 0;
           }
       if (x_phases_.size())
         for (n = 0; n < N; n++)
-          if (x_phases_[n].non_nul()) x_phases_[n]->changer_temps(temps);
+          if (x_phases_[n]) x_phases_[n]->changer_temps(temps);
     }
 }

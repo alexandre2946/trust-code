@@ -68,7 +68,7 @@ int Echange_Thermique_Volumique_Elem::lire_motcle_non_standard(const Motcle& mot
 int Echange_Thermique_Volumique_Elem::initialiser(double temps)
 {
   Ai_->initialiser(temps);
-  if (ep_cond_.non_nul()) ep_cond_->initialiser(temps);
+  if (ep_cond_) ep_cond_->initialiser(temps);
   /* recherche du terme source de l'autre cote */
   if (!equation().probleme().is_coupled())
     Process::exit(que_suis_je() + " can only be used in a coupled problem!");
@@ -81,7 +81,7 @@ int Echange_Thermique_Volumique_Elem::initialiser(double temps)
             if (sub_type(Echange_Thermique_Volumique_Elem, so.valeur()) && ref_cast(Echange_Thermique_Volumique_Elem, so.valeur()).tag_ == tag_)
               o_ech_ = ref_cast(Echange_Thermique_Volumique_Elem, so.valeur());
     }
-  if (!o_ech_.non_nul()) //pas trouve
+  if (!o_ech_) //pas trouve
     Process::exit(que_suis_je() + " : could not find matching term for name " + tag_ + " in problem " + equation().probleme().le_nom() + " !");
 
   return Source_base::initialiser(temps);
@@ -90,8 +90,8 @@ int Echange_Thermique_Volumique_Elem::initialiser(double temps)
 void Echange_Thermique_Volumique_Elem::mettre_a_jour(double temps)
 {
   Ai_->mettre_a_jour(temps);
-  if (ep_cond_.non_nul()) ep_cond_->mettre_a_jour(temps);
-  if (cond_.non_nul()) cond_->mettre_a_jour(temps);
+  if (ep_cond_) ep_cond_->mettre_a_jour(temps);
+  if (cond_) cond_->mettre_a_jour(temps);
 }
 
 void Echange_Thermique_Volumique_Elem::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
@@ -158,13 +158,13 @@ void Echange_Thermique_Volumique_Elem::ajouter_blocs(matrices_t matrices, Double
   for (int e = 0; e < ne_tot; e++) polys(e) = e;
   for (int o_e = 0; o_e < o_ne_tot; o_e++) o_polys(o_e) = o_e;
   Ai_->valeur_aux_elems(dom[0]->xp(), polys, Ai), o_ech_->Ai_->valeur_aux_elems(dom[1]->xp(), o_polys, o_Ai);
-  if (ep_cond_.non_nul())
+  if (ep_cond_)
     ep.resize(ne_tot, 1), ep_cond_->valeur_aux_elems(dom[0]->xp(), polys, ep);
-  if (o_ech_->ep_cond_.non_nul())
+  if (o_ech_->ep_cond_)
     o_ep.resize(o_ne_tot, 1), o_ech_->ep_cond_->valeur_aux_elems(dom[1]->xp(), o_polys, o_ep);
-  if (cond_.non_nul())
+  if (cond_)
     cond.resize(ne_tot, 1), cond_->valeur_aux_elems(dom[0]->xp(), polys, cond);
-  if (o_ech_->cond_.non_nul())
+  if (o_ech_->cond_)
     o_cond.resize(o_ne_tot, 1), o_ech_->cond_->valeur_aux_elems(dom[1]->xp(), o_polys, o_cond);
   for (int i = 0; i < 2; i++)
     if ((i ? &o_ech_->flux_par_ : &flux_par_)->non_nul())

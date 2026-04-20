@@ -280,7 +280,7 @@ Sortie& Postraitement::printOn(Sortie& s ) const
 Entree& Postraitement::readOn(Entree& s)
 {
   Cerr << "Reading guidelines of postprocessing" << finl;
-  assert(mon_probleme.non_nul());
+  assert(mon_probleme);
 
   const Nom& le_nom_du_post = le_nom();
   Nom vide;
@@ -1608,7 +1608,7 @@ void Postraitement::init()
             if (Motcle(loc_post) == "FACES" || champ->get_discretisation().is_poly_family())
               {
                 OBS_PTR(Domaine_dis_base) ref_domaine_dis = champ->get_ref_domaine_dis_base();
-                if (ref_domaine_dis.non_nul())
+                if (ref_domaine_dis)
                   domaine_dis_pour_faces_ = ref_domaine_dis;
               }
             if (Motcle(nom_post)== Motcle(nom[0]))
@@ -1657,7 +1657,7 @@ void Postraitement::init()
       liste_dom_ecrit.add(token); // on ajoute dans la liste !
       format_post_->ecrire_domaine_dis(dom,domaine_dis_pour_faces_,est_le_premier_postraitement_pour_nom_fich_);
       // domaine_dis_pour_faces non_nul() si on demande un postraitement d'un champ aux faces:
-      if (domaine_dis_pour_faces_.non_nul() && Motcle(format_) != "LML")
+      if (domaine_dis_pour_faces_ && Motcle(format_) != "LML")
         {
           const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis_pour_faces_.valeur());
           const IntTab& faces_sommets = domaine_vf.face_sommets();
@@ -1727,7 +1727,7 @@ int Postraitement::postraiter_champs()
     {
       format_post_->ecrire_domaine_dis(dom,domaine_dis_pour_faces_,est_le_premier_postraitement_pour_nom_fich_);
 
-      if (domaine_dis_pour_faces_.non_nul())
+      if (domaine_dis_pour_faces_)
         {
           const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis_pour_faces_.valeur());
           const IntTab& faces_sommets = domaine_vf.face_sommets();

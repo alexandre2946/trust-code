@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -266,7 +266,7 @@ void Portance_interfaciale_PolyMAC_MPFA::mettre_a_jour(double temps)
 {
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
   /* Wobble si besoin */
-  if ((wobble.non_nul()) || (C_lift.non_nul()))
+  if ((bool(wobble)) || (bool(C_lift)))
     {
       const Champ_Face_PolyMAC_MPFA& ch = ref_cast(Champ_Face_PolyMAC_MPFA, equation().inconnue());
       const DoubleTab& pvit = equation().inconnue().passe(),
@@ -306,7 +306,7 @@ void Portance_interfaciale_PolyMAC_MPFA::mettre_a_jour(double temps)
               }
           }
 
-      if ((wobble.non_nul()))
+      if ((bool(wobble)))
         {
           DoubleTab& tab_wobble = wobble->valeurs();
           for (k=0 ; k<N ; k++)
@@ -320,7 +320,7 @@ void Portance_interfaciale_PolyMAC_MPFA::mettre_a_jour(double temps)
                 }
         }
 
-      if (C_lift.non_nul())
+      if (C_lift)
         {
           DoubleTab& tab_cl = C_lift->valeurs();
 

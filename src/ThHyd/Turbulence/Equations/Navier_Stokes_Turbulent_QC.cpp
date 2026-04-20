@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@ Sortie& Navier_Stokes_Turbulent_QC::printOn(Sortie& is) const { return Equation_
 
 Entree& Navier_Stokes_Turbulent_QC::readOn(Entree& is)
 {
-  assert(le_fluide.non_nul());
+  assert(le_fluide);
   if (!sub_type(Fluide_Quasi_Compressible, le_fluide.valeur()))
     {
       Cerr << "ERROR: the equation " << this->que_suis_je() << " can be associated only to a quasi-compressible fluid." << finl;

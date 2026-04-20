@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -193,12 +193,12 @@ void Domaine_dis_base::discretiser_root(const Nom& typ)
 
 void Domaine_dis_base::creer_champ(const Motcle& motlu, const Probleme_base& pb)
 {
-  if (motlu == "VOLUME_MAILLE" && volume_maille_.est_nul())
+  if (motlu == "VOLUME_MAILLE" && !volume_maille_)
     {
       pb.discretisation().volume_maille(pb.schema_temps(), pb.domaine_dis(), volume_maille_);
       champs_compris_.ajoute_champ(volume_maille_);
     }
-  else if (motlu == "MESH_NUMBERING" && mesh_numbering_.est_nul())
+  else if (motlu == "MESH_NUMBERING" && !mesh_numbering_)
     {
       pb.discretisation().mesh_numbering(pb.schema_temps(), pb.domaine_dis(), mesh_numbering_);
       champs_compris_.ajoute_champ(mesh_numbering_);

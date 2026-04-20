@@ -236,7 +236,7 @@ void Sonde::completer()
  */
 Entree& Sonde::readOn(Entree& is)
 {
-  assert(mon_post.non_nul());
+  assert(mon_post);
   Motcle motlu;
   //Motcle accolade_ouverte("{");
   Motcle accolade_fermee("}");
@@ -1138,7 +1138,7 @@ void Sonde::ouvrir_fichier()
                   if (dimension == 3) fichier() << " z= " << p(i, 2);
                 }
               s << finl;
-              if (mon_champ.non_nul())
+              if (mon_champ)
                 {
                   const Noms unites = mon_champ->get_property("unites");
                   s << "# Champ " << nom_champ_lu_ << " [" << unites[ncomp == -1 ? 0 : ncomp] << "]" << finl;

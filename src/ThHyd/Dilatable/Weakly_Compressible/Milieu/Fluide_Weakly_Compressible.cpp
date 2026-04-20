@@ -69,7 +69,7 @@ void Fluide_Weakly_Compressible::completer(const Probleme_base& pb)
   if (use_total_hydro_pressure())
     checkTraitementPth(pb.equation(0).domaine_Cl_dis());
 
-  if (ch_Pth_xyz_.non_nul())
+  if (ch_Pth_xyz_)
     {
       if (ch_Pth_xyz_->que_suis_je() != "Champ_Fonc_xyz") // TODO : check if it is generic
         {
@@ -163,13 +163,13 @@ void Fluide_Weakly_Compressible::completer(const Probleme_base& pb)
   Fluide_Dilatable_base::completer(pb);
 
   // le bon temps
-  assert(ch_pression_eos_.non_nul());
+  assert(ch_pression_eos_);
   ch_pression_eos_->mettre_a_jour(le_probleme_->schema_temps().temps_courant());
 
-  if (ch_pression_hydro_.non_nul())
+  if (ch_pression_hydro_)
     ch_pression_hydro_->mettre_a_jour(le_probleme_->schema_temps().temps_courant());
 
-  if (ch_unsolved_species_.non_nul())
+  if (ch_unsolved_species_)
     ch_unsolved_species_->mettre_a_jour(le_probleme_->schema_temps().temps_courant());
 }
 

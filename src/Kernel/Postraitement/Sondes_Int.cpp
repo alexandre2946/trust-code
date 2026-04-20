@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@ Sortie& Sondes_Int::printOn(Sortie& s ) const { return s ; }
  */
 Entree& Sondes_Int::readOn(Entree& s )
 {
-  assert(mon_post.non_nul());
+  assert(mon_post);
 
   Motcle motlu;
   Motcle accolade_ouverte("{");

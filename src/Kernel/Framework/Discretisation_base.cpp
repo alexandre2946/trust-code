@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -449,7 +449,7 @@ Nom Discretisation_base::get_name_of_type_for(const Nom& class_operateur, const 
 
       Nom nom_discr = que_suis_je();
       Cerr << "The discretization used is : " << nom_discr << finl;
-      assert(champ_sup.non_nul());
+      assert(champ_sup);
 
       const Champ_base& diffusivite = champ_sup.valeur();
 

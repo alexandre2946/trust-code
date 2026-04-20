@@ -91,7 +91,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::preparer_calcul()
   /* au cas ou... */
   const Domaine_Poly_base& domaine = le_dom_poly_.valeur();
   equation().init_champ_convecte();
-  flux_bords_.resize(domaine.premiere_face_int(), (le_champ_inco.non_nul() ? le_champ_inco->valeurs() : equation().inconnue().valeurs()).line_size());
+  flux_bords_.resize(domaine.premiere_face_int(), (le_champ_inco ? le_champ_inco->valeurs() : equation().inconnue().valeurs()).line_size());
 
   if (domaine.domaine().nb_joints() && domaine.domaine().joint(0).epaisseur() < 2)
     {
@@ -223,7 +223,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::ajouter_blocs(matrices_t mats, DoubleTab&
 void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::ajouter_blocs_gen(matrices_t mats, DoubleTab& secmem, const DoubleTab& vit, const tabs_t& semi_impl) const
 {
   const Domaine_Poly_base& domaine = le_dom_poly_.valeur();
-  const Champ_Inc_base& cc = le_champ_inco.non_nul() ? le_champ_inco.valeur() : equation().champ_convecte();
+  const Champ_Inc_base& cc = le_champ_inco ? le_champ_inco.valeur() : equation().champ_convecte();
   const std::string& nom_cc = cc.le_nom().getString();
   Matrice_Morse *m_vit = mats.count("vitesse") ? mats.at("vitesse") : nullptr;
 
@@ -352,19 +352,19 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::creer_champ(const Motcle& motlu)
 
   const int i = noms_cc_phases_.rang(motlu), j = noms_vd_phases_.rang(motlu), k = noms_x_phases_.rang(motlu);
 
-  if (i >= 0 && !cc_phases_[i].non_nul())
+  if (i >= 0 && !cc_phases_[i])
     {
       equation().discretisation().discretiser_champ("vitesse", equation().domaine_dis(), noms_cc_phases_[i], "kg/m2/s", dimension, 1, 0, cc_phases_[i]);
       champs_compris_.ajoute_champ(cc_phases_[i]);
     }
 
-  if (j >= 0 && !vd_phases_[j].non_nul())
+  if (j >= 0 && !vd_phases_[j])
     {
       equation().discretisation().discretiser_champ("vitesse", equation().domaine_dis(), noms_vd_phases_[j], "m/s", dimension, 1, 0, vd_phases_[j]);
       champs_compris_.ajoute_champ(vd_phases_[j]);
     }
 
-  if (k >= 0 && !x_phases_[k].non_nul())
+  if (k >= 0 && !x_phases_[k])
     {
       equation().discretisation().discretiser_champ("temperature", equation().domaine_dis(), noms_x_phases_[k], "m/s", 1, 1, 0, x_phases_[k]);
       champs_compris_.ajoute_champ(x_phases_[k]);
@@ -382,7 +382,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::mettre_a_jour_gen(double temps, const Dou
   Op_Conv_PolyMAC_CDO_base::mettre_a_jour(temps);
 
   const Domaine_Poly_base& domaine = le_dom_poly_.valeur();
-  const Champ_Inc_base& cc = le_champ_inco.non_nul() ? le_champ_inco.valeur() : equation().champ_convecte();
+  const Champ_Inc_base& cc = le_champ_inco ? le_champ_inco.valeur() : equation().champ_convecte();
 
   const IntTab& f_e = domaine.face_voisins(), &e_f = domaine.elem_faces();
 
@@ -421,7 +421,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::mettre_a_jour_gen(double temps, const Dou
     {
       int m = 0;
       for (int n = 0; n < N; n++, m += (M > 1))
-        if (cc_phases_[n].non_nul()) /* mise a jour des champs de debit */
+        if (cc_phases_[n]) /* mise a jour des champs de debit */
           {
             Champ_Face_PolyMAC_HFV& c_ph = ref_cast(Champ_Face_PolyMAC_HFV, cc_phases_[n].valeur());
             DoubleTab& v_ph = c_ph.valeurs();
@@ -450,7 +450,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::mettre_a_jour_gen(double temps, const Dou
     {
       int m = 0;
       for (int n = 0; n < N; n++, m += (M > 1))
-        if (vd_phases_[n].non_nul()) /* mise a jour des champs de vitesse debitante */
+        if (vd_phases_[n]) /* mise a jour des champs de vitesse debitante */
           {
             const DoubleTab& alp = equation().inconnue().valeurs();
             Champ_Face_PolyMAC_HFV& c_ph = ref_cast(Champ_Face_PolyMAC_HFV, vd_phases_[n].valeur());
@@ -502,13 +502,13 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::mettre_a_jour_gen(double temps, const Dou
           }
 
         for (int n = 0; n < N; n++)
-          if (x_phases_[n].non_nul())
+          if (x_phases_[n])
             x_phases_[n]->valeurs()(e) = Gt ? G(n) / Gt : 0.;
       }
 
   if (x_phases_.size())
     for (int n = 0; n < N; n++)
-      if (x_phases_[n].non_nul())
+      if (x_phases_[n])
         x_phases_[n]->changer_temps(temps);
 }
 

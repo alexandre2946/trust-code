@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -45,7 +45,7 @@ void Op_Evanescence_Homogene_VDF_Face::preparer_calcul()
 
 void Op_Evanescence_Homogene_VDF_Face::calc_grad_alpha_faces(DoubleTab& gradAlphaFaces) const
 {
-  assert (grad_vdf_faces_.non_nul());
+  assert (grad_vdf_faces_);
 
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
   const DoubleTab& alpha = pbm.equation_masse().inconnue().passe();

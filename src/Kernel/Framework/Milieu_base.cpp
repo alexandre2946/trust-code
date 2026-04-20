@@ -80,13 +80,13 @@ Entree& Milieu_base::readOn(Entree& is)
   param.lire_avec_accolades_depuis(is);
   check_gravity_vector();
   creer_champs_non_lus();
-  if (ch_g_.non_nul()) champs_don_.add(ch_g_.valeur());
-  if (ch_alpha_.non_nul()) champs_don_.add(ch_alpha_.valeur());
-  if (ch_lambda_.non_nul()) champs_don_.add(ch_lambda_.valeur());
-  if (ch_Cp_.non_nul()) champs_don_.add(ch_Cp_.valeur());
-  if (ch_beta_th_.non_nul()) champs_don_.add(ch_beta_th_.valeur());
-  if (ch_porosites_.non_nul()) champs_don_.add(ch_porosites_.valeur());
-  if (ch_diametre_hyd_.non_nul()) champs_don_.add(ch_diametre_hyd_.valeur());
+  if (ch_g_) champs_don_.add(ch_g_.valeur());
+  if (ch_alpha_) champs_don_.add(ch_alpha_.valeur());
+  if (ch_lambda_) champs_don_.add(ch_lambda_.valeur());
+  if (ch_Cp_) champs_don_.add(ch_Cp_.valeur());
+  if (ch_beta_th_) champs_don_.add(ch_beta_th_.valeur());
+  if (ch_porosites_) champs_don_.add(ch_porosites_.valeur());
+  if (ch_diametre_hyd_) champs_don_.add(ch_diametre_hyd_.valeur());
   return is;
 }
 
@@ -127,7 +127,7 @@ void Milieu_base::discretiser(const Probleme_base& pb, const  Discretisation_bas
 
   int lambda_nb_comp = 0;
 
-  if(ch_lambda_.non_nul())
+  if(ch_lambda_)
     {
       // Returns number of components of lambda field
       lambda_nb_comp = ch_lambda_->nb_comp( );
@@ -158,39 +158,39 @@ void Milieu_base::discretiser(const Probleme_base& pb, const  Discretisation_bas
         }
       champs_compris_.ajoute_champ(ch_lambda_.valeur());
     }
-  if (!ch_alpha_.non_nul()&&(ch_lambda_.non_nul()))
+  if (!ch_alpha_&&(bool(ch_lambda_)))
     {
       double temps=ch_lambda_->temps();
       // ch_alpha (i.e. diffusivite_thermique) will have same component number as ch_lambda
       dis.discretiser_champ("champ_elem",domaine_dis,"neant","neant",lambda_nb_comp,temps,ch_alpha_);
       dis.discretiser_champ("champ_elem",domaine_dis,"neant","neant",lambda_nb_comp,temps,ch_alpha_fois_rho_);
     }
-  if (ch_alpha_.non_nul())
+  if (ch_alpha_)
     {
       dis.nommer_completer_champ_physique(domaine_dis,"diffusivite_thermique","m2/s",ch_alpha_.valeur(),pb);
       dis.nommer_completer_champ_physique(domaine_dis,"alpha_fois_rho","kg/ms",ch_alpha_fois_rho_.valeur(),pb);
       champs_compris_.ajoute_champ(ch_alpha_.valeur());
       champs_compris_.ajoute_champ(ch_alpha_fois_rho_.valeur());
     }
-  if (ch_beta_th_.non_nul())
+  if (ch_beta_th_)
     {
       dis.nommer_completer_champ_physique(domaine_dis,"dilatabilite","K-1",ch_beta_th_.valeur(),pb);
       champs_compris_.ajoute_champ(ch_beta_th_.valeur());
     }
-  if  (ch_Cp_.non_nul())
+  if  (ch_Cp_)
     {
       dis.nommer_completer_champ_physique(domaine_dis,"capacite_calorifique","J/kg/K",ch_Cp_.valeur(),pb);
       champs_compris_.ajoute_champ(ch_Cp_.valeur());
     }
-  if  (ch_rho_.non_nul())
+  if  (ch_rho_)
     {
       dis.nommer_completer_champ_physique(domaine_dis,"masse_volumique","kg/m^3",ch_rho_,pb);
       champs_compris_.ajoute_champ(ch_rho_);
     }
-  if (ch_rho_.non_nul() && ch_Cp_.non_nul())
+  if (ch_rho_ && ch_Cp_)
     {
       assert (ch_rho_->nb_comp() == ch_Cp_->nb_comp());
-      if(!ch_rho_Cp_comme_T_.non_nul())
+      if(!ch_rho_Cp_comme_T_)
         {
           const double temps = pb.schema_temps().temps_courant();
           // E. Saikali
@@ -211,20 +211,20 @@ void Milieu_base::discretiser(const Probleme_base& pb, const  Discretisation_bas
 // methode utile pour F5 ! F5 n'appelle pas Milieu_base::discretiser mais Milieu_base::discretiser_porosite ...
 void Milieu_base::discretiser_porosite(const Probleme_base& pb, const Discretisation_base& dis)
 {
-  if (!zdb_.non_nul()) zdb_ = pb.domaine_dis();
+  if (!zdb_) zdb_ = pb.domaine_dis();
   const double temps = pb.schema_temps().temps_courant();
   Nom fld_name = "porosite_volumique", fld_unit = "rien";
 
   // On construit porosite_face_ avec un descripteur parallele
   const MD_Vector& md = ref_cast(Domaine_VF, zdb_.valeur()).md_vector_faces();
-  if (!porosite_face_.get_md_vector().non_nul())
+  if (!porosite_face_.get_md_vector())
     {
       MD_Vector_tools::creer_tableau_distribue(md, porosite_face_, RESIZE_OPTIONS::NOCOPY_NOINIT);
       assert (ref_cast(Domaine_VF, zdb_.valeur()).nb_faces_tot() == porosite_face_.size_totale());
     }
   porosite_face_ = 1.;
 
-  if (ch_porosites_.non_nul()) // Lu par porosites_champ
+  if (ch_porosites_) // Lu par porosites_champ
     {
       assert (!is_user_porosites());
       if (porosites_.is_read())
@@ -275,7 +275,7 @@ void Milieu_base::discretiser_porosite(const Probleme_base& pb, const Discretisa
   else if (porosites_.is_read()) // via porosites
     {
       assert (!is_field_porosites());
-      if (ch_porosites_.non_nul())
+      if (ch_porosites_)
         {
           Cerr << "WHAT ?? You can not define in your medium both porosites_champ & porosites ! Remove one of them !" << finl;
           Process::exit();
@@ -311,20 +311,20 @@ void Milieu_base::discretiser_porosite(const Probleme_base& pb, const Discretisa
 
 void Milieu_base::discretiser_diametre_hydro(const Probleme_base& pb, const Discretisation_base& dis)
 {
-  if (!zdb_.non_nul()) zdb_ = pb.domaine_dis();
+  if (!zdb_) zdb_ = pb.domaine_dis();
   const double temps = pb.schema_temps().temps_courant();
   Nom fld_name = "diametre_hydraulique", fld_unit = "m";
 
   // On construit porosite_face_ avec un descripteur parallele
   const MD_Vector& md = ref_cast(Domaine_VF, zdb_.valeur()).md_vector_faces();
-  if (!diametre_hydraulique_face_.get_md_vector().non_nul())
+  if (!diametre_hydraulique_face_.get_md_vector())
     {
       MD_Vector_tools::creer_tableau_distribue(md, diametre_hydraulique_face_, RESIZE_OPTIONS::NOCOPY_NOINIT);
       assert (ref_cast(Domaine_VF, zdb_.valeur()).nb_faces_tot() == diametre_hydraulique_face_.size_totale());
     }
   diametre_hydraulique_face_ = 0.; /* les diametres hydrauliques valent 0 */
 
-  if (ch_diametre_hyd_.non_nul()) // Lu par diametre_hyd_champ
+  if (ch_diametre_hyd_) // Lu par diametre_hyd_champ
     {
       has_hydr_diam_ = true;
       if (sub_type(Champ_Fonc_MED, ch_diametre_hyd_.valeur()))
@@ -442,7 +442,7 @@ void Milieu_base::preparer_calcul()
 
 void Milieu_base::check_gravity_vector() const
 {
-  if (ch_g_.non_nul())
+  if (ch_g_)
     if(Objet_U::dimension != ch_g_->nb_comp())
       {
         Cerr << "The dimension is " << Objet_U::dimension << " and you create a gravity vector with " << ch_g_->nb_comp() << " components." << finl;
@@ -452,7 +452,7 @@ void Milieu_base::check_gravity_vector() const
 
 void Milieu_base::creer_champs_non_lus()
 {
-  if (ch_rho_.non_nul() && ch_lambda_.non_nul() && ch_Cp_.non_nul())
+  if (ch_rho_ && ch_lambda_ && ch_Cp_)
     creer_alpha();
 }
 
@@ -510,9 +510,9 @@ void Milieu_base::associer_gravite(const Champ_Don_base& la_gravite)
     }
   g_via_associer_ = la_gravite;
 
-  if (via_associer_ && ch_g_.non_nul())
+  if (via_associer_ && ch_g_)
     {
-      assert (g_via_associer_.non_nul());
+      assert (g_via_associer_);
       Cerr << "WHAT ?? Remove the associer gravity line from your jdd because it is already in the medium !!!" << finl;
       Process::exit();
     }
@@ -529,7 +529,7 @@ void Milieu_base::associer_gravite(const Champ_Don_base& la_gravite)
  */
 void Milieu_base::calculer_alpha()
 {
-  if(ch_lambda_.non_nul())
+  if(ch_lambda_)
     {
       DoubleTab& tabalpha = ch_alpha_->valeurs(), &tab_lambda_sur_cp = ch_alpha_fois_rho_->valeurs();
 
@@ -583,26 +583,26 @@ void Milieu_base::calculate_face_porosity()
 void Milieu_base::mettre_a_jour(double temps)
 {
   //Cerr << que_suis_je() << "Milieu_base::mettre_a_jour" << finl;
-  if (ch_rho_.non_nul()) ch_rho_->mettre_a_jour(temps);
+  if (ch_rho_) ch_rho_->mettre_a_jour(temps);
 
-  if (ch_g_.non_nul()) ch_g_->mettre_a_jour(temps);
+  if (ch_g_) ch_g_->mettre_a_jour(temps);
 
-  if (g_via_associer_.non_nul()) g_via_associer_->mettre_a_jour(temps);
+  if (g_via_associer_) g_via_associer_->mettre_a_jour(temps);
 
-  if (ch_lambda_.non_nul()) ch_lambda_->mettre_a_jour(temps);
+  if (ch_lambda_) ch_lambda_->mettre_a_jour(temps);
 
-  if (ch_Cp_.non_nul()) ch_Cp_->mettre_a_jour(temps);
+  if (ch_Cp_) ch_Cp_->mettre_a_jour(temps);
 
-  if (ch_beta_th_.non_nul()) ch_beta_th_->mettre_a_jour(temps);
+  if (ch_beta_th_) ch_beta_th_->mettre_a_jour(temps);
 
-  if ( (ch_lambda_.non_nul()) && (ch_Cp_.non_nul()) && (ch_rho_.non_nul()) )
+  if ( (bool(ch_lambda_)) && (bool(ch_Cp_)) && (bool(ch_rho_)) )
     {
       calculer_alpha();
       ch_alpha_->changer_temps(temps);
       ch_alpha_fois_rho_->changer_temps(temps);
     }
 
-  if (ch_rho_Cp_comme_T_.non_nul()) update_rho_cp(temps);
+  if (ch_rho_Cp_comme_T_) update_rho_cp(temps);
 
   mettre_a_jour_porosite(temps); // pour F5 !
 }
@@ -610,7 +610,7 @@ void Milieu_base::mettre_a_jour(double temps)
 // methode utile pour F5 ! F5 n'appelle pas Milieu_base::mettre_a_jour mais Milieu_base::mettre_a_jour_porosite ...
 void Milieu_base::mettre_a_jour_porosite(double temps)
 {
-  assert(ch_porosites_.non_nul() && ch_diametre_hyd_.non_nul());
+  assert(ch_porosites_ && ch_diametre_hyd_);
   if (is_field_porosites())
     if (sub_type(Champ_Input_P0_Composite, ch_porosites_.valeur()))
       {
@@ -669,12 +669,12 @@ void Milieu_base::update_rho_cp(double temps)
 
 void Milieu_base::abortTimeStep()
 {
-  if (ch_rho_.non_nul()) ch_rho_->abortTimeStep();
+  if (ch_rho_) ch_rho_->abortTimeStep();
 }
 
 void Milieu_base::resetTime(double time)
 {
-  if (ch_rho_.non_nul())
+  if (ch_rho_)
     {
       if (sub_type(Champ_Don_base, ch_rho_.valeur()))
         ch_rho_->mettre_a_jour(time);
@@ -688,9 +688,9 @@ void Milieu_base::resetTime(double time)
 void Milieu_base::creer_alpha()
 {
   Cerr << "Milieu_base::creer_alpha (champ non lu)" << finl;
-  assert(ch_lambda_.non_nul());
-  assert(ch_rho_.non_nul());
-  assert(ch_Cp_.non_nul());
+  assert(ch_lambda_);
+  assert(ch_rho_);
+  assert(ch_Cp_);
   ch_alpha_ = ch_lambda_;
   ch_alpha_fois_rho_ = ch_lambda_;
   ch_alpha_->nommer("alpha");
@@ -706,13 +706,13 @@ void Milieu_base::creer_alpha()
  */
 const Champ_Don_base& Milieu_base::gravite() const
 {
-  if (!ch_g_.non_nul() && !g_via_associer_.non_nul())
+  if (!ch_g_ && !g_via_associer_)
     {
       Cerr << "The gravity has not been associated with the medium" << finl;
       Process::exit();
     }
 
-  return ch_g_.non_nul() ? ch_g_.valeur() : g_via_associer_.valeur();
+  return ch_g_ ? ch_g_.valeur() : g_via_associer_.valeur();
 }
 
 /*! @brief Renvoie la gravite du milieu si elle a ete associe provoque une erreur sinon.
@@ -721,13 +721,13 @@ const Champ_Don_base& Milieu_base::gravite() const
  */
 Champ_Don_base& Milieu_base::gravite()
 {
-  if (!ch_g_.non_nul() && !g_via_associer_.non_nul())
+  if (!ch_g_ && !g_via_associer_)
     {
       Cerr << "The gravity has not been associated with the medium" << finl;
       Process::exit();
     }
 
-  return ch_g_.non_nul() ? ch_g_.valeur() : g_via_associer_.valeur();
+  return ch_g_ ? ch_g_.valeur() : g_via_associer_.valeur();
 }
 
 int Milieu_base::initialiser(const double temps)
@@ -735,24 +735,24 @@ int Milieu_base::initialiser(const double temps)
   Cerr << que_suis_je() << " Milieu_base:::initialiser" << finl;
   if (sub_type(Champ_Don_base, ch_rho_.valeur())) ref_cast(Champ_Don_base, ch_rho_.valeur()).initialiser(temps);
 
-  if (ch_g_.non_nul()) ch_g_->initialiser(temps);
+  if (ch_g_) ch_g_->initialiser(temps);
 
-  if (g_via_associer_.non_nul()) g_via_associer_->initialiser(temps);
+  if (g_via_associer_) g_via_associer_->initialiser(temps);
 
-  if (ch_lambda_.non_nul()) ch_lambda_->initialiser(temps);
+  if (ch_lambda_) ch_lambda_->initialiser(temps);
 
-  if (ch_Cp_.non_nul()) ch_Cp_->initialiser(temps);
+  if (ch_Cp_) ch_Cp_->initialiser(temps);
 
-  if (ch_beta_th_.non_nul()) ch_beta_th_->initialiser(temps);
+  if (ch_beta_th_) ch_beta_th_->initialiser(temps);
 
-  if ( (ch_lambda_.non_nul()) && (ch_Cp_.non_nul()) && (ch_rho_.non_nul()) )
+  if ( (bool(ch_lambda_)) && (bool(ch_Cp_)) && (bool(ch_rho_)) )
     {
       calculer_alpha();
       ch_alpha_->changer_temps(temps);
       ch_alpha_fois_rho_->changer_temps(temps);
     }
 
-  if (ch_rho_Cp_comme_T_.non_nul()) update_rho_cp(temps);
+  if (ch_rho_Cp_comme_T_) update_rho_cp(temps);
 
   int err=0;
   Nom msg;
@@ -765,7 +765,7 @@ int Milieu_base::initialiser(const double temps)
 int Milieu_base::initialiser_porosite(const double temps)
 {
   // TODO : XXX : a voir si ICoCo ? faut l'initialiser dans le main ?
-  assert(ch_porosites_.non_nul() && ch_diametre_hyd_.non_nul());
+  assert(ch_porosites_ && ch_diametre_hyd_);
   ch_porosites_->initialiser(temps);
   ch_diametre_hyd_->initialiser(temps);
   return 1;
@@ -895,7 +895,7 @@ Champ_Don_base& Milieu_base::beta_t()
  */
 int Milieu_base::a_gravite() const
 {
-  return (ch_g_.non_nul() || g_via_associer_.non_nul()) ? 1 : 0;
+  return (ch_g_ || g_via_associer_) ? 1 : 0;
 }
 
 const Champ_base& Milieu_base::get_champ(const Motcle& nom) const

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -53,7 +53,7 @@ protected:
 inline void Op_Moyenne::mettre_a_jour(double tps)
 {
   integrale_champ_.mettre_a_jour(tps);
-  if (ch_moyenne_convergee_.non_nul())
+  if (ch_moyenne_convergee_)
     {
       //const Champ_Fonc_reprise& ch_moy = ref_cast(Champ_Fonc_reprise,ch_moyenne_convergee_.valeur());
       DoubleTab& valeurs_integrale = valeurs();

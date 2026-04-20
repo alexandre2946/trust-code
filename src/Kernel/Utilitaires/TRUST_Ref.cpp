@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -48,7 +48,7 @@ bool TRUST_Ref_Objet_U::est_nul() const
 
 int operator ==(const TRUST_Ref_Objet_U& r1, const TRUST_Ref_Objet_U& r2)
 {
-  if (r1.est_nul() && r2.est_nul()) return 1;
+  if (!r1 && !r2) return 1;
   if (r1->numero() == r2->numero()) return 1;
   return 0;
 }

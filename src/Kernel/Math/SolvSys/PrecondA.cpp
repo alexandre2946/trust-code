@@ -49,7 +49,7 @@ void PrecondA::set_param(Param& param) const
 static void prepare_precond(OWN_PTR(Precond_base)& p, const Matrice_Base& m, const DoubleVect& v,
                             Precond_base::Init_Status status)
 {
-  if (p.non_nul())
+  if (p)
     {
       Precond_base& pp = p.valeur();
       pp.reinit(status);

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -30,7 +30,7 @@ public :
   virtual ~Op_Diff_Turbulent_base() { }
   void associer_diffusivite_turbulente(const Champ_Fonc_base& );
   inline const Champ_Fonc_base& diffusivite_turbulente() const { return la_diffusivite_turbulente.valeur(); }
-  inline bool has_diffusivite_turbulente() const { return la_diffusivite_turbulente.non_nul(); }
+  inline bool has_diffusivite_turbulente() const { return bool(la_diffusivite_turbulente); }
 
 private:
   OBS_PTR(Champ_Fonc_base) la_diffusivite_turbulente;

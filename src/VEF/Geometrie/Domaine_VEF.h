@@ -99,7 +99,7 @@ public:
   inline const IntVect& get_ok_arete() const { return ok_arete; }
   inline const DoubleVect& get_volumes_aretes() const { return volumes_aretes; }
 
-  inline virtual const MD_Vector& md_vector_p1b() const { assert(md_vector_p1b_.non_nul()); return md_vector_p1b_; }
+  inline virtual const MD_Vector& md_vector_p1b() const { assert(md_vector_p1b_); return md_vector_p1b_; }
 
   inline int numero_premier_element() const;
   inline int numero_premier_sommet() const;

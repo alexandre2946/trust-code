@@ -45,7 +45,7 @@ void Convection_Diffusion_Fluide_Dilatable_Proto::calculer_div_rho_u_impl
     }
 
   // on cherche a changer temporairement le domaine_cl
-  if (ch_unite_.est_nul())
+  if (!ch_unite_)
     {
       ch_unite_ = eqn.inconnue();
       ch_unite_->valeurs() = 1.0;

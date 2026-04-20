@@ -271,7 +271,7 @@ void Modele_turbulence_hyd_base::discretiser_K(const Schema_Temps_base& sch, Dom
 int Modele_turbulence_hyd_base::preparer_calcul()
 {
   int res = 1;
-  if (loipar_.non_nul())
+  if (loipar_)
     res = loipar_->init_lois_paroi();
 
   bool contient_distance_paroi = false;
@@ -305,7 +305,7 @@ bool Modele_turbulence_hyd_base::initTimeStep(double dt)
 
 void Modele_turbulence_hyd_base::creer_champ(const Motcle& motlu)
 {
-  if (loipar_.non_nul())
+  if (loipar_)
     {
       loipar_->creer_champ(motlu);
     }
@@ -316,7 +316,7 @@ bool Modele_turbulence_hyd_base::has_champ(const Motcle& nom, OBS_PTR(Champ_base
   if (champs_compris_.has_champ(nom, ref_champ))
     return true;
 
-  if (loipar_.non_nul())
+  if (loipar_)
     if (loipar_->has_champ(nom, ref_champ))
       return true;
 
@@ -328,7 +328,7 @@ bool Modele_turbulence_hyd_base::has_champ(const Motcle& nom) const
   if (champs_compris_.has_champ(nom))
     return true;
 
-  if (loipar_.non_nul())
+  if (loipar_)
     if (loipar_->has_champ(nom))
       return true;
 
@@ -342,7 +342,7 @@ const Champ_base& Modele_turbulence_hyd_base::get_champ(const Motcle& nom) const
   if (champs_compris_.has_champ(nom, ref_champ))
     return ref_champ;
 
-  if (loipar_.non_nul())
+  if (loipar_)
     if (loipar_->has_champ(nom, ref_champ))
       return ref_champ;
 
@@ -356,7 +356,7 @@ void Modele_turbulence_hyd_base::get_noms_champs_postraitables(Noms& nom, Option
   else
     nom.add(champs_compris_.liste_noms_compris());
 
-  if (loipar_.non_nul())
+  if (loipar_)
     loipar_->get_noms_champs_postraitables(nom, opt);
 }
 
@@ -369,9 +369,9 @@ void Modele_turbulence_hyd_base::imprimer(Sortie& os) const
   const Schema_Temps_base& sch = mon_equation_->schema_temps();
   double temps_courant = sch.temps_courant();
   double dt = sch.pas_de_temps();
-  if (loipar_.non_nul() && limpr_ustar(temps_courant, sch.temps_precedent(), dt, dt_impr_ustar_))
+  if (loipar_ && limpr_ustar(temps_courant, sch.temps_precedent(), dt, dt_impr_ustar_))
     loipar_->imprimer_ustar(os);
-  if (loipar_.non_nul() && limpr_ustar(temps_courant, sch.temps_precedent(), dt, dt_impr_ustar_mean_only_))
+  if (loipar_ && limpr_ustar(temps_courant, sch.temps_precedent(), dt, dt_impr_ustar_mean_only_))
     loipar_->imprimer_ustar_mean_only(os, boundaries_, boundaries_list_, nom_fichier_);
 }
 
@@ -401,7 +401,7 @@ int Modele_turbulence_hyd_base::limpr_ustar(double temps_courant, double temps_p
 std::vector<YAML_data> Modele_turbulence_hyd_base::data_a_sauvegarder() const
 {
   std::vector<YAML_data> data;
-  if (loipar_.non_nul())
+  if (loipar_)
     {
       data = loipar_->data_a_sauvegarder();
     }
@@ -418,7 +418,7 @@ std::vector<YAML_data> Modele_turbulence_hyd_base::data_a_sauvegarder() const
 int Modele_turbulence_hyd_base::sauvegarder(Sortie& os) const
 {
   a_faire(os);
-  if (loipar_.non_nul())
+  if (loipar_)
     {
       loipar_->sauvegarder(os);
     }
@@ -441,7 +441,7 @@ int Modele_turbulence_hyd_base::sauvegarder(Sortie& os) const
  */
 int Modele_turbulence_hyd_base::reprendre(Entree& is)
 {
-  if (loipar_.non_nul())
+  if (loipar_)
     loipar_->reprendre(is);
   return 0;
 }

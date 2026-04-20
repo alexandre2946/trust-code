@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -259,7 +259,7 @@ static int ecriture_special_part2(const Domaine_VF& zvf, Sortie& fich, const Dou
 int EcritureLectureSpecial::ecriture_special(const Domaine_VF& zvf, Sortie& fich, const DoubleTab& val)
 {
   const MD_Vector& md = val.get_md_vector();
-  if (!md.non_nul())
+  if (!md)
     {
       Cerr << "EcritureLectureSpecial::ecriture_special: error, cannot save an array with no metadata" << finl;
       Process::exit();
@@ -522,7 +522,7 @@ void EcritureLectureSpecial::lecture_special(const Domaine_VF& zvf, Entree& fich
 {
 
   const MD_Vector& md_vect = val.get_md_vector();
-  if (!md_vect.non_nul())
+  if (!md_vect)
     {
       Cerr << "EcritureLectureSpecial::ecriture_special: error, cannot save an array with no metadata" << finl;
       Process::exit();

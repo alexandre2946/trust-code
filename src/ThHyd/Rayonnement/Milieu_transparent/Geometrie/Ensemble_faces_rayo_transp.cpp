@@ -60,7 +60,7 @@ int Ensemble_faces_rayo_transp::contient(int num_face) const
 
 int Ensemble_faces_rayo_transp::is_ok() const
 {
-  if (les_cl_base_.non_nul())
+  if (les_cl_base_)
     return 1;
   else
     return 0;

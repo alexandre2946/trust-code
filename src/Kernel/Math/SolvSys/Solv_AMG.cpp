@@ -238,7 +238,7 @@ void Solv_AMG::create_amg()
 int Solv_AMG::resoudre_systeme(const Matrice_Base& mat, const DoubleVect& b, DoubleVect& x)
 {
   // We don't create solver during readOn as usual but just before solve to get more infos about matrix/vectors to fine tune
-  if (solveur_.est_nul())
+  if (!solveur_)
     {
       create_amg();
       int nb_blocks = sub_type(MD_Vector_composite, b.get_md_vector().valeur()) ? ref_cast(MD_Vector_composite, b.get_md_vector().valeur()).nb_parts() : 1;

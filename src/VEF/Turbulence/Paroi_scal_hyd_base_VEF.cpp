@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -97,7 +97,7 @@ int Paroi_scal_hyd_base_VEF::init_lois_paroi()
           // Note B.M.: on passe ici deux fois: une fois au readOn (par Paroi_scal_hyd_base_VEF::associer())
           //  et une fois par Modele_turbulence_scal_base::preparer_calcul())
           // donc tester si pas deja fait:
-          if (!dist_equiv.get_md_vector().non_nul())
+          if (!dist_equiv.get_md_vector())
             le_bord.frontiere().creer_tableau_faces(dist_equiv, RESIZE_OPTIONS::NOCOPY_NOINIT);
           //assert(dist_equiv.get_md_vector() == le_bord.frontiere().md_vector_faces());
 

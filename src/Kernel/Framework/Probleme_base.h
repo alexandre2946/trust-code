@@ -103,7 +103,7 @@ public:
   Schema_Temps_base& schema_temps();
   const Domaine& domaine() const;
   Domaine& domaine();
-  bool has_domaine_dis() const { return le_domaine_dis_.non_nul(); }
+  bool has_domaine_dis() const { return bool(le_domaine_dis_); }
   const Domaine_dis_base& domaine_dis() const;
   Domaine_dis_base& domaine_dis();
   bool is_dilatable() const;
@@ -139,7 +139,7 @@ public:
 
   virtual void addInputField(Field_base& f) { addInputField_impl(*this, f); }
 
-  bool is_coupled() const { return pbc_.non_nul(); }
+  bool is_coupled() const { return bool(pbc_); }
   virtual inline bool has_mod_rayo_transp() const { return false; }
 
   int postraiter(int force = 1) override;
@@ -240,7 +240,7 @@ protected :
  */
 inline const Discretisation_base& Probleme_base::discretisation() const
 {
-  if(la_discretisation_.est_nul())
+  if(!la_discretisation_)
     {
       Cerr << que_suis_je() << " has not been discretized!" << finl;
       exit();

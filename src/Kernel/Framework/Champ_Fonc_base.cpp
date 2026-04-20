@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -34,12 +34,12 @@ void Champ_Fonc_base::associer_domaine_dis_base(const Domaine_dis_base& z_dis)
 
 const Domaine_dis_base& Champ_Fonc_base::domaine_dis_base() const
 {
-  return le_dom_VF.non_nul() ? le_dom_VF.valeur() : Champ_Don_base::domaine_dis_base() /* throw */;
+  return le_dom_VF ? le_dom_VF.valeur() : Champ_Don_base::domaine_dis_base() /* throw */;
 }
 
 const Domaine_VF& Champ_Fonc_base::domaine_vf() const
 {
-  assert (le_dom_VF.non_nul());
+  assert (le_dom_VF);
   return le_dom_VF.valeur();
 }
 
@@ -64,7 +64,7 @@ void Champ_Fonc_base::creer_tableau_distribue(const MD_Vector& md, RESIZE_OPTION
 {
   // Note B.M.: pour etre symetrique avec Champ_Inc_base, il faudrait tester si le
   // champ est scalaire ou multi-scalaire (voir Champ_Inc_base::creer_tableau_distribue())
-  if (valeurs_.size_array() == 0 && (!valeurs_.get_md_vector().non_nul()))
+  if (valeurs_.size_array() == 0 && (!valeurs_.get_md_vector()))
     {
       // Note B.M.: les methodes fixer_nb_valeurs_nodales sont appelees a tort et a travers.
       // Ne rien faire si le tableau a deja la bonne structure
@@ -73,7 +73,7 @@ void Champ_Fonc_base::creer_tableau_distribue(const MD_Vector& md, RESIZE_OPTION
   // Ca va planter si on a attache une autre structure parallele (c'est voulu !)
   if (!(valeurs_.get_md_vector() == md))
     {
-      if (valeurs_.get_md_vector().non_nul())
+      if (valeurs_.get_md_vector())
         {
           Cerr << "Internal error in Champ_Fonc_base::creer_tableau_distribue:\n" << " array has already a (wrong) parallel descriptor" << finl;
           Process::exit();

@@ -26,7 +26,7 @@ Sortie& Convection_Diffusion_Fluide_Dilatable_base::printOn(Sortie& is) const
 
 Entree& Convection_Diffusion_Fluide_Dilatable_base::readOn(Entree& is)
 {
-  assert(l_inco_ch.non_nul() && le_fluide.non_nul());
+  assert(l_inco_ch && le_fluide);
   return Convection_Diffusion_std::readOn(is);
 }
 
@@ -63,7 +63,7 @@ const Champ_Don_base& Convection_Diffusion_Fluide_Dilatable_base::diffusivite_po
 
 const Fluide_Dilatable_base& Convection_Diffusion_Fluide_Dilatable_base::fluide() const
 {
-  if (le_fluide.est_nul())
+  if (!le_fluide)
     {
       Cerr << "You forgot to associate the fluid to the problem named " << probleme().le_nom() << finl;
       Process::exit();
@@ -73,7 +73,7 @@ const Fluide_Dilatable_base& Convection_Diffusion_Fluide_Dilatable_base::fluide(
 
 Fluide_Dilatable_base& Convection_Diffusion_Fluide_Dilatable_base::fluide()
 {
-  assert(le_fluide.non_nul());
+  assert(le_fluide);
   return le_fluide.valeur();
 }
 

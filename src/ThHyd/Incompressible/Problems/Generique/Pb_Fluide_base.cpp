@@ -62,7 +62,7 @@ void Pb_Fluide_base::completer()
 {
   Probleme_base::completer();
 
-  if (mod_rayo_transp_.non_nul())
+  if (mod_rayo_transp_)
     mod_rayo_transp_->completer();
 }
 
@@ -73,7 +73,7 @@ int Pb_Fluide_base::postraiter(int force)
   if (!ok)
     return 0;
 
-  if (mod_rayo_transp_.non_nul())
+  if (mod_rayo_transp_)
     mod_rayo_transp_->postraiter();
 
   return ok;
@@ -83,7 +83,7 @@ void Pb_Fluide_base::validateTimeStep()
 {
   Probleme_base::validateTimeStep();
 
-  if (mod_rayo_transp_.non_nul())
+  if (mod_rayo_transp_)
     mod_rayo_transp_->mettre_a_jour(presentTime());
 }
 

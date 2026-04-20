@@ -37,11 +37,11 @@ public:
   void validateTimeStep() override;
 
   Entree& lire_radiation_models(Entree& is, Motcle& mot) override final;
-  inline bool has_mod_rayo_transp() const override final { return mod_rayo_transp_.non_nul(); }
+  inline bool has_mod_rayo_transp() const override final { return bool(mod_rayo_transp_); }
 
   inline Modele_rayo_transp& get_mod_rayo_transp()
   {
-    if(mod_rayo_transp_.est_nul())
+    if(!mod_rayo_transp_)
       Process::exit("Pb_Fluide_base::get_mod_rayo_transp() -- No transparent radiation model is associated for your problem !!! ");
 
     return mod_rayo_transp_.valeur();
@@ -49,7 +49,7 @@ public:
 
   inline const Modele_rayo_transp& get_mod_rayo_transp() const
   {
-    if(mod_rayo_transp_.est_nul())
+    if(!mod_rayo_transp_)
       Process::exit("Pb_Fluide_base::get_mod_rayo_transp() -- No transparent radiation model is associated for your problem !!! ");
 
     return mod_rayo_transp_.valeur();

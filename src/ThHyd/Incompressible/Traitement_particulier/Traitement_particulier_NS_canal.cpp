@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -190,7 +190,7 @@ void Traitement_particulier_NS_canal::remplir_Tab_recap(IntTab& Tab_rec) const
 void Traitement_particulier_NS_canal::preparer_calcul_particulier()
 {
   const RefObjU& modele_turbulence = mon_equation->get_modele(TURBULENCE);
-  if (modele_turbulence.non_nul() && sub_type(Modele_turbulence_hyd_base,modele_turbulence.valeur()))
+  if (modele_turbulence && sub_type(Modele_turbulence_hyd_base,modele_turbulence.valeur()))
     {
       oui_profil_nu_t = 1;
       Nval=13;
@@ -750,7 +750,7 @@ void Traitement_particulier_NS_canal::calcul_reynolds_tau()
         nb_cl_diri+=1;
     }
 
-  if (modele_turbulence.non_nul() && !ref_cast(Modele_turbulence_hyd_base,modele_turbulence.valeur()).loi_paroi().que_suis_je().debute_par("negligeable"))
+  if (modele_turbulence && !ref_cast(Modele_turbulence_hyd_base,modele_turbulence.valeur()).loi_paroi().que_suis_je().debute_par("negligeable"))
     {
       // PQ : 13/07/05 : prise en compte des lois de paroi pour le calcul de u_tau
       // Hypotheses :    1ere condition de Dirichlet = paroi basse

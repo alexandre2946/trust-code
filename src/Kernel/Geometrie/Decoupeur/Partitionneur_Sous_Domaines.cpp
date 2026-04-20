@@ -46,7 +46,7 @@ Sortie& Partitionneur_Sous_Domaines::printOn(Sortie& os) const
  */
 void Partitionneur_Sous_Domaines::set_param(Param& param) const
 {
-  if (ref_domaine_.est_nul())
+  if (!ref_domaine_)
     {
       Cerr << " Error: the domain has not been associated" << finl;
       Process::exit();
@@ -70,7 +70,7 @@ void Partitionneur_Sous_Domaines::associer_domaine(const Domaine& domaine)
  */
 void Partitionneur_Sous_Domaines::initialiser(const Noms& noms_sous_domaines)
 {
-  assert(ref_domaine_.non_nul());
+  assert(ref_domaine_);
   noms_sous_domaines_ = noms_sous_domaines;
 }
 
@@ -89,7 +89,7 @@ void Partitionneur_Sous_Domaines::initialiser(const Noms& noms_sous_domaines)
  */
 void Partitionneur_Sous_Domaines::construire_partition(IntVect& elem_part, int& nb_parts_tot) const
 {
-  assert(ref_domaine_.non_nul());
+  assert(ref_domaine_);
   const Domaine& dom = ref_domaine_.valeur();
   const int nb_elem = dom.nb_elem_tot();
   elem_part.resize(nb_elem);

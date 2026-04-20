@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -51,7 +51,7 @@ protected:
 
 inline const Equation_base& Assembleur_P_EF::equation() const
 {
-  if (mon_equation.est_nul())
+  if (!mon_equation)
     {
       Cerr << "\nError in Assembleur_P_EF::equation() : The equation is unknown !" << finl;
       Process::exit();

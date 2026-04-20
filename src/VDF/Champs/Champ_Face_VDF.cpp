@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -355,7 +355,7 @@ void Champ_Face_VDF::calcul_y_plus(DoubleTab& y_plus, const Domaine_Cl_VDF& doma
   int yplus_already_computed = 0; // flag
 
   const RefObjU& modele_turbulence = eqn_hydr.get_modele(TURBULENCE);
-  if (modele_turbulence.non_nul() && sub_type(Modele_turbulence_hyd_base, modele_turbulence.valeur()))
+  if (modele_turbulence && sub_type(Modele_turbulence_hyd_base, modele_turbulence.valeur()))
     {
       const Modele_turbulence_hyd_base& mod_turb = ref_cast(Modele_turbulence_hyd_base, modele_turbulence.valeur());
       const Turbulence_paroi_base& loipar = mod_turb.loi_paroi();

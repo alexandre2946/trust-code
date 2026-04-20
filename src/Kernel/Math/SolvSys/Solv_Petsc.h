@@ -94,7 +94,7 @@ public :
   };
   inline PCstruct& get_precond_user()
   {
-    if (pc_user_.pc_shell.est_nul()) create_solver();
+    if (!pc_user_.pc_shell) create_solver();
     return pc_user_;
   }
   inline bool amgx() const

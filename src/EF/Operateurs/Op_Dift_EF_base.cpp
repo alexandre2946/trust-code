@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -61,7 +61,7 @@ void Op_Dift_EF_base::completer()
   marque_elem(equation());
 
   const RefObjU& modele_turbulence = equation().get_modele(TURBULENCE);
-  if (modele_turbulence.non_nul() && sub_type(Modele_turbulence_hyd_base,modele_turbulence.valeur()))
+  if (modele_turbulence && sub_type(Modele_turbulence_hyd_base,modele_turbulence.valeur()))
     {
       const Modele_turbulence_hyd_base& mod_turb = ref_cast(Modele_turbulence_hyd_base,modele_turbulence.valeur());
       const Champ_Fonc_base& viscosite_turbulente = mod_turb.viscosite_turbulente();

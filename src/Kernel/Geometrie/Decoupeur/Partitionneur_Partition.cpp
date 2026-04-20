@@ -38,7 +38,7 @@ Sortie& Partitionneur_Partition::printOn(Sortie& os) const
  */
 void Partitionneur_Partition::set_param(Param& param) const
 {
-  if (ref_domaine_interpol_.est_nul())
+  if (!ref_domaine_interpol_)
     {
       Cerr << " Error: the domain has not been associated" << finl;
       Process::exit();
@@ -82,7 +82,7 @@ void Partitionneur_Partition::associer_domaine(const Domaine& domaine)
 void Partitionneur_Partition::initialiser()
 {
 
-  assert(ref_domaine_interpol_.non_nul());
+  assert(ref_domaine_interpol_);
 }
 
 void Partitionneur_Partition::construire_partition(IntVect& elem_part, int& nb_parts_tot) const
@@ -90,8 +90,8 @@ void Partitionneur_Partition::construire_partition(IntVect& elem_part, int& nb_p
 
 
   OBS_PTR(Domaine) ref_domaine_calcul_ = ref_cast(Domaine, Interprete::objet(dom_calcul_));
-  assert(ref_domaine_interpol_.non_nul());
-  assert(ref_domaine_calcul_.non_nul());
+  assert(ref_domaine_interpol_);
+  assert(ref_domaine_calcul_);
 
   // Domaine dom_interpol
   const Domaine& dom_interpol = ref_domaine_interpol_.valeur();

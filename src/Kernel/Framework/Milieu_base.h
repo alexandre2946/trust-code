@@ -58,7 +58,7 @@ public:
   inline DoubleVect& porosite_elem() { return static_cast<DoubleVect&>(ch_porosites_->valeurs()); }
   inline const DoubleVect& porosite_elem() const { return static_cast<const DoubleVect&>(ch_porosites_->valeurs()); }
   inline double porosite_elem(const int i) const { return ch_porosites_->valeurs()(i,0); }
-  bool has_porosites() const { return ch_porosites_.non_nul(); }
+  bool has_porosites() const { return bool(ch_porosites_); }
   inline DoubleVect& porosite_face() { return porosite_face_; }
   inline const DoubleVect& porosite_face() const { return porosite_face_; }
   inline const Champ_Don_base& get_porosites_champ() const { return ch_porosites_; }
@@ -89,21 +89,21 @@ public:
   virtual void associer_gravite(const Champ_Don_base&);
   virtual const Champ_base& masse_volumique() const;
   virtual Champ_base& masse_volumique();
-  bool has_masse_volumique() const { return ch_rho_.non_nul(); }
+  bool has_masse_volumique() const { return bool(ch_rho_); }
   virtual const Champ_Don_base& diffusivite() const;
   virtual Champ_Don_base& diffusivite();
-  bool has_diffusivite() const { return ch_alpha_.non_nul(); }
+  bool has_diffusivite() const { return bool(ch_alpha_); }
   virtual const Champ_Don_base& diffusivite_fois_rho() const;
   virtual Champ_Don_base& diffusivite_fois_rho();
   virtual const Champ_Don_base& conductivite() const;
   virtual Champ_Don_base& conductivite();
-  bool has_conductivite() const { return ch_lambda_.non_nul(); }
+  bool has_conductivite() const { return bool(ch_lambda_); }
   virtual const Champ_Don_base& capacite_calorifique() const;
   virtual Champ_Don_base& capacite_calorifique();
-  bool has_capacite_calorifique() const { return ch_Cp_.non_nul(); }
+  bool has_capacite_calorifique() const { return bool(ch_Cp_); }
   virtual const Champ_Don_base& beta_t() const;
   virtual Champ_Don_base& beta_t();
-  bool has_beta_t() const { return ch_beta_th_.non_nul(); }
+  bool has_beta_t() const { return bool(ch_beta_th_); }
   virtual const Champ_Don_base& gravite() const;
   virtual Champ_Don_base& gravite();
   virtual int a_gravite() const;

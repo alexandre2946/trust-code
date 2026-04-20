@@ -569,7 +569,7 @@ void Champ_P1NC::calcul_y_plus(const Domaine_Cl_VEF& domaine_Cl_VEF, DoubleVect&
   int yplus_already_computed = 0; // flag
 
   const RefObjU& modele_turbulence = eqn_hydr.get_modele(TURBULENCE);
-  if (modele_turbulence.non_nul() && sub_type(Modele_turbulence_hyd_base, modele_turbulence.valeur()))
+  if (modele_turbulence && sub_type(Modele_turbulence_hyd_base, modele_turbulence.valeur()))
     {
       const Modele_turbulence_hyd_base& mod_turb = ref_cast(Modele_turbulence_hyd_base, modele_turbulence.valeur());
       const Turbulence_paroi_base& loipar = mod_turb.loi_paroi();

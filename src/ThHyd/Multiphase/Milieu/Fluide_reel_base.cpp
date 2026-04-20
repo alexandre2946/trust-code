@@ -167,7 +167,7 @@ int Fluide_reel_base::initialiser(const double temps)
   if (id_composite_ == -1)
     Milieu_base::initialiser_porosite(temps);
 
-  if (id_composite_ < 0 && ch_g_.non_nul())
+  if (id_composite_ < 0 && ch_g_)
     ch_g_->initialiser(temps);
 
   return 1;
@@ -204,7 +204,7 @@ void Fluide_reel_base::mettre_a_jour(double t)
   ch_alpha_->mettre_a_jour(t);
   ch_alpha_fois_rho_->mettre_a_jour(t);
   ch_beta_th_->mettre_a_jour(t);
-  if (ch_rho_Cp_comme_T_.non_nul()) update_rho_cp(t);
+  if (ch_rho_Cp_comme_T_) update_rho_cp(t);
 
   const Champ_Inc_base& ch_T_ou_h = res_en_T_ ? equation("temperature").inconnue() : equation("enthalpie").inconnue(),
                         &ch_p = ref_cast(Navier_Stokes_std, equation("vitesse")).pression();

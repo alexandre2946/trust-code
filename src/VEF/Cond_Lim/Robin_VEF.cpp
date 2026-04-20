@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -57,7 +57,7 @@ void Robin_VEF::completer()
 {
   Cond_lim_base::completer();
 
-  assert( mon_dom_cl_dis.non_nul());
+  assert( mon_dom_cl_dis);
 
   if (!sub_type(Navier_Stokes_std, mon_dom_cl_dis->equation()))
     Process::exit("Robin_VEF is not yet coded on scalar equations ... \n");

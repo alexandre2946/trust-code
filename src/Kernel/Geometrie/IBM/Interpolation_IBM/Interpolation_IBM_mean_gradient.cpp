@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -45,7 +45,7 @@ void Interpolation_IBM_mean_gradient::discretise(const Discretisation_base& dis,
   Noms units(nb_comp);
   Noms c_nam(nb_comp);
 
-  if (corresp_elems_lu_.non_nul())
+  if (corresp_elems_lu_)
     {
       has_corresp_ = true;
       dis.discretiser_champ("champ_elem",le_dom_EF,"corresp_elems","none",1,0., corresp_elems_);

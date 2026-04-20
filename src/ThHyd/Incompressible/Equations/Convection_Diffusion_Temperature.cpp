@@ -36,8 +36,8 @@ Sortie& Convection_Diffusion_Temperature::printOn(Sortie& is) const { return Con
 
 Entree& Convection_Diffusion_Temperature::readOn(Entree& is)
 {
-  assert(la_temperature.non_nul());
-  assert(le_fluide.non_nul());
+  assert(la_temperature);
+  assert(le_fluide);
   Convection_Diffusion_Temperature_base::readOn(is);
   //Nom unite;
   //if (dimension+bidim_axi==2) unite="[W/m]";
@@ -193,7 +193,7 @@ void Convection_Diffusion_Temperature::creer_champ(const Motcle& motlu)
 
   if (motlu == "gradient_temperature")
     {
-      if (gradient_temperature.est_nul())
+      if (!gradient_temperature)
         {
           const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
           dis.grad_T(domaine_dis(),domaine_Cl_dis(),la_temperature,gradient_temperature);
@@ -204,7 +204,7 @@ void Convection_Diffusion_Temperature::creer_champ(const Motcle& motlu)
   Motcle nom_mot(motlu),temp_mot(nom_mot);
   if (nom_mot.debute_par("H_ECHANGE"))
     {
-      if (h_echange.est_nul())
+      if (!h_echange)
         {
           const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
           temp_mot.suffix("H_ECHANGE_");
@@ -224,7 +224,7 @@ bool Convection_Diffusion_Temperature::has_champ(const Motcle& nom, OBS_PTR(Cham
       return true;
     }
 
-  if (h_echange.non_nul())
+  if (h_echange)
     if (nom == h_echange->le_nom())
       {
         ref_champ = Convection_Diffusion_Temperature::get_champ(nom);
@@ -242,7 +242,7 @@ bool Convection_Diffusion_Temperature::has_champ(const Motcle& nom) const
   if (nom == "gradient_temperature")
     return true;
 
-  if (h_echange.non_nul())
+  if (h_echange)
     if (nom == h_echange->le_nom())
       return true;
 
@@ -263,7 +263,7 @@ const Champ_base& Convection_Diffusion_Temperature::get_champ(const Motcle& nom)
       return champs_compris_.get_champ(nom);
     }
 
-  if (h_echange.non_nul())
+  if (h_echange)
     if (nom == h_echange->le_nom())
       {
         double temps_init = schema_temps().temps_init();

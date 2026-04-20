@@ -106,7 +106,7 @@ const Champ_base& Op_Diff_EF::diffusivite() const
 
 const Champ_base& Op_Diff_EF::diffusivite_volumique() const
 {
-  if (!diffusivite_volumique_.non_nul())
+  if (!diffusivite_volumique_)
     {
       Cerr << que_suis_je() << " has no volumic diffusivity associated." << finl;
       Process::exit();
@@ -118,7 +118,7 @@ void Op_Diff_EF::remplir_nu(DoubleTab& nu) const
 {
   const Domaine_EF& domaine_EF = le_dom_EF.valeur();
   // On dimensionne nu
-  if (!nu.get_md_vector().non_nul())
+  if (!nu.get_md_vector())
     domaine_EF.domaine().creer_tableau_elements(nu);
   const DoubleTab& diffu=diffusivite().valeurs();
   if (diffu.size()==1)
@@ -136,9 +136,9 @@ void Op_Diff_EF::remplir_nu(DoubleTab& nu) const
 
 void Op_Diff_EF::remplir_lambda(DoubleTab& lambda) const
 {
-  assert(diffusivite_volumique_.non_nul());
+  assert(diffusivite_volumique_);
   const Domaine_EF& domaine_EF = le_dom_EF.valeur();
-  if (!lambda.get_md_vector().non_nul())
+  if (!lambda.get_md_vector())
     domaine_EF.domaine().creer_tableau_elements(lambda);
 
   const DoubleTab& diffu = diffusivite_volumique().valeurs();
@@ -167,7 +167,7 @@ void Op_Diff_EF::calculer_von_mises(const DoubleTab& deplacement, DoubleTab& def
   const double r_tol = 1e-12;
 
   remplir_nu(nu_);
-  const bool have_lambda = diffusivite_volumique_.non_nul();
+  const bool have_lambda = bool(diffusivite_volumique_);
   if (have_lambda) remplir_lambda(lambda_);
 
   von_mises = 0.;
@@ -462,7 +462,7 @@ void Op_Diff_EF::ajouter_contribution(const DoubleTab& transporte, Matrice_Morse
   if (N == 1) ajouter_contributions_bords(matrice);
   else if (bidim_axi) ajouter_contribution_axisymetrique(N, matrice);
 
-  if (diffusivite_volumique_.non_nul())
+  if (diffusivite_volumique_)
     ajouter_contribution_diffusivite_volumique(N, matrice);
 }
 

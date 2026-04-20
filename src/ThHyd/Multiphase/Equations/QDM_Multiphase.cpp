@@ -64,7 +64,7 @@ Entree& QDM_Multiphase::readOn(Entree& is)
 {
   evanescence_.associer_eqn(*this);
   Navier_Stokes_std::readOn(is);
-  assert(le_fluide.non_nul());
+  assert(le_fluide);
   if (!sub_type(Fluide_base,le_fluide.valeur()))
     {
       Cerr<<"ERROR : the QDM_Multiphase equation can be associated only to a fluid."<<finl;
@@ -74,7 +74,7 @@ Entree& QDM_Multiphase::readOn(Entree& is)
   terme_convectif->set_incompressible(0);
 
   const Pb_Multiphase& pb = ref_cast(Pb_Multiphase, probleme());
-  if (evanescence_.est_nul() && pb.nb_phases() > 1)
+  if (!evanescence_ && pb.nb_phases() > 1)
     {
       // Special treatment for Pb_Multiphase_HEM : We enforce the evanescence to a specific value
       if (sub_type(Pb_Multiphase_HEM, probleme()))
@@ -117,13 +117,13 @@ int QDM_Multiphase::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 void QDM_Multiphase::dimensionner_matrice_sans_mem(Matrice_Morse& matrice)
 {
   Navier_Stokes_std::dimensionner_matrice_sans_mem(matrice);
-  if (evanescence_.non_nul()) evanescence_->dimensionner(matrice);
+  if (evanescence_) evanescence_->dimensionner(matrice);
 }
 
 int QDM_Multiphase::has_interface_blocs() const
 {
   int ok = Navier_Stokes_std::has_interface_blocs();
-  if (evanescence_.non_nul()) ok &= evanescence_->has_interface_blocs();
+  if (evanescence_) ok &= evanescence_->has_interface_blocs();
   return ok;
 }
 
@@ -131,13 +131,13 @@ int QDM_Multiphase::has_interface_blocs() const
 void QDM_Multiphase::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   Navier_Stokes_std::dimensionner_blocs(matrices, semi_impl);
-  if (evanescence_.non_nul()) evanescence_->dimensionner_blocs(matrices, semi_impl);
+  if (evanescence_) evanescence_->dimensionner_blocs(matrices, semi_impl);
 }
 
 void QDM_Multiphase::assembler_blocs_avec_inertie(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl)
 {
   Navier_Stokes_std::assembler_blocs_avec_inertie(matrices, secmem, semi_impl);
-  if (evanescence_.non_nul()) evanescence_->ajouter_blocs(matrices, secmem, semi_impl);
+  if (evanescence_) evanescence_->ajouter_blocs(matrices, secmem, semi_impl);
 }
 
 void QDM_Multiphase::mettre_a_jour(double temps)
@@ -148,7 +148,7 @@ void QDM_Multiphase::mettre_a_jour(double temps)
 
   int i, j, n, N = ref_cast(Pb_Multiphase, probleme()).nb_phases(), d, D = dimension;
   for (n = 0; n < N; n++)
-    if (vit_phases_[n].non_nul())
+    if (vit_phases_[n])
       {
         vit_phases_[n]->mettre_a_jour(temps);
         DoubleTab_parts psrc(inconnue().valeurs()), pdst(vit_phases_[n]->valeurs());
@@ -165,13 +165,13 @@ void QDM_Multiphase::mettre_a_jour(double temps)
           }
       }
 
-  if (grad_u.non_nul()) grad_u->mettre_a_jour(temps);
-  if (la_vorticite.non_nul()) la_vorticite->mettre_a_jour(temps);
-  if (Taux_cisaillement.non_nul()) Taux_cisaillement->mettre_a_jour(temps);
+  if (grad_u) grad_u->mettre_a_jour(temps);
+  if (la_vorticite) la_vorticite->mettre_a_jour(temps);
+  if (Taux_cisaillement) Taux_cisaillement->mettre_a_jour(temps);
 
   const bool is_vdf = discretisation().is_vdf();
   for (n = 0; n < N; n++)
-    if (grad_vit_phases_[n].non_nul())
+    if (grad_vit_phases_[n])
       {
         if (is_vdf)
           {
@@ -198,7 +198,7 @@ void QDM_Multiphase::mettre_a_jour(double temps)
           }
         grad_vit_phases_[n]->mettre_a_jour(temps);
       }
-  if (gradient_P.non_nul())
+  if (gradient_P)
     {
       gradient_P->valeurs() = 0;
       gradient->ajouter(la_pression->valeurs(), gradient_P->valeurs());
@@ -297,16 +297,16 @@ void QDM_Multiphase::get_noms_champs_postraitables(Noms& noms,Option opt) const
 void QDM_Multiphase::creer_champ(const Motcle& motlu)
 {
   Navier_Stokes_std::creer_champ(motlu);
-  if (la_vorticite.non_nul())
-    if (grad_u.est_nul()) creer_champ("gradient_vitesse");
+  if (la_vorticite)
+    if (!grad_u) creer_champ("gradient_vitesse");
   int i = noms_vit_phases_.rang(motlu);
-  if (i >= 0 && vit_phases_[i].est_nul())
+  if (i >= 0 && !vit_phases_[i])
     {
       discretisation().discretiser_champ("vitesse",domaine_dis(), noms_vit_phases_[i], "m/s",dimension, 1, 0, vit_phases_[i]);
       champs_compris_.ajoute_champ(vit_phases_[i]);
     }
   i = noms_grad_vit_phases_.rang(motlu);
-  if (i >= 0 && grad_vit_phases_[i].est_nul())
+  if (i >= 0 && !grad_vit_phases_[i])
     {
       int D = dimension ;
       Noms noms(D * D), unites(D * D);
@@ -326,7 +326,7 @@ void QDM_Multiphase::creer_champ(const Motcle& motlu)
 
   if (motlu == "gradient_pression")
     {
-      if (gradient_P.est_nul())
+      if (!gradient_P)
         {
           const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
           dis.gradient_P(schema_temps(), domaine_dis(), gradient_P, ref_cast(Pb_Multiphase, probleme()).nb_phases());
@@ -404,7 +404,7 @@ int QDM_Multiphase::preparer_calcul()
   pression().changer_temps(temps);
   pression_pa().changer_temps(temps);
 
-  if (evanescence_.non_nul())
+  if (evanescence_)
     evanescence_->preparer_calcul();
 
   return 1;
@@ -414,7 +414,7 @@ double QDM_Multiphase::alpha_res() const
 {
   const Pb_Multiphase& pb = ref_cast(Pb_Multiphase, probleme());
   if (pb.nb_phases() == 1) return 0.;
-  if (evanescence_.est_nul()) Process::exit( "QDM_Multiphase::alpha_res : the evanescence operator should have been created already !" );
+  if (!evanescence_) Process::exit( "QDM_Multiphase::alpha_res : the evanescence operator should have been created already !" );
   if sub_type(Operateur_Evanescence_base, evanescence_.valeur()) return ref_cast(Operateur_Evanescence_base, evanescence_.valeur()).alpha_res();
   return -1.;
 }

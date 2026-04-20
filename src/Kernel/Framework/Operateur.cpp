@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -143,7 +143,7 @@ const Discretisation_base& Operateur::discretisation() const
  */
 void Operateur::completer()
 {
-  if (!le_champ_inco.non_nul())
+  if (!le_champ_inco)
     le_champ_inco=mon_equation->inconnue();
 
   l_op_base().completer();

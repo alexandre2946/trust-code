@@ -568,8 +568,8 @@ void Milieu_composite::calculer_temperature_multiphase(const Objet_U& obj, Doubl
 void Milieu_composite::abortTimeStep()
 {
   Fluide_base::abortTimeStep();
-  if (ch_e_int_.non_nul()) ch_e_int_->abortTimeStep();
-  if (ch_h_ou_T_.non_nul()) ch_h_ou_T_->abortTimeStep();
+  if (ch_e_int_) ch_e_int_->abortTimeStep();
+  if (ch_h_ou_T_) ch_h_ou_T_->abortTimeStep();
 }
 
 bool Milieu_composite::initTimeStep(double dt)
@@ -581,11 +581,11 @@ bool Milieu_composite::initTimeStep(double dt)
 
   /* champs dont on doit creer des cases */
   std::vector<Champ_Inc_base *> vch;
-  if (ch_rho_.non_nul() && sub_type(Champ_Inc_base, ch_rho_.valeur()))
+  if (ch_rho_ && sub_type(Champ_Inc_base, ch_rho_.valeur()))
     vch.push_back(&ref_cast(Champ_Inc_base, ch_rho_.valeur()));
-  if (ch_e_int_.non_nul() && sub_type(Champ_Inc_base, ch_e_int_.valeur()))
+  if (ch_e_int_ && sub_type(Champ_Inc_base, ch_e_int_.valeur()))
     vch.push_back(&ref_cast(Champ_Inc_base, ch_e_int_.valeur()));
-  if (ch_h_ou_T_.non_nul() && sub_type(Champ_Inc_base, ch_h_ou_T_.valeur()))
+  if (ch_h_ou_T_ && sub_type(Champ_Inc_base, ch_h_ou_T_.valeur()))
     vch.push_back(&ref_cast(Champ_Inc_base, ch_h_ou_T_.valeur()));
 
   for (auto &pch : vch)

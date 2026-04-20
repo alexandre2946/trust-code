@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -132,7 +132,7 @@ void Schema_Comm::set_group(const Comm_Group& group)
  */
 const Comm_Group& Schema_Comm::get_group() const
 {
-  assert(ref_group_.non_nul());
+  assert(ref_group_);
   return ref_group_.valeur();
 }
 
@@ -167,7 +167,7 @@ void Schema_Comm::set_send_recv_pe_list(const ArrOfInt& send_pe_list,
 void Schema_Comm::begin_comm() const
 {
   // On verifie qu'une autre communication n'est pas en cours.
-  assert (status_ == RESET && ref_group_.non_nul());
+  assert (status_ == RESET && ref_group_);
   status_ = WRITING;
   // On verifie que tous les membres du groupe executent ceci.
   // Si ca plante ici, c'est que tous les membres declares ne sont
@@ -269,7 +269,7 @@ void Schema_Comm::echange_taille(const ArrOfInt& send_size,
 
 
 
-  assert(status_ == WRITING && ref_group_.non_nul());
+  assert(status_ == WRITING && ref_group_);
   const Comm_Group& group = ref_group_.valeur();
   assert(&group == &PE_Groups::current_group());
 
@@ -316,7 +316,7 @@ void Schema_Comm::echange_taille(const ArrOfInt& send_size,
 void Schema_Comm::echange_messages(const ArrOfInt& send_size,
                                    const ArrOfInt& recv_size) const
 {
-  assert(status_ == WRITING && ref_group_.non_nul());
+  assert(status_ == WRITING && ref_group_);
   const Comm_Group& group = ref_group_.valeur();
   assert(&group == &PE_Groups::current_group());
 
@@ -439,7 +439,7 @@ void Schema_Comm::echange_messages(const ArrOfInt& recv_size) const
  */
 void Schema_Comm::end_comm() const
 {
-  assert(status_ == EXCHANGED && ref_group_.non_nul());
+  assert(status_ == EXCHANGED && ref_group_);
   const Comm_Group& group = ref_group_.valeur();
   assert(&group == &PE_Groups::current_group());
 
@@ -494,7 +494,7 @@ Sortie& Schema_Comm::send_buffer(int num_PE) const
   //   begin_comm();
   //    ...
   ///  echange_xxx();
-  assert(status_ == WRITING && ref_group_.non_nul());
+  assert(status_ == WRITING && ref_group_);
 
   // On verifie que le PE demande est bien dans la liste
   // des PEs declares en envoi.
@@ -514,7 +514,7 @@ Entree& Schema_Comm::recv_buffer(int num_PE) const
   //   echange_xxx();
   //    ...
   //   end_comm();
-  assert(status_ == EXCHANGED && ref_group_.non_nul());
+  assert(status_ == EXCHANGED && ref_group_);
   // On verifie que le PE demande est bien dans la liste
   // des PEs declares en reception.
   assert((me_to_me_&&num_PE==Process::me()) || check_PE_in_list(num_PE, recv_pe_list_));
@@ -523,13 +523,13 @@ Entree& Schema_Comm::recv_buffer(int num_PE) const
 
 const ArrOfInt& Schema_Comm::get_send_pe_list() const
 {
-  assert(ref_group_.non_nul());
+  assert(ref_group_);
   return send_pe_list_;
 }
 
 const ArrOfInt& Schema_Comm::get_recv_pe_list() const
 {
-  assert(ref_group_.non_nul());
+  assert(ref_group_);
   return recv_pe_list_;
 }
 

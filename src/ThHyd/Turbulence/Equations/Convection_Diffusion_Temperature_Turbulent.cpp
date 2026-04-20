@@ -121,7 +121,7 @@ void Convection_Diffusion_Temperature_Turbulent::creer_champ(const Motcle& motlu
 {
   Convection_Diffusion_Temperature::creer_champ(motlu);
 
-  if (le_modele_turbulence.non_nul())
+  if (le_modele_turbulence)
     le_modele_turbulence->creer_champ(motlu);
 }
 
@@ -130,7 +130,7 @@ bool Convection_Diffusion_Temperature_Turbulent::has_champ(const Motcle& nom, OB
   if (Convection_Diffusion_Temperature::has_champ(nom, ref_champ))
     return true;
 
-  if (le_modele_turbulence.non_nul())
+  if (le_modele_turbulence)
     if (le_modele_turbulence->has_champ(nom, ref_champ))
       return true;
 
@@ -142,7 +142,7 @@ bool Convection_Diffusion_Temperature_Turbulent::has_champ(const Motcle& nom) co
   if (Convection_Diffusion_Temperature::has_champ(nom))
     return true;
 
-  if (le_modele_turbulence.non_nul())
+  if (le_modele_turbulence)
     if (le_modele_turbulence->has_champ(nom))
       return true;
 
@@ -156,7 +156,7 @@ const Champ_base& Convection_Diffusion_Temperature_Turbulent::get_champ(const Mo
   if (Convection_Diffusion_Temperature::has_champ(nom, ref_champ))
     return ref_champ;
 
-  if (le_modele_turbulence.non_nul())
+  if (le_modele_turbulence)
     if (le_modele_turbulence->has_champ(nom, ref_champ))
       return ref_champ;
 
@@ -166,7 +166,7 @@ const Champ_base& Convection_Diffusion_Temperature_Turbulent::get_champ(const Mo
 void Convection_Diffusion_Temperature_Turbulent::get_noms_champs_postraitables(Noms& nom, Option opt) const
 {
   Convection_Diffusion_Temperature::get_noms_champs_postraitables(nom, opt);
-  if (le_modele_turbulence.non_nul())
+  if (le_modele_turbulence)
     le_modele_turbulence->get_noms_champs_postraitables(nom, opt);
 }
 
@@ -201,7 +201,7 @@ const RefObjU& Convection_Diffusion_Temperature_Turbulent::get_modele(Type_model
   for (const auto &itr : liste_modeles_)
     {
       const RefObjU& mod = itr;
-      if (mod.non_nul())
+      if (mod)
         if ((sub_type(Modele_turbulence_scal_base, mod.valeur())) && (type == TURBULENCE))
           return mod;
     }

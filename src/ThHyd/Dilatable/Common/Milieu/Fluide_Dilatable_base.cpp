@@ -41,7 +41,7 @@ Entree& Fluide_Dilatable_base::readOn(Entree& is)
 void Fluide_Dilatable_base::discretiser(const Probleme_base& pb, const  Discretisation_base& dis)
 {
   Cerr<<"Fluide_Dilatable_base::discretiser"<<finl;
-  if (le_probleme_.est_nul()) le_probleme_ = pb;
+  if (!le_probleme_) le_probleme_ = pb;
 
   const Domaine_dis_base& domaine_dis=pb.equation(0).domaine_dis();
   double temps=pb.schema_temps().temps_courant();
@@ -51,13 +51,13 @@ void Fluide_Dilatable_base::discretiser(const Probleme_base& pb, const  Discreti
   dis.discretiser_champ("temperature",domaine_dis,"masse_volumique_p","neant",1,temps,ch_rho);
   ch_rho_ = ch_rho.valeur();
 
-  if (ch_Cp_.est_nul() || !sub_type(Champ_Uniforme,ch_Cp_.valeur())) //ie Cp non constant : gaz reels
+  if (!ch_Cp_ || !sub_type(Champ_Uniforme,ch_Cp_.valeur())) //ie Cp non constant : gaz reels
     {
       Cerr<<"Heat capacity Cp is discretized once more for space variable case."<<finl;
       dis.discretiser_champ("temperature",domaine_dis,"cp_prov","neant",1,temps,ch_Cp_);
     }
 
-  if (ch_lambda_.est_nul() || ((!sub_type(Champ_Uniforme,ch_lambda_.valeur())) && (!sub_type(Champ_Fonc_Tabule,ch_lambda_.valeur()))))
+  if (!ch_lambda_ || ((!sub_type(Champ_Uniforme,ch_lambda_.valeur())) && (!sub_type(Champ_Fonc_Tabule,ch_lambda_.valeur()))))
     {
       // cas particulier etait faux en VEF voir quand cela sert (FM slt) : sera nomme par milieu_base
       dis.discretiser_champ("champ_elem",domaine_dis,"neant","neant",1,temps,ch_lambda_);
@@ -233,13 +233,13 @@ void Fluide_Dilatable_base::warn_syntax_Sutherland()
 void Fluide_Dilatable_base::verifier_coherence_champs(int& err,Nom& msg)
 {
   msg="";
-  if (ch_rho_.non_nul()) { }
+  if (ch_rho_) { }
   else
     {
       msg += "The density rho has not been specified. \n";
       err = 1;
     }
-  if (ch_mu_.non_nul())
+  if (ch_mu_)
     {
       if (sub_type(Champ_Uniforme,ch_mu_.valeur()))
         {
@@ -255,13 +255,13 @@ void Fluide_Dilatable_base::verifier_coherence_champs(int& err,Nom& msg)
       msg += "The dynamical viscosity mu has not been specified. \n";
       err = 1;
     }
-  if (ch_lambda_.non_nul()) { }
+  if (ch_lambda_) { }
   else
     {
       msg += "The conductivity lambda has not been specified. \n";
       err = 1;
     }
-  if (ch_Cp_.non_nul()) { }
+  if (ch_Cp_) { }
   else
     {
       msg += "The heat capacity Cp has not been specified. \n";
@@ -353,16 +353,16 @@ void Fluide_Dilatable_base::creer_champs_non_lus()
   // on s'occupe de lamda si mu uniforme et CP uniforme
   // on type lambda en champ uniforme et on met lambda=mu*Cp/Pr
   //
-  if (ch_mu_.non_nul())
+  if (ch_mu_)
     {
-      if ((ch_lambda_.est_nul())||(!sub_type(Champ_Fonc_Tabule,ch_lambda_.valeur())))
+      if ((!ch_lambda_)||(!sub_type(Champ_Fonc_Tabule,ch_lambda_.valeur())))
         if ((sub_type(Champ_Uniforme,ch_mu_.valeur()))&&(sub_type(Loi_Etat_GP_base,loi_etat_.valeur())))
           {
             if (!sub_type(Loi_Etat_Multi_GP_QC,loi_etat_.valeur()))
               {
                 // Si mu uniforme et si la loi d'etat est celle d'un gaz parfait
                 double lold=-1;
-                if (ch_lambda_.non_nul())
+                if (ch_lambda_)
                   lold=ch_lambda_->valeurs()(0,0);
                 ch_lambda_.typer(ch_mu_->le_type());
                 ch_lambda_=ch_mu_;
@@ -384,7 +384,7 @@ void Fluide_Dilatable_base::creer_champs_non_lus()
               }
           }
 
-      if (ch_lambda_.non_nul())
+      if (ch_lambda_)
         {
           if (sub_type(Sutherland,ch_lambda_.valeur()))
             {
@@ -419,7 +419,7 @@ int Fluide_Dilatable_base::initialiser(const double temps)
   ch_Cp_->initialiser(temps);
   update_rho_cp(temps);
 
-  if (coeff_absorption_.non_nul() && indice_refraction_.non_nul())
+  if (coeff_absorption_ && indice_refraction_)
     initialiser_radiatives(temps);
 
   if (equation_.size() && (*(equation_.begin()->second)).inconnue().valeurs().isDataOnDevice())
@@ -475,7 +475,7 @@ void Fluide_Dilatable_base::creer_champ(const Motcle& motlu)
 {
   if(motlu == "source_masse_espece")
     {
-      if (ch_source_masse_esp_.est_nul())
+      if (!ch_source_masse_esp_)
         {
           double temps = le_probleme_->schema_temps().temps_courant();
 
@@ -485,7 +485,7 @@ void Fluide_Dilatable_base::creer_champ(const Motcle& motlu)
     }
   else if (motlu == "source_masse_projection")
     {
-      if (ch_source_masse_proj_.est_nul())
+      if (!ch_source_masse_proj_)
         {
           double temps = le_probleme_->schema_temps().temps_courant();
 
@@ -576,7 +576,7 @@ void Fluide_Dilatable_base::update_pressure_fields(double temps)
  */
 void Fluide_Dilatable_base::completer(const Probleme_base& pb)
 {
-  if (le_probleme_.est_nul()) le_probleme_ = pb;
+  if (!le_probleme_) le_probleme_ = pb;
   ch_inco_chaleur_ = pb.equation(1).inconnue();
   ch_vitesse_ = pb.equation(0).inconnue();
   ch_pression_ = ref_cast(Navier_Stokes_std, pb.equation(0)).pression();

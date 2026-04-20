@@ -36,7 +36,7 @@ Entree& Neumann_paroi::readOn(Entree& s)
 
 void Neumann_paroi::verifie_ch_init_nb_comp() const
 {
-  if (le_champ_front.non_nul())
+  if (le_champ_front)
     {
       const Equation_base& eq = domaine_Cl_dis().equation();
       const int nb_comp = le_champ_front->nb_comp();

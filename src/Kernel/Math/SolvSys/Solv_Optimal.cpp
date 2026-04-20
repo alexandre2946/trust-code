@@ -279,7 +279,7 @@ Solv_Optimal::Solv_Optimal():n_resol_(0),n_reinit_(0)
 }
 Solv_Optimal::~Solv_Optimal()
 {
-  if (le_solveur_.non_nul()) Cerr<<" The solver used by Solv_Optimal was "<<le_solveur_<<finl;
+  if (le_solveur_) Cerr<<" The solver used by Solv_Optimal was "<<le_solveur_<<finl;
 }
 Sortie& Solv_Optimal::printOn(Sortie& s ) const
 {
@@ -372,7 +372,7 @@ int Solv_Optimal::resoudre_systeme(const Matrice_Base& matrice, const DoubleVect
 void Solv_Optimal::reinit()
 {
   n_reinit_++;
-  if (le_solveur_.non_nul())
+  if (le_solveur_)
     le_solveur_->reinit();
 }
 

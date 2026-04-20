@@ -117,7 +117,7 @@ public :
   inline Matrice& matrice_pression() { return matrice_pression_; }
   inline OWN_PTR(Assembleur_base)& assembleur_pression() { return assembleur_pression_; }
 
-  inline bool has_grad_P() const { return gradient_P.non_nul(); }
+  inline bool has_grad_P() const { return bool(gradient_P); }
   inline Champ_Inc_base& grad_P() { return gradient_P.valeur(); }
   inline const Champ_Inc_base& grad_P() const { return gradient_P.valeur(); }
   inline Champ_Inc_base& pression() { return la_pression.valeur(); }

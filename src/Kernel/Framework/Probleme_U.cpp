@@ -502,7 +502,7 @@ OBS_PTR(Champ_Generique_base) Probleme_U::findOutputField(const Nom& name) const
 void Probleme_U::getInputFieldTemplate(const Nom& name, TrioField& afield) const
 {
   OBS_PTR(Field_base) ch=findInputField(name);
-  if (!ch.non_nul())
+  if (!ch)
     throw WrongArgument(le_nom().getChar(),"getInputFieldTemplate",name.getString(),"no input field of that name");
 
   // Du au fait qu'on ne peut pas faire une ref sur Champ_Input_Proto qui n'est pas un Objet_U...
@@ -519,7 +519,7 @@ void Probleme_U::getInputFieldTemplate(const Nom& name, TrioField& afield) const
 void Probleme_U::setInputField(const Nom& name, const TrioField& afield)
 {
   OBS_PTR(Field_base) ch=findInputField(name);
-  if (!ch.non_nul())
+  if (!ch)
     throw WrongArgument(le_nom().getChar(),"setInputField",name.getString(),"no input field of that name");
   if (!est_egal(afield._time1,presentTime()))
     throw WrongArgument(le_nom().getChar(),"setInputField","afield","Should be defined on current time interval");
@@ -540,7 +540,7 @@ void Probleme_U::getOutputField(const Nom& name,  TrioField& afield) const
 {
 
   OBS_PTR(Champ_Generique_base) ref_ch=findOutputField(name);
-  if (!ref_ch.non_nul())
+  if (!ref_ch)
     throw WrongArgument(le_nom().getChar(),"getOutputField",name.getString(),"no output field of that name");
 
   const Champ_Generique_base& ch = ref_ch.valeur();
@@ -552,7 +552,7 @@ void Probleme_U::getOutputField(const Nom& name,  TrioField& afield) const
 void Probleme_U::setInputDoubleValue(const Nom& name, const double val)
 {
   OBS_PTR(Field_base) ch = findInputField(name);
-  if (!ch.non_nul())
+  if (!ch)
     throw WrongArgument(le_nom().getChar(),"setInputDoubleValue",name.getString(),"no input field of that name");
   if (ch->nb_comp() != 1)
     throw WrongArgument(le_nom().getChar(),"getOutputDoubleValue",name.getString(),"invalid field size!!");

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -103,7 +103,7 @@ void Op_Diff_PolyMAC_HFV_base::update_nu() const
 /* calcul des variables auxiliaires en semi-implicite */
 void Op_Diff_PolyMAC_HFV_base::update_aux(double t) const
 {
-  const std::string& nom_inco = (le_champ_inco.non_nul() ? le_champ_inco.valeur() : equation().inconnue()).le_nom().getString();
+  const std::string& nom_inco = (le_champ_inco ? le_champ_inco.valeur() : equation().inconnue()).le_nom().getString();
   int i, j, n_ext = (int) op_ext.size(), first_run = mat_aux.nb_lignes() == 0; /* nombre d'operateurs */
   if (first_run)
     for (mat_aux.dimensionner(n_ext, n_ext), i = 0; i < n_ext; i++)
@@ -147,7 +147,7 @@ void Op_Diff_PolyMAC_HFV_base::update_aux(double t) const
   /* resolution */
   if (first_run)
     {
-      if (equation().parametre_equation().non_nul())
+      if (equation().parametre_equation())
         solv_aux = ref_cast(Parametre_implicite, equation().parametre_equation().valeur()).solveur(); //on copie le solveur de l'equation
       else
         {

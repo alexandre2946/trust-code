@@ -35,7 +35,7 @@ Entree& Schema_Implicite_Multi_TimeStep_base::readOn(Entree& s)
 {
   Schema_Implicite_base::readOn(s);
 
-  if(!le_solveur.non_nul())
+  if(!le_solveur)
     {
       Cerr << "A solver must be selected." << finl;
       Cerr << "Syntax : " << finl

@@ -145,7 +145,7 @@ void Format_Post_Med::ecrire_domaine_dual(const Domaine& domaine, const int est_
 
   bool append = !est_le_premier_post;
 
-  assert(domaine_dis_.non_nul());
+  assert(domaine_dis_);
   ecr_med_.set_file_name_and_dom(nom_fich, domaine, &domaine_dis_.valeur());
   ecr_med_.ecrire_domaine_dual(append);
 }
@@ -354,7 +354,7 @@ int Format_Post_Med::ecrire_domaine_med(const Domaine& domaine,const Nom& nom_fi
       Cerr << "Opening MED file " << nom_fic << " with " << ecr_med_.version() << " format. ";
       Cerr << finl;
     }
-  ecr_med_.set_file_name_and_dom(nom_fic, domaine, domaine_dis_.non_nul() ? &domaine_dis_.valeur() : nullptr);
+  ecr_med_.set_file_name_and_dom(nom_fic, domaine, domaine_dis_ ? &domaine_dis_.valeur() : nullptr);
   ecr_med_.ecrire_domaine_dis(append);
   return 1;
 
@@ -379,7 +379,7 @@ int Format_Post_Med::ecrire_champ_med(const Domaine& dom,const Noms& unite_, con
                                       const DoubleTab& valeurs,Nom& nom_fich)
 {
   Nom fic = nom_pdb.nom_me(me());
-  ecr_med_.set_file_name_and_dom(fic, dom, domaine_dis_.non_nul() ? &domaine_dis_.valeur() : nullptr);
+  ecr_med_.set_file_name_and_dom(fic, dom, domaine_dis_ ? &domaine_dis_.valeur() : nullptr);
 
   Nom nom_post(id_du_champ);
   Noms noms_compo_courts(noms_compo);

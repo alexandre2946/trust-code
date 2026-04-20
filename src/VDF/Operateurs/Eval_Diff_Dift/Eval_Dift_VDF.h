@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -79,7 +79,7 @@ public:
 
   void update_equivalent_distance()
   {
-    if (loipar.non_nul())
+    if (loipar)
       {
         int s = loipar->tab_equivalent_distance_size();
         equivalent_distance.dimensionner(s);

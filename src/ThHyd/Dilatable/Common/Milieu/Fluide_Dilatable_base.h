@@ -89,13 +89,13 @@ public :
   inline Champ_Don_base& mu_sur_Schmidt() { return ch_mu_sur_Sc; }
   inline const Champ_Don_base& nu_sur_Schmidt() const { return ch_nu_sur_Sc; }
   inline Champ_Don_base& nu_sur_Schmidt() { return ch_nu_sur_Sc; }
-  inline const Champ_Don_base& source_masse_espece() const { assert (ch_source_masse_esp_.non_nul()); return ch_source_masse_esp_; }
-  inline Champ_Don_base& source_masse_espece() { assert (ch_source_masse_esp_.non_nul()); return ch_source_masse_esp_; }
-  inline const Champ_Don_base& source_masse_projection() const { assert (ch_source_masse_proj_.non_nul()); return ch_source_masse_proj_; }
-  inline Champ_Don_base& source_masse_projection() { assert (ch_source_masse_proj_.non_nul()); return ch_source_masse_proj_; }
+  inline const Champ_Don_base& source_masse_espece() const { assert (ch_source_masse_esp_); return ch_source_masse_esp_; }
+  inline Champ_Don_base& source_masse_espece() { assert (ch_source_masse_esp_); return ch_source_masse_esp_; }
+  inline const Champ_Don_base& source_masse_projection() const { assert (ch_source_masse_proj_); return ch_source_masse_proj_; }
+  inline Champ_Don_base& source_masse_projection() { assert (ch_source_masse_proj_); return ch_source_masse_proj_; }
 
-  inline bool has_source_masse_espece_champ() const { return ch_source_masse_esp_.non_nul(); }
-  inline bool has_source_masse_projection_champ() const { return ch_source_masse_proj_.non_nul(); }
+  inline bool has_source_masse_espece_champ() const { return bool(ch_source_masse_esp_); }
+  inline bool has_source_masse_projection_champ() const { return bool(ch_source_masse_proj_); }
 
   inline const  DoubleTab& rho_n() const { return loi_etat_->rho_n(); }
   inline const  DoubleTab& rho_np1() const { return loi_etat_->rho_np1(); }

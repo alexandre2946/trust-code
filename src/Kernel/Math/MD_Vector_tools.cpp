@@ -78,7 +78,7 @@ bool resize_tab_or_vect(TRUSTVect<_TYPE_,_SIZE_>& v, _SIZE_ sz, int sz_r, RESIZE
 template <class VECT, class TAB>
 static void creer_tableau_distribue_(const MD_Vector& md, VECT& v, RESIZE_OPTIONS opt)
 {
-  if (v.get_md_vector().non_nul())
+  if (v.get_md_vector())
     {
       // Si ce message apparait et qu'on est sur de ce qu'on fait,
       // faire ceci avant d'appeler creer_tableau_distribue:
@@ -139,7 +139,7 @@ static void creer_tableau_seq_(const MD_Vector& md, TRUSTVect<_TYPE_,_SIZE_>& v,
  */
 void MD_Vector_tools::creer_tableau_distribue(const MD_Vector& md, Array_base& v, RESIZE_OPTIONS opt)
 {
-  if (!md.non_nul())
+  if (!md)
     {
       Cerr << "Error in MD_Vector_tools::creer_tableau_distribue(): MD_Vector is null" << finl;
       Process::exit();
@@ -270,7 +270,7 @@ template<typename _TYPE_>
 inline void MD_Vector_tools::call_virtual_exchange(TRUSTVect<_TYPE_>& v, MD_Vector_tools::Operations_echange opt, IsExchangeBlocking is_exchange_blocking, const std::string kernel_name)
 {
   const MD_Vector& md = v.get_md_vector();
-  if (md.non_nul() && Process::is_parallel())
+  if (md && Process::is_parallel())
     {
       // [ABN] in some weird cases (like building a temporary domain when reading a MED file)
       // we might end up calling the current method with a sequential MD_Vector:
@@ -309,7 +309,7 @@ void MD_Vector_tools::compute_sequential_items_index(const MD_Vector&, MD_Vector
 void MD_Vector_tools::creer_md_vect_renum(const IntVect& renum, MD_Vector& md_vect)
 {
   const MD_Vector& src_md = renum.get_md_vector();
-  if (!src_md.non_nul())
+  if (!src_md)
     {
       Cerr << "Internal error in MD_Vector_tools::creer_md_vect_renum: descripteur nul !" << finl;
       Process::exit();

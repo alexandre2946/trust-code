@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -198,7 +198,7 @@ void Debog_Pb::write_geometry_data()
   register_item(dom.md_vector_sommets(), "SOM");
   register_item(dom.md_vector_elements(), "ELEM");
   register_item(zvf.md_vector_faces(), "FACE");
-  if (zvf.md_vector_aretes().non_nul())
+  if (zvf.md_vector_aretes())
     register_item(zvf.md_vector_aretes(), "ARETES");
 }
 

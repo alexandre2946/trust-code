@@ -501,7 +501,7 @@ void projette(DoubleTab& valeurs_espace,const DoubleTab& val_source,const Domain
 
 const Champ_base& Champ_Generique_Transformation::get_champ_without_evaluation(OWN_PTR(Champ_base)&) const
 {
-  if (espace_stockage_.est_nul())
+  if (!espace_stockage_)
     creer_espace_stockage(nature_ch,nb_comp_,espace_stockage_);
   else
     espace_stockage_->changer_temps(get_source(0).get_time());
@@ -510,7 +510,7 @@ const Champ_base& Champ_Generique_Transformation::get_champ_without_evaluation(O
 const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&) const
 {
   const Domaine_dis_base& domaine_dis = get_ref_domaine_dis_base();
-  if (espace_stockage_.est_nul())
+  if (!espace_stockage_)
     creer_espace_stockage(nature_ch,nb_comp_,espace_stockage_);
   else
     espace_stockage_->changer_temps(get_source(0).get_time());

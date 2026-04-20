@@ -137,7 +137,7 @@ template <typename _TYPE_, typename _SIZE_>
 int tri_lexicographique_tableau(TRUSTTab<_TYPE_,_SIZE_>& tab)
 {
   // On verifie que le tableau n'est pas un tableau distribue:
-  assert(!tab.get_md_vector().non_nul());
+  assert(!tab.get_md_vector());
 
   const _SIZE_ nb_lignes = tab.dimension(0);
   const int nb_colonnes = tab.line_size();
@@ -189,7 +189,7 @@ int tri_lexicographique_tableau_indirect(const TRUSTTab<_TYPE_,_SIZE_>& tab, Arr
 {
   using int_t = _SIZE_;
   // On verifie que le tableau n'est pas un tableau distribue:
-  assert(!tab.get_md_vector().non_nul());
+  assert(!tab.get_md_vector());
 
   const int_t dimtab = tab.dimension_tot(0);
   if (index.size_array() == 0 && dimtab > 0)

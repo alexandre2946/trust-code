@@ -44,8 +44,8 @@ DoubleTab& Masse_VDF_Face::appliquer_impl(DoubleTab& sm) const
   else
     {
 
-      assert(le_dom_VDF.non_nul());
-      assert(le_dom_Cl_VDF.non_nul());
+      assert(le_dom_VDF);
+      assert(le_dom_Cl_VDF);
       const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
       const DoubleVect& porosite_face = equation().milieu().porosite_face();
       const DoubleVect& volumes_entrelaces = domaine_VDF.volumes_entrelaces();

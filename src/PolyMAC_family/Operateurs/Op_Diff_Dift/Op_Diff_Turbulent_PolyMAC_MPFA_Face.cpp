@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -67,7 +67,7 @@ void Op_Diff_Turbulent_PolyMAC_MPFA_Face::mettre_a_jour(double temps)
 
 void Op_Diff_Turbulent_PolyMAC_MPFA_Face::modifier_mu(DoubleTab& mu) const
 {
-  if (corr_.est_nul()) return; //rien a faire
+  if (!corr_) return; //rien a faire
   const DoubleTab& rho = equation().milieu().masse_volumique().passe(),
                    *alpha = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()).equation_masse().inconnue().passe() : nullptr;
   int i, nl = mu.dimension(0), n, N = equation().inconnue().valeurs().line_size(), cR = rho.dimension(0) == 1, d, D = dimension;

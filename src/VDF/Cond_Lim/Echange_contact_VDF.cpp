@@ -106,7 +106,7 @@ void calculer_h_local(DoubleTab& tab,const Equation_base& une_eqn,const Domaine_
 
   const RefObjU& modele_turbulence = une_eqn.get_modele(TURBULENCE);
 
-  if (modele_turbulence.non_nul() && sub_type(Modele_turbulence_scal_base,modele_turbulence.valeur()) && opt!=1 )
+  if (modele_turbulence && sub_type(Modele_turbulence_scal_base,modele_turbulence.valeur()) && opt!=1 )
     {
       const Modele_turbulence_scal_base& mod_turb_scal = ref_cast(Modele_turbulence_scal_base,modele_turbulence.valeur());
       const Turbulence_paroi_scal_base& loi_par = mod_turb_scal.loi_paroi();
@@ -175,7 +175,7 @@ void calculer_h_distant(DoubleTab& tab,const Equation_base& une_eqn,const Domain
   bool dequiv=false;
 
   const RefObjU& modele_turbulence = une_eqn.get_modele(TURBULENCE);
-  if (modele_turbulence.non_nul() && sub_type(Modele_turbulence_scal_base,modele_turbulence.valeur()) && opt!=1 )
+  if (modele_turbulence && sub_type(Modele_turbulence_scal_base,modele_turbulence.valeur()) && opt!=1 )
     {
 
       const Modele_turbulence_scal_base& mod_turb_scal = ref_cast(Modele_turbulence_scal_base,modele_turbulence.valeur());

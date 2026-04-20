@@ -97,7 +97,7 @@ void Op_Dift_EF_Q1::remplir_nu(DoubleTab& nu) const
 {
   const Domaine_EF& domaine_EF = le_dom_EF.valeur();
   // On dimensionne nu
-  if (!nu.get_md_vector().non_nul())
+  if (!nu.get_md_vector())
     domaine_EF.domaine().creer_tableau_elements(nu);
   const DoubleTab& diffu=diffusivite().valeurs();
   if (diffu.size()==1)

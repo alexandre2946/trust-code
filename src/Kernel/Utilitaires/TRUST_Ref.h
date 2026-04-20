@@ -101,7 +101,7 @@ public:
 template<typename _CLASSE_>
 inline int operator ==(const TRUST_Ref<_CLASSE_>& r1, const TRUST_Ref<_CLASSE_>& r2)
 {
-  if (r1.est_nul() && r2.est_nul()) return 1;
+  if (!r1 && !r2) return 1;
   if (r1->numero() == r2->numero()) return 1;
   return 0;
 }

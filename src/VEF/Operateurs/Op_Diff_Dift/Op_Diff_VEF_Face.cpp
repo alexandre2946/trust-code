@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -298,7 +298,7 @@ void Op_Diff_VEF_Face::ajouter_cas_vectoriel(const DoubleTab& inconnue,
   assert(nb_comp==dimension);
 
   // Construction du tableau grad_ si necessaire
-  if(!grad_.get_md_vector().non_nul())
+  if(!grad_.get_md_vector())
     {
       grad_.resize(0, Objet_U::dimension, Objet_U::dimension);
       domaine_VEF.domaine().creer_tableau_elements(grad_);

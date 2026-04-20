@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -57,7 +57,7 @@ void Op_Diff_Turbulent_PolyMAC_MPFA_Elem::completer()
 
 void Op_Diff_Turbulent_PolyMAC_MPFA_Elem::modifier_mu(DoubleTab& mu) const
 {
-  if (corr_.est_nul()) return; //rien a faire
+  if (!corr_) return; //rien a faire
 
   const Operateur_base& op_qdm = equation().probleme().equation(0).operateur(0).l_op_base();
   if (!sub_type(Op_Diff_Turbulent_PolyMAC_MPFA_Face, op_qdm))
@@ -67,7 +67,7 @@ void Op_Diff_Turbulent_PolyMAC_MPFA_Elem::modifier_mu(DoubleTab& mu) const
     }
 
   const Correlation_base& corr_visc_qdm = ref_cast(Op_Diff_Turbulent_PolyMAC_MPFA_Face, op_qdm).correlation();
-  if (corr_.est_nul() || !sub_type(Viscosite_turbulente_base, corr_visc_qdm))
+  if (!corr_ || !sub_type(Viscosite_turbulente_base, corr_visc_qdm))
     {
       Cerr << "Error in " << que_suis_je() << ": no turbulent viscosity correlation found!" << finl;
       Process::exit();

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -69,7 +69,7 @@ int Operateurs_Statistique_tps::sauvegarder(Sortie& os) const
 int Operateurs_Statistique_tps::reprendre(Entree& is)
 {
   //Cerr << "Operateurs_Statistique_tps::reprendre" << finl;
-  if (mon_post_.non_nul())
+  if (mon_post_)
     {
       double tstat_deb_sauv,temps_derniere_mise_a_jour_stats;
       if(TRUST_2_PDI::is_PDI_restart())

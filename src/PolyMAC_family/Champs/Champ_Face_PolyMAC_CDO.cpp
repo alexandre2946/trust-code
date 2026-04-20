@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -471,7 +471,7 @@ DoubleTab& Champ_Face_PolyMAC_CDO::valeur_aux_elems_(const DoubleTab& val_face, 
     Process::exit("TRUST error in Champ_Face_PolyMAC_CDO::valeur_aux_elems_ : A scalar field cannot be of Champ_Face type !");
 
   // seulement si Champ_Face_PolyMAC_CDO car interp_ve est besoin de mon_dom_cl_dis ...
-  if (mon_dom_cl_dis.est_nul() && que_suis_je() == "Champ_Face_PolyMAC_CDO")
+  if (!mon_dom_cl_dis && que_suis_je() == "Champ_Face_PolyMAC_CDO")
     return val_elem; //on ne peut rien faire tant qu'on ne connait pas les CLs
 
   //on interpole ve sur tous les elements, puis on se restreint a les_polys
@@ -505,7 +505,7 @@ DoubleVect& Champ_Face_PolyMAC_CDO::valeur_aux_elems_compo(const DoubleTab& posi
   assert(val.size_totale() >= les_polys.size());
 
   // seulement si Champ_Face_PolyMAC_CDO car interp_ve est besoin de mon_dom_cl_dis ...
-  if (mon_dom_cl_dis.est_nul() && que_suis_je() ==  "Champ_Face_PolyMAC_CDO")
+  if (!mon_dom_cl_dis && que_suis_je() ==  "Champ_Face_PolyMAC_CDO")
     return val; //on ne peut rien faire tant qu'on ne connait pas les CLs
 
   //on interpole ve sur tous les elements, puis on se restreint a les_polys

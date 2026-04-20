@@ -34,7 +34,7 @@ Entree& Paroi_hyd_base_EF::readOn(Entree& s) { return Turbulence_paroi_base::rea
 
 void Paroi_hyd_base_EF::creer_champ(const Motcle& motlu)
 {
-  if (motlu == "u_star" && !champ_u_star_.non_nul())
+  if (motlu == "u_star" && !champ_u_star_)
     {
       int nb_comp = 1;
       Noms noms(1);
@@ -125,7 +125,7 @@ void Paroi_hyd_base_EF::init_lois_paroi_()
   const int nb_faces_bord = le_dom_dis_->nb_faces_bord();
   tab_u_star_.resize(nb_faces_bord);
   tab_d_plus_.resize(nb_faces_bord);
-  if (!Cisaillement_paroi_.get_md_vector().non_nul())
+  if (!Cisaillement_paroi_.get_md_vector())
     {
       Cisaillement_paroi_.resize(0, dimension);
       zvf.creer_tableau_faces_bord(Cisaillement_paroi_);

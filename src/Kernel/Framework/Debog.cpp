@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,13 +20,13 @@
 
 void Debog::verifier(const char* const msg, double x)
 {
-  if (Debog_Pb::get_debog_instance().non_nul())
+  if (Debog_Pb::get_debog_instance())
     Debog_Pb::get_debog_instance()->verifier(msg, x);
 }
 
 void Debog::verifier(const char* const msg, int x)
 {
-  if (Debog_Pb::get_debog_instance().non_nul())
+  if (Debog_Pb::get_debog_instance())
     Debog_Pb::get_debog_instance()->verifier(msg, x);
 }
 
@@ -37,13 +37,13 @@ void Debog::verifier_bord(const char* const msg, const DoubleVect& arr, int num_
 
 void Debog::verifier(const char* const msg, const Champ_Inc_base& x)
 {
-  if (Debog_Pb::get_debog_instance().non_nul())
+  if (Debog_Pb::get_debog_instance())
     Debog_Pb::get_debog_instance()->verifier(msg, x.valeurs());
 }
 
 void Debog::set_nom_pb_actuel(const Nom& nom)
 {
-  if (Debog_Pb::get_debog_instance().non_nul())
+  if (Debog_Pb::get_debog_instance())
     Debog_Pb::get_debog_instance()->set_nom_pb_actuel(nom);
 }
 
@@ -65,7 +65,7 @@ void Debog::verifier_indices_items(const char* const msg, const MD_Vector& md, c
  */
 int Debog::active()
 {
-  return Debog_Pb::get_debog_instance().non_nul();
+  return bool(Debog_Pb::get_debog_instance());
 }
 
 /*! @brief like verifier(), but, in "read&compare" mode, put the reference value found in the file in the ref variable.
@@ -73,7 +73,7 @@ int Debog::active()
  */
 void Debog::verifier_getref(const char* const msg, double x, double& ref)
 {
-  if (Debog_Pb::get_debog_instance().non_nul())
+  if (Debog_Pb::get_debog_instance())
     Debog_Pb::get_debog_instance()->verifier(msg, x, &ref);
 }
 
@@ -82,13 +82,13 @@ void Debog::verifier_getref(const char* const msg, double x, double& ref)
  */
 void Debog::verifier_getref(const char* const msg, int x, int& ref)
 {
-  if (Debog_Pb::get_debog_instance().non_nul())
+  if (Debog_Pb::get_debog_instance())
     Debog_Pb::get_debog_instance()->verifier(msg, x, &ref);
 }
 
 void Debog::verifier(const char* const msg, const DoubleVect& x)
 {
-  if (Debog_Pb::get_debog_instance().non_nul())
+  if (Debog_Pb::get_debog_instance())
     Debog_Pb::get_debog_instance()->verifier(msg, x);
 }
 
@@ -99,13 +99,13 @@ void Debog::verifier(const char* const msg, const DoubleVect& x)
  */
 void Debog::verifier_getref(const char* const msg, const DoubleVect& x, DoubleVect& ref)
 {
-  if (Debog_Pb::get_debog_instance().non_nul())
+  if (Debog_Pb::get_debog_instance())
     Debog_Pb::get_debog_instance()->verifier(msg, x, &ref);
 }
 
 void Debog::verifier(const char* const msg, const IntVect& x)
 {
-  if (Debog_Pb::get_debog_instance().non_nul())
+  if (Debog_Pb::get_debog_instance())
     Debog_Pb::get_debog_instance()->verifier(msg, x);
 }
 
@@ -116,12 +116,12 @@ void Debog::verifier(const char* const msg, const IntVect& x)
  */
 void Debog::verifier_getref(const char* const msg, const IntVect& x, IntVect& ref)
 {
-  if (Debog_Pb::get_debog_instance().non_nul())
+  if (Debog_Pb::get_debog_instance())
     Debog_Pb::get_debog_instance()->verifier(msg, x, &ref);
 }
 
 void Debog::verifier_Mat_elems(const char* const msg, const Matrice_Base& la_matrice)
 {
-  if (Debog_Pb::get_debog_instance().non_nul())
+  if (Debog_Pb::get_debog_instance())
     Debog_Pb::get_debog_instance()->verifier_Mat_elems(msg, la_matrice);
 }

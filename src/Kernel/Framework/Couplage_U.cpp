@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -186,7 +186,7 @@ OBS_PTR(Field_base) Couplage_U::findInputField(const Nom& name) const
   for (int i=0; i<nb_problemes(); i++)
     {
       ch=probleme(i).findInputField(name);
-      if (ch.non_nul())
+      if (ch)
         return ch;
     }
   return ch;
@@ -197,7 +197,7 @@ OBS_PTR(Champ_Generique_base) Couplage_U::findOutputField(const Nom& name) const
   for (int i=0; i<nb_problemes(); i++)
     {
       ch=probleme(i).findOutputField(name);
-      if (ch.non_nul())
+      if (ch)
         return ch;
     }
   return ch;

@@ -223,7 +223,7 @@ void Op_Grad_VDF_Face::dimensionner_blocs(matrices_t matrices, const tabs_t& sem
   Stencil sten(0, 2);
 
   const Champ_Face_VDF& ch = ref_cast(Champ_Face_VDF, equation().inconnue());
-  const DoubleTab& vit = ch.valeurs(), &press = le_champ_inco.non_nul() ? le_champ_inco->valeurs() : ref_cast(Navier_Stokes_std, equation()).pression().valeurs();
+  const DoubleTab& vit = ch.valeurs(), &press = le_champ_inco ? le_champ_inco->valeurs() : ref_cast(Navier_Stokes_std, equation()).pression().valeurs();
   const int N = vit.line_size(), M = press.line_size();
   Matrice_Morse *mat = matrices["pression"], mat2;
 
@@ -242,7 +242,7 @@ void Op_Grad_VDF_Face::dimensionner_blocs(matrices_t matrices, const tabs_t& sem
 void Op_Grad_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   Matrice_Morse *mat = matrices.count("pression") ? matrices.at("pression") : nullptr;
-  const DoubleTab& inco = semi_impl.count("pression") ? semi_impl.at("pression") : (le_champ_inco.non_nul() ? le_champ_inco->valeurs() : ref_cast(Navier_Stokes_std, equation()).pression().valeurs()),
+  const DoubleTab& inco = semi_impl.count("pression") ? semi_impl.at("pression") : (le_champ_inco ? le_champ_inco->valeurs() : ref_cast(Navier_Stokes_std, equation()).pression().valeurs()),
                    *alp = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()).equation_masse().inconnue().passe() : nullptr;
 
   assert_espace_virtuel_vect(inco);

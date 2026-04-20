@@ -55,7 +55,7 @@ void SSOR::prepare_(const Matrice_Base& la_matrice, const DoubleVect& secmem)
       // Pour le prochain preconditionnement, verifier la matrice
       avec_assert_ = 1;
 
-      if (nproc() == 1 || !(md_secmem_.non_nul())) algo_items_communs_ = 0;
+      if (nproc() == 1 || !(md_secmem_)) algo_items_communs_ = 0;
       else
         {
           // Nombre d'items sequentiels sur ce proc

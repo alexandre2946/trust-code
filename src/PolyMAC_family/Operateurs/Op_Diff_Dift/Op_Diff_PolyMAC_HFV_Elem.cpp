@@ -41,7 +41,7 @@ void Op_Diff_PolyMAC_HFV_Elem::completer()
 {
   Op_Diff_PolyMAC_HFV_base::completer();
   Equation_base& eq = equation();
-  Champ_Elem_PolyMAC_HFV& ch = ref_cast(Champ_Elem_PolyMAC_HFV, le_champ_inco.non_nul() ? le_champ_inco.valeur() : eq.inconnue());
+  Champ_Elem_PolyMAC_HFV& ch = ref_cast(Champ_Elem_PolyMAC_HFV, le_champ_inco ? le_champ_inco.valeur() : eq.inconnue());
   ch.init_auxiliary_variables();
   const Domaine_PolyMAC_HFV& domaine = ref_cast(Domaine_PolyMAC_HFV, le_dom_poly_.valeur());
   if (domaine.domaine().nb_joints() && domaine.domaine().joint(0).epaisseur() < 1)
@@ -116,7 +116,7 @@ double Op_Diff_PolyMAC_HFV_Elem::calculer_dt_stab() const
 void Op_Diff_PolyMAC_HFV_Elem::dimensionner_blocs_ext(int aux_only, matrices_t matrices, const tabs_t& semi_impl) const
 {
   init_op_ext();
-  const std::string& nom_inco = (le_champ_inco.non_nul() ? le_champ_inco.valeur() : equation().inconnue()).le_nom().getString();
+  const std::string& nom_inco = (le_champ_inco ? le_champ_inco.valeur() : equation().inconnue()).le_nom().getString();
   int i, j, k, l, e, o_e, f, o_f, fb, m, n, M, n_ext = (int) op_ext.size(), n_sten = 0, semi = (int) semi_impl.count(nom_inco);
   long p;
   std::vector<Matrice_Morse*> mat(n_ext); //matrices
@@ -223,7 +223,7 @@ void Op_Diff_PolyMAC_HFV_Elem::dimensionner_blocs_ext(int aux_only, matrices_t m
 void Op_Diff_PolyMAC_HFV_Elem::ajouter_blocs_ext(int aux_only, matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   init_op_ext();
-  const std::string& nom_inco = (le_champ_inco.non_nul() ? le_champ_inco.valeur() : equation().inconnue()).le_nom().getString();
+  const std::string& nom_inco = (le_champ_inco ? le_champ_inco.valeur() : equation().inconnue()).le_nom().getString();
   int i, j, k1, k2, e, f, fb, n, M, n_ext = (int) op_ext.size(), semi = (int) semi_impl.count(nom_inco), d, D = dimension;
   std::vector<Matrice_Morse*> mat(n_ext); //matrices
   std::vector<int> N, ne_tot; //composantes
@@ -324,7 +324,7 @@ void Op_Diff_PolyMAC_HFV_Elem::ajouter_blocs_ext(int aux_only, matrices_t matric
   for (f = 0; f < domaine[0].get().nb_faces(); f++)
     if (!aux_only && semi && mat[0])
       for (n = 0; n < N[0]; n++) //semi-implicite : T_f^+ = var_aux
-        secmem(ne_tot[0] + f, n) += v_aux[0](f, n) - (le_champ_inco.non_nul() ? le_champ_inco->valeurs() : equation().inconnue().valeurs())(ne_tot[0] + f, n), (*mat[0])(N[0] * (ne_tot[0] + f) + n,
+        secmem(ne_tot[0] + f, n) += v_aux[0](f, n) - (le_champ_inco ? le_champ_inco->valeurs() : equation().inconnue().valeurs())(ne_tot[0] + f, n), (*mat[0])(N[0] * (ne_tot[0] + f) + n,
                                     N[0] * (ne_tot[0] + f) + n)++;
     else if (fcl[0](f, 0) == 0 || fcl[0](f, 0) == 5)
       continue; //face interne ou Neumann_val_ext -> rien

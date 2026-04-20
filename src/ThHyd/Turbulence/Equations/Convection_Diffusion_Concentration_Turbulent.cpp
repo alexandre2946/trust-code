@@ -133,7 +133,7 @@ void Convection_Diffusion_Concentration_Turbulent::creer_champ(const Motcle& mot
 {
   Convection_Diffusion_Concentration::creer_champ(motlu);
 
-  if (le_modele_turbulence.non_nul())
+  if (le_modele_turbulence)
     le_modele_turbulence->creer_champ(motlu);
 }
 
@@ -142,7 +142,7 @@ bool Convection_Diffusion_Concentration_Turbulent::has_champ(const Motcle& nom, 
   if (Convection_Diffusion_Concentration::has_champ(nom, ref_champ))
     return true;
 
-  if (le_modele_turbulence.non_nul())
+  if (le_modele_turbulence)
     if (le_modele_turbulence->has_champ(nom, ref_champ))
       return true;
 
@@ -154,7 +154,7 @@ bool Convection_Diffusion_Concentration_Turbulent::has_champ(const Motcle& nom) 
   if (Convection_Diffusion_Concentration::has_champ(nom))
     return true;
 
-  if (le_modele_turbulence.non_nul())
+  if (le_modele_turbulence)
     if (le_modele_turbulence->has_champ(nom))
       return true;
 
@@ -168,7 +168,7 @@ const Champ_base& Convection_Diffusion_Concentration_Turbulent::get_champ(const 
   if (Convection_Diffusion_Concentration::has_champ(nom, ref_champ))
     return ref_champ;
 
-  if (le_modele_turbulence.non_nul())
+  if (le_modele_turbulence)
     if (le_modele_turbulence->has_champ(nom, ref_champ))
       return ref_champ;
 
@@ -178,7 +178,7 @@ const Champ_base& Convection_Diffusion_Concentration_Turbulent::get_champ(const 
 void Convection_Diffusion_Concentration_Turbulent::get_noms_champs_postraitables(Noms& nom, Option opt) const
 {
   Convection_Diffusion_Concentration::get_noms_champs_postraitables(nom, opt);
-  if (le_modele_turbulence.non_nul())
+  if (le_modele_turbulence)
     le_modele_turbulence->get_noms_champs_postraitables(nom, opt);
 }
 
@@ -207,7 +207,7 @@ const RefObjU& Convection_Diffusion_Concentration_Turbulent::get_modele(Type_mod
   for (const auto &itr : liste_modeles_)
     {
       const RefObjU& mod = itr;
-      if (mod.non_nul())
+      if (mod)
         if ((sub_type(Modele_turbulence_scal_base, mod.valeur())) && (type == TURBULENCE))
           return mod;
     }

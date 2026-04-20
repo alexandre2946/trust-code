@@ -951,7 +951,7 @@ void Champ_P1NC_implementation::filtrer_L2(DoubleTab& valeurs) const
       if (ch_inc_P1NC.equation().le_nom()!="gradient_pression")
         {
           const RefObjU& modele_turbulence = ch_inc_P1NC.equation().get_modele(TURBULENCE);
-          if (modele_turbulence.non_nul() && sub_type(Modele_turbulence_hyd_base,modele_turbulence.valeur()))
+          if (modele_turbulence && sub_type(Modele_turbulence_hyd_base,modele_turbulence.valeur()))
             {
               const Modele_turbulence_hyd_base& mod_turb = ref_cast(Modele_turbulence_hyd_base,modele_turbulence.valeur());
               const Turbulence_paroi_base& loipar = mod_turb.loi_paroi();

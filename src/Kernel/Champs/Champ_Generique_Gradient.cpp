@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -95,7 +95,7 @@ void Champ_Generique_Gradient::completer(const Postraitement_base& post)
 const Champ_base& Champ_Generique_Gradient::get_champ_without_evaluation(OWN_PTR(Champ_base)& espace_stockage) const
 {
 
-  if (Op_Grad_.non_nul())
+  if (Op_Grad_)
     {
       OWN_PTR(Champ_Fonc_base)  es_tmp;
       espace_stockage = creer_espace_stockage(vectoriel,dimension,es_tmp);
@@ -115,7 +115,7 @@ const Champ_base& Champ_Generique_Gradient::get_champ(OWN_PTR(Champ_base)& espac
   OWN_PTR(Champ_base) source_espace_stockage;
   const Champ_base& source = get_source(0).get_champ(source_espace_stockage);
 
-  if (Op_Grad_.non_nul())
+  if (Op_Grad_)
     {
       OWN_PTR(Champ_Fonc_base)  es_tmp;
       espace_stockage = creer_espace_stockage(vectoriel,dimension,es_tmp);

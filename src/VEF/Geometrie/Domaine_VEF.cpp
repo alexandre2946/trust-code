@@ -984,7 +984,7 @@ void Domaine_VEF::calculer_volumes_entrelaces()
 
   // Si domaine dynamique, le tableau peut eventuellement deja avoir la bonne structure, ou pas.
   // S'il n'est pas deformable, on n'est pas cense passer ici deux fois.
-  assert(domaine().deformable() || !(volumes_entrelaces_.get_md_vector().non_nul()));
+  assert(domaine().deformable() || !(volumes_entrelaces_.get_md_vector()));
   if (!(volumes_entrelaces_.get_md_vector() == md_vector_faces()))
     {
       volumes_entrelaces_.reset();

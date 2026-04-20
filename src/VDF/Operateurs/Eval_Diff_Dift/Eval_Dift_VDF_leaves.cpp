@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,7 +18,7 @@
 void Eval_Dift_VDF_Elem::init_ind_fluctu_term()
 {
   ind_Fluctu_Term = 0;
-  if (loipar.est_nul()) ind_Fluctu_Term = 1;
+  if (!loipar) ind_Fluctu_Term = 1;
 }
 
 void Eval_Dift_VDF_Elem::associer_loipar(const Turbulence_paroi_scal_base& loi_paroi)

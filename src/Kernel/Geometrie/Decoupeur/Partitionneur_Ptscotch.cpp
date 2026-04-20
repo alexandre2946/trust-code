@@ -75,7 +75,7 @@ void Partitionneur_Ptscotch::construire_partition(IntVect& elem_part, int& nb_pa
   Cerr << "Ptscotch is not compiled with this version. Use another partition tool like Tranche." << finl;
   Process::exit();
 #else
-  if (!ref_domaine_.non_nul())
+  if (!ref_domaine_)
     {
       Cerr << "Error in Partitionneur_Ptscotch::construire_partition\n";
       Cerr << " The domain has not been associated" << finl;

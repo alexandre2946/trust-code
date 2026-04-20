@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -383,7 +383,7 @@ void Perte_Charge_Singuliere::lire_surfaces(Entree& is, const Domaine& le_domain
     Cerr << " " << faces_found << " faces have been found for the section." << finl;
 
   les_faces.resize(compteur);
-  if (orientation.non_nul())
+  if (orientation)
     {
       sgn.resize(compteur);
       DoubleTrav xvf(compteur, Objet_U::dimension), ori(compteur, Objet_U::dimension);

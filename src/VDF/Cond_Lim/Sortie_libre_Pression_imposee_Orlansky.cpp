@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -91,7 +91,7 @@ void Sortie_libre_Pression_imposee_Orlansky::mettre_a_jour(double temps)
 
   Cond_lim_base::mettre_a_jour(temps);
 
-  assert(pression_interne.non_nul());
+  assert(pression_interne);
   const Front_VF& le_bord = ref_cast(Front_VF, frontiere_dis());
   int ndeb = le_bord.num_premiere_face();
   int nb_faces_loc = le_bord.nb_faces();

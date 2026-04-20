@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -35,7 +35,7 @@ Sortie& Sondes::printOn(Sortie& s ) const { return s ; }
  */
 Entree& Sondes::readOn(Entree& s )
 {
-  assert(mon_post.non_nul());
+  assert(mon_post);
 
   Motcle motlu;
   Motcle accolade_ouverte("{");
@@ -85,7 +85,7 @@ Entree& Sondes::readOn(Entree& s )
 void Sondes::set_noms_champs_postraitables()
 {
   // Reconstruit noms_champs_postraitables_
-  if (mon_post.non_nul())
+  if (mon_post)
     {
       Noms noms;
       mon_post->probleme().get_noms_champs_postraitables(noms);
@@ -130,9 +130,9 @@ OBS_PTR(Champ_base) Sondes::get_from_cache(OBS_PTR(Champ_Generique_base)& mon_ch
       espaceStockageList.add(espace_stockage);
       sourceNoms.add(nom_champ_lu_);
       // Voir Champ_Generique_base pour la definition de l'espace stockage
-      return espace_stockage.non_nul() ? espaceStockageList.dernier().valeur() : ma_source;
+      return espace_stockage ? espaceStockageList.dernier().valeur() : ma_source;
     }
-  else if (espaceStockageList(num).non_nul())
+  else if (espaceStockageList(num))
     return espaceStockageList(num).valeur();
   else
     return sourceList(num);

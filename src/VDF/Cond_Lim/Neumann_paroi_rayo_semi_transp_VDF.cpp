@@ -99,7 +99,7 @@ void Neumann_paroi_rayo_semi_transp_VDF::calculer_temperature_bord(double temps)
   assert(le_milieu.capacite_calorifique().nb_comp() == 1);
   assert(le_milieu.masse_volumique().nb_comp() == 1);
   double d_Cp, d_rho, d_Lambda;
-  if (Cp.get_md_vector().non_nul() || rho.get_md_vector().non_nul() || Lambda.get_md_vector().non_nul())
+  if (Cp.get_md_vector() || rho.get_md_vector() || Lambda.get_md_vector())
     {
       // L'un des champs n'est pas uniforme
       ArrOfDouble tmp(3);

@@ -168,7 +168,7 @@ int Solv_GCP_NS::resoudre_systeme(const Matrice_Base& matrice, const DoubleVect&
   residu *= -1;
   DoubleVect g(F0);
   double norme = mp_norme_vect(residu);
-  if (le_precond_.non_nul())
+  if (le_precond_)
     le_precond_->preconditionner(A00, residu, g);
   else
     solveur_poisson0.resoudre_systeme(A00, residu, g);
@@ -204,7 +204,7 @@ int Solv_GCP_NS::resoudre_systeme(const Matrice_Base& matrice, const DoubleVect&
         {
           if ((limpr() == 1) && (je_suis_maitre()))
             Cout << "Solveur0: ";
-          if (le_precond_.non_nul())
+          if (le_precond_)
             le_precond_->preconditionner(A00, residu, g);
           else
             solveur_poisson0.resoudre_systeme(A00, residu, g);

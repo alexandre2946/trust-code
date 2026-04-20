@@ -163,7 +163,7 @@ void Modele_turbulence_hyd_0_eq_base::imprimer(Sortie& os) const
   double temps_courant = sch.temps_courant();
   double dt = sch.pas_de_temps();
   if (limpr_ustar(temps_courant, sch.temps_precedent(), dt, dt_impr_ustar_) || limpr_ustar(temps_courant, sch.temps_precedent(), dt, dt_impr_ustar_mean_only_))
-    if (K_eps_sortie_.non_nul())
+    if (K_eps_sortie_)
       {
         double temps = mon_equation_->schema_temps().temps_courant();
         K_eps_sortie_->mettre_a_jour(temps);

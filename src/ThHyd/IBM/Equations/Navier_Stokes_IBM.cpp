@@ -216,7 +216,7 @@ int Navier_Stokes_IBM::preparer_calcul()
   divergence.calculer(la_vitesse->valeurs(), divergence_U->valeurs());
   divergence_U->changer_temps(temps);
 
-  if (le_traitement_particulier.non_nul())
+  if (le_traitement_particulier)
     le_traitement_particulier->preparer_calcul_particulier();
 
   Debog::verifier("Navier_Stokes_std::preparer_calcul, vitesse", inconnue());

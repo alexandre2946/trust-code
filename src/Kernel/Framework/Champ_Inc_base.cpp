@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -99,7 +99,7 @@ void Champ_Inc_base::creer_tableau_distribue(const MD_Vector& md, RESIZE_OPTIONS
       DoubleTab& tab = futur(i);
       // Note B.M: Ce test n'est pas symetrique avec Champ_Fonc_base => incoherence de nb_dim
       // pour les champs "multiscalaires" a une composante.
-      if (tab.size_array() == 0 && (!tab.get_md_vector().non_nul()))
+      if (tab.size_array() == 0 && (!tab.get_md_vector()))
         {
           // Note B.M.: les methodes fixer_nb_valeurs_nodales sont appelees a tort et a travers.
           // Ne rien faire si le tableau a deja la bonne structure
@@ -107,7 +107,7 @@ void Champ_Inc_base::creer_tableau_distribue(const MD_Vector& md, RESIZE_OPTIONS
         }
       if (!(tab.get_md_vector() == md))
         {
-          if (tab.get_md_vector().non_nul())
+          if (tab.get_md_vector())
             {
               Cerr << "Internal error in Champ_Inc_base::creer_tableau_distribue:\n" << " array has alreary a (wrong) parallel descriptor" << finl;
               Process::exit();
@@ -707,7 +707,7 @@ void Champ_Inc_base::associer_domaine_dis_base(const Domaine_dis_base& z_dis)
 
 const Domaine_Cl_dis_base& Champ_Inc_base::domaine_Cl_dis() const
 {
-  if (!mon_dom_cl_dis.non_nul())
+  if (!mon_dom_cl_dis)
     return equation().domaine_Cl_dis();
   else
     return mon_dom_cl_dis.valeur();
@@ -715,7 +715,7 @@ const Domaine_Cl_dis_base& Champ_Inc_base::domaine_Cl_dis() const
 
 Domaine_Cl_dis_base& Champ_Inc_base::domaine_Cl_dis()
 {
-  if (!mon_dom_cl_dis.non_nul())
+  if (!mon_dom_cl_dis)
     return equation().domaine_Cl_dis();
   else
     return mon_dom_cl_dis.valeur();

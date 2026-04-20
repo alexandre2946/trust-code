@@ -165,7 +165,7 @@ void Eq_rayo_semi_transp::associer_milieu_base(const Milieu_base& un_milieu)
  */
 const Milieu_base& Eq_rayo_semi_transp::milieu() const
 {
-  if (!le_fluide_.non_nul())
+  if (!le_fluide_)
     {
       Cerr << "You forgot to associate the fluid to the problem named " << probleme().le_nom() << finl;
       Process::exit();
@@ -181,7 +181,7 @@ const Milieu_base& Eq_rayo_semi_transp::milieu() const
  */
 Milieu_base& Eq_rayo_semi_transp::milieu()
 {
-  if (!le_fluide_.non_nul())
+  if (!le_fluide_)
     {
       Cerr << "You forgot to associate the fluid to the problem named " << probleme().le_nom() << finl;
       Process::exit();

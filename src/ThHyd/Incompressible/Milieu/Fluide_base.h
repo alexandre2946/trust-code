@@ -59,17 +59,17 @@ public :
   inline Champ_Don_base& viscosite_cinematique() { return ch_nu_.valeur(); }
   inline const Champ_Don_base& viscosite_dynamique() const { return ch_mu_.valeur(); }
   inline Champ_Don_base& viscosite_dynamique() { return ch_mu_.valeur(); }
-  bool has_viscosite_dynamique() const { return ch_mu_.non_nul(); }
+  bool has_viscosite_dynamique() const { return bool(ch_mu_); }
 
   // Renvoie la dilatabilite du constituant, beta_co.
   inline const Champ_Don_base& beta_c() const { return ch_beta_co_.valeur(); }
   inline Champ_Don_base& beta_c() { return ch_beta_co_.valeur(); }
-  bool has_beta_c() const { return ch_beta_co_.non_nul(); }
+  bool has_beta_c() const { return bool(ch_beta_co_); }
 
   // Renvoie le coefficient d'absorbtion du fluide
   inline Champ_Don_base& kappa() { return coeff_absorption_.valeur(); }
   inline const Champ_Don_base& kappa() const { return coeff_absorption_.valeur(); }
-  bool has_kappa() const { return coeff_absorption_.non_nul(); }
+  bool has_kappa() const { return bool(coeff_absorption_); }
 
   // Renvoie l'indice de refraction du fluide
   inline Champ_Don_base& indice() { return indice_refraction_.valeur(); }
@@ -80,10 +80,10 @@ public :
   inline const Champ_Don_base& longueur_rayo() const { return longueur_rayo_.valeur(); }
   void typer_longeur_rayo(const Nom& typ) { longueur_rayo_.typer(typ); }
 
-  inline bool is_rayo_semi_transp() const override { return (coeff_absorption_.non_nul() && indice_refraction_.non_nul()); }
+  inline bool is_rayo_semi_transp() const override { return (coeff_absorption_ && indice_refraction_); }
   inline bool is_rayo_transp() const override { return is_rad_transp_med_; }
   inline void set_rayo_transp_flag() { is_rad_transp_med_ = true; }
-  inline bool is_longueur_rayo_discretised() const { return longueur_rayo_.non_nul(); }
+  inline bool is_longueur_rayo_discretised() const { return bool(longueur_rayo_); }
 
 protected :
   void creer_e_int() const; // creation sur demande de e_int / h

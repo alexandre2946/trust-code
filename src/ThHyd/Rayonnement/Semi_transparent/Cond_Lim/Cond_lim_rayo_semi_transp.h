@@ -34,12 +34,12 @@ public:
   virtual void associer_pb_rayo_semi_transp(const Pb_rayo_semi_transp&);
   inline const Pb_rayo_semi_transp& pb_rayo_semi_transp() const
   {
-    assert(pb_rayo_semi_transp_.non_nul());
+    assert(pb_rayo_semi_transp_);
     return pb_rayo_semi_transp_.valeur();
   }
   inline Pb_rayo_semi_transp& pb_rayo_semi_transp()
   {
-    assert(pb_rayo_semi_transp_.non_nul());
+    assert(pb_rayo_semi_transp_);
     return pb_rayo_semi_transp_.valeur();
   }
 

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -40,7 +40,7 @@ void Paroi_hyd_base_VEF::init_lois_paroi_()
   const int nb_faces_bord = le_dom_dis_->nb_faces_bord();
   tab_u_star_.resize(nb_faces_bord);
   tab_d_plus_.resize(nb_faces_bord);
-  if (!Cisaillement_paroi_.get_md_vector().non_nul())
+  if (!Cisaillement_paroi_.get_md_vector())
     {
       Cisaillement_paroi_.resize(0, dimension);
       zvf.creer_tableau_faces_bord(Cisaillement_paroi_);

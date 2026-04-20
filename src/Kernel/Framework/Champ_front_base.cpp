@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -175,7 +175,7 @@ void Champ_front_base::calculer_derivee_en_temps(double t1, double t2)
     {
       const DoubleTab& v1 = valeurs_au_temps(t1);
       const DoubleTab& v2 = valeurs_au_temps(t2);
-      if (!Gpoint_.get_md_vector().non_nul() && v1.dimension(0) == 1)
+      if (!Gpoint_.get_md_vector() && v1.dimension(0) == 1)
         {
           // Champ instationnaire uniforme
           int dim = v1.dimension(1);

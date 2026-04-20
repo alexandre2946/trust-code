@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -19,7 +19,7 @@ void Navier_Stokes_Turbulent::creer_champ(const Motcle& motlu)
 {
   Navier_Stokes_std::creer_champ(motlu);
 
-  if (le_modele_turbulence.non_nul()) le_modele_turbulence->creer_champ(motlu);
+  if (le_modele_turbulence) le_modele_turbulence->creer_champ(motlu);
 }
 
 void Navier_Stokes_Turbulent::imprime_residu(SFichier& fic)

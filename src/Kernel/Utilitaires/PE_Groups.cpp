@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -78,7 +78,7 @@ void PE_Groups::create_group(const ArrOfInt& liste_pe, OWN_PTR(Comm_Group) & gro
  */
 void PE_Groups::init_group(const ArrOfInt& liste_pe, OWN_PTR(Comm_Group) & group)
 {
-  assert(group.non_nul());
+  assert(group);
   group->init_group(liste_pe);
 }
 
@@ -193,7 +193,7 @@ const Comm_Group& PE_Groups::groupe_TRUST()
  */
 const Comm_Group& PE_Groups::get_node_group()
 {
-  assert(node_group.non_nul());
+  assert(node_group);
   return node_group.valeur();
 }
 
@@ -202,7 +202,7 @@ const Comm_Group& PE_Groups::get_node_group()
  */
 const Comm_Group& PE_Groups::get_node_master()
 {
-  assert(node_master.non_nul());
+  assert(node_master);
   return node_master.valeur();
 }
 
@@ -211,7 +211,7 @@ const Comm_Group& PE_Groups::get_node_master()
  */
 const Comm_Group& PE_Groups::get_user_defined_group()
 {
-  assert(user_defined_group.non_nul());
+  assert(user_defined_group);
   return user_defined_group.valeur();
 }
 
@@ -232,26 +232,26 @@ void PE_Groups::initialize(const Comm_Group& groupe_trio_u)
  */
 void PE_Groups::initialize_node(const Comm_Group& ngrp)
 {
-  assert(node_group.est_nul());
+  assert(!node_group);
   node_group = ngrp;
 }
 
 void PE_Groups::initialize_user_defined_group(const Comm_Group& ngrp)
 {
-  assert(user_defined_group.est_nul());
+  assert(!user_defined_group);
   user_defined_group = ngrp;
 }
 
 bool PE_Groups::has_user_defined_group()
 {
-  return user_defined_group.non_nul();
+  return bool(user_defined_group);
 }
 
 /*! @brief Methode a appeler apres l'initialisation de trio_u_world et de node_group et l'initialisation des compteurs statistiques de TRUST
  */
 void PE_Groups::initialize_node_master(const Comm_Group& ngrp)
 {
-  assert(node_master.est_nul());
+  assert(!node_master);
   node_master = ngrp;
 }
 

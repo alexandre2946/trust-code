@@ -68,7 +68,7 @@ void Fluide_Ostwald::discretiser(const Probleme_base& pb, const  Discretisation_
   ch_mu_.typer(Nom("Champ_Ostwald_") + dis_nam);
 
   dis2.proprietes_physiques_fluide_Ostwald(eqn_hydr.domaine_dis(),(*this),eqn_hydr,eqn_hydr.inconnue());
-  if (K_.non_nul())
+  if (K_)
     {
       dis.nommer_completer_champ_physique(domaine_dis,"consistance","kg/m/s",K_.valeur(),pb);
       champs_compris_.ajoute_champ(K_.valeur());
@@ -85,7 +85,7 @@ void Fluide_Ostwald::creer_champs_non_lus()
 void Fluide_Ostwald::mettre_a_jour(double tps)
 {
   K_->mettre_a_jour(tps);
-  if (N_.non_nul() )
+  if (N_ )
     N_->mettre_a_jour(tps);
   Fluide_Incompressible::mettre_a_jour(tps);
 }

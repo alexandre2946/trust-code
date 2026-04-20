@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -164,7 +164,7 @@ void Op_Diff_PolyMAC_CDO_base::update_nu() const
   const DoubleTab& diffu = diffusivite().valeurs();
   if (equation().que_suis_je() != "Transport_K_Epsilon")
     {
-      if (!diffu.get_md_vector().non_nul())
+      if (!diffu.get_md_vector())
         {
           // diffusvite uniforme
           int n = nu_.dimension_tot(0), nb_comp = nu_.line_size();
@@ -201,7 +201,7 @@ void Op_Diff_PolyMAC_CDO_base::update_nu() const
         }
       else
         {
-          if (!diffu_turb.get_md_vector().non_nul())
+          if (!diffu_turb.get_md_vector())
             {
               // diffusvite uniforme
               int n = nu_.dimension_tot(0), nb_comp = nu_.line_size();
@@ -224,7 +224,7 @@ void Op_Diff_PolyMAC_CDO_base::update_nu() const
   /* 2. nu_fac : prend en compte les lois de parois et le facteur utilisateur (nu_fac_mod) */
   // utilise-t-on des lois de paroi ?
   const RefObjU& modele_turbulence = equation().get_modele(TURBULENCE);
-  int loi_par = modele_turbulence.non_nul() && sub_type(Modele_turbulence_scal_base, modele_turbulence.valeur()) &&
+  int loi_par = modele_turbulence && sub_type(Modele_turbulence_scal_base, modele_turbulence.valeur()) &&
                 ref_cast(Modele_turbulence_scal_base,modele_turbulence.valeur()).loi_paroi().use_equivalent_distance();
 
   for (i = 0; i <= cls.size(); i++) //boucle sur les bords, puis sur les faces internes

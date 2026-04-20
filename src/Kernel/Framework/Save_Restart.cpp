@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -652,7 +652,7 @@ int Save_Restart::sauver() const
           ficsauv_created_ = true;
         }
     }
-  else if (!ficsauv_.non_nul() && !osauv_hdf_)
+  else if (!ficsauv_ && !osauv_hdf_)
     {
       // Si le fichier de sauvegarde n'a pas ete ouvert alors on cree le fichier de sauvegarde:
       if (Motcle(checkpoint_format_) == "formatte")
@@ -770,7 +770,7 @@ void Save_Restart::finir()
   // Si c'est une sauvegarde_simple, le fin a ete mis a chaque appel a ::sauver()
   if(Motcle(checkpoint_format_) == "pdi" && TRUST_2_PDI::is_PDI_initialized())
     TRUST_2_PDI::finalize();
-  else  if (!simple_restart_ && (ficsauv_.non_nul() || osauv_hdf_) )
+  else  if (!simple_restart_ && (ficsauv_ || osauv_hdf_) )
     {
       if (Motcle(checkpoint_format_) == "xyz")
         {

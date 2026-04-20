@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -32,14 +32,14 @@ void Op_Diff_VDF_base::completer()
 {
   Operateur_base::completer();
   // Certains operateurs (Axi) n'ont pas d'iterateurs en VDF... Encore une anomalie dans la conception a corriger un jour !
-  if (iter_.non_nul())
+  if (iter_)
     {
       const bool is_pb_multi = sub_type(Pb_Multiphase, equation().probleme());
 
       iter_->completer_();
-      const Champ_Inc_base& cc = le_champ_inco.non_nul() ? le_champ_inco.valeur() : equation().inconnue();
+      const Champ_Inc_base& cc = le_champ_inco ? le_champ_inco.valeur() : equation().inconnue();
       iter_->associer_champ_convecte_ou_inc(cc, nullptr);
-      iter_->set_name_champ_inco(le_champ_inco.non_nul() ? nom_inconnue() : cc.le_nom().getString());
+      iter_->set_name_champ_inco(le_champ_inco ? nom_inconnue() : cc.le_nom().getString());
       iter_->set_convective_op_pb_type(false /* diff op */, is_pb_multi);
       iter_->set_multiscalar_diff(equation().diffusion_multi_scalaire());
       if (is_pb_multi && sub_type(Convection_Diffusion_Temperature_base, equation()))
@@ -57,7 +57,7 @@ void Op_Diff_VDF_base::completer()
 int Op_Diff_VDF_base::impr(Sortie& os) const
 {
   // Certains operateurs (Axi) n'ont pas d'iterateurs en VDF... Encore une anomalie dans la conception a corriger un jour !
-  return (iter_.non_nul()) ? iter_->impr(os) : 0;
+  return (bool(iter_)) ? iter_->impr(os) : 0;
 }
 
 /*! @brief calcule la contribution de la diffusion, la range dans resu

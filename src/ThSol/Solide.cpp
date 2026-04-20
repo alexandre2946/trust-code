@@ -34,7 +34,7 @@ Sortie& Solide::printOn(Sortie& os) const { return Milieu_base::printOn(os); }
 Entree& Solide::readOn(Entree& is)
 {
   Milieu_base::readOn(is);
-  if (mon_champ_.non_nul())  champs_don_.add(mon_champ_.valeur());
+  if (mon_champ_)  champs_don_.add(mon_champ_.valeur());
   return is;
 }
 
@@ -89,7 +89,7 @@ void Solide::discretiser(const Probleme_base& pb, const Discretisation_base& dis
     }
 
   Milieu_base::discretiser(pb,dis);
-  if (mon_champ_.non_nul())
+  if (mon_champ_)
     {
       is_user_defined_ = true;
       const Domaine_dis_base& domaine_dis=pb.equation(0).domaine_dis();

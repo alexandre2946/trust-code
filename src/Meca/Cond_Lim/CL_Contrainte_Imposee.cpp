@@ -33,7 +33,7 @@ Entree& CL_Contrainte_Imposee::readOn(Entree& is)
 
 void CL_Contrainte_Imposee::verifie_ch_init_nb_comp() const
 {
-  if (le_champ_front.non_nul())
+  if (le_champ_front)
     {
       const int nb_comp = le_champ_front->nb_comp();
       if (nb_comp != 1)

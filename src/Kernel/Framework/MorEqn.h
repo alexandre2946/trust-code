@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -61,7 +61,7 @@ MorEqn::~MorEqn()
  */
 inline const Equation_base& MorEqn::equation() const
 {
-  if (mon_equation.est_nul())
+  if (!mon_equation)
     {
       Cerr << "\nError in MorEqn::equation() : The equation is unknown !" << finl;
       Process::exit();
@@ -75,7 +75,7 @@ inline const Equation_base& MorEqn::equation() const
  */
 inline  Equation_base& MorEqn::equation()
 {
-  if (mon_equation.est_nul())
+  if (!mon_equation)
     {
       Cerr << "\nError in MorEqn::equation() : The equation is unknown !" << finl;
       Process::exit();
@@ -84,7 +84,7 @@ inline  Equation_base& MorEqn::equation()
 }
 int MorEqn::mon_equation_non_nul() const
 {
-  return mon_equation.non_nul();
+  return bool(mon_equation);
 }
 #endif
 

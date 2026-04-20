@@ -98,7 +98,7 @@ public:
   TRUST_Deriv() :  Objet_U_ptr(), pointeur_(nullptr) { }
   TRUST_Deriv(const TRUST_Deriv& t) : TRUST_Deriv()
   {
-    if (t.non_nul()) recopie(t.valeur());
+    if (t) recopie(t.valeur());
   }
 
   TRUST_Deriv(const _CLASSE_& t) : TRUST_Deriv()
@@ -153,7 +153,7 @@ public:
     if (pointeur_ != t.pointeur_)
       {
         detach();
-        if (t.non_nul()) recopie(t.valeur());
+        if (t) recopie(t.valeur());
       }
     return *this;
   }

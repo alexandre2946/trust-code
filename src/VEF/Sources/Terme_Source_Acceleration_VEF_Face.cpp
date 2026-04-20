@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -77,7 +77,7 @@ static void TSAVEF_ajouter_liste_faces(const int premiere_face, const int dernie
   // Pointeur constant sur tableau constant.
   // Pointeur nul si ref_rho_ est une reference nulle.
   const DoubleTab * const rho_elem =
-    (ref_rho.non_nul()) ? &(ref_rho->valeurs()) : 0;
+    (bool(ref_rho)) ? &(ref_rho->valeurs()) : 0;
   const int dim = Objet_U::dimension;
 
   for (num_face=premiere_face; num_face<derniere_face; num_face++)

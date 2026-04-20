@@ -34,8 +34,8 @@ Entree& Masse_PolyMAC_CDO_Face::readOn(Entree& s) { return s; }
 DoubleTab& Masse_PolyMAC_CDO_Face::appliquer_impl(DoubleTab& sm) const
 {
   //hors faces de bord, on ne fait rien et on passe secmem a corriger_derivee_* (car PolyMAC_CDO a une matrice de masse)
-  assert(le_dom_PolyMAC_CDO.non_nul());
-  assert(le_dom_Cl_PolyMAC_CDO.non_nul());
+  assert(le_dom_PolyMAC_CDO);
+  assert(le_dom_Cl_PolyMAC_CDO);
   const Domaine_PolyMAC_CDO& domaine_PolyMAC_CDO = le_dom_PolyMAC_CDO.valeur();
   const Champ_Face_PolyMAC_CDO& ch = ref_cast(Champ_Face_PolyMAC_CDO, equation().inconnue());
   ch.fcl();

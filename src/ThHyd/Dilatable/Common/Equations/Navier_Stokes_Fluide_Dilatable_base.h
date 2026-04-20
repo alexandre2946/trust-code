@@ -72,16 +72,16 @@ public :
   inline void mettre_a_jour(double temps) override
   {
     Navier_Stokes_std::mettre_a_jour(temps);
-    if (source_masse_.non_nul())
+    if (source_masse_)
       source_masse_->mettre_a_jour(temps);
   }
 
   inline const Champ_Inc_base& rho_la_vitesse() const override { return rho_la_vitesse_; }
 
-  inline bool has_source_masse() const { return source_masse_.non_nul(); }
+  inline bool has_source_masse() const { return bool(source_masse_); }
   inline const Source_Masse_Fluide_Dilatable_base& source_masse() const
   {
-    assert(source_masse_.non_nul());
+    assert(source_masse_);
     return source_masse_.valeur();
   }
 

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -29,7 +29,7 @@ Sortie& Navier_Stokes_WC::printOn(Sortie& is) const
 Entree& Navier_Stokes_WC::readOn(Entree& is)
 {
   Navier_Stokes_Fluide_Dilatable_base::readOn(is);
-  assert(le_fluide.non_nul());
+  assert(le_fluide);
   if (!sub_type(Fluide_Weakly_Compressible,le_fluide.valeur()))
     {
       Cerr<<"ERROR : the Navier_Stokes_WC equation can be associated only to a weakly compressible fluid."<<finl;

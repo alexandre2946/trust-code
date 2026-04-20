@@ -37,8 +37,8 @@ void Op_Diff_PolyMAC_MPFA_Face::completer()
   Op_Diff_PolyMAC_MPFA_base::completer();
 
   const Domaine_PolyMAC_MPFA& domaine = ref_cast(Domaine_PolyMAC_MPFA, le_dom_poly_.valeur());
-  Champ_Face_PolyMAC_MPFA& ch = ref_cast(Champ_Face_PolyMAC_MPFA, le_champ_inco.non_nul() ? le_champ_inco.valeur() : equation().inconnue());
-  if (le_champ_inco.non_nul())
+  Champ_Face_PolyMAC_MPFA& ch = ref_cast(Champ_Face_PolyMAC_MPFA, le_champ_inco ? le_champ_inco.valeur() : equation().inconnue());
+  if (le_champ_inco)
     ch.init_auxiliary_variables(); // cas flica5 : ce n'est pas l'inconnue qui est utilisee, donc on cree les variables auxiliaires ici
 
   flux_bords_.resize(domaine.premiere_face_int(), dimension * ch.valeurs().line_size());
@@ -245,7 +245,7 @@ void Op_Diff_PolyMAC_MPFA_Face::ajouter_blocs(matrices_t matrices, DoubleTab& se
   const std::string& nom_inco = equation().inconnue().le_nom().getString();
   Matrice_Morse *mat = matrices.count(nom_inco) && !semi_impl.count(nom_inco) ? matrices[nom_inco] : nullptr; //facultatif
 
-  const DoubleTab& inco = semi_impl.count(nom_inco) ? semi_impl.at(nom_inco) : le_champ_inco.non_nul() ? le_champ_inco->valeurs() : equation().inconnue().valeurs();
+  const DoubleTab& inco = semi_impl.count(nom_inco) ? semi_impl.at(nom_inco) : le_champ_inco ? le_champ_inco->valeurs() : equation().inconnue().valeurs();
 
   const Champ_Face_PolyMAC_MPFA& ch = ref_cast(Champ_Face_PolyMAC_MPFA, equation().inconnue());
   const Domaine_PolyMAC_MPFA& domaine = ref_cast(Domaine_PolyMAC_MPFA, le_dom_poly_.valeur());

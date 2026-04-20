@@ -45,7 +45,7 @@ protected:
   Sortie& printOn(Sortie& os) const override
   {
 #ifndef LATATOOLS
-    if (TRUSTArray<_TYPE_,_SIZE_>::nproc() > 1 && md_vector_.non_nul())
+    if (TRUSTArray<_TYPE_,_SIZE_>::nproc() > 1 && md_vector_)
       Process::exit("Error in TRUSTVect::printOn: try to print a parallel vector");
     TRUSTArray<_TYPE_,_SIZE_>::printOn(os);
 #endif
@@ -61,7 +61,7 @@ protected:
   {
 #ifndef LATATOOLS
     // Que veut-on faire si on lit dans un vecteur ayant deja une structure parallele ?
-    if (md_vector_.non_nul())
+    if (md_vector_)
       Process::exit("Error in TRUSTVect::readOn: vector has a parallel structure");
     TRUSTArray<_TYPE_,_SIZE_>::readOn(is);
     size_reelle_ = TRUSTArray<_TYPE_,_SIZE_>::size_array();

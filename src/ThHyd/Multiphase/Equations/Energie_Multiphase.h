@@ -70,7 +70,7 @@ public :
   }
   int has_champ_convecte() const override
   {
-    return champ_convecte_.non_nul();
+    return bool(champ_convecte_);
   }
   void init_champ_convecte() const override; //a appeller dans le completer() des operateurs/sources qui auront besoin de champ_convecte_
 

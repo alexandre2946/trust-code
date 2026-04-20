@@ -264,7 +264,7 @@ const Champ_base& Champ_Generique_Interpolation::get_champ_with_calculer_champ_p
   Nature_du_champ nature_source = (ncomp==-1)?source.nature_du_champ():scalaire;
   nature_source = source.nature_du_champ();
   int nb_comp = source.nb_comp();
-  if (espace_stockage_.est_nul())
+  if (!espace_stockage_)
     creer_espace_stockage(nature_source, nb_comp, espace_stockage_);
   espace_stockage_->changer_temps(source.temps());
 
@@ -552,7 +552,7 @@ Entity Champ_Generique_Interpolation::get_localisation(const int index) const
 
 const Domaine& Champ_Generique_Interpolation::get_ref_domain() const
 {
-  if (domaine_.non_nul())
+  if (domaine_)
     {
       return domaine_.valeur();
     }
@@ -679,9 +679,9 @@ void Champ_Generique_Interpolation::completer(const Postraitement_base& post)
 }
 const Domaine_dis_base& Champ_Generique_Interpolation::get_ref_domaine_dis_base() const
 {
-  if (domaine_.non_nul())
+  if (domaine_)
     {
-      if (le_dom_dis.est_nul())
+      if (!le_dom_dis)
         {
           Cerr << "Error in Interpolation definition:" << finl;
           Cerr << "The domain " << domaine_->le_nom() << " is not built." << finl;
@@ -725,7 +725,7 @@ const Motcle Champ_Generique_Interpolation::get_directive_pour_discr() const
 //stockage dans la methode get_champ()
 void Champ_Generique_Interpolation::discretiser_domaine()
 {
-  if (domaine_.non_nul())
+  if (domaine_)
     {
       const Probleme_base& Pb = get_ref_pb_base();
       const Discretisation_base& discr = Pb.discretisation();

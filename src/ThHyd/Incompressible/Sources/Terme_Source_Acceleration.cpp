@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -178,9 +178,9 @@ void Terme_Source_Acceleration::lire_data(Entree& s)
 
   // On verifie que c'est coherent:
   int n = 0;
-  if (omega_.non_nul()) n++;
-  if (domegadt_.non_nul()) n++;
-  if (centre_rotation_.non_nul()) n++;
+  if (omega_) n++;
+  if (domegadt_) n++;
+  if (centre_rotation_) n++;
   if (n != 0 && n != 3)
     {
       Cerr << "Erreur dans Terme_Source_Acceleration::lire_data" << finl;
@@ -203,7 +203,7 @@ void Terme_Source_Acceleration::lire_data(Entree& s)
           exit();
         }
     }
-  if (champ_acceleration_.non_nul())
+  if (champ_acceleration_)
     {
       if (champ_acceleration_->valeurs().dimension(0) != 1)
         {
@@ -281,14 +281,14 @@ Terme_Source_Acceleration::calculer_la_source(DoubleTab& acceleration_aux_faces)
   {
     int j;
 
-    if (champ_acceleration_.non_nul())
+    if (champ_acceleration_)
       {
         const DoubleTab& a_ = champ_acceleration_->valeurs();
         for (j = 0; j < dim; j++)
           a[j] = a_(0, j);
       }
 
-    if (omega_.non_nul())
+    if (omega_)
       {
         // L'utilisateur a specifie un mouvement de rotation solide
         const DoubleTab& champ_w  = omega_          ->valeurs();
@@ -386,9 +386,9 @@ DoubleTab& Terme_Source_Acceleration::calculer(DoubleTab& resu) const
 void Terme_Source_Acceleration::mettre_a_jour(double temps)
 {
   //Cerr << "Terme_Source_Acceleration::mettre_a_jour temps=" << temps << finl;
-  if (champ_acceleration_.non_nul())
+  if (champ_acceleration_)
     champ_acceleration_->mettre_a_jour(temps);
-  if (omega_.non_nul())
+  if (omega_)
     {
       omega_->mettre_a_jour(temps);
       domegadt_->mettre_a_jour(temps);

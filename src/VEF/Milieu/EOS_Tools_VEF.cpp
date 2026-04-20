@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -50,7 +50,7 @@ void EOS_Tools_VEF::associer_domaines(const Domaine_dis_base& dds, const Domaine
 {
   le_dom = ref_cast(Domaine_VEF,dds);
   le_dom_Cl = domaine_cl;
-  if (!un_.get_md_vector().non_nul())
+  if (!un_.get_md_vector())
     {
       le_dom->creer_tableau_faces(un_, RESIZE_OPTIONS::NOCOPY_NOINIT);
       mapToDevice(un_); // Copy on device this constant array

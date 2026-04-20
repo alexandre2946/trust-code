@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -155,7 +155,7 @@ void Cond_lim_base::verifie_ch_init_nb_comp() const
  */
 void Cond_lim_base::associer_fr_dis_base(const Frontiere_dis_base& fr)
 {
-  assert(le_champ_front.non_nul());
+  assert(le_champ_front);
   le_champ_front->associer_fr_dis_base(fr);
   modifier_val_imp = 0;
 }

@@ -43,7 +43,7 @@ Block_Iter<_SIZE_> determine_blocks(Mp_vect_options opt, const MD_Vector& md, co
   //    - we want all items (VECT_SEQUENTIAL_ITEMS)
   //    - md.valeur() is a MD_Vector_seq
   //    - or md.valeur() is a MD_Vector_composite when it is an aggregation of several MD_Vector_seq)
-  const bool use_blocks = (opt != VECT_ALL_ITEMS && md.non_nul() && md->use_blocks());
+  const bool use_blocks = (opt != VECT_ALL_ITEMS && md && md->use_blocks());
 
   if (use_blocks)
     {
@@ -848,7 +848,7 @@ void invalidate_data(TRUSTVect<_TYPE_,_SIZE_>& resu, Mp_vect_options opt)
 
   const MD_Vector& md = resu.get_md_vector();
   const int line_size = resu.line_size();
-  if (opt == VECT_ALL_ITEMS || (!md.non_nul())) return; // no invalid values
+  if (opt == VECT_ALL_ITEMS || (!md)) return; // no invalid values
   assert(opt == VECT_SEQUENTIAL_ITEMS || opt == VECT_REAL_ITEMS);
   const ArrOfInt& items_blocs = (opt == VECT_SEQUENTIAL_ITEMS) ? md->get_blocs_items_to_sum() : md->get_blocs_items_to_compute();
   const int blocs_size = items_blocs.size_array();

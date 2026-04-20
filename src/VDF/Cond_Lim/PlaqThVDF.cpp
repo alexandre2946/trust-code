@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -49,7 +49,7 @@ void PlaqThVDF::mettre_a_jour(double )
 
   // Calcul de himp :
   const RefObjU& modele_turbulence = eqn.get_modele(TURBULENCE);
-  if (modele_turbulence.non_nul() && sub_type(Modele_turbulence_scal_base,modele_turbulence.valeur()))
+  if (modele_turbulence && sub_type(Modele_turbulence_scal_base,modele_turbulence.valeur()))
     {
       const Modele_turbulence_scal_base& modele = ref_cast(Modele_turbulence_scal_base,modele_turbulence.valeur());
       const Turbulence_paroi_scal_base& loipar = modele.loi_paroi();

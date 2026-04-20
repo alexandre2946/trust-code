@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -376,7 +376,7 @@ void corriger(const Domaine_VEF& domaine_VEF, DoubleTab& champ_filtre_, Matrice&
       DoubleVect& Pa = parties_P[2];  // partie aretes
 
       // Si premier passage on assemble la matrice
-      if (!matrice.non_nul()) assembler(domaine_VEF, matrice);
+      if (!matrice) assembler(domaine_VEF, matrice);
 
       // Construction du second membre
       DoubleVect secmem;

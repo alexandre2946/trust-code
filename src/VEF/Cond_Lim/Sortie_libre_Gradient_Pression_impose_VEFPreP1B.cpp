@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -74,7 +74,7 @@ void Sortie_libre_Gradient_Pression_impose_VEFPreP1B::mettre_a_jour(double temps
 // Retourne 1 si OK, 0 sinon.
 int Sortie_libre_Gradient_Pression_impose_VEFPreP1B::calculer_trace_pression()
 {
-  if (!pression_interne.non_nul())
+  if (!pression_interne)
     {
       Cerr << "Sortie_libre_Gradient_Pression_impose_VEFPreP1B::calculer_trace_pression() : la pression n'est pas definie!" << finl;
       return 0;

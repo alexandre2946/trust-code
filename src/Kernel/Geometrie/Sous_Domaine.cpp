@@ -139,7 +139,7 @@ void Sous_Domaine_32_64<_SIZE_>::build(Entree& is)
     les_mots[12]= "fonction_sous_domaine";
   }
 
-  if (!le_dom_.non_nul())
+  if (!le_dom_)
     {
       Cerr << "You have not associated one of the objects of type Sous_Domaine " << finl;
       Cerr << "to the object of type Domain " << finl;
@@ -1084,7 +1084,7 @@ int Sous_Domaine_32_64<_SIZE_>::associer_(Objet_U& ob)
 {
   if( sub_type(Domaine_t, ob))
     {
-      if(le_dom_.non_nul()) return 1;
+      if(le_dom_) return 1;
       associer_domaine(ref_cast(Domaine_t, ob));
       ob.associer_(*this);
       return 1;

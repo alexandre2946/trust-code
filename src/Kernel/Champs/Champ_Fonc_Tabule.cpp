@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -155,7 +155,7 @@ Entree& Champ_Fonc_Tabule::readOn(Entree& is)
 
 Champ_base& Champ_Fonc_Tabule::affecter_(const Champ_base& ch)
 {
-  if (le_champ_tabule_dis.est_nul())
+  if (!le_champ_tabule_dis)
     Cerr << le_nom() << "type : " << que_suis_je() << " can not be assigned to " << ch.le_nom() << " because " << le_nom() << " is incomplete " << finl;
   else
     {

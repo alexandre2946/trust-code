@@ -384,7 +384,7 @@ void Probleme_base::discretiser(Discretisation_base& une_discretisation)
   la_discretisation_ = une_discretisation;
   Cerr << "Discretization of the domain associated with the problem " << le_nom() << finl;
 
-  if (!le_domaine_.non_nul())
+  if (!le_domaine_)
     Process::exit("ERROR: Discretize - You're trying to discretize a problem without having associated a Domain to it!!! Fix your dataset.");
 
   // Initialisation du tableau renum_som_perio
@@ -535,7 +535,7 @@ void Probleme_base::imprimer(Sortie& os) const
  */
 void Probleme_base::associer_sch_tps_base(const Schema_Temps_base& un_schema_en_temps)
 {
-  if (le_schema_en_temps_.non_nul())
+  if (le_schema_en_temps_)
     {
       Cerr << finl;
       Cerr<<"Error: Problem "<<le_nom()<<" was already associated with the scheme "<< le_schema_en_temps_->le_nom()<<" and we try to associate it with "<<un_schema_en_temps.le_nom() << "." <<finl;
@@ -556,7 +556,7 @@ void Probleme_base::associer_sch_tps_base(const Schema_Temps_base& un_schema_en_
  */
 const Schema_Temps_base& Probleme_base::schema_temps() const
 {
-  if(!le_schema_en_temps_.non_nul())
+  if(!le_schema_en_temps_)
     {
       Cerr << le_nom() << " has not been associated to a time scheme !" << finl;
       exit();
@@ -574,7 +574,7 @@ const Schema_Temps_base& Probleme_base::schema_temps() const
  */
 Schema_Temps_base& Probleme_base::schema_temps()
 {
-  if(!le_schema_en_temps_.non_nul())
+  if(!le_schema_en_temps_)
     {
       Cerr << le_nom() << " has not been associated to a time scheme !" << finl;
       exit();
@@ -1085,7 +1085,7 @@ int Probleme_base::postraiter(int force)
 
   statistics().end_count(STD_COUNTERS::postreatment);
   //Start specific postraitements for mobile domain (like ALE)
-  if(!save_restart_.is_restart_in_progress() && le_domaine_dis_.non_nul())
+  if(!save_restart_.is_restart_in_progress() && le_domaine_dis_)
     {
       //no projection during the iteration of resumption of computation
       double temps = le_schema_en_temps_->temps_courant();
@@ -1315,7 +1315,7 @@ void Probleme_base::getOutputPointValues(const Nom& name,
     {
       OBS_PTR(Champ_Generique_base) ref_ch = findOutputField(name);
 
-      if (ref_ch.est_nul())
+      if (!ref_ch)
         {
           Cerr << "Error in Probleme_base::getOutputPointValues => No output fields of name " << name << finl;
           Process::exit();

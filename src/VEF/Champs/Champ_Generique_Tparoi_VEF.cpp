@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -99,7 +99,7 @@ const Champ_base& Champ_Generique_Tparoi_VEF::get_champ(OWN_PTR(Champ_base)& esp
   // on recuprere l'eqn de temp
   const Equation_base& my_eqn=ref_cast(Champ_Inc_base,source).equation();
   const RefObjU& modele_turbulence = my_eqn.get_modele(TURBULENCE);
-  if ( modele_turbulence.non_nul() && sub_type(Modele_turbulence_scal_base,modele_turbulence.valeur()))
+  if ( modele_turbulence && sub_type(Modele_turbulence_scal_base,modele_turbulence.valeur()))
     {
       const Modele_turbulence_scal_base& mod_turb_scal = ref_cast(Modele_turbulence_scal_base,modele_turbulence.valeur());
       const Turbulence_paroi_scal_base& loiparth = mod_turb_scal.loi_paroi();

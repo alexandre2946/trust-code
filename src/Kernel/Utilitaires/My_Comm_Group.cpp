@@ -106,7 +106,7 @@ Entree& My_Comm_Group::interpreter(Entree& is)
   Process::exit("What !!! You need an MPI TRUST version to use My_Comm_Group !!!");
 #endif
 
-  assert(my_comm_group.est_nul());
+  assert(!my_comm_group);
 
   const int nb_procs = Process::nproc();
   const int rank = Process::me();
@@ -146,6 +146,6 @@ Entree& My_Comm_Group::interpreter(Entree& is)
 
 const Comm_Group& My_Comm_Group::get_my_comm_group()
 {
-  assert(my_comm_group.non_nul());
+  assert(my_comm_group);
   return my_comm_group.valeur();
 }

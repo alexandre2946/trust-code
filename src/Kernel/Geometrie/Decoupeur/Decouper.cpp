@@ -54,7 +54,7 @@ void Decouper_32_64<_SIZE_>::lire_partitionneur(Entree& is)
   Cerr << " Creation of a partitioner of type: " << type_partitionneur << finl;
   deriv_partitionneur_.typer(type_partitionneur);
   // En cas d'echec (si le nom du type est invalide) : exit
-  if (! deriv_partitionneur_.non_nul())
+  if (!deriv_partitionneur_)
     Process::exit();
 
   // Initialisation des parametres du partitionneur

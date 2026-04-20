@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -91,7 +91,7 @@ public:
   virtual int systeme_invariant() const;
   virtual void ajouter_contribution_explicite_au_second_membre(const Champ_Inc_base& inconnue, DoubleTab& derivee) const;
   const Champ_Inc_base& mon_inconnue() const { return le_champ_inco.valeur(); }
-  bool has_champ_inco() const { return le_champ_inco.non_nul(); }
+  bool has_champ_inco() const { return bool(le_champ_inco); }
   const std::string& nom_inconnue() const
   {
     assert (has_champ_inco());

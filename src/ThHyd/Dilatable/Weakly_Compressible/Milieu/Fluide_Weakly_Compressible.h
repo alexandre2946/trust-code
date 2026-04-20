@@ -58,7 +58,7 @@ public :
   inline void set_resume_flag() { sim_resumed_ = 1; }
   inline bool use_total_pressure() { return use_total_pressure_; }
   inline bool use_hydrostatic_pressure() { return use_hydrostatic_pressure_; }
-  inline bool use_pth_xyz() { return ch_Pth_xyz_.non_nul(); }
+  inline bool use_pth_xyz() { return bool(ch_Pth_xyz_); }
   inline bool use_total_hydro_pressure() { return (use_total_pressure_||use_hydrostatic_pressure_); }
   inline bool use_saved_data() { return sim_resumed_; }
   inline bool use_grad_pression_eos() { return use_grad_pression_eos_; }

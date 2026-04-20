@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -110,7 +110,7 @@ template <typename _TYPE_>
 void remplir_items_non_calcules_(TRUSTVect<_TYPE_>& v, _TYPE_ valeur)
 {
 #ifndef LATATOOLS
-  if (v.get_md_vector().non_nul() && Process::is_parallel()) // Checking virtual items in sequential is meaningless
+  if (v.get_md_vector() && Process::is_parallel()) // Checking virtual items in sequential is meaningless
     {
       const ArrOfInt& blocs = v.get_md_vector()->get_blocs_items_to_compute();
       const int sz = blocs.size_array() / 2, line_size = v.line_size();

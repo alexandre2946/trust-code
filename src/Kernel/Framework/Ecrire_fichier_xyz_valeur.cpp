@@ -90,7 +90,7 @@ bool Ecrire_fichier_xyz_valeur::getStatField_(const Nom& fname, OBS_PTR(Champ_ba
         // If the name indicated in the dataset is that of a statistical field,
         // it must correspond to the name of the post-processing field.
         post.champ_fonc(nom_test, field, op_stat);
-        if (field.non_nul())
+        if (field)
           {
             champ_stat = true;
             break;
@@ -153,7 +153,7 @@ void Ecrire_fichier_xyz_valeur::writeValuesOnBoundary_(const Nom& fname, const s
 
 void Ecrire_fichier_xyz_valeur::write_fields() const
 {
-  if(eqn_.est_nul())
+  if(!eqn_)
     return;
 
   if (!write_field_during_current_timestep_())

@@ -380,7 +380,7 @@ void Champ_Generique_Extraction::completer(const Postraitement_base& post)
 
 const Domaine& Champ_Generique_Extraction::get_ref_domain() const
 {
-  if (domaine_.non_nul())
+  if (domaine_)
     return domaine_.valeur();
   else
     {
@@ -399,7 +399,7 @@ void Champ_Generique_Extraction::get_copy_domain(Domaine& domain) const
 
 const Domaine_dis_base& Champ_Generique_Extraction::get_ref_domaine_dis_base() const
 {
-  if (domaine_.non_nul())
+  if (domaine_)
     return  le_dom_dis.valeur();
   else
     {
@@ -423,7 +423,7 @@ Entity Champ_Generique_Extraction::get_localisation(const int index) const
 //a l espace de stockage dans la methode get_champ()
 void Champ_Generique_Extraction::discretiser_domaine()
 {
-  if (domaine_.non_nul())
+  if (domaine_)
     {
       const Probleme_base& Pb = get_ref_pb_base();
       const Discretisation_base& discr = Pb.discretisation();

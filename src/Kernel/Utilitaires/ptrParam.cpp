@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -48,7 +48,7 @@ const Param& ptrParam::valeur() const
 
 ptrParam::ptrParam(const ptrParam& p):Objet_U(p)
 {
-  if (p.non_nul())
+  if (p)
     abort();
   param_=0;
 }

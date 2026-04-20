@@ -175,7 +175,7 @@ static void instantiate_node_mpi(OWN_PTR(Comm_Group) & ngrp, OWN_PTR(Comm_Group)
 static void init_node_mpi(OWN_PTR(Comm_Group) & ngrp)
 {
 #ifdef MPI_
-  assert(ngrp.non_nul());
+  assert(ngrp);
   Comm_Group_MPI& mpi_on_node = ref_cast(Comm_Group_MPI, ngrp.valeur());
   mpi_on_node.init_comm_on_numa_node();
 #endif
@@ -184,7 +184,7 @@ static void init_node_mpi(OWN_PTR(Comm_Group) & ngrp)
 static void init_node_masters(OWN_PTR(Comm_Group) & master)
 {
 #ifdef MPI_
-  assert(master.non_nul());
+  assert(master);
   Comm_Group_MPI& mm = ref_cast(Comm_Group_MPI, master.valeur());
   mm.init_comm_on_node_master();
 #endif

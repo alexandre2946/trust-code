@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -77,39 +77,39 @@ void Echange_interne_impose::verifie_ch_init_nb_comp() const
 
 void  Echange_interne_impose::set_temps_defaut(double temps)
 {
-  if (h_gap_.non_nul())
+  if (h_gap_)
     h_gap_->set_temps_defaut(temps);
   Echange_externe_impose::set_temps_defaut(temps);
 }
 void  Echange_interne_impose::fixer_nb_valeurs_temporelles(int nb_cases)
 {
-  if (h_gap_.non_nul())
+  if (h_gap_)
     h_gap_->fixer_nb_valeurs_temporelles(nb_cases);
   Echange_externe_impose::fixer_nb_valeurs_temporelles(nb_cases);
 }
 //
 void  Echange_interne_impose::changer_temps_futur(double temps,int i)
 {
-  if (h_gap_.non_nul())
+  if (h_gap_)
     h_gap_->changer_temps_futur(temps,i);
   Echange_externe_impose::changer_temps_futur(temps,i);
 }
 int  Echange_interne_impose::avancer(double temps)
 {
-  if (h_gap_.non_nul())
+  if (h_gap_)
     h_gap_->avancer(temps);
   return Echange_externe_impose::avancer(temps);
 }
 
 int  Echange_interne_impose::reculer(double temps)
 {
-  if (h_gap_.non_nul())
+  if (h_gap_)
     h_gap_->reculer(temps);
   return Echange_externe_impose::reculer(temps);
 }
 void  Echange_interne_impose::associer_fr_dis_base(const Frontiere_dis_base& fr)
 {
-  if (h_gap_.non_nul())
+  if (h_gap_)
     h_gap_->associer_fr_dis_base(fr);
   Echange_externe_impose::associer_fr_dis_base(fr);
 }

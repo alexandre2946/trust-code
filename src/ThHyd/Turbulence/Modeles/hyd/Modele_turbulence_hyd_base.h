@@ -49,8 +49,8 @@ public:
   inline const Equation_base& equation() const;
   inline const Turbulence_paroi_base& loi_paroi() const { return loipar_.valeur(); }
   inline Turbulence_paroi_base& loi_paroi() { return loipar_.valeur(); }
-  bool utiliser_loi_paroi() const { return loipar_.non_nul() ? loipar_->use_shear() : false; }
-  bool has_loi_paroi_hyd() const { return loipar_.non_nul(); }
+  bool utiliser_loi_paroi() const { return loipar_ ? loipar_->use_shear() : false; }
+  bool has_loi_paroi_hyd() const { return bool(loipar_); }
   virtual bool calcul_tenseur_Re(const DoubleTab& nu_turb, const DoubleTab& grad, DoubleTab& Re) const { return false; }
   virtual void set_param(Param& param) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
@@ -110,7 +110,7 @@ private:
  */
 inline Equation_base& Modele_turbulence_hyd_base::equation()
 {
-  if (mon_equation_.est_nul())
+  if (!mon_equation_)
     {
       Cerr << "Error in Modele_turbulence_hyd_base::equation() : The equation is unknown !" << finl;
       Process::exit();
@@ -120,7 +120,7 @@ inline Equation_base& Modele_turbulence_hyd_base::equation()
 
 inline const Equation_base& Modele_turbulence_hyd_base::equation() const
 {
-  if (mon_equation_.est_nul())
+  if (!mon_equation_)
     {
       Cerr << "Error in Modele_turbulence_hyd_base::equation() : The equation is unknown !" << finl;
       Process::exit();

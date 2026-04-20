@@ -26,7 +26,7 @@ Entree& Paroi_rayo_transp::readOn(Entree& is) { return is; }
 
 int Paroi_rayo_transp::initialiser(double temps)
 {
-  assert(le_modele_rayo_.est_nul());
+  assert(!le_modele_rayo_);
 
   // on recupere le modele rayo seulement si pb fluide et rayo ... !
   const Probleme_base& this_pb = domaine_Cl_dis().equation().probleme();

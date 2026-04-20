@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -44,7 +44,7 @@ void Op_Dift_Multiphase_VDF_Face::creer_champ(const Motcle& motlu)
 
 void Op_Dift_Multiphase_VDF_Face::completer()
 {
-  assert(corr_.non_nul());
+  assert(corr_);
   completer_Op_Dift_VDF_base();
   associer_pb<Eval_Dift_Multiphase_VDF_Face>(equation().probleme());
 

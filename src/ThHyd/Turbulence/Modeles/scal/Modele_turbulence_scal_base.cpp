@@ -43,7 +43,7 @@ Entree& Modele_turbulence_scal_base::readOn(Entree& is)
   // lp loi de paroi du modele de turbulence de l'hydraulique
   const RefObjU& modele_turbulence = le_pb.equation(0).get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base, modele_turbulence.valeur());
-  if (loipar_.est_nul() && mod_turb_hydr.has_loi_paroi_hyd())
+  if (!loipar_ && mod_turb_hydr.has_loi_paroi_hyd())
     {
       Cerr << finl;
       Cerr << "Mot cle " << mot << "non trouve !" << finl;
@@ -207,7 +207,7 @@ bool Modele_turbulence_scal_base::initTimeStep(double dt)
  */
 int Modele_turbulence_scal_base::preparer_calcul()
 {
-  if (loipar_.non_nul())
+  if (loipar_)
     loipar_->init_lois_paroi();
   mettre_a_jour(0.);
   if (nom_fichier_!="")
@@ -221,7 +221,7 @@ int Modele_turbulence_scal_base::preparer_calcul()
 std::vector<YAML_data> Modele_turbulence_scal_base::data_a_sauvegarder() const
 {
   std::vector<YAML_data> data;
-  if (loipar_.non_nul())
+  if (loipar_)
     data = loipar_->data_a_sauvegarder();
   return data;
 }
@@ -233,7 +233,7 @@ std::vector<YAML_data> Modele_turbulence_scal_base::data_a_sauvegarder() const
  */
 int Modele_turbulence_scal_base::sauvegarder(Sortie& os) const
 {
-  if (loipar_.non_nul())
+  if (loipar_)
     return loipar_->sauvegarder(os);
   else
     return 0;
@@ -272,14 +272,14 @@ int Modele_turbulence_scal_base::reprendre(Entree& is)
    if (!loipar.non_nul())
    loipar.typer(typ);        */
 
-  if (loipar_.non_nul())
+  if (loipar_)
     loipar_->reprendre(is);
   return 1;
 }
 
 void Modele_turbulence_scal_base::creer_champ(const Motcle& motlu)
 {
-  if (loipar_.non_nul())
+  if (loipar_)
     loipar_->creer_champ(motlu);
 }
 
@@ -288,7 +288,7 @@ bool Modele_turbulence_scal_base::has_champ(const Motcle& nom, OBS_PTR(Champ_bas
   if (champs_compris_.has_champ(nom, ref_champ))
     return true;
 
-  if (loipar_.non_nul())
+  if (loipar_)
     if (loipar_->has_champ(nom, ref_champ))
       return true;
 
@@ -300,7 +300,7 @@ bool Modele_turbulence_scal_base::has_champ(const Motcle& nom) const
   if (champs_compris_.has_champ(nom))
     return true;
 
-  if (loipar_.non_nul())
+  if (loipar_)
     if (loipar_->has_champ(nom))
       return true;
 
@@ -314,7 +314,7 @@ const Champ_base& Modele_turbulence_scal_base::get_champ(const Motcle& nom) cons
   if (champs_compris_.has_champ(nom, ref_champ))
     return ref_champ;
 
-  if (loipar_.non_nul())
+  if (loipar_)
     if (loipar_->has_champ(nom, ref_champ))
       return ref_champ;
 
@@ -328,7 +328,7 @@ void Modele_turbulence_scal_base::get_noms_champs_postraitables(Noms& nom, Optio
   else
     nom.add(champs_compris_.liste_noms_compris());
 
-  if (loipar_.non_nul())
+  if (loipar_)
     loipar_->get_noms_champs_postraitables(nom, opt);
 }
 

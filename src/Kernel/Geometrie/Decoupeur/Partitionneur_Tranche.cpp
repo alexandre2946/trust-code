@@ -37,7 +37,7 @@ Sortie& Partitionneur_Tranche_32_64<_SIZE_>::printOn(Sortie& os) const
 template <typename _SIZE_>
 void Partitionneur_Tranche_32_64<_SIZE_>::set_param(Param& param) const
 {
-  if (ref_domaine_.est_nul())
+  if (!ref_domaine_)
     {
       Cerr << " Error: the domain has not been associated" << finl;
       Process::exit();
@@ -81,7 +81,7 @@ template <typename _SIZE_>
 void Partitionneur_Tranche_32_64<_SIZE_>::initialiser(const ArrOfInt& nb_tranches)
 {
 
-  assert(ref_domaine_.non_nul());
+  assert(ref_domaine_);
   assert(nb_tranches.size_array() == nb_tranches_.size_array());
   assert(min_array(nb_tranches) > 0);
 
@@ -157,7 +157,7 @@ void Partitionneur_Tranche_32_64<_SIZE_>::construire_partition(BigIntVect_& elem
 {
   using DoubleTab_t = DoubleTab_T<_SIZE_>;
 
-  assert(ref_domaine_.non_nul());
+  assert(ref_domaine_);
   assert(nb_tranches_[0] > 0);
 
   const Domaine_t& dom = ref_domaine_.valeur();

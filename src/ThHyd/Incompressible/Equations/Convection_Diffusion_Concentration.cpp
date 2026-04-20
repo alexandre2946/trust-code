@@ -36,7 +36,7 @@ Sortie& Convection_Diffusion_Concentration::printOn(Sortie& is) const { return C
  */
 Entree& Convection_Diffusion_Concentration::readOn(Entree& is)
 {
-  assert(la_concentration.non_nul());
+  assert(la_concentration);
   Convection_Diffusion_std::readOn(is);
   if (terme_convectif.op_non_nul())
     {
@@ -135,7 +135,7 @@ const Champ_Don_base& Convection_Diffusion_Concentration::diffusivite_pour_trans
  */
 void Convection_Diffusion_Concentration::discretiser()
 {
-  assert(le_constituant.non_nul());
+  assert(le_constituant);
   const Discret_Thyd& dis = ref_cast(Discret_Thyd, discretisation());
   Cerr << "Transport concentration(s) equation discretization " << finl;
   nb_constituants_ = constituant().nb_constituants();
@@ -177,7 +177,7 @@ Milieu_base& Convection_Diffusion_Concentration::milieu()
  */
 const Constituant& Convection_Diffusion_Concentration::constituant() const
 {
-  if(!le_constituant.non_nul())
+  if(!le_constituant)
     {
       Cerr << "You forgot to associate the constituent to the problem named " << probleme().le_nom() << finl;
       Process::exit();
@@ -192,7 +192,7 @@ const Constituant& Convection_Diffusion_Concentration::constituant() const
  */
 Constituant& Convection_Diffusion_Concentration::constituant()
 {
-  if(!le_constituant.non_nul())
+  if(!le_constituant)
     {
       Cerr << "No constituant has been associated "
            << "with a Convection_Diffusion_Concentration equation." << finl;

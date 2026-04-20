@@ -117,7 +117,7 @@ void Op_Grad_EF::ajouter_bord(DoubleTab& resu,const Domaine_EF& domaine_EF,const
   int nb_som_face=domaine_EF.nb_som_face();
   const DoubleTab& xs = domaine_EF.domaine().les_sommets();
 
-  if (int_P_bord_.non_nul())
+  if (int_P_bord_)
     {
       resu+= int_P_bord_->valeurs();
     }

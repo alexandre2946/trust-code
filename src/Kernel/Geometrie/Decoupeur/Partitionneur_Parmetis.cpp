@@ -83,7 +83,7 @@ void Partitionneur_Parmetis::construire_partition(IntVect& elem_part, int& nb_pa
   Process::exit();
 #else
 
-  if (!ref_domaine_.non_nul())
+  if (!ref_domaine_)
     {
       Cerr << "Error in Partitionneur_Parmetis::construire_partition\n";
       Cerr << " The domain has not been associated" << finl;

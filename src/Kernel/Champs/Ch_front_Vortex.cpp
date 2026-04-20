@@ -96,7 +96,7 @@ int Ch_front_Vortex::my_rand( )
 void Ch_front_Vortex::sauvegarder_vortex()
 {
   Nom fichier = "vortex.sauv";
-  if(la_frontiere_dis.non_nul())
+  if(la_frontiere_dis)
     {
       Cerr << "Saving vortices in " << fichier << finl;
       EcrFicCollecte fic(fichier);
@@ -122,7 +122,7 @@ void Ch_front_Vortex::reprendre_vortex()
 
   Nom fichier = "vortex.sauv";
   if (nproc()>1) fichier=fichier.nom_me(me());
-  if(la_frontiere_dis.non_nul())
+  if(la_frontiere_dis)
     {
       Cerr << "Resumption of vortices in " << fichier << finl;
       EFichier fic(fichier);

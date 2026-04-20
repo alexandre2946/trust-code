@@ -85,7 +85,7 @@ void Turbulence_paroi_base::typer_lire_turbulence_paroi(OWN_PTR(Turbulence_paroi
 
 void Turbulence_paroi_base::creer_champ(const Motcle& motlu)
 {
-  if (motlu == "u_star" && champ_u_star_.est_nul())
+  if (motlu == "u_star" && !champ_u_star_)
     {
       int nb_comp = 1;
       Noms noms(1);

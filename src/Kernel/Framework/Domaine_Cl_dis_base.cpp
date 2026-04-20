@@ -41,7 +41,7 @@ Sortie& Domaine_Cl_dis_base::printOn(Sortie& os) const
  */
 Entree& Domaine_Cl_dis_base::readOn(Entree& is)
 {
-  assert(mon_equation.non_nul());
+  assert(mon_equation);
   const Domaine& ledomaine=equation().domaine_dis().domaine();
   Motcle accolade_ouverte("{");
   Motcle accolade_fermee("}");

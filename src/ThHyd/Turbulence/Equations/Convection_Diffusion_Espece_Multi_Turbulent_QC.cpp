@@ -74,7 +74,7 @@ void Convection_Diffusion_Espece_Multi_Turbulent_QC::creer_champ(const Motcle& m
 {
   Convection_Diffusion_Espece_Multi_QC::creer_champ(motlu);
 
-  if (le_modele_turbulence.non_nul())
+  if (le_modele_turbulence)
     le_modele_turbulence->creer_champ(motlu);
 }
 
@@ -83,7 +83,7 @@ bool Convection_Diffusion_Espece_Multi_Turbulent_QC::has_champ(const Motcle& nom
   if (Convection_Diffusion_Espece_Multi_QC::has_champ(nom, ref_champ))
     return true;
 
-  if (le_modele_turbulence.non_nul())
+  if (le_modele_turbulence)
     if (le_modele_turbulence->has_champ(nom, ref_champ))
       return true;
 
@@ -95,7 +95,7 @@ bool Convection_Diffusion_Espece_Multi_Turbulent_QC::has_champ(const Motcle& nom
   if (Convection_Diffusion_Espece_Multi_QC::has_champ(nom))
     return true;
 
-  if (le_modele_turbulence.non_nul())
+  if (le_modele_turbulence)
     if (le_modele_turbulence->has_champ(nom))
       return true;
 
@@ -109,7 +109,7 @@ const Champ_base& Convection_Diffusion_Espece_Multi_Turbulent_QC::get_champ(cons
   if (Convection_Diffusion_Espece_Multi_QC::has_champ(nom, ref_champ))
     return ref_champ;
 
-  if (le_modele_turbulence.non_nul())
+  if (le_modele_turbulence)
     if (le_modele_turbulence->has_champ(nom, ref_champ))
       return ref_champ;
 
@@ -120,7 +120,7 @@ void Convection_Diffusion_Espece_Multi_Turbulent_QC::get_noms_champs_postraitabl
 {
   Convection_Diffusion_Espece_Multi_QC::get_noms_champs_postraitables(nom, opt);
 
-  if (le_modele_turbulence.non_nul())
+  if (le_modele_turbulence)
     le_modele_turbulence->get_noms_champs_postraitables(nom, opt);
 }
 /*! @brief Mise a jour en temps de l'equation, double appel a: Convection_Diffusion_Espece_Multi_QC::mettre_a_jour(double );
@@ -192,7 +192,7 @@ const RefObjU& Convection_Diffusion_Espece_Multi_Turbulent_QC::get_modele(Type_m
   for (const auto &itr : liste_modeles_)
     {
       const RefObjU& mod = itr;
-      if (mod.non_nul())
+      if (mod)
         if ((sub_type(Modele_turbulence_scal_base, mod.valeur())) && (type == TURBULENCE))
           return mod;
     }

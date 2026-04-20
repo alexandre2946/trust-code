@@ -56,7 +56,7 @@ void Partitionneur_Fichier_Decoupage::initialiser(const char *filename)
  */
 void Partitionneur_Fichier_Decoupage::construire_partition(IntVect& elem_part, int& nb_parts_tot) const
 {
-  if (! ref_domaine_.non_nul())
+  if (!ref_domaine_)
     {
       Cerr << "Error in Partitionneur_Fichier_Decoupage::construire_partition\n";
       Cerr << " The domain has not been associated" << finl;

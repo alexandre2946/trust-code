@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -47,7 +47,7 @@ inline DoubleTab& Champ_Elem_PolyMAC_CDO::trace(const Frontiere_dis_base& fr, Do
 
   DoubleTrav dst; //reconstruction du champ aux faces (on ne le remplit que sur le bord concerne)
   int i, n, e, f, N = src.nb_dim() > 1 ? src.dimension(1): 1, has_faces = src.dimension_tot(0) > domaine.nb_elem_tot();
-  if (!x.dimension(0) && !x.get_md_vector().non_nul()) x.resize(fvf.nb_faces(), N);
+  if (!x.dimension(0) && !x.get_md_vector()) x.resize(fvf.nb_faces(), N);
   dst.resize(domaine.nb_faces(), N);
   for (i = 0; i < fvf.nb_faces(); i++)
     for (n = 0, f = fvf.num_face(i), e = f_e(f, 0); n < N; n++)

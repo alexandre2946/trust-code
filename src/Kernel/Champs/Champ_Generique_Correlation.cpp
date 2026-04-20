@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -115,7 +115,7 @@ const Champ_base& Champ_Generique_Correlation::get_champ(OWN_PTR(Champ_base)& es
   //Pas completement exact car il y a le cas de la correlation vecteur-vecteur et dans
   //ce cas c est un tenseur qui est manipule (la nature n est pas scalaire ou vectorielle)
   Nature_du_champ nature_source = (nb_comp==1)?scalaire:vectoriel;
-  if (espace_stockage_.est_nul())
+  if (!espace_stockage_)
     creer_espace_stockage(nature_source,nb_comp,espace_stockage_);
   else
     espace_stockage_->changer_temps(temps());

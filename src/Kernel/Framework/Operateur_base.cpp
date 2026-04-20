@@ -88,12 +88,12 @@ void Operateur_base::resetTime(double)
  */
 void Operateur_base::completer()
 {
-  assert(mon_equation.non_nul());
+  assert(mon_equation);
   const Equation_base& eqn = equation();
   const Domaine_dis_base& zdis= eqn.domaine_dis();
 
-  const Domaine_Cl_dis_base& zcl = le_champ_inco.non_nul() ? le_champ_inco->domaine_Cl_dis() : eqn.domaine_Cl_dis();
-  const Champ_Inc_base& inco = le_champ_inco.non_nul() ? le_champ_inco.valeur() : eqn.inconnue();
+  const Domaine_Cl_dis_base& zcl = le_champ_inco ? le_champ_inco->domaine_Cl_dis() : eqn.domaine_Cl_dis();
+  const Champ_Inc_base& inco = le_champ_inco ? le_champ_inco.valeur() : eqn.inconnue();
   associer(zdis, zcl, inco);
   const Conds_lim& les_cl = zcl.les_conditions_limites();
   for (auto& itr : les_cl)

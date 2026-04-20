@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -109,8 +109,8 @@ DoubleTab& Iterateur_PolyMAC_CDO_Elem<_TYPE_>::ajouter(const DoubleTab& donne,
 {
   ((_TYPE_&) flux_evaluateur).mettre_a_jour();
   assert(donne.nb_dim() < 3);
-  assert(la_zcl.non_nul());
-  assert(le_domaine.non_nul());
+  assert(la_zcl);
+  assert(le_domaine);
   int ncomp=1;
   if (donne.nb_dim() == 2)
     ncomp=donne.dimension(1);
@@ -403,8 +403,8 @@ template <class _TYPE_>  void Iterateur_PolyMAC_CDO_Elem<_TYPE_>::calculer_flux_
 {
   ((_TYPE_&) flux_evaluateur).mettre_a_jour();
   assert(donnee.nb_dim() < 3);
-  assert(la_zcl.non_nul());
-  assert(le_domaine.non_nul());
+  assert(la_zcl);
+  assert(le_domaine);
   int ncomp=1;
   if (donnee.nb_dim() == 2)
     ncomp=donnee.dimension(1);
@@ -1128,8 +1128,8 @@ template <class _TYPE_>  void Iterateur_PolyMAC_CDO_Elem<_TYPE_>::contribuer_au_
 {
   ((_TYPE_&) flux_evaluateur).mettre_a_jour();
   assert(resu.nb_dim() < 3);
-  assert(la_zcl.non_nul());
-  assert(le_domaine.non_nul());
+  assert(la_zcl);
+  assert(le_domaine);
   int ncomp=1;
   if (resu.nb_dim() == 2)
     ncomp=resu.dimension(1);
@@ -1691,8 +1691,8 @@ template <class _TYPE_>  void Iterateur_PolyMAC_CDO_Elem<_TYPE_>::ajouter_contri
 {
   ((_TYPE_&) flux_evaluateur).mettre_a_jour();
   assert(inco.nb_dim() < 3);
-  assert(la_zcl.non_nul());
-  assert(le_domaine.non_nul());
+  assert(la_zcl);
+  assert(le_domaine);
   int ncomp=1;
   if (inco.nb_dim() == 2)
     ncomp=inco.dimension(1);
@@ -2268,8 +2268,8 @@ template <class _TYPE_>  void Iterateur_PolyMAC_CDO_Elem<_TYPE_>::ajouter_contri
 {
   ((_TYPE_&) flux_evaluateur).mettre_a_jour();
   assert(inco.nb_dim() < 3);
-  assert(la_zcl.non_nul());
-  assert(le_domaine.non_nul());
+  assert(la_zcl);
+  assert(le_domaine);
   int ncomp=1;
   if (inco.nb_dim() == 2)
     ncomp=inco.dimension(1);

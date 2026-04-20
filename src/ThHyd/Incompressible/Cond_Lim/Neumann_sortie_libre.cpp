@@ -92,7 +92,7 @@ Entree& Neumann_sortie_libre::readOn(Entree& s)
 
 void Neumann_sortie_libre::verifie_ch_init_nb_comp() const
 {
-  if (le_champ_front.non_nul())
+  if (le_champ_front)
     {
       const Equation_base& eq = domaine_Cl_dis().equation();
       const int nb_comp = le_champ_front->nb_comp();
@@ -134,14 +134,14 @@ double Neumann_sortie_libre::val_ext(int i) const
 int Neumann_sortie_libre::initialiser(double temps)
 {
   Cond_lim_base::initialiser(temps);
-  assert(le_champ_ext.non_nul());
+  assert(le_champ_ext);
   return le_champ_ext->initialiser(temps, domaine_Cl_dis().equation().inconnue());
 }
 
 void Neumann_sortie_libre::associer_fr_dis_base(const Frontiere_dis_base& fr)
 {
   Cond_lim_base::associer_fr_dis_base(fr);
-  assert(le_champ_ext.non_nul());
+  assert(le_champ_ext);
   le_champ_ext->associer_fr_dis_base(fr);
   modifier_val_imp = 0;
 }

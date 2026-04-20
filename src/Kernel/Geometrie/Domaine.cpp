@@ -409,7 +409,7 @@ typename Domaine_32_64<_SZ_>::SmallArrOfTID_t& Domaine_32_64<_SZ_>::chercher_ele
   if (!deformable() && positions.dimension(0) > 1)
     {
       set_cache = true;
-      if (deriv_octree_.est_nul() || !deriv_octree_->construit())
+      if (!deriv_octree_ || !deriv_octree_->construit())
         {
           // Vide le cache
           cached_elements_.reset();
@@ -763,11 +763,11 @@ void Domaine_32_64<_SZ_>::calculer_mon_centre_de_gravite(ArrOfDouble& c)
 template<typename _SZ_>
 void Domaine_32_64<_SZ_>::calculer_volumes(DoubleVect_t& volumes, DoubleVect_t& inverse_volumes) const
 {
-  if (!volumes.get_md_vector().non_nul())
+  if (!volumes.get_md_vector())
     creer_tableau_elements(volumes, RESIZE_OPTIONS::NOCOPY_NOINIT);
   elem_->calculer_volumes(volumes); // Dimensionne et calcule le DoubleVect volumes
   // Check and fill inverse_volumes
-  if (!inverse_volumes.get_md_vector().non_nul())
+  if (!inverse_volumes.get_md_vector())
     creer_tableau_elements(inverse_volumes, RESIZE_OPTIONS::NOCOPY_NOINIT);
   int_t size = volumes.size_totale();
   for (int_t i = 0; i < size; i++)
@@ -809,14 +809,14 @@ void Domaine_32_64<_SZ_>::rang_elems_sommet(SmallArrOfTID_t& elems, double x, do
 template<typename _SZ_>
 void Domaine_32_64<_SZ_>::invalide_octree()
 {
-  if (deriv_octree_.non_nul())
+  if (deriv_octree_)
     deriv_octree_.detach();
 }
 
 template<typename _SZ_>
 const typename Domaine_32_64<_SZ_>::OctreeRoot_t& Domaine_32_64<_SZ_>::construit_octree() const
 {
-  if (!deriv_octree_.non_nul())
+  if (!deriv_octree_)
     deriv_octree_.typer("OctreeRoot");
   OctreeRoot_t& octree = deriv_octree_.valeur();
   if (!octree.construit())
@@ -832,7 +832,7 @@ const typename Domaine_32_64<_SZ_>::OctreeRoot_t& Domaine_32_64<_SZ_>::construit
 template<typename _SZ_>
 const typename Domaine_32_64<_SZ_>::OctreeRoot_t& Domaine_32_64<_SZ_>::construit_octree(int& reel) const
 {
-  if (!deriv_octree_.non_nul())
+  if (!deriv_octree_)
     deriv_octree_.typer("OctreeRoot");
   OctreeRoot_t& octree = deriv_octree_.valeur();
   if (!octree.construit() || (reel != octree.reel()))
@@ -860,7 +860,7 @@ template<typename _SZ_>
 const MD_Vector& Domaine_32_64<_SZ_>::md_vector_elements() const
 {
   const MD_Vector& md = mes_elems_.get_md_vector();
-  if (!md.non_nul())
+  if (!md)
     {
       Cerr << "Internal error in Domaine_32_64<_SZ_>::md_vector_elements(): descriptor for elements not initialized\n"
            << " You might use a buggy Domain constructor that does not build descriptors,\n"
@@ -1239,7 +1239,7 @@ void Domaine_32_64<_SZ_>::merge_wo_vertices_with(Domaine_32_64<_SZ_>& dom2)
   Cerr << "   Merging elem info for domain "<< nom_ << " with " << dom2.nom_ << finl;
 
   // Prepare type if first merge:
-  if (!elem_.non_nul())
+  if (!elem_)
     elem_ = dom2.elem_;
 
   // Prepare correct initial elem size if first merge
@@ -1790,7 +1790,7 @@ void Domaine_32_64<int>::init_faces_virt_bord(const MD_Vector& md_vect_faces, MD
           IntTab& faces_sommets_frontiere = front.les_sommets_des_faces();
           // Certains problemes ont plusieurs objets Domaine_VF attaches a la meme Domaine (rayonnement)
           // Si on est deja passe par ici, ne pas refaire le travail:
-          if (faces_sommets_frontiere.get_md_vector().non_nul())
+          if (faces_sommets_frontiere.get_md_vector())
             continue;
           const int nb_faces_front = front.nb_faces();
           // Construction d'un descripteur contenant le sous-ensemble des faces de cette frontiere
@@ -1848,7 +1848,7 @@ void Domaine_32_64<int>::init_faces_virt_bord(const MD_Vector& md_vect_faces, MD
       IntTab& faces_sommets_frontiere = front.les_sommets_des_faces();
       // Certains problemes ont plusieurs objets Domaine_VF attaches a la meme Domaine (rayonnement)
       // Si on est deja passe par ici, ne pas refaire le travail:
-      if (faces_sommets_frontiere.get_md_vector().non_nul())
+      if (faces_sommets_frontiere.get_md_vector())
         continue;
       //les tableaux faces_sommets_frontiere doivent faire la meme largeur sur tous les procs avant echange
       int nb_som_faces = Process::mp_max(faces_sommets_frontiere.dimension(1));

@@ -71,7 +71,7 @@ void Partitionneur_Fichier_MED::initialiser(const char *filename)
  */
 void Partitionneur_Fichier_MED::construire_partition(IntVect& elem_part, int& nb_parts_tot) const
 {
-  if (! ref_domaine_.non_nul())
+  if (!ref_domaine_)
     {
       Cerr << "Error in Partitionneur_Fichier_MED::construire_partition\n";
       Cerr << " The domain has not been associated" << finl;

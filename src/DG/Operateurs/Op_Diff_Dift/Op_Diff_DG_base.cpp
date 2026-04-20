@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -183,7 +183,7 @@ void Op_Diff_DG_base::update_nu() const
   const DoubleTab& diffu = diffusivite().valeurs();
   if (equation().que_suis_je() != "Transport_K_Epsilon")
     {
-      if (!diffu.get_md_vector().non_nul())
+      if (!diffu.get_md_vector())
         {
           // diffusivite uniforme
           int n = nu_.dimension_tot(0), nb_comp = nu_.line_size();
@@ -222,7 +222,7 @@ void Op_Diff_DG_base::update_nu() const
         }
       else
         {
-          if (!diffu_turb.get_md_vector().non_nul())
+          if (!diffu_turb.get_md_vector())
             {
               // diffusvite uniforme
               int n = nu_.dimension_tot(0), nb_comp = nu_.line_size();

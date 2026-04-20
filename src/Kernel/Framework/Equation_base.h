@@ -186,7 +186,7 @@ public :
   */
   //le champ  : autant de valeurs spatiales / temporelles que l'inconnue
   Champ_Inc_base& champ_conserve() const { return champ_conserve_.valeur(); }
-  int has_champ_conserve() const { return champ_conserve_.non_nul(); }
+  int has_champ_conserve() const { return bool(champ_conserve_); }
 
   void init_champ_conserve() const; //a appeller dans le completer() des operateurs/sources qui auront besoin de champ_conserve_
   /* fonction de calcul par defaut de champ_conserve */
@@ -199,7 +199,7 @@ public :
 
   //par defaut le champ conserve
   virtual Champ_Inc_base& champ_convecte() const { return champ_conserve_.valeur(); }
-  virtual int has_champ_convecte() const { return champ_conserve_.non_nul(); }
+  virtual int has_champ_convecte() const { return bool(champ_conserve_); }
   virtual void init_champ_convecte() const { init_champ_conserve(); }
   //mise a jour de champ_conserve / champ_convecte : appele par Probleme_base::mettre_a_jour() apres avoir mis a jour le milieu
   //si reset = 1, force le calcul de toutes les valeurs temporelles (et pas seulement de la valeur courante)
@@ -342,7 +342,7 @@ inline const Nom& Equation_base::le_nom() const
  */
 inline Domaine_Cl_dis_base& Equation_base::domaine_Cl_dis()
 {
-  assert(le_dom_Cl_dis.non_nul());
+  assert(le_dom_Cl_dis);
   return le_dom_Cl_dis.valeur();
 }
 
@@ -354,7 +354,7 @@ inline Domaine_Cl_dis_base& Equation_base::domaine_Cl_dis()
  */
 inline const Domaine_Cl_dis_base& Equation_base::domaine_Cl_dis() const
 {
-  assert(le_dom_Cl_dis.non_nul());
+  assert(le_dom_Cl_dis);
   return le_dom_Cl_dis.valeur();
 }
 

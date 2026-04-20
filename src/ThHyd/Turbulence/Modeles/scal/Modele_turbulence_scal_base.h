@@ -98,7 +98,7 @@ inline const Turbulence_paroi_scal_base& Modele_turbulence_scal_base::loi_paroi(
  */
 inline int Modele_turbulence_scal_base::loi_paroi_non_nulle() const
 {
-  return loipar_.non_nul();
+  return bool(loipar_);
 }
 
 /*! @brief Renvoie la loi de turbulence sur la paroi
@@ -112,7 +112,7 @@ inline Turbulence_paroi_scal_base& Modele_turbulence_scal_base::loi_paroi()
 
 inline Convection_Diffusion_std& Modele_turbulence_scal_base::equation()
 {
-  if (mon_equation_.est_nul())
+  if (!mon_equation_)
     {
       Cerr << "\nError in Modele_turbulence_scal_base::equation() : The equation is unknown !" << finl;
       Process::exit();
@@ -122,7 +122,7 @@ inline Convection_Diffusion_std& Modele_turbulence_scal_base::equation()
 
 inline const Convection_Diffusion_std& Modele_turbulence_scal_base::equation() const
 {
-  if (mon_equation_.est_nul())
+  if (!mon_equation_)
     {
       Cerr << "\nError in Modele_turbulence_scal_base::equation() : The equation is unknown !" << finl;
       Process::exit();

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -56,7 +56,7 @@ void Op_Dift_VEF_base::completer()
   Operateur_base::completer();
 
   const RefObjU& modele_turbulence = equation().get_modele(TURBULENCE);
-  if (modele_turbulence.non_nul() && sub_type(Modele_turbulence_hyd_base, modele_turbulence.valeur()))
+  if (modele_turbulence && sub_type(Modele_turbulence_hyd_base, modele_turbulence.valeur()))
     {
       const Modele_turbulence_hyd_base& mod_turb = ref_cast(Modele_turbulence_hyd_base, modele_turbulence.valeur());
       const Champ_Fonc_base& viscosite_turbulente = mod_turb.viscosite_turbulente();
@@ -173,7 +173,7 @@ void Op_Dift_VEF_base::calculer_pour_post(Champ_base& espace_stockage, const Nom
     {
       DoubleTab& es_valeurs = espace_stockage.valeurs();
 
-      if (le_dom_vef.non_nul())
+      if (le_dom_vef)
         {
           remplir_nu(nu_); // On remplit le tableau nu contenant la diffusivite en chaque elem
 

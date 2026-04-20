@@ -64,7 +64,7 @@ void Fluide_Incompressible::set_param(Param& param) const
 void Fluide_Incompressible::verifier_coherence_champs(int& err,Nom& msg)
 {
   msg="";
-  if (ch_rho_.non_nul())
+  if (ch_rho_)
     {
       if (!sub_type(Champ_Uniforme,ch_rho_.valeur()))
         {
@@ -72,7 +72,7 @@ void Fluide_Incompressible::verifier_coherence_champs(int& err,Nom& msg)
           err = 1;
         }
     }
-  if (ch_Cp_.non_nul())
+  if (ch_Cp_)
     {
       if (!sub_type(Champ_Uniforme,ch_Cp_.valeur()))
         {

@@ -51,17 +51,17 @@ void Milieu_Elasticite::creer_champs_non_lus()
 {
   Milieu_base::creer_champs_non_lus();
 
-  if (ch_lambda_lame_.est_nul())
+  if (!ch_lambda_lame_)
     {
       ch_lambda_lame_ = ch_E_;
       ch_lambda_lame_->nommer("lambda_lame");
     }
-  if (ch_mu_.est_nul())
+  if (!ch_mu_)
     {
       ch_mu_ = ch_E_;
       ch_mu_->nommer("mu_lame");
     }
-  if (ch_K_.est_nul())
+  if (!ch_K_)
     {
       ch_K_ = ch_E_;
       ch_K_->nommer("bulk_modulus");
@@ -71,7 +71,7 @@ void Milieu_Elasticite::creer_champs_non_lus()
 void Milieu_Elasticite::discretiser(const Probleme_base& pb, const Discretisation_base& dis)
 {
   Milieu_base::discretiser(pb, dis);
-  if (zdb_.est_nul()) zdb_ = pb.domaine_dis();
+  if (!zdb_) zdb_ = pb.domaine_dis();
 
   const Domaine_dis_base& domaine_dis = pb.domaine_dis();
   const int nc = pb.equation(0).inconnue().nb_valeurs_temporelles();
@@ -82,7 +82,7 @@ void Milieu_Elasticite::discretiser(const Probleme_base& pb, const Discretisatio
   dis.nommer_completer_champ_physique(domaine_dis, "mu_lame", "Pa", ch_mu_.valeur(), pb);
   dis.nommer_completer_champ_physique(domaine_dis, "module_volumique", "Pa", ch_K_.valeur(), pb);
   dis.discretiser_champ("champ_elem", domaine_dis, "masse_volumique_lagrangienne", "kg/m^3", 1, nc, pb.schema_temps().temps_courant(), ch_rho_lag_);
-  if (ch_coeff_dilatation_th_.non_nul())
+  if (ch_coeff_dilatation_th_)
     dis.nommer_completer_champ_physique(domaine_dis, "coeff_dilatation_thermique", "K-1", ch_coeff_dilatation_th_.valeur(), pb);
 
   ch_rho_lag_->associer_eqn(pb.equation(0));
@@ -93,7 +93,7 @@ void Milieu_Elasticite::discretiser(const Probleme_base& pb, const Discretisatio
   champs_compris_.ajoute_champ(ch_mu_.valeur());
   champs_compris_.ajoute_champ(ch_K_.valeur());
   champs_compris_.ajoute_champ(ch_rho_lag_.valeur());
-  if (ch_coeff_dilatation_th_.non_nul())
+  if (ch_coeff_dilatation_th_)
     champs_compris_.ajoute_champ(ch_coeff_dilatation_th_.valeur());
 
   eq_ = pb.equation(0);
@@ -108,7 +108,7 @@ int Milieu_Elasticite::initialiser(const double temps)
   ch_lambda_lame_->initialiser(temps);
   ch_mu_->initialiser(temps);
   ch_K_->initialiser(temps);
-  if (ch_coeff_dilatation_th_.non_nul()) ch_coeff_dilatation_th_->initialiser(temps);
+  if (ch_coeff_dilatation_th_) ch_coeff_dilatation_th_->initialiser(temps);
   ch_rho_lag_->passe() = ch_rho_->valeurs()(0, 0);
   ch_rho_lag_->valeurs() = ch_rho_->valeurs()(0, 0);
   ch_rho_lag_->mettre_a_jour(temps);
@@ -119,7 +119,7 @@ int Milieu_Elasticite::initialiser(const double temps)
 
 bool Milieu_Elasticite::initTimeStep(double dt)
 {
-  if (eq_.est_nul()) throw;
+  if (!eq_) throw;
   const Schema_Temps_base& sch = eq_->schema_temps(); //on recupere le schema en temps par la 1ere equation
 
   for (int i = 1; i <= sch.nb_valeurs_futures(); i++)
@@ -132,7 +132,7 @@ bool Milieu_Elasticite::initTimeStep(double dt)
 
 void Milieu_Elasticite::mettre_a_jour(double temps)
 {
-  if (ch_E_.est_nul() || ch_nu_.est_nul() || ch_lambda_lame_.est_nul() || ch_mu_.est_nul() || ch_K_.est_nul())
+  if (!ch_E_ || !ch_nu_ || !ch_lambda_lame_ || !ch_mu_ || !ch_K_)
     {
       Cerr << que_suis_je() << " cannot update without E, nu, lambda, mu or K fields." << finl;
       Process::exit();
@@ -142,7 +142,7 @@ void Milieu_Elasticite::mettre_a_jour(double temps)
 
   ch_E_->mettre_a_jour(temps);
   ch_nu_->mettre_a_jour(temps);
-  if (ch_coeff_dilatation_th_.non_nul()) ch_coeff_dilatation_th_->mettre_a_jour(temps);
+  if (ch_coeff_dilatation_th_) ch_coeff_dilatation_th_->mettre_a_jour(temps);
 
   ch_lambda_lame_->changer_temps(temps);
   ch_mu_->changer_temps(temps);
@@ -178,7 +178,7 @@ void Milieu_Elasticite::verifier_coherence_champs(int& err, Nom& message)
 
 void Milieu_Elasticite::ensure_rho_field()
 {
-  if (ch_rho_.est_nul())
+  if (!ch_rho_)
     {
       Cerr << que_suis_je() << " requires a rho field to be specified." << finl;
       Process::exit();

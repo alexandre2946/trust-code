@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -42,7 +42,7 @@ void Op_Ecart_type::completer(const Probleme_base& Pb, const Nom& prefix)
   Nom pdi_name = prefix + nom_pour_post;
   integrale_carre_champ_.le_champ_calcule().set_pdi_name(pdi_name);
 
-  if (la_moyenne_.non_nul())
+  if (la_moyenne_)
     integrale_champ_ = moyenne().integrale();
 
   // Dimensionnement du champ integrale_champ a la meme taille que mon_champ

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -113,7 +113,7 @@ protected:
  */
 inline const Champ_Fonc_base& Champ_Fonc_Tabule::le_champ_tabule_discretise() const
 {
-  if (!le_champ_tabule_dis.non_nul())
+  if (!le_champ_tabule_dis)
     {
       Cerr << "The attribute le_champ_tabule_dis of Champ_fonc_tabule " << le_nom() << " is not filled." << finl;
       Process::exit();

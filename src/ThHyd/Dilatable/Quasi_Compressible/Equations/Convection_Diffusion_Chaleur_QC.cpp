@@ -107,7 +107,7 @@ int Convection_Diffusion_Chaleur_QC::lire_motcle_non_standard(const Motcle& mot,
     }
   else if (mot=="mode_calcul_convection")
     {
-      if (terme_convectif.non_nul())
+      if (terme_convectif)
         {
           Cerr<<" The option "<<mot<<" must be indicated before the convection operator."<<finl;
           Cerr<<" Please modify your data set."<<finl;

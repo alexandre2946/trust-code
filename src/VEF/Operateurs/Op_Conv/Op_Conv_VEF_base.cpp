@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -155,7 +155,7 @@ void Op_Conv_VEF_base::calculer_pour_post(Champ_base& espace_stockage,const Nom&
       DoubleTab& es_valeurs = espace_stockage.valeurs();
       es_valeurs = 1.e30;
 
-      if ((le_dom_vef.non_nul()) && (la_zcl_vef.non_nul()))
+      if ((bool(le_dom_vef)) && (bool(la_zcl_vef)))
         {
           const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
           const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();

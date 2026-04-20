@@ -125,7 +125,7 @@ void Partitionneur_Metis_32_64<_SIZE_>::construire_partition(BigIntVect_& elem_p
   Cerr << "METIS is not compiled with this version. Use another partition tool like Tranche." << finl;
   Process::exit();
 #else
-  if (!ref_domaine_.non_nul())
+  if (!ref_domaine_)
     {
       Cerr << "Error in Partitionneur_Metis_32_64<_SIZE_>::construire_partition\n";
       Cerr << " The domain has not been associated" << finl;

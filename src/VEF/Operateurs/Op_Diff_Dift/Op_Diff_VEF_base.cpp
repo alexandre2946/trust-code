@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -187,7 +187,7 @@ void Op_Diff_VEF_base::calculer_pour_post(Champ_base& espace_stockage,const Nom&
     {
       DoubleTab& es_valeurs = espace_stockage.valeurs();
 
-      if (le_dom_vef.non_nul())
+      if (le_dom_vef)
         {
           remplir_nu(nu_);
           const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
@@ -253,12 +253,12 @@ void Op_Diff_VEF_base::remplir_nu(DoubleTab& tab_nu) const
   const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
   // On dimensionne nu
   const DoubleTab& tab_diffu = diffusivite().valeurs();
-  if (!tab_nu.get_md_vector().non_nul())
+  if (!tab_nu.get_md_vector())
     {
       tab_nu.resize(0, tab_diffu.line_size());
       domaine_VEF.domaine().creer_tableau_elements(tab_nu, RESIZE_OPTIONS::NOCOPY_NOINIT);
     }
-  if (!tab_diffu.get_md_vector().non_nul())
+  if (!tab_diffu.get_md_vector())
     {
       // diffusivite uniforme
       const int n = tab_nu.dimension_tot(0);

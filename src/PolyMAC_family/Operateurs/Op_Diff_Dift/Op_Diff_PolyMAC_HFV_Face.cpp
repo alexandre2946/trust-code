@@ -38,7 +38,7 @@ void Op_Diff_PolyMAC_HFV_Face::completer()
   Op_Diff_PolyMAC_HFV_base::completer();
   const Domaine_PolyMAC_HFV& domaine = ref_cast(Domaine_PolyMAC_HFV, le_dom_poly_.valeur());
   Equation_base& eq = equation();
-  Champ_Face_PolyMAC_HFV& ch = ref_cast(Champ_Face_PolyMAC_HFV, le_champ_inco.non_nul() ? le_champ_inco.valeur() : eq.inconnue());
+  Champ_Face_PolyMAC_HFV& ch = ref_cast(Champ_Face_PolyMAC_HFV, le_champ_inco ? le_champ_inco.valeur() : eq.inconnue());
   ch.init_auxiliary_variables(); /* ajout des inconnues auxiliaires (vorticites aux aretes) */
   flux_bords_.resize(domaine.premiere_face_int(), dimension * ch.valeurs().line_size());
   if (domaine.domaine().nb_joints() && domaine.domaine().joint(0).epaisseur() < 1)
@@ -93,7 +93,7 @@ double Op_Diff_PolyMAC_HFV_Face::calculer_dt_stab() const
 
 void Op_Diff_PolyMAC_HFV_Face::dimensionner_blocs_ext(int aux_only, matrices_t matrices, const tabs_t& semi_impl) const
 {
-  const Champ_Face_PolyMAC_HFV& ch = ref_cast(Champ_Face_PolyMAC_HFV, le_champ_inco.non_nul() ? le_champ_inco.valeur() : equation().inconnue());
+  const Champ_Face_PolyMAC_HFV& ch = ref_cast(Champ_Face_PolyMAC_HFV, le_champ_inco ? le_champ_inco.valeur() : equation().inconnue());
   const std::string& nom_inco = ch.le_nom().getString();
   if (!matrices.count(nom_inco))
     return; //pas de bloc diagonal -> rien a faire
@@ -229,7 +229,7 @@ void Op_Diff_PolyMAC_HFV_Face::dimensionner_blocs_ext(int aux_only, matrices_t m
 // renvoie resu
 void Op_Diff_PolyMAC_HFV_Face::ajouter_blocs_ext(int aux_only, matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Champ_Face_PolyMAC_HFV& ch = ref_cast(Champ_Face_PolyMAC_HFV, le_champ_inco.non_nul() ? le_champ_inco.valeur() : equation().inconnue());
+  const Champ_Face_PolyMAC_HFV& ch = ref_cast(Champ_Face_PolyMAC_HFV, le_champ_inco ? le_champ_inco.valeur() : equation().inconnue());
   const Conds_lim& cls = ch.domaine_Cl_dis().les_conditions_limites();
   const Domaine_PolyMAC_HFV& domaine = ref_cast(Domaine_PolyMAC_HFV, le_dom_poly_.valeur());
   const IntTab& e_f = domaine.elem_faces(), &f_s = domaine.face_sommets(), &e_a = domaine.domaine().elem_aretes(),

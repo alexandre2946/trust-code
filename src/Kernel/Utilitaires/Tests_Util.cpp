@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -19,7 +19,7 @@ int test_Ref()
   Cerr << "test_Ref" << finl;
   DoubleVect x(5);
   OBS_PTR(DoubleVect) xx;                                //Constructeur par defaut.
-  assert(xx.est_nul());                        //non_nul
+  assert(!xx);                        //non_nul
   OBS_PTR(DoubleVect) yy(x);                        //Constructeur par const T&.
   OBS_PTR(DoubleVect) zz(yy);                        //Constructeur par const T&.
   xx=x;                                        //Operateur = const T&.
@@ -30,7 +30,7 @@ int test_Ref()
   (static_cast<DoubleVect&>(xx))[2]=1;                        //cast
   assert (xx == x);                                //Operateur !=
   const Nom& name=xx.le_nom();                        //le_nom()
-  return zz.non_nul();                                //non_nul
+  return bool(zz);                                //non_nul
 }
 
 
@@ -42,7 +42,7 @@ int test_Deriv()
   Cerr << "test_Deriv" << finl;
   DoubleVect x(5);
   OWN_PTR(DoubleVect) xx;                        //Constructeur par defaut.
-  assert(xx.est_nul());
+  assert(!xx);
   OWN_PTR(DoubleVect) yy(x);                        //Constructeur par const T&.
   OWN_PTR(DoubleVect) zz(yy);                        //Constructeur par const T&.
   xx=x;                                        //Operateur = const T&.
@@ -53,7 +53,7 @@ int test_Deriv()
   (static_cast<DoubleVect&>(xx))[2]=1;                        //cast
   assert (xx != x);                                //Operateur !=
   const Nom& name=xx.le_nom();                        //le_nom()
-  return zz.non_nul();                                //non_nul
+  return bool(zz);                                //non_nul
 }
 
 

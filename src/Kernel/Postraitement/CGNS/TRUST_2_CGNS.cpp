@@ -307,7 +307,7 @@ void TRUST_2_CGNS::clear_vectors()
 void TRUST_2_CGNS::fill_global_infos()
 {
 #ifdef MPI_
-  assert (sommets_.non_nul() && elems_.non_nul());
+  assert (sommets_ && elems_);
 
   const bool by_comm_grp = is_comm_group_mode(postraiter_domaine_);
 
@@ -361,13 +361,13 @@ void TRUST_2_CGNS::fill_global_infos()
 
 void TRUST_2_CGNS::get_domaine_dis_vf_if_poly(Domaine_dis_base*& domaine_dis, Domaine_VF*& vf)
 {
-  assert(dom_trust_.non_nul());
+  assert(dom_trust_);
   domaine_dis = nullptr;
   vf = nullptr;
 
-  if (fs_dual_.est_nul() && ef_dual_.est_nul())
+  if (!fs_dual_ && !ef_dual_)
     {
-      if (domaine_dis_.non_nul()
+      if (domaine_dis_
           && domaine_dis_->domaine().le_nom() == dom_trust_->le_nom() // XXX peut etre sous_zone ;)
           && domaine_dis_->face_sommets().size() > 0)  // see if well filled for example
         {
@@ -392,7 +392,7 @@ void TRUST_2_CGNS::get_domaine_dis_vf_if_poly(Domaine_dis_base*& domaine_dis, Do
 void TRUST_2_CGNS::fill_global_infos_poly(const bool is_polyedre)
 {
 #ifdef MPI_
-  assert(dom_trust_.non_nul());
+  assert(dom_trust_);
 
   const bool by_comm_grp = is_comm_group_mode(postraiter_domaine_);
 
@@ -604,7 +604,7 @@ int TRUST_2_CGNS::convert_connectivity(const CGNS_TYPE type, std::vector<cgsize_
 
 CGNS_TYPE TRUST_2_CGNS::convert_elem_type(const Motcle& type) const
 {
-  assert(elems_.non_nul());
+  assert(elems_);
   const int nb_comp = elems_->dimension(1);
 
   if (type.debute_par("HEXAEDRE"))
@@ -653,7 +653,7 @@ int TRUST_2_CGNS::topo_dim_from_elem(CGNS_TYPE etype, bool is_polyedre) const
 
 int TRUST_2_CGNS::convert_connectivity_nface(std::vector<cgsize_t>& econ, std::vector<cgsize_t>& eoff, int decal)
 {
-  assert (dom_trust_.non_nul());
+  assert (dom_trust_);
 
   Domaine_dis_base *domaine_dis = nullptr;
   Domaine_VF *vf = nullptr;
@@ -705,7 +705,7 @@ int TRUST_2_CGNS::convert_connectivity_nface(std::vector<cgsize_t>& econ, std::v
 
 int TRUST_2_CGNS::convert_connectivity_ngon(std::vector<cgsize_t>& econ, std::vector<cgsize_t>& eoff, const bool is_polyedre, int decal)
 {
-  assert (dom_trust_.non_nul());
+  assert (dom_trust_);
   if (is_polyedre)
     {
       Domaine_dis_base* domaine_dis = nullptr;

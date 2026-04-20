@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -42,8 +42,8 @@ class Echange_impose_base : public Cond_lim_base
   Declare_base_sans_constructeur(Echange_impose_base);
 public:
 
-  inline bool has_emissivite() const { return emissivite_.non_nul(); }
-  inline bool has_h_imp() const { return h_imp_.non_nul(); }
+  inline bool has_emissivite() const { return bool(emissivite_); }
+  inline bool has_h_imp() const { return bool(h_imp_); }
 
   const DoubleTab& tab_T_ext(double temps=DMAXFLOAT) const;
   const DoubleTab& tab_h_imp(double temps=DMAXFLOAT) const;

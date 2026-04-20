@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -47,7 +47,7 @@ protected:
   {
 #ifndef LATATOOLS
     assert(verifie_LINE_SIZE());
-    if (TRUSTVect<_TYPE_,_SIZE_>::nproc() > 1 && TRUSTVect<_TYPE_,_SIZE_>::get_md_vector().non_nul())
+    if (TRUSTVect<_TYPE_,_SIZE_>::nproc() > 1 && TRUSTVect<_TYPE_,_SIZE_>::get_md_vector())
       Process::exit("Error in TRUSTTab::printOn: try to print a parallel vector");
     os << this->nb_dim_ << finl;
     assert(dimensions_[0] == dimension_tot_0_);
@@ -70,7 +70,7 @@ protected:
   {
 #ifndef LATATOOLS
     // Que veut-on faire si on lit dans un vecteur ayant deja une structure parallele ?
-    if (TRUSTVect<_TYPE_,_SIZE_>::get_md_vector().non_nul())
+    if (TRUSTVect<_TYPE_,_SIZE_>::get_md_vector())
       Process::exit("Error in TRUSTTab::readOn: vector has a parallel structure");
 
     is >> this->nb_dim_;

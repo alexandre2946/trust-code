@@ -233,7 +233,7 @@ Milieu_base& Conduction::milieu()
  */
 const Solide& Conduction::solide() const
 {
-  if(le_solide.est_nul())
+  if(!le_solide)
     {
       Cerr << "You forgot to associate the solid to the problem named " << probleme().le_nom() << finl;
       Process::exit();
@@ -245,7 +245,7 @@ void Conduction::creer_champ(const Motcle& motlu)
 {
   if (motlu == "temperature_paroi" || motlu == "wall_temperature")
     {
-      if (temperature_paroi_.est_nul())
+      if (!temperature_paroi_)
         {
           const Discret_Thermique& dis = ref_cast(Discret_Thermique, discretisation());
           dis.t_paroi(domaine_dis(), domaine_Cl_dis(), la_temperature, temperature_paroi_);
@@ -267,7 +267,7 @@ bool Conduction::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) co
   if (Equation_base::has_champ(nom, ref_champ))
     return true;
 
-  if (le_traitement_particulier.non_nul())
+  if (le_traitement_particulier)
     if (le_traitement_particulier->has_champ(nom, ref_champ))
       return true;
 
@@ -282,7 +282,7 @@ bool Conduction::has_champ(const Motcle& nom) const
   if (Equation_base::has_champ(nom))
     return true;
 
-  if (le_traitement_particulier.non_nul())
+  if (le_traitement_particulier)
     if (le_traitement_particulier->has_champ(nom))
       return true;
 
@@ -305,7 +305,7 @@ const Champ_base& Conduction::get_champ(const Motcle& nom) const
   if (Equation_base::has_champ(nom, ref_champ))
     return ref_champ;
 
-  if (le_traitement_particulier.non_nul())
+  if (le_traitement_particulier)
     if (le_traitement_particulier->has_champ(nom, ref_champ))
       return ref_champ;
 
@@ -325,7 +325,7 @@ void Conduction::get_noms_champs_postraitables(Noms& nom, Option opt) const
   else
     nom.add(noms_compris);
 
-  if (le_traitement_particulier.non_nul())
+  if (le_traitement_particulier)
     le_traitement_particulier->get_noms_champs_postraitables(nom, opt);
 }
 
@@ -336,7 +336,7 @@ void Conduction::get_noms_champs_postraitables(Noms& nom, Option opt) const
  */
 Solide& Conduction::solide()
 {
-  if(!le_solide.non_nul())
+  if(!le_solide)
     {
       Cerr << "A solide medium has not been associated to a Conduction equation"<<finl;
       exit();
@@ -370,6 +370,6 @@ void Conduction::mettre_a_jour(double temps)
 {
   Equation_base::mettre_a_jour(temps);
 
-  if (le_traitement_particulier.non_nul())
+  if (le_traitement_particulier)
     le_traitement_particulier->post_traitement_particulier();
 }

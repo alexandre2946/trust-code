@@ -92,7 +92,7 @@ const Champ_base& Champ_Generique_Moyenne::get_champ(OWN_PTR(Champ_base)&) const
   const Champ_base& source = mon_champ->get_champ(espace_stockage_source);
   Nature_du_champ nature_source = source.nature_du_champ();
   int nb_comp = source.nb_comp();
-  if (espace_stockage_.est_nul())
+  if (!espace_stockage_)
     creer_espace_stockage(nature_source,nb_comp,espace_stockage_);
   else
     espace_stockage_->changer_temps(temps());

@@ -68,12 +68,12 @@ Sortie& Fluide_base::printOn(Sortie& os) const
 Entree& Fluide_base::readOn(Entree& is)
 {
   Milieu_base::readOn(is);
-  if (ch_mu_.non_nul()) champs_don_.add(ch_mu_.valeur());
-  if (ch_nu_.non_nul()) champs_don_.add(ch_nu_.valeur());
-  if (ch_beta_co_.non_nul()) champs_don_.add(ch_beta_co_.valeur());
-  if (coeff_absorption_.non_nul()) champs_don_.add(coeff_absorption_.valeur());
-  if (indice_refraction_.non_nul()) champs_don_.add(indice_refraction_.valeur());
-  if (longueur_rayo_.non_nul()) champs_don_.add(longueur_rayo_.valeur());
+  if (ch_mu_) champs_don_.add(ch_mu_.valeur());
+  if (ch_nu_) champs_don_.add(ch_nu_.valeur());
+  if (ch_beta_co_) champs_don_.add(ch_beta_co_.valeur());
+  if (coeff_absorption_) champs_don_.add(coeff_absorption_.valeur());
+  if (indice_refraction_) champs_don_.add(indice_refraction_.valeur());
+  if (longueur_rayo_) champs_don_.add(longueur_rayo_.valeur());
   return is;
 }
 
@@ -98,7 +98,7 @@ void Fluide_base::discretiser(const Probleme_base& pb, const Discretisation_base
   const Domaine_dis_base& domaine_dis = pb.equation(0).domaine_dis();
   // mu rho nu  revoir
   double temps = pb.schema_temps().temps_courant();
-  if (ch_mu_.non_nul())
+  if (ch_mu_)
     if (sub_type(Champ_Fonc_MED, ch_mu_.valeur()))
       {
         Cerr << " on convertit le champ_fonc_med en champ_don" << finl;
@@ -112,12 +112,12 @@ void Fluide_base::discretiser(const Probleme_base& pb, const Discretisation_base
         ch_mu_->valeurs() = mu_prov->valeurs();
 
       }
-  if (ch_mu_.est_nul())
+  if (!ch_mu_)
     {
       dis.discretiser_champ("champ_elem", domaine_dis, "neant", "neant", 1, temps, ch_mu_);
       dis.discretiser_champ("champ_elem", domaine_dis, "neant", "neant", 1, temps, ch_nu_);
     }
-  if (ch_mu_.non_nul())
+  if (ch_mu_)
     {
       dis.nommer_completer_champ_physique(domaine_dis, "viscosite_dynamique", "kg/m/s", ch_mu_.valeur(), pb);
       champs_compris_.ajoute_champ(ch_mu_.valeur());
@@ -126,15 +126,15 @@ void Fluide_base::discretiser(const Probleme_base& pb, const Discretisation_base
     {
       dis.discretiser_champ("champ_elem", domaine_dis, "neant", "neant", 1, temps, ch_nu_);
     }
-  if (ch_nu_.est_nul())
+  if (!ch_nu_)
     dis.discretiser_champ("champ_elem", domaine_dis, "neant", "neant", 1, temps, ch_nu_);
 
-  if (ch_nu_.non_nul())
+  if (ch_nu_)
     {
       dis.nommer_completer_champ_physique(domaine_dis, "viscosite_cinematique", "m2/s", ch_nu_.valeur(), pb);
       champs_compris_.ajoute_champ(ch_nu_.valeur());
     }
-  if (ch_beta_co_.non_nul())
+  if (ch_beta_co_)
     {
       dis.nommer_completer_champ_physique(domaine_dis, "dilatabilite_solutale", ".", ch_beta_co_.valeur(), pb);
       champs_compris_.ajoute_champ(ch_beta_co_.valeur());
@@ -156,7 +156,7 @@ void Fluide_base::discretiser(const Probleme_base& pb, const Discretisation_base
 void Fluide_base::verifier_coherence_champs(int& err, Nom& msg)
 {
   msg = "";
-  if (ch_rho_.non_nul())
+  if (ch_rho_)
     {
       if (mp_min_vect(ch_rho_->valeurs()) <= 0)
         {
@@ -169,7 +169,7 @@ void Fluide_base::verifier_coherence_champs(int& err, Nom& msg)
       msg += "The density rho has not been specified. \n";
       err = 1;
     }
-  if ((ch_Cp_.non_nul()) && ((ch_lambda_.non_nul()) && (ch_beta_th_.non_nul()))) // Fluide anisotherme
+  if ((bool(ch_Cp_)) && ((bool(ch_lambda_)) && (bool(ch_beta_th_)))) // Fluide anisotherme
     {
       if (sub_type(Champ_Uniforme, ch_Cp_.valeur()))
         {
@@ -194,19 +194,19 @@ void Fluide_base::verifier_coherence_champs(int& err, Nom& msg)
         }
 
     }
-  if (((ch_Cp_.non_nul()) || (ch_beta_th_.non_nul())) && (ch_lambda_.est_nul()))
+  if (((bool(ch_Cp_)) || (bool(ch_beta_th_))) && (!ch_lambda_))
     {
       msg += " Physical properties for an anisotherm case : \n";
       msg += "the conductivity lambda has not been specified. \n";
       if (err == 0) err = 2; // if err=1 we keep it since err=1 exits while err=2 displays warning!
     }
-  if (((ch_lambda_.non_nul()) || (ch_beta_th_.non_nul())) && (ch_Cp_.est_nul()))
+  if (((bool(ch_lambda_)) || (bool(ch_beta_th_))) && (!ch_Cp_))
     {
       msg += " Physical properties for an anisotherm case : \n";
       msg += "the heat capacity Cp has not been specified. \n";
       if (err == 0) err = 2;
     }
-  if (((ch_lambda_.non_nul()) || (ch_Cp_.non_nul())) && (ch_beta_th_.est_nul()))
+  if (((bool(ch_lambda_)) || (bool(ch_Cp_))) && (!ch_beta_th_))
     {
       msg += " Physical properties for an anisotherm case : \n";
       msg += "the thermal expansion coefficient beta_th has not been specified. \n";
@@ -215,20 +215,20 @@ void Fluide_base::verifier_coherence_champs(int& err, Nom& msg)
 
   // Test de la coherence des proprietees radiatives du fluide incompressible
   // (pour un milieu semi transparent
-  if ((coeff_absorption_.non_nul()) && (indice_refraction_.est_nul()))
+  if ((bool(coeff_absorption_)) && (!indice_refraction_))
     {
       msg += " Physical properties for semi tranparent radiation case : \n";
       msg += "Refraction index has not been specfied while it has been done for absorption coefficient. \n";
       err = 1;
     }
-  if ((coeff_absorption_.est_nul()) && (indice_refraction_.non_nul()))
+  if ((!coeff_absorption_) && (bool(indice_refraction_)))
     {
       msg += " Physical properties for semi tranparent radiation case : \n";
       msg += "Absorption coefficient has not been specfied while it has been done for refraction index. \n";
       err = 1;
     }
 
-  if ((coeff_absorption_.non_nul()) && indice_refraction_.non_nul())
+  if ((bool(coeff_absorption_)) && indice_refraction_)
     {
       if (sub_type(Champ_Uniforme, coeff_absorption_.valeur()))
         {
@@ -250,8 +250,8 @@ void Fluide_base::verifier_coherence_champs(int& err, Nom& msg)
  */
 void Fluide_base::creer_nu()
 {
-  assert(ch_mu_.non_nul());
-  assert(ch_rho_.non_nul());
+  assert(ch_mu_);
+  assert(ch_rho_);
   ch_nu_ = ch_mu_;
   if (sub_type(Champ_Uniforme, ch_mu_.valeur()) && !sub_type(Champ_Uniforme, ch_rho_.valeur()))
     ch_nu_->valeurs().resize(ch_rho_->valeurs().dimension_tot(0), ch_rho_->valeurs().line_size());
@@ -297,7 +297,7 @@ bool Fluide_base::initTimeStep(double dt)
 void Fluide_base::mettre_a_jour(double temps)
 {
   Milieu_base::mettre_a_jour(temps);
-  if (ch_beta_co_.non_nul())
+  if (ch_beta_co_)
     ch_beta_co_->mettre_a_jour(temps);
   ch_mu_->mettre_a_jour(temps);
   calculer_nu();
@@ -308,7 +308,7 @@ void Fluide_base::mettre_a_jour(double temps)
 
   // Mise a jour des proprietes radiatives du fluide incompressible
   // (Pour un fluide incompressible semi transparent).
-  if (coeff_absorption_.non_nul() && indice_refraction_.non_nul())
+  if (coeff_absorption_ && indice_refraction_)
     {
       coeff_absorption_->mettre_a_jour(temps);
       indice_refraction_->mettre_a_jour(temps);
@@ -341,7 +341,7 @@ int Fluide_base::initialiser(const double temps)
   Milieu_base::initialiser(temps);
   ch_mu_->initialiser(temps);
 
-  if (ch_beta_co_.non_nul())
+  if (ch_beta_co_)
     ch_beta_co_->initialiser(temps);
 
   calculer_nu();
@@ -350,7 +350,7 @@ int Fluide_base::initialiser(const double temps)
 
   // Initialisation des proprietes radiatives du fluide incompressible
   // (Pour un fluide incompressible semi transparent).
-  if (coeff_absorption_.non_nul() && indice_refraction_.non_nul())
+  if (coeff_absorption_ && indice_refraction_)
     {
       Cerr << "Semi transparent fluid properties initialization." << finl;
       coeff_absorption_->initialiser(temps);
@@ -427,7 +427,7 @@ void Fluide_base::creer_temperature_multiphase() const
   if (res_en_T) return; /* Do nothing */
 
   const Equation_base& eq = equation("enthalpie");
-  if (ch_e_int_.est_nul()) creer_e_int();
+  if (!ch_e_int_) creer_e_int();
   ch_h_ou_T_ = ch_e_int_; // on initialise
   ch_h_ou_T_->nommer("temperature");
   ch_h_ou_T_->mettre_a_jour(eq.inconnue().temps());
@@ -491,31 +491,31 @@ void Fluide_base::calculer_e_int(const Objet_U& obj, DoubleTab& val, DoubleTab& 
 
 const Champ_base& Fluide_base::energie_interne() const
 {
-  if (ch_e_int_.est_nul()) creer_e_int();
+  if (!ch_e_int_) creer_e_int();
   return ch_e_int_;
 }
 
 Champ_base& Fluide_base::energie_interne()
 {
-  if (ch_e_int_.est_nul()) creer_e_int();
+  if (!ch_e_int_) creer_e_int();
   return ch_e_int_;
 }
 
 const Champ_base& Fluide_base::enthalpie() const
 {
-  if (ch_h_ou_T_.est_nul() && ch_e_int_.est_nul()) creer_e_int();
-  return ch_h_ou_T_.non_nul() ? ch_h_ou_T_ : ch_e_int_;
+  if (!ch_h_ou_T_ && !ch_e_int_) creer_e_int();
+  return ch_h_ou_T_ ? ch_h_ou_T_ : ch_e_int_;
 }
 
 Champ_base& Fluide_base::enthalpie()
 {
-  if (ch_h_ou_T_.est_nul() && ch_e_int_.est_nul()) creer_e_int();
-  return ch_h_ou_T_.non_nul() ? ch_h_ou_T_ : ch_e_int_;
+  if (!ch_h_ou_T_ && !ch_e_int_) creer_e_int();
+  return ch_h_ou_T_ ? ch_h_ou_T_ : ch_e_int_;
 }
 
 const Champ_base& Fluide_base::temperature_multiphase() const
 {
-  if (ch_h_ou_T_.est_nul())
+  if (!ch_h_ou_T_)
     creer_temperature_multiphase();
 
   if (sub_type(Fluide_Incompressible, *this))
@@ -526,7 +526,7 @@ const Champ_base& Fluide_base::temperature_multiphase() const
 
 Champ_base& Fluide_base::temperature_multiphase()
 {
-  if (ch_h_ou_T_.est_nul())
+  if (!ch_h_ou_T_)
     creer_temperature_multiphase();
 
   if (sub_type(Fluide_Incompressible, *this))

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -38,9 +38,9 @@ public:
   DoubleTab& calculer(DoubleTab&) const override;
   int a_pour_Champ_Fonc(const Motcle& mot, OBS_PTR(Champ_base) &ch_ref) const override;
   inline const Champ_Don_base& champ_vitesse() const { return champ_vitesse_; }
-  bool has_champ_vitesse() const { return champ_vitesse_.non_nul(); }
+  bool has_champ_vitesse() const { return bool(champ_vitesse_); }
   inline const Champ_Don_base& omega() const { return omega_; }
-  bool has_omega() const { return omega_.non_nul(); }
+  bool has_omega() const { return bool(omega_); }
 
 protected:
   virtual void lire_data(Entree& s);

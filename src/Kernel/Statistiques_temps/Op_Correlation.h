@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -63,9 +63,9 @@ protected:
 
 inline void Op_Correlation::associer_op_stat(const Operateur_Statistique_tps_base& un_op_stat)
 {
-  if (!la_moyenne_a_.non_nul())
+  if (!la_moyenne_a_)
     la_moyenne_a_ = ref_cast(Op_Moyenne, un_op_stat);
-  else if (!la_moyenne_b_.non_nul())
+  else if (!la_moyenne_b_)
     la_moyenne_b_ = ref_cast(Op_Moyenne, un_op_stat);
   else
     {

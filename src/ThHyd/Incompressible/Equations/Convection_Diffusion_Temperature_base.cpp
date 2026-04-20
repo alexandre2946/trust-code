@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -25,7 +25,7 @@ Entree& Convection_Diffusion_Temperature_base::readOn(Entree& is) { return Conve
 
 const Fluide_base& Convection_Diffusion_Temperature_base::fluide() const
 {
-  if(le_fluide.est_nul())
+  if(!le_fluide)
     {
       Cerr << "You forgot to associate the fluid to the problem named " << probleme().le_nom() << finl;
       Process::exit();
@@ -41,7 +41,7 @@ const Fluide_base& Convection_Diffusion_Temperature_base::fluide() const
  */
 Fluide_base& Convection_Diffusion_Temperature_base::fluide()
 {
-  if(le_fluide.est_nul())
+  if(!le_fluide)
     {
       Cerr << "You forgot to associate the fluid to the problem named " << probleme().le_nom() << finl;
       Process::exit();
@@ -66,7 +66,7 @@ void Convection_Diffusion_Temperature_base::creer_champ(const Motcle& motlu)
 
   if (motlu == "temperature_paroi" || motlu == "wall_temperature")
     {
-      if (temperature_paroi_.est_nul())
+      if (!temperature_paroi_)
         {
           const Discret_Thermique& dis = ref_cast(Discret_Thermique, discretisation());
           dis.t_paroi(domaine_dis(), domaine_Cl_dis(), inconnue(), temperature_paroi_);

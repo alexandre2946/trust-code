@@ -58,7 +58,7 @@ void Op_Grad_PolyMAC_MPFA_Face::update_grad(int full_stencil) const
 {
   const Domaine_PolyMAC_MPFA& domaine = ref_cast(Domaine_PolyMAC_MPFA, ref_domaine.valeur());
   const Champ_Face_PolyMAC_MPFA& ch = ref_cast(Champ_Face_PolyMAC_MPFA, equation().inconnue());
-  const DoubleTab& press = le_champ_inco.non_nul() ? le_champ_inco->valeurs() : ref_cast(Navier_Stokes_std, equation()).pression().valeurs(),
+  const DoubleTab& press = le_champ_inco ? le_champ_inco->valeurs() : ref_cast(Navier_Stokes_std, equation()).pression().valeurs(),
                    *alp = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()).equation_masse().inconnue().passe() : nullptr;
   const int M = press.line_size();
   double t_past = equation().inconnue().recuperer_temps_passe();
@@ -78,7 +78,7 @@ void Op_Grad_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const ta
   const DoubleTab& nf = domaine.face_normales(), &xp = domaine.xp(), &xv = domaine.xv();
   const DoubleVect& fs = domaine.face_surfaces(), &ve = domaine.volumes();
   const int ne_tot = domaine.nb_elem_tot(), nf_tot = domaine.nb_faces_tot(), D = dimension, N = ch.valeurs().line_size(),
-            M = (le_champ_inco.non_nul() ? le_champ_inco->valeurs() : ref_cast(Navier_Stokes_std, equation()).pression().valeurs()).line_size();
+            M = (le_champ_inco ? le_champ_inco->valeurs() : ref_cast(Navier_Stokes_std, equation()).pression().valeurs()).line_size();
 
   update_grad(domaine.domaine().deformable() || sub_type(Pb_Multiphase, equation().probleme())); //provoque le calcul du gradient
 
@@ -219,7 +219,7 @@ void Op_Grad_PolyMAC_MPFA_Face::ajouter_blocs(matrices_t matrices, DoubleTab& se
   const Conds_lim& cls = ref_dcl->les_conditions_limites();
   const IntTab& f_e = domaine.face_voisins(), &fcl = ch.fcl();
   const DoubleTab& nf = domaine.face_normales(), &xp = domaine.xp(), &xv = domaine.xv(), &vfd = domaine.volumes_entrelaces_dir(),
-                   &press = semi_impl.count("pression") ? semi_impl.at("pression") : (le_champ_inco.non_nul() ? le_champ_inco->valeurs() : ref_cast(Navier_Stokes_std, equation()).pression().valeurs()),
+                   &press = semi_impl.count("pression") ? semi_impl.at("pression") : (le_champ_inco ? le_champ_inco->valeurs() : ref_cast(Navier_Stokes_std, equation()).pression().valeurs()),
                     *alp = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()).equation_masse().inconnue().passe() : nullptr;
 
   const DoubleVect& fs = domaine.face_surfaces(), &ve = domaine.volumes(), &pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face();

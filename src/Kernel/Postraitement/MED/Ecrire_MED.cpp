@@ -227,7 +227,7 @@ void Ecrire_MED_32_64<int>::ecrire_domaine_dual(bool append)
 
   // Retrieve (or build!) the **dual** mesh associated with the domain.
   // This potentially means discretizing the domaine !
-  assert(domaine_dis_.non_nul());
+  assert(domaine_dis_);
   const Domaine_VF& dom_vf = ref_cast(Domaine_VF, domaine_dis_.valeur());
   const auto& dual_m = dom_vf.get_mc_dual_mesh();
   MEDCouplingUMesh *dual_no_const = const_cast<MEDCouplingUMesh *>(dual_m);  // because of setCoords() and setMeshAtLevel()
@@ -277,7 +277,7 @@ void Ecrire_MED_32_64<_SIZE_>::fill_faces_and_boundaries()
   get_bords_infos(noms_bords_and_jnts, sz_bords_and_jnts);
 
   int_t nfaces = 0;
-  bool full_face_mesh = domaine_dis_.non_nul() && ref_cast(Domaine_VF, domaine_dis_.valeur()).elem_faces().size()>0;
+  bool full_face_mesh = domaine_dis_ && ref_cast(Domaine_VF, domaine_dis_.valeur()).elem_faces().size()>0;
   // If the domain has faces (eg:domain computation), we can create a face mesh (all faces, incl internal ones), else only a boundary mesh
   if (full_face_mesh)
     {

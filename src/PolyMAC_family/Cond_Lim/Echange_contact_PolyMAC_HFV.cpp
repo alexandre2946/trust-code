@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -51,7 +51,7 @@ Entree& Echange_contact_PolyMAC_HFV::readOn(Entree& s )
 
 void Echange_contact_PolyMAC_HFV::init_op() const
 {
-  if (o_diff.non_nul()) return;
+  if (o_diff) return;
   Champ_front_calc ch;
   ch.creer(nom_autre_pb_, nom_bord_, nom_champ_);
   fvf = ref_cast(Front_VF, frontiere_dis()), o_fvf = ref_cast(Front_VF, ch.front_dis()); //frontieres

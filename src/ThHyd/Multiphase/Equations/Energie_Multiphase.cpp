@@ -38,8 +38,8 @@ Sortie& Energie_Multiphase::printOn(Sortie& is) const { return Convection_Diffus
 
 Entree& Energie_Multiphase::readOn(Entree& is)
 {
-  assert(l_inco_ch_.non_nul());
-  assert(le_fluide.non_nul());
+  assert(l_inco_ch_);
+  assert(le_fluide);
   evanescence_.associer_eqn(*this);
   Convection_Diffusion_Temperature_base::readOn(is);
 
@@ -145,13 +145,13 @@ const Motcle& Energie_Multiphase::domaine_application() const
 void Energie_Multiphase::dimensionner_matrice_sans_mem(Matrice_Morse& matrice)
 {
   Convection_Diffusion_Temperature_base::dimensionner_matrice_sans_mem(matrice);
-  if (evanescence_.non_nul()) evanescence_->dimensionner(matrice);
+  if (evanescence_) evanescence_->dimensionner(matrice);
 }
 
 int Energie_Multiphase::has_interface_blocs() const
 {
   int ok = Convection_Diffusion_Temperature_base::has_interface_blocs();
-  if (evanescence_.non_nul()) ok &= evanescence_->has_interface_blocs();
+  if (evanescence_) ok &= evanescence_->has_interface_blocs();
   return ok;
 }
 
@@ -159,13 +159,13 @@ int Energie_Multiphase::has_interface_blocs() const
 void Energie_Multiphase::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   Convection_Diffusion_Temperature_base::dimensionner_blocs(matrices, semi_impl);
-  if (evanescence_.non_nul()) evanescence_->dimensionner_blocs(matrices, semi_impl);
+  if (evanescence_) evanescence_->dimensionner_blocs(matrices, semi_impl);
 }
 
 void Energie_Multiphase::assembler_blocs_avec_inertie(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl)
 {
   Convection_Diffusion_Temperature_base::assembler_blocs_avec_inertie(matrices, secmem, semi_impl);
-  if (evanescence_.non_nul()) evanescence_->ajouter_blocs(matrices, secmem, semi_impl);
+  if (evanescence_) evanescence_->ajouter_blocs(matrices, secmem, semi_impl);
 }
 
 void Energie_Multiphase::calculer_alpha_rho_e_conv(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv)
@@ -261,7 +261,7 @@ void Energie_Multiphase::calculer_alpha_rho_h(const Objet_U& obj, DoubleTab& val
 
 void Energie_Multiphase::init_champ_convecte() const
 {
-  if (champ_convecte_.non_nul()) return; //deja fait
+  if (champ_convecte_) return; //deja fait
   int Nt = inconnue().nb_valeurs_temporelles(), Nl = inconnue().valeurs().size_reelle_ok() ? inconnue().valeurs().dimension(0) : -1, Nc = inconnue().valeurs().line_size();
   //champ_convecte_ : meme type / support que l'inconnue
   discretisation().creer_champ(champ_convecte_, domaine_dis(), inconnue().que_suis_je(), "N/A", "N/A", Nc, Nl, Nt, schema_temps().temps_courant());

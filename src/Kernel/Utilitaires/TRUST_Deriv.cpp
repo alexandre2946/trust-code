@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -27,7 +27,7 @@ TRUST_Deriv_Objet_U::TRUST_Deriv_Objet_U() : Objet_U_ptr(), pointeur_(nullptr) {
 
 TRUST_Deriv_Objet_U::TRUST_Deriv_Objet_U(const TRUST_Deriv_Objet_U& t) : Objet_U_ptr(), pointeur_(nullptr)
 {
-  if (t.non_nul()) recopie(t.valeur());
+  if (t) recopie(t.valeur());
 }
 
 TRUST_Deriv_Objet_U::TRUST_Deriv_Objet_U(const Objet_U& t) : Objet_U_ptr(), pointeur_(nullptr)
@@ -45,7 +45,7 @@ const TRUST_Deriv_Objet_U& TRUST_Deriv_Objet_U::operator=(const Objet_U& t)
 const TRUST_Deriv_Objet_U& TRUST_Deriv_Objet_U::operator=(const TRUST_Deriv_Objet_U& t)
 {
   detach();
-  if (t.non_nul()) recopie(t.valeur());
+  if (t) recopie(t.valeur());
   else set_Objet_U_ptr(nullptr);
   return *this;
 }

@@ -35,13 +35,13 @@ public :
 
   inline const Champ_Don_base& diffusivite_constituant() const
   {
-    assert(D_.non_nul());
+    assert(D_);
     return D_.valeur();
   }
 
   inline void mettre_a_jour(double temps) override
   {
-    if (D_.non_nul()) D_->mettre_a_jour(temps);
+    if (D_) D_->mettre_a_jour(temps);
   }
 
   void discretiser(const Probleme_base& pb, const Discretisation_base& dis) override;
@@ -50,7 +50,7 @@ public :
 
   int initialiser(const double temps) override
   {
-    if (D_.non_nul()) D_->initialiser(temps);
+    if (D_) D_->initialiser(temps);
     return 1;
   }
 

@@ -208,7 +208,7 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ(OWN_PTR(Champ_base)&) 
     Process::exit("PolyMAC_HFV/PolyMAC_MPFA face field not supported yet for Reduction_0D");
 
 
-  if (espace_stockage_.est_nul())
+  if (!espace_stockage_)
     creer_espace_stockage(nature_source,nb_comp,espace_stockage_);
   else
     espace_stockage_->changer_temps(get_time());
@@ -695,7 +695,7 @@ void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVec
     {
       const Domaine_dis_base& domaine_dis = get_source(0).get_ref_domaine_dis_base();
       const Domaine_VF& zvf = ref_cast(Domaine_VF,domaine_dis);
-      if (!un_.get_md_vector().non_nul())
+      if (!un_.get_md_vector())
         {
           Entity loc = get_localisation();
           if (loc == Entity::ELEMENT)
