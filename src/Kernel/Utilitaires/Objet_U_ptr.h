@@ -39,6 +39,11 @@ public:
   bool non_nul() const;
   bool est_nul() const;
 
+  explicit operator bool() const noexcept
+  {
+    assert(get_Objet_U_ptr_check() || 1); // this should disappear. when the factory is fixed probably
+    return (cle_ >= 0) ? true : false;
+  }
 
   [[deprecated("Do not use naming logic on OWN_PTR, Trust_Deriv, Objet_U_ptr. Will be removed")]]
   const Nom& le_nom() const override

@@ -101,6 +101,7 @@ public:
   ~LataDeriv() { delete ptr_; ptr_ = 0; }
   void reset() { delete ptr_; ptr_ = 0; }
   bool non_nul() const { return ptr_ != 0; }
+  explicit operator bool() const noexcept { return ptr_ != nullptr; }
   // operator C &() { return valeur(); }
   // operator const C &() const { return valeur(); }
   C& valeur() { if (!ptr_) throw ERROR_NULL; return *ptr_; }
@@ -150,6 +151,7 @@ public:
   operator C& () { if (!ptr_) throw ERROR_NULL; return *ptr_; }
   C& valeur() { if (!ptr_) throw ERROR_NULL; return *ptr_; }
   bool non_nul() const { return ptr_ != 0; }
+  explicit operator bool() const noexcept { return ptr_ != nullptr; }
 protected:
   C *ptr_;
 };

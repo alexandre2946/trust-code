@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -90,6 +90,9 @@ public:
   inline value_type* operator ->() { assert(p_ != nullptr); return p_; }
   bool non_nul() const { return p_ != nullptr; }
   bool est_nul() const { return p_ == nullptr; }
+
+  explicit operator bool() const noexcept { return p_ != nullptr; }
+
   const Nom& le_nom() const = delete;
   void reset() {  p_ = nullptr; }
 };
@@ -129,6 +132,8 @@ public:
   const TRUST_Ref_Objet_U& operator=(const TRUST_Ref_Objet_U& t);
   bool non_nul() const;
   bool est_nul() const;
+
+  explicit operator bool() const noexcept { return p_ != nullptr; }
 
   inline const Objet_U& valeur() const { assert(p_ != nullptr); return *p_; }
   inline Objet_U& valeur() { assert(p_ != nullptr); return *p_; }

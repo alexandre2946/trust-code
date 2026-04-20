@@ -32,6 +32,7 @@ public:
   ptrParam(const ptrParam&);
   const ptrParam& operator=(const ptrParam&);
   inline int non_nul() const { return (param_!=0); }
+  explicit operator bool() const noexcept { return param_ != nullptr; }
   void create(const char*);
   Param& valeur();
   const Param& valeur() const;
