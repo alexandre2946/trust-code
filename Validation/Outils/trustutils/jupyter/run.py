@@ -68,14 +68,14 @@ def useMEDCoupling():
         raise Exception("Could not load MEDCoupling environment!")
         
 def useLataTools():
-    """ Load LataTools environment in the PYTHONPATH so that 'import LataLoader' can work.
+    """ Load LataTools environment in the PYTHONPATH so that 'import TRUST_Post_Loader' can work.
     """
     import sys
     useMEDCoupling()
     trust_root = os.environ["TRUST_ROOT"]
     sys.path.append(f"{trust_root}/exec/lata_tools/lib")
     # for testing. no need to try/catch, that would just shadow the initial exception
-    import LataLoader
+    import TRUST_Post_Loader
     
 ######## PRIVATE STUFF #########
 
@@ -1451,7 +1451,7 @@ def is_NOT_RUN():
     """
     Check global variable _NOT_RUN to know if option -not_run was set.
 
-    Useful if lata files are read by the user (eg. with lataloader).
+    Useful if lata files are read by the user (eg. with TRUST_Post_Loader).
     And probably a lot of other use cases
     """
 

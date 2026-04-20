@@ -6,7 +6,7 @@ set(CMAKE_INSTALL_MESSAGE LAZY)
 project(lata_tools)
 
 set (loadercpp off)
-option(loaderpython "Build swig of lataloader" ON)
+option(loaderpython "Build swig of TRUST_Post_Loader" ON)
 set (TRUST_INT64 $ENV{TRUST_INT64})
 
 # if ("${TRUST_INT64}"  STREQUAL "1" )
