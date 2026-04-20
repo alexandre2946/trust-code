@@ -1031,7 +1031,7 @@ void OctreeRoot_32_64<_SIZE_>::rang_elems_sommet(SmallArrOfTID_t& elements, doub
 template <typename _SIZE_>
 int OctreeRoot_32_64<_SIZE_>::construit() const
 {
-  if((le_dom.non_nul()==0)||(valid_!=1))
+  if((le_dom.est_nul())||(valid_!=1))
     // L'Octree n'est pas construit ou le domaine est nulle
     return 0;
   else

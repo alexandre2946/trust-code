@@ -61,7 +61,7 @@ MorEqn::~MorEqn()
  */
 inline const Equation_base& MorEqn::equation() const
 {
-  if (mon_equation.non_nul()==0)
+  if (mon_equation.est_nul())
     {
       Cerr << "\nError in MorEqn::equation() : The equation is unknown !" << finl;
       Process::exit();
@@ -75,7 +75,7 @@ inline const Equation_base& MorEqn::equation() const
  */
 inline  Equation_base& MorEqn::equation()
 {
-  if (mon_equation.non_nul()==0)
+  if (mon_equation.est_nul())
     {
       Cerr << "\nError in MorEqn::equation() : The equation is unknown !" << finl;
       Process::exit();
@@ -84,11 +84,7 @@ inline  Equation_base& MorEqn::equation()
 }
 int MorEqn::mon_equation_non_nul() const
 {
-  //Pour pouvoir tester si la reference est
-  if (mon_equation.non_nul())
-    return 1;
-  else
-    return 0;
+  return mon_equation.non_nul();
 }
 #endif
 

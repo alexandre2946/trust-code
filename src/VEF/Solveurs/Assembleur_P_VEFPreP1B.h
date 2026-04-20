@@ -40,7 +40,7 @@ public :
   void completer(const Equation_base& ) override;
   inline const Equation_base& equation() const
   {
-    if (mon_equation.non_nul()==0)
+    if (mon_equation.est_nul())
       {
         Cerr << "\nError in Assembleur_P_VEFPreP1B::equation() : The equation is unknown !" << finl;
         Process::exit();

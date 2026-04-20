@@ -112,7 +112,7 @@ inline Turbulence_paroi_scal_base& Modele_turbulence_scal_base::loi_paroi()
 
 inline Convection_Diffusion_std& Modele_turbulence_scal_base::equation()
 {
-  if (mon_equation_.non_nul() == 0)
+  if (mon_equation_.est_nul())
     {
       Cerr << "\nError in Modele_turbulence_scal_base::equation() : The equation is unknown !" << finl;
       Process::exit();
@@ -122,7 +122,7 @@ inline Convection_Diffusion_std& Modele_turbulence_scal_base::equation()
 
 inline const Convection_Diffusion_std& Modele_turbulence_scal_base::equation() const
 {
-  if (mon_equation_.non_nul() == 0)
+  if (mon_equation_.est_nul())
     {
       Cerr << "\nError in Modele_turbulence_scal_base::equation() : The equation is unknown !" << finl;
       Process::exit();

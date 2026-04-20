@@ -195,7 +195,7 @@ const Nom& Champ_front_calc::nom_bord_oppose() const
  */
 const Equation_base& Champ_front_calc::equation() const
 {
-  if (l_inconnue.non_nul()==0)
+  if (l_inconnue.est_nul())
     {
       Cerr << "\nError in Champ_front_calc::equation() : not able to return the equation !" << finl;
       Process::exit();

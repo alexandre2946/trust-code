@@ -19,7 +19,7 @@ int test_Ref()
   Cerr << "test_Ref" << finl;
   DoubleVect x(5);
   OBS_PTR(DoubleVect) xx;                                //Constructeur par defaut.
-  assert(xx.non_nul() == 0);                        //non_nul
+  assert(xx.est_nul());                        //non_nul
   OBS_PTR(DoubleVect) yy(x);                        //Constructeur par const T&.
   OBS_PTR(DoubleVect) zz(yy);                        //Constructeur par const T&.
   xx=x;                                        //Operateur = const T&.
@@ -42,7 +42,7 @@ int test_Deriv()
   Cerr << "test_Deriv" << finl;
   DoubleVect x(5);
   OWN_PTR(DoubleVect) xx;                        //Constructeur par defaut.
-  assert(xx.non_nul() == 0);
+  assert(xx.est_nul());
   OWN_PTR(DoubleVect) yy(x);                        //Constructeur par const T&.
   OWN_PTR(DoubleVect) zz(yy);                        //Constructeur par const T&.
   xx=x;                                        //Operateur = const T&.
