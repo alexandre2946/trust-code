@@ -827,11 +827,30 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
         }
       else
         {
+          if (directive=="champ_fonc_quad_dg") //This is for DG
+					{
+              IntTab nb_points, ind_integ_points;
+              int nb_elem = valeurs_espace.dimension(0);
+              zvf.get_ind_integ_points(ind_integ_points);
+              zvf.get_nb_integ_points(nb_points);
+          Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_elem, KOKKOS_LAMBDA(const int i)
+          {
+              for (int pt=0; pt<nb_points[i]; pt++)
+              {
+                  int k = ind_integ_points[i]+pt;
+									v(k) = source_so_val(i, num_compo*nb_points[i]+pt);
+									}
+          });
+          end_gpu_timer(__KERNEL_NAME__);
+					}
+					else
+					{
           Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_pos, KOKKOS_LAMBDA(const int i)
           {
             v(i) = source_so_val(i, num_compo);
           });
           end_gpu_timer(__KERNEL_NAME__);
+					}
         }
     }
   else if (Motcle(methode_)=="formule")
