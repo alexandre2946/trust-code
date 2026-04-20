@@ -228,9 +228,39 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ(OWN_PTR(Champ_base)&) 
 
   if (domaine_dis.que_suis_je() == "Domaine_DG")
     {
-      //bool is_vectorial = source.is_vectorial(); TODO DG vectorial case
-      extraire(val_extraite,valeurs_source,basis_function,order);
-      espace_valeurs = val_extraite;
+      if (nb_comp==1)
+        {
+          extraire(val_extraite,valeurs_source,basis_function,order);
+          espace_valeurs = val_extraite;
+        }
+      else
+        {
+          assert(nb_comp==Objet_U::dimension);
+          int size_vect = valeurs_source.dimension(0);
+          DoubleTrav vect_source;
+          vect_source.resize(size_vect);
+          for (int comp=0; comp<nb_comp; comp++)
+            {
+              {
+                CDoubleTabView valeurs = valeurs_source.view_ro();
+                DoubleArrView vect = static_cast<ArrOfDouble&>(vect_source).view_wo();
+                Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), size_vect, KOKKOS_LAMBDA(const int i)
+                {
+                  vect(i) = valeurs(i,comp);
+                });
+                end_gpu_timer(__KERNEL_NAME__);
+              }
+              extraire(val_extraite,vect_source,basis_function,order);
+              {
+                DoubleTabView valeurs = espace_valeurs.view_wo();
+                Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), size_vect, KOKKOS_LAMBDA(const int i)
+                {
+                  valeurs(i,comp) = val_extraite;
+                });
+                end_gpu_timer(__KERNEL_NAME__);
+              }
+            }
+        }
     }
   else if (nb_comp==1)
     {
