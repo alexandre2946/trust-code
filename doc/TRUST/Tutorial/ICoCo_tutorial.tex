@@ -1204,16 +1204,20 @@ The procedure is described in this exercice. However, it depends on the TrioCFD 
 \begin{block}{If you want to use you own TrioCFD version?}
 
 a) Edit the project.cfg of TrioCFD:\\
+\begin{tiny}
     > cd PathToTrioCFD \\
     > source env\_TrioCFD.sh \\
-    > echo "MEDICoCo : \$TRUST\_ROOT/Outils/ICoCo/ICoCo\_src" >> project.cfg
+    > sed -i "/[dependencies]/a MEDICoCo : \$TRUST\_ROOT/Outils/ICoCo/ICoCo\_src" project.cfg
+\end{tiny}
 \end{block}
 
 \begin{block}{}
 b) Configure and compile TrioCFD:\\
+\begin{tiny}
 > ./configure \\
 > make optim debug \\
 > make module\_optim module\_debug
+\end{tiny}
 \end{block}
 
 \end{frame}
@@ -1231,16 +1235,20 @@ a) Create a baltik project with dependency to TrioCFD:\\
 
 \begin{block}{}
 b) Add ICoCo as a dependency of your baltik project:\\
+\begin{tiny}
     > cd BaltikName \\
-    > echo "MEDICoCo : \$TRUST\_ROOT/Outils/ICoCo/ICoCo\_src" >> project.cfg
+    > sed -i "/[dependencies]/a MEDICoCo : \$TRUST\_ROOT/Outils/ICoCo/ICoCo\_src" project.cfg
+\end{tiny}
 \end{block}
 
 \begin{block}{}
 c) Configure and compile your baltik project:\\
+\begin{tiny}
 > ./configure \\
 > source env\_*.sh \\
 > make optim debug \\
 > make module\_optim module\_debug
+\end{tiny}
 \end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
