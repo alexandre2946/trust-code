@@ -1403,11 +1403,19 @@ void Equation_base::verifie_ch_init_nb_comp(const Champ_Inc_base& ch_ref, const 
           exit();
         }
     }
-  else if (nature==basis_function_scalar)
+  else if (nature==basis_function_order_1_scalar)
     {
       // Todo DG implement some check for size ?
     }
-  else if (nature==basis_function_vectorial)
+  else if (nature==basis_function_order_2_scalar)
+    {
+      // Todo DG implement some check for size ?
+    }
+  else if (nature==basis_function_order_1_vectorial)
+    {
+      // Todo DG implement some check for size ?
+    }
+  else if (nature==basis_function_order_2_vectorial)
     {
       // Todo DG implement some check for size ?
     }

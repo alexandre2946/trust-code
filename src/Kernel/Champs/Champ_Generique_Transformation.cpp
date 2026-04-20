@@ -223,16 +223,17 @@ void Champ_Generique_Transformation::completer(const Postraitement_base& post)
           if ((Motcle(methode_) == "vecteur"))
             {
 
-              if (source.nature_du_champ()!=scalaire && source.nature_du_champ()!=basis_function_scalar)
+              if (source.is_vectorial())
                 {
                   Cerr<<que_suis_je()<<" The source fields must be of scalar nature for option vecteur."<<finl;
                   exit();
                 }
             }
-          int nb_comp = source.nb_comp();
+          const Domaine_dis_base& domaine_dis = get_source(0).get_ref_domaine_dis_base();
+          int nb_comp = (domaine_dis.que_suis_je()=="Domaine_DG") ? (source.is_vectorial() ? Objet_U::dimension : 1) : source.nb_comp();
           nb_comp_ = (nb_comp_<nb_comp)?  nb_comp:nb_comp_;
 
-          if (source.nature_du_champ()==vectoriel)
+          if (source.is_vectorial())
             nature_ch = vectoriel;
           else if (source.nature_du_champ()==multi_scalaire)
             nature_ch = multi_scalaire;
@@ -608,7 +609,7 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
               int nelem = valeurs_espace.dimension(0);
               int npoints = valeurs_espace.dimension(1);
               sources_val[so].resize(nelem,npoints);
-              source_so.eval_elem(sources_val[so]);
+              if (Motcle(methode_)!="vecteur") source_so.eval_elem(sources_val[so]);
             }
           else source_so.valeur_aux(positions,sources_val[so]);
         }
@@ -646,17 +647,43 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
       Kokkos::Array<CDoubleTabView, max_nb_sources> sources;
       for (int so=0; so<nb_sources; so++)
         sources[so] = sources_val[so].view_ro();
+      IntTab nb_points, ind_integ_points;
+      zvf.get_ind_integ_points(ind_integ_points);
+      zvf.get_nb_integ_points(nb_points);
       DoubleArrView valeurs = static_cast<ArrOfDouble&>(valeurs_espace).view_wo();
-      Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_pos, KOKKOS_LAMBDA(const int i)
-      {
-        int threadId = parser.acquire();
-        for (int so=0; so<nb_sources; so++)
-          for (int j=0; j<dim; j++)
-            parser.setVar(so*dim+j,sources[so](i,j), threadId);
-        valeurs(i) = parser.eval(threadId);
-        parser.release(threadId);
-      });
-      end_gpu_timer(__KERNEL_NAME__);
+      if (directive == "champ_fonc_quad_dg") //This is for DG
+        {
+          int nb_elem = valeurs_espace.dimension(0);
+          CIntArrView ind_integ_points_w = static_cast<const ArrOfInt&>(ind_integ_points).view_ro();
+          CIntArrView nb_points_w = static_cast<const ArrOfInt&>(nb_points).view_ro();
+          Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_elem, KOKKOS_LAMBDA(const int i)
+          {
+            for (int pt=0; pt<nb_points_w(i); pt++)
+              {
+                int threadId = parser.acquire();
+                int k = ind_integ_points_w(i)+pt;
+                for (int so=0; so<nb_sources; so++)
+                  for (int j=0; j<dim; j++)
+                    parser.setVar(so*dim+j,sources[so](i,j*nb_points_w[i]+pt), threadId);
+                valeurs(k) = parser.eval(threadId);
+                parser.release(threadId);
+              }
+          });
+          end_gpu_timer(__KERNEL_NAME__);
+        }
+      else
+        {
+          Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_pos, KOKKOS_LAMBDA(const int i)
+          {
+            int threadId = parser.acquire();
+            for (int so=0; so<nb_sources; so++)
+              for (int j=0; j<dim; j++)
+                parser.setVar(so*dim+j,sources[so](i,j), threadId);
+            valeurs(i) = parser.eval(threadId);
+            parser.release(threadId);
+          });
+          end_gpu_timer(__KERNEL_NAME__);
+        }
     }
   else if (Motcle(methode_)=="vecteur")
     {
@@ -710,10 +737,11 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
           if (directive=="champ_fonc_quad_dg") //This is for DG
             {
               IntTab nb_points, ind_integ_points;
+              int nb_elem = valeurs_espace.dimension(0);
               zvf.get_ind_integ_points(ind_integ_points);
               zvf.get_nb_integ_points(nb_points);
 
-              for (int i=0; i<nb_pos; i++)
+              for (int i=0; i<nb_elem; i++)
                 {
                   for (int pt=0; pt<nb_points[i]; pt++)
                     {
@@ -733,7 +761,7 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
                               const DoubleTab& source_so_val = sources_val[so];
                               fxyz[j].setVar(so+4,source_so_val(i,0));
                             }
-                          int l = nb_points[i]*nb_comp_+j;
+                          int l = nb_points[i]*j + pt;
                           valeurs_espace(i,l) = fxyz[j].eval();
                         }
                     }
@@ -1034,7 +1062,7 @@ int Champ_Generique_Transformation::preparer_macro()
           OWN_PTR(Champ_base) source_espace_stockage;
           const Champ_base& source = get_source(i).get_champ(source_espace_stockage);
           int nb_comp = source.nb_comp();
-          if (source.nature_du_champ()!=vectoriel && source.nature_du_champ()!=multi_scalaire)
+          if (!source.is_vectorial() && source.nature_du_champ()!=multi_scalaire)
             {
               msg = "At least one of the source fields is not of vector nature.";
               erreur = 1;
@@ -1066,7 +1094,8 @@ int Champ_Generique_Transformation::preparer_macro()
             {
               OWN_PTR(Champ_base) source_espace_stockage;
               const Champ_base& source = get_source(i).get_champ(source_espace_stockage);
-              int nb_comp = source.nb_comp();
+              const Domaine_dis_base& domaine_dis = get_source(i).get_ref_domaine_dis_base();
+              int nb_comp = (domaine_dis.que_suis_je()=="Domaine_DG") ? (source.is_vectorial() ? Objet_U::dimension : 1) : source.nb_comp();
               const Noms compo = get_source(i).get_property("composantes");
               for (int comp=0; comp<nb_comp; comp++)
                 {

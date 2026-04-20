@@ -465,10 +465,12 @@ void Champ_base::calculer_valeurs_elem_post(DoubleTab& les_valeurs,int nb_elem,N
       nom_dom_inc=ref_cast(Champ_Fonc_base, *this).domaine().le_nom();
     }
 
-
-  bool isChamp_basis_function_DG = (que_suis_je() == ("Champ_Elem_DG") || que_suis_je() == ("Champ_Fonc_Quad_DG"));
-  if (isChamp_basis_function_DG)
-    les_valeurs.resize(nb_elem, 1);
+  bool isChamp_basis_function = is_basis_function();
+  if (isChamp_basis_function)
+    {
+      int ndim = is_vectorial() ? Objet_U::dimension : 1;
+      les_valeurs.resize(nb_elem, ndim);
+    }
   else
     les_valeurs.resize(nb_elem, nb_compo_);
 

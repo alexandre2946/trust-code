@@ -33,8 +33,8 @@
 
 // Definition of the nature of a field:
 enum Nature_du_champ { scalaire, multi_scalaire, vectoriel,
-					   basis_function_order_0_scalar, basis_function_order_1_scalar, basis_function_order_2_scalar,
-					   basis_function_order_0_vectorial, basis_function_order_1_vectorial, basis_function_order_2_vectorial
+                       basis_function_order_1_scalar, basis_function_order_2_scalar,
+                       basis_function_order_1_vectorial, basis_function_order_2_vectorial
                      };
 
 class Field_base : public Objet_U
@@ -77,11 +77,12 @@ public:
   virtual Nature_du_champ nature_du_champ() const { return nature_; } // Renvoie la nature d'un champ (scalaire, multiscalaire, vectoriel).
   virtual Nature_du_champ fixer_nature_du_champ(Nature_du_champ nat);
 
-  inline static bool is_basis_function(Nature_du_champ nature)  { return nature>=basis_function_order_0_scalar; }
-  inline static bool is_vectorial(Nature_du_champ nature) {
-	  return  (nature==vectoriel | nature == basis_function_order_0_vectorial | nature == basis_function_order_1_vectorial | nature == basis_function_order_2_vectorial );
+  bool is_basis_function() const  { return nature_>=basis_function_order_1_scalar; }
+  bool is_vectorial() const
+  {
+    return  ((nature_==vectoriel) | (nature_ == basis_function_order_1_vectorial) | (nature_ == basis_function_order_2_vectorial) );
   }
-  static const int order(Nature_du_champ nature) ;
+  int order_field() const;
 
 protected:
   Nom nom_;
@@ -89,28 +90,5 @@ protected:
   int nb_compo_;
   Nature_du_champ nature_;
 };
-
-/*! @brief Renvoie l'ordre des fonctions de base
- *
- */
-const int Field_base::order(Nature_du_champ nature)
-{
-	switch (nature)
-	{
-	case scalaire:
-	case vectoriel:
-	case multi_scalaire:
-	case basis_function_order_0_scalar:
-	case basis_function_order_0_vectorial:
-		return 0;
-	case basis_function_order_1_scalar:
-	case basis_function_order_1_vectorial:
-		return 1;
-	case basis_function_order_2_scalar:
-	case basis_function_order_2_vectorial:
-		return 2;
-	}
-	return 0;
-}
 
 #endif /* Field_base_included */

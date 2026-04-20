@@ -53,7 +53,8 @@ public:
   const Champ_base&  get_champ(OWN_PTR(Champ_base)& espace_stockage) const override;
   const Champ_base&  get_champ_without_evaluation(OWN_PTR(Champ_base)& espace_stockage) const override;
   void nommer_source() override;
-  void extraire(double& val_extraites, const DoubleVect& val_source, const Nature_du_champ nature, const int composante_VDF=-1) const;
+  void extraire(double& val_extraites, const DoubleVect& val_source, const bool basis_function, const int composante_VDF=-1) const;
+  const Motcle get_directive_pour_discr() const override;
 
 protected:
 

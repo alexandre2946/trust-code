@@ -120,35 +120,35 @@ void DG_discretisation::discretiser_champ(const Motcle& directive, const Domaine
     }
 
   if (nb_comp == 1)
-	  switch(order_DG)
-	  {
-	  case 0:
-		  champ->fixer_nature_du_champ(basis_function_order_0_scalar);
-		  break;
-	  case 1:
-		  champ->fixer_nature_du_champ(basis_function_order_1_scalar);
-		  break;
-	  case 2:
-		  champ->fixer_nature_du_champ(basis_function_order_2_scalar);
-		  break;
-	  default:
-		  assert(0);
-	  }
+    switch(order_DG)
+      {
+      case 0:
+        champ->fixer_nature_du_champ(scalaire);
+        break;
+      case 1:
+        champ->fixer_nature_du_champ(basis_function_order_1_scalar);
+        break;
+      case 2:
+        champ->fixer_nature_du_champ(basis_function_order_2_scalar);
+        break;
+      default:
+        assert(0);
+      }
   else
-	  switch(order_DG)
-	  {
-	  case 0:
-		  champ->fixer_nature_du_champ(basis_function_order_0_vectorial);
-		  break;
-	  case 1:
-		  champ->fixer_nature_du_champ(basis_function_order_1_vectorial);
-		  break;
-	  case 2:
-		  champ->fixer_nature_du_champ(basis_function_order_2_vectorial);
-		  break;
-	  default:
-		  assert(0);
-	  }
+    switch(order_DG)
+      {
+      case 0:
+        champ->fixer_nature_du_champ(vectoriel);
+        break;
+      case 1:
+        champ->fixer_nature_du_champ(basis_function_order_1_vectorial);
+        break;
+      case 2:
+        champ->fixer_nature_du_champ(basis_function_order_2_vectorial);
+        break;
+      default:
+        assert(0);
+      }
 
 
 }
@@ -263,9 +263,9 @@ void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
   //it s difficult to discriminate the field P0 and P1 before postreatment
   // + how to do it for vector champ_inc like velocity ?
 
-  bool vector = Field_base::is_vectorial(nature);
+  bool vector = ((nature==vectoriel) | (nature == basis_function_order_1_vectorial) | (nature == basis_function_order_2_vectorial) );
   if (!vector) nb_comp = default_nb_comp;
-  else nb_comp = nb_comp*default_nb_comp;
+  else nb_comp = Objet_U::dimension*default_nb_comp;
   if (champ_fonc)
     {
       creer_champ(*champ_fonc, z, type, noms[0], unites[0], nb_comp, nb_ddl, temps, directive, que_suis_je());

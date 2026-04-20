@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -206,4 +206,25 @@ const Nom& Field_base::unite() const
 Nature_du_champ Field_base::fixer_nature_du_champ(Nature_du_champ n)
 {
   return nature_ = n;
+}
+
+/*! @brief Renvoie l'ordre des fonctions de base
+ *
+ */
+int Field_base::order_field() const
+{
+  switch (nature_)
+    {
+    case scalaire:
+    case vectoriel:
+    case multi_scalaire:
+      return 0;
+    case basis_function_order_1_scalar:
+    case basis_function_order_1_vectorial:
+      return 1;
+    case basis_function_order_2_scalar:
+    case basis_function_order_2_vectorial:
+      return 2;
+    }
+  return 0;
 }

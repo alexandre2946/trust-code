@@ -166,7 +166,7 @@ const BasisFunction& Domaine_DG::get_basisFunction(int order) const
 /*! @brief Compute L_1 norm
  *
  */
-double Domaine_DG::compute_L1_norm(const DoubleVect& val_source, const Nature_du_champ nature_source) const
+double Domaine_DG::compute_L1_norm(const DoubleVect& val_source, const bool basis_function, const int order) const
 {
   //In case of Champ_Fonc_Quad, the values are on the quadrature point
   const Quadrature_base& quad = get_quadrature(5);
@@ -174,9 +174,6 @@ double Domaine_DG::compute_L1_norm(const DoubleVect& val_source, const Nature_du
   int nelem = nb_elem();
 
   //In case of Champ_Inc_Elem, the values are the coefficient of the basis function
-  bool basis_function = Field_base::is_basis_function(nature_source);
-  const int order = Field_base::order(nature_source);
-
   const BasisFunction& bfunc = get_basisFunction(order);
   const int nb_bfunc = bfunc.nb_bfunc();
   DoubleTab fbase(nb_bfunc, nb_pts_integ_max);
@@ -191,7 +188,7 @@ double Domaine_DG::compute_L1_norm(const DoubleVect& val_source, const Nature_du
           for (int k = 0; k < quad.nb_pts_integ(i) ; k++)
             {
               for (int l =0; l<nb_bfunc; l++)
-                val_elem(k) += val_source(i*nb_bfunc+l)*fbase(i,k);
+                val_elem(k) += val_source(i*nb_bfunc+l)*fbase(l,k);
 
               val_elem(k) = std::fabs(val_elem(k));
             }
@@ -210,7 +207,7 @@ double Domaine_DG::compute_L1_norm(const DoubleVect& val_source, const Nature_du
 /*! @brief Compute L_2 norm
  *
  */
-double Domaine_DG::compute_L2_norm(const DoubleVect& val_source, const Nature_du_champ nature_source) const
+double Domaine_DG::compute_L2_norm(const DoubleVect& val_source, const bool basis_function, const int order) const
 {
   //In case of Champ_Fonc_Quad, the values are on the quadrature point
   const Quadrature_base& quad = get_quadrature(5);
@@ -218,9 +215,6 @@ double Domaine_DG::compute_L2_norm(const DoubleVect& val_source, const Nature_du
   int nelem = nb_elem();
 
   //In case of Champ_Inc_Elem, the values are the coefficient of the basis function
-  bool basis_function = Field_base::is_basis_function(nature_source);
-  const int order = Field_base::order(nature_source);
-
   const BasisFunction& bfunc = get_basisFunction(order);
   const int nb_bfunc = bfunc.nb_bfunc();
   DoubleTab fbase(nb_bfunc, nb_pts_integ_max);
@@ -235,7 +229,7 @@ double Domaine_DG::compute_L2_norm(const DoubleVect& val_source, const Nature_du
           for (int k = 0; k < quad.nb_pts_integ(i) ; k++)
             {
               for (int l =0; l<nb_bfunc; l++)
-                val_elem(k) += val_source(i*nb_bfunc+l)*fbase(i,k);
+                val_elem(k) += val_source(i*nb_bfunc+l)*fbase(l,k);
 
               val_elem(k) = val_elem(k)*val_elem(k);
             }
@@ -253,7 +247,7 @@ double Domaine_DG::compute_L2_norm(const DoubleVect& val_source, const Nature_du
 /*! @brief Compute average
  *
  */
-void Domaine_DG::compute_average(const DoubleVect& val_source, double& sum, double& volume, const Nature_du_champ nature_source) const
+void Domaine_DG::compute_average(const DoubleVect& val_source, double& sum, double& volume, const bool basis_function, const int order) const
 {
   //In case of Champ_Fonc_Quad, the values are on the quadrature point
   const Quadrature_base& quad = get_quadrature(5);
@@ -261,9 +255,6 @@ void Domaine_DG::compute_average(const DoubleVect& val_source, double& sum, doub
   int nelem = nb_elem();
 
   //In case of Champ_Inc_Elem, the values are the coefficient of the basis function
-  bool basis_function = Field_base::is_basis_function(nature_source);
-  const int order = Field_base::order(nature_source);
-
   const BasisFunction& bfunc = get_basisFunction(order);
   const int nb_bfunc = bfunc.nb_bfunc();
   DoubleTab fbase(nb_bfunc, nb_pts_integ_max);
@@ -271,13 +262,14 @@ void Domaine_DG::compute_average(const DoubleVect& val_source, double& sum, doub
   DoubleTab val_elem(nb_pts_integ_max);
   for (int i = 0; i < nelem; i++)
     {
-      if (nature_source>=basis_function_order_0_scalar;)
+      if (basis_function)
         {
+          val_elem = 0.;
           bfunc.eval_bfunc(quad, i, fbase);
           for (int k = 0; k < quad.nb_pts_integ(i) ; k++)
             {
               for (int l =0; l<nb_bfunc; l++)
-                val_elem(k) += val_source(i*nb_bfunc+l)*fbase(i,k);
+                val_elem(k) += val_source(i*nb_bfunc+l)*fbase(l,k);
             }
         }
       else
@@ -293,7 +285,7 @@ void Domaine_DG::compute_average(const DoubleVect& val_source, double& sum, doub
 /*! @brief Compute average with porosity
  *
  */
-void Domaine_DG::compute_average_porosity(const DoubleVect& val_source, const DoubleVect& porosity, double& sum, double& volume, const Nature_du_champ nature_source) const
+void Domaine_DG::compute_average_porosity(const DoubleVect& val_source, const DoubleVect& porosity, double& sum, double& volume, const bool basis_function, const int order) const
 {
   //In case of Champ_Fonc_Quad, the values are on the quadrature point
   const Quadrature_base& quad = get_quadrature(5);
@@ -301,9 +293,6 @@ void Domaine_DG::compute_average_porosity(const DoubleVect& val_source, const Do
   int nelem = nb_elem();
 
   //In case of Champ_Inc_Elem, the values are the coefficient of the basis function
-  bool basis_function = Field_base::is_basis_function(nature_source);
-  const int order = Field_base::order(nature_source);
-
   const BasisFunction& bfunc = get_basisFunction(order);
   const int nb_bfunc = bfunc.nb_bfunc();
   DoubleTab fbase(nb_bfunc, nb_pts_integ_max);
@@ -313,11 +302,12 @@ void Domaine_DG::compute_average_porosity(const DoubleVect& val_source, const Do
     {
       if (basis_function)
         {
+          val_elem = 0.;
           bfunc.eval_bfunc(quad, i, fbase);
           for (int k = 0; k < quad.nb_pts_integ(i) ; k++)
             {
               for (int l =0; l<nb_bfunc; l++)
-                val_elem(k) += val_source(i*nb_bfunc+l)*fbase(i,k);
+                val_elem(k) += val_source(i*nb_bfunc+l)*fbase(l,k);
               val_elem(k) *= porosity(i);
             }
         }

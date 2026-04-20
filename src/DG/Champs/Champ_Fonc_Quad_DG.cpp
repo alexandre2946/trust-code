@@ -64,11 +64,8 @@ DoubleTab& Champ_Fonc_Quad_DG::valeur_aux_elems(const DoubleTab& positions, cons
   if (nb_polys == 0)
     return result;
 
-  // TODO : FIXME
-  // For FT the resize should be done in its good position and not here ...
-  if (result.nb_dim() == 1) result.resize(nb_polys, 1);
-
-  assert(result.line_size() == 1);
+  int dim = 1;
+  if (nature_ == vectoriel) dim = Objet_U::dimension;
   ToDo_Kokkos("critical");
 
   DoubleTab value_pts(nb_pts_integ_max);
@@ -80,12 +77,15 @@ DoubleTab& Champ_Fonc_Quad_DG::valeur_aux_elems(const DoubleTab& positions, cons
 
       if (cell != -1)
         {
-          for (int k=0; k<quad.nb_pts_integ(cell); k++)
-            value_pts(k) = values(cell,k);
+          for (int j=0; j<dim; j++)
+            {
+              for (int k=0; k<quad.nb_pts_integ(cell); k++)
+                value_pts(k) = values(cell,j*nb_pts_integ_max + k);
 //          value_pts.ref_tab(values,cell,1); //pb de const
 
-          result(i,0) = quad.compute_integral_on_elem(cell, value_pts);
-          result(i,0) /= volume(cell);
+              result(i,j) = quad.compute_integral_on_elem(cell, value_pts);
+              result(i,j) /= volume(cell);
+            }
         }
     }
 

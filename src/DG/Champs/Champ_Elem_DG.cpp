@@ -215,7 +215,7 @@ DoubleTab& Champ_Elem_DG::eval_elem(DoubleTab& tab_valeurs) const
   const Quadrature_base& quad = domaine.get_quadrature(5);
   int nb_pts_integ_max = quad.nb_pts_integ_max();
 
-  const int dim = tab_valeurs.dimension(1)/nb_pts_integ_max;
+  const int dim = is_vectorial() ? Objet_U::dimension : 1;
 
   const Champ_base& ch_base = le_champ();
   const DoubleTab& values = ch_base.valeurs();
@@ -223,6 +223,7 @@ DoubleTab& Champ_Elem_DG::eval_elem(DoubleTab& tab_valeurs) const
   assert(tab_valeurs.dimension(0) == nb_elem && tab_valeurs.dimension(1) == dim*nb_pts_integ_max );
 
   DoubleTab fbase(nb_bfunc_,nb_pts_integ_max);
+  tab_valeurs = 0.;
   for (int i = 0; i < nb_elem; i++)
     {
       bfunc.eval_bfunc(quad, i, fbase);
@@ -232,7 +233,6 @@ DoubleTab& Champ_Elem_DG::eval_elem(DoubleTab& tab_valeurs) const
 
           for (int j = 0; j < quad.nb_pts_integ(i) ; j++)
             {
-              tab_valeurs(i,j) = 0.;
               for (int l =0; l<nb_bfunc_; l++)
                 tab_valeurs(i,j+d*nb_pts_integ_max) += values(i,l+d*nb_bfunc_) * fbase(l,j); // reconstruction valeurs du champ aux points d'integrations
             }
@@ -262,11 +262,7 @@ DoubleTab& Champ_Elem_DG::valeur_aux_elems(const DoubleTab& positions, const Int
   if (nb_polys == 0)
     return result;
 
-  // TODO : FIXME
-  // For FT the resize should be done in its good position and not here ...
-  if (result.nb_dim() == 1) result.resize(nb_polys, 1);
-
-  assert(result.line_size() == 1);
+  int ndim = is_vectorial() ? Objet_U::dimension : 1;
   ToDo_Kokkos("critical");
 
   DoubleTab fbase(nb_bfunc_, nb_pts_integ_max);
@@ -281,13 +277,16 @@ DoubleTab& Champ_Elem_DG::valeur_aux_elems(const DoubleTab& positions, const Int
         {
           bfunc.eval_bfunc(quad, cell, fbase);
 
-          product = 0.;
-          for (int k = 0; k < quad.nb_pts_integ(cell) ; k++)
-            for (int l =0; l<nb_bfunc_; l++)
-              product(k) += values(cell,l) * fbase(l,k); // reconstruction valeurs du champ aux points coords
+          for (int j = 0; j<ndim;  j++)
+            {
+              product = 0.;
+              for (int k = 0; k < quad.nb_pts_integ(cell) ; k++)
+                for (int l =0; l<nb_bfunc_; l++)
+                  product(k) += values(cell,j*nb_bfunc_ + l) * fbase(l,k); // reconstruction valeurs du champ aux points coords
 
-          result(i,0) = quad.compute_integral_on_elem(cell, product);
-          result(i,0) /= volume(cell);
+              result(i,j) = quad.compute_integral_on_elem(cell, product);
+              result(i,j) /= volume(cell);
+            }
         }
     }
 

@@ -184,7 +184,8 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ_without_evaluation(OWN
   OWN_PTR(Champ_base) source_espace_stockage;
   const Champ_base& source = get_source(0).get_champ_without_evaluation(source_espace_stockage);
   Nature_du_champ nature_source = source.nature_du_champ();
-  int nb_comp = source.nb_comp();
+  const Domaine_dis_base& domaine_dis = get_source(0).get_ref_domaine_dis_base();
+  int nb_comp = (domaine_dis.que_suis_je()=="Domaine_DG") ? (source.is_vectorial() ? Objet_U::dimension : 1) : source.nb_comp();
 
   OWN_PTR(Champ_Fonc_base)  es_tmp;
   espace_stockage = creer_espace_stockage(nature_source,nb_comp,es_tmp);
@@ -200,7 +201,9 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ(OWN_PTR(Champ_base)&) 
   const Champ_base& source = get_source(0).get_champ(source_espace_stockage_);
   const Domaine_dis_base& domaine_dis = get_source(0).get_ref_domaine_dis_base();
   Nature_du_champ nature_source = source.nature_du_champ();
-  int nb_comp = source.nb_comp();
+  bool basis_function = source.is_basis_function();
+  int order = source.order_field();
+  int nb_comp = (domaine_dis.que_suis_je()=="Domaine_DG") ? (source.is_vectorial() ? Objet_U::dimension : 1) : source.nb_comp();
 
   // dimension() sur le tableau de valeurs des champs PolyMAC_HFV renvoie -1 (plusieurs supports)
   // ToDo: reecrire completement cette methode (horrible, tres mal ecrite) en deportant les methodes min/max/sum/... pour chaque OWN_PTR(Champ_base) !
@@ -224,20 +227,16 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ(OWN_PTR(Champ_base)&) 
   const Domaine_VF& zvf = ref_cast(Domaine_VF,domaine_dis);
   double val_extraite=-100.;
 
-  if (nb_comp==1)
+  if (domaine_dis.que_suis_je() == "Domaine_DG")
     {
-      extraire(val_extraite,valeurs_source, nature_source);
+      //bool is_vectorial = source.is_vectorial(); TODO DG vectorial case
+      extraire(val_extraite,valeurs_source,basis_function,order);
       espace_valeurs = val_extraite;
     }
-  else if (domaine_dis.que_suis_je() == "Domaine_DG")
+  else if (nb_comp==1)
     {
-	  //bool is_vectorial = Field_base::is_vectorial(nature_source);TODO DG vectorial case
-      extraire(val_extraite,valeurs_source,nature_source);
-      int size_vect = valeurs_source.dimension(0);
-      ToDo_Kokkos("critical");
-      for (int i=0; i<size_vect; i++)
-        for (int j=0; j<nb_comp; j++)
-          espace_valeurs(i,j) = val_extraite;
+      extraire(val_extraite,valeurs_source,basis_function);
+      espace_valeurs = val_extraite;
     }
   else
     {
@@ -302,7 +301,7 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ(OWN_PTR(Champ_base)&) 
                   }
             }
           // Passage si necessaire de la composante pour les Champ_face
-          extraire(val_extraite,vect_source,nature_source,(nb_dim==nb_comp?-1:comp));
+          extraire(val_extraite,vect_source,basis_function,(nb_dim==nb_comp?-1:comp));
 
           if (nb_dim==nb_comp)
             {
@@ -328,14 +327,10 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ(OWN_PTR(Champ_base)&) 
 }
 
 //Extrait la valeur du vecteur val_source dans val_extraite
-void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVect& val_source, const Nature_du_champ nature_source, const int composante_VDF) const
+void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVect& val_source, const bool basis_function, const int composante_VDF) const
 {
 
-  // TODO DG
-  // for DG, sometimes, the reduction 0D have to be a value for the cell, but sometimes if there is additional postreatment, it has to be a Champ_Fonc_Quad_elem type,
-  // how to discriminate the two possibilities
-  // For now, the norm reductions are consider to be cell values, but for the reductions weighted average and weighted sum are probably have to give values on quadrature points
-  // the composante_VDF for DG discriminates if this is a basis function or a champ_fonc with a value on each quadrature point
+  // Careful :: the composante_VDF for DG gives the order of the source basis_functions
 
   if (methode_=="min")
     {
@@ -384,11 +379,11 @@ void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVec
         {
           if (methode_ =="L1_norm")
             {
-              sum = zvf.compute_L1_norm(val_source,nature_source);
+              sum = zvf.compute_L1_norm(val_source,basis_function,composante_VDF);
             }
           else if (methode_ =="L2_norm")
             {
-              sum = zvf.compute_L2_norm(val_source,nature_source);
+              sum = zvf.compute_L2_norm(val_source,basis_function,composante_VDF);
             }
           else
             {
@@ -546,7 +541,7 @@ void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVec
       // au ELEM
       if (get_localisation()==Entity::ELEMENT)
         {
-          zvf.compute_average(val_source, sum, volume, nature_source);
+          zvf.compute_average(val_source, sum, volume, basis_function, composante_VDF);
         }
 
       // au FACE
@@ -669,7 +664,7 @@ void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVec
           const DoubleVect& poro= source2.valeurs();
           assert(volumes.size_array()==poro.size_array());
           ToDo_Kokkos("Code but check test!");
-          zvf.compute_average_porosity(val_source,poro,sum,volume,nature_source);
+          zvf.compute_average_porosity(val_source,poro,sum,volume,basis_function,composante_VDF);
         }
       else
         {
@@ -793,4 +788,11 @@ void Champ_Generique_Reduction_0D::nommer_source()
     }
 }
 
+const Motcle Champ_Generique_Reduction_0D::get_directive_pour_discr() const
+{
+  const Domaine_dis_base& domaine_dis = get_source(0).get_ref_domaine_dis_base();
+  if (domaine_dis.que_suis_je() == "Domaine_DG")
+    return "champ_fonc_quad_dg";
 
+  return get_source(0).get_directive_pour_discr();
+}

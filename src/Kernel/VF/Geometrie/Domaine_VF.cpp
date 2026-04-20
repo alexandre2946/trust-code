@@ -1219,7 +1219,7 @@ void Domaine_VF::get_position(DoubleTab& positions) const
   // positions = zvf.xp();
 }
 
-double Domaine_VF::compute_L1_norm(const DoubleVect& val_source, const Nature_du_champ nature_source) const
+double Domaine_VF::compute_L1_norm(const DoubleVect& val_source, const bool basis_function, const int order) const
 {
   double sum = 0.;
   const int ne = nb_elem();
@@ -1230,7 +1230,7 @@ double Domaine_VF::compute_L1_norm(const DoubleVect& val_source, const Nature_du
   return sum;
 }
 
-double Domaine_VF::compute_L2_norm(const DoubleVect& val_source, const Nature_du_champ nature_source) const
+double Domaine_VF::compute_L2_norm(const DoubleVect& val_source, const bool basis_function, const int order) const
 {
   double sum = 0.;
   const int ne = nb_elem();
@@ -1241,7 +1241,7 @@ double Domaine_VF::compute_L2_norm(const DoubleVect& val_source, const Nature_du
   return sum;
 }
 
-void Domaine_VF::compute_average(const DoubleVect& val_source, double& sum, double& volume, const Nature_du_champ nature_source) const
+void Domaine_VF::compute_average(const DoubleVect& val_source, double& sum, double& volume, const bool basis_function, const int order) const
 {
   const int ne = nb_elem();
   CDoubleArrView vol = volumes().view_ro();
@@ -1255,7 +1255,7 @@ void Domaine_VF::compute_average(const DoubleVect& val_source, double& sum, doub
   end_gpu_timer(__KERNEL_NAME__);
 }
 
-void Domaine_VF::compute_average_porosity(const DoubleVect& val_source, const DoubleVect& porosity, double& sum, double& volume, const Nature_du_champ nature_source) const
+void Domaine_VF::compute_average_porosity(const DoubleVect& val_source, const DoubleVect& porosity, double& sum, double& volume, const bool basis_function, const int order) const
 {
   const int ne = nb_elem();
   CDoubleArrView vol = volumes().view_ro();
