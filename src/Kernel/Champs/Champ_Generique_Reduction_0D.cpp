@@ -184,8 +184,7 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ_without_evaluation(OWN
   OWN_PTR(Champ_base) source_espace_stockage;
   const Champ_base& source = get_source(0).get_champ_without_evaluation(source_espace_stockage);
   Nature_du_champ nature_source = source.nature_du_champ();
-  const Domaine_dis_base& domaine_dis = get_source(0).get_ref_domaine_dis_base();
-  int nb_comp = (domaine_dis.que_suis_je()=="Domaine_DG") ? (source.is_vectorial() ? Objet_U::dimension : 1) : source.nb_comp();
+  int nb_comp = source.nb_comp();
 
   OWN_PTR(Champ_Fonc_base)  es_tmp;
   espace_stockage = creer_espace_stockage(nature_source,nb_comp,es_tmp);

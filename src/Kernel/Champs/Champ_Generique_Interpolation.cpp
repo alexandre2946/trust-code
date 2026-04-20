@@ -219,8 +219,7 @@ const Champ_base& Champ_Generique_Interpolation::get_champ_without_evaluation(OW
   //Creation du champ espace_stockage
   Nature_du_champ nature_source = (ncomp==-1)?source.nature_du_champ():scalaire;
   nature_source = source.nature_du_champ();
-  const Domaine_dis_base& domaine_dis = get_source(0).get_ref_domaine_dis_base();
-  int nb_comp = (domaine_dis.que_suis_je()=="Domaine_DG") ? (source.is_vectorial() ? Objet_U::dimension : 1) : source.nb_comp();
+  int nb_comp = source.nb_comp();
 
   OWN_PTR(Champ_Fonc_base)  es_tmp;
   espace_stockage = creer_espace_stockage(nature_source,nb_comp,es_tmp);
@@ -264,11 +263,12 @@ const Champ_base& Champ_Generique_Interpolation::get_champ_with_calculer_champ_p
   //Creation du champ espace_stockage
   Nature_du_champ nature_source = (ncomp==-1)?source.nature_du_champ():scalaire;
   nature_source = source.nature_du_champ();
-  const Domaine_dis_base& domaine_dis = get_source(0).get_ref_domaine_dis_base();
-  int nb_comp = (domaine_dis.que_suis_je()=="Domaine_DG") ? (source.is_vectorial() ? Objet_U::dimension : 1) : source.nb_comp();
+  int nb_comp = source.nb_comp();
   if (!espace_stockage_)
     creer_espace_stockage(nature_source, nb_comp, espace_stockage_);
   espace_stockage_->changer_temps(source.temps());
+
+  nb_comp = espace_stockage_->nb_comp(); // with DG, espace_stockage has smaller dimension than source
 
   //double default_value=-1e35;
   //espace_stockage.valeurs()=default_value;
