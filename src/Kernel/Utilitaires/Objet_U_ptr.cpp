@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -160,19 +160,7 @@ int Objet_U_ptr::check_Objet_U_ptr_type(const Objet_U * ptr) const
   return 1;
 }
 
-/*! @brief Renvoie ref_().
- *
- * le_nom() si le pointeur est non nul ou "Pointeur Nul"
- *
- */
-const Nom& Objet_U_ptr::le_nom() const
-{
-  static Nom nom("Pointeur Nul");
-  const Objet_U * addr = get_Objet_U_ptr_check();
-  if (addr)
-    return addr->le_nom();
-  return nom;
-}
+
 
 /*! @brief Pour mettre a jour les cles lorsque les Objet_U ont etes renumerotes.
  *

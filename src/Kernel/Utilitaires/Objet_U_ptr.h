@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -39,7 +39,19 @@ public:
   bool non_nul() const;
   bool est_nul() const;
 
-  const Nom& le_nom() const override;
+
+  [[deprecated("Do not use naming logic on OWN_PTR, Trust_Deriv, Objet_U_ptr. Will be removed")]]
+  const Nom& le_nom() const override
+  {
+    throw std::logic_error("Error: le_nom() called on Objet_U_ptr\nDo not use naming logic on OWN_PTR, Trust_Deriv, Objet_U_ptr. Will be removed");
+  }
+
+  [[deprecated("Do not use naming logic on OWN_PTR, Trust_Deriv, Objet_U_ptr. Will be removed")]]
+  void nommer(const Nom&) override
+  {
+    throw std::logic_error("Error: nommer() called on Objet_U_ptr\nDo not use naming logic on OWN_PTR, Trust_Deriv, Objet_U_ptr. Will be removed");
+  }
+
   Objet_U * typer(const char * nom_type);
   void detach();
 #ifndef LATATOOLS

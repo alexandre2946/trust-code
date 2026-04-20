@@ -829,7 +829,7 @@ void Domaine_VF::infobord()
         s=s+surfaces(j);
       s=mp_sum(s);
       raccords(i)->set_aire(s);
-      Cerr<<"Area of "<<raccords(i).le_nom()<<"  \t= "<<s<<finl;
+      Cerr<<"Area of "<<raccords(i)->le_nom()<<"  \t= "<<s<<finl;
     }
 
   // Bords
@@ -862,7 +862,7 @@ void Domaine_VF::info_elem_som()
   for (int i=0; i<raccords.nb_raccords(); i++)
     {
       trustIdType nb_boundary_faces = mp_sum(ref_cast(Frontiere,raccords(i).valeur()).nb_faces());
-      Cerr<< nb_boundary_faces << " of them on boundary "<<raccords(i).le_nom()<<finl;
+      Cerr<< nb_boundary_faces << " of them on boundary "<<raccords(i)->le_nom()<<finl;
 
     }
   Bords& bords=domaine().faces_bord();

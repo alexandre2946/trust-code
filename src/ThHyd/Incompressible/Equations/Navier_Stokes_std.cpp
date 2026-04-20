@@ -1193,7 +1193,7 @@ int Navier_Stokes_std::reprendre(Entree& is)
   if(!TRUST_2_PDI::is_PDI_restart())
     {
       double temps = schema_temps().temps_courant();
-      Nom ident_pression(la_pression.le_nom());
+      Nom ident_pression(la_pression->le_nom());
       ident_pression += la_pression->que_suis_je();
       ident_pression += probleme().domaine().le_nom();
       ident_pression += Nom(temps,probleme().reprise_format_temps());

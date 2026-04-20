@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -46,7 +46,7 @@ void Puissance_Thermique_EF::associer_domaines(const Domaine_dis_base& domaine_d
 void Puissance_Thermique_EF::associer_pb(const Probleme_base& pb)
 {
   const Equation_base& eqn = pb.equation(0);
-  eqn.discretisation().nommer_completer_champ_physique(eqn.domaine_dis(), la_puissance.le_nom(), "W/m3", la_puissance, pb);
+  eqn.discretisation().nommer_completer_champ_physique(eqn.domaine_dis(), la_puissance->le_nom(), "W/m3", la_puissance, pb);
   Eval_Puiss_Th_EF& eval_puis = dynamic_cast<Eval_Puiss_Th_EF&> (iter_->evaluateur());
   eval_puis.associer_champs(la_puissance);
 }

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -45,7 +45,7 @@ void Terme_Source_Constituant_VEF_Face::associer_domaines(const Domaine_dis_base
 void Terme_Source_Constituant_VEF_Face::associer_pb(const Probleme_base& pb)
 {
   const Equation_base& eqn = pb.equation(0);
-  eqn.discretisation().nommer_completer_champ_physique(eqn.domaine_dis(), la_source_constituant.le_nom(), "", la_source_constituant, pb);
+  eqn.discretisation().nommer_completer_champ_physique(eqn.domaine_dis(), la_source_constituant->le_nom(), "", la_source_constituant, pb);
   Eval_Source_C_VEF_Face& eval_puis = dynamic_cast<Eval_Source_C_VEF_Face&> (iter_->evaluateur());
   eval_puis.associer_champs(la_source_constituant);
 }

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -275,7 +275,7 @@ void Milieu_composite::discretiser(const Probleme_base& pb, const  Discretisatio
         for (int l = k + 1; l < N; l++)
           {
             int phase = fluides_[k]->le_nom().debute_par("gaz");
-            Nom espece = phase ? fluides_[k].le_nom().getSuffix("gaz_") : fluides_[k].le_nom().getSuffix("liquide_");
+            Nom espece = phase ? fluides_[k]->le_nom().getSuffix("gaz_") : fluides_[k]->le_nom().getSuffix("liquide_");
             if (has_interface(k, l)) // OK si interf/saturation
               {
                 Interface_base& inter = get_interface(k, l);

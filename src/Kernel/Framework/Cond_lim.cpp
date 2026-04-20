@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -19,7 +19,7 @@ Implemente_instanciable(Cond_lim,"Cond_lim",OWN_PTR(Cond_lim_base));
 
 Sortie& Cond_lim::printOn(Sortie& s ) const
 {
-  return s << que_suis_je() << " " << le_nom();
+  return s << que_suis_je() << " " << valeur().le_nom();
 }
 
 Entree& Cond_lim::readOn(Entree& s )

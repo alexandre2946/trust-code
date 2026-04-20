@@ -284,6 +284,27 @@ void check_frontiere(const LIST_FRONTIERE& list, const char *msg)
     }
 }
 
+template<class LIST_FRONTIERE>
+void check_frontiere_own_ptr(const LIST_FRONTIERE& list, const char *msg)
+{
+  int n = list.size();
+  if (!is_parallel_object(n))
+    {
+      Cerr << " Fatal error: processors don't have the same number of boundaries " << msg << finl;
+      Process::exit();
+    }
+  for (int i = 0; i < n; i++)
+    {
+      const Nom& nom = list[i]->le_nom();
+      Cerr << "  Boundary " << msg << " : " << nom << finl;
+      if (!is_parallel_object(nom))
+        {
+          Cerr << " Fatal error: processors don't have the same number of boundaries " << msg << finl;
+          Process::exit();
+        }
+    }
+}
+
 
 /*! @brief associate the read objects to the domaine and check that the reading objects are coherent
  */
@@ -315,7 +336,7 @@ void Domaine_32_64<_SZ_>::check_domaine()
   // Verifications sanitaires:
   // On doit avoir le meme nombre de frontieres et les memes noms sur tous les procs
   ::check_frontiere(mes_faces_bord_, "(Bord)");
-  ::check_frontiere(mes_faces_raccord_, "(Raccord)");
+  ::check_frontiere_own_ptr(mes_faces_raccord_, "(Raccord)");
   ::check_frontiere(mes_bords_int_, "(Bord_Interne)");
   ::check_frontiere(mes_groupes_faces_, "(Groupe_Faces)");
 }

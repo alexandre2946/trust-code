@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -275,27 +275,27 @@ double Milieu_MUSIG::get_Diameter_Sauter(int iPhaseMilieu) const
 bool Milieu_MUSIG::has_dispersed_gas(int k) const
 {
   bool dispersedGas = false;
-  if (fluides_[k].le_nom().debute_par("gaz_dispersee")) dispersedGas = true;
+  if (fluides_[k]->le_nom().debute_par("gaz_dispersee")) dispersedGas = true;
   return dispersedGas;
 }
 
 bool Milieu_MUSIG::has_dispersed_liquid(int k) const
 {
   bool dispersedLiquid = false;
-  if (fluides_[k].le_nom().debute_par("liquide_dispersee")) dispersedLiquid = true;
+  if (fluides_[k]->le_nom().debute_par("liquide_dispersee")) dispersedLiquid = true;
   return dispersedLiquid;
 }
 
 bool Milieu_MUSIG::has_carrier_liquid(int k) const
 {
   bool carrierLiquid = false;
-  if (fluides_[k].le_nom().debute_par("liquide_continu")) carrierLiquid = true;
+  if (fluides_[k]->le_nom().debute_par("liquide_continu")) carrierLiquid = true;
   return carrierLiquid;
 }
 
 bool Milieu_MUSIG::has_carrier_gas(int k) const
 {
   bool carrierGas = false;
-  if (fluides_[k].le_nom().debute_par("gaz_continu")) carrierGas = true;
+  if (fluides_[k]->le_nom().debute_par("gaz_continu")) carrierGas = true;
   return carrierGas;
 }

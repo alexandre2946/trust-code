@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -90,8 +90,6 @@ protected:
 private:
   _CLASSE_ *pointeur_ = nullptr;
 
-  /* XXX Elie Saikali : interdit de l'appeler ! */
-  void nommer(const Nom&) override { /* NON PAS POSSIBLE */ }
   int reprendre(Entree&) override { return -100; /* NON PAS POSSIBLE */ }
   int sauvegarder(Sortie&) const override { return -100; /* NON PAS POSSIBLE */ }
 

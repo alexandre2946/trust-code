@@ -205,7 +205,7 @@ void Modele_turbulence_hyd_0_eq_base::imprimer(Sortie& os) const
         const Domaine& dom = mon_equation_->domaine_dis().domaine();
         Nom fic = fichier_K_eps_sortie_.nom_me(me());
 
-        const Nom& nom_post = K_eps_sortie_.le_nom();
+        const Nom& nom_post = K_eps_sortie_->le_nom();
         const Nom& type_elem = dom.type_elem()->que_suis_je();
         assert(K_eps_sortie_->valeurs().dimension(0) == dom.nb_elem());
         Ecrire_MED ecr_med(fic, dom);

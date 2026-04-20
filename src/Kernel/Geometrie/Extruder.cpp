@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -386,7 +386,7 @@ void Extruder::extruder_dvt(Domaine& dom, Faces& les_faces, int oldnbsom, int ol
 
   for (auto &itr : dom.faces_raccord())
     {
-      check_boundary_name(itr.le_nom());
+      check_boundary_name(itr->le_nom());
       Faces& les_faces_bord = itr->faces();
       traiter_faces_dvt(les_faces_bord, les_faces, oldnbsom, oldsz, nbfaces2D);
     }
@@ -583,7 +583,7 @@ void Extruder::extruder_dvt_hexa(Domaine& dom, Faces& les_faces, int oldnbsom, i
 
   for (auto &itr : dom.faces_raccord())
     {
-      check_boundary_name(itr.le_nom());
+      check_boundary_name(itr->le_nom());
       Faces& les_faces_bord = itr->faces();
       traiter_faces_dvt_hexa(les_faces_bord, oldnbsom);
     }
