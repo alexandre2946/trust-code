@@ -1,9 +1,9 @@
-XX/XX/26 (TRUST) Change       : Warning, VEF VerifierCoin keyword algorithm has been rewritten which possibly change the numerotation of the mesh and the partitioned mesh 
-XX/XX/26 (TRUST) Solver       : Sparskit based solver "solveur gen { solv_elem bicgstab|gmres ... }" removed. It can be replaced by more efficient PETSc equivalent solvers
-XX/XX/26 (TRUST) Tool         : trust -energy JOB_ID returns now on well-configured cluster the energy consumption of your job
 -------------------------------------------------------------------------------------------------
 Release notes version 1.9.8_beta : Enhancements, modifications and corrected bugs since version 1.9.7 :
 --------------------------------------------------------------------------------------------------
+20/04/26 (TRUST) Change       : Warning, VEF VerifierCoin keyword algorithm has been rewritten which possibly change the numerotation of the mesh and the partitioned mesh 
+20/04/26 (TRUST) Solver       : Sparskit based solver "solveur gen { solv_elem bicgstab|gmres ... }" removed. It can be replaced by more efficient PETSc equivalent solvers
+20/04/26 (TRUST) Tool         : trust -energy JOB_ID returns now on well-configured cluster the energy consumption of your job
 14/04/26 (TRUST) New feature  : CGNS supports now reset_time used in the framework of ICoCo
 14/04/26 (TRUST) New feature  : CGNS supports now deformable & lagrangian meshes
 14/04/26 (TRUST) New feature  : Add python module TRUST_Post_Loader to load and post-process TRUST cgns files as in medcoupling via python
