@@ -36,16 +36,6 @@ const TRUST_Ref_Objet_U& TRUST_Ref_Objet_U::operator=(const TRUST_Ref_Objet_U& t
   return *this;
 }
 
-bool TRUST_Ref_Objet_U::non_nul() const
-{
-  return p_ != nullptr;
-}
-
-bool TRUST_Ref_Objet_U::est_nul() const
-{
-  return p_ == nullptr;
-}
-
 int operator ==(const TRUST_Ref_Objet_U& r1, const TRUST_Ref_Objet_U& r2)
 {
   if (!r1 && !r2) return 1;

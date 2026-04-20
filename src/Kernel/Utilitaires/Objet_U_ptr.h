@@ -36,9 +36,6 @@ public:
   Objet_U_ptr(const Objet_U_ptr&) = delete;
   const Objet_U_ptr& operator=(const Objet_U_ptr&) = delete;
 
-  bool non_nul() const;
-  bool est_nul() const;
-
   explicit operator bool() const noexcept
   {
     assert(get_Objet_U_ptr_check() || 1); // this should disappear. when the factory is fixed probably
