@@ -266,11 +266,6 @@ void Modele_turbulence_scal_base::a_faire(Sortie& os) const
  */
 int Modele_turbulence_scal_base::reprendre(Entree& is)
 {
-  // Pour l'instant on ne lit plus dans le .sauv
-  /*Nom typ ;
-   is>>typ;
-   if (!loipar.non_nul())
-   loipar.typer(typ);        */
 
   if (loipar_)
     loipar_->reprendre(is);

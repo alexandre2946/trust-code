@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -53,9 +53,6 @@ protected:
 
 inline int Operateur_Diff::op_non_nul() const
 {
-  if (non_nul())
-    return 1;
-  else
-    return 0;
+  return  this->operator bool();
 }
 #endif

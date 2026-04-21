@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -99,9 +99,6 @@ inline void Operateur_Conv::typer(const Nom& a_type)
 
 inline int Operateur_Conv::op_non_nul() const
 {
-  if (non_nul())
-    return 1;
-  else
-    return 0;
+  return this->operator bool();
 }
 #endif

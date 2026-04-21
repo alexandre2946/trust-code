@@ -50,7 +50,7 @@ template<class _TYPE_>
 void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs(matrices_t mats, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   ((_TYPE_&) flux_evaluateur).mettre_a_jour();
-  assert(op_base->equation().inconnue().valeurs().nb_dim() < 3 && la_zcl.non_nul() && le_dom.non_nul());
+  assert(op_base->equation().inconnue().valeurs().nb_dim() < 3 && la_zcl && le_dom);
   const int ncomp = op_base->equation().inconnue().valeurs().line_size();
   DoubleTab& flux_bords = op_base->flux_bords();
   flux_bords.resize(le_dom->nb_faces_bord(), ncomp);
@@ -145,7 +145,7 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_interne(const int N, matrices_t m
 {
   const DoubleTab& donnee = semi_impl.count(nom_ch_inco_) ? semi_impl.at(nom_ch_inco_) : le_champ_convecte_ou_inc->valeurs();
   Type_Double flux(N), aii(N * (multiscalar_diff_ ? N : 1)), ajj(N * (multiscalar_diff_ ? N : 1)), aef(N);
-  const int ndeb = le_dom->premiere_face_int(), nfin = le_dom->nb_faces(), Mv = le_ch_v.non_nul() ? le_ch_v->valeurs().line_size() : N;
+  const int ndeb = le_dom->premiere_face_int(), nfin = le_dom->nb_faces(), Mv = le_ch_v ? le_ch_v->valeurs().line_size() : N;
   for (int face = ndeb; face < nfin; face++)
     {
       flux_evaluateur.flux_faces_interne(donnee, face, flux);
@@ -190,9 +190,9 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_(const BC& cl, const int nd
   constexpr bool is_neum_paroi = std::is_same<BC, Neumann_paroi>::value;
   constexpr bool is_paroi_contact = std::is_same<BC, Echange_global_impose>::value;
 
-  const bool is_Temp_impose_flux_parietal = is_scal_imp && corr_flux_parietal_.non_nul() && !is_conv_op_;
-  const bool is_Neumann_flux_parietal = is_neum_paroi && corr_flux_parietal_.non_nul() && !is_conv_op_;
-  const bool is_paroi_contact_flux_parietal = is_paroi_contact && corr_flux_parietal_.non_nul() && !is_conv_op_;
+  const bool is_Temp_impose_flux_parietal = is_scal_imp && corr_flux_parietal_ && !is_conv_op_;
+  const bool is_Neumann_flux_parietal = is_neum_paroi && corr_flux_parietal_ && !is_conv_op_;
+  const bool is_paroi_contact_flux_parietal = is_paroi_contact && corr_flux_parietal_ && !is_conv_op_;
 
   if (should_calc_flux)
     {
@@ -217,7 +217,7 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_(const BC& cl, const int nd
         }
       else
         {
-          int e, Mv = le_ch_v.non_nul() ? le_ch_v->valeurs().line_size() : N;
+          int e, Mv = le_ch_v ? le_ch_v->valeurs().line_size() : N;
           Type_Double flux(N), aii(N * (multiscalar_diff_ ? N : 1)), ajj(N * (multiscalar_diff_ ? N : 1)), aef(N);
           for (int face = ndeb; face < nfin; face++)
             {
@@ -232,7 +232,7 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_(const BC& cl, const int nd
           //derivees : vitesse
           if (m_vit)
             {
-              const IntTab *fcl_v = le_ch_v.non_nul() ? &ref_cast(Champ_Face_base, le_ch_v.valeur()).fcl() : nullptr;
+              const IntTab *fcl_v = le_ch_v ? &ref_cast(Champ_Face_base, le_ch_v.valeur()).fcl() : nullptr;
               for (int f = ndeb; f < nfin; f++)
                 if ((*fcl_v)(f, 0) < 2)
                   {
@@ -332,7 +332,7 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_(const Echange_externe_impo
       if (le_dom->front_VF(num_cl).le_nom() == frontiere_dis.le_nom())
         boundary_index = num_cl;
 
-      int e, Mv = le_ch_v.non_nul() ? le_ch_v->valeurs().line_size() : N;
+      int e, Mv = le_ch_v ? le_ch_v->valeurs().line_size() : N;
       for (int face = ndeb; face < nfin; face++)
         {
           const int local_face = le_dom->front_VF(boundary_index).num_local_face(face);

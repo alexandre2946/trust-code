@@ -139,7 +139,7 @@ public:
   template<class C> C& get_item(const Nom& id, int tstep)
   {
     LataDeriv<LataObject>& obj = get_item_(id, tstep);
-    if (obj.non_nul())
+    if (obj)
       return obj.refcast(C);
     else
       return obj.instancie(C);

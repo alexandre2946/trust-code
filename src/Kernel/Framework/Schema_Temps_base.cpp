@@ -251,7 +251,6 @@ void Schema_Temps_base::resetTime(double time)
 
 void Schema_Temps_base::associer_pb(const Probleme_base& un_probleme)
 {
-  //assert(!mon_probleme.non_nul());
   mon_probleme=un_probleme;
 }
 

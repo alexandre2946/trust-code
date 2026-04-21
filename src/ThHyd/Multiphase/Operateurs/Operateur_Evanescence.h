@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -38,7 +38,7 @@ public:
   DoubleTab& calculer(const DoubleTab& donnee, DoubleTab& resu) const override { return valeur().calculer(donnee, resu); }
   void typer(const Nom& un_type) { OWN_PTR(Operateur_Evanescence_base)::typer(un_type); }
   void typer() override;
-  inline int op_non_nul() const override { return non_nul(); };
+  inline int op_non_nul() const override { return this->operator bool(); };
 
 protected:
   OBS_PTR(Champ_base) la_diffusivite_;

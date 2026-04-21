@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -151,7 +151,7 @@ void Iterateur_VDF_Elem<_TYPE_>::contribuer_au_second_membre(DoubleTab& resu) co
 {
   ((_TYPE_&) flux_evaluateur).mettre_a_jour();
   const int ncomp = resu.line_size();
-  assert(resu.nb_dim() < 3 && la_zcl.non_nul() && le_dom.non_nul());
+  assert(resu.nb_dim() < 3 && la_zcl && le_dom);
   assert(op_base->flux_bords().dimension(0)==le_dom->nb_faces_bord()); /* resize deja fait */
   if (ncomp == 1)
     {

@@ -297,7 +297,7 @@ void LataFilterCache::release_item(const Nom& id)
     }
   data_[i].last_access_time_ = cache_data_access_count_++;
   data_[i].lock_--;
-  if (data_[i].item_.non_nul())
+  if (data_[i].item_)
     data_[i].memory_size_ = data_[i].item_.valeur().compute_memory_size();
   else
     data_[i].memory_size_ = 0;
@@ -682,7 +682,7 @@ void LataFilter::get_all_metadata(LataVector<LataGeometryMetaData>& geoms_data, 
         }
     }
 
-  if (user_fields_.non_nul())
+  if (user_fields_)
     user_fields_.valeur().new_fields_metadata(*this, fields_data);
 }
 
@@ -777,7 +777,7 @@ const Domain& LataFilter::get_geometry(const Domain_Id& id)
     requested_id.timestep_ = 0;
 
   LataDeriv<Domain>& dom_ptr = get_cached_domain(requested_id);
-  if (!dom_ptr.non_nul())
+  if (!dom_ptr)
     {
       if (geom_metadata.source_ == "latadb")
         {
@@ -851,7 +851,7 @@ const Domain& LataFilter::get_geometry(const Domain_Id& id)
 Operator& LataFilter::get_set_operator(const Domain_Id& id)
 {
   LataDeriv<Operator>& op_ptr = get_cached_operator(id);
-  if (!op_ptr.non_nul())
+  if (!op_ptr)
     {
       // Operator not in the cache ? Build it:
       if (id.name_.finit_par("_IJK"))
@@ -888,7 +888,7 @@ const LataField_base& LataFilter::get_field(const Field_Id& id)
   const LataFieldMetaData& field_metadata = get_field_metadata(id.uname_);
 
   LataDeriv<LataField_base>& field_ptr = get_cached_field(id);
-  if (!field_ptr.non_nul())
+  if (!field_ptr)
     {
       if (field_metadata.source_ == "latadb")
         {

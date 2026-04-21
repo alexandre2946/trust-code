@@ -54,7 +54,7 @@ Geometry_handle::~Geometry_handle()
 
 void Geometry_handle::reset()
 {
-  if (geom_.non_nul())
+  if (geom_)
     lata_filter_.valeur().release_geometry(geom_.valeur());
   geom_.reset();
   lata_filter_.reset();
@@ -62,7 +62,7 @@ void Geometry_handle::reset()
 
 const DomainUnstructured & Geometry_handle::geom()
 {
-  if (!geom_.non_nul()) {
+  if (!geom_) {
     Journal() << "Internal error in Geometry_handle::geom() : nul pointer" << endl;
     throw;
   }
@@ -77,7 +77,7 @@ const DomainUnstructured & Geometry_handle::geom()
 
 const DomainIJK & Geometry_handle::geom_ijk()
 {
-  if (!geom_.non_nul()) {
+  if (!geom_) {
     Journal() << "Internal error in Geometry_handle::geom() : nul pointer" << endl;
     throw;
   }
@@ -92,7 +92,7 @@ const DomainIJK & Geometry_handle::geom_ijk()
 
 bool Geometry_handle::test_ijk()
 {
-  if (!geom_.non_nul()) {
+  if (!geom_) {
     Journal() << "Internal error in Geometry_handle::geom() : nul pointer" << endl;
     throw;
   }

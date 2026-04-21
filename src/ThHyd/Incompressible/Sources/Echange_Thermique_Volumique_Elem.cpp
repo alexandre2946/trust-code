@@ -167,13 +167,16 @@ void Echange_Thermique_Volumique_Elem::ajouter_blocs(matrices_t matrices, Double
   if (o_ech_->cond_)
     o_cond.resize(o_ne_tot, 1), o_ech_->cond_->valeur_aux_elems(dom[1]->xp(), o_polys, o_cond);
   for (int i = 0; i < 2; i++)
-    if ((i ? &o_ech_->flux_par_ : &flux_par_)->non_nul())
-      {
-        v_e[i].resize(0, D * N[i]);
-        dom[i]->domaine().creer_tableau_elements(v_e[i]);
-        ref_cast(Navier_Stokes_std, pb[i]->equation(0)).inconnue().valeur_aux_elems(dom[i]->xp(), i ? o_polys : polys, v_e[i]);
-        if (i) v_e[i].echange_espace_virtuel();
-      }
+    {
+      auto& flux = i ? o_ech_->flux_par_ : flux_par_;
+      if (flux)
+        {
+          v_e[i].resize(0, D * N[i]);
+          dom[i]->domaine().creer_tableau_elements(v_e[i]);
+          ref_cast(Navier_Stokes_std, pb[i]->equation(0)).inconnue().valeur_aux_elems(dom[i]->xp(), i ? o_polys : polys, v_e[i]);
+          if (i) v_e[i].echange_espace_virtuel();
+        }
+    }
 
   /* matrice du remapper */
   const std::vector<std::map<mcIdType,double>>& interp = equation().probleme().domaine().get_remapper(o_ech_->equation().probleme().domaine(), true)->getCrudeMatrix();
@@ -198,37 +201,40 @@ void Echange_Thermique_Volumique_Elem::ajouter_blocs(matrices_t matrices, Double
             //flux parietaux de chaque cote
             DoubleTrav f_h(2, std::max(N[0], N[1])); // f_h(i, j) : fraction de l'echange avec la phase j du cote i
             for (int i = 0; i < 2; i++)
-              if ((i ? &o_ech_->flux_par_ : &flux_par_)->non_nul())
-                {
-                  const Flux_parietal_base& corr = ref_cast(Flux_parietal_base, (i ? &o_ech_->flux_par_ : &flux_par_)->valeur());
-                  const DoubleTab* alpha = sub_type(Pb_Multiphase, *pb[i]) ? &ref_cast(Pb_Multiphase, *pb[i]).equation_masse().inconnue().passe() : nullptr, &dh = pb[i]->milieu().diametre_hydraulique_elem(),
-                                   &press = ref_cast(Navier_Stokes_std, pb[i]->equation(0)).pression().passe(),
-                                    &lamb = ref_cast(Fluide_base, pb[i]->milieu()).conductivite().passe(), &mu = ref_cast(Fluide_base, pb[i]->milieu()).viscosite_dynamique().passe(),
-                                     &rho = pb[i]->milieu().masse_volumique().passe(), &Cp = pb[i]->milieu().capacite_calorifique().passe();
-                  int Clamb = lamb.dimension(0) == 1, Cmu = mu.dimension(0) == 1, Crho = rho.dimension(0) == 1, Ccp = Cp.dimension(0) == 1, el = i ? o_e : e, nonlinear = 0;
+              {
+                auto& flux = i ? o_ech_->flux_par_ : flux_par_;
+                if (flux)
+                  {
+                    const Flux_parietal_base& corr = ref_cast(Flux_parietal_base, flux.valeur());
+                    const DoubleTab* alpha = sub_type(Pb_Multiphase, *pb[i]) ? &ref_cast(Pb_Multiphase, *pb[i]).equation_masse().inconnue().passe() : nullptr, &dh = pb[i]->milieu().diametre_hydraulique_elem(),
+                                     &press = ref_cast(Navier_Stokes_std, pb[i]->equation(0)).pression().passe(),
+                                      &lamb = ref_cast(Fluide_base, pb[i]->milieu()).conductivite().passe(), &mu = ref_cast(Fluide_base, pb[i]->milieu()).viscosite_dynamique().passe(),
+                                       &rho = pb[i]->milieu().masse_volumique().passe(), &Cp = pb[i]->milieu().capacite_calorifique().passe();
+                    int Clamb = lamb.dimension(0) == 1, Cmu = mu.dimension(0) == 1, Crho = rho.dimension(0) == 1, Ccp = Cp.dimension(0) == 1, el = i ? o_e : e, nonlinear = 0;
 
-                  Flux_parietal_base::input_t in;
-                  Flux_parietal_base::output_t out;
-                  DoubleTrav qpk(N[i]), dTf_qpk(N[i], N[i]), dTp_qpk(N[i]), qpi(N[i], N[i]), dTf_qpi(N[i], N[i], N[i]), dTp_qpi(N[i], N[i]), nv(N[i]);
-                  in.N = N[i], in.D_h = dh(el), in.D_ch = dh(el), in.alpha = alpha ? &(*alpha)(el, 0) : nullptr, in.T = &(*pvals[i])(el, 0), in.p = press(el), in.v = nv.addr();
-                  in.lambda = &lamb(!Clamb * el, 0), in.mu = &mu(!Cmu * el, 0), in.rho = &rho(!Crho * el, 0), in.Cp = &Cp(!Ccp * el, 0), in.Tp = 0;
-                  out.qpk = &qpk, out.dTf_qpk = &dTf_qpk, out.dTp_qpk = &dTp_qpk, out.qpi = &qpi, out.dTf_qpi = &dTf_qpi, out.dTp_qpi = &dTp_qpi, out.nonlinear = &nonlinear;
-                  for (int d = 0; d < D; d++)
-                    for (int n = 0; n < N[i]; n++)
-                      nv(n) += v_e[i](el, N[i] * d + n) * v_e[i](el, N[i] * d + n);
-                  for (int n = 0; n < N[0]; n++) nv(n) = sqrt(nv[n]);
-                  //appel!
-                  corr.qp(in, out);
-                  if (nonlinear)
-                    Process::exit(que_suis_je() + " : nonlinear heat flux such as " + corr.que_suis_je() + " are not implemented yet!");
-                  //on n'est interesse que par les coeffs d'echange
-                  for (int n = 0; n < N[i]; n++) hf[i] += -dTf_qpk(n, n);
-                  for (int n = 0; n < N[i]; n++) f_h(i, n) = -dTf_qpk(n, n) / hf[i];
-                  invh += 1. / hf[i];
-                }
-              else if (N[i] > 1)
-                Process::exit(que_suis_je() + " : multi-component heat flux with " + pb[i]->le_nom() + ", but no heat_flux has been defined!");
-              else f_h(i, 0) = 1;
+                    Flux_parietal_base::input_t in;
+                    Flux_parietal_base::output_t out;
+                    DoubleTrav qpk(N[i]), dTf_qpk(N[i], N[i]), dTp_qpk(N[i]), qpi(N[i], N[i]), dTf_qpi(N[i], N[i], N[i]), dTp_qpi(N[i], N[i]), nv(N[i]);
+                    in.N = N[i], in.D_h = dh(el), in.D_ch = dh(el), in.alpha = alpha ? &(*alpha)(el, 0) : nullptr, in.T = &(*pvals[i])(el, 0), in.p = press(el), in.v = nv.addr();
+                    in.lambda = &lamb(!Clamb * el, 0), in.mu = &mu(!Cmu * el, 0), in.rho = &rho(!Crho * el, 0), in.Cp = &Cp(!Ccp * el, 0), in.Tp = 0;
+                    out.qpk = &qpk, out.dTf_qpk = &dTf_qpk, out.dTp_qpk = &dTp_qpk, out.qpi = &qpi, out.dTf_qpi = &dTf_qpi, out.dTp_qpi = &dTp_qpi, out.nonlinear = &nonlinear;
+                    for (int d = 0; d < D; d++)
+                      for (int n = 0; n < N[i]; n++)
+                        nv(n) += v_e[i](el, N[i] * d + n) * v_e[i](el, N[i] * d + n);
+                    for (int n = 0; n < N[0]; n++) nv(n) = sqrt(nv[n]);
+                    //appel!
+                    corr.qp(in, out);
+                    if (nonlinear)
+                      Process::exit(que_suis_je() + " : nonlinear heat flux such as " + corr.que_suis_je() + " are not implemented yet!");
+                    //on n'est interesse que par les coeffs d'echange
+                    for (int n = 0; n < N[i]; n++) hf[i] += -dTf_qpk(n, n);
+                    for (int n = 0; n < N[i]; n++) f_h(i, n) = -dTf_qpk(n, n) / hf[i];
+                    invh += 1. / hf[i];
+                  }
+                else if (N[i] > 1)
+                  Process::exit(que_suis_je() + " : multi-component heat flux with " + pb[i]->le_nom() + ", but no heat_flux has been defined!");
+                else f_h(i, 0) = 1;
+              }
             //contributions!
             for (int n = 0; n < N[0]; n++)
               {

@@ -83,7 +83,7 @@ void Interpolation_IBM_elem_fluid::computeFluidElems(Domaine_dis_base& le_dom_EF
   // l'etape calcul (cas du pre_pro Salome)
   // On utilise un champ d'etiquette pour fluid_elems_ (par exemple le no elem Salome)
   // et un champ d'element reprenant ces etiquettes
-  if ((&corresp_elems_)->non_nul())
+  if (corresp_elems_)
     {
       DoubleTab& corresp_elems_ref = corresp_elems_->valeurs();
       int nb_tag_max = -1;

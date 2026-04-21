@@ -36,7 +36,7 @@ Entree& Source_PDF_base::readOn(Entree& s)
   param.ajouter("interpolation",&interpolation_lue_,Param::OPTIONAL);
 
   param.lire_avec_accolades(s);
-  if ((&interpolation_lue_)->non_nul())
+  if (interpolation_lue_)
     {
       if (!(interpolation_lue_->que_suis_je() == "Interpolation_IBM_aucune"))
         {

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -179,10 +179,10 @@ void TRUSTChamp_Morceaux_generique<_TYPE_>::mettre_a_jour(double time)
   else
     {
       OWN_PTR(Champ_base) espace_stockage;
-      const Champ_base *ch = !ref_pb.non_nul() ? nullptr : ref_pb->has_champ(nom_champ_parametre_) ? &ref_pb->get_champ(nom_champ_parametre_) : &ref_pb->get_champ_post(nom_champ_parametre_).get_champ(espace_stockage);
+      const Champ_base *ch = !ref_pb ? nullptr : ref_pb->has_champ(nom_champ_parametre_) ? &ref_pb->get_champ(nom_champ_parametre_) : &ref_pb->get_champ_post(nom_champ_parametre_).get_champ(espace_stockage);
       const int nb_som_elem = mon_domaine->nb_som_elem();
       int dim = dimension;
-      bool pb = ref_pb.non_nul();
+      bool pb = bool(ref_pb);
       const int max_parser_size = 200;
       if (parser.size()>max_parser_size)
         {
@@ -288,7 +288,7 @@ Entree& TRUSTChamp_Morceaux_generique<_TYPE_>::complete_readOn(const int dim, co
       psr.setNbVar(5);
       psr.setString(tmp);
       psr.addVar("x"), psr.addVar("y"), psr.addVar("z"), psr.addVar("t");
-      if (ref_pb.non_nul()) psr.addVar("val");
+      if (ref_pb) psr.addVar("val");
       psr.parseString();
 
       for (poly = 0; poly < mon_domaine->nb_elem_tot(); poly++)
@@ -310,7 +310,7 @@ Entree& TRUSTChamp_Morceaux_generique<_TYPE_>::complete_readOn(const int dim, co
           psr.setNbVar(5);
           psr.setString(tmp);
           psr.addVar("x"), psr.addVar("y"), psr.addVar("z"), psr.addVar("t");
-          if (ref_pb.non_nul()) psr.addVar("val");
+          if (ref_pb) psr.addVar("val");
           psr.parseString();
 
           for (poly = 0; poly < ssz.nb_elem_tot(); poly++)

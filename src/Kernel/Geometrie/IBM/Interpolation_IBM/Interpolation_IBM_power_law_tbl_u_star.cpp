@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -46,7 +46,7 @@ void Interpolation_IBM_power_law_tbl_u_star::discretise(const Discretisation_bas
   Noms units(nb_comp);
   Noms c_nam(nb_comp);
 
-  if ((&corresp_elems_lu_)->non_nul())
+  if (corresp_elems_lu_)
     {
       dis.discretiser_champ("champ_elem",le_dom_EF,"corresp_elems","none",1,0., corresp_elems_);
       corresp_elems_->affecter(corresp_elems_lu_);
