@@ -39,7 +39,8 @@ define_modules_config()
       module="gnu/11 mpi/openmpi/4.0.5"
       module="gnu/11 mpi/openmpi/4.0.5 mkl/20.0.0" # Regression perf 1.9.1-1.9.2 a cause de Lapack dans OpenBlas plus lent que Lapack de Mkl
    fi
-   module="python3/3.8.10 swig/4.0.2 texlive gnuplot cmake/3.26.4 "$module # cmake 3.22 important pour AmgX et Nvidia-HPC
+   #module="python3/3.8.10 swig/4.0.2 texlive gnuplot cmake/3.26.4 "$module # cmake 3.22 important pour AmgX et Nvidia-HPC
+   module="python3/3.12 swig/4.0.2 texlive gnuplot cmake/3.29.6 $module"
    echo "# Module $module detected and loaded on $HOST."
    echo "module purge 1>/dev/null 2>&1" >> $env
    echo "module load $module 1>/dev/null || exit -1" >> $env

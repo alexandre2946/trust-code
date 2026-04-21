@@ -39,7 +39,8 @@ define_modules_config()
    fi
    # depuis v1.9.2, install sans conda, on prend python+swig+cmake module
    # 2023/10/02: libgd utile pour installer gnuplot
-   module="python3/3.8.10 swig/4.0.2 gnuplot cmake/3.26.4 $module"
+   #module="python3/3.8.10 swig/4.0.2 gnuplot cmake/3.26.4 $module"
+   module="python3/3.12 swig/4.0.2 gnuplot cmake/3.29.6 $module"
    #
    echo "# Module $module detected and loaded on $HOST."
    echo "module purge 1>/dev/null 2>/dev/null" >> $env
