@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -31,7 +31,12 @@ Entree& SolveurSys::readOn(Entree& is)
   Nom solver_name;
   param.ajouter("solveur_pression", &solver_name, Param::REQUIRED);
   param.lire_sans_accolade(is);
-
+  if (solver_name == "GEN")
+    {
+      Cerr << "Error: Sparskit based solver 'solveur gen { solv_elem bicgstab|gmres ... }' removed in v1.9.8" << finl;
+      Cerr << "       It can be replaced by more efficient PETSc equivalent solvers." << finl;
+      Process::exit();
+    }
   Nom type_solv_sys("Solv_");
   type_solv_sys += solver_name;
   typer(type_solv_sys);
