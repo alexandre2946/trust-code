@@ -18,7 +18,6 @@
  Assembleur_P_VEFPreP1B Assembleur_P_VEFPreP1B Assembleur_P_VEFPreP1B.h
  Associer|Associate Associer Associer.h
  Axi Axi Axi.h
- BiCGStab SolvElem_BiCGStab SolvElem_BiCGStab.h
  Bidim_Axi Bidim_Axi Bidim_Axi.h
  Bord Bord_32_64 Bord.h
  Bords Bords_32_64 Bords.h
@@ -474,7 +473,6 @@
  Frottement_interfacial_Wallis Frottement_interfacial_Wallis Frottement_interfacial_Wallis.h
  Frottement_interfacial_Weber Frottement_interfacial_Weber Frottement_interfacial_Weber.h
  Frottement_interfacial_Zenit Frottement_interfacial_Zenit Frottement_interfacial_Zenit.h
- Gmres SolvElem_Gmres SolvElem_Gmres.h
  Gradient Champ_Generique_Gradient Champ_Generique_Gradient.h
  gradient_temperature_Champ_P1NC grad_T_Champ_P1NC grad_T_Champ_P1NC.h
  grad_Champ_Face_PolyMAC_MPFA grad_Champ_Face_PolyMAC_MPFA grad_Champ_Face_PolyMAC_MPFA.h
@@ -498,7 +496,6 @@
  IJK_Lata_Swap_JK IJK_Lata_Swap_JK IJK_Lata_Swap_JK.h
  IJK_Test_Multigrille IJK_Test_Multigrille IJK_Test_Multigrille.h
  IJK_VDF_converter IJK_VDF_converter IJK_VDF_converter.h
- ILU ILU_SP ILU_SP.h
  Implicite Implicite Piso.h
  Imprimer_flux Imprimer_flux Imprimer_flux.h
  Imprimer_flux_sum Imprimer_flux_sum Imprimer_flux_sum.h
@@ -1152,7 +1149,6 @@
  Simpler_Base Simpler_Base Simpler_Base.h
  Solide Solide Solide.h
  Solide_SWIFT_VDF_P0_VDF Terme_Source_Solide_SWIFT_VDF Terme_Source_Solide_SWIFT_VDF.h
- SolvElem_base SolvElem_base SolvElem_base.h
  SolveurPP1B SolveurPP1B SolveurPP1B.h
  SolveurSys SolveurSys SolveurSys.h
  SolveurSys_base SolveurSys_base SolveurSys_base.h
@@ -1169,7 +1165,6 @@
  Solv_Externe Solv_Externe Solv_Externe.h
  Solv_GCP Solv_GCP Solv_GCP.h
  Solv_GCP_NS Solv_GCP_NS Solv_GCP_NS.h
- Solv_Gen Solv_Gen Solv_Gen.h
  Solv_Gmres Solv_Gmres Solv_Gmres.h
  solv_iteratif solv_iteratif solv_iteratif.h
  Solv_Multigrille_Adrien Multigrille_Adrien Multigrille_Adrien.h
