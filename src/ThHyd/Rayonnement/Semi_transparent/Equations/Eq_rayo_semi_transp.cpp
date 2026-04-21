@@ -289,12 +289,12 @@ void Eq_rayo_semi_transp::Mat_Morse_to_Mat_Bloc(Matrice& matrice_tmp)
   Matrice_Morse& MBrr = ref_cast(Matrice_Morse, matrice.get_bloc(0, 0).valeur());
   Matrice_Morse& MBrv = ref_cast(Matrice_Morse, matrice.get_bloc(0, 1).valeur());
 
-  IntVect& tab1RR = MBrr.get_set_tab1();
-  IntVect& tab2RR = MBrr.get_set_tab2();
-  DoubleVect& coeffRR = MBrr.get_set_coeff();
-  IntVect& tab1RV = MBrv.get_set_tab1();
-  IntVect& tab2RV = MBrv.get_set_tab2();
-  DoubleVect& coeffRV = MBrv.get_set_coeff();
+  auto& tab1RR = MBrr.get_set_tab1();
+  auto& tab2RR = MBrr.get_set_tab2();
+  auto& coeffRR = MBrr.get_set_coeff();
+  auto& tab1RV = MBrv.get_set_tab1();
+  auto& tab2RV = MBrv.get_set_tab2();
+  auto& coeffRV = MBrv.get_set_coeff();
 
   DoubleTab ligne_tmp(n1);
   for (int i = 0; i < n2; i++)
@@ -321,8 +321,8 @@ void Eq_rayo_semi_transp::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice_tmp)
   const int n2 = rayo_solv_->nb_colonnes();
 
   int iligne;
-  const IntVect& tab1 = la_matrice_.get_set_tab1();
-  const IntVect& tab2 = la_matrice_.get_set_tab2();
+  const auto& tab1 = la_matrice_.get_set_tab1();
+  const auto& tab2 = la_matrice_.get_set_tab2();
 
   matrice_tmp.typer("Matrice_Bloc");
   Matrice_Bloc& matrice = ref_cast(Matrice_Bloc, matrice_tmp.valeur());
@@ -335,10 +335,10 @@ void Eq_rayo_semi_transp::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice_tmp)
   MBrr.dimensionner(n2, 0);
   MBrv.dimensionner(n2, 0);
 
-  IntVect& tab1RR = MBrr.get_set_tab1();
-  IntVect& tab2RR = MBrr.get_set_tab2();
-  IntVect& tab1RV = MBrv.get_set_tab1();
-  IntVect& tab2RV = MBrv.get_set_tab2();
+  auto& tab1RR = MBrr.get_set_tab1();
+  auto& tab2RR = MBrr.get_set_tab2();
+  auto& tab1RV = MBrv.get_set_tab1();
+  auto& tab2RV = MBrv.get_set_tab2();
 
   IntVect compteur_MBrr(n2);
   IntVect compteur_MBrv(n2);
