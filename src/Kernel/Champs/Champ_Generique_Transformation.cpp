@@ -769,33 +769,33 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
             }
           else
             {
-          		Kokkos::Array<CDoubleTabView, max_nb_sources> sources;
-          		for (int so=0; so<nb_sources; so++)
-          		  sources[so] = sources_val[so].view_ro();
-          		int dim = dimension;
-          		CDoubleTabView pos = positions.view_ro();
-          		DoubleTabView valeurs = valeurs_espace.view_wo();
-          		for (int j=0; j<nb_comp_; j++)
-          		  {
-          		    ParserView fxyzj(fxyz[j]);
-          		    fxyzj.parseString();
-          		    Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_pos, KOKKOS_LAMBDA(const int i)
-          		    {
-          		      double x = pos(i,0);
-          		      double y = pos(i,1);
-          		      double z = (dim>2 ? pos(i,2) : 0);
-          		      int threadId = fxyzj.acquire();
-          		      fxyzj.setVar(0,x,threadId);
-          		      fxyzj.setVar(1,y,threadId);
-          		      fxyzj.setVar(2,z,threadId);
-          		      fxyzj.setVar(3,temps,threadId);
-          		      for (int so=0; so<nb_sources; so++)
-          		        fxyzj.setVar(so+4,sources[so](i,0),threadId);
-          		      valeurs(i,j) = fxyzj.eval(threadId);
-          		      fxyzj.release(threadId);
-          		    });
-          		    end_gpu_timer(__KERNEL_NAME__);
-								}
+              Kokkos::Array<CDoubleTabView, max_nb_sources> sources;
+              for (int so=0; so<nb_sources; so++)
+                sources[so] = sources_val[so].view_ro();
+              int dim = dimension;
+              CDoubleTabView pos = positions.view_ro();
+              DoubleTabView valeurs = valeurs_espace.view_wo();
+              for (int j=0; j<nb_comp_; j++)
+                {
+                  ParserView fxyzj(fxyz[j]);
+                  fxyzj.parseString();
+                  Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_pos, KOKKOS_LAMBDA(const int i)
+                  {
+                    double x = pos(i,0);
+                    double y = pos(i,1);
+                    double z = (dim>2 ? pos(i,2) : 0);
+                    int threadId = fxyzj.acquire();
+                    fxyzj.setVar(0,x,threadId);
+                    fxyzj.setVar(1,y,threadId);
+                    fxyzj.setVar(2,z,threadId);
+                    fxyzj.setVar(3,temps,threadId);
+                    for (int so=0; so<nb_sources; so++)
+                      fxyzj.setVar(so+4,sources[so](i,0),threadId);
+                    valeurs(i,j) = fxyzj.eval(threadId);
+                    fxyzj.release(threadId);
+                  });
+                  end_gpu_timer(__KERNEL_NAME__);
+                }
             }
         }
     }
@@ -828,29 +828,29 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
       else
         {
           if (directive=="champ_fonc_quad_dg") //This is for DG
-					{
+            {
               IntTab nb_points, ind_integ_points;
               int nb_elem = valeurs_espace.dimension(0);
               zvf.get_ind_integ_points(ind_integ_points);
               zvf.get_nb_integ_points(nb_points);
-          Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_elem, KOKKOS_LAMBDA(const int i)
-          {
-              for (int pt=0; pt<nb_points[i]; pt++)
+              Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_elem, KOKKOS_LAMBDA(const int i)
               {
-                  int k = ind_integ_points[i]+pt;
-									v(k) = source_so_val(i, num_compo*nb_points[i]+pt);
-									}
-          });
-          end_gpu_timer(__KERNEL_NAME__);
-					}
-					else
-					{
-          Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_pos, KOKKOS_LAMBDA(const int i)
-          {
-            v(i) = source_so_val(i, num_compo);
-          });
-          end_gpu_timer(__KERNEL_NAME__);
-					}
+                for (int pt=0; pt<nb_points[i]; pt++)
+                  {
+                    int k = ind_integ_points[i]+pt;
+                    v(k) = source_so_val(i, num_compo*nb_points[i]+pt);
+                  }
+              });
+              end_gpu_timer(__KERNEL_NAME__);
+            }
+          else
+            {
+              Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_pos, KOKKOS_LAMBDA(const int i)
+              {
+                v(i) = source_so_val(i, num_compo);
+              });
+              end_gpu_timer(__KERNEL_NAME__);
+            }
         }
     }
   else if (Motcle(methode_)=="formule")

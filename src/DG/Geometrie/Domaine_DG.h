@@ -19,13 +19,10 @@
 
 #include <Domaine_Poly_base.h>
 #include <Option_DG.h>
-<<<<<<< HEAD
-#include <Matrice_Base.h>
-=======
+#include <Matrix_tools.h>
 #include <memory>
 #include <map>
 #include <tuple>
->>>>>>> bb644372cc (wip)
 
 class Quadrature_base;
 class BasisFunction;
