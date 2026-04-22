@@ -210,10 +210,10 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
 
   Matrice_Morse *matv = matrices.count("vitesse") ? matrices["vitesse"] : nullptr;
 
-  /*bool stabilisation = ((order_v == order_p) && matrices.count("pression")); // Calculate the stabilization term if the same order is used for velocity and pressure, and if the matrix for pressure is allocated
+  bool stabilisation = ((order_v == order_p) && matrices.count("pression")); // Calculate the stabilization term if the same order is used for velocity and pressure, and if the matrix for pressure is allocated
   Matrice_Morse *matp = matrices.count("pression") ? (stabilisation ? matrices["pression"] : nullptr) : nullptr;
   const DoubleTab& inco_p = semi_impl.count("pression") ? semi_impl.at("pression") : ref_cast(Navier_Stokes_std, equation()).pression().valeurs();
-  */
+
   const Domaine_DG& domaine = le_dom_DG.valeur();
   const IntTab& face_voisins = domaine.face_voisins();
 
@@ -460,7 +460,7 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
   }
 
 
-  /*if (!matp) return; // No matrix allocated for the stabilization term, we skip the calculation
+  if (!matp) return; // No matrix allocated for the stabilization term, we skip the calculation
   {
     //stabilization part
     op_diff_->update_nu();
@@ -521,11 +521,11 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
                   eval_jump_on_facet11(k) = nu_f * f_base_p1(pressure_index_l, k) * f_base_p1(pressure_index_r, k) * sur_f;
                 coeff11 = quad.compute_integral_on_facet(face, eval_jump_on_facet11);
                 (*matp)(ind_elem1_p + pressure_index_l, ind_elem1_p + pressure_index_r) += coeff11;
-                secmem(elem1, pressure_index_r) -= coeff11 * inco_p(elem1, pressure_index_r);
+                secmem(elem1, pressure_index_l) -= coeff11 * inco_p(elem1, pressure_index_r);
               }
           }
       }
-  }*/
+  }
 }
 
 DoubleTab& Op_Div_DG::calculer(const DoubleTab& vit, DoubleTab& div) const
