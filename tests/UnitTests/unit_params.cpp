@@ -9,6 +9,11 @@
 
 
 
+template<typename T>
+bool contains(const std::map<std::string, T> map, const std::string& key) {
+    return (map.find(key) != map.end());
+}
+
 class Named_Object : public Objet_U_With_Params
 {
   Declare_instanciable_with_param(Named_Object);
@@ -354,29 +359,29 @@ End
     EXPECT_TRUE(test_obj.vec_strs.empty());
     EXPECT_TRUE(test_obj.vec_objs.empty());
 
-    ASSERT_TRUE(test_obj.map_ints.contains("a"));
-    ASSERT_TRUE(test_obj.map_ints.contains("b"));
+    ASSERT_TRUE(contains(test_obj.map_ints, "a"));
+    ASSERT_TRUE(contains(test_obj.map_ints, "b"));
     EXPECT_EQ(test_obj.map_ints.at("a"), 1);
     EXPECT_EQ(test_obj.map_ints.at("b"), 2);
 
-    ASSERT_TRUE(test_obj.map_dbls.contains("a"));
-    ASSERT_TRUE(test_obj.map_dbls.contains("b"));
-    ASSERT_TRUE(test_obj.map_dbls.contains("c"));
+    ASSERT_TRUE(contains(test_obj.map_dbls, "a"));
+    ASSERT_TRUE(contains(test_obj.map_dbls, "b"));
+    ASSERT_TRUE(contains(test_obj.map_dbls, "c"));
     EXPECT_EQ(test_obj.map_dbls.at("a"), 1.2);
     EXPECT_EQ(test_obj.map_dbls.at("b"), -2.333);
     EXPECT_EQ(test_obj.map_dbls.at("c"), 1e6);
 
-    ASSERT_TRUE(test_obj.map_strs.contains("a"));
-    ASSERT_TRUE(test_obj.map_strs.contains("b"));
-    ASSERT_TRUE(test_obj.map_strs.contains("c"));
+    ASSERT_TRUE(contains(test_obj.map_strs, "a"));
+    ASSERT_TRUE(contains(test_obj.map_strs, "b"));
+    ASSERT_TRUE(contains(test_obj.map_strs, "c"));
     EXPECT_EQ(test_obj.map_strs.at("a"), "azdafa");
     EXPECT_EQ(test_obj.map_strs.at("b"), "2adfzaa");
     EXPECT_EQ(test_obj.map_strs.at("c"), "azefaz");
 
 
-    ASSERT_TRUE(test_obj.map_objs.contains("key1"));
-    ASSERT_TRUE(test_obj.map_objs.contains("key2"));
-    ASSERT_TRUE(test_obj.map_objs.contains("key3"));
+    ASSERT_TRUE(contains(test_obj.map_objs, "key1"));
+    ASSERT_TRUE(contains(test_obj.map_objs, "key2"));
+    ASSERT_TRUE(contains(test_obj.map_objs, "key3"));
     EXPECT_EQ(std::string(test_obj.map_objs.at("key1")->le_type()), "Nom");
     EXPECT_EQ(std::string(test_obj.map_objs.at("key2")->le_type()), "Nom");
     EXPECT_EQ(std::string(test_obj.map_objs.at("key3")->le_type()), "Motcle");
@@ -418,29 +423,29 @@ End
     EXPECT_TRUE(test_obj.vec_strs.empty());
     EXPECT_TRUE(test_obj.vec_objs.empty());
 
-    EXPECT_TRUE(test_obj.map_ints.contains("a"));
-    EXPECT_TRUE(test_obj.map_ints.contains("b"));
+    EXPECT_TRUE(contains(test_obj.map_ints, "a"));
+    EXPECT_TRUE(contains(test_obj.map_ints, "b"));
     EXPECT_EQ(test_obj.map_ints.at("a"), 1);
     EXPECT_EQ(test_obj.map_ints.at("b"), 2);
 
-    EXPECT_TRUE(test_obj.map_dbls.contains("a"));
-    EXPECT_TRUE(test_obj.map_dbls.contains("b"));
-    EXPECT_TRUE(test_obj.map_dbls.contains("c"));
+    EXPECT_TRUE(contains(test_obj.map_dbls, "a"));
+    EXPECT_TRUE(contains(test_obj.map_dbls, "b"));
+    EXPECT_TRUE(contains(test_obj.map_dbls, "c"));
     EXPECT_EQ(test_obj.map_dbls.at("a"), 1.2);
     EXPECT_EQ(test_obj.map_dbls.at("b"), -2.333);
     EXPECT_EQ(test_obj.map_dbls.at("c"), 1e6);
 
-    EXPECT_TRUE(test_obj.map_strs.contains("a"));
-    EXPECT_TRUE(test_obj.map_strs.contains("b"));
-    EXPECT_TRUE(test_obj.map_strs.contains("c"));
+    EXPECT_TRUE(contains(test_obj.map_strs, "a"));
+    EXPECT_TRUE(contains(test_obj.map_strs, "b"));
+    EXPECT_TRUE(contains(test_obj.map_strs, "c"));
     EXPECT_EQ(test_obj.map_strs.at("a"), "azdafa");
     EXPECT_EQ(test_obj.map_strs.at("b"), "2adfzaa");
     EXPECT_EQ(test_obj.map_strs.at("c"), "azefaz");
 
 
-    EXPECT_TRUE(test_obj.map_objs.contains("key1"));
-    EXPECT_TRUE(test_obj.map_objs.contains("key2"));
-    EXPECT_TRUE(test_obj.map_objs.contains("key3"));
+    EXPECT_TRUE(contains(test_obj.map_objs, "key1"));
+    EXPECT_TRUE(contains(test_obj.map_objs, "key2"));
+    EXPECT_TRUE(contains(test_obj.map_objs, "key3"));
     EXPECT_EQ(std::string(test_obj.map_objs.at("key1")->le_type()), "Nom");
     EXPECT_EQ(std::string(test_obj.map_objs.at("key2")->le_type()), "Nom");
     EXPECT_EQ(std::string(test_obj.map_objs.at("key3")->le_type()), "Motcle");
@@ -479,17 +484,17 @@ End
     Test_Param& test_obj = ref_cast(Test_Param, obj);
 
 
-    ASSERT_TRUE(test_obj.map_named.contains("k1"));
+    ASSERT_TRUE(contains(test_obj.map_named,"k1"));
     EXPECT_EQ(std::string(test_obj.map_named.at("k1")->le_type()), "Named_Object");
     EXPECT_EQ(std::string(test_obj.map_named.at("k1")->le_nom()), "k1");
     EXPECT_EQ(test_obj.map_named.at("k1")->value, "foo");
 
-    ASSERT_TRUE(test_obj.map_named.contains("k2"));
+    ASSERT_TRUE(contains(test_obj.map_named, "k2"));
     EXPECT_EQ(std::string(test_obj.map_named.at("k2")->le_type()), "Named_Object");
     EXPECT_EQ(std::string(test_obj.map_named.at("k2")->le_nom()), "k2");
     EXPECT_EQ(test_obj.map_named.at("k2")->value, "bar");
 
-    ASSERT_TRUE(test_obj.map_named.contains("k3"));
+    ASSERT_TRUE(contains(test_obj.map_named, "k3"));
     ASSERT_EQ(std::string(test_obj.map_named.at("k3")->le_type()), "Named_Object_Specialized"); // assert because refcast later
     EXPECT_EQ(std::string(test_obj.map_named.at("k3")->le_nom()), "k3");
     EXPECT_EQ(test_obj.map_named.at("k3")->value, "bar");
