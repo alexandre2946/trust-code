@@ -685,10 +685,10 @@ template<typename T>
 void Param::ajouter(const char * mot, const std::map<std::string, TRUST_Deriv<T>>* quoi ,Param::Nature nat)
 {
 
-  Objet_a_lire& obj = create_or_get_objet_a_lire(mot);
+  Objet_a_lire& obj_a_lire = create_or_get_objet_a_lire(mot);
 
   auto natc = nat == Param::REQUIRED ? Objet_a_lire::REQUIRED :  Objet_a_lire::OPTIONAL;
-  obj.set_nature(natc);
+  obj_a_lire.set_nature(natc);
   auto ptr = const_cast<std::map<std::string, TRUST_Deriv<T>>*>(quoi);
 
   // captured by copy for error msg
@@ -698,12 +698,13 @@ void Param::ajouter(const char * mot, const std::map<std::string, TRUST_Deriv<T>
   // lambda that will set the values of objects in the map
   auto map_initializer = [ptr, attr_name, prop](std::map<std::string, DerObjU>& map)
   {
-    for (const auto& [key, o]: map)
+    for (const auto& key_to_objU: map)
       {
-
-        if (sub_type(T, o.valeur()))
+        const auto& key = key_to_objU.first;
+        const auto& objU = key_to_objU.second;
+        if (sub_type(T, objU.valeur()))
           {
-            const T& cast_obj = ref_cast(T, o.valeur());
+            const T& cast_obj = ref_cast(T, objU.valeur());
             (*ptr)[key] = cast_obj;
             // name the object with the map key
             (*ptr)[key]->nommer(key);
@@ -712,13 +713,13 @@ void Param::ajouter(const char * mot, const std::map<std::string, TRUST_Deriv<T>
           {
             Cerr <<"When reading '" << prop << "'" << finl;
             Cerr <<"In keyword '" << attr_name << "', wrong type at key " <<  key << finl;
-            Cerr <<o.valeur().le_type() << " is not a subtype of " << T::info_obj.name() << finl;
+            Cerr <<objU.valeur().le_type() << " is not a subtype of " << T::info_obj.name() << finl;
             Process::exit();
           }
 
       }
   };
-  obj.set_map_obj_initializer(map_initializer);
+  obj_a_lire.set_map_obj_initializer(map_initializer);
 }
 
 #endif

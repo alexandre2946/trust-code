@@ -55,7 +55,7 @@ void Partitionneur_Union::validate_params() const
   for (const auto& p: fic_ssz)
     {
       // p.first is name of subdomain and p.second is file name
-      // waiting for c++20 for syntax: for (const auto& [subdomain, filename]: fic_ssz)
+      // waiting for c++17 for syntax: for (const auto& [subdomain, filename]: fic_ssz)
       if (Interprete::objet_existant(p.first) == 0)
         {
           Process::exit(p.first + "is not an existing TRUST object");

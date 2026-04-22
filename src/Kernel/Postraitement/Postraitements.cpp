@@ -302,12 +302,16 @@ void Postraitements::completer()
 
       // chick if we have at least one duplicated names
       bool has_duplicates = false;
-      for (const auto& [name, count] : file_name_counts)
-        if (count > 1)
-          {
-            has_duplicates = true;
-            break;
-          }
+      for (const auto& name_to_count: file_name_counts)
+        {
+
+          const auto& count = name_to_count.second;
+          if (count > 1)
+            {
+              has_duplicates = true;
+              break;
+            }
+        }
 
       if (has_duplicates) // si has_duplicates => on renomme SEULEMENT les doublons !
         {
