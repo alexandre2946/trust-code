@@ -203,7 +203,7 @@ void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
   motcles[7] = "champ_face";     // Choix standard pour la vitesse
 
   Nom type;
-  int default_nb_comp = 0; // Valeur par defaut du nombre de composantes
+  int nb_points = 0; // Valeur par defaut du nombre de composantes
   int rang = motcles.search(directive);
   const Quadrature_base& quad = domaine_DG.get_quadrature(5); // TODO: Make this depend from the order of discretization ...
   int nb_pts_integ_max = quad.nb_pts_integ_max();
@@ -215,21 +215,21 @@ void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
     case 1:
     case 2:
       type = "Champ_Fonc_Quad_DG";
-      default_nb_comp = nb_pts_integ_max; //Option_DG::Nb_col_from_order(order_DG);;
+      nb_points = nb_pts_integ_max; //Option_DG::Nb_col_from_order(order_DG);;
       break;
     case 3:
       type = "Champ_Fonc_Elem_DG";
-      default_nb_comp = 1;
+      nb_points = 1;
       break;
     case 4:
     case 5:
     case 7:
       type = "Champ_Fonc_Quad_DG";
-      default_nb_comp = nb_pts_integ_max;
+      nb_points = nb_pts_integ_max;
       break;
     case 6:
       type = "Champ_Fonc_Som_DG";
-      default_nb_comp = 1;
+      nb_points = 1;
       break;
     default:
       assert(rang < 0);
@@ -259,31 +259,44 @@ void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
   else
     assert(0);
 
-  //TODO DG basis_function and champ_fonc_P1 have more dimension than the postprocess field but only for scalar field for now
-  //it s difficult to discriminate the field P0 and P1 before postreatment
-  // + how to do it for vector champ_inc like velocity ?
-
   bool vector = ((nature==vectoriel) | (nature == basis_function_order_1_vectorial) | (nature == basis_function_order_2_vectorial) );
-  if (!vector) nb_comp = default_nb_comp;
-  else nb_comp = Objet_U::dimension*default_nb_comp;
+  if (vector) nb_comp = dimension;
+  else nb_comp = 1;
   if (champ_fonc)
     {
-      creer_champ(*champ_fonc, z, type, noms[0], unites[0], nb_comp, nb_ddl, temps, directive, que_suis_je());
-      if (vector) champ_fonc->valeur().fixer_nature_du_champ(vectoriel); //TODO should be considered multiscalar cases for pb_multiphase, maybe nature du champ into creer_champ's options
+      creer_champ(*champ_fonc, z, type, noms[0], unites[0], nb_comp*nb_points, nb_ddl, temps, directive, que_suis_je());
+      if (nb_comp == 1)
+        champ_fonc->valeur().fixer_nature_du_champ(scalaire);
+      else if (nb_comp == dimension)
+        champ_fonc->valeur().fixer_nature_du_champ(vectoriel);
+      else
+        {
+          Cerr << "multi_scalaire not implemented for now" << finl;
+          exit();
+        }
     }
   else
     {
-      creer_champ(*champ_don, z, type, noms[0], unites[0], nb_comp, nb_ddl, temps, directive, que_suis_je());
-      if (vector) champ_don->valeur().fixer_nature_du_champ(vectoriel);
+      creer_champ(*champ_don, z, type, noms[0], unites[0], nb_comp*nb_points, nb_ddl, temps, directive, que_suis_je());
+      if (nb_comp == 1)
+        champ_don->valeur().fixer_nature_du_champ(scalaire);
+      else if (nb_comp == dimension)
+        champ_don->valeur().fixer_nature_du_champ(vectoriel);
+      else
+        {
+          Cerr << "multi_scalaire not implemented for now" << finl;
+          exit();
+        }
     }
 
 
 
   if ((nature == multi_scalaire) && (champ_fonc))
     {
-      champ_fonc->valeur().fixer_nature_du_champ(nature);
-      champ_fonc->valeur().fixer_unites(unites);
-      champ_fonc->valeur().fixer_noms_compo(noms);
+      throw;
+      //champ_fonc->valeur().fixer_nature_du_champ(nature);
+      //champ_fonc->valeur().fixer_unites(unites);
+      //champ_fonc->valeur().fixer_noms_compo(noms);
     }
   else if ((nature == multi_scalaire) && (champ_don))
     {

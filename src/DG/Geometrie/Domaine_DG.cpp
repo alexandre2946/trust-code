@@ -173,16 +173,17 @@ double Domaine_DG::compute_L1_norm(const DoubleVect& val_source, const bool basi
   int nb_pts_integ_max = quad.nb_pts_integ_max();
   int nelem = nb_elem();
 
-  //In case of Champ_Inc_Elem, the values are the coefficient of the basis function
-  const BasisFunction& bfunc = get_basisFunction(order);
-  const int nb_bfunc = bfunc.nb_bfunc();
-  DoubleTab fbase(nb_bfunc, nb_pts_integ_max);
-
   DoubleTab val_elem(nb_pts_integ_max);
   double sum = 0.;
-  for (int i = 0; i < nelem; i++)
+
+  if (basis_function)
     {
-      if (basis_function)
+      //In case of Champ_Inc_Elem, the values are the coefficient of the basis function
+      const BasisFunction& bfunc = get_basisFunction(order);
+      const int nb_bfunc = bfunc.nb_bfunc();
+      DoubleTab fbase(nb_bfunc, nb_pts_integ_max);
+
+      for (int i = 0; i < nelem; i++)
         {
           bfunc.eval_bfunc(quad, i, fbase);
           for (int k = 0; k < quad.nb_pts_integ(i) ; k++)
@@ -192,14 +193,17 @@ double Domaine_DG::compute_L1_norm(const DoubleVect& val_source, const bool basi
 
               val_elem(k) = std::fabs(val_elem(k));
             }
+          sum += quad.compute_integral_on_elem(i, val_elem);
         }
-      else
+    }
+  else
+    {
+      for (int i = 0; i < nelem; i++)
         {
-
           for (int k = 0; k < quad.nb_pts_integ(i) ; k++)
             val_elem(k) = std::fabs(val_source(i*nb_pts_integ_max+k));
+          sum += quad.compute_integral_on_elem(i, val_elem);
         }
-      sum += quad.compute_integral_on_elem(i, val_elem);
     }
 
   return sum;
@@ -214,16 +218,16 @@ double Domaine_DG::compute_L2_norm(const DoubleVect& val_source, const bool basi
   int nb_pts_integ_max = quad.nb_pts_integ_max();
   int nelem = nb_elem();
 
-  //In case of Champ_Inc_Elem, the values are the coefficient of the basis function
-  const BasisFunction& bfunc = get_basisFunction(order);
-  const int nb_bfunc = bfunc.nb_bfunc();
-  DoubleTab fbase(nb_bfunc, nb_pts_integ_max);
-
   DoubleTab val_elem(nb_pts_integ_max);
   double sum = 0.;
-  for (int i = 0; i < nelem; i++)
+  if (basis_function)
     {
-      if (basis_function)
+      //In case of Champ_Inc_Elem, the values are the coefficient of the basis function
+      const BasisFunction& bfunc = get_basisFunction(order);
+      const int nb_bfunc = bfunc.nb_bfunc();
+      DoubleTab fbase(nb_bfunc, nb_pts_integ_max);
+
+      for (int i = 0; i < nelem; i++)
         {
           bfunc.eval_bfunc(quad, i, fbase);
           for (int k = 0; k < quad.nb_pts_integ(i) ; k++)
@@ -233,13 +237,17 @@ double Domaine_DG::compute_L2_norm(const DoubleVect& val_source, const bool basi
 
               val_elem(k) = val_elem(k)*val_elem(k);
             }
+          sum += quad.compute_integral_on_elem(i, val_elem);
         }
-      else
+    }
+  else
+    {
+      for (int i = 0; i < nelem; i++)
         {
           for (int k = 0; k < quad.nb_pts_integ(i) ; k++)
             val_elem(k) = val_source(i*nb_pts_integ_max+k)*val_source(i*nb_pts_integ_max+k);
+          sum += quad.compute_integral_on_elem(i, val_elem);
         }
-      sum += quad.compute_integral_on_elem(i, val_elem);
     }
 
   return sum;
@@ -254,15 +262,16 @@ void Domaine_DG::compute_average(const DoubleVect& val_source, double& sum, doub
   int nb_pts_integ_max = quad.nb_pts_integ_max();
   int nelem = nb_elem();
 
-  //In case of Champ_Inc_Elem, the values are the coefficient of the basis function
-  const BasisFunction& bfunc = get_basisFunction(order);
-  const int nb_bfunc = bfunc.nb_bfunc();
-  DoubleTab fbase(nb_bfunc, nb_pts_integ_max);
-
   DoubleTab val_elem(nb_pts_integ_max);
-  for (int i = 0; i < nelem; i++)
+
+  if (basis_function)
     {
-      if (basis_function)
+      //In case of Champ_Inc_Elem, the values are the coefficient of the basis function
+      const BasisFunction& bfunc = get_basisFunction(order);
+      const int nb_bfunc = bfunc.nb_bfunc();
+      DoubleTab fbase(nb_bfunc, nb_pts_integ_max);
+
+      for (int i = 0; i < nelem; i++)
         {
           val_elem = 0.;
           bfunc.eval_bfunc(quad, i, fbase);
@@ -271,15 +280,20 @@ void Domaine_DG::compute_average(const DoubleVect& val_source, double& sum, doub
               for (int l =0; l<nb_bfunc; l++)
                 val_elem(k) += val_source(i*nb_bfunc+l)*fbase(l,k);
             }
+          sum += quad.compute_integral_on_elem(i, val_elem);
+          volume += volumes(i);
         }
-      else
+    }
+  else
+    {
+      for (int i = 0; i < nelem; i++)
         {
 
           for (int k = 0; k < quad.nb_pts_integ(i) ; k++)
             val_elem(k) = val_source(i*nb_pts_integ_max+k);
+          sum += quad.compute_integral_on_elem(i, val_elem);
+          volume += volumes(i);
         }
-      sum += quad.compute_integral_on_elem(i, val_elem);
-      volume += volumes(i);
     }
 }
 /*! @brief Compute average with porosity
@@ -292,15 +306,15 @@ void Domaine_DG::compute_average_porosity(const DoubleVect& val_source, const Do
   int nb_pts_integ_max = quad.nb_pts_integ_max();
   int nelem = nb_elem();
 
-  //In case of Champ_Inc_Elem, the values are the coefficient of the basis function
-  const BasisFunction& bfunc = get_basisFunction(order);
-  const int nb_bfunc = bfunc.nb_bfunc();
-  DoubleTab fbase(nb_bfunc, nb_pts_integ_max);
-
   DoubleTab val_elem(nb_pts_integ_max);
-  for (int i = 0; i < nelem; i++)
+  if (basis_function)
     {
-      if (basis_function)
+      //In case of Champ_Inc_Elem, the values are the coefficient of the basis function
+      const BasisFunction& bfunc = get_basisFunction(order);
+      const int nb_bfunc = bfunc.nb_bfunc();
+      DoubleTab fbase(nb_bfunc, nb_pts_integ_max);
+
+      for (int i = 0; i < nelem; i++)
         {
           val_elem = 0.;
           bfunc.eval_bfunc(quad, i, fbase);
@@ -310,14 +324,20 @@ void Domaine_DG::compute_average_porosity(const DoubleVect& val_source, const Do
                 val_elem(k) += val_source(i*nb_bfunc+l)*fbase(l,k);
               val_elem(k) *= porosity(i);
             }
+          sum += quad.compute_integral_on_elem(i, val_elem);
+          volume += volumes(i)*porosity(i);
         }
-      else
+    }
+  else
+    {
+      for (int i = 0; i < nelem; i++)
         {
+
           for (int k = 0; k < quad.nb_pts_integ(i) ; k++)
             val_elem(k) = val_source(i*nb_pts_integ_max+k)*porosity(i);
+          sum += quad.compute_integral_on_elem(i, val_elem);
+          volume += volumes(i)*porosity(i);
         }
-      sum += quad.compute_integral_on_elem(i, val_elem);
-      volume += volumes(i)*porosity(i);
     }
 }
 /*! @brief Compute geometric quantities used for the computation
