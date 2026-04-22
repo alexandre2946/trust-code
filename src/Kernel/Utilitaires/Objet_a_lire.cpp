@@ -419,7 +419,7 @@ std::map<std::string, T> read_map_impl(
 
   while (true)
     {
-      if (map.contains(key))
+      if (map.find(key)!=map.end())
         {
           Cerr << "Duplicate key '" << key << "' found for param: " << motcle << endl;
           Process::exit();
