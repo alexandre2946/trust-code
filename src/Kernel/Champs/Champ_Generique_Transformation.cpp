@@ -647,13 +647,13 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
       Kokkos::Array<CDoubleTabView, max_nb_sources> sources;
       for (int so=0; so<nb_sources; so++)
         sources[so] = sources_val[so].view_ro();
-      IntTab nb_points, ind_integ_points;
-      zvf.get_ind_integ_points(ind_integ_points);
-      zvf.get_nb_integ_points(nb_points);
       DoubleArrView valeurs = static_cast<ArrOfDouble&>(valeurs_espace).view_wo();
       if (directive == "champ_fonc_quad_dg") //This is for DG
         {
           int nb_elem = valeurs_espace.dimension(0);
+          IntTab nb_points, ind_integ_points;
+          zvf.get_ind_integ_points(ind_integ_points);
+          zvf.get_nb_integ_points(nb_points);
           CIntArrView ind_integ_points_w = static_cast<const ArrOfInt&>(ind_integ_points).view_ro();
           CIntArrView nb_points_w = static_cast<const ArrOfInt&>(nb_points).view_ro();
           Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_elem, KOKKOS_LAMBDA(const int i)
