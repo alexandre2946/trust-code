@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -44,6 +44,17 @@ Entree& Triangulation_base::interpreter_(Entree& is)
     }
 
   associer_domaine(is);
+
+  /* Periodic boundaries should be declared **after** this family of Interprete since they modify
+   connectivity:
+   */
+  if(domaine().bords_perio().size() > 0)
+    {
+      Cerr << finl << "ERROR: you are trying to triangulate/tetraedrize a domain after having declared its periodic boundaries!!" << finl;
+      Cerr << "The instruction 'declarer_bord_perio' should be use after all the Interprete modifying the connectivity of the domain." << finl << finl;
+      Process::exit();
+    }
+
   Scatter::uninit_sequential_domain(domaine());
   trianguler(domaine());
   Scatter::init_sequential_domain(domaine());
