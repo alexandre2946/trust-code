@@ -100,7 +100,7 @@ class Abstract_Parser:
             if interp:
                 interp_cls = ClassFactory.GetPydClassFromName("Interprete")
                 l = [c for c in root_cls if issubclass(c, interp_cls)]
-                assert len(l) <= 1, f"Synonym '{kw}' matches more than one Interprete keyword!!"
+                assert len(l) <= 1, f"Synonym '{kw}' matches more than one Interprete keyword, list is {l}!!"
                 if len(l):
                     return l[0]
             if not ClassFactory.Exist(ClassFactory.ToPydName(kw)):
