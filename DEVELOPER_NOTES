@@ -1,7 +1,7 @@
 -------------------------------------------------------------
 Developer notes version 1.9.8_beta : Changes since version 1.9.7 :
 -------------------------------------------------------------
-xxxxxxxx (TRUST) Change       : Objet_U_ptr and OWN_PTR forbid direct use of `ptr.le_nom` and `nommer`. Use ptr->le_nom instead. Check ptr.non_nul() before if needed.
+23/04/26 (TRUST) Change       : Objet_U_ptr and OWN_PTR forbid direct use of `ptr.le_nom` and `nommer`. Use ptr->le_nom instead. Check ptr.non_nul() before if needed.
 22/04/26 (TRUST) Param        : param.ajouter now accepts maps and vectors from stdlib, containint values of following types: int/double/std::string/OWN_PTR(...).
 22/04/26 (TRUST) Param        : param.ajouter_flag no longer accepts argument `nat` (from enum Param::Nature).
 20/04/26 (TRUST) Matrix       : Introduce Stencil structure to deal with possible nnz larger than 2^31 (possible on future GPU device)
