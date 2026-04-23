@@ -427,7 +427,7 @@ void Faces_builder::creer_faces_frontiere(const int nb_voisins_attendus,
   constexpr bool STOP_FIRST_ERR = true; // set this to true in Debug to stop gdb at the right place.
 
   int i_face;
-  int nb_sommets_par_face_fr=sommets_faces_fr.dimension(1);
+  int nb_sommets_par_face_fr = sommets_faces_fr.nb_dim() == 2 ? sommets_faces_fr.dimension(1) : 0; // sommets_faces_fr might be completely empty
   for (i_face = 0; i_face < nb_faces; i_face++)
     {
       for (int i = 0; i < std::min(nb_sommets_par_face, nb_sommets_par_face_fr); i++)
