@@ -650,7 +650,7 @@ void TestInvalidateData(Mp_vect_options opt) {
     {
     const MD_Vector& md = expected_resu.get_md_vector();
     const int line_size = expected_resu.line_size();
-    if (opt == VECT_ALL_ITEMS || (!md.non_nul())) return; // no invalid values
+    if (opt == VECT_ALL_ITEMS || (!md)) return; // no invalid values
     assert(opt == VECT_SEQUENTIAL_ITEMS || opt == VECT_REAL_ITEMS);
     const ArrOfInt& items_blocs = (opt == VECT_SEQUENTIAL_ITEMS) ? md->get_items_to_sum() : md->get_items_to_compute();
     const int blocs_size = items_blocs.size_array();

@@ -40,7 +40,7 @@ Entree& Momentum_Euler::readOn(Entree& is)
   terme_diffusif.set_fichier("Contrainte_visqueuse");
   terme_diffusif.set_description("Friction drag exerted by the fluid=Integral(-mu*(grad(u) +grad(u)^T)*ndS) [N] if SI units used");
 
-  assert(le_fluide.non_nul());
+  assert(le_fluide);
   if (!sub_type(Fluide_base, le_fluide.valeur()))
     {
       Cerr << "ERROR : the Momentum_Euler equation can be associated only to a fluid." << finl;
@@ -119,7 +119,7 @@ void Momentum_Euler::discretiser_vitesse()
   for (int i = 0; i < pb.nb_phases(); i++)
     {
       noms_vit_phases_[i] = Nom("vitesse_") + pb.nom_phase(i);
-      if (vit_phases_[i].est_nul())
+      if (!vit_phases_[i])
         {
           discretisation().discretiser_champ("vitesse", domaine_dis(), noms_vit_phases_[i], "m/s", dimension, 1, 0, vit_phases_[i]);
           champs_compris_.ajoute_champ(vit_phases_[i]);
@@ -194,7 +194,7 @@ void Momentum_Euler::creer_champ(const Motcle& motlu)
 {
   Navier_Stokes_std::creer_champ(motlu);
   int i = noms_vit_phases_.rang(motlu);
-  if (i >= 0 && vit_phases_[i].est_nul())
+  if (i >= 0 && !vit_phases_[i])
     {
       discretisation().discretiser_champ("vitesse", domaine_dis(), noms_vit_phases_[i], "m/s", dimension, 1, 0, vit_phases_[i]);
       champs_compris_.ajoute_champ(vit_phases_[i]);
@@ -388,7 +388,7 @@ void Momentum_Euler::init_alpha_rho_u()
   const int Nb_phase = ref_cast(Pb_Euler, probleme()).nb_phases(), D = Objet_U::dimension;
   for (int n = 0; n < Nb_phase; n++)
     {
-      assert(vit_phases_[n].non_nul());
+      assert(vit_phases_[n]);
       DoubleTab_parts psrc(vitesse().valeurs()), pdst(vit_phases_[n]->valeurs());
       for (int i = 0; i < std::min(psrc.size(), pdst.size()); i++)
         {

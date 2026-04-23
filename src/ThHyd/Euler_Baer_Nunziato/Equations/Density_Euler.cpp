@@ -30,7 +30,7 @@ Sortie& Density_Euler::printOn(Sortie& is) const { return Equation_base::printOn
 Entree& Density_Euler::readOn(Entree& is)
 {
   Conservation_Euler::readOn(is);
-  assert(densite_.non_nul());
+  assert(densite_);
   terme_convectif.associer_eqn(*this);
   terme_convectif.set_fichier("Debit");
   terme_convectif.set_description((Nom) "Mass flow rate=Integral(-rho*u*ndS) [kg/s] if SI units used");

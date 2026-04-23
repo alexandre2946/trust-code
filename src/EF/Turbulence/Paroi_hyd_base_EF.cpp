@@ -51,7 +51,7 @@ void Paroi_hyd_base_EF::creer_champ(const Motcle& motlu)
 
 bool Paroi_hyd_base_EF::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const
 {
-  if (champ_u_star_.non_nul() && (nom == champ_u_star_->le_nom()))
+  if (champ_u_star_ && (nom == champ_u_star_->le_nom()))
     {
       ref_champ = Paroi_hyd_base_EF::get_champ(nom);
       return true;
@@ -64,7 +64,7 @@ bool Paroi_hyd_base_EF::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_ch
 
 bool Paroi_hyd_base_EF::has_champ(const Motcle& nom) const
 {
-  if (champ_u_star_.non_nul() && (nom == champ_u_star_->le_nom()))
+  if (champ_u_star_ && (nom == champ_u_star_->le_nom()))
     return true;
   return champs_compris_.has_champ(nom);
 }
@@ -73,7 +73,7 @@ const Champ_base& Paroi_hyd_base_EF::get_champ(const Motcle& nom) const
 {
   const Domaine_EF& domaine_EF = ref_cast(Domaine_EF, le_dom_dis_.valeur());
   const IntTab& face_voisins = domaine_EF.face_voisins();
-  if (champ_u_star_.non_nul() && (nom == champ_u_star_->le_nom()))
+  if (champ_u_star_ && (nom == champ_u_star_->le_nom()))
     {
       // Initialisation a 0 du champ volumique u_star
       DoubleTab& valeurs = champ_u_star_->valeurs();

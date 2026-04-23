@@ -132,7 +132,7 @@ void Domaine_VF::order_faces(Faces& les_faces)
   IntTab sort_key;
   compute_sort_key(les_faces, sort_key);
   tri_lexicographique_tableau(sort_key);
-  if (reorder_.non_nul() && reorder_->algo() != Reorder_Algo::None && !reorder_->skip_faces())
+  if (reorder_ && reorder_->algo() != Reorder_Algo::None && !reorder_->skip_faces())
     {
       les_faces.calculer_centres_gravite(xv_);
       sort_along_zcurve(les_faces, sort_key);
@@ -239,7 +239,7 @@ void Domaine_VF::compute_sort_key(Faces& les_faces, IntTab& sort_key)
  */
 void Domaine_VF::sort_along_zcurve(const Faces& les_faces, IntTab& sort_key) const
 {
-  assert(reorder_.non_nul());
+  assert(reorder_);
   const int nbfaces = les_faces.nb_faces();
   std::string algon = reorder_->algo() == Reorder_Algo::Morton ? "Morton" : "Hilbert";
   Cerr << "****************************************************************" << finl;
@@ -377,7 +377,7 @@ void Domaine_VF::discretiser()
   Domaine_dis_base::discretiser();
 
   // Re-order the domain indices of elements and/or nodes (faces are handled later)
-  if(reorder_.non_nul())
+  if(reorder_)
     reorder_->reorder_domain(domaine());
 
   Domaine& ledomaine=domaine();

@@ -29,7 +29,7 @@ public :
   inline void typer(const Nom& a_type) { OWN_PTR(Operateur_NConserv_base)::typer(a_type); }
   inline Operateur_base& l_op_base() override { return valeur(); }
   inline const Operateur_base& l_op_base() const override { return valeur(); }
-  inline int op_non_nul() const override { return non_nul(); }
+  inline int op_non_nul() const override { return this->operator bool(); }
 
   DoubleTab& ajouter(const DoubleTab&, DoubleTab& ) const override;
   DoubleTab& calculer(const DoubleTab&, DoubleTab& ) const override;

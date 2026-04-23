@@ -26,7 +26,7 @@ Entree& Op_Conv_Coloc_base::readOn(Entree& is) { Operateur_Conv_base::readOn(is)
 void Op_Conv_Coloc_base::completer()
 {
   Operateur_base::completer();
-  assert(le_dom_coloc_.non_nul());
+  assert(le_dom_coloc_);
 }
 
 void Op_Conv_Coloc_base::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& zcl, const Champ_Inc_base& inc)

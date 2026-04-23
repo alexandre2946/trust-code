@@ -30,8 +30,8 @@ Sortie& Conservation_Euler::printOn(Sortie& is) const { return Equation_base::pr
 
 Entree& Conservation_Euler::readOn(Entree& is)
 {
-  assert(l_inco_ch_.non_nul());
-  assert(le_fluide_.non_nul());
+  assert(l_inco_ch_);
+  assert(le_fluide_);
   champs_compris_.ajoute_champ(l_inco_ch_);
   return Equation_base::readOn(is);
 }
@@ -85,7 +85,7 @@ Milieu_base& Conservation_Euler::milieu()
 
 const Fluide_base& Conservation_Euler::fluide() const
 {
-  if (le_fluide_.est_nul())
+  if (!le_fluide_)
     {
       Cerr << "You forgot to associate the fluid to the problem named " << probleme().le_nom() << finl;
       Process::exit();
@@ -95,7 +95,7 @@ const Fluide_base& Conservation_Euler::fluide() const
 
 Fluide_base& Conservation_Euler::fluide()
 {
-  assert(le_fluide_.non_nul());
+  assert(le_fluide_);
   return le_fluide_.valeur();
 }
 
