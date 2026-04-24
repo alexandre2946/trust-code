@@ -150,6 +150,18 @@ void Champ_Generique_Transformation::verifier_coherence_donnees()
 }
 void Champ_Generique_Transformation::verifier_localisation()
 {
+  //TODO DG temporary ?
+  const Domaine_dis_base& domaine_dis = get_source(0).get_ref_domaine_dis_base();
+  if (domaine_dis.que_suis_je()=="Domaine_DG")
+    {
+      if (!(localisation_=="elem"))
+        {
+          Cerr << "Error in Champ_Generique_Transformation::verifier_localisation\n"
+               << "with DG the only possible localisation for Transformation is \"elem\"" << finl;
+          exit();
+        }
+    }
+
   Motcles localisations(4);
   localisations[0] = "elem";
   localisations[1] = "som";

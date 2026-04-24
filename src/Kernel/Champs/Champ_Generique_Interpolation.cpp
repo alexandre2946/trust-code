@@ -177,15 +177,25 @@ int Champ_Generique_Interpolation::set_domaine(const Nom& nom_domaine, int exit_
 const Champ_base& Champ_Generique_Interpolation::get_champ(OWN_PTR(Champ_base)&) const
 {
   const Domaine_dis_base& domaine_dis = get_ref_domaine_dis_base();
+  bool is_domaine_DG = (domaine_dis.que_suis_je()=="Domaine_DG");
   if (localisation_ == "")
     {
       Cerr << "Error in Champ_Generique_Interpolation::get_champ()\n"
            << " Localisation has not been initialized" << finl;
       exit();
     }
-  else if ((localisation_=="elem") & (domaine_dis.que_suis_je()=="Domaine_DG"))
+  else if (is_domaine_DG)
     {
-      return get_source(0).get_champ(espace_stockage_source_);
+      if (localisation_=="elem")
+        {
+          return get_source(0).get_champ(espace_stockage_source_);
+        }
+      else if (localisation_!="elem_dg")
+        {
+          Cerr << "Error in Champ_Generique_Interpolation::get_champ\n"
+               << "with DG the only possible localisation for Transformation is \"elem\"" << finl;
+          exit();
+        }
     }
 
   if (methode_ == "calculer_champ_post")
