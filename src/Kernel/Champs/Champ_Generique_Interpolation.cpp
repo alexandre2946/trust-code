@@ -94,7 +94,7 @@ int Champ_Generique_Interpolation::set_localisation(const Motcle& loc, int exit_
   localisations[0] = "elem";
   localisations[1] = "som";
   localisations[2] = "faces";
-  localisations[3] = "elem_quad";
+  localisations[3] = "elem_dg";
   int ok = 0;
   if (localisations.search(loc) >= 0)
     {
@@ -176,13 +176,14 @@ int Champ_Generique_Interpolation::set_domaine(const Nom& nom_domaine, int exit_
  */
 const Champ_base& Champ_Generique_Interpolation::get_champ(OWN_PTR(Champ_base)&) const
 {
+  const Domaine_dis_base& domaine_dis = get_ref_domaine_dis_base();
   if (localisation_ == "")
     {
       Cerr << "Error in Champ_Generique_Interpolation::get_champ()\n"
            << " Localisation has not been initialized" << finl;
       exit();
     }
-  else if (localisation_ == "elem_quad")
+  else if ((localisation_=="elem") & (domaine_dis.que_suis_je()=="Domaine_DG"))
     {
       return get_source(0).get_champ(espace_stockage_source_);
     }
@@ -313,7 +314,7 @@ const Champ_base& Champ_Generique_Interpolation::get_champ_with_calculer_champ_p
     }
 
   int imax = espace_valeurs.dimension(0);
-  if (localisation_ == "elem")
+  if ((localisation_ == "elem") | (localisation_=="elem_DG"))
     {
       const int nb_elements = domaine.nb_elem();
       nb_comp = espace_stockage_->nb_comp(); // with DG, espace_stockage has smaller dimension than source
@@ -535,7 +536,7 @@ void Champ_Generique_Interpolation::get_copy_values(DoubleTab& values) const
 Entity Champ_Generique_Interpolation::get_localisation(const int index) const
 {
   Entity loc;
-  if ((localisation_=="elem") | (localisation_=="elem_quad"))
+  if ((localisation_=="elem") | (localisation_=="elem_DG"))
     {
       loc = Entity::ELEMENT;
     }
@@ -706,19 +707,16 @@ const Motcle Champ_Generique_Interpolation::get_directive_pour_discr() const
 
   if (localisation_=="elem")
     {
-      directive = "champ_elem";
-    }
-  else if (localisation_ == "elem_quad")
-    {
+      const Domaine_dis_base& domaine_dis = get_ref_domaine_dis_base();
       const Champ_base& ch = get_source(0).get_champ(espace_stockage_source_);
       if (sub_type(Champ_Inc_P0_base,ch))
-        {
-          directive = "champ_elem_DG";
-        }
+        directive = (domaine_dis.que_suis_je() == "Domaine_DG") ? "champ_elem_DG" : "champ_elem";
       else if (sub_type(Champ_Fonc_P0_base,ch))
-        {
-          directive = "champ_fonc_quad_DG";
-        }
+        directive = (domaine_dis.que_suis_je() == "Domaine_DG") ? "champ_fonc_quad_DG" : "champ_elem";
+    }
+  else if (localisation_=="elem_DG")
+    {
+      directive = "champ_elem";
     }
   else if (localisation_=="som")
     {

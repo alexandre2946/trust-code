@@ -1212,6 +1212,18 @@ int Postraitement::lire_champs_a_postraiter(Entree& s, bool expect_acco)
         }
 
       s>>motlu2;
+      //TODO DG may be temporary ?
+      Probleme_base& le_pb = mon_probleme.valeur();
+      if (le_pb.domaine_dis().que_suis_je() == "Domaine_DG")
+        {
+          if (motlu2!="elem")
+            {
+              Cerr << "Error in Postreatment\n"
+                   << "with DG the only possible localisation to postprocessed field is \"elem\"" << finl;
+              exit();
+            }
+        }
+
       if ((motlu2=="elem") || (motlu2=="som") || (motlu2=="faces"))
         {
           //Prise en compte des pb_med
@@ -1993,7 +2005,10 @@ Nom Postraitement::set_expression_champ(const Motcle& motlu1,const Motcle& motlu
   else
     {
       ajout = "Interpolation { localisation ";
-      ajout += motlu2;
+      if (mon_probleme.valeur().domaine_dis().que_suis_je() == "Domaine_DG")
+        ajout += " elem_DG ";
+      else
+        ajout += motlu2;
 
       if (motlu3=="Moyenne")
         ajout += " source Moyenne { ";
