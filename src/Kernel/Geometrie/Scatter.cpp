@@ -27,6 +27,7 @@
 #include <MD_Vector_tools.h>
 #include <MD_Vector_std.h>
 #include <MD_Vector_seq.h>
+#include <unistd.h> // PGI
 #include <Poly_geom_base.h>
 #include <Entree_Brute.h>
 #include <Comm_Group_MPI.h>
