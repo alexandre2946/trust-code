@@ -167,8 +167,6 @@ void Champ_Generique_Transformation::completer(const Postraitement_base& post)
 {
 
   bool sources_location_ok = true;
-  bool fictive_source = false;
-
   int nb_source_fictive=0;
   int nb_sources = get_nb_sources();
   if (nb_sources==0)
@@ -261,7 +259,7 @@ void Champ_Generique_Transformation::completer(const Postraitement_base& post)
         }
       else
         {
-          fictive_source = true;
+          fictive_source_ = true;
         }
     }
   else
@@ -421,7 +419,7 @@ void Champ_Generique_Transformation::completer(const Postraitement_base& post)
     }
   else
     {
-      if( ! fictive_source && localisation_ != sources_location[0] )
+      if( ! fictive_source_ && localisation_ != sources_location[0] )
         {
           Cerr << "Warning first source is located to "<<sources_location[0]<<" but the user has specified "<< localisation_<<finl;
         }
@@ -608,8 +606,9 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
             {
               int nelem = valeurs_espace.dimension(0);
               int npoints = valeurs_espace.dimension(1);
+              if (methode_=="vecteur") npoints /= dimension; //TODO DG will be cleaner when quadrature is in Kernel
               sources_val[so].resize(nelem,npoints);
-              if (Motcle(methode_)!="vecteur") source_so.eval_elem(sources_val[so]);
+              if (!fictive_source_) source_so.eval_elem(sources_val[so]);
             }
           else source_so.valeur_aux(positions,sources_val[so]);
         }
@@ -759,7 +758,7 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
                           for (int so=0; so<nb_sources; so++)
                             {
                               const DoubleTab& source_so_val = sources_val[so];
-                              fxyz[j].setVar(so+4,source_so_val(i,0));
+                              fxyz[j].setVar(so+4,source_so_val(i,pt));
                             }
                           int l = nb_points[i]*j + pt;
                           valeurs_espace(i,l) = fxyz[j].eval();

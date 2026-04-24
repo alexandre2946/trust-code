@@ -111,6 +111,7 @@ protected:
   Motcle localisation_;        //Localisation du support d evaluation de l expression
   Nom unite_;                 //unite du champ obtenu (a specifier par l'utilisateur)
   Nature_du_champ nature_ch = scalaire;   //Nature du champ evalue
+  bool fictive_source_ = false;
 
 private:
   mutable OWN_PTR(Champ_Fonc_base) espace_stockage_;
