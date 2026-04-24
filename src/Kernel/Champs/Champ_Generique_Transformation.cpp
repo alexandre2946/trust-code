@@ -882,10 +882,10 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
           DoubleTabView valeurs = valeurs_espace.view_wo();
           Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_elem, KOKKOS_LAMBDA(const int i)
           {
-            for (int j=0; j<nb_points_w(i); j++)
+            for (int pt=0; pt<nb_points_w(i); pt++)
               {
                 int threadId = parser.acquire();
-                int k = ind_integ_points_w(i)+j;
+                int k = ind_integ_points_w(i)+pt;
                 double x = special ? 1e38 : pos(k,0);
                 double y = special ? 1e38 : pos(k,1);
                 double z = special ? 1e38 : (dim>2 ? pos(k,2) : 0);
@@ -894,9 +894,13 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
                 parser.setVar(2,z,threadId);
                 parser.setVar(3,temps,threadId);
 
-                for (int so=0; so<nb_sources; so++)
-                  parser.setVar(so+4,sources[so](i,j),threadId);
-                valeurs(i, j) = parser.eval(threadId);
+                for (int d = 0; d < nb_comp_; d++)
+                  {
+                    int j = nb_points_w(i)*d + pt;
+                    for (int so=0; so<nb_sources; so++)
+                      parser.setVar(so+4,sources[so](i,j),threadId);
+                    valeurs(i, j) = parser.eval(threadId);
+                  }
               }
           });
           end_gpu_timer(__KERNEL_NAME__);
