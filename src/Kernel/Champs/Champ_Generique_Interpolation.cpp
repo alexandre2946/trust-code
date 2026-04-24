@@ -20,6 +20,8 @@
 #include <Synonyme_info.h>
 #include <Param.h>
 #include <Domaine_dis_cache.h>
+#include <Champ_Inc_P0_base.h>
+#include <Champ_Fonc_P0_base.h>
 
 Implemente_instanciable_sans_constructeur(Champ_Generique_Interpolation,"Champ_Post_Interpolation|Interpolation",Champ_Gen_de_Champs_Gen);
 
@@ -88,10 +90,11 @@ void Champ_Generique_Interpolation::reset()
  */
 int Champ_Generique_Interpolation::set_localisation(const Motcle& loc, int exit_on_error)
 {
-  Motcles localisations(3);
+  Motcles localisations(4);
   localisations[0] = "elem";
   localisations[1] = "som";
   localisations[2] = "faces";
+  localisations[3] = "elem_quad";
   int ok = 0;
   if (localisations.search(loc) >= 0)
     {
@@ -178,6 +181,10 @@ const Champ_base& Champ_Generique_Interpolation::get_champ(OWN_PTR(Champ_base)&)
       Cerr << "Error in Champ_Generique_Interpolation::get_champ()\n"
            << " Localisation has not been initialized" << finl;
       exit();
+    }
+  else if (localisation_ == "elem_quad")
+    {
+      return get_source(0).get_champ(espace_stockage_source_);
     }
 
   if (methode_ == "calculer_champ_post")
@@ -268,8 +275,6 @@ const Champ_base& Champ_Generique_Interpolation::get_champ_with_calculer_champ_p
     creer_espace_stockage(nature_source, nb_comp, espace_stockage_);
   espace_stockage_->changer_temps(source.temps());
 
-  nb_comp = espace_stockage_->nb_comp(); // with DG, espace_stockage has smaller dimension than source
-
   //double default_value=-1e35;
   //espace_stockage.valeurs()=default_value;
   int decal=10;
@@ -311,6 +316,7 @@ const Champ_base& Champ_Generique_Interpolation::get_champ_with_calculer_champ_p
   if (localisation_ == "elem")
     {
       const int nb_elements = domaine.nb_elem();
+      nb_comp = espace_stockage_->nb_comp(); // with DG, espace_stockage has smaller dimension than source
       if (ncomp==-1)
         {
           DoubleTrav val_temp;
@@ -372,7 +378,6 @@ const Champ_base& Champ_Generique_Interpolation::get_champ_with_calculer_champ_p
                     espace_valeurs(i,j) = val_temp(i);
             }
         }
-
     }
   else if (localisation_=="som")
     {
@@ -530,7 +535,7 @@ void Champ_Generique_Interpolation::get_copy_values(DoubleTab& values) const
 Entity Champ_Generique_Interpolation::get_localisation(const int index) const
 {
   Entity loc;
-  if (localisation_=="elem")
+  if ((localisation_=="elem") | (localisation_=="elem_quad"))
     {
       loc = Entity::ELEMENT;
     }
@@ -702,6 +707,18 @@ const Motcle Champ_Generique_Interpolation::get_directive_pour_discr() const
   if (localisation_=="elem")
     {
       directive = "champ_elem";
+    }
+  else if (localisation_ == "elem_quad")
+    {
+      const Champ_base& ch = get_source(0).get_champ(espace_stockage_source_);
+      if (sub_type(Champ_Inc_P0_base,ch))
+        {
+          directive = "champ_elem_DG";
+        }
+      else if (sub_type(Champ_Fonc_P0_base,ch))
+        {
+          directive = "champ_fonc_quad_DG";
+        }
     }
   else if (localisation_=="som")
     {
