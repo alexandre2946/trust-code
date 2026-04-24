@@ -175,9 +175,9 @@ uint64_t hilbertCode_3D(uint32_t x, uint32_t y, uint32_t z)
     cube_pos_t res;
     for (int i = 0; i < 3; i++)
       {
-        uint8_t idx = std::abs(p1[i])-1;
+        uint8_t idx = (uint8_t)(std::abs(p1[i])-1); // 0 excluded in p1, so this is actually never negative. We can brute-force cast.
         int8_t sig = p1[i] > 0 ? 1 : -1;
-        res[i] = p2[idx]*sig;
+        res[i] = (int8_t)(p2[idx]*sig);
       }
     return res;
   };
@@ -194,7 +194,7 @@ uint64_t hilbertCode_3D(uint32_t x, uint32_t y, uint32_t z)
     for(int i=0; i < 3; i++)
       {
         int8_t v = perm[i];
-        uint8_t idx = std::abs(v)-1;
+        uint8_t idx = (uint8_t)(std::abs(v)-1);  // 0 excluded in perm, so this is actually never negative. We can brute-force cast.
         int8_t mask = (v < 0) ? 0b1 : 0b0;
         res[idx] = (uint8_t)(cod2[i] ^ mask); // XOR
       }
