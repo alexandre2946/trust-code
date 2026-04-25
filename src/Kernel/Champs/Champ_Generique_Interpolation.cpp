@@ -85,7 +85,7 @@ void Champ_Generique_Interpolation::reset()
 
 /*! @brief Initialisation de la classe: initialisation de la localisation demandee.
  *
- * Parametres valides : elem, som.
+ * Parametres valides : elem, som, faces, elem_dg.
  *
  */
 int Champ_Generique_Interpolation::set_localisation(const Motcle& loc, int exit_on_error)
@@ -176,7 +176,7 @@ int Champ_Generique_Interpolation::set_domaine(const Nom& nom_domaine, int exit_
  */
 const Champ_base& Champ_Generique_Interpolation::get_champ(OWN_PTR(Champ_base)&) const
 {
-  const Domaine_dis_base& domaine_dis = get_ref_domaine_dis_base();
+  const Domaine_dis_base& domaine_dis = get_source(0).get_ref_domaine_dis_base();
   bool is_domaine_DG = (domaine_dis.que_suis_je()=="Domaine_DG");
   if (localisation_ == "")
     {
@@ -717,12 +717,17 @@ const Motcle Champ_Generique_Interpolation::get_directive_pour_discr() const
 
   if (localisation_=="elem")
     {
-      const Domaine_dis_base& domaine_dis = get_ref_domaine_dis_base();
-      const Champ_base& ch = get_source(0).get_champ(espace_stockage_source_);
-      if (sub_type(Champ_Inc_P0_base,ch))
-        directive = (domaine_dis.que_suis_je() == "Domaine_DG") ? "champ_elem_DG" : "champ_elem";
-      else if (sub_type(Champ_Fonc_P0_base,ch))
-        directive = (domaine_dis.que_suis_je() == "Domaine_DG") ? "champ_fonc_quad_DG" : "champ_elem";
+      directive = "champ_elem";
+      const Domaine_dis_base& domaine_dis = get_source(0).get_ref_domaine_dis_base();
+      if (domaine_dis.que_suis_je() == "Domaine_DG")
+        {
+          OWN_PTR(Champ_base) espace_stockage_source;
+          const Champ_base& ch = get_source(0).get_champ_without_evaluation(espace_stockage_source);
+          if (sub_type(Champ_Inc_P0_base,ch))
+            directive = "champ_elem_DG";
+          else if (sub_type(Champ_Fonc_P0_base,ch))
+            directive = "champ_fonc_quad_DG";
+        }
     }
   else if (localisation_=="elem_DG")
     {

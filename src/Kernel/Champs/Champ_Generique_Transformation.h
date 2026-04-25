@@ -75,7 +75,7 @@
 // ...
 // "loc" permet de specifier une localisation particuliere pour evaluer les valeurs de l espace de stockage
 // "unite" permet a l'utilisateur de donner une unite au champ obtenu
-//  valeurs possibles : "elem", "som", "faces" et "elem_som".
+//  valeurs possibles : "elem", "som", "faces", "elem_dg" et "elem_som".
 //  Dans le cas ou aucune localisation n'est specifiee, la localisation retenue est celle du support de la premiere source.
 //
 

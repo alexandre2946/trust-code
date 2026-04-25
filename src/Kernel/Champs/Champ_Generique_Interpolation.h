@@ -34,7 +34,7 @@
 //               }
 // "nom_champ" fixe par utilisateur sera le nom du champ generique
 // "dom_interp" nom du domaine d interpolation dans le cas ou il differe du domaine de calcul (optionnel)
-// "loc" designe la localisation d interpolation "elem" ou "som"
+// "loc" designe la localisation d interpolation "elem", "elem_dg", "faces" ou "som"
 // "type_champ_gen" type d'un champ generique
 
 class Champ_Generique_Interpolation : public Champ_Gen_de_Champs_Gen

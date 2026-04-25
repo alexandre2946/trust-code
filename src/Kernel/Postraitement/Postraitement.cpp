@@ -545,7 +545,7 @@ void Postraitement::set_param(Param& param) const
 
 // XD champ_a_post objet_lecture nul 0 Field to be post-processed.
 // XD   attr champ chaine champ 0 Name of the post-processed field.
-// XD   attr localisation chaine(into=["elem","som","faces"]) localisation 1 Localisation of post-processed field values: The two available values are elem, som, or faces (LATA format only) used respectively to select field values at mesh centres (CHAMPMAILLE type field in the lml file) or at mesh nodes (CHAMPPOINT type field in the lml file). If no selection is made, localisation is set to som by default.
+// XD   attr localisation chaine(into=["elem","som","faces","elem_dg"]) localisation 1 Localisation of post-processed field values: The two available values are elem, som, or faces (LATA format only) used respectively to select field values at mesh centres (CHAMPMAILLE type field in the lml file) or at mesh nodes (CHAMPPOINT type field in the lml file). If no selection is made, localisation is set to som by default, elem_dg is specific for dg discretisation to interpolate value on one unique cell center value.
 // XD champs_a_post listobj nul -1 champ_a_post 0 Fields to be post-processed.
 
 // XD interface_posts objet_lecture nul 0 not set
@@ -596,14 +596,14 @@ void Postraitement::set_param(Param& param) const
 // XD   attr val floattant val 0 not_set
 // XD stat_post_moyenne stat_post_deriv moyenne 0 to calculate the average of the field over time
 // XD   attr field chaine field 0 name of the field on which statistical analysis will be performed. Possible keywords are Vitesse (velocity), Pression (pressure), Temperature, Concentration, ...
-// XD   attr localisation chaine(into=["elem","som","faces"]) localisation 1 Localisation of post-processed field value
+// XD   attr localisation chaine(into=["elem","elem_dg","som","faces"]) localisation 1 Localisation of post-processed field value
 // XD stat_post_ecart_type stat_post_deriv ecart_type 0 to calculate the standard deviation (statistic rms) of the field
 // XD   attr field chaine field 0 name of the field on which statistical analysis will be performed. Possible keywords are Vitesse (velocity), Pression (pressure), Temperature, Concentration, ...
-// XD   attr localisation chaine(into=["elem","som","faces"]) localisation 1 Localisation of post-processed field value
+// XD   attr localisation chaine(into=["elem","elem_dg","som","faces"]) localisation 1 Localisation of post-processed field value
 // XD stat_post_correlation stat_post_deriv correlation 0 correlation between the two fields
 // XD   attr first_field chaine first_field 0 first field
 // XD   attr second_field chaine second_field 0 second field
-// XD   attr localisation chaine(into=["elem","som","faces"]) localisation 1 Localisation of post-processed field value
+// XD   attr localisation chaine(into=["elem","elem_dg","som","faces"]) localisation 1 Localisation of post-processed field value
 
 int Postraitement::lire_motcle_non_standard(const Motcle& mot, Entree& s)
 {
