@@ -13,38 +13,42 @@
 *
 *****************************************************************************/
 
-#include <Pb_Couple_Optimisation_IBM.h>
-#include <Probleme_base.h>
+#ifndef Terme_Derivee_Forme_base_included
+#define Terme_Derivee_Forme_base_included
 
-Implemente_instanciable(Pb_Couple_Optimisation_IBM,"Pb_Couple_Optimisation_IBM",Probleme_Couple);
+#include <TRUST_Ref.h>
+#include <TRUST_Deriv.h>
+#include <TRUSTTabs_forward.h>
+#include <Champ_Don_base.h>
+#include <Champ_Fonc_base.h>
+#include <Source_base.h>
 
-Entree& Pb_Couple_Optimisation_IBM::readOn(Entree& is)
+/*! @brief Classe Terme_Derivee_Forme_base Cette classe represente un terme source de l'equation de projection en optimisation de forme
+ *
+ */
+class Terme_Derivee_Forme_base : public Source_base
 {
-  return is;
-}
 
-Sortie& Pb_Couple_Optimisation_IBM::printOn(Sortie& os) const
-{
-  return Probleme_Couple::printOn(os);
-}
+  Declare_base(Terme_Derivee_Forme_base);
 
-void Pb_Couple_Optimisation_IBM::initialize()
-{
-  Probleme_Couple::initialize();
-}
+public :
+  DoubleTab& calculer(DoubleTab& ) const override;
+  void mettre_a_jour(double ) override;
+  void modify_name_file(Nom& ) const;
 
-int Pb_Couple_Optimisation_IBM::associer_(Objet_U& ob)
-{
-  Probleme_Couple::associer_(ob);
-  return 1;
-}
+  void set_source_derivee_forme(DoubleTab&) const;
+  const DoubleTab& get_source_derivee_forme() const { return source_derivee_forme->valeurs(); };
 
-void Pb_Couple_Optimisation_IBM::le_modele_interpolation_IBM(const Interpolation_IBM_base& un_modele_d_interpolation)
-{
-  my_interpolation_IBM_ = un_modele_d_interpolation;
-}
+  // Methodes de l interface des champs postraitables
+  void creer_champ(const Motcle& motlu) override;
+  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
+  bool has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const override;
+  bool has_champ(const Motcle& nom) const override;
+  const Champ_base& get_champ(const Motcle&) const override;
 
-void Pb_Couple_Optimisation_IBM::validateTimeStep()
-{
-  Probleme_Couple::validateTimeStep();
-}
+protected:
+  OWN_PTR(Champ_Don_base) source_derivee_forme;
+  mutable OWN_PTR(Champ_Fonc_base)  champ_derivee_forme_; //!< Champ pour postraitement
+};
+
+#endif
