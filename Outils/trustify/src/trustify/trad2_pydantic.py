@@ -9,7 +9,7 @@ import pathlib
 import textwrap
 import datetime
 import trustify.trad2_utilities as tu
-from trustify.misc_utilities import logger, ClassFactory, TrustifyException
+from trustify.misc_utilities import logger, ClassFactory, TrustifyException, pretty_error
 
 ################################################################
 
@@ -111,19 +111,32 @@ def get_list_type_from_block(block, all_blocks):
         most_nested_type = it_blk
     return f'Annotated[List[{s_typ}], "{ClassFactory.ToPydName(block.name)}"]', most_nested_type
 
-def write_pyd_block(block, pyd_file, all_blocks):
+def write_pyd_block(block, pyd_file, all_blocks, recur_level=0):
     """ Write a TRAD2Block as a pydantic class, in the pyd_file
     """
     assert isinstance(block, tu.TRAD2Block)
-
     if block.pyd_written: return
+
+    # detect and nicely diagnose infinite recursion
+    if recur_level > 80:
+        print(pretty_error(block.info[0], block.info[1],
+                           f" Infinite recursion! Something wrong with block named '{block.name}'!! Is an attribute of the class, the class itself?"))
+    if recur_level > 100:
+        raise Exception(pretty_error(block.info[0], block.info[1],
+                                     f" Infinite recursion! Something wrong with block named '{block.name}'!! Is an attribute of the class, the class itself?"))
+
+    # check base class actually exists!
+    if block.name != "objet_u" and block.name_base not in ["objet_u"] and not block.name.startswith("listobj"):
+        if not block.name_base in all_blocks:
+            raise Exception(pretty_error(block.info[0], block.info[1],
+                                         f" keyword '{block.name}' is declared having parent '{block.name_base}', but this parent does not exist!"))
 
     # dependencies must be written before self (see down below for list items)
     dependencies = [block.name_base] + [a.type for a in block.attrs]
     for dpy in dependencies:
         dpy_block = all_blocks.get(dpy, None)
         if dpy_block:
-            write_pyd_block(dpy_block, pyd_file, all_blocks)
+            write_pyd_block(dpy_block, pyd_file, all_blocks, recur_level=recur_level+1)
 
     # Get base class name. If void (like for Objet_U), inherit from TRUSTBaseModel:
     base_cls_n = ClassFactory.ToPydName(block.name_base) or "TRUSTBaseModel"

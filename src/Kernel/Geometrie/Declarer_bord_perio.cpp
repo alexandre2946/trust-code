@@ -23,8 +23,7 @@
 
 Implemente_instanciable_32_64(Declarer_bord_perio_32_64,"Declarer_bord_perio",Interprete_geometrique_base_32_64<_T_>);
 Add_synonym(Declarer_bord_perio,"Corriger_frontiere_periodique");
-
-// XD declarer_bord_perio_64 interprete corriger_frontiere_periodique_64 -1 The Declarer_bord_perio_64 did the same thing as Declarer_bord_perio for big (64b) domain.
+Add_synonym(Declarer_bord_perio_64,"Corriger_frontiere_periodique_64");
 
 // XD declarer_bord_perio interprete corriger_frontiere_periodique 1 The Declarer_bord_perio keyword is mandatory to first define the periodic boundaries, to reorder the faces and eventually fix unaligned nodes of these boundaries. Faces on one side of the periodic domain are put first, then the faces on the opposite side, in the same order. It must be run in sequential before mesh splitting.
 //  XD attr domaine chaine domaine 0 Name of domain.

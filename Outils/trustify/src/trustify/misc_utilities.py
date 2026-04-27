@@ -250,7 +250,7 @@ class ClassFactory:
         """ Build multi-map from synonyms to root names.
         Motivating example: 'convection { negligeable } / diffusion { negligleable }'
         This must be called once all classes have been registered. See also ConstrainBase_Parser._SYNO_ORIG_NAME
-        definition in base.py 
+        definition in base.py
         """
         cls._SYNO_ORIG_NAME = {}
         for c in cls.GetAllConstrainBasePyd():

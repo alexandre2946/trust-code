@@ -75,6 +75,8 @@ class Abstract_Parser:
         """
         # Is this a (non-synonym) valid class name? If so, it has precedence over any other synonyms (e.g. 'partition' ...)
         ret = []
+        # For trustify, 64b version of keywords are simply exactly the same as the original 32b ones:
+        if kw.endswith("_64"): kw = kw[:-len("_64")]
         if ClassFactory.Exist(ClassFactory.ToPydName(kw)):
             ret.append(ClassFactory.GetPydClassFromName(kw))
         if ret == [] and not kw in ClassFactory._SYNO_ORIG_NAME:
@@ -89,6 +91,9 @@ class Abstract_Parser:
     @classmethod
     def GetOneClassFromSyno(cls, kw, stream, interp=True):
         """ Same as GetAllClassesFromSyno but selecting the most likely keyword ... this is ugly and to be fixed once TRIOXDATA is dead. """
+        # For trustify, 64b version of keywords are simply exactly the same as the original 32b ones:
+        if kw.endswith("_64"): kw = kw[:-len("_64")]
+
         root_cls = cls.GetAllClassesFromSyno(kw, stream)
         ret = root_cls[0]
         if len(root_cls) > 1:
@@ -369,7 +374,7 @@ class ConstrainBase_Parser(BaseCommon_Parser):
         BaseCommon_Parser.__init__(self, pyd_value)
         opbr  = TRUSTTokens(low=["{"], orig=[" {\n"])
         clobr = TRUSTTokens(low=["}"], orig=[" \n}\n"])
-        clsnam = TRUSTTokens(low=[], orig=[" " + ClassFactory.GetPydFromParser(self.__class__).__name__])
+        clsnam = TRUSTTokens(low=[], orig=[" " + ClassFactory.GetPydFromParser(self.__class__).__name__.lower()])
         self._tokens = {"{": opbr,           #: For a ConstrainBase we might need opening and closing brace. By default those
                         "}": clobr,          # are simple '{' and '}' followed by a line return. If ReadFromTokens() was
                         "cls_nam": clsnam }  # invoked to build the object this will respect the initial input (with potentially more spaces)
@@ -617,12 +622,10 @@ class ConstrainBase_Parser(BaseCommon_Parser):
         """
         cls = self.__class__
         if self._read_type:
-            pyd_cls = ClassFactory.GetPydFromParser(cls)
-            expec = [pyd_cls.__name__] + pyd_cls._synonyms[None]
-            for e in expec:
-                if self.checkToken("cls_nam", e.lower()):
-                    return self._tokens["cls_nam"].orig()
-            return [" " + pyd_cls.__name__.lower()]
+            if self._tokens.get("cls_nam", TRUSTTokens()).low() != "":
+                return self._tokens["cls_nam"].orig()
+            else:
+                return [" " + pyd_cls.__name__.lower()]
         return []
 
     def _extendWithAttrTokens(self, tok_lst, attr_nam, attr_val):
@@ -1169,14 +1172,10 @@ class Declaration_Parser(ConstrainBase_Parser):
         """ Override - see BaseCommon_Parser """
         s = []
         ze_type = self._pyd_value.ze_type
-        # List of all possible names for the type stored in the Declaration:
-        ok = [ze_type.__name__.lower()] + ze_type._synonyms[None] # Key 'None' has all the synonyms for the keyword itself (not its attribute)
-        # Is the current stored token one of them?
-        tok_merged = ''.join(self._tokens.get("cls_nam", TRUSTTokens()).low())
-        if tok_merged in ok:
+        if self._tokens.get("cls_nam", TRUSTTokens()).low() != "":
             cn = self._tokens["cls_nam"].orig()
         else:
-            cn = [" " + ze_type.__name__]
+            cn = [" " + ze_type.__name__.lower()]
         s.extend(cn)
         identif = self._pyd_value.identifier
         if self.checkToken("identifier", identif):

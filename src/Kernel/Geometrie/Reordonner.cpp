@@ -17,7 +17,7 @@
 #include <Domaine.h>
 
 Implemente_instanciable_32_64(Reordonner_32_64,"Reordonner",Interprete_geometrique_base_32_64<_T_>);
-// XD resequencing interprete reordonner -1 The Reordonner_32_64 interpretor is required sometimes for a VDF mesh which is not produced by the internal mesher. Example where this is used: NL2 Read_file dom fichier.geom NL2 Reordonner_32_64 dom NL2 Observations: This keyword is redundant when the mesh that is read is correctly sequenced in the TRUST sense. This significant mesh operation may take some time... The message returned by TRUST is not explicit when the Reordonner_32_64 (Resequencing) keyword is required but not included in the data set...
+// XD resequencing interprete reordonner -1 The Reordonner interpretor is required sometimes for a VDF mesh which is not produced by the internal mesher. Example where this is used: NL2 Read_file dom fichier.geom NL2 Reordonner dom NL2 Observations: This keyword is redundant when the mesh that is read is correctly sequenced in the TRUST sense. This significant mesh operation may take some time... The message returned by TRUST is not explicit when the Reordonner (Resequencing) keyword is required but not included in the data set...
 // XD attr domain_name ref_domaine domain_name 0 Name of domain to resequence.
 
 

@@ -133,3 +133,18 @@ def buildSolveurPressionExpec(mod):
   p.option_solveur = b
   p.solveur = "cholesky"
   return p
+
+def buildForward64_Expec(mod):
+    """ Reference data for:
+    
+        dimension 3
+        lire_med_bidon_64 rmed    # with a comment #
+        fin
+    """
+    from trustify.misc_utilities import ClassFactory
+    # First and 2nd item are forward declarations
+    exp0 = mod.Declaration()
+    exp0.identifier = "rmed"
+    exp0.ze_type = ClassFactory.GetPydClassFromName("Read_med_bidon")
+    return exp0
+

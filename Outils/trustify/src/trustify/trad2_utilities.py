@@ -102,6 +102,8 @@ class TRAD2Block:
         if base_nam == "listobj": b = TRAD2BlockList()
         else:                     b = TRAD2Block()
         b.name, b.name_base, nam2, acco_s = [t.lower() for t in tab[:4]]
+        if b.name == b.name_base:
+            raise Exception(pretty_error(fname, lineno, f"Keyword/class '{b.name}' inherits from itself!! You should put a parent class as second parameter in the XD line.")) from None
         a = None
         try:
             a = int(acco_s)
@@ -247,7 +249,9 @@ class TRAD2Content:
         pass
 
     def _parseMacro(self, tag, l):
-        """ Generic method for parsing a 'implemente_instanciable' or 'add_synonym()' """
+        """ Generic method for parsing a 'implemente_instanciable' or 'add_synonym()' 
+        All trailing '_64' or '_32_64' are removed. 64b is handled when building the synonyms.
+        """
         if tag in l:
             t = l.split(",")
             cls_nam = t[0].split("(")[1].strip()
@@ -255,6 +259,8 @@ class TRAD2Content:
                 cls_nam = cls_nam[:-len("_32_64")]
             v = t[1].split(")")[0].strip()
             s = v.replace('"', '')
+            if s .endswith("_64"):
+                s = s.replace("_64", "")
             return cls_nam, s
 
     @classmethod
@@ -414,7 +420,9 @@ class TRAD2Content:
                 if cls_nam not in impl:
                     raise Exception(pretty_error(f_name, lin_n, f"'Add_synonym' macro used before 'Implemente_instanciable'"))
                 kw = impl[cls_nam]
-                self.synos.setdefault(kw, []).append(s)
+                self.synos.setdefault(kw, [])
+                if s not in self.synos[kw]:
+                    self.synos[kw].append(s)
 
             #
             # Now handle XD tags - we accumulate attributes separately per level:
