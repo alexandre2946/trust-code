@@ -17,6 +17,7 @@
 #include <TRUSTTrav.h>
 #include <Domaine.h>
 #include <Param.h>
+#include <Source_PDF_base.h>
 
 Implemente_instanciable( Interpolation_IBM_elem_fluid, "Interpolation_IBM_element_fluide|IBM_element_fluide", Interpolation_IBM_base ) ;
 // XD interpolation_ibm_elem_fluid interpolation_ibm_base ibm_element_fluide 1 Immersed Boundary Method (IBM): fluid element interpolation.
@@ -30,10 +31,12 @@ Sortie& Interpolation_IBM_elem_fluid::printOn( Sortie& os ) const
 void Interpolation_IBM_elem_fluid::set_param(Param& param) const
 {
   Interpolation_IBM_base::set_param(param);
-  param.ajouter("points_fluides",&fluid_points_lu_,Param::REQUIRED); // XD_ADD_P field_base Node field giving the projection of the point below (points_solides) falling into the pure cell fluid
-  param.ajouter("points_solides",&solid_points_lu_,Param::REQUIRED); // XD_ADD_P field_base Node field giving the projection of the node on the immersed boundary
-  param.ajouter("elements_fluides",&fluid_elems_lu_,Param::REQUIRED);   // XD_ADD_P field_base Node field giving the number of the element (cell) containing the pure fluid point
-  param.ajouter("correspondance_elements",&corresp_elems_lu_,Param::REQUIRED);   // XD_ADD_P field_base Cell field giving the SALOME cell number
+  param.ajouter("points_fluides",&fluid_points_lu_,Param::OPTIONAL); // XD_ADD_P field_base Node field giving the projection of the point below (points_solides) falling into the pure cell fluid
+  param.ajouter("points_solides",&solid_points_lu_,Param::OPTIONAL); // XD_ADD_P field_base Node field giving the projection of the node on the immersed boundary
+  param.ajouter("elements_fluides",&fluid_elems_lu_,Param::OPTIONAL);   // XD_ADD_P field_base Node field giving the number of the element (cell) containing the pure fluid point
+  param.ajouter("correspondance_elements",&corresp_elems_lu_,Param::OPTIONAL);   // XD_ADD_P field_base Cell field giving the SALOME cell number
+  param.ajouter_flag("get_fluid_points_from_prepro", &fluid_points_from_prepro_,Param::OPTIONAL); // XD_ADD_P get IBM fluid points from prepro.
+  param.ajouter_flag("get_fluid_elems_from_prepro", &fluid_elems_from_prepro_,Param::OPTIONAL); // XD_ADD_P get IBM fluid elems from prepro.
 }
 
 Entree& Interpolation_IBM_elem_fluid::readOn( Entree& is )
@@ -44,36 +47,56 @@ Entree& Interpolation_IBM_elem_fluid::readOn( Entree& is )
   return is;
 }
 
-void Interpolation_IBM_elem_fluid::discretise(const Discretisation_base& dis, Domaine_dis_base& le_dom_EF)
+void Interpolation_IBM_elem_fluid::discretise(const Discretisation_base& dis, Domaine_dis_base& le_dom_dis)
 {
+  Interpolation_IBM_base::discretise(dis, le_dom_dis);
   int nb_comp = Objet_U::dimension;
   Noms units(nb_comp);
   Noms c_nam(nb_comp);
 
-  dis.discretiser_champ("champ_sommets",le_dom_EF,"fluid_elems","none",1,0., fluid_elems_);
-  fluid_elems_->affecter(fluid_elems_lu_);
-  if (corresp_elems_lu_)
+  dis.discretiser_champ("champ_sommets",le_dom_dis,"fluid_elems","none",1,0., fluid_elems_);
+  if (fluid_elems_from_prepro_)
     {
-      has_corresp_ = true;
-      dis.discretiser_champ("champ_elem",le_dom_EF,"corresp_elems","none",1,0., corresp_elems_);
-      corresp_elems_->affecter(corresp_elems_lu_);
+      OBS_PTR(Prepro_IBM_base) my_prep =  my_source_->getpreproLu();
+      if ((&my_prep)->non_nul())
+        {
+          DoubleTab& the_values = ref_cast_non_const(DoubleTab, my_prep->get_champ_fluid_elems());
+          fluid_elems_->valeurs() = the_values;
+        }
     }
-  dis.discretiser_champ("vitesse",le_dom_EF,vectoriel,c_nam,units,nb_comp,0.,fluid_points_);
-  fluid_points_->affecter(fluid_points_lu_);
-  dis.discretiser_champ("vitesse",le_dom_EF,vectoriel,c_nam,units,nb_comp,0.,solid_points_);
-  solid_points_->affecter(solid_points_lu_);
-  computeFluidElems(le_dom_EF);
+  else
+    {
+      if (fluid_elems_lu_.non_nul()) fluid_elems_->affecter(fluid_elems_lu_);
+    }
+
+  if (corresp_elems_.non_nul()) has_corresp_ = true;
+
+  dis.discretiser_champ("champ_sommets",le_dom_dis,vectoriel,c_nam,units,nb_comp,0.,fluid_points_);
+  if (fluid_points_from_prepro_)
+    {
+      OBS_PTR(Prepro_IBM_base) my_prep =  my_source_->getpreproLu();
+      if ((&my_prep)->non_nul())
+        {
+          DoubleTab& the_values = ref_cast_non_const(DoubleTab, my_prep->get_champ_fluid_points());
+          fluid_points_->valeurs() = the_values;
+        }
+    }
+  else
+    {
+      if (fluid_points_lu_.non_nul()) fluid_points_->affecter(fluid_points_lu_);
+    }
+  computeFluidElems(le_dom_dis);
 }
 
-void Interpolation_IBM_elem_fluid::computeFluidElems(Domaine_dis_base& le_dom_EF)
+void Interpolation_IBM_elem_fluid::computeFluidElems(Domaine_dis_base& le_dom_dis)
 {
   double eps = 1e-12;
-  int nb_som = le_dom_EF.nb_som();
-  int nb_som_tot = le_dom_EF.nb_som_tot();
-  int nb_elem = le_dom_EF.nb_elem();
-  int nb_elem_tot = le_dom_EF.nb_elem_tot();
-  const DoubleTab& coordsDom = le_dom_EF.domaine().coord_sommets();
-  // const IntTab& elems = le_dom_EF.domaine().les_elems();
+  int nb_som = le_dom_dis.nb_som();
+  int nb_som_tot = le_dom_dis.nb_som_tot();
+  int nb_elem = le_dom_dis.nb_elem();
+  int nb_elem_tot = le_dom_dis.nb_elem_tot();
+  const DoubleTab& coordsDom = le_dom_dis.domaine().coord_sommets();
+  // const IntTab& elems = le_dom_dis.domaine().les_elems();
 
   DoubleTab& elems_fluid_ref = fluid_elems_->valeurs();
   DoubleTab& fluid_points_ref = fluid_points_->valeurs();
@@ -144,9 +167,12 @@ void Interpolation_IBM_elem_fluid::computeFluidElems(Domaine_dis_base& le_dom_EF
                           Cerr<<"coords_point(node) : x y z    = "<<coordsDom(i,0)<<" "<<coordsDom(i,1)<<" "<<coordsDom(i,2)<<finl;
                           Cerr<<"fluid_points(node) : xf yf zf = "<<x<<" "<<y<<" "<<z<<finl;
                           Cerr<<"solid_points(node) : xs ys zs = "<<xs<<" "<<ys<<" "<<zs<<finl;
-                          int elem_found = le_dom_EF.domaine().chercher_elements(x,y,z);
+                          int elem_found = le_dom_dis.domaine().chercher_elements(x,y,z);
                           Cerr<<"chercher_elements(xf,yf,zf) = "<<elem_found<<finl;
-                          exit();
+                          if (elem_found != -1)
+                            elems_fluid_ref(i) = elem_found;
+                          else
+                            exit();
                         }
                     }
                 }
@@ -160,4 +186,11 @@ void Interpolation_IBM_elem_fluid::computeFluidElems(Domaine_dis_base& le_dom_EF
             }
         }
     }
+}
+
+void Interpolation_IBM_elem_fluid::set_fields_from_prepro_to_interp(Prepro_IBM_base& un_prepro)
+{
+  Interpolation_IBM_base::set_fields_from_prepro_to_interp(un_prepro);
+  fluid_points_->valeurs() = un_prepro.get_champ_fluid_points();
+  fluid_elems_->valeurs() = un_prepro.get_champ_fluid_elems();
 }

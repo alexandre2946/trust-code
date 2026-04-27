@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2025, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -38,15 +38,16 @@ public :
   };
 
 protected :
-  void computeSommetsVoisins(Domaine_dis_base& le_dom_EF, const Champ_Don_base& solid_points, const Champ_Don_base& corresp_elems, bool has_corres);
-
-  OWN_PTR(Champ_Don_base) is_dirichlet_lu_;
-  OWN_PTR(Champ_Don_base) is_dirichlet_;
+  void computeSommetsVoisins(Domaine_dis_base& le_dom_, const Champ_Don_base& solid_points, const Champ_Don_base& corresp_elems, bool has_corres);
 
   OWN_PTR(Champ_Don_base) solid_elems_lu_;
   OWN_PTR(Champ_Don_base) solid_elems_;
+  OWN_PTR(Champ_Don_base) my_is_dirichlet_;
 
   IntLists sommets_voisins_;
+  friend class Source_PDF_base;
+  friend class Source_PDF_EF;
+  friend class Source_PDF_VEF;
 };
 
 #endif /* Interpolation_IBM_mean_gradient_proto_included */

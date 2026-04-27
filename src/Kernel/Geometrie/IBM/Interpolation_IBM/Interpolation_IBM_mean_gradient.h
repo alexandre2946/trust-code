@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2025, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -34,13 +34,15 @@ class Interpolation_IBM_mean_gradient : public Interpolation_IBM_base, public In
   Declare_instanciable( Interpolation_IBM_mean_gradient ) ;
 
 public :
-  void discretise(const Discretisation_base&, Domaine_dis_base& le_dom_EF) override;
+  void discretise(const Discretisation_base&, Domaine_dis_base& le_dom_) override;
   inline IntList& getSommetsVoisinsOf(int i)
   {
     return sommets_voisins_[i];
   };
+  void set_fields_from_prepro_to_interp(Prepro_IBM_base&) override;
 protected :
-  friend class Source_PDF_EF;
+
+  bool solid_elems_from_prepro_ = false;
 };
 
 #endif /* Interpolation_IBM_mean_gradient_included */

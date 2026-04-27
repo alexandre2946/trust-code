@@ -13,84 +13,48 @@
 *
 *****************************************************************************/
 
-#ifndef Interpolation_IBM_power_law_tbl_proto_included
-#define Interpolation_IBM_power_law_tbl_proto_included
+#ifndef Interpolation_IBM_thermal_wall_law_included
+#define Interpolation_IBM_thermal_wall_law_included
 
+#include <Interpolation_IBM_elem_fluid.h>
+#include <Domaine.h>
+#include <Param.h>
 
-/*! @brief : class Interpolation_IBM_power_law_tbl_proto
- *
- *  Pure C++ class to allow multiple inheritance in Interpolation_IBM_power_law_tbl
- *
- *
- *
- */
-
-class Interpolation_IBM_power_law_tbl_proto
+class Interpolation_IBM_thermal_wall_law : public Interpolation_IBM_elem_fluid
 {
 
+  Declare_instanciable( Interpolation_IBM_thermal_wall_law ) ;
+
 public :
-// Constantes
-  inline double get_A_pwl(int a)
+  double Kader(double, double);
+
+  inline int get_formulation_Tp()
   {
-    if (a == 1)
-      {
-        return A_pwl_WJSP_;
-      }
-    else
-      {
-        return  A_pwl_;
-      }
+    return formulation_Tp_;
   };
 
-  inline double get_C_pwl_WJSP()
+  inline int get_boundary_type()
   {
-    return  C_pwl_WJSP_;
-  };
+    return boundary_type_;
+  }
 
-  inline double get_D_pwl_WJSP()
+  inline double get_T_inlet()
   {
-    return  D_pwl_WJSP_;
-  };
+    return T_inlet_;
+  }
 
-
-// Puissances
-  inline double get_B_pwl()
+  inline double get_Prandlt_mol()
   {
-    return  B_pwl_;
-  };
+    return Prandlt_mol_;
+  }
 
-  inline double get_p_pwl_WJSP()
-  {
-    return  p_pwl_WJSP_;
-  };
-
-// Limites
-  inline double get_y_c_p_pwl()
-  {
-    return y_c_p_pwl_;
-  };
-
-  inline double get_y_c1_p_pwl_WJSP()
-  {
-    return y_c1_p_pwl_WJSP_;
-  };
-
-  inline double get_y_c2_p_pwl_WJSP()
-  {
-    return y_c2_p_pwl_WJSP_;
-  };
+  void set_param(Param&);
 
 protected :
-  double A_pwl_ = 8.3;
-  double A_pwl_WJSP_ = 8.438565669851982;
-  double C_pwl_WJSP_ = 20.197802756630782;
-  double D_pwl_WJSP_ = -34.3779384724374;
-  double B_pwl_ = 1./7.;
-  double p_pwl_WJSP_ = 0.49570985985551774;
-  double y_c_p_pwl_ = 11.81;
-  double y_c1_p_pwl_WJSP_ = 6.549332667516647;
-  double y_c2_p_pwl_WJSP_ = 54.75271424217823;
-  friend class Source_PDF_base;
+  int formulation_Tp_ = 0; // Choix loi de theta+
+  int boundary_type_ = 0; // Choix du type de condition limite (0 = temp imp., 1 = flux imp.)
+  double T_inlet_ = 0.0;
+  double Prandlt_mol_ = 0.0;
 };
 
-#endif /* Interpolation_IBM_power_law_tbl_proto_included */
+#endif /* Interpolation_IBM_thermal_wall_law_included */

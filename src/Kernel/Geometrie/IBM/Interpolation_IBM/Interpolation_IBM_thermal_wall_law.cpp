@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2026, CEA
+* Copyright (c) 2025, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,18 +13,18 @@
 *
 *****************************************************************************/
 
-#include <Interpolation_IBM_power_law_tbl.h>
+#include <Interpolation_IBM_thermal_wall_law.h>
 
-Implemente_instanciable( Interpolation_IBM_power_law_tbl, "Interpolation_IBM_power_law_tbl|IBM_power_law_tbl", Interpolation_IBM_elem_fluid ) ;
-// XD interpolation_ibm_power_law_tbl interpolation_ibm_elem_fluid ibm_power_law_tbl 1 Immersed Boundary Method (IBM): power law interpolation.
 
-Sortie& Interpolation_IBM_power_law_tbl::printOn( Sortie& os ) const
+Implemente_instanciable( Interpolation_IBM_thermal_wall_law, "Interpolation_IBM_thermal_wall_law|IBM_thermal_wall_law", Interpolation_IBM_elem_fluid ) ;
+
+Sortie& Interpolation_IBM_thermal_wall_law::printOn( Sortie& os ) const
 {
   Interpolation_IBM_elem_fluid::printOn( os );
   return os;
 }
 
-Entree& Interpolation_IBM_power_law_tbl::readOn( Entree& is )
+Entree& Interpolation_IBM_thermal_wall_law::readOn( Entree& is )
 {
   Param param(que_suis_je());
   set_param(param);
@@ -33,10 +33,30 @@ Entree& Interpolation_IBM_power_law_tbl::readOn( Entree& is )
   return is;
 }
 
-void Interpolation_IBM_power_law_tbl::set_param(Param& param) const
+void Interpolation_IBM_thermal_wall_law::set_param(Param& param)
 {
   Interpolation_IBM_elem_fluid::set_param( param );
-  param.ajouter("formulation_WJSP",&formulation_WJSP_,Param::OPTIONAL);
-  param.ajouter("formulation_linear_pwl",&formulation_linear_pwl_,Param::OPTIONAL);  // XD_ADD_P entier Choix formulation lineaire ou non
+  param.ajouter("formulation_Tplus",&formulation_Tp_,Param::OPTIONAL);  // XD_ADD_P entier Choix formulation calcul T+ (Kader si rien)
+  param.ajouter("boundary_type",&boundary_type_,Param::REQUIRED); // XD_ADD_P entier Choix type de cond limite
+  param.ajouter("T_inlet",&T_inlet_,Param::REQUIRED); // XD_ADD_P double Demande la température d'écoulement d'entrée moyenne
+  param.ajouter("Prandlt_mol",&Prandlt_mol_,Param::REQUIRED); // XD_ADD_P double Demande le Prandlt du fluide
+}
 
+double Interpolation_IBM_thermal_wall_law::Kader(double yplus, double Prandlt)
+{
+// Calcul de Beta
+  double a = 3.85*pow(Prandlt,1/3) -1.3;
+  double b = 2.12 * log(Prandlt);
+  double Beta = pow(a,2) + b;
+// Calcul de Gamma
+  a = 0.01*pow(yplus*Prandlt,4);
+  b = 1 + 5*yplus + pow(Prandlt,3);
+  double Gamma = a/b;
+// Calcul de theta+
+  a = yplus * exp(- Gamma) * Prandlt;
+  b = 2.12 * log(1 + yplus) + Beta;
+  double c = exp (- 1 / Gamma);
+  double thetaplus = a + b*c;
+
+  return thetaplus;
 }

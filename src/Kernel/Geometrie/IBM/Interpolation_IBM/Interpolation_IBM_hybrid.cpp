@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2025, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -32,23 +32,30 @@ Entree& Interpolation_IBM_hybrid::readOn( Entree& is )
   //Interpolation_IBM_elem_fluid::readOn(is);
   Param param(que_suis_je());
   Interpolation_IBM_elem_fluid::set_param(param);
-  param.ajouter("est_dirichlet",&is_dirichlet_lu_,Param::REQUIRED);   // XD_ADD_P field_base Node field of booleans indicating whether the node belong to an element where the interface is
   param.ajouter("elements_solides",&solid_elems_lu_,Param::REQUIRED); // XD_ADD_P field_base Node field giving the element number containing the solid point
   param.lire_avec_accolades_depuis(is);
   return is;
 }
 
-void Interpolation_IBM_hybrid::discretise(const Discretisation_base& dis, Domaine_dis_base& le_dom_EF)
+void Interpolation_IBM_hybrid::discretise(const Discretisation_base& dis, Domaine_dis_base& le_dom_)
 {
   Cerr << "(IBM) Warning! Interpolation IBM_hybrid has no validation test case." << finl;
 
-  Interpolation_IBM_elem_fluid::discretise(dis,le_dom_EF);
+  Interpolation_IBM_elem_fluid::discretise(dis,le_dom_);
 
-  dis.discretiser_champ("champ_sommets",le_dom_EF,"solid_elems","none",1,0., solid_elems_);
+  dis.discretiser_champ("champ_sommets",le_dom_,"solid_elems","none",1,0., solid_elems_);
   solid_elems_->affecter(solid_elems_lu_);
-  dis.discretiser_champ("champ_sommets",le_dom_EF,"is_dirichlet","none",1,0., is_dirichlet_);
-  is_dirichlet_->affecter(is_dirichlet_lu_);
 
-  computeSommetsVoisins(le_dom_EF, solid_points_, corresp_elems_, has_corresp_);
+  if(!(is_dirichlet_.non_nul()))
+    {
+      Cerr<<"Interpolation_IBM_hybrid: field est_dirichlet is required. exit()"<<endl;
+      exit();
+    }
+  else
+    {
+      my_is_dirichlet_ = is_dirichlet_;
+    }
+
+  computeSommetsVoisins(le_dom_, solid_points_, corresp_elems_, has_corresp_);
 }
 

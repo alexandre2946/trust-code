@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2025, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,24 +18,24 @@
 #include <Domaine.h>
 #include <Process.h>
 
-void Interpolation_IBM_mean_gradient_proto::computeSommetsVoisins(Domaine_dis_base& le_dom_EF,
+void Interpolation_IBM_mean_gradient_proto::computeSommetsVoisins(Domaine_dis_base& le_dom_,
                                                                   const Champ_Don_base& solid_points,
                                                                   const Champ_Don_base& corresp_elems,
                                                                   bool has_corres)
 {
-  int nb_som = le_dom_EF.nb_som();
-  int nb_som_tot = le_dom_EF.nb_som_tot();
-  int nb_elem = le_dom_EF.nb_elem();
-  int nb_elem_tot = le_dom_EF.nb_elem_tot();
-  int nb_som_elem = le_dom_EF.domaine().nb_som_elem();
+  int nb_som = le_dom_.nb_som();
+  int nb_som_tot = le_dom_.nb_som_tot();
+  int nb_elem = le_dom_.nb_elem();
+  int nb_elem_tot = le_dom_.nb_elem_tot();
+  int nb_som_elem = le_dom_.domaine().nb_som_elem();
   DoubleTab& elems_solid_ref = solid_elems_->valeurs();
-  const IntTab& elems = le_dom_EF.domaine().les_elems();
-  const DoubleTab& coordsDom = le_dom_EF.domaine().coord_sommets();
+  const IntTab& elems = le_dom_.domaine().les_elems();
+  const DoubleTab& coordsDom = le_dom_.domaine().coord_sommets();
   const DoubleTab& solidPointsCoords = solid_points.valeurs();
 
   //Cerr << "nb_som_elem = " << nb_som_elem << finl;
 
-  DoubleTab& is_dirichlet = is_dirichlet_->valeurs();
+  DoubleTab& is_dirichlet = my_is_dirichlet_->valeurs();
 
   // On cree un indicateur nodal reperant si un noeud appartient a un ou des elements
   // etant totalement fluide (sans noeuds CL Dirichelt immergee)
@@ -153,7 +153,7 @@ void Interpolation_IBM_mean_gradient_proto::computeSommetsVoisins(Domaine_dis_ba
                           int elems_xpf = (int)lrint(elems_solid_ref(num_som_2));
                           bool flag_xpf = true;
                           //bool flag_prt_nodes = false;
-                          int elem_found = le_dom_EF.domaine().chercher_elements(xpf1,xpf2,xpf3);
+                          int elem_found = le_dom_.domaine().chercher_elements(xpf1,xpf2,xpf3);
                           if (elems_xpf >= 0)
                             {
                               // test de verification prepro Salome/Trust :

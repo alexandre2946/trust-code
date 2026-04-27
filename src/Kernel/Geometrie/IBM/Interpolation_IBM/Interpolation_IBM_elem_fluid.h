@@ -33,7 +33,8 @@ class Interpolation_IBM_elem_fluid : public Interpolation_IBM_base
   Declare_instanciable( Interpolation_IBM_elem_fluid ) ;
 
 public :
-  void discretise(const Discretisation_base&, Domaine_dis_base& le_dom_EF) override;
+  void discretise(const Discretisation_base&, Domaine_dis_base&) override;
+  void set_fields_from_prepro_to_interp(Prepro_IBM_base&) override;
 
 protected :
   virtual void computeFluidElems(Domaine_dis_base&);
@@ -45,7 +46,14 @@ protected :
   OWN_PTR(Champ_Don_base) fluid_elems_lu_;
   OWN_PTR(Champ_Don_base) fluid_elems_;
 
+  bool fluid_points_from_prepro_ = false;
+  bool fluid_elems_from_prepro_ = false;
+
+  friend class Source_PDF_base;
   friend class Source_PDF_EF;
+  friend class Source_PDF_VEF;
+  friend class Source_PDF_VDF;
+
 };
 
 #endif /* Interpolation_IBM_elem_fluid_included */

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2025, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -39,7 +39,6 @@ public :
     return sommets_voisins_[i];
   };
 protected :
-  friend class Source_PDF_EF;
 };
 
 #endif /* Interpolation_IBM_hybrid_included */

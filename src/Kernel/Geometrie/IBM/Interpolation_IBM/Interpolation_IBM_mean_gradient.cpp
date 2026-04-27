@@ -18,6 +18,7 @@
 
 #include <Domaine.h>
 #include <Param.h>
+#include <Source_PDF_base.h>
 
 Implemente_instanciable( Interpolation_IBM_mean_gradient, "Interpolation_IBM_gradient_moyen|IBM_gradient_moyen", Interpolation_IBM_base ) ;
 // XD interpolation_ibm_mean_gradient interpolation_ibm_base ibm_gradient_moyen 1 Immersed Boundary Method (IBM): mean gradient interpolation.
@@ -31,31 +32,56 @@ Sortie& Interpolation_IBM_mean_gradient::printOn( Sortie& os ) const
 Entree& Interpolation_IBM_mean_gradient::readOn( Entree& is )
 {
   Param param(que_suis_je());
-  param.ajouter("points_solides",&solid_points_lu_,Param::REQUIRED);  // XD_ADD_P field_base Node field giving the projection of the node on the immersed boundary
-  param.ajouter("est_dirichlet",&is_dirichlet_lu_,Param::REQUIRED);   // XD_ADD_P field_base Node field of booleans indicating whether the node belong to an element where the interface is
-  param.ajouter("correspondance_elements",&corresp_elems_lu_,Param::REQUIRED); // XD_ADD_P field_base Cell field giving the SALOME cell number
-  param.ajouter("elements_solides",&solid_elems_lu_,Param::REQUIRED); // XD_ADD_P field_base Node field giving the element number containing the solid point
+  param.ajouter("points_solides",&solid_points_lu_,Param::OPTIONAL);  // XD_ADD_P field_base Node field giving the projection of the node on the immersed boundary
+  param.ajouter("est_dirichlet",&is_dirichlet_lu_,Param::OPTIONAL);   // XD_ADD_P field_base Node field of booleans indicating whether the node belong to an element where the interface is
+  param.ajouter("correspondance_elements",&corresp_elems_lu_,Param::OPTIONAL); // XD_ADD_P field_base Cell field giving the SALOME cell number
+  param.ajouter("elements_solides",&solid_elems_lu_,Param::OPTIONAL); // XD_ADD_P field_base Node field giving the element number containing the solid point
+  param.ajouter_flag("get_solid_points_from_prepro", &solid_points_from_prepro_,Param::OPTIONAL); // XD_ADD_P get IBM solid points from prepro.
+  param.ajouter_flag("get_solid_elems_from_prepro", &solid_elems_from_prepro_,Param::OPTIONAL); // XD_ADD_P get IBM solid elems from prepro.
+  param.ajouter_flag("get_is_dirichlet_from_prepro", &is_dirichlet_from_prepro_,Param::OPTIONAL); // XD_ADD_P get IBM is_dirichlet from prepro.
+  param.ajouter_flag("get_corresp_elems_from_prepro", &corresp_elems_from_prepro_,Param::OPTIONAL); // XD_ADD_P get IBM corresp_elems from prepro.
   param.lire_avec_accolades_depuis(is);
   return is;
 }
 
-void Interpolation_IBM_mean_gradient::discretise(const Discretisation_base& dis, Domaine_dis_base& le_dom_EF)
+void Interpolation_IBM_mean_gradient::discretise(const Discretisation_base& dis, Domaine_dis_base& le_dom_)
 {
+  Interpolation_IBM_base::discretise(dis, le_dom_);
   int nb_comp = Objet_U::dimension;
   Noms units(nb_comp);
   Noms c_nam(nb_comp);
 
-  if (corresp_elems_lu_)
+  if (corresp_elems_.non_nul()) has_corresp_ = true;
+
+  dis.discretiser_champ("champ_sommets",le_dom_,"solid_elems","none",1,0., solid_elems_);
+  if (solid_elems_from_prepro_)
     {
-      has_corresp_ = true;
-      dis.discretiser_champ("champ_elem",le_dom_EF,"corresp_elems","none",1,0., corresp_elems_);
-      corresp_elems_->affecter(corresp_elems_lu_);
+      OBS_PTR(Prepro_IBM_base) my_prep =  my_source_->getpreproLu();
+      if ((&my_prep)->non_nul())
+        {
+          DoubleTab& the_values = ref_cast_non_const(DoubleTab, my_prep->get_champ_solid_elems());
+          solid_elems_->valeurs() = the_values;
+        }
     }
-  dis.discretiser_champ("champ_sommets",le_dom_EF,"solid_elems","none",1,0., solid_elems_);
-  solid_elems_->affecter(solid_elems_lu_);
-  dis.discretiser_champ("champ_sommets",le_dom_EF,"is_dirichlet","none",1,0., is_dirichlet_);
-  is_dirichlet_->affecter(is_dirichlet_lu_);
-  dis.discretiser_champ("vitesse",le_dom_EF,vectoriel,c_nam,units,nb_comp,0., solid_points_);
-  solid_points_->affecter(solid_points_lu_);
-  computeSommetsVoisins(le_dom_EF, solid_points_, corresp_elems_, has_corresp_);
+  else
+    {
+      if (solid_elems_lu_.non_nul()) solid_elems_->affecter(solid_elems_lu_);
+    }
+
+  if(!(is_dirichlet_.non_nul()))
+    {
+      Cerr<<"Interpolation_IBM_mean_gradient: field est_dirichlet is required. exit()"<<endl;
+      exit();
+    }
+  else
+    {
+      my_is_dirichlet_ = is_dirichlet_;
+    }
+  computeSommetsVoisins(le_dom_, solid_points_, corresp_elems_, has_corresp_);
+}
+
+void Interpolation_IBM_mean_gradient::set_fields_from_prepro_to_interp(Prepro_IBM_base& un_prepro)
+{
+  Interpolation_IBM_base::set_fields_from_prepro_to_interp(un_prepro);
+  solid_elems_->valeurs() = un_prepro.get_champ_solid_elems();
 }

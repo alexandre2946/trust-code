@@ -42,10 +42,16 @@ public :
     return formulation_linear_pwl_;
   };
 
+  inline int get_formulation_WJSP()
+  {
+    return formulation_WJSP_;
+  };
+
   void set_param(Param&) const override;
 
 protected :
   int formulation_linear_pwl_ = 0; // Choix formulation lineaire ou non
+  int formulation_WJSP_ = 0; // Choix loi WJSP ou WJS
 };
 
 #endif /* Interpolation_IBM_power_law_tbl_included */

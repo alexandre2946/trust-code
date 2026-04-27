@@ -42,6 +42,7 @@ Entree& Interpolation_IBM_power_law_tbl_u_star::readOn( Entree& is )
 
 void Interpolation_IBM_power_law_tbl_u_star::discretise(const Discretisation_base& dis, Domaine_dis_base& le_dom_EF)
 {
+  Interpolation_IBM_base::discretise(dis, le_dom_EF);
   int nb_comp = Objet_U::dimension;
   Noms units(nb_comp);
   Noms c_nam(nb_comp);
@@ -55,7 +56,5 @@ void Interpolation_IBM_power_law_tbl_u_star::discretise(const Discretisation_bas
   solid_elems_->affecter(solid_elems_lu_);
   dis.discretiser_champ("champ_sommets",le_dom_EF,"is_dirichlet","none",1,0., is_dirichlet_);
   is_dirichlet_->affecter(is_dirichlet_lu_);
-  dis.discretiser_champ("vitesse",le_dom_EF,vectoriel,c_nam,units,nb_comp,0., solid_points_);
-  solid_points_->affecter(solid_points_lu_);
   computeSommetsVoisins(le_dom_EF, solid_points_, corresp_elems_, has_corresp_);
 }
