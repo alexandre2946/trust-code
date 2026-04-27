@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2025, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,6 @@
 
 #ifndef Source_PDF_EF_included
 #define Source_PDF_EF_included
-
 
 #include <Navier_Stokes_std.h>
 #include <Source_PDF_base.h>
@@ -38,13 +37,10 @@ public:
   DoubleTab& ajouter_(const DoubleTab&, DoubleTab&, const int) const override ;
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override;
   void verif_ajouter_contrib(const DoubleTab& variable, Matrice_Morse& matrice) const ;
-  DoubleTab compute_coeff_elem() const override;
-  DoubleVect diag_coeff_elem(ArrOfDouble&, const DoubleTab&, int) const override;
-  DoubleTab compute_coeff_matrice() const override;
   void multiply_coeff_volume(DoubleTab&) const override;
-  void correct_variable(const DoubleTab&,DoubleTab&) const override ;
   void test(Matrice&) const;
   void updateChampRho();
+  void volume_source_term_PDF(DoubleTab&) override;
 
   void correct_pressure(const DoubleTab&,DoubleTab&,const DoubleTab&) const override ;
   void correct_incr_pressure(const DoubleTab&,DoubleTab&) const override ;
@@ -59,18 +55,14 @@ public:
   bool has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const override;
   bool has_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
+  void filtre_CLD(DoubleTab&) const override;
 
 protected:
-  OWN_PTR(Champ_Don_base) champ_nodal_;
-  void compute_variable_imposee_projete(const DoubleTab&, const DoubleTab&, double, double) override;
   void calculer_variable_imposee_hybrid()  override;
   void calculer_variable_imposee_elem_fluid() override;
   void calculer_variable_imposee_mean_grad()  override;
   void calculer_vitesse_imposee_power_law_tbl() override;
   void calculer_vitesse_imposee_power_law_tbl_u_star() override;
-  void rotate_imposed_velocity(DoubleTab&) override;
-  DoubleTab compute_pond(const DoubleTab&, const DoubleTab&, const DoubleVect&, int&, int&) const ;
-  void filtre_CLD(DoubleTab&) const;
   OBS_PTR(Domaine_EF) le_dom_EF;
   OBS_PTR(Domaine_Cl_EF) le_dom_Cl_EF;
   void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;

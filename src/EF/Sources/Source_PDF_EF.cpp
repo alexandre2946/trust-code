@@ -35,12 +35,7 @@
 #include <Op_Conv_EF.h>
 
 Implemente_instanciable(Source_PDF_EF,"Source_PDF_EF",Source_PDF_base);
-// XD source_pdf source_base source_pdf 1 Source term for Penalised Direct Forcing (PDF) method.
-// XD attr aire field_base aire 0 volumic field: a boolean for the cell (0 or 1) indicating if the obstacle is in the cell
-// XD attr rotation field_base rotation 0 volumic field with 9 components representing the change of basis on cells (local to global). Used for rotating cases for example.
-// XD attr transpose_rotation rien transpose_rotation 1 whether to transpose the basis change matrix.
-// XD attr modele bloc_pdf_model modele 0 model used for the Penalized Direct Forcing
-// XD attr interpolation interpolation_ibm_base interpolation 1 interpolation method
+// XD source_pdf source_pdf_base source_pdf 1 Source term for Penalized Direct Forcing (PDF) method.
 
 /*##################################################################################################
 ####################################################################################################
@@ -56,7 +51,8 @@ Entree& Source_PDF_EF::readOn(Entree& s)
 
 Sortie& Source_PDF_EF::printOn(Sortie& s ) const
 {
-  return s << que_suis_je();
+  Source_PDF_base::printOn(s);
+  return s;
 }
 
 /*##################################################################################################
@@ -67,232 +63,16 @@ Sortie& Source_PDF_EF::printOn(Sortie& s ) const
 
 void Source_PDF_EF::associer_pb(const Probleme_base& pb)
 {
-  // Matrice Rotation
-  int dim_esp = Objet_U::dimension;
-  assert(dim_esp==3);
-  int nb_comp=dim_esp*dim_esp;
-  Noms nom_c(nb_comp);
-  Noms unites(nb_comp);
-  pb.discretisation().discretiser_champ("champ_elem",le_dom_EF.valeur(),vectoriel,nom_c,unites,nb_comp,0.,champ_rotation_);
-  champ_rotation_->affecter(champ_rotation_lu_);
-
-  // Aire
-  pb.discretisation().discretiser_champ("champ_elem",le_dom_EF.valeur(),"aire","m-1",1,0., champ_aire_);
-  champ_aire_->affecter(champ_aire_lu_);
-  pb.discretisation().discretiser_champ("champ_elem",le_dom_EF.valeur(),"rho","kg.m-3",1,0., champ_rho_);
-
-  Source_PDF_base::updateChampRho();
-
-  // Transposition Matrice Rotation
-  if (transpose_rotation_)
-    {
-
-      DoubleTab& val=champ_rotation_->valeurs();
-
-      int nb_case=val.dimension_tot(0);
-      for (int ele=0; ele<nb_case; ele++)
-        for (int k=0; k<dim_esp; k++)
-          for (int i=k+1; i<dim_esp; i++)
-            {
-              double tmp=val(ele,3*k+i);
-              val(ele,3*k+i)=val(ele,3*i+k);
-              val(ele,3*i+k)=tmp;
-            }
-
-    }
-
-  // Relaxation
-  temps_relax_ = modele_lu_.temps_relax_;
-  echelle_relax_ = modele_lu_.echelle_relax_;
-
-  // Variable Imposee sur IB
-  const DoubleTab& variable=equation().inconnue().valeurs();
-  Motcle directive("temperature");
-  if (equation().inconnue().nature_du_champ()==vectoriel) directive="vitesse";
-  nb_comp=variable.dimension(1);
-  assert(nb_comp==modele_lu_.dim_variable_);
-  Nom nom_c1(equation().inconnue().le_nom());
-  Nom unites1(equation().inconnue().unites()[0]);
-  type_variable_imposee_ = modele_lu_.type_variable_imposee_;
-  pb.discretisation().discretiser_champ(directive,le_dom_EF.valeur(),nom_c1,unites1,nb_comp,0.,modele_lu_.variable_imposee_);
-
-  if (interpolation_bool_)
-    {
-      Domaine_dis_base& le_dom_dis_base = ref_cast(Domaine_dis_base,le_dom_EF.valeur());
-      interpolation_lue_->discretise(pb.discretisation(),le_dom_dis_base);
-      if (type_variable_imposee_ == 1)
-        {
-          if (interpolation_lue_->que_suis_je() == "Interpolation_IBM_gradient_moyen" || interpolation_lue_->que_suis_je() == "Interpolation_IBM_power_law_tbl_u_star")
-            {
-              const Interpolation_IBM_mean_gradient& interp = ref_cast(Interpolation_IBM_mean_gradient,interpolation_lue_.valeur());
-              this->compute_variable_imposee_projete(interp.solid_elems_->valeurs(), interp.solid_points_->valeurs(), -2.0, 1e-6);
-            }
-          else
-            {
-              const Interpolation_IBM_elem_fluid& interp = ref_cast(Interpolation_IBM_elem_fluid,interpolation_lue_.valeur());
-              compute_variable_imposee_projete(interp.fluid_elems_->valeurs(), interp.solid_points_->valeurs(), -2.0, 1e-6);
-            }
-        }
-      else
-        {
-          modele_lu_.variable_imposee_->affecter(modele_lu_.variable_imposee_lu_);
-        }
-    }
-  else
-    {
-      if (type_variable_imposee_ != 1)
-        {
-          modele_lu_.variable_imposee_->affecter(modele_lu_.variable_imposee_lu_);
-        }
-      else
-        {
-          const DoubleTab& coords = le_dom_EF->domaine().coord_sommets();
-          modele_lu_.affecter_variable_imposee(le_dom_EF.valeur(), coords);
-        }
-    }
-  if (modele_lu_.local_ == 1)
-    {
-      if (nb_comp != dim_esp)
-        {
-          Cerr<<"Source_PDF_EF::associer_pb: dimension variable differente "<<dim_esp<<"! "<<finl;
-          abort();
-        }
-      rotate_imposed_velocity(modele_lu_.variable_imposee_->valeurs());
-    }
-
-  variable_imposee_ = modele_lu_.variable_imposee_->valeurs();
-  pb.discretisation().discretiser_champ("champ_sommets",le_dom_EF.valeur(),"","",1,0., champ_nodal_);
-
-  compute_indicateur_nodal_champ_aire();
-
-  matrice_pression_variable_bool_ = false;
-  if (temps_relax_ != 1.0e+12) matrice_pression_variable_bool_ = true;
+  Source_PDF_base::associer_pb(pb);
 
   int nb_som=le_dom_EF->domaine().nb_som();
   tab_u_star_ibm_.resize(nb_som);
   tab_y_plus_ibm_.resize(nb_som);
 }
 
-void Source_PDF_EF::rotate_imposed_velocity(DoubleTab& vitesse_imposee)
-{
-  const Domaine_EF& domaine_EF = le_dom_EF.valeur();
-  const IntTab& elems= domaine_EF.domaine().les_elems();
-  int nb_som_elem=domaine_EF.domaine().nb_som_elem();
-  int nb_elem_tot=domaine_EF.domaine().nb_elem_tot();
-  DoubleTab& rotation = champ_rotation_->valeurs();
-  int nb_som_tot=domaine_EF.domaine().nb_som_tot();
-
-
-  // COPIES
-  DoubleTab vitesse = vitesse_imposee;
-  assert(Objet_U::dimension==3);
-  int dim_var=vitesse_imposee.dimension(1);
-  assert(Objet_U::dimension==dim_var);
-
-  //vitesse_imposee.echange_espace_virtuel();
-  DoubleTrav marqueur=equation().probleme().get_champ("vitesse").valeurs();
-  vitesse_imposee = 0.;
-  marqueur = 0.;
-
-  for (int num_elem=0; num_elem<nb_elem_tot; num_elem++)
-    {
-      double norm =  sqrt(rotation(num_elem,0)*rotation(num_elem,0)
-                          +rotation(num_elem,1)*rotation(num_elem,1)
-                          +rotation(num_elem,2)*rotation(num_elem,2)
-                          +rotation(num_elem,3)*rotation(num_elem,3)
-                          +rotation(num_elem,4)*rotation(num_elem,4)
-                          +rotation(num_elem,5)*rotation(num_elem,5)
-                          +rotation(num_elem,6)*rotation(num_elem,6)
-                          +rotation(num_elem,7)*rotation(num_elem,7)
-                          +rotation(num_elem,8)*rotation(num_elem,8));
-      if (norm > 1e-6)
-        {
-          for (int i=0; i<nb_som_elem; i++)
-            {
-              int s = elems(num_elem,i);
-              for (int c=0; c<dim_var; c++)
-                {
-                  for (int k=0; k<dim_var; k++)
-                    {
-                      vitesse_imposee(s,c) += rotation(num_elem,3*c+k)*vitesse(s,k);
-                      //Cerr << "k = " << k << ", c = " << c << ", 3*c+k = " << 3*c+k << ", rotation = " << rotation(num_elem,3*c+k) << finl;
-                    }
-                }
-              marqueur(s,0) += 1.0;
-            }
-        }
-    }
-  for (int i=0; i<nb_som_tot; i++)
-    {
-      if(marqueur(i,0) > 0.)
-        {
-          for (int c=0; c<dim_var; c++)
-            {
-              vitesse_imposee(i,c) /= marqueur(i,0);
-            }
-        }
-    }
-}
-
 void Source_PDF_EF::compute_indicateur_nodal_champ_aire()
 {
-  // indicateur_nodal_champ_aire_ = 1 si sommet appartient a un element dont l'aire <> 0
-  // 0 sinon
-  const DoubleTab& aire=champ_aire_->valeurs();
-  const Domaine_EF& domaine_EF = le_dom_EF.valeur();
-  int nb_elems=domaine_EF.domaine().nb_elem_tot();
-  int nb_nodes=domaine_EF.domaine().nb_som_tot();
-  int nb_som_elem=domaine_EF.domaine().nb_som_elem();
-  const IntTab& elems= domaine_EF.domaine().les_elems() ;
-
-  DoubleTab indic(nb_nodes);
-  indic = 0.;
-  for (int num_elem=0; num_elem<nb_elems; num_elem++)
-    {
-      if (aire(num_elem)>0.)
-        {
-          for (int i=0; i<nb_som_elem; i++)
-            {
-              int s1=elems(num_elem,i);
-              indic(s1) = 1.;
-            }
-        }
-    }
-  indicateur_nodal_champ_aire_ = indic;
-}
-
-void Source_PDF_EF::compute_variable_imposee_projete(const DoubleTab& marqueur, const DoubleTab& points, double val, double eps)
-{
-  int nb_som=le_dom_EF->domaine().nb_som();
-  int dim = Objet_U::dimension;
-  const DoubleTab& coords = le_dom_EF->domaine().coord_sommets();
-  ArrOfDouble x(dim);
-  int dim_var = equation().inconnue().valeurs().dimension(1);
-  for (int i = 0; i < nb_som; i++)
-    {
-      if ((marqueur(i) >= val + eps) || (marqueur(i) <= val - eps))
-        {
-          for (int j = 0; j < dim; j++)
-            {
-              x[j] = points(i,j);
-            }
-          for (int j = 0; j < dim_var; j++)
-            {
-              modele_lu_.variable_imposee_->valeurs()(i,j) = modele_lu_.get_variable_imposee(x,j);
-            }
-        }
-      else
-        {
-          for (int j = 0; j < dim; j++)
-            {
-              x[j] = coords(i,j);
-            }
-          for (int j = 0; j < dim_var; j++)
-            {
-              modele_lu_.variable_imposee_->valeurs()(i,j) = modele_lu_.get_variable_imposee(x,j);
-            }
-        }
-    }
+  Source_PDF_base::compute_indicateur_nodal_champ_aire();
 }
 
 void Source_PDF_EF::associer_domaines(const Domaine_dis_base& domaine_dis,
@@ -300,201 +80,6 @@ void Source_PDF_EF::associer_domaines(const Domaine_dis_base& domaine_dis,
 {
   le_dom_EF = ref_cast(Domaine_EF, domaine_dis);
   le_dom_Cl_EF = ref_cast(Domaine_Cl_EF, domaine_Cl_dis);
-}
-
-DoubleTab Source_PDF_EF::compute_coeff_elem() const
-{
-  // coeff = 1 si aire dans element <= 0
-  // coeff = 1 + (Ksi/eta) * coeff_relax sinon
-  const Domaine_EF& domaine_EF = le_dom_EF.valeur();
-  const IntTab& elems= domaine_EF.domaine().les_elems() ;
-  int nb_som_elem=domaine_EF.domaine().nb_som_elem();
-  int nb_elems=domaine_EF.domaine().nb_elem_tot();
-  const DoubleTab& rotation=champ_rotation_->valeurs();
-  const DoubleTab& aire = champ_aire_->valeurs();
-
-  int dim_var = equation().inconnue().valeurs().dimension(1);
-  ArrOfDouble variable_elem(dim_var);
-  int dim_esp = Objet_U::dimension ;
-  if (dim_var != 1 && dim_var != dim_esp)
-    {
-      Cerr<<"compute_coeff_elem: dimension variable differente 1 ou "<<dim_esp<<"! "<<finl;
-      exit();
-    }
-  DoubleTab coeff(nb_elems, dim_var);
-
-  const double dt_ref = equation().probleme().schema_temps().pas_de_temps();
-  const double dt_min = equation().probleme().schema_temps().pas_temps_min();
-  double dt = std::max(dt_ref,dt_min);
-  const DoubleTab& rho_m=champ_rho_->valeurs();
-  if (equation().probleme().schema_temps().temps_courant()==0)
-    {
-      dt = 1.0;
-    }
-  // Cerr<<"dt pour compute_coeff_elem : "<< dt <<finl;
-
-  double val_coeff ;
-  DoubleVect val_diag_coef(dim_var);
-  for (int num_elem=0; num_elem<nb_elems; num_elem++)
-    {
-      if (aire(num_elem)<=0.)
-        {
-          for (int comp=0; comp<dim_var; comp++) coeff(num_elem, comp) = 1. ;
-        }
-      else
-        {
-          const DoubleTab& variable=equation().inconnue().valeurs();
-          variable_elem=0;
-          for (int s=0; s<nb_som_elem; s++)
-            {
-              int som_glob=elems(num_elem,s);
-              for (int comp=0; comp<dim_var; comp++)
-                variable_elem[comp]+=variable(som_glob,comp);
-            }
-          // rho/dt * coeff_relax
-          val_coeff = fonct_coeff(rho_m(num_elem), aire(num_elem), dt) ;
-          // 1/eta
-          if (dim_var == dim_esp)
-            {
-              val_diag_coef = diag_coeff_elem(variable_elem, rotation, num_elem) ;
-            }
-          else
-            {
-              val_diag_coef(0) = 1.0 / modele_lu_.eta_ ;
-            }
-          // coeff = 1 + (Ksi/eta) * coeff_relax
-          for (int comp=0; comp<dim_esp; comp++)
-            coeff(num_elem, comp) = 1.+ val_coeff * val_diag_coef(comp) * dt / rho_m(num_elem) ;
-        }
-    }
-  return coeff;
-}
-
-DoubleVect Source_PDF_EF::diag_coeff_elem(ArrOfDouble& variable_elem, const DoubleTab& rotation, int num_elem) const
-{
-  assert(Objet_U::dimension==3);
-  ArrOfDouble tuvw(dimension);
-
-  tuvw = get_tuvw_local();
-
-  ArrOfDouble sum_dir_loc(dimension) ;
-  for (int i=0; i<dimension; i++)
-    {
-      sum_dir_loc[i]=0.;
-      for (int k=0; k<dimension; k++)
-        sum_dir_loc[i]+=rotation(num_elem,3*i+k);
-    }
-
-  DoubleVect diag_coef(dimension);
-  for (int comp=0; comp<dimension; comp++)
-    {
-      diag_coef(comp) = 0. ;
-      for (int k=0; k<dimension; k++)
-        diag_coef(comp)+=tuvw[k]*sum_dir_loc[k]*rotation(num_elem,3*k+comp);
-    }
-
-  return diag_coef ;
-}
-
-DoubleTab Source_PDF_EF::compute_coeff_matrice() const
-{
-  // coeff sommet = Sigma_elem coeff_elem / Nb contributions;  avec :
-  // coeff_elem = Ksi/eta * coeff_relax si element dont l'aire <>= 0
-  // coeff_elem = 0 sinon
-  const Domaine_EF& domaine_EF = le_dom_EF.valeur();
-  const IntTab& elems= domaine_EF.domaine().les_elems();
-  int nb_som_elem=domaine_EF.domaine().nb_som_elem();
-  int nb_elems=domaine_EF.domaine().nb_elem_tot();
-  int nb_som_tot=domaine_EF.domaine().nb_som_tot();
-  const DoubleTab& rotation=champ_rotation_->valeurs();
-  const DoubleTab& aire = champ_aire_->valeurs();
-
-  int dim_esp = Objet_U::dimension ;
-  const DoubleTab& variable=equation().inconnue().valeurs();
-  int dim_var = variable.dimension(1);
-  if (dim_var != 1 && dim_var != dim_esp)
-    {
-      Cerr<<"compute_coeff_matrice: dimension variable differente 1 ou "<<dim_esp<<"! "<<finl;
-      exit();
-    }
-  ArrOfDouble variable_elem(dim_var);
-  DoubleTab coeff(variable);
-  IntTab contrib(nb_som_tot, dim_var);
-  contrib = 0;
-  coeff = 0.;
-
-  const double dt_ref = equation().probleme().schema_temps().pas_de_temps();
-  const double dt_min = equation().probleme().schema_temps().pas_temps_min();
-  double dt = std::max(dt_ref,dt_min);
-  const DoubleTab& rho_m=champ_rho_->valeurs();
-  if (equation().probleme().schema_temps().temps_courant()==0)
-    {
-      dt = 1.0;
-    }
-  // Cerr<<"dt pour compute_coeff_matrice : "<< dt <<finl;
-
-  double val_coeff ;
-  DoubleVect val_diag_coef(dim_var), coeff_el(dim_var) ;
-  for (int num_elem=0; num_elem<nb_elems; num_elem++)
-    {
-      if (aire(num_elem)<=0.)
-        {
-          for (int comp=0; comp<dim_var; comp++) coeff_el(comp) = 0. ;
-        }
-      else
-        {
-          variable_elem=0.;
-          for (int s=0; s<nb_som_elem; s++)
-            {
-              int som_glob=elems(num_elem,s);
-              for (int comp=0; comp<dim_var; comp++)
-                variable_elem[comp]+=variable(som_glob,comp);
-            }
-          // rho/dt * coeff_relax
-          val_coeff = fonct_coeff(rho_m(num_elem), aire(num_elem), dt) ;
-          //  1/eta
-          if (dim_var == dim_esp)
-            {
-              val_diag_coef = diag_coeff_elem(variable_elem, rotation, num_elem) ;
-            }
-          else
-            {
-              val_diag_coef(0) = 1.0 / modele_lu_.eta_ ;
-            }
-          // coeff = Ksi/eta * coeff_relax
-          for (int comp=0; comp<dim_var; comp++)
-            coeff_el(comp) = val_coeff * val_diag_coef(comp) * dt / rho_m(num_elem) ;
-        }
-      for (int i = 0; i<nb_som_elem; i++)
-        {
-          int s = elems(num_elem,i);
-          for (int comp=0; comp<dim_var; comp++)
-            {
-              if (coeff_el(comp) > 0.)
-                {
-                  coeff(s,comp)+= coeff_el(comp);
-                  contrib(s, comp) += 1;
-                }
-              // Cerr<<"Source_PDF_EF: coeff_el ("<<comp<<"): "<<" "<<coeff_el(comp)<<finl;
-            }
-        }
-    }
-
-  double val = 0.;
-  for (int s = 0; s<nb_som_tot; s++)
-    {
-      for (int comp=0; comp<dim_var; comp++)
-        {
-          val = 1.;
-          if (contrib(s,comp) != 0)
-            {
-              val += coeff(s,comp)/contrib(s,comp);
-            }
-          coeff(s,comp) = val;
-          // Cerr<<"Source_PDF_EF: contrib coeff ("<<s<<","<<comp<<"): "<<contrib(s,comp)<<" "<<coeff(s,comp)<<finl;
-        }
-    }
-  return coeff;
 }
 
 void Source_PDF_EF::multiply_coeff_volume(DoubleTab& coeff) const
@@ -514,28 +99,36 @@ void Source_PDF_EF::multiply_coeff_volume(DoubleTab& coeff) const
     }
 }
 
-DoubleTab Source_PDF_EF::compute_pond(const DoubleTab& rho_m, const DoubleTab& aire, const DoubleVect& volume_thilde, int& nb_som_elem, int& nb_elems) const
+void Source_PDF_EF::volume_source_term_PDF(DoubleTab& volume_term_PDF)
 {
-  // return = 0 si aire dans element <= 0
-  // return = rho/dt * coeff_relax * volume_thilde / (8*8)  sinon
-  DoubleTab pond = rho_m;
-  double inv_nb_som = 1. / nb_som_elem;
+  const DoubleTab& variable=equation().inconnue().valeurs();
+  int nb_som= variable.dimension(0);
+  assert(nb_som == volume_term_PDF.dimension(0));
+  volume_term_PDF = 0.;
 
-  const double dt_ref = equation().probleme().schema_temps().pas_de_temps();
-  const double dt_min = equation().probleme().schema_temps().pas_temps_min();
-  double dt = std::max(dt_ref,dt_min);
-  if (equation().probleme().schema_temps().temps_courant()==0)
-    {
-      dt = 1.0;
-    }
+  const IntTab& elems= le_dom_EF.valeur().domaine().les_elems() ;
+  const DoubleVect& volume_thilde = le_dom_EF.valeur().volumes_thilde();
+  int nb_som_elem = le_dom_EF.valeur().domaine().nb_som_elem();
+  double inv_nb_som = 1. / nb_som_elem;
+  int nb_elems = le_dom_EF.valeur().domaine().nb_elem_tot();
+  const DoubleTab& aire=champ_aire_->valeurs();
+  DoubleTrav pond(nb_elems);
+  pond = 1.;
 
   for (int num_elem=0; num_elem<nb_elems; num_elem++)
     {
-      pond(num_elem) = fonct_coeff(rho_m(num_elem), aire(num_elem), dt) ;
+      if (aire(num_elem)<=0.) pond(num_elem) =0.;
+      // pond = volume_thilde / (8*8)
       pond(num_elem) *= volume_thilde(num_elem)*inv_nb_som*inv_nb_som;
+      for (int i=0; i<nb_som_elem; i++)
+        {
+          volume_term_PDF(elems(num_elem,i)) += pond(num_elem)*nb_som_elem;
+        }
     }
 
-  return pond;
+  double bilan = 0.0;
+  for (int j=0; j<nb_som; j++) bilan += volume_term_PDF(j);
+  Cerr<<"(IBM) volume_source_term_PDF: bilan = "<<bilan<<endl;
 }
 
 /*##################################################################################################
@@ -766,30 +359,6 @@ void  Source_PDF_EF::verif_ajouter_contrib(const DoubleTab& variable, Matrice_Mo
     }
 }
 
-void Source_PDF_EF::correct_variable(const DoubleTab& coeff_node, DoubleTab& variable) const
-{
-  int nb_data_vit = variable.size();
-  int nb_node_2 = coeff_node.dimension(0) ;
-  int ncomp = coeff_node.dimension(1) ;
-  if (nb_data_vit != nb_node_2 * ncomp)
-    {
-      Cerr<<"Source_PDF: numbers of nodes are different for variable and champ_coeff_tfsdia_gb_som_"<<finl;
-      abort();
-    }
-  const DoubleTab& vit_dir=variable_imposee_;
-  for(int i=0; i<nb_node_2; i++)
-    {
-      for (int j=0; j<ncomp; j++)
-        {
-          if (coeff_node(i,j)!= 1.0)
-            {
-              variable(i,j)=vit_dir(i,j);
-            }
-          // Cerr<<"Source_PDF: coeff_node variable("<<i<<","<<j<<"): "<<coeff_node(i,j)<<" "<<variable(i,j)<<finl;
-        }
-    }
-}
-
 /*##################################################################################################
 ####################################################################################################
 ################################# calculer_variable_imposee ########################################
@@ -833,6 +402,7 @@ void Source_PDF_EF::calculer_variable_imposee_elem_fluid()
               double xjs = solid_points(i,j);
               d1 += (xj-xjs)*(xj-xjs);
               d2 += (xjf-xj)*(xjf-xj);
+              //Cerr << "xj " << xj << "xjf " << xjf << "xjs " << xjs << endl;
             }
           d1 = sqrt(d1);
           d2 = sqrt(d2);
@@ -1070,12 +640,30 @@ void Source_PDF_EF::calculer_vitesse_imposee_power_law_tbl()
   DoubleTab& vitesse_imposee_mod = modele_lu_.variable_imposee_->valeurs();
   DoubleTab& vitesse_imposee_calculee = variable_imposee_;
   Interpolation_IBM_power_law_tbl& interp = ref_cast(Interpolation_IBM_power_law_tbl,interpolation_lue_.valeur());
+  int form_WJSP = interp.get_formulation_WJSP();
   DoubleTab& fluid_points = interp.fluid_points_->valeurs();
   DoubleTab& solid_points = interp.solid_points_->valeurs();
   DoubleTab& fluid_elems = interp.fluid_elems_->valeurs();
-  double A_pwl = interp.get_A_pwl();
+  double A_pwl = interp.get_A_pwl(form_WJSP);
   double B_pwl = interp.get_B_pwl();
-  double y_c_p_pwl = interp.get_y_c_p_pwl();
+  double y_c_p_pwl = 0;
+  double C_pwl_WJSP = 0;
+  double D_pwl_WJSP = 0;
+  double p_pwl_WJSP = 0;
+  double y_c1_p_pwl_WJSP = 0;
+  double y_c2_p_pwl_WJSP = 0;
+  if (!form_WJSP)
+    {
+      y_c_p_pwl = interp.get_y_c_p_pwl();
+    }
+  else
+    {
+      C_pwl_WJSP = interp.get_C_pwl_WJSP();
+      D_pwl_WJSP = interp.get_D_pwl_WJSP();
+      p_pwl_WJSP = interp.get_p_pwl_WJSP();
+      y_c1_p_pwl_WJSP = interp.get_y_c1_p_pwl_WJSP();
+      y_c2_p_pwl_WJSP = interp.get_y_c2_p_pwl_WJSP();
+    }
   int impr_yplus = interp.get_impr() ;
   Champ_Q1_EF& champ_vitesse_inconnue = ref_cast(Champ_Q1_EF,equation().inconnue());
   DoubleTab& val_vitesse_inconnue = champ_vitesse_inconnue.valeurs();
@@ -1120,6 +708,7 @@ void Source_PDF_EF::calculer_vitesse_imposee_power_law_tbl()
   double h_yplus_max = 0.0;
   double h_yplus_mean = 0.0;
   int yplus_count=0 ;
+  double y_plus=0;
 
   int N = interp.get_N_histo();
   DoubleTab tab_h(1, nb_som);
@@ -1195,110 +784,249 @@ void Source_PDF_EF::calculer_vitesse_imposee_power_law_tbl()
 
               double u_tau_ref = pow ( norme_v_ref_t , (1/(1+B_pwl)) ) * pow ( A_pwl, (-1/(1+B_pwl)) )  * pow ( y_ref , (-B_pwl/(1+B_pwl)) ) * pow ( nu,(B_pwl/(1+B_pwl)) ) ;
 
-              // Cerr<<"u_tau_ref y_ref   nu ="<<u_tau_ref<<" "<<y_ref<<" "<<nu<<finl;;
+              // Cerr<<"u_tau_ref y_ref   nu ="<<u_tau_ref<<" "<<y_ref<<" "<<nu<<finl;
 
               double y_ref_p = y_ref * u_tau_ref  / nu;  //la on a enfin tout ce qu'il faut pour etablir la loi polynomiale pour y r+
               double test_ref;
 
-              if ( y_ref_p > y_c_p_pwl)  // a partir de la commence l'expression de la loi de paroi polynomiale turbulente
+              if (!form_WJSP)
                 {
-                  if (!form_lin_pwl)
+                  if ( y_ref_p > y_c_p_pwl)  // a partir de la commence l'expression de la loi de paroi polynomiale turbulente
                     {
-                      for(int j = 0; j < nb_comp; j++) vitesse_imposee_calculee(i,j) =  v_ref_t(0,j) * pow ( d1 / y_ref , B_pwl )  ;
-                    }
-                  else // Formulation lineaire de la loi polynomilale ------------------------------
-                    {
-                      for(int j = 0; j < nb_comp; j++) vitesse_imposee_calculee(i,j) =  v_ref_t(0,j) *(1. - B_pwl*(1-d1/y_ref)) ;
-                    }
-                  test_ref = 1.;
-                  // Cerr << "zone log/sous-couche inertielle en coherence avec le calcul de u tau" << finl;
-                }
-              else
-                {
-                  // En fait, on est en sous-couche visqueuse
-                  if (!form_lin_pwl)
-                    {
-                      for(int j = 0; j < nb_comp; j++) vitesse_imposee_calculee(i,j) =  v_ref_t(0,j) * ( d1 / y_ref )   ;
+                      if (!form_lin_pwl)
+                        {
+                          for(int j = 0; j < nb_comp; j++) vitesse_imposee_calculee(i,j) =  v_ref_t(0,j) * pow ( d1 / y_ref , B_pwl )  ;
+                        }
+                      else // Formulation lineaire de la loi polynomilale ------------------------------
+                        {
+                          for(int j = 0; j < nb_comp; j++) vitesse_imposee_calculee(i,j) =  v_ref_t(0,j) *(1. - B_pwl*(1-d1/y_ref)) ;
+                        }
+                      test_ref = 1.;
+                      // Cerr << "zone log/sous-couche inertielle en coherence avec le calcul de u tau" << finl;
                     }
                   else
                     {
-                      for(int j = 0; j < nb_comp; j++) vitesse_imposee_calculee(i,j) = v_ref_t(0,j) * (1. - pow(u_tau_ref, 2.)*(y_ref-d1)/(nu *norme_v_ref_t));
-                    }
-                  test_ref = -1. ;
-                  u_tau_ref = pow ( (nu * norme_v_ref_t / y_ref) , 0.5 ) ; // on recalcule u_tau et y_plus en lineaire au pt reference
-                  y_ref_p = y_ref * u_tau_ref / nu;
-                  if ( y_ref_p > y_c_p_pwl )
-                    {
-                      // Incoherence : on n utilise pas de lois de paroi
-                      itisok = 0;
-                    }
-                  // Cerr << "zone lineaire/sous-couche visqueuse" << finl;
-                }                   // Fin LdPturb
+                      // En fait, on est en sous-couche visqueuse
+                      if (!form_lin_pwl)
+                        {
+                          for(int j = 0; j < nb_comp; j++) vitesse_imposee_calculee(i,j) =  v_ref_t(0,j) * ( d1 / y_ref )   ;
+                        }
+                      else
+                        {
+                          for(int j = 0; j < nb_comp; j++) vitesse_imposee_calculee(i,j) = v_ref_t(0,j) * (1. - pow(u_tau_ref, 2.)*(y_ref-d1)/(nu *norme_v_ref_t));
+                        }
+                      test_ref = -1. ;
+                      u_tau_ref = pow ( (nu * norme_v_ref_t / y_ref) , 0.5 ) ; // on recalcule u_tau et y_plus en lineaire au pt reference
+                      y_ref_p = y_ref * u_tau_ref / nu;
+                      if ( y_ref_p > y_c_p_pwl )
+                        {
+                          // Incoherence : on n utilise pas de lois de paroi
+                          itisok = 0;
+                        }
+                      // Cerr << "zone lineaire/sous-couche visqueuse" << finl;
+                    }                   // Fin LdPturb
 
-              double norme_v_imp_c = 0;
-              for(int j=0 ; j < nb_comp; j++) norme_v_imp_c += vitesse_imposee_calculee(i ,j) * vitesse_imposee_calculee(i ,j);
-              norme_v_imp_c = sqrt( norme_v_imp_c );
+                  double norme_v_imp_c = 0;
+                  for(int j=0 ; j < nb_comp; j++) norme_v_imp_c += vitesse_imposee_calculee(i ,j) * vitesse_imposee_calculee(i ,j);
+                  norme_v_imp_c = sqrt( norme_v_imp_c );
 
-              double u_tau = pow ( norme_v_imp_c , (1/(1+B_pwl)) ) * pow ( A_pwl, (-1/(1+B_pwl)) )  * pow ( d1 , (-B_pwl/(1+B_pwl)) ) * pow ( nu,(B_pwl/(1+B_pwl)) ) ; // Hypothese : sous-couche puissance
-              double y_plus = u_tau * d1 / nu;
-              double test_;
-              if (y_plus >y_c_p_pwl)
-                {
-                  test_ = 1.;
-                  // Cerr<<"u_tau ="<<u_tau<<" y+ = "<<y_plus<<" y+ref = "<<y_ref_p<<finl;
-                }
-              else
-                {
-                  test_ = -1.;
-                  u_tau = pow ( (nu * norme_v_imp_c/ d1) , 0.5 ) ; // on recalcule u_tau et y_plus en lineaire au pt force
+                  double u_tau = pow ( norme_v_imp_c , (1/(1+B_pwl)) ) * pow ( A_pwl, (-1/(1+B_pwl)) )  * pow ( d1 , (-B_pwl/(1+B_pwl)) ) * pow ( nu,(B_pwl/(1+B_pwl)) ) ; // Hypothese : sous-couche puissance
                   y_plus = u_tau * d1 / nu;
-                  if ( y_plus > y_c_p_pwl )
+                  double test_;
+                  if (y_plus >y_c_p_pwl)
                     {
-                      // Incoherence : on n utilise pas de lois de paroi
-                      Cerr<<"INCOHERENCE: u_tau ="<<u_tau<<" y+ = "<<y_plus<<" y+ref = "<<y_ref_p<<finl;
+                      test_ = 1.;
+                      // Cerr<<"u_tau ="<<u_tau<<" y+ = "<<y_plus<<" y+ref = "<<y_ref_p<<finl;
+                    }
+                  else
+                    {
+                      test_ = -1.;
+                      u_tau = pow ( (nu * norme_v_imp_c/ d1) , 0.5 ) ; // on recalcule u_tau et y_plus en lineaire au pt force
+                      y_plus = u_tau * d1 / nu;
+                      if ( y_plus > y_c_p_pwl )
+                        {
+                          // Incoherence : on n utilise pas de lois de paroi
+                          Cerr<<"INCOHERENCE: u_tau ="<<u_tau<<" y+ = "<<y_plus<<" y+ref = "<<y_ref_p<<finl;
+                          itisok = 0;
+                        }
+                    }
+                  // Cerr<<"u_tau d1   nu ="<<u_tau<<" "<<d1<<" "<<nu<<finl;;
+
+                  // ici on effectue le test pour savoir si le noeud de frontiere et le point fluide se trouvent dans la meme zone: si oui ok, si non on impose la vitesse
+                  // Traitement des exceptions
+                  if ( (test_ * test_ref < 0) || (itisok == 0) )  //si non on affecte la vitesse paroi
+                    {
+                      for(int j = 0; j < nb_comp; j++)  vitesse_imposee_calculee(i,j) = vitesse_imposee_mod(i,j);
+
+                      // Cerr << "erreur" << finl;
                       itisok = 0;
                     }
-                }
-              // Cerr<<"u_tau d1   nu ="<<u_tau<<" "<<d1<<" "<<nu<<finl;;
+                  else
+                    {
+                      tab_u_star_ibm_(i) = u_tau;
+                      tab_y_plus_ibm_(i) = y_plus;
+                    }
 
-              // ici on effectue le test pour savoir si le noeud de frontiere et le point fluide se trouvent dans la meme zone: si oui ok, si non on impose la vitesse
-              // Traitement des exceptions
-              if ( (test_ * test_ref < 0) || (itisok == 0) )  //si non on affecte la vitesse paroi
-                {
-                  for(int j = 0; j < nb_comp; j++)  vitesse_imposee_calculee(i,j) = vitesse_imposee_mod(i,j);
-
-                  // Cerr << "erreur" << finl;
-                  itisok = 0;
+                  if (impr_yplus && itisok && (indicateur_nodal_champ_aire_(i)==1.))
+                    {
+                      if (d1 > d1_max) d1_max = d1;
+                      if (d1 < d1_min) d1_min = d1;
+                      d1_mean +=  d1;
+                      if (y_plus > yplus_max) yplus_max = y_plus;
+                      if (y_plus < yplus_min) yplus_min = y_plus;
+                      yplus_mean +=  y_plus;
+                      if (u_tau > u_tau_max) u_tau_max = u_tau;
+                      if (u_tau < u_tau_min) u_tau_min = u_tau;
+                      u_tau_mean += u_tau;
+                      if (y_ref_p > yplus_ref_max) yplus_ref_max = y_ref_p;
+                      if (y_ref_p < yplus_ref_min) yplus_ref_min = y_ref_p;
+                      yplus_ref_mean += y_ref_p;
+                      if (u_tau_ref > u_tau_ref_max) u_tau_ref_max = u_tau_ref;
+                      if (u_tau_ref < u_tau_ref_min) u_tau_ref_min = u_tau_ref;
+                      u_tau_ref_mean += u_tau_ref;
+                      // Distribution des y+ au voisinage des parois
+                      if (y_plus > h_yplus_max) h_yplus_max = y_plus;
+                      if (y_plus < h_yplus_min) h_yplus_min = y_plus;
+                      h_yplus_mean += y_plus;
+                      tab_h(0,yplus_count) = y_plus;
+                      yplus_count += 1;
+                    }
                 }
               else
                 {
-                  tab_u_star_ibm_(i) = u_tau;
-                  tab_y_plus_ibm_(i) = y_plus;
-                }
+                  //double u_tau;
+                  if ( y_ref_p > y_c2_p_pwl_WJSP)  // a partir de la commence l'expression de la loi de paroi polynomiale turbulente
+                    {
+                      y_plus = u_tau_ref * d1/nu;
+                      if (y_plus > y_c2_p_pwl_WJSP)
+                        {
+                          if (!form_lin_pwl)
+                            {
+                              for(int j = 0; j < nb_comp; j++) vitesse_imposee_calculee(i,j) =  v_ref_t(0,j) * pow ( d1 / y_ref , B_pwl )  ;
+                            }
+                          else // Formulation lineaire de la loi polynomilale ------------------------------
+                            {
+                              for(int j = 0; j < nb_comp; j++) vitesse_imposee_calculee(i,j) =  v_ref_t(0,j) * (1. - B_pwl*(1-d1/y_ref)) ;
+                            }
+                        }
+                      else if (y_plus < y_c2_p_pwl_WJSP and y_plus > y_c1_p_pwl_WJSP)
+                        {
+                          if (!form_lin_pwl)
+                            {
+                              for(int j = 0; j < nb_comp; j++) vitesse_imposee_calculee(i,j) = (C_pwl_WJSP*pow(y_plus,2*p_pwl_WJSP-1) *u_tau_ref + D_pwl_WJSP*pow(y_plus,p_pwl_WJSP-1) *u_tau_ref)* v_ref_t(0,j)/norme_v_ref_t;
+                            }
+                          else // Formulation lineaire de la loi polynomilale ------------------------------
+                            {
+                              for(int j = 0; j < nb_comp; j++) vitesse_imposee_calculee(i,j) = 0 ;
+                            }
+                        }
+                      else
+                        {
+                          if (!form_lin_pwl)
+                            {
+                              for(int j = 0; j < nb_comp; j++) vitesse_imposee_calculee(i,j) =  y_plus * u_tau_ref * v_ref_t(0,j)/norme_v_ref_t;
+                            }
+                          else // Formulation lineaire de la loi polynomilale ------------------------------
+                            {
+                              for(int j = 0; j < nb_comp; j++) vitesse_imposee_calculee(i,j) =  v_ref_t(0,j) * (1. - B_pwl*(1-d1/y_ref)) ;
+                            }
+                        }
+                      // Cerr << "zone log/sous-couche inertielle en coherence avec le calcul de u tau" << finl;
+                    }
+                  else // hypothèse buffer layer
+                    {
+                      u_tau_ref = (nu/y_ref) * pow(-(D_pwl_WJSP/(2*C_pwl_WJSP)) * (1 + pow(1 + 4 * C_pwl_WJSP/pow(D_pwl_WJSP,2) * norme_v_ref_t * y_ref /nu ,1/2)),1/p_pwl_WJSP) ;
+                      y_ref_p = y_ref * u_tau_ref  / nu;
+                      if (y_ref_p < y_c2_p_pwl_WJSP and y_ref_p > y_c1_p_pwl_WJSP)
+                        {
+                          y_plus = u_tau_ref * d1/nu;
+                          if (y_plus < y_c2_p_pwl_WJSP and y_plus > y_c1_p_pwl_WJSP)
+                            {
+                              if (!form_lin_pwl)
+                                {
+                                  double phi = -pow(1 + 4 * C_pwl_WJSP/pow(D_pwl_WJSP,2) *  norme_v_ref_t * y_ref /nu,1/2) - 1;
+                                  double u_norm = pow(D_pwl_WJSP,2) * nu / (4 * C_pwl_WJSP * y_ref) * (pow ( d1 / y_ref , 2*p_pwl_WJSP - 1 ) * pow(phi,2) + 2 * pow ( d1 / y_ref , p_pwl_WJSP - 1 ) * phi);
+                                  for(int j = 0; j < nb_comp; j++) vitesse_imposee_calculee(i,j) =  u_norm * v_ref_t(0,j)/norme_v_ref_t;
+                                }
+                              else // Formulation lineaire de la loi polynomilale ------------------------------
+                                {
+                                  for(int j = 0; j < nb_comp; j++) vitesse_imposee_calculee(i,j) =  0 ; //à faire
+                                }
+                            }
+                          else
+                            {
+                              if (!form_lin_pwl)
+                                {
+                                  for(int j = 0; j < nb_comp; j++) vitesse_imposee_calculee(i,j) =  y_plus * u_tau_ref * v_ref_t(0,j)/norme_v_ref_t  ;
+                                }
+                              else // Formulation lineaire de la loi polynomilale ------------------------------
+                                {
+                                  for(int j = 0; j < nb_comp; j++) vitesse_imposee_calculee(i,j) =  0 ;
+                                }
+                            }
+                        }
+                      else
+                        {
+                          // En fait, on est en sous-couche visqueuse
+                          if (!form_lin_pwl)
+                            {
+                              for(int j = 0; j < nb_comp; j++) vitesse_imposee_calculee(i,j) =  v_ref_t(0,j) * ( d1 / y_ref )   ;
+                            }
+                          else
+                            {
+                              for(int j = 0; j < nb_comp; j++) vitesse_imposee_calculee(i,j) = v_ref_t(0,j) * (1. - pow(u_tau_ref, 2.)*(y_ref-d1)/(nu *norme_v_ref_t));
+                            }
+                          u_tau_ref = pow ( (nu * norme_v_ref_t / y_ref) , 0.5 ) ; // on recalcule u_tau et y_plus en lineaire au pt reference
+                          y_ref_p = y_ref * u_tau_ref / nu;
+                          if ( y_ref_p > y_c1_p_pwl_WJSP)
+                            {
+                              // Incoherence : on n utilise pas de lois de paroi
+                              itisok = 0;
+                              Cerr << "Incohérence" << endl;
+                            }
+                        }
+                    }
+                  // Cerr<<"u_tau d1   nu ="<<u_tau<<" "<<d1<<" "<<nu<<finl;;
 
-              if (impr_yplus && itisok && (indicateur_nodal_champ_aire_(i)==1.))
-                {
-                  if (d1 > d1_max) d1_max = d1;
-                  if (d1 < d1_min) d1_min = d1;
-                  d1_mean +=  d1;
-                  if (y_plus > yplus_max) yplus_max = y_plus;
-                  if (y_plus < yplus_min) yplus_min = y_plus;
-                  yplus_mean +=  y_plus;
-                  if (u_tau > u_tau_max) u_tau_max = u_tau;
-                  if (u_tau < u_tau_min) u_tau_min = u_tau;
-                  u_tau_mean += u_tau;
-                  if (y_ref_p > yplus_ref_max) yplus_ref_max = y_ref_p;
-                  if (y_ref_p < yplus_ref_min) yplus_ref_min = y_ref_p;
-                  yplus_ref_mean += y_ref_p;
-                  if (u_tau_ref > u_tau_ref_max) u_tau_ref_max = u_tau_ref;
-                  if (u_tau_ref < u_tau_ref_min) u_tau_ref_min = u_tau_ref;
-                  u_tau_ref_mean += u_tau_ref;
-                  // Distribution des y+ au voisinage des parois
-                  if (y_plus > h_yplus_max) h_yplus_max = y_plus;
-                  if (y_plus < h_yplus_min) h_yplus_min = y_plus;
-                  h_yplus_mean += y_plus;
-                  tab_h(0,yplus_count) = y_plus;
-                  yplus_count += 1;
+                  // ici on effectue le test pour savoir si le noeud de frontiere et le point fluide se trouvent dans la meme zone: si oui ok, si non on impose la vitesse
+
+                  // Traitement des exceptions
+                  if (itisok == 0)  //si non on affecte la vitesse paroi
+                    {
+                      for(int j = 0; j < nb_comp; j++)  vitesse_imposee_calculee(i,j) = vitesse_imposee_mod(i,j);
+
+                      // Cerr << "erreur" << finl;
+                      itisok = 0;
+                    }
+                  else
+                    {
+                      tab_u_star_ibm_(i) = u_tau_ref;
+                      tab_y_plus_ibm_(i) = y_plus;
+                    }
+                  if (impr_yplus && itisok && (indicateur_nodal_champ_aire_(i)==1.))
+                    {
+                      if (d1 > d1_max) d1_max = d1;
+                      if (d1 < d1_min) d1_min = d1;
+                      d1_mean +=  d1;
+                      if (y_plus > yplus_max) yplus_max = y_plus;
+                      if (y_plus < yplus_min) yplus_min = y_plus;
+                      yplus_mean +=  y_plus;
+                      if (u_tau_ref > u_tau_max) u_tau_max = u_tau_ref;
+                      if (u_tau_ref < u_tau_min) u_tau_min = u_tau_ref;
+                      u_tau_mean += u_tau_ref;
+                      if (y_ref_p > yplus_ref_max) yplus_ref_max = y_ref_p;
+                      if (y_ref_p < yplus_ref_min) yplus_ref_min = y_ref_p;
+                      yplus_ref_mean += y_ref_p;
+                      if (u_tau_ref > u_tau_ref_max) u_tau_ref_max = u_tau_ref;
+                      if (u_tau_ref < u_tau_ref_min) u_tau_ref_min = u_tau_ref;
+                      u_tau_ref_mean += u_tau_ref;
+                      // Distribution des y+ au voisinage des parois
+                      if (y_plus > h_yplus_max) h_yplus_max = y_plus;
+                      if (y_plus < h_yplus_min) h_yplus_min = y_plus;
+                      h_yplus_mean += y_plus;
+                      tab_h(0,yplus_count) = y_plus;
+                      yplus_count += 1;
+                    }
                 }
             }
         }
@@ -1353,7 +1081,7 @@ void Source_PDF_EF::calculer_vitesse_imposee_power_law_tbl_u_star()
   DoubleTab& is_dirichlet = interp.is_dirichlet_->valeurs();
   DoubleTab& solid_points = interp.solid_points_->valeurs();
   DoubleTab& solid_elems = interp.solid_elems_->valeurs();
-  double A_pwl = interp.get_A_pwl();
+  double A_pwl = interp.get_A_pwl(0);
   double B_pwl = interp.get_B_pwl();
   double y_c_p_pwl = interp.get_y_c_p_pwl();
   int impr_yplus = interp.get_impr() ;
@@ -1683,6 +1411,7 @@ void Source_PDF_EF::correct_incr_pressure(const DoubleTab& coeff_node, DoubleTab
         }
     }
 }
+
 void Source_PDF_EF::correct_pressure(const DoubleTab& coeff_node, DoubleTab& pression, const DoubleTab& correction_en_pression) const
 {
   const DoubleTab& aire=champ_aire_->valeurs();
@@ -1778,9 +1507,13 @@ int Source_PDF_EF::impr(Sortie& os) const
           const Schema_Temps_base& sch=equation().probleme().schema_temps();
           double temps=sch.temps_courant();
           double pdtps = sch.pas_de_temps();
-          if (temps == pdtps) return 0;
+          if (temps == pdtps)
+            {
+              int flag = Process::je_suis_maitre();
+              if(flag) ouvrir_fichier(Flux,"",flag);
+              return 0;
+            }
           const DoubleTab& variable=equation().inconnue().valeurs();
-          int nb_som=le_dom_EF->domaine().nb_som();
           Nom espace=" \t";
 
           int nb_comp = variable.dimension(1);
@@ -1829,32 +1562,9 @@ int Source_PDF_EF::impr(Sortie& os) const
               Process::exit();
             }
 
-          DoubleTrav resu(variable);
-          calculer(resu, i_traitement_special);
-          DoubleTrav flag_cl(resu);
-          filtre_CLD(flag_cl);
+          Source_PDF_base& my_src = ref_cast_non_const(Source_PDF_base,*this);
+          my_src.compute_source_term_PDF(i_traitement_special, secmem_conv, bilan_);
 
-          assert(Objet_U::dimension <= 3);
-          DoubleVect source_term[3];
-          bilan_ = 0.0;
-          for (int i=0; i<nb_comp; i++)
-            {
-              source_term[i] = champ_nodal_->valeurs();
-              source_term[i] = 0.;
-              for (int j=0; j<nb_som; j++)
-                {
-                  double  filter = (std::fabs(resu(j,i)) > 0?1.:0.);
-                  filter *= flag_cl(j,i);
-                  source_term[i](j) = (resu(j,i) - sec_mem_pdf(j,i) + secmem_conv(j,i))*filter;
-                  // if(  (abs(resu(j,i)) > 1.0) )
-                  //   {
-                  // Cerr<<"i,j = "<<i<<" "<<j<<" ; resu = "<<resu(j,i)<<" ; sec_mem_pdf = "<<sec_mem_pdf(j,i)<<" ; bilan = "<<source_term[i](j)<<endl;
-                  // Cerr<<"secmem_conv = "<<secmem_conv(j,i)<<endl;
-                  // }
-                }
-              bilan_(i) = mp_somme_vect(source_term[i]);
-            }
-          // mp_sum_for_each_item(bilan_);
           int flag = Process::je_suis_maitre();
           if(flag)
             {
@@ -1886,7 +1596,9 @@ int Source_PDF_EF::impr(Sortie& os) const
 
 void Source_PDF_EF::creer_champ(const Motcle& motlu)
 {
-  if (motlu=="u_star_ibm" && !champ_u_star_ibm_ && imm_wall_law_)
+  Source_PDF_base::creer_champ(motlu);
+
+  if (motlu=="u_star_ibm" && !champ_u_star_ibm_.non_nul() && imm_wall_law_)
     {
       int nb_comp = 1;
       Noms noms(1);
@@ -1914,7 +1626,9 @@ void Source_PDF_EF::creer_champ(const Motcle& motlu)
 
 bool Source_PDF_EF::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const
 {
-  if (nom == "u_star_ibm" && champ_u_star_ibm_)
+  if (Source_PDF_base::has_champ(nom)) return Source_PDF_base::has_champ(nom, ref_champ);
+
+  if (nom == "u_star_ibm" && champ_u_star_ibm_.non_nul())
     {
       ref_champ = Source_PDF_EF::get_champ(nom);
       return true;
@@ -1924,24 +1638,26 @@ bool Source_PDF_EF::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ)
       ref_champ = Source_PDF_EF::get_champ(nom);
       return true;
     }
-  else if (champs_compris_.has_champ(nom, ref_champ))
-    return true;
   else
-    return false;
+    return false; /* rien trouve */
 }
 
 bool Source_PDF_EF::has_champ(const Motcle& nom) const
 {
-  if (nom == "u_star_ibm" && champ_u_star_ibm_)
+  if (Source_PDF_base::has_champ(nom)) return true;
+
+  if (nom == "u_star_ibm" && champ_u_star_ibm_.non_nul())
     return true;
   else if (nom == "y_plus_ibm" && champ_y_plus_ibm_)
     return true;
   else
-    return champs_compris_.has_champ(nom);
+    return false; /* rien trouve */
 }
 
 const Champ_base& Source_PDF_EF::get_champ(const Motcle& nom) const
 {
+  if (Source_PDF_base::has_champ(nom)) return Source_PDF_base::get_champ(nom);
+
   if (nom=="u_star_ibm")
     {
       if (!champ_u_star_ibm_)
@@ -1958,7 +1674,6 @@ const Champ_base& Source_PDF_EF::get_champ(const Motcle& nom) const
             valeurs(num_node)=tab_u_star_ibm_(num_node);
         }
       valeurs.echange_espace_virtuel();
-      // Champ_Fonc_base& ch=ref_cast_non_const(Champ_Fonc_base,champ_u_star_ibm_);
       champ_u_star_ibm_->mettre_a_jour(equation().probleme().schema_temps().temps_courant());
       return champs_compris_.get_champ(nom);
     }
@@ -1978,7 +1693,6 @@ const Champ_base& Source_PDF_EF::get_champ(const Motcle& nom) const
             valeurs(num_node)=tab_y_plus_ibm_(num_node);
         }
       valeurs.echange_espace_virtuel();
-      // Champ_Fonc_base& ch=ref_cast_non_const(Champ_Fonc_base,champ_y_plus_ibm_);
       champ_y_plus_ibm_->mettre_a_jour(equation().probleme().schema_temps().temps_courant());
       return champs_compris_.get_champ(nom);
     }
@@ -1988,12 +1702,11 @@ const Champ_base& Source_PDF_EF::get_champ(const Motcle& nom) const
 
 void Source_PDF_EF::get_noms_champs_postraitables(Noms& nom,Option opt) const
 {
-  Source_base::get_noms_champs_postraitables(nom,opt);
+  Source_PDF_base::get_noms_champs_postraitables(nom,opt);
 
   Noms noms_compris = champs_compris_.liste_noms_compris();
   if(imm_wall_law_)
     {
-      Cerr<<" imm_wall_law_ : "<<finl;
       noms_compris.add("u_star_ibm");
       noms_compris.add("y_plus_ibm");
     }

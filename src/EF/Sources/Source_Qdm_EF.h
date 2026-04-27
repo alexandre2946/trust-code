@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2025, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -24,6 +24,8 @@ class Probleme_base;
 class Domaine_Cl_EF;
 class Domaine_EF;
 
+class Champ_Fonc_base;
+
 /*! @brief class Source_Qdm_EF
  *
  * @sa Source_base
@@ -40,12 +42,23 @@ public:
   DoubleTab& calculer(DoubleTab& ) const override;
   void mettre_a_jour(double ) override;
 
+  //Methodes de l interface des champs postraitables
+  /////////////////////////////////////////////////////
+  void creer_champ(const Motcle& motlu) override;
+  const Champ_base& get_champ(const Motcle& nom) const override;
+  bool has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const override;
+  bool has_champ(const Motcle& nom) const override;
+  void get_noms_champs_postraitables(Noms& nom, Option opt = NONE) const override;
+  /////////////////////////////////////////////////////
+
 protected:
 
   OBS_PTR(Domaine_EF) le_dom_EF;
   OBS_PTR(Domaine_Cl_EF) le_dom_Cl_EF;
   void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;
 
+  OWN_PTR(Champ_Don_base) la_source_lu;   //!< Champ lu si non uniforme
+  mutable OWN_PTR(Champ_Fonc_base)  champ_source_qdm_;     //!< Champ pour postraitement
 };
 
 #endif
