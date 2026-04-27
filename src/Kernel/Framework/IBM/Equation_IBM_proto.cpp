@@ -59,7 +59,7 @@ Entree& Equation_IBM_proto::readOn_ibm_proto(Entree& is, Equation_base& eq)
     {
       Cerr<<"(IBM) Immersed Interface with Source_PDF_base for equation : "<< eq_IBM_->le_nom()<<finl;
       eq.sources()[i_source_pdf_]->set_description((Nom)"Sum of the PDF source term on the obstacle (~= force/power induced by the obstacle under some assumptions)");
-      Nom the_suffix = eq_IBM_->le_nom().getSuffix("pb");
+      Nom the_suffix = eq_IBM_->le_nom().getSuffix(eq_IBM_->probleme().le_nom());
       eq.sources()[i_source_pdf_]->set_fichier((Nom)the_suffix+"_Bilan_term_induced_by_obstacle");
     }
 
@@ -81,6 +81,24 @@ bool Equation_IBM_proto::initTimeStep_ibm_proto(double ddt)
   Cerr<<"(IBM) initTimeStep_IBM: update of immersed values for equation : "<< eq_IBM_->le_nom() <<finl;
   Source_PDF_base& src = dynamic_cast<Source_PDF_base&>((eq_IBM_->sources())[i_source_pdf_].valeur());
   src.calculer_variable_imposee();
+
+  if ( src.get_modele().get_PDF_mobile() && src.get_modele().is_vitesse_PDF_donnee() )
+    {
+      Cerr<<"(IBM) PDF_mobile : updating the shape following shape velocity"<<finl;
+      const Probleme_base& pb = eq_IBM_->probleme();
+      const Domaine_dis_base& le_dom_dis = pb.domaine_dis();
+      const DoubleTab& coords = le_dom_dis.domaine().coord_sommets();
+      Domaine_VF& le_dom_VF = ref_cast_non_const(Domaine_VF, pb.domaine_dis());
+      double delta_t = eq_IBM_->schema_temps().pas_de_temps();
+      double temps= eq_IBM_->schema_temps().temps_courant();
+
+      // Deplacement de la frontiere
+      PDF_model& my_model = ref_cast_non_const(PDF_model, src.get_modele());
+      my_model.affecter_vitesse_shape_IBM(le_dom_VF, coords, temps);
+      DoubleTab& vitesse = ref_cast_non_const(DoubleTab, src.get_modele().get_vitesse_shape_IBM()) ;
+      double raid = my_model.raid();
+      src.update_elem_IBM(vitesse, delta_t,raid);
+    }
   return true;
 }
 

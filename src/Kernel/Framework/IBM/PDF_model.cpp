@@ -33,10 +33,15 @@ Entree& PDF_model::readOn(Entree& is)
 {
   // (xdata documentation is in the TRAD_2.org because we need a special bloc_lecture object)
   Param param(que_suis_je());
+  param.ajouter_flag("moving_IB", &PDF_mobile_,Param::OPTIONAL);
+  param.ajouter_flag("use_pseudo_level_set_moving_PDF", &use_pseudo_level_set_moving_PDF_,Param::OPTIONAL);
+  param.ajouter_non_std("velocity_shape_IBM_function",(this),Param::OPTIONAL);
+  param.ajouter("IBM_spring_parameter",&raid_, Param::OPTIONAL); // XD_ADD_P floattant spring coefficient for moving IBM
   param.ajouter("eta",&eta_, Param::REQUIRED); // XD_ADD_P floattant penalization coefficient
   param.ajouter("bilan_PDF",&pdf_bilan_,Param::OPTIONAL); // XD_ADD_P entier type de bilan du terme PDF (seul/avec temps/avec convection)
   param.ajouter("temps_relaxation_coefficient_PDF",&temps_relax_,Param::OPTIONAL); // XD_ADD_P floattant time relaxation on the forcing term to help
   param.ajouter("echelle_relaxation_coefficient_PDF",&echelle_relax_,Param::OPTIONAL); // XD_ADD_P floattant time relaxation on the forcing term to help convergence
+  param.ajouter("regularization_coefficient_PDF",&regul_coeff_PDF_,Param::OPTIONAL); // XD_ADD_P regularization coefficient for the forcing term (dead cell)
   param.ajouter_flag("local",&local_); // XD_ADD_P rien whether the prescribed velocity is expressed in the global or local basis
   param.ajouter_non_std("vitesse_imposee_data",(this),Param::OPTIONAL); // XD_ADD_P field_base Prescribed velocity as a field
   param.ajouter_non_std("vitesse_imposee_fonction",(this),Param::OPTIONAL); // XD_ADD_P listchaine Prescribed velocity as a set of ananlytical component
@@ -81,6 +86,30 @@ int PDF_model::lire_motcle_non_standard(const Motcle& un_mot, Entree& is)
       is >> variable_imposee_lu_;
       dim_variable_ = variable_imposee_lu_->valeurs().dimension(1);
     }
+  else if (un_mot == "velocity_shape_IBM_function")
+    {
+      vitesse_PDF_donnee_ = 1;
+      PDF_mobile_ = 1;
+
+      Nom expr_vit_shape;
+      int dim_vitesse_shape;
+      is >> dim_vitesse_shape;
+      assert(dim_vitesse_shape == Objet_U::dimension);
+      parsers_vitesse_shape_.dimensionner(dim_vitesse_shape);
+      for (int i = 0; i < dim_vitesse_shape; i++)
+        {
+          is >> expr_vit_shape;
+          std::string sx(expr_vit_shape);
+          std::transform(sx.begin(), sx.end(), sx.begin(), ::toupper);
+          parsers_vitesse_shape_[i].setString(sx);
+          parsers_vitesse_shape_[i].setNbVar(4);
+          parsers_vitesse_shape_[i].addVar("x");
+          parsers_vitesse_shape_[i].addVar("y");
+          parsers_vitesse_shape_[i].addVar("z");
+          parsers_vitesse_shape_[i].addVar("t");
+          parsers_vitesse_shape_[i].parseString();
+        }
+    }
   else
     {
       Cerr << "PDF_model: token not understood: " << un_mot << finl;
@@ -96,13 +125,22 @@ int PDF_model::lire_motcle_non_standard(const Motcle& un_mot, Entree& is)
         }
     }
   Cerr << " imposed variable dimension = " << dim_variable_ << finl;
-  if (local_ && (dim_variable_ != Objet_U::dimension))
+  if (local_ == 1 && (dim_variable_ != Objet_U::dimension))
     {
       Cerr << "PDF_model with local system for a vector only (Objet_U::dimension != dim_variable_) = " << dim_variable_ << finl;
       Process::exit();
     }
 
   return 1;
+}
+
+void PDF_model::discretiser_vitesse_shape_IBM(const Probleme_base& pb)
+{
+  int nb_comp= Objet_U::dimension;
+  Noms nom_c11(nb_comp);
+  Noms unites11(nb_comp);
+  pb.discretisation().discretiser_champ("champ_elem",pb.domaine_dis(),vectoriel,nom_c11,unites11,nb_comp,0.,vitesse_shape_IBM_);
+  vitesse_shape_IBM_->valeurs() = 0.;
 }
 
 void PDF_model::affecter_variable_imposee(Domaine_VF& le_dom, const DoubleTab& coords)
@@ -135,6 +173,41 @@ void PDF_model::affecter_variable_imposee(Domaine_VF& le_dom, const DoubleTab& c
     {
       Cerr << __FILE__ << ", line " << (int)__LINE__ << " : Unexpected error." << finl;
       exit();
+    }
+}
+
+void PDF_model::affecter_vitesse_shape_IBM(Domaine_VF& le_dom_VF, const DoubleTab& coords, double temps)
+{
+  // pour des data aux elements
+  const Domaine& le_dom =  le_dom_VF.domaine();
+  int nb_elem_tot = le_dom.nb_elem_tot();
+  int nb_som_elem = le_dom.nb_som_elem();
+  const IntTab& elems = le_dom.les_elems() ;
+
+  DoubleTab& vitesse_depl_ref = vitesse_shape_IBM_->valeurs();
+  int dim = Objet_U::dimension;
+
+  ArrOfDouble x(dim);
+
+  for (int elem = 0; elem < nb_elem_tot; elem++)
+    {
+      for (int k = 0; k < dim; k++)
+        {
+          x[k] = 0.;
+          for (int nod=0; nod<nb_som_elem; nod++)
+            {
+              int nod_glob = elems(elem, nod);
+              x[k] +=  coords(nod_glob,k) / nb_som_elem;
+            }
+        }
+
+      for (int k = 0; k < dim; k++)
+        {
+          for (int i = 0; i < dim; i++) parsers_vitesse_shape_[k].setVar(i,x[i]);
+          parsers_vitesse_shape_[k].setVar(3, temps);
+          vitesse_depl_ref(elem,k) = parsers_vitesse_shape_[k].eval();
+        }
+//      Cerr << "vitesse_depl_ref(elem)  = " << vitesse_depl_ref(elem,0)<<" "<< vitesse_depl_ref(elem,1)<<" " << vitesse_depl_ref(elem,2) << finl;
     }
 }
 
