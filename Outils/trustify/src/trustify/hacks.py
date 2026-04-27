@@ -38,7 +38,7 @@ for c in ClassFactory.GetAllConstrainBaseParser():
              #   Mor_eqn_Parser:             diffusion_implicite_jdd6
              #   Corps_postraitement_Parser: distance_paroi_jdd1.data
              #   Pb_base_Parser:             Kernel_ecrire_champ_med.data
-             c._read_type = False
+            c._read_type = False
         # eqn_base is an exception to mor_eqn_Tru because of listeqn in Scalaires_passifs
         # -> example: WC_multi_2_3_espece.data
         Eqn_base_Parser._read_type = True
@@ -58,41 +58,6 @@ def toDSToken_hack(self):
 
 try:
     Listeqn_Parser.toDatasetTokens = toDSToken_hack
-except:
-    pass
-
-#
-# Specificities for fluide_diphasique - in this case we want to revert the first hack !!!!!
-# Inside a Fluide_diphasique, we always need to read the type of the 2 sub-fluids .... painful.
-#
-def readFromTokens_braces_dipha_hack(self, stream):
-    lst_cls = []
-    for c in ClassFactory.GetAllConstrainBaseParser():
-        if issubclass(c, Milieu_base_Parser):
-            c._read_type = True
-            lst_cls.append(c)
-
-    val = ConstrainBase_Parser._readFromTokens_braces(self, stream)
-
-    for c in lst_cls:
-        c._read_type = False
-
-def toDSToken_dipha_hack(self):
-    lst_cls = []
-    for c in ClassFactory.GetAllConstrainBaseParser():
-        if issubclass(c, Milieu_base_Parser) and not issubclass(c, Fluide_diphasique_Parser):
-            c._read_type = True
-            lst_cls.append(c)
-
-    val = ConstrainBase_Parser.toDatasetTokens(self)
-
-    for c in lst_cls:
-        c._read_type = False
-    return val
-
-try:
-    Fluide_diphasique_Parser._readFromTokens_braces = readFromTokens_braces_dipha_hack
-    Fluide_diphasique_Parser.toDatasetTokens = toDSToken_dipha_hack
 except:
     pass
 

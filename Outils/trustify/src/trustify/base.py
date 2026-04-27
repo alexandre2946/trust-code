@@ -674,6 +674,8 @@ class ConstrainBase_Parser(BaseCommon_Parser):
             attr_val = getattr(pyd_val, attr_nam)
             if attr_val is None:
                 continue
+            # When braces are there, we need the attribute name explicitly.
+            all_n = [attr_nam] + pyd_val.__class__._synonyms.get(attr_nam,[])
             # WARNING: special case - flags need to be completely removed if False (we don't even want the attribute name .. which is the flag)
             if attr_val.__class__ is bool and not(attr_val):
                 continue
