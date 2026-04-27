@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2025, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -86,6 +86,7 @@ public:
 
   // Access methods to the problem list
 
+  void suppProblem(Probleme_U&);                       // Deleted a problem from the list
   void addProblem(Probleme_U&);                        // Append a problem to the list
   int nb_problemes() const;                            // Number of problems
 
@@ -102,6 +103,11 @@ private:
 };
 
 // inline access methods
+
+inline void Couplage_U::suppProblem(Probleme_U& pb)
+{
+  problems.suppr(pb);
+}
 
 inline void Couplage_U::addProblem(Probleme_U& pb)
 {
