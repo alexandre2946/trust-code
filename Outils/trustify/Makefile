@@ -1,6 +1,6 @@
 org=$(TRUST_ROOT)/Outils/trustify
 
-all: Makefile clean install check 
+all: Makefile clean install check test
 
 install: install.sh 
 	@env TRUSTIFY_FROM_TRUST=1 ./install.sh
@@ -17,13 +17,18 @@ clean:
 
 # For developpers:
 test:
-	@(source $(org)/env.sh && env python -m unittest test.test_rw_elementary.TestCase )
-	@(source $(org)/env.sh && env python -m unittest test.test_rw_full_datasets.TestCase )
-	@(source $(org)/env.sh && env jupyter-nbconvert --to html --no-input --output $(TRUST_TMP)/trustify_ex.html --execute doc/examples/hello_world/HelloWorld.ipynb )
-
-test_debug:
-	@(source $(org)/env.sh && env TRUSTIFY_DEBUG=1 python -m unittest test.test_rw_elementary.TestCase )
-	@(source $(org)/env.sh && env TRUSTIFY_DEBUG=1 python -m unittest test.test_rw_full_datasets.TestCase )
+	@echo ""
+	@echo "======= Starting unit tests of trustify ========="
+	@echo ""
+	@(source $(org)/env_dev.sh && env python -m unittest test.test_rw_elementary.TestCase )
+	@(source $(org)/env_dev.sh && env python -m unittest test.test_rw_full_datasets.TestCase )
+ifeq ($(TRUST_DISABLE_JUPYTER),0)
+	@(source $(org)/env_dev.sh && env jupyter-nbconvert --to html --no-input --output $(TRUST_TMP)/trustify_ex.html --execute doc/examples/hello_world/HelloWorld.ipynb ) 
+endif
+	
+test_debug: install_dev
+	@(source $(org)/env_dev.sh && env TRUSTIFY_DEBUG=1 python -m unittest test.test_rw_elementary.TestCase )
+	@(source $(org)/env_dev.sh && env TRUSTIFY_DEBUG=1 python -m unittest test.test_rw_full_datasets.TestCase )
 
 help:
 	@echo The following make targets are available
