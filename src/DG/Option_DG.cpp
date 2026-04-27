@@ -47,7 +47,6 @@ Entree& Option_DG::interpreter(Entree& is)
   if (vo != -1)
     {
       ORDERS["vitesse"] = vo;
-      ORDERS["divergence_U"] = vo;
       ORDERS["gradient_pression"] = vo;
     }
   if (to != -1)
@@ -56,6 +55,7 @@ Entree& Option_DG::interpreter(Entree& is)
     {
       ORDERS["pression"] = po;
       ORDERS["pression_pa"] = po;
+      ORDERS["divergence_U"] = po;
     }
 
   return is;
