@@ -16,7 +16,7 @@
 #include <Coloc_discretisation.h>
 #include <Domaine_Coloc.h>
 #include <Equation_base.h>
-#include <Schema_Implicite_base.h>
+#include <Probleme_base.h>
 
 Implemente_instanciable(Coloc_discretisation, "Coloc", Discret_Thyd);
 
@@ -107,10 +107,11 @@ void Coloc_discretisation::discretiser_champ(const Motcle& directive, const Doma
   discretiser_champ_fonc_don(directive, z, nature, noms, unites, nb_comp, temps, champ);
 }
 
-
-
 Nom Coloc_discretisation::get_name_of_type_for(const Nom& class_operateur, const Nom& type_operateur, const Equation_base& eqn, const OBS_PTR(Champ_base) &champ_sup) const
 {
+  if (eqn.probleme().que_suis_je() != "Pb_Euler")
+    Process::exit("\nError with the chosen discretization !!!! \nThe colocalised discretization currently works only for the Euler problem !! Please select another one ... \n");
+
   Nom type;
   Nom type_ch = eqn.inconnue().que_suis_je();
   if (type_ch.debute_par("Champ_Elem"))  type_ch = "_Elem";
