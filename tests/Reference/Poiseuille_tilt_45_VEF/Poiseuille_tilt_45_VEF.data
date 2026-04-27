@@ -1,0 +1,166 @@
+# PARALLEL NOT #
+# Hydraulique 2D laminaire POISEUILLE_ALIGNED #
+/*  Re = (rho*U_max*L)/mu
+  rho = 1.0 kg/m^3
+  U_max = 1 m/s
+  L = 1 m
+  Re = 1
+  mu = (rho*U_max*L)/Re
+  A.N.
+  mu = 1.0 */
+
+dimension 3
+Pb_Hydraulique_IBM pb
+Domaine dom
+
+# BEGIN MESH #
+Read_MED {
+    domain dom
+    file res_domain_mesh_80_pl_mesh_1_theta_45.med
+}
+Tetraedriser_homogene dom
+
+regroupebord dom Wall { TOP }
+regroupebord dom Postpro { BOTTOM }
+regroupebord dom Sortie { OUT UP }
+regroupebord dom Entree { IN DOWN }
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+    Partition_tool tranche { tranches 2 2 1 }
+    Larg_joint 2
+    zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+# DISCRETISATION EF #
+
+VEFPreP1B dis
+
+# SCHEMA EN TEMPS ------------------------------------ #
+
+Schema_Euler_implicite sch
+Read sch
+{
+    tinit 0
+    tmax 100.
+    dt_min 5.e-8
+    dt_impr 5.e-1
+    dt_sauv 20.0
+    seuil_statio 1.e-10
+    solveur implicite
+    {
+        seuil_convergence_implicite 1.e-10
+        seuil_convergence_solveur  1e-10
+        solveur Petsc IBICGSTAB { precond diag { } seuil 1e-10 }
+    }
+    dt_start dt_calc
+    dt_max 0.1
+    nb_pas_dt_max 3
+    facsec 2.5
+}
+
+
+Associer pb dom
+Associer pb sch
+Discretiser pb dis
+
+Lire pb
+{
+
+    fluide_incompressible {
+        mu  Champ_Uniforme 1 1.0
+        rho Champ_Uniforme 1 1.0
+    }
+
+
+    Navier_Stokes_ibm
+    {
+        projection_initiale 1
+        methode_calcul_pression_initiale avec_sources
+        solveur_pression petsc cholesky { }
+        convection { centre }
+        diffusion { }
+        initial_conditions
+        {
+            vitesse champ_uniforme 3 0. 0. 0.
+        }
+        sources
+        {
+            Source_PDF
+            {
+                aire Champ_Fonc_MED {
+                    domain domain_mesh
+                    file res_domain_mesh_80_pl_mesh_1_theta_45.med
+                    field aire
+                    last_time
+                }
+                rotation Champ_Fonc_MED {
+                    domain domain_mesh
+                    file res_domain_mesh_80_pl_mesh_1_theta_45.med
+                    field rotation
+                    last_time
+                }
+                modele
+                {
+                    eta 1.0e-12
+                    vitesse_imposee_data champ_uniforme 3 0. 0. 0.
+                }
+                interpolation IBM_power_law_tbl
+                {
+                    est_dirichlet Champ_Fonc_MED { last_time file res_domain_mesh_80_pl_mesh_1_theta_45.med domain domain_mesh field is_node_dirichlet loc som }
+                    points_fluides Champ_Fonc_MED { last_time file res_domain_mesh_80_pl_mesh_1_theta_45.med domain domain_mesh field projection_Fluid loc som }
+                    points_solides Champ_Fonc_MED { last_time file res_domain_mesh_80_pl_mesh_1_theta_45.med domain domain_mesh field projection_Solid loc som }
+                    elements_fluides Champ_Fonc_MED { last_time file res_domain_mesh_80_pl_mesh_1_theta_45.med  domain domain_mesh field fl_elem_number loc som }
+                    correspondance_elements Champ_Fonc_MED { last_time file res_domain_mesh_80_pl_mesh_1_theta_45.med domain domain_mesh field TRUST_SALOME_correspondance loc elem }
+                    impr nb_histo_boxes_impr 5
+                    formulation_linear_pwl 0
+            formulation_WJSP 0
+                }
+            }
+        }
+        boundary_conditions
+        {
+            Wall Symetrie
+            Postpro Symetrie
+            Entree frontiere_ouverte_vitesse_imposee Champ_front_MED Champ_Fonc_MED {
+                domain domain_mesh
+                file velocity_BC_80_theta_45.med
+                field velocity
+                loc som
+                last_time
+            }
+            Sortie frontiere_ouverte_pression_imposee Champ_front_MED Champ_Fonc_MED {
+                domain domain_mesh
+                file pressure_BC_80_theta_45.med
+                field pressure
+                last_time
+            }
+        }
+    }
+
+    Post_processings
+    {
+        lml
+        {
+            format lml fichier Poiseuille_tilt_45_VEF
+            Champs dt_post 1e0
+            {
+                pression elem
+                vitesse som
+                y_plus_ibm som
+                u_star_ibm som
+            }
+        }
+    }
+}
+
+resoudre pb
+fin

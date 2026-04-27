@@ -1,0 +1,223 @@
+# PARALLEL NOT #
+# Hydraulique 2D laminaire POISEUILLE_ALIGNED
+Re = (rho*U_max*L)/mu
+rho = 1.0 kg/m^3
+U_max = 1 m/s
+L = 1 m
+Re = 1
+mu = (rho*U_max*L)/Re
+A.N.
+mu = 1.0 #
+
+dimension 3
+Pb_Hydraulique_IBM pb
+Domaine dom
+
+# DEBUT MAILLAGE #
+Read_MED {
+    domain dom
+    file domain_mesh_40.med
+}
+
+regroupebord dom Wall { TOP DOWN UP }
+regroupebord dom Postpro { BOTTOM }
+regroupebord dom Sortie { OUT }
+regroupebord dom Entree { IN }
+# FIN MAILLAGE #
+
+# DEBUT DECOUPAGE 
+Partition dom
+{
+    Partition_tool tranche { tranches 2 2 1 }
+    Larg_joint 2
+    zones_name DOM
+}
+End
+ FIN DECOUPAGE #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+ END SCATTER #
+
+# DISCRETISATION EF ---------------------------------- #
+
+EF dis
+
+# SCHEMA EN TEMPS ------------------------------------ #
+
+Schema_Euler_implicite sch
+Read sch
+{
+    tinit 0
+    tmax 55.
+    dt_min 5.e-8
+    dt_impr 5.e-1
+    dt_sauv 100.
+    seuil_statio 1.e-4
+    solveur implicite
+    {
+        seuil_convergence_implicite 1.e-10
+        seuil_convergence_solveur  1e-10
+        solveur Petsc IBICGSTAB { precond diag { } seuil 1e-10 }
+    }
+    dt_start dt_calc
+    dt_max 0.1
+    nb_pas_dt_max 3
+    facsec 2.5
+}
+
+
+Associer pb dom
+Associer pb sch
+Discretiser pb dis
+
+Read pb
+{
+
+    fluide_incompressible {
+        mu  Champ_Uniforme 1 1.0
+        rho Champ_Uniforme 1 1.0
+    }
+
+
+    Navier_Stokes_IBM
+    {
+        projection_initiale 1
+        postraiter_gradient_pression_sans_masse
+        methode_calcul_pression_initiale avec_sources
+        solveur_pression petsc cholesky { }
+        convection { generic centre }
+        diffusion { option { grad_u_transpose_partout 1 } }
+        initial_conditions
+        {
+            vitesse Champ_fonc_xyz dom  3 0. (x_GT_0.5)*(x_LT_1.5)*(-4.0*x*x+8.0*x-3.0) 0.
+        }
+        sources
+        {
+            Source_PDF
+            {
+                
+                prepro_ibm methode_IBM_ponderation { 
+                    epsilon_prepro_IBM 1.0e-6
+                    constant_c_IBM 0.
+                    directions_pt_fluid 3 1 0 0 
+                type_de_ponderation 2
+                    MESH_Lagrange_name obs_mesh 
+            MESH_Lagrange_file pl_mesh_1.med
+            write_results_prepro
+            Out_MED_file_name prepro_out.med
+                    prepro_IBM_verbose 0
+            verify_results_prepro
+                }    
+
+                 /* prepro_ibm methode_IBM_Uzawa { 
+                    epsilon_prepro_IBM 1.0e-6
+                    constant_c_IBM 1.
+                    directions_pt_fluid 3 1 0 0
+                    choix_de_la_methode_uzawa 2
+                    MESH_Lagrange_name obs_mesh 
+            MESH_Lagrange_file pl_mesh_1.med
+            write_results_prepro
+            Out_MED_file_name prepro_out.med
+                    prepro_IBM_verbose 0
+                    verify_results_prepro
+                }  */
+                get_aire_from_prepro
+                get_barycenter_from_prepro
+        get_rotation_from_prepro
+                aire Champ_Fonc_MED {
+                    domain domain_mesh
+                    file res_domain_mesh_40_pl_mesh_1.med
+                    field aire
+                    last_time
+                }
+                barycentre Champ_Fonc_MED {
+                    domain domain_mesh
+                    file res_domain_mesh_40_pl_mesh_1.med
+                    field barycentre
+                    last_time
+                }
+                rotation Champ_Fonc_MED {
+                    domain domain_mesh
+                    file res_domain_mesh_40_pl_mesh_1.med
+                    field rotation
+                    last_time
+                }
+                
+                modele
+                {
+                    eta 1.0e-12
+                    vitesse_imposee_data champ_uniforme 3 0. 0. 0.
+                }
+                interpolation IBM_element_fluide
+                {
+                    get_is_dirichlet_from_prepro
+            get_fluid_points_from_prepro
+            get_solid_points_from_prepro
+            get_fluid_elems_from_prepro
+            get_corresp_elems_from_prepro
+            
+                    est_dirichlet Champ_Fonc_MED {
+                        domain domain_mesh
+                        file res_domain_mesh_40_pl_mesh_1.med
+                        field is_node_dirichlet
+                        loc som
+                        last_time
+                    }
+                    points_fluides Champ_Fonc_MED {
+                        domain domain_mesh
+                        file res_domain_mesh_40_pl_mesh_1.med
+                        field projection_Fluid
+                        loc som
+                        last_time
+                    }
+                    points_solides Champ_Fonc_MED {
+                        domain domain_mesh
+                        file res_domain_mesh_40_pl_mesh_1.med
+                        field projection_Solid
+                        loc som
+                        last_time
+                    }
+                    elements_fluides Champ_Fonc_MED {
+                        domain domain_mesh
+                        file res_domain_mesh_40_pl_mesh_1.med
+                        field fl_elem_number
+                        loc som
+                        last_time
+                    }
+                    correspondance_elements Champ_Fonc_MED {
+                        domain domain_mesh
+                        file res_domain_mesh_40_pl_mesh_1.med
+                        field TRUST_SALOME_correspondance
+                        last_time
+                    }
+                } 
+            }
+        }
+        boundary_conditions
+        {
+            Wall Symetrie
+            Postpro Symetrie
+            Sortie frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 1.0
+            Entree frontiere_ouverte_vitesse_imposee Champ_front_fonc_txyz 3 0. (x_GT_0.5)*(x_LT_1.5)*(-4.0*x*x+8.0*x-3.0) 0.
+        }
+    }
+
+    Post_processings
+    {
+        lml
+        {
+            format lml fichier POISEUILLE_ALIGNED_prepro_IBM
+            Champs dt_post 1e0
+            {
+                pression elem
+                vitesse som
+                barycentre_IBM elem
+                aire_IBM elem
+                normal_IBM elem
+            }
+        }
+    }
+}
+resoudre pb
+fin

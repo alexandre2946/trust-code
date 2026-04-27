@@ -117,6 +117,7 @@ Read pb
                     correspondance_elements Champ_Fonc_MED { last_time file res_domain_mesh_40_pl_mesh_1.med domain domain_mesh field TRUST_SALOME_correspondance loc elem }
                     impr nb_histo_boxes_impr 5
                     formulation_linear_pwl 0
+            formulation_WJSP 0
                 }
             }
         }
