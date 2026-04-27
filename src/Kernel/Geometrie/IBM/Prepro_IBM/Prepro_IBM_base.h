@@ -12,6 +12,7 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
+
 #ifndef Prepro_IBM_base_included
 #define Prepro_IBM_base_included
 
@@ -19,8 +20,17 @@
 #include <Champ_Don_base.h>
 #include <Param.h>
 #include <Debog.h>
+#include <Probleme_base.h>
+#include <Equation_base.h>
+#include <Champ_base.h> // Pour Nature_du_champ
+#include <Discretisation_base.h>
+#include <TRUST_Ref.h>
+#include <Octree_Double.h>
 
 using namespace std;
+
+class Domaine_dis_base;
+class Source_PDF_base;
 
 class Prepro_IBM_base :public Objet_U
 {
@@ -28,27 +38,76 @@ class Prepro_IBM_base :public Objet_U
   Declare_base(Prepro_IBM_base); // declaration de l'instance a utiliser
 
 public:
-  void set_param(Param&) const override;
+  virtual void associer_pb(const Probleme_base&);
+  void discretiser() ;
+  inline int verify_results_prepro() { return verify_results_prepro_; };
+  void compute_h_max_elem();
+  void compute_NeighNode(int);
+  inline const DoubleTab& get_champ_aire() {return champ_aire_->valeurs();}
+  inline const DoubleTab& get_champ_rotation() {return champ_rotation_->valeurs();}
+  inline const DoubleTab& get_champ_barycentre() {return champ_bary_->valeurs();}
+  inline const DoubleTab& get_champ_solid_points() {return solid_points_->valeurs();}
+  inline const DoubleTab& get_champ_fluid_points() {return fluid_points_->valeurs();}
+  inline const DoubleTab& get_champ_solid_elems() {return solid_elems_->valeurs();}
+  inline const DoubleTab& get_champ_fluid_elems() {return fluid_elems_->valeurs();}
+  inline const DoubleTab& get_champ_corresp_elems() {return corresp_elems_->valeurs();}
+  inline const DoubleTab& get_isNodeDirichlet() {return isNodeDirichlet_->valeurs();}
+  inline const DoubleTab& get_h_max_elem() {return h_max_elem_->valeurs();}
+  inline const DoubleTab& get_h_max_node() {return h_max_node_->valeurs();}
+  inline void set_champ_aire(DoubleTab& champ_aire) {champ_aire_->valeurs() = champ_aire;}
+  inline void set_champ_rotation(DoubleTab& champ_rotation) {champ_rotation_->valeurs() = champ_rotation;}
+  inline void set_champ_barycentre(DoubleTab& champ_bary) {champ_bary_->valeurs() = champ_bary;}
+  void calculer_normal_proj_solid(DoubleTab&, DoubleTab&);
+  virtual void compute_solid_fluid(int);
 
 protected:
+  void set_param(Param&) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  OWN_PTR(Champ_Don_base) aDomUMesh_; // Mesh calcul
-  OWN_PTR(Champ_Don_base) aSkinUMesh_; // Mesh IBM
+  void computeLocalFrame(const DoubleTab&, DoubleTab&, DoubleTab&, int);
+  void computeMatRot(const DoubleTab&, DoubleTab&, DoubleTab&, int);
+  void computeAire2();
+  void Save_Med_File();
+  void compute_effective_error();
+  void intersectPolyPoly2D(MEDCouplingUMesh *, MEDCouplingUMesh *, DoubleTab&, IntTab&, double, int&);
+  void intersectSegPoly2D(MEDCouplingUMesh *, DoubleTab&, DoubleTab&, double, MCAuto<MEDCoupling::DataArrayDouble>, int&);
+  void intersectSegSeg2D(DoubleTab&, DoubleTab&, DoubleTab&, DoubleTab&, DoubleTab&, double, int&);
+  OBS_PTR(Probleme_base) mon_pb_;
+  Nom nom_fichier_med_IB_, nom_maillage_IB_ = "??";
+  Domaine dom_med_IB_;
+  const MEDCoupling::MEDCouplingUMesh* aSkinUMesh_; // Mesh MedCoupling IBM
+  DoubleTab barySurf_; // Barycentres maillage Lagrangien
+  DoubleTab normalArr_; // Normales maillage Lagrangien
+  DoubleTab coordsSur3D_; // Coord maillage Lagrangien
+
   double eps_ = 1.0e-12; // precision geometrique
+  double eps_effec_ = 1.0e-12; // precision geometrique effective
   double c_prepro_ = 0.; // facteur multiplicatif pour la recherche du ptr fluide
   IntTab dimTab_ ; // choix des directions de recherche du pt fluide
   bool save_prepro_ = false; // Sauvegarde des résultats dans un fichier MED
+  bool verify_results_prepro_ = false; // Verification champ calcules par prepro versus champs lu fichier MED (source_PDF)
 
+  // Champs produits par les prepro_IBM
+  OWN_PTR(Champ_Don_base) champ_rotation_, champ_aire_; // Rotation et Aire IBM maillage Eulerien
+  OWN_PTR(Champ_Don_base) champ_bary_; // Barycentres IBM maillage Eulerien
+  OWN_PTR(Champ_Don_base) champ_normal_; // Normales IBM maillage Eulerien
+
+  OWN_PTR(Champ_Don_base) isNodeDirichlet_ ;
   OWN_PTR(Champ_Don_base) fluid_points_;
   OWN_PTR(Champ_Don_base) fluid_elems_;
   OWN_PTR(Champ_Don_base) solid_points_;
   OWN_PTR(Champ_Don_base) solid_elems_;
   OWN_PTR(Champ_Don_base) corresp_elems_;
-  OWN_PTR(Champ_Don_base) champ_rotation_, champ_aire_;
 
+  OWN_PTR(Champ_Don_base) h_max_elem_;
+  OWN_PTR(Champ_Don_base) h_max_node_;
+
+  IntLists sommets_voisins_;
+
+  Nom nom_fichier_med_Out_;
+
+  int verbose_=0;
 
   friend class Source_PDF_base;
-  friend class Interpolation_IBM_base;
 };
 #endif
 

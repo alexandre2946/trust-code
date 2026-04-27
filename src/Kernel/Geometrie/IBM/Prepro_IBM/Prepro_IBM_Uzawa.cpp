@@ -12,6 +12,7 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
+
 #include <Prepro_IBM_Uzawa.h>
 
 Implemente_instanciable( Prepro_IBM_Uzawa,"Prepro_IBM_Uzawa|methode_IBM_Uzawa",Prepro_IBM_base );
@@ -42,4 +43,17 @@ Entree& Prepro_IBM_Uzawa::readOn(Entree& is)
     }
 
   return is;
+}
+
+void Prepro_IBM_Uzawa::associer_pb(const Probleme_base& pb)
+{
+  Prepro_IBM_base::associer_pb(pb);
+  compute_solid_fluid(0);
+
+  // Ecriture eventuelle
+  if( save_prepro_ == 1) Save_Med_File();
+}
+
+void Prepro_IBM_Uzawa::compute_solid_fluid(int maj_from_ext)
+{
 }

@@ -12,6 +12,7 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
+
 #ifndef Prepro_IBM_Ponderation_included
 #define Prepro_IBM_Ponderation_included
 
@@ -22,14 +23,14 @@ class Prepro_IBM_Ponderation :public Prepro_IBM_base
   Declare_instanciable( Prepro_IBM_Ponderation ) ;
 
 public:
+  void associer_pb(const Probleme_base&) override;
+  void compute_solid_fluid(int) override;
 
 private:
+  void projectSolidPoints();
+  void projectFluidPoints();
   void set_param(Param&) const override;
-  void intersect_ponderation( );
   int pond_= 2 ; // choix de la methode de ponderation par defaut
-
-  friend class Source_PDF_EF;
-
 };
 
 #endif

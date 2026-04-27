@@ -12,6 +12,7 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
+
 #ifndef Prepro_IBM_Uzawa_included
 #define Prepro_IBM_Uzawa_included
 
@@ -22,10 +23,11 @@ class Prepro_IBM_Uzawa :public Prepro_IBM_base
   Declare_instanciable( Prepro_IBM_Uzawa ) ;
 
 public:
+  void associer_pb(const Probleme_base&) override;
+  void compute_solid_fluid(int) override;
 
 private:
   void set_param(Param&) const override;
-  void intersect_iterative( );
   int lvl_= 1 ; // choix de la methode d'Uzawa par defaut
 };
 
