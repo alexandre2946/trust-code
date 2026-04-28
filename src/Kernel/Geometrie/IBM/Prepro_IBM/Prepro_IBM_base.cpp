@@ -365,7 +365,7 @@ void Prepro_IBM_base::computeAire2()
   DoubleTrav t1Arr(nbElemSur, dim_esp), t2Arr(nbElemSur, dim_esp);
   Sous_Domaine sdom_mesh3D_loc;
   sdom_mesh3D_loc.associer_domaine(le_dom);
-  std::vector<long> numNodes, numNodes2D, numNodes3D;
+  std::vector<mcIdType> numNodes, numNodes2D, numNodes3D;
   ArrOfDouble mesh2DBBox(2*dim_esp);
   Octree_Double octree_mesh3D;
   octree_mesh3D.build_nodes(le_dom.les_sommets(), 0, eps_); //ne pas inclure les sommets virtuels
@@ -908,7 +908,7 @@ void Prepro_IBM_base::intersectPolyPoly2D(MEDCouplingUMesh * polyMesh1, MEDCoupl
   //   }
 
   // Connectivite 2D
-  std::vector<long> numNodes2D;
+  std::vector<mcIdType> numNodes2D;
   numNodes2D.clear();
 
   // Test aire < eps ;
@@ -1000,7 +1000,7 @@ void Prepro_IBM_base::intersectSegPoly2D(MEDCouplingUMesh * polyEdgeMesh, Double
   DoubleTrav coords;
   coords.resize(nbNodes, (dim_esp-1));
   std::copy(mc_coords, mc_coords+coords.size_array(), coords.addr());
-  std::vector<long> numNodes;
+  std::vector<mcIdType> numNodes;
 
   MCAuto<MEDCoupling::DataArrayDouble> MC_p(MEDCoupling::DataArrayDouble::New());
   DoubleTrav pe1(dim_esp-1);
