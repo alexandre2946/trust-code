@@ -45,7 +45,7 @@ public:
   {
     return solid_points_;
   }
-  void set_param(Param&);
+  void set_param(Param&) const override;
   void calculer_normal_et_distance_proj_solid();
   void definir_pseudo_level_set();
   void calcul_cluster_pseudo_level_set(IntLists&, int, IntTab&, DoubleTab&, IntList&, int);

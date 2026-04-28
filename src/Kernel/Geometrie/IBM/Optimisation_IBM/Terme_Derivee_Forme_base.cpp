@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -29,7 +29,8 @@ Entree& Terme_Derivee_Forme_base::readOn(Entree& s)
 {
   Cerr << "Lecture Derivee de forme" << finl;
 
-  equation().discretisation().discretiser_champ(equation().discretisation().is_polymac_family() ? "temperature" : "champ_elem", equation().domaine_dis(), "derivee_forme", ",",1,0., source_derivee_forme);
+  equation().discretisation().discretiser_champ(equation().discretisation().is_poly_family() ? "temperature" : "champ_elem", equation().domaine_dis(), "derivee_forme", ",",1,0., source_derivee_forme);
+  source_derivee_forme->nommer("derivee_forme");
   source_derivee_forme->valeurs() = 0.;
   champs_compris_.ajoute_champ(source_derivee_forme);
   return s;
@@ -42,10 +43,10 @@ Sortie& Terme_Derivee_Forme_base::printOn(Sortie& s ) const
 
 void Terme_Derivee_Forme_base::modify_name_file(Nom& fichier) const
 {
-  if (source_derivee_forme.le_nom()!="derivee_forme")
+  if (source_derivee_forme->le_nom()!="derivee_forme")
     {
       fichier+="_";
-      fichier+=source_derivee_forme.le_nom();
+      fichier+=source_derivee_forme->le_nom();
     }
 }
 

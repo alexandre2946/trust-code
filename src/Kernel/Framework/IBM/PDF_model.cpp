@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -33,8 +33,8 @@ Entree& PDF_model::readOn(Entree& is)
 {
   // (xdata documentation is in the TRAD_2.org because we need a special bloc_lecture object)
   Param param(que_suis_je());
-  param.ajouter_flag("moving_IB", &PDF_mobile_,Param::OPTIONAL);
-  param.ajouter_flag("use_pseudo_level_set_moving_PDF", &use_pseudo_level_set_moving_PDF_,Param::OPTIONAL);
+  param.ajouter_flag("moving_IB", &PDF_mobile_);
+  param.ajouter_flag("use_pseudo_level_set_moving_PDF", &use_pseudo_level_set_moving_PDF_);
   param.ajouter_non_std("velocity_shape_IBM_function",(this),Param::OPTIONAL);
   param.ajouter("IBM_spring_parameter",&raid_, Param::OPTIONAL); // XD_ADD_P floattant spring coefficient for moving IBM
   param.ajouter("eta",&eta_, Param::REQUIRED); // XD_ADD_P floattant penalization coefficient
