@@ -57,6 +57,7 @@ public :
   void compute_average_porosity(const DoubleVect& val_source, const DoubleVect& porosity, double& sum, double& average, const bool basis_function, const int order) const override;
   void get_nb_integ_points(IntTab& nb_integ_points) const override;
   void get_ind_integ_points(IntTab& ind_integ_points) const override;
+  int get_max_nb_integ_points() const override;
 
   void calculer_h_carre() override;
 

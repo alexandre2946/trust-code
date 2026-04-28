@@ -1283,6 +1283,13 @@ void Domaine_VF::get_ind_integ_points(IntTab& ) const
   //surcharge dans domaine_DG mais qui n'est pas dans kernel
 }
 
+int Domaine_VF::get_max_nb_integ_points() const
+{
+  Process::exit("The function should not be used in domaine_VF, related to quadrature points (DG discretization)");
+  return 0;
+  //surcharge dans domaine_DG mais qui n'est pas dans kernel
+}
+
 #ifdef TRUST_USE_ARBORX
 // Callback to store the result indices
 struct ExtractIndex

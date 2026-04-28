@@ -665,6 +665,7 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
           IntTab nb_points, ind_integ_points;
           zvf.get_ind_integ_points(ind_integ_points);
           zvf.get_nb_integ_points(nb_points);
+          int nb_pts_integ_max = zvf.get_max_nb_integ_points();
           CIntArrView ind_integ_points_w = static_cast<const ArrOfInt&>(ind_integ_points).view_ro();
           CIntArrView nb_points_w = static_cast<const ArrOfInt&>(nb_points).view_ro();
           Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_elem, KOKKOS_LAMBDA(const int i)
@@ -675,7 +676,7 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
                 int k = ind_integ_points_w(i)+pt;
                 for (int so=0; so<nb_sources; so++)
                   for (int j=0; j<dim; j++)
-                    parser.setVar(so*dim+j,sources[so](i,j*nb_points_w[i]+pt), threadId);
+                    parser.setVar(so*dim+j,sources[so](i,j*nb_pts_integ_max+pt), threadId);
                 valeurs(k) = parser.eval(threadId);
                 parser.release(threadId);
               }
@@ -751,6 +752,7 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
               int nb_elem = valeurs_espace.dimension(0);
               zvf.get_ind_integ_points(ind_integ_points);
               zvf.get_nb_integ_points(nb_points);
+              int nb_pts_integ_max = zvf.get_max_nb_integ_points();
 
               for (int i=0; i<nb_elem; i++)
                 {
@@ -772,7 +774,7 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
                               const DoubleTab& source_so_val = sources_val[so];
                               fxyz[j].setVar(so+4,source_so_val(i,pt));
                             }
-                          int l = nb_points[i]*j + pt;
+                          int l = nb_pts_integ_max*j + pt;
                           valeurs_espace(i,l) = fxyz[j].eval();
                         }
                     }
@@ -844,12 +846,13 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
               int nb_elem = valeurs_espace.dimension(0);
               zvf.get_ind_integ_points(ind_integ_points);
               zvf.get_nb_integ_points(nb_points);
+              int nb_pts_integ_max = zvf.get_max_nb_integ_points();
               Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_elem, KOKKOS_LAMBDA(const int i)
               {
                 for (int pt=0; pt<nb_points[i]; pt++)
                   {
                     int k = ind_integ_points[i]+pt;
-                    v(k) = source_so_val(i, num_compo*nb_points[i]+pt);
+                    v(k) = source_so_val(i, num_compo*nb_pts_integ_max+pt);
                   }
               });
               end_gpu_timer(__KERNEL_NAME__);
@@ -886,6 +889,7 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
           IntTab nb_points, ind_integ_points;
           zvf.get_ind_integ_points(ind_integ_points);
           zvf.get_nb_integ_points(nb_points);
+          int nb_pts_integ_max = zvf.get_max_nb_integ_points();
 
           CIntArrView ind_integ_points_w = static_cast<const ArrOfInt&>(ind_integ_points).view_ro();
           CIntArrView nb_points_w = static_cast<const ArrOfInt&>(nb_points).view_ro();
@@ -907,7 +911,7 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
 
                 for (int d = 0; d < nb_comp_; d++)
                   {
-                    int j = nb_points_w(i)*d + pt;
+                    int j = nb_pts_integ_max*d + pt;
                     for (int so=0; so<nb_sources; so++)
                       parser.setVar(so+4,sources[so](i,j),threadId);
                     valeurs(i, j) = parser.eval(threadId);

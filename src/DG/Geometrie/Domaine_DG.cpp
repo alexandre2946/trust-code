@@ -138,6 +138,12 @@ void Domaine_DG::get_nb_integ_points(IntTab& nb_integ_points) const
 //  nb_integ_points.ref(tab_pts_integ);
 }
 
+int Domaine_DG::get_max_nb_integ_points() const
+{
+  const Quadrature_base& quad = get_quadrature(5);
+  return quad.nb_pts_integ_max();
+}
+
 /*! @brief Create the indirection that give for each cell, the index number of the first integration point
  *
  * @param ind_integ_points : ind_integ_points[i] give the index of the first integration point associated with cell i

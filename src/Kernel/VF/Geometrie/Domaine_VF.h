@@ -169,6 +169,7 @@ public :
   virtual void compute_average_porosity(const DoubleVect& val_source, const DoubleVect& porosity, double& sum, double& volume, const bool basis_function, const int order) const;
   virtual void get_nb_integ_points(IntTab& nelem) const;
   virtual void get_ind_integ_points(IntTab& nelem) const;
+  virtual int get_max_nb_integ_points() const;
 
   //produit scalaire (a - ma).(b - mb)
   inline double dot (const double *a, const double *b, const double *ma = nullptr, const double *mb = nullptr) const;
