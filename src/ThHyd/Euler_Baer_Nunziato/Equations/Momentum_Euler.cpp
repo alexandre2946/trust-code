@@ -469,7 +469,6 @@ const Operateur& Momentum_Euler::operateur(int i) const
     return terme_nconserv_;
   else
     return Navier_Stokes_std::operateur(i);
-  return terme_convectif;
 }
 
 Operateur& Momentum_Euler::operateur(int i)
@@ -478,5 +477,4 @@ Operateur& Momentum_Euler::operateur(int i)
     return terme_nconserv_;
   else
     return Navier_Stokes_std::operateur(i);
-  return terme_convectif;
 }
