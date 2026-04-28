@@ -94,7 +94,7 @@ Read pb
         fields dt_post 30.
         {
             temperature elem
-            erreur_T
+            erreur_T elem
         }
     }
 }
