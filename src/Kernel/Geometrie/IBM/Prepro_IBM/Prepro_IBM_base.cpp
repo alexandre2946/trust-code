@@ -711,8 +711,11 @@ void Prepro_IBM_base::computeAire2()
 
       // Bilan AIre element e
       aire_tot_calcul += aire_elem_calcul ;
-      double val1;
-      measure_aSkinUMesh->getArray()->getTuple(e, &val1);
+      const auto* arrayskin = measure_aSkinUMesh->getArray();
+      if (arrayskin->getNumberOfComponents() != 1)
+        Process::exit("measure_aSkinUMesh should have one composant \n");
+      const double val1 = arrayskin->getIJ(e, 0);
+
       Cerr<<"///////////// Measure of surface for element "<<e<<" = "<<val1<<finl;
       Cerr<<"///////////// Measure of computed surface for element "<<e<<" = "<<aire_elem_calcul <<finl;
 
