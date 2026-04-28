@@ -90,7 +90,7 @@ protected:
 
   void build_mass_matrix();
   void build_transition_matrix();
-  void orthonormalize(const Quadrature_base& quad, const int& nelem, const int& nb_pts_integ, DoubleTab& fbasis) const;
+  void orthonormalize(const int& nelem, const int& nb_pts_integ, DoubleTab& fbasis) const;
 
   void gramSchmidt(DoubleTab& fbase, const Quadrature_base& quad, const int& num_elem, const int& current_indice, const int& nb_pts_integ, const double& volume, int index);
 

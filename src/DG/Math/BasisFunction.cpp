@@ -196,10 +196,10 @@ void BasisFunction::eval_bfunc(const Quadrature_base& quad, const int& nelem, Do
     Process::exit();
 
   if (is_orthonormalized_)
-    orthonormalize(quad, nelem, quad.nb_pts_integ(nelem), fbasis);
+    orthonormalize(nelem, quad.nb_pts_integ(nelem), fbasis);
 }
 
-void BasisFunction::orthonormalize(const Quadrature_base& quad, const int& nelem, const int& nb_pts_integ, DoubleTab& fbasis) const
+void BasisFunction::orthonormalize(const int& nelem, const int& nb_pts_integ, DoubleTab& fbasis) const
 {
   int current_indice = indices_glob_elem_(nelem);
 
@@ -269,7 +269,7 @@ void BasisFunction::eval_bfunc(const DoubleTab& coords, const int& nelem, Double
     Process::exit();
 
   if (is_orthonormalized_)
-    orthonormalize(quad, nelem, nb_points, fbasis);
+    orthonormalize(nelem, nb_points, fbasis);
 }
 
 /* @brief Evaluation of the divergence of the basis functions (need to indicate which scalar component we are using) on integration points for elements
@@ -333,7 +333,7 @@ void BasisFunction::eval_grad_bfunc(const Quadrature_base& quad, const int& nele
     Process::exit();
 
   if (is_orthonormalized_)
-    orthonormalize(quad, nelem, quad.nb_pts_integ(nelem), grad_fbasis);
+    orthonormalize(nelem, quad.nb_pts_integ(nelem), grad_fbasis);
 }
 
 
@@ -373,7 +373,7 @@ void BasisFunction::eval_bfunc_on_facets(const Quadrature_base& quad, const int&
     Process::exit();
 
   if (is_orthonormalized_)
-    orthonormalize(quad, nelem, nb_pts_integ_on_facets, fbasis);
+    orthonormalize(nelem, nb_pts_integ_on_facets, fbasis);
 }
 
 void BasisFunction::eval_grad_bfunc_on_facets(const Quadrature_base& quad, const int& nelem, const int& num_face, DoubleTab& grad_fbasis) const
@@ -417,7 +417,7 @@ void BasisFunction::eval_grad_bfunc_on_facets(const Quadrature_base& quad, const
     Process::exit();
 
   if (is_orthonormalized_)
-    orthonormalize(quad, nelem, nb_pts_integ_on_facets, grad_fbasis);
+    orthonormalize(nelem, nb_pts_integ_on_facets, grad_fbasis);
 }
 
 void BasisFunction::eval_div_bfunc_on_facets(const Quadrature_base& quad, const int& nelem, const int& num_face,  DoubleTab& div_fbasis) const
