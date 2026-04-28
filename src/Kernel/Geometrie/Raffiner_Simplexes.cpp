@@ -57,7 +57,6 @@ public:
   using IntTab_t = IntTab_T<_SIZE_>;
   using DoubleTab_t = DoubleTab_T<_SIZE_>;
   using SmallArrOfTID_t = SmallArrOfTID_T<_SIZE_>;
-
   using Domaine_t = Domaine_32_64<_SIZE_>;
   using Sous_Domaine_t = Sous_Domaine_32_64<_SIZE_>;
   using Frontiere_t = Frontiere_32_64<_SIZE_>;
@@ -795,14 +794,14 @@ void Impl_32_64<_SIZE_>::build_frontier(const Frontiere_t& src,
           Process::exit();
         }
       const int_t coarse_cell         = incident_cells[0];
-      const int face_in_coarse_cell = Faces_builder::chercher_face_element<_SIZE_>(nodes_of_cells_src,
-                                                                                   faces_pattern,
-                                                                                   nodes_of_current_face,
-                                                                                   coarse_cell);
+      const int face_in_coarse_cell = Faces_builder_32_64<_SIZE_>::chercher_face_element(nodes_of_cells_src,
+                                                                                         faces_pattern,
+                                                                                         nodes_of_current_face,
+                                                                                         coarse_cell);
       if (face_in_coarse_cell < 0)
         {
           Cerr << "Error in Raffiner_Simplexes_32_64.cpp 'build_frontier()'" << finl;
-          Cerr << "  Internal error in 'Faces_builder::chercher_face_element()'" << finl;
+          Cerr << "  Internal error in 'Faces_builder_32_64<_SIZE_>::chercher_face_element()'" << finl;
           Process::exit();
         }
 

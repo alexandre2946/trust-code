@@ -27,14 +27,16 @@
 #include <array>
 #include <map>
 
-Faces_builder::Faces_builder() :
+template <typename _SIZE_>
+Faces_builder_32_64<_SIZE_>::Faces_builder_32_64() :
   les_elements_ptr_(0),
   connectivite_som_elem_ptr_(0),
   is_polyedre_(-1)
 {
 }
 
-void Faces_builder::reset()
+template <typename _SIZE_>
+void Faces_builder_32_64<_SIZE_>::reset()
 {
   les_elements_ptr_ = 0;
   connectivite_som_elem_ptr_ = 0;
@@ -55,10 +57,11 @@ void Faces_builder::reset()
  *   - joints.items_communs(FACE)
  *
  */
-void Faces_builder::creer_faces_reeles(Domaine& domaine,
-                                       const Static_Int_Lists& connect_som_elem,
-                                       Faces&   les_faces,
-                                       IntTab& elem_faces)
+template <typename _SIZE_>
+void Faces_builder_32_64<_SIZE_>::creer_faces_reeles(Domaine_t& domaine,
+                                                     const Static_Int_Lists_t& connect_som_elem,
+                                                     Faces_t&   les_faces,
+                                                     IntTab_t& elem_faces)
 {
   les_elements_ptr_ = & domaine.les_elems();
 
@@ -80,12 +83,12 @@ void Faces_builder::creer_faces_reeles(Domaine& domaine,
   // L'ordre des sommets est celui donne par l'element de reference,
   // pour celui des elements voisins de la face qui a le plus petit
   // indice.
-  IntTab& faces_sommets = les_faces.les_sommets();
+  IntTab_t& faces_sommets = les_faces.les_sommets();
 
   // Tableau de taille (nb_faces, 2) contenant pour chaque face
   // les indices des deux elements voisins. Si "i_face" a un seul voisin,
   // faces_voisins_(i_face, 1) = -1;
-  IntTab& faces_voisins = les_faces.voisins();
+  IntTab_t& faces_voisins = les_faces.voisins();
 
   // Initialisation des references utilisees dans check_erreur_faces
   faces_sommets_ = faces_sommets;
@@ -99,7 +102,7 @@ void Faces_builder::creer_faces_reeles(Domaine& domaine,
   //                    tableaux faces_sommets et faces_voisins
   //   (les faces de l'element sont dans l'ordre donne par faces_element_reference)
   //  espaces distants et virtuels appropries pour les elements
-  const int nb_elements          = les_elements().dimension(0);
+  const int_t nb_elements          = les_elements().dimension(0);
   const int nb_faces_par_element = faces_element_reference(0).dimension(0);
   elem_faces.resize(nb_elements, nb_faces_par_element);
   elem_faces = -1;
@@ -107,12 +110,12 @@ void Faces_builder::creer_faces_reeles(Domaine& domaine,
   const int nb_sommets_par_face = faces_element_reference(0).dimension(1);
   // On ajoute chaque face avec resize(n+1,...), donc smart_resize:
   // Calcul du nombre theorique de faces:
-  const int nb_faces_front = domaine.nb_faces_frontiere() + domaine.nb_faces_joint();
-  int nb_faces_prevision = (nb_elements * nb_faces_par_element + nb_faces_front) / 2;
+  const int_t nb_faces_front = domaine.nb_faces_frontiere() + domaine.nb_faces_joint();
+  int_t nb_faces_prevision = (nb_elements * nb_faces_par_element + nb_faces_front) / 2;
   if (is_polyedre_)
     {
       // les faces sont toutes deja connues....
-      const Poly_geom_base& poly=ref_cast(Poly_geom_base,ref_domaine_->type_elem().valeur());
+      const Poly_geom_base_t& poly=ref_cast(Poly_geom_base_t,ref_domaine_->type_elem().valeur());
       nb_faces_prevision=(poly.get_somme_nb_faces_elem()+ nb_faces_front) / 2;;
     }
   // Allocation memoire pour le nombre de faces prevu pour eviter de reallouer
@@ -129,11 +132,12 @@ void Faces_builder::creer_faces_reeles(Domaine& domaine,
 
   // Creation des faces de bord
   {
-    Bords& bords = domaine.faces_bord();
+    Bords_t& bords = domaine.faces_bord();
     const int n = bords.size();
     for (int i = 0; i < n; i++)
       {
-        Frontiere& frontiere = bords[i];
+        Frontiere_t& frontiere = bords[i];
+
         creer_faces_frontiere(1, /* un element voisin par face */
                               frontiere,
                               faces_sommets,
@@ -141,13 +145,13 @@ void Faces_builder::creer_faces_reeles(Domaine& domaine,
                               elem_faces);
       }
   }
-  // Raccords
+// Raccords
   {
-    Raccords& raccords = domaine.faces_raccord();
+    Raccords_t& raccords = domaine.faces_raccord();
     const int n = raccords.size();
     for (int i = 0; i < n; i++)
       {
-        Frontiere& frontiere = raccords[i].valeur();
+        Frontiere_t& frontiere = raccords[i].valeur();
         creer_faces_frontiere(1, /* un element voisin par face */
                               frontiere,
                               faces_sommets,
@@ -156,13 +160,13 @@ void Faces_builder::creer_faces_reeles(Domaine& domaine,
       }
   }
 
-  // Faces de "bord internes"
+// Faces de "bord internes"
   {
-    Bords_Internes& faces_int = domaine.bords_int();
+    Bords_Internes_t& faces_int = domaine.bords_int();
     const int n = faces_int.size();
     for (int i = 0; i < n; i++)
       {
-        Frontiere& frontiere = faces_int[i];
+        Frontiere_t& frontiere = faces_int[i];
         creer_faces_frontiere(2, /* deux elements voisin par face */
                               frontiere,
                               faces_sommets,
@@ -176,19 +180,19 @@ void Faces_builder::creer_faces_reeles(Domaine& domaine,
     // la face voisins de deuxieme voisin:
     if (n > 0)
       {
-        Cerr << "Faces_builder::creer_faces_reeles not coded for the internal faces of boundary" << finl;
+        Cerr << "Faces_builder_32_64<_SIZE_>::creer_faces_reeles not coded for the internal faces of boundary" << finl;
         Process::exit();
         // A faire selon l'ancienne version de domaine2... et a tester !
       }
   }
 
-  // Faces de joint
+// Faces de joint
   {
-    Joints& joints = domaine.faces_joint();
+    Joints_t& joints = domaine.faces_joint();
     const int n = joints.size();
     for (int i = 0; i < n; i++)
       {
-        Frontiere& frontiere = joints[i];
+        Frontiere_t& frontiere = joints[i];
         creer_faces_frontiere(2, /* elements voisins par face */
                               frontiere,
                               faces_sommets,
@@ -196,57 +200,62 @@ void Faces_builder::creer_faces_reeles(Domaine& domaine,
                               elem_faces);
         // Remplissage de items_communs(FACE)
         // Les faces de joint sont dans le meme ordre en local et sur le voisin.
-        Joint& joint = joints[i];
-        ArrOfInt& indices_faces =
+        Joint_t& joint = joints[i];
+        ArrOfInt_t& indices_faces =
           joint.set_joint_item(JOINT_ITEM::FACE).set_items_communs();
-        const int nb_faces  = joint.nb_faces();
+        const int_t nb_faces  = joint.nb_faces();
         indices_faces.resize_array(nb_faces);
-        const int num_premiere_face = joint.num_premiere_face();
-        for (int i2 = 0; i2 < nb_faces; i2++)
+        const int_t num_premiere_face = joint.num_premiere_face();
+        for (int_t i2 = 0; i2 < nb_faces; i2++)
           indices_faces[i2] = num_premiere_face + i2;
       }
   }
 
-  // *********************************************
-  // Faces internes
+// *********************************************
+// Faces internes
 
   creer_faces_internes(faces_sommets,
                        elem_faces,
                        faces_voisins);
 
 
-  // Identification des groupes de faces
+// Identification des groupes de faces
   {
-    Groupes_Faces& groupes_faces = domaine.groupes_faces();
+    Groupes_Faces_t& groupes_faces = domaine.groupes_faces();
     const int n = groupes_faces.size();
     for (int i = 0; i < n; i++)
       {
-        Groupe_Faces& groupe_faces = groupes_faces[i];
+        Groupe_Faces_t& groupe_faces = groupes_faces[i];
         identification_groupe_faces(groupe_faces,
                                     elem_faces);
       }
   }
-  // *********************************************
-  // C'est fini: on verifie qu'on a bien le nombre de faces prevu
+// *********************************************
+// C'est fini: on verifie qu'on a bien le nombre de faces prevu
   if (faces_sommets.dimension(0) != nb_faces_prevision)
     {
-      Cerr << "Error in Faces_builder::creer_faces_reeles:\n"
+      Cerr << "Error in Faces_builder_32_64<_SIZE_>::creer_faces_reeles:\n"
            << " number of faces does not match predicted number of faces.\n"
            << " (problem with faces_bords_internes ?)" << finl;
       Process::exit();
     }
-  // RAZ des attributs de la classe
+
+// RAZ attribut smart_resize des tableaux faces_sommets et faces_voisins.
+
+
+// RAZ des attributs de la classe
   reset();
 }
 
 /*! @brief methode outil pour creer_faces_frontiere et creer_faces_internes (si liste non vide sur au moins un processeur, affiche un message et exit()).
  *
  */
-void Faces_builder::check_erreur_faces(const char * message,
-                                       const ArrOfInt& liste_faces) const
+template <typename _SIZE_>
+void Faces_builder_32_64<_SIZE_>::check_erreur_faces(const char * message,
+                                                     const ArrOfInt_t& liste_faces) const
 {
   const int nmax = 100;
-  int n = liste_faces.size_array();
+  int_t n = liste_faces.size_array();
   if (n > 0)
     {
       Cerr << "==========================" << finl;
@@ -254,33 +263,33 @@ void Faces_builder::check_erreur_faces(const char * message,
            << "\nSee log file of this PE for detailed info."
            << finl;
       Sortie& J = Process::Journal();
-      J <<  "Error in Faces_builder::creer_faces_*\n"
+      J <<  "Error in Faces_builder_32_64<_SIZE_>::creer_faces_*\n"
         << message << finl;
       if (n > nmax)
         {
           J << "Too many faces to display (" << n << ") display only " << nmax << " first faces" << finl;
           n = nmax;
         }
-      int i;
+      int_t i;
       J << "Display format:\n"
         << " facenumber = face index in faces_sommet array\n"
         << " som1..som4 = node index\n"
         << " elem1 elem2 = neighbouring element number\n"
         << "facenumber som1 (x1 y1 z1) som2 (x2 y2 z2) [som3 (x3 y3 z3)...] elem1 elem2" << finl;
       char s[1000];
-      const DoubleTab& coord = ref_domaine_->coord_sommets();
-      const IntTab&     faces = faces_sommets_.valeur();
-      const IntTab&     face_elem = face_elem_.valeur();
+      const DoubleTab_t& coord = ref_domaine_->coord_sommets();
+      const IntTab_t&     faces = faces_sommets_.valeur();
+      const IntTab_t&     face_elem = face_elem_.valeur();
       const int dim = Objet_U::dimension;
-      const int nb_som_faces = faces.dimension(1);
+      const int_t nb_som_faces = faces.dimension(1);
       for (i = 0; i < n; i++)
         {
           char *sptr = s;
-          const int iface = liste_faces[i];
+          const int_t iface = liste_faces[i];
           sptr += snprintf(sptr, 100, "%4ld ",(long) iface);
           for (int j = 0; j < nb_som_faces; j++)
             {
-              const int isom = faces(iface,j);
+              const int_t isom = faces(iface,j);
               sptr += snprintf(sptr, 100, "%5ld(", (long)isom);
               for (int k = 0; k < dim; k++)
                 if (isom!=-1)
@@ -290,7 +299,7 @@ void Faces_builder::check_erreur_faces(const char * message,
           sptr += snprintf(sptr, 100, "%4ld %4ld", (long)face_elem(iface,0),(long) face_elem(iface,1));
           J << s << finl;
         }
-      NettoieNoeuds::verifie_noeuds(ref_domaine_.valeur());
+      NettoieNoeuds_t::verifie_noeuds(ref_domaine_.valeur());
       Process::exit();
     }
 }
@@ -298,16 +307,17 @@ void Faces_builder::check_erreur_faces(const char * message,
 /*! @brief ajoute une face reelle dans faces_sommets et faces_voisins.
  *
  */
-int Faces_builder::ajouter_une_face(const ArrOfInt& une_face,
-                                    const int elem0,
-                                    const int elem1,
-                                    IntTab& faces_sommets,
-                                    IntTab& faces_voisins)
+template <typename _SIZE_>
+_SIZE_ Faces_builder_32_64<_SIZE_>::ajouter_une_face(const SmallArrOfTID_t& une_face,
+                                                     const int_t elem0,
+                                                     const int_t elem1,
+                                                     IntTab_t& faces_sommets,
+                                                     IntTab_t& faces_voisins)
 {
   int i;
-  const int num_new_face        = faces_sommets.dimension(0);
-  const int nb_sommets_par_face = faces_sommets.dimension(1);
-  const int new_size = num_new_face + 1;
+  const int_t num_new_face        = faces_sommets.dimension(0);
+  const int nb_sommets_par_face = (int)faces_sommets.dimension(1);
+  const int_t new_size = num_new_face + 1;
 
   assert(une_face.size_array() == nb_sommets_par_face);
   faces_sommets.resize(new_size, nb_sommets_par_face);
@@ -322,13 +332,13 @@ int Faces_builder::ajouter_une_face(const ArrOfInt& une_face,
 }
 
 template <typename _SIZE_>
-int Faces_builder::chercher_face_element(const IntTab_T<_SIZE_>&    elem_som,
-                                         const IntTab& faces_element_ref,
-                                         const SmallArrOfTID_T<_SIZE_>& une_face,
-                                         const _SIZE_     elem)
+int Faces_builder_32_64<_SIZE_>::chercher_face_element(const IntTab_t&    elem_som,
+                                                       const IntTab& faces_element_ref,
+                                                       const SmallArrOfTID_t& une_face,
+                                                       const int_t    elem)
 {
-  const int nb_faces_element = faces_element_ref.dimension(0);
-  const int nb_sommets_par_face = faces_element_ref.dimension(1);
+  const int nb_faces_element = (int)faces_element_ref.dimension(0);
+  const int nb_sommets_par_face = (int)faces_element_ref.dimension(1);
 
   int i_face, i_som2, i_som;
   for (i_face = 0; i_face < nb_faces_element; i_face++)
@@ -336,7 +346,7 @@ int Faces_builder::chercher_face_element(const IntTab_T<_SIZE_>&    elem_som,
       for (i_som = 0; i_som < nb_sommets_par_face; i_som++)
         {
           const int sommet_elem_ref = faces_element_ref(i_face, i_som);
-          _SIZE_ sommet_domaine ;
+          int_t sommet_domaine ;
           if (sommet_elem_ref==-1)
             sommet_domaine=-1;
           else
@@ -356,17 +366,12 @@ int Faces_builder::chercher_face_element(const IntTab_T<_SIZE_>&    elem_som,
     return i_face;
 }
 
-// Explicit instanciation
-template int Faces_builder::chercher_face_element(const IntTab_T<int>& elem_som, const IntTab& faces_element_ref, const SmallArrOfTID_T<int>& une_face, const int elem);
-#if INT_is_64_ == 2
-template int Faces_builder::chercher_face_element(const IntTab_T<trustIdType>& elem_som, const IntTab& faces_element_ref, const SmallArrOfTID_T<trustIdType>& une_face, const trustIdType elem);
-#endif
-
-const IntTab& Faces_builder::faces_element_reference(int elem) const
+template <typename _SIZE_>
+const IntTab& Faces_builder_32_64<_SIZE_>::faces_element_reference(int_t elem) const
 {
   if (is_polyedre_==1)
     {
-      const Poly_geom_base& poly=ref_cast(Poly_geom_base,ref_domaine_->type_elem().valeur());
+      const Poly_geom_base_t& poly =ref_cast(Poly_geom_base_t,ref_domaine_->type_elem().valeur());
       IntTab& elem_ref_mod=ref_cast_non_const(IntTab,faces_element_reference_old_);
       poly.get_tab_faces_sommets_locaux(elem_ref_mod,elem);
 
@@ -384,10 +389,11 @@ const IntTab& Faces_builder::faces_element_reference(int elem) const
  *   l'element, on renvoie -1.
  *
  */
-int Faces_builder::chercher_face_element(const ArrOfInt& une_face,
-                                         const int     elem) const
+template <typename _SIZE_>
+int Faces_builder_32_64<_SIZE_>::chercher_face_element(const SmallArrOfTID_t& une_face,
+                                                       const int_t     elem) const
 {
-  const IntTab& elem_som                = les_elements();
+  const IntTab_t& elem_som                = les_elements();
   const IntTab& faces_element_ref       = faces_element_reference(elem);
   int i_face = chercher_face_element(elem_som, faces_element_ref, une_face, elem);
   return i_face;
@@ -403,43 +409,53 @@ int Faces_builder::chercher_face_element(const ArrOfInt& une_face,
  *    faces_voisins
  *
  */
-void Faces_builder::creer_faces_frontiere(const int nb_voisins_attendus,
-                                          Frontiere&   frontiere,
-                                          IntTab& faces_sommets,
-                                          IntTab& faces_voisins,
-                                          IntTab& elem_faces) const
+template <typename _SIZE_>
+void Faces_builder_32_64<_SIZE_>::creer_faces_frontiere(const int_t nb_voisins_attendus,
+                                                        Frontiere_t&   frontiere,
+                                                        IntTab_t& faces_sommets,
+                                                        IntTab_t& faces_voisins,
+                                                        IntTab_t& elem_faces) const
 {
   assert(nb_voisins_attendus == 1 || nb_voisins_attendus == 2);
 
-  const Static_Int_Lists& som_elem   = connectivite_som_elem();
-  const int   nb_sommets_par_face  = faces_element_reference(0).dimension(0) ? faces_element_reference(0).dimension(1) : 3;
-  const int   num_premiere_face    = faces_sommets.dimension(0);
-  const int   nb_elem_reels        = elem_faces.dimension(0);
+  const Static_Int_Lists_t& som_elem   = connectivite_som_elem();
+  const int  nb_sommets_par_face  = faces_element_reference(0).dimension(0) ? faces_element_reference(0).dimension(1) : 3;
+  const int_t   num_premiere_face    = faces_sommets.dimension(0);
+  const int_t   nb_elem_reels        = elem_faces.dimension(0);
   frontiere.fixer_num_premiere_face(num_premiere_face);
 
-  const Faces&   faces_frontiere  = frontiere.faces();
-  const IntTab& sommets_faces_fr = faces_frontiere.les_sommets();
-  const int   nb_faces         = faces_frontiere.nb_faces();
-  ArrOfInt       une_face(nb_sommets_par_face);
-  ArrOfInt       voisins;
+  const Faces_t&   faces_frontiere  = frontiere.faces();
+  const IntTab_t& sommets_faces_fr = faces_frontiere.les_sommets();
+  const int_t   nb_faces         = faces_frontiere.nb_faces();
+  SmallArrOfTID_t une_face(nb_sommets_par_face);
+  SmallArrOfTID_t  voisins;
 
-  ArrOfInt liste_faces_erreur0, liste_faces_erreur1, liste_faces_erreur2, liste_faces_erreur3;
-  constexpr bool STOP_FIRST_ERR = true; // set this to true in Debug to stop gdb at the right place.
+  ArrOfInt_t liste_faces_erreur0;
+
+  ArrOfInt_t liste_faces_erreur1;
+
+  ArrOfInt_t liste_faces_erreur2;
+
+  ArrOfInt_t liste_faces_erreur3;
+
+  constexpr bool STOP_FIRST_ERR = false; // set this to true in Debug to stop gdb at the right place.
 
   int i_face;
-  int nb_sommets_par_face_fr = sommets_faces_fr.nb_dim() == 2 ? sommets_faces_fr.dimension(1) : 0; // sommets_faces_fr might be completely empty
   for (i_face = 0; i_face < nb_faces; i_face++)
     {
-      for (int i = 0; i < std::min(nb_sommets_par_face, nb_sommets_par_face_fr); i++)
-        une_face[i] = sommets_faces_fr(i_face, i);
-      for (int i = std::min(nb_sommets_par_face, nb_sommets_par_face_fr); i < nb_sommets_par_face; i++)
-        une_face[i] = -1;
+      {
+        int nb_sommets_par_face_fr= (int)sommets_faces_fr.dimension(1);
+        for (int i = 0; i < std::min(nb_sommets_par_face, nb_sommets_par_face_fr); i++)
+          une_face[i] = sommets_faces_fr(i_face, i);
+        for (int i = std::min(nb_sommets_par_face, nb_sommets_par_face_fr); i < nb_sommets_par_face; i++)
+          une_face[i] = -1;
+      }
       // Quels sont les elements voisins de cette face ?
       find_adjacent_elements(som_elem, une_face, voisins);
-      const int nb_voisins = voisins.size_array();
-      const int elem0 = (nb_voisins > 0) ? voisins[0] : -1;
-      const int elem1 = (nb_voisins > 1) ? voisins[1] : -1;
-      const int indice_face =
+      const int_t nb_voisins = voisins.size_array();
+      const int_t elem0 = (nb_voisins > 0) ? voisins[0] : -1;
+      const int_t elem1 = (nb_voisins > 1) ? voisins[1] : -1;
+      const int_t indice_face =
         ajouter_une_face(une_face, elem0, elem1, faces_sommets, faces_voisins);
 
       switch(nb_voisins)
@@ -459,7 +475,7 @@ void Faces_builder::creer_faces_frontiere(const int nb_voisins_attendus,
                 int i_voisin;
                 for (i_voisin = 0; i_voisin < nb_voisins; i_voisin++)
                   {
-                    const int elem = voisins[i_voisin];
+                    const int_t elem = voisins[i_voisin];
                     // Quelle est la face de l'element ?
                     const int i_face_elem = chercher_face_element(une_face, elem);
                     if (i_face_elem >= 0)
@@ -547,52 +563,56 @@ void Faces_builder::creer_faces_frontiere(const int nb_voisins_attendus,
  *   Les faces de joint ont deja ete creees.
  *
  */
-void Faces_builder::creer_faces_internes(IntTab& faces_sommets,
-                                         IntTab& elem_faces,
-                                         IntTab& faces_voisins) const
+template <typename _SIZE_>
+void Faces_builder_32_64<_SIZE_>::creer_faces_internes(IntTab_t& faces_sommets,
+                                                       IntTab_t& elem_faces,
+                                                       IntTab_t& faces_voisins) const
 {
-  const IntTab& elem_som             = les_elements();
-  const Static_Int_Lists& som_elem   = connectivite_som_elem();
-  //  const IntTab & faces_elem_ref       = faces_element_reference();
-  const int   nb_elem              = elem_som.dimension(0);
+  const IntTab_t& elem_som             = les_elements();
+  const Static_Int_Lists_t& som_elem   = connectivite_som_elem();
+  //  const IntTab_t & faces_elem_ref       = faces_element_reference();
+  const int_t   nb_elem              = elem_som.dimension(0);
   const int   nb_faces_par_element = faces_element_reference(0).dimension(0);
   const int   nb_sommets_par_face  = nb_faces_par_element ? faces_element_reference(0).dimension(1) : 3;
 
   // Tableau temporaire dans lequel on stocke les indices des sommets
   // de la face en cours de traitement
-  ArrOfInt une_face(nb_sommets_par_face);
+  SmallArrOfTID_t une_face(nb_sommets_par_face);
   // Tableau temporaire (liste des elements voisins d'une face)
-  ArrOfInt voisins;
+  SmallArrOfTID_t voisins;
 
   // Liste des faces n'ayant qu'un seul voisin et qui ne figurent pas
   // dans les faces de bord (ce sont des erreurs):
-  ArrOfInt liste_faces_frontiere_non_declarees;
-  ArrOfInt liste_faces_joint_non_declarees;
+  ArrOfInt_t liste_faces_frontiere_non_declarees;
+
+  ArrOfInt_t liste_faces_joint_non_declarees;
 
   // Liste des faces presentant une erreur de connectivite (plus de
   // deux elements voisins, ou connection a des sommets qui ne
   // sont pas une face de l'element:
-  ArrOfInt liste_faces_erreurs_connectivite;
+  ArrOfInt_t liste_faces_erreurs_connectivite;
 
   constexpr bool STOP_FIRST_ERR = false; // set this to true in Debug to stop gdb at the right place.
 
   // Boucle sur les elements
-  ToDo_Kokkos("critical");
-  for (int i_elem = 0; i_elem < nb_elem; i_elem++)
+  int_t i_elem;
+  for (i_elem = 0; i_elem < nb_elem; i_elem++)
     {
+      int i_face;
       // Boucle sur les faces de l'element
-      for (int i_face = 0; i_face < nb_faces_par_element; i_face++)
+      for (i_face = 0; i_face < nb_faces_par_element; i_face++)
         {
 
           // L'indice de cette face dans le tableau faces_sommets.
           // Il vaut -1 si la face n'a pas encore ete creee,
-          int indice_face = elem_faces(i_elem, i_face);
+          int_t indice_face = elem_faces(i_elem, i_face);
 
           // Calcul des indices des sommets de la face dans le domaine:
+          int i;
           // Attention il ne faut laisser l'appel ici...
           const IntTab& faces_elem_ref       = faces_element_reference(i_elem);
 
-          for (int i = 0; i < nb_sommets_par_face; i++)
+          for (i = 0; i < nb_sommets_par_face; i++)
             {
               // indice du sommet sur l'element de reference
               const int i_som_ref = faces_elem_ref(i_face, i);
@@ -601,7 +621,7 @@ void Faces_builder::creer_faces_internes(IntTab& faces_sommets,
                 une_face[i] = -1;
               else
                 {
-                  const int i_som = elem_som(i_elem, i_som_ref);
+                  const int_t i_som = elem_som(i_elem, i_som_ref);
                   une_face[i] = i_som;
                 }
             }
@@ -616,7 +636,7 @@ void Faces_builder::creer_faces_internes(IntTab& faces_sommets,
               // Le tableau "voisins" est classe dans l'ordre croissant.
               find_adjacent_elements(som_elem, une_face, voisins);
 
-              const int nb_voisins = voisins.size_array();
+              const int_t nb_voisins = voisins.size_array();
               assert (nb_voisins > 0); // Il devrait au moins y avoir i_elem !!! (ou alors on a une face constitues de -1);
 
               if (nb_voisins == 1)   // ***** La face a 1 voisin ********
@@ -642,8 +662,8 @@ void Faces_builder::creer_faces_internes(IntTab& faces_sommets,
               else if (nb_voisins == 2)     // ***** La face a 2 voisins ********
                 {
 
-                  const int elem0 = voisins[0];
-                  const int elem1 = voisins[1];
+                  const int_t elem0 = voisins[0];
+                  const int_t elem1 = voisins[1];
                   assert(elem0 < elem1);
                   if (indice_face >= 0)
                     {
@@ -703,8 +723,8 @@ void Faces_builder::creer_faces_internes(IntTab& faces_sommets,
                 {
                   if (indice_face < 0)
                     {
-                      const int elem0 = voisins[0];
-                      const int elem1 = voisins[1];
+                      const int_t elem0 = voisins[0];
+                      const int_t elem1 = voisins[1];
                       indice_face = ajouter_une_face(une_face, elem0, elem1,
                                                      faces_sommets, faces_voisins);
                     }
@@ -736,30 +756,31 @@ void Faces_builder::creer_faces_internes(IntTab& faces_sommets,
  *   Remplissage du tableau indices_faces d'un groupes de faces specifique
  *
  */
-void Faces_builder::identification_groupe_faces(Groupe_Faces& groupe_faces,
-                                                const IntTab& elem_faces) const
+template <typename _SIZE_>
+void Faces_builder_32_64<_SIZE_>::identification_groupe_faces(Groupe_Faces_t& groupe_faces,
+                                                              const IntTab_t& elem_faces) const
 {
-  const Static_Int_Lists& som_elem   = connectivite_som_elem();
+  const Static_Int_Lists_t& som_elem   = connectivite_som_elem();
   const int   nb_sommets_par_face  = faces_element_reference(0).dimension(0) ? faces_element_reference(0).dimension(1) : 3;
 
-  const Faces&   faces_specifiees  = groupe_faces.faces();
-  const IntTab& sommets_faces_fr = faces_specifiees.les_sommets();
-  const int   nb_faces         = faces_specifiees.nb_faces();
-  ArrOfInt& indices_faces = groupe_faces.get_indices_faces();
+  const Faces_t&   faces_specifiees  = groupe_faces.faces();
+  const IntTab_t& sommets_faces_fr = faces_specifiees.les_sommets();
+  const int_t   nb_faces         = faces_specifiees.nb_faces();
+  ArrOfInt_t& indices_faces = groupe_faces.get_indices_faces();
   indices_faces.resize_array(nb_faces);
 
-  ArrOfInt       une_face(nb_sommets_par_face);
-  ArrOfInt       voisins;
+  SmallArrOfTID_t une_face(nb_sommets_par_face);
+  SmallArrOfTID_t voisins;
 
-  ArrOfInt liste_faces_erreur0;
+  ArrOfInt_t liste_faces_erreur0;
 
-  ArrOfInt liste_faces_erreur1;
+  ArrOfInt_t liste_faces_erreur1;
 
 
   for (int i_face = 0; i_face < nb_faces; i_face++)
     {
       {
-        int nb_sommets_par_face_fr=sommets_faces_fr.dimension(1);
+        int nb_sommets_par_face_fr= (int)sommets_faces_fr.dimension(1);
         for (int i = 0; i < std::min(nb_sommets_par_face, nb_sommets_par_face_fr); i++)
           une_face[i] = sommets_faces_fr(i_face, i);
         for (int i = std::min(nb_sommets_par_face, nb_sommets_par_face_fr); i < nb_sommets_par_face; i++)
@@ -767,7 +788,7 @@ void Faces_builder::identification_groupe_faces(Groupe_Faces& groupe_faces,
       }
       // Quels sont les elements voisins de cette face ?
       find_adjacent_elements(som_elem, une_face, voisins);
-      const int nb_voisins = voisins.size_array();
+      const int_t nb_voisins = voisins.size_array();
 
       switch(nb_voisins)
         {
@@ -780,7 +801,7 @@ void Faces_builder::identification_groupe_faces(Groupe_Faces& groupe_faces,
         case 1:
         case 2:
           {
-            const int elem = voisins[0];
+            const int_t elem = voisins[0];
             // Quelle est la face de l'element ?
             const int i_face_elem = chercher_face_element(une_face, elem);
 
@@ -807,3 +828,7 @@ void Faces_builder::identification_groupe_faces(Groupe_Faces& groupe_faces,
   check_erreur_faces(msg, liste_faces_erreur1);
 }
 
+template class Faces_builder_32_64<int>;
+//#if INT_is_64_ == 2
+template class Faces_builder_32_64<trustIdType>;
+//#endif

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,10 +16,12 @@
 #ifndef Extruder_included
 #define Extruder_included
 
+#include <Faces_builder.h>
 #include <Interprete_geometrique_base.h>
-
+#include <Static_Int_Lists.h>
 #include <Domaine_forward.h>
 #include <Domaine_forward.h>
+#include <Bord.h>
 
 /*! @brief Classe Extruder Cette classe est un interprete qui sert a lire et executer
  *
@@ -30,13 +32,24 @@
  *
  * @sa Interprete Extruder, Cette classe est utilisable en 3D
  */
-class Extruder : public Interprete_geometrique_base
+
+template <typename _SIZE_>
+class Extruder_32_64 : public Interprete_geometrique_base_32_64<_SIZE_>
 {
-  Declare_instanciable_sans_constructeur(Extruder);
+  Declare_instanciable_sans_constructeur_32_64(Extruder_32_64);
 
 public :
+  using int_t = _SIZE_;
+  using Domaine_t = Domaine_32_64<_SIZE_>;
+  using Faces_t = Faces_32_64<_SIZE_>;
+  using Bord_t =  Bord_32_64<_SIZE_>;
+  using IntTab_t = IntTab_T<_SIZE_>;
+  using DoubleTab_t = DoubleTab_T<_SIZE_>;
+  using Faces_builder_t = Faces_builder_32_64<_SIZE_>;
+  using Static_Int_Lists_t = Static_Int_Lists_32_64<_SIZE_>;
 
-  Extruder();
+  Extruder_32_64();
+
   Entree& interpreter_(Entree&) override;
   inline void setDirection(double lx, double ly, double lz)
   {
@@ -46,19 +59,23 @@ public :
   }
   inline void setNbTranches(int n) { NZ = n; }
 
-  void extruder(Domaine&) ;
+  void extruder(Domaine_t&) ;
+
 
 protected:
-  void extruder_hexa(Domaine&);
-  virtual void extruder_dvt(Domaine&, Faces&, int, int ) ;
-  virtual void extruder_dvt_hexa(Domaine&, Faces&, int , int ) ;
+  void extruder_hexa(Domaine_t&);
+  virtual void extruder_dvt(Domaine_t&, Faces_t&, int_t, int_t ) ;
+  virtual void extruder_dvt_hexa(Domaine_t&, Faces_t&, int_t , int_t ) ;
 
   ArrOfDouble direction;
   int NZ = -10;
 
 private:
-  void traiter_faces_dvt_hexa(Faces&, int);
-  void traiter_faces_dvt(Faces&, Faces&, int, int, int);
+  void traiter_faces_dvt_hexa(Faces_t&, int_t);
+  void traiter_faces_dvt(Faces_t&, Faces_t&, int_t, int_t, int_t);
 };
+
+using Extruder = Extruder_32_64<int>;
+using Extruder_64 = Extruder_32_64<trustIdType>;
 
 #endif

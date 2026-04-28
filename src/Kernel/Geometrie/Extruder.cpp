@@ -13,6 +13,7 @@
 *
 *****************************************************************************/
 
+#include <Frontiere.h>
 #include <Connectivite_som_elem.h>
 #include <Static_Int_Lists.h>
 #include <Faces_builder.h>
@@ -21,20 +22,23 @@
 #include <Scatter.h>
 #include <Param.h>
 
-Implemente_instanciable_sans_constructeur(Extruder, "Extruder", Interprete_geometrique_base);
+Implemente_instanciable_sans_constructeur_32_64(Extruder_32_64, "Extruder", Interprete_geometrique_base_32_64<_T_>);
 // XD extruder interprete extruder 1 Class to create a 3D tetrahedral/hexahedral mesh (a prism is cut in 14) from a 2D triangular/quadrangular mesh.
 
-Extruder::Extruder() { direction.resize(3, RESIZE_OPTIONS::NOCOPY_NOINIT); }
+template <typename _SIZE_>
+Extruder_32_64<_SIZE_>::Extruder_32_64() { direction.resize(3, RESIZE_OPTIONS::NOCOPY_NOINIT); }
 
-Sortie& Extruder::printOn(Sortie& os) const { return Interprete::printOn(os); }
+template <typename _SIZE_>
+Sortie&  Extruder_32_64<_SIZE_>::printOn(Sortie& os) const { return Interprete::printOn(os); }
 
-Entree& Extruder::readOn(Entree& is) { return Interprete::readOn(is); }
+template <typename _SIZE_>
+Entree&  Extruder_32_64<_SIZE_>::readOn(Entree& is) { return Interprete::readOn(is); }
 
 /*! @brief Fonction principale de l'interprete Extruder Triangule 1 a 1 toutes les domaines du domaine
  *
  *     specifie par la directive.
  *     On triangule le domaine grace a la methode:
- *       void Extruder::extruder(Domaine& domaine) const
+ *       void Extruder_32_64<_SIZE_>::extruder(Domaine_t& domaine) const
  *     Extruder signifie ici transformer en triangle des
  *     elements geometrique d'un domaine.
  *
@@ -42,18 +46,19 @@ Entree& Extruder::readOn(Entree& is) { return Interprete::readOn(is); }
  * @return (Entree&) le flot d'entree
  * @throws l'objet a mailler n'est pas du type Domaine
  */
-Entree& Extruder::interpreter_(Entree& is)
+template <typename _SIZE_>
+Entree&  Extruder_32_64<_SIZE_>::interpreter_(Entree& is)
 {
   Nom nom_dom;
-  Param param(que_suis_je());
+  Param param(this->que_suis_je());
   param.ajouter("domaine",&nom_dom,Param::REQUIRED);  // XD attr domaine ref_domaine domain_name 0 Name of the domain.
   param.ajouter("nb_tranches",&NZ,Param::REQUIRED);   // XD attr nb_tranches entier nb_tranches 0 Number of elements in the extrusion direction.
   param.ajouter_arr_size_predefinie("direction",&direction,Param::REQUIRED); // XD attr direction troisf direction 0 Direction of the extrude operation.
   param.lire_avec_accolades_depuis(is);
-  associer_domaine(nom_dom);
-  Scatter::uninit_sequential_domain(domaine());
-  extruder(domaine());
-  Scatter::init_sequential_domain(domaine());
+  this->associer_domaine(nom_dom);
+  Scatter::uninit_sequential_domain(this->domaine());
+  extruder(this->domaine());
+  Scatter::init_sequential_domain(this->domaine());
   return is;
 }
 
@@ -73,9 +78,10 @@ inline void check_boundary_name(const Nom& name)
  *     Pour l'instant on ne sait raffiner que des Rectangles
  *     (on les coupe en 4).
  *
- * @param (Domaine& domaine) le domaine dont on veut raffiner les elements
+ * @param (Domaine_t& domaine) le domaine dont on veut raffiner les elements
  */
-void Extruder::extruder(Domaine& dom)
+template <typename _SIZE_>
+void Extruder_32_64<_SIZE_>::extruder(Domaine_t& dom)
 {
 
 
@@ -85,14 +91,14 @@ void Extruder::extruder(Domaine& dom)
     }
   else if( dom.type_elem()->que_suis_je() == "Triangle")
     {
-      int oldnbsom = dom.nb_som();
-      IntTab& les_elems=dom.les_elems();
-      int oldsz=les_elems.dimension(0);
+      int_t oldnbsom = dom.nb_som();
+      IntTab_t& les_elems=dom.les_elems();
+      int_t oldsz=les_elems.dimension(0);
       double dx = direction[0]/NZ;
       double dy = direction[1]/NZ;
       double dz = direction[2]/NZ;
 
-      Faces les_faces;
+      Faces_t les_faces;
       //domaine.creer_faces(les_faces);
       {
         // bloc a factoriser avec Domaine_VF.cpp :
@@ -100,28 +106,28 @@ void Extruder::extruder(Domaine& dom)
         les_faces.typer(type_face);
         les_faces.associer_domaine(dom);
 
-        Static_Int_Lists connectivite_som_elem;
-        const int     nb_sommets_tot = dom.nb_som_tot();
-        const IntTab&    elements       = dom.les_elems();
+        Static_Int_Lists_t connectivite_som_elem;
+        const int_t     nb_sommets_tot = dom.nb_som_tot();
+        const IntTab_t&   elements       = dom.les_elems();
 
         construire_connectivite_som_elem(nb_sommets_tot,
                                          elements,
                                          connectivite_som_elem,
                                          1 /* include virtual elements */);
 
-        Faces_builder faces_builder;
-        IntTab elem_faces; // Tableau dont on aura pas besoin
+        Faces_builder_t faces_builder;
+        IntTab_t elem_faces; // Tableau dont on aura pas besoin
         faces_builder.creer_faces_reeles(dom,
                                          connectivite_som_elem,
                                          les_faces,
                                          elem_faces);
       }
-      const int nbfaces2D = les_faces.nb_faces();
+      const int_t nbfaces2D = les_faces.nb_faces();
 
 
-      int newnbsom = oldnbsom*(NZ+1)+NZ*oldsz+nbfaces2D*NZ;
-      DoubleTab new_soms(newnbsom, 3);
-      DoubleTab& coord_sommets=dom.les_sommets();
+      int_t newnbsom = (oldnbsom*(NZ+1)+NZ*oldsz+nbfaces2D*NZ);
+      DoubleTab_t new_soms(newnbsom, 3);
+      DoubleTab_t& coord_sommets=dom.les_sommets();
       Objet_U::dimension=3;
 
 
@@ -148,11 +154,11 @@ void Extruder::extruder(Domaine& dom)
 
 
       // puis on cree les centres de gravite des elements 2D puis translation de ces points
-      for (int i=0; i<oldsz; i++)
+      for (int_t i=0; i<oldsz; i++)
         {
-          int i0=les_elems(i,0);
-          int i1=les_elems(i,1);
-          int i2=les_elems(i,2);
+          int_t i0=les_elems(i,0);
+          int_t i1=les_elems(i,1);
+          int_t i2=les_elems(i,2);
 
           double xg = 1./3.*(coord_sommets(i0,0)+coord_sommets(i1,0)+coord_sommets(i2,0))+0.5*dx;
           double yg = 1./3.*(coord_sommets(i0,1)+coord_sommets(i1,1)+coord_sommets(i2,1))+0.5*dy;
@@ -162,9 +168,9 @@ void Extruder::extruder(Domaine& dom)
           for (int k=0; k<NZ; k++)
             {
 
-              new_soms(oldnbsom*(NZ+1)+k*oldsz+i,0)=xg;
-              new_soms(oldnbsom*(NZ+1)+k*oldsz+i,1)=yg;
-              new_soms(oldnbsom*(NZ+1)+k*oldsz+i,2)=z;
+              new_soms((oldnbsom*(NZ+1)+k*oldsz+i),0)=xg;
+              new_soms((oldnbsom*(NZ+1)+k*oldsz+i),1)=yg;
+              new_soms((oldnbsom*(NZ+1)+k*oldsz+i),2)=z;
 
               xg += dx;
               yg += dy;
@@ -176,8 +182,8 @@ void Extruder::extruder(Domaine& dom)
       // enfin, on cree les centres des faces du maillage 2D puis translation de ces points
       for (int i=0; i<nbfaces2D; i++)
         {
-          int i0=les_faces.sommet(i,0);
-          int i1=les_faces.sommet(i,1);
+          int_t i0=les_faces.sommet(i,0);
+          int_t i1=les_faces.sommet(i,1);
 
           double x01 = 0.5*(coord_sommets(i0,0)+coord_sommets(i1,0))+0.5*dx;
           double y01 = 0.5*(coord_sommets(i0,1)+coord_sommets(i1,1))+0.5*dy;
@@ -187,9 +193,9 @@ void Extruder::extruder(Domaine& dom)
 
           for (int k=0; k<NZ; k++)
             {
-              new_soms(oldnbsom*(NZ+1)+NZ*oldsz+k*nbfaces2D+i,0)=x01;
-              new_soms(oldnbsom*(NZ+1)+NZ*oldsz+k*nbfaces2D+i,1)=y01;
-              new_soms(oldnbsom*(NZ+1)+NZ*oldsz+k*nbfaces2D+i,2)=z;
+              new_soms((oldnbsom*(NZ+1)+NZ*oldsz+k*nbfaces2D+i),0)=x01;
+              new_soms((oldnbsom*(NZ+1)+NZ*oldsz+k*nbfaces2D+i),1)=y01;
+              new_soms((oldnbsom*(NZ+1)+NZ*oldsz+k*nbfaces2D+i),2)=z;
               x01 += dx;
               y01 += dy;
               z += dz;
@@ -200,19 +206,19 @@ void Extruder::extruder(Domaine& dom)
       coord_sommets.resize(0);
       dom.ajouter(new_soms);
 
-      int newnbelem = 14*NZ*oldsz;
-      IntTab new_elems(newnbelem, 4); // les nouveaux elements
-      int cpt=0;
+      int_t newnbelem = 14*NZ*oldsz;
+      IntTab_t new_elems(newnbelem, 4); // les nouveaux elements
+      int_t cpt=0;
 
 
       // en premier, on stocke les tetra du haut et du bas : NZ*nb_triangle*2 tetra
-      for (int i=0; i<oldsz; i++)
+      for (int_t i=0; i<oldsz; i++)
         {
-          int i0=les_elems(i,0);
-          int i1=les_elems(i,1);
-          int i2=les_elems(i,2);
+          int_t i0=les_elems(i,0);
+          int_t i1=les_elems(i,1);
+          int_t i2=les_elems(i,2);
 
-          int ig=oldnbsom*(NZ+1)+i;
+          int_t ig=oldnbsom*(NZ+1)+i;
 
           for (int k=0; k<NZ; k++)
             {
@@ -228,7 +234,7 @@ void Extruder::extruder(Domaine& dom)
               new_elems(2*k*oldsz+2*i+1,3) = ig;
               cpt++;
 
-              mettre_a_jour_sous_domaine(dom,i,2*k*oldsz+2*i,2);
+              this->mettre_a_jour_sous_domaine(dom,i,(2*k*oldsz+2*i),2);
 
               i0+=oldnbsom;
               i1+=oldnbsom;
@@ -240,21 +246,21 @@ void Extruder::extruder(Domaine& dom)
 
 
       // puis les autres tetras
-      for (int i=0; i<nbfaces2D; i++)
+      for (int_t i=0; i<nbfaces2D; i++)
         {
           for (int ivois=0; ivois<2; ivois++)
             {
-              int elem = les_faces.voisin(i,ivois);
+              int_t elem = les_faces.voisin(i,ivois);
 
               if (elem>=0)
                 {
-                  int i0=les_faces.sommet(i,0);
-                  int i1=les_faces.sommet(i,1);
-                  int i01=oldnbsom*(NZ+1)+NZ*oldsz+i;
+                  int_t i0=les_faces.sommet(i,0);
+                  int_t i1=les_faces.sommet(i,1);
+                  int_t i01=oldnbsom*(NZ+1)+NZ*oldsz+i;
 
-                  for (int k=0; k<NZ; k++)
+                  for (int_t k=0; k<NZ; k++)
                     {
-                      int ig=oldnbsom*(NZ+1)+k*oldsz+elem;
+                      int_t ig=oldnbsom*(NZ+1)+k*oldsz+elem;
 
                       new_elems(cpt,0) = i0;
                       new_elems(cpt,1) = i1;
@@ -299,32 +305,32 @@ void Extruder::extruder(Domaine& dom)
     {
       Cerr << "It is not known yet how to extrude "
            << dom.type_elem()->que_suis_je() <<"s"<<finl;
-      exit();
+      this->exit();
     }
 }
 
 
-
-void Extruder::traiter_faces_dvt(Faces& les_faces_bord, Faces& les_faces, int oldnbsom, int oldsz, int nbfaces2D )
+template <typename _SIZE_>
+void Extruder_32_64<_SIZE_>::traiter_faces_dvt(Faces_t& les_faces_bord, Faces_t& les_faces, int_t oldnbsom, int_t oldsz, int_t nbfaces2D )
 {
-  int size_2D = les_faces_bord.nb_faces();
+  int_t size_2D = les_faces_bord.nb_faces();
 
-  IntTab les_sommets(4*size_2D*NZ, 3);
+  IntTab_t les_sommets(4*size_2D*NZ, 3);
 
-  for (int i=0; i<size_2D; i++)
+  for (int_t i=0; i<size_2D; i++)
     {
-      int i0=les_faces_bord.sommet(i,0);
-      int i1=les_faces_bord.sommet(i,1);
+      int_t i0=les_faces_bord.sommet(i,0);
+      int_t i1=les_faces_bord.sommet(i,1);
 
       //double x01 = 0.5*(coord_sommets(i0,0)+coord_sommets(i1,0));
       //double y01 = 0.5*(coord_sommets(i0,1)+coord_sommets(i1,1));
 
       // on recherche le numero de cette face de bord: pas top!
-      int jface=-1;
-      for (int iface=0; iface<nbfaces2D; iface++)
+      int_t jface=-1;
+      for (int_t iface=0; iface<nbfaces2D; iface++)
         {
-          int j0=les_faces.sommet(iface,0);
-          int j1=les_faces.sommet(iface,1);
+          int_t j0=les_faces.sommet(iface,0);
+          int_t j1=les_faces.sommet(iface,1);
 
           if (((i0==j0) &&(i1==j1)) || ((i0==j1) &&(i1==j0)))
             {
@@ -334,11 +340,11 @@ void Extruder::traiter_faces_dvt(Faces& les_faces_bord, Faces& les_faces, int ol
         }
       assert(jface>=0);
 
-      for (int k=0; k<NZ; k++)
+      for (int_t k=0; k<NZ; k++)
         {
           //double z = (k+0.5)*dz;
           //int i01 = domaine.chercher_sommets(x01, y01, z);
-          int j01 = oldnbsom*(NZ+1)+NZ*oldsz+k*nbfaces2D+jface;
+          int_t j01 = oldnbsom*(NZ+1)+NZ*oldsz+k*nbfaces2D+jface;
 
           les_sommets(k*4*size_2D+4*i,0) = i0;
           les_sommets(k*4*size_2D+4*i,1) = i1;
@@ -370,50 +376,50 @@ void Extruder::traiter_faces_dvt(Faces& les_faces_bord, Faces& les_faces, int ol
 }
 
 
-
-void Extruder::extruder_dvt(Domaine& dom, Faces& les_faces, int oldnbsom, int oldsz)
+template <typename _SIZE_>
+void Extruder_32_64<_SIZE_>::extruder_dvt(Domaine_t& dom, Faces_t& les_faces, int_t oldnbsom, int_t oldsz)
 {
 
-  const int nbfaces2D = les_faces.nb_faces();
-  IntTab& les_elems=dom.les_elems();
+  const int_t nbfaces2D = les_faces.nb_faces();
+  IntTab_t& les_elems=dom.les_elems();
 
   for (auto &itr : dom.faces_bord())
     {
       check_boundary_name(itr.le_nom());
-      Faces& les_faces_bord = itr.faces();
+      Faces_t& les_faces_bord = itr.faces();
       traiter_faces_dvt(les_faces_bord, les_faces, oldnbsom, oldsz, nbfaces2D);
     }
 
   for (auto &itr : dom.faces_raccord())
     {
       check_boundary_name(itr->le_nom());
-      Faces& les_faces_bord = itr->faces();
+      Faces_t& les_faces_bord = itr->faces();
       traiter_faces_dvt(les_faces_bord, les_faces, oldnbsom, oldsz, nbfaces2D);
     }
 
-  Bord& devant = dom.faces_bord().add(Bord());
+  Bord_t& devant = dom.faces_bord().add(Bord_t());
   devant.nommer("devant");
-  Faces& les_faces_dvt=devant.faces();
+  Faces_t& les_faces_dvt=devant.faces();
   les_faces_dvt.typer(Type_Face::triangle_3D);
 
-  IntTab som_dvt(oldsz, 3);
+  IntTab_t som_dvt(oldsz, 3);
   les_faces_dvt.voisins().resize(oldsz, 2);
   les_faces_dvt.voisins()=-1;
 
-  Bord& derriere = dom.faces_bord().add(Bord());
+  Bord_t& derriere = dom.faces_bord().add(Bord_t());
   derriere.nommer("derriere");
-  Faces& les_faces_der=derriere.faces();
+  Faces_t& les_faces_der=derriere.faces();
   les_faces_der.typer(Type_Face::triangle_3D);
 
-  IntTab som_der(oldsz, 3);
+  IntTab_t som_der(oldsz, 3);
   les_faces_der.voisins().resize(oldsz, 2);
   les_faces_der.voisins()=-1;
 
-  for (int i=0; i<oldsz; i++)
+  for (int_t i=0; i<oldsz; i++)
     {
-      int i0=les_elems(2*i,0);
-      int i1=les_elems(2*i,1);
-      int i2=les_elems(2*i,2);
+      int_t i0=les_elems(2*i,0);
+      int_t i1=les_elems(2*i,1);
+      int_t i2=les_elems(2*i,2);
 
       som_dvt(i,0) = i0;
       som_dvt(i,1) = i1;
@@ -430,47 +436,47 @@ void Extruder::extruder_dvt(Domaine& dom, Faces& les_faces, int oldnbsom, int ol
   les_faces_der.les_sommets().ref(som_der);
 
 }
-
-void Extruder::extruder_hexa(Domaine& dom)
+template <typename _SIZE_>
+void Extruder_32_64<_SIZE_>::extruder_hexa(Domaine_t& dom)
 {
 
-  int oldnbsom = dom.nb_som();
-  IntTab& les_elems=dom.les_elems();
-  int oldsz=les_elems.dimension(0);
+  int_t oldnbsom = dom.nb_som();
+  IntTab_t& les_elems=dom.les_elems();
+  int_t oldsz=les_elems.dimension(0);
   double dx = direction[0]/NZ;
   double dy = direction[1]/NZ;
   double dz = direction[2]/NZ;
 
-  Faces les_faces;
+  Faces_t les_faces;
   {
     // bloc a factoriser avec Domaine_VF.cpp :
     Type_Face type_face = dom.type_elem()->type_face(0);
     les_faces.typer(type_face);
     les_faces.associer_domaine(dom);
 
-    Static_Int_Lists connectivite_som_elem;
-    const int     nb_sommets_tot = dom.nb_som_tot();
-    const IntTab&    elements       = dom.les_elems();
+    Static_Int_Lists_t connectivite_som_elem;
+    const int_t     nb_sommets_tot = dom.nb_som_tot();
+    const IntTab_t&    elements       = dom.les_elems();
 
     construire_connectivite_som_elem(nb_sommets_tot,
                                      elements,
                                      connectivite_som_elem,
                                      1 /* include virtual elements */);
 
-    Faces_builder faces_builder;
-    IntTab elem_faces; // Tableau dont on aura pas besoin
+    Faces_builder_t faces_builder;
+    IntTab_t elem_faces; // Tableau dont on aura pas besoin
     faces_builder.creer_faces_reeles(dom,
                                      connectivite_som_elem,
                                      les_faces,
                                      elem_faces);
   }
 
-  int newnbsom = oldnbsom*(NZ+1);
-  DoubleTab new_soms(newnbsom, 3);
-  DoubleTab& coord_sommets=dom.les_sommets();
+  int_t newnbsom = oldnbsom*(NZ+1);
+  DoubleTab_t new_soms(newnbsom, 3);
+  DoubleTab_t& coord_sommets=dom.les_sommets();
   Objet_U::dimension=3;
 
-  int i;
+  int_t i;
   // les sommets du maillage 2D sont translates
   for (i=0; i<oldnbsom; i++)
     {
@@ -495,20 +501,20 @@ void Extruder::extruder_hexa(Domaine& dom)
   coord_sommets.resize(0);
   dom.ajouter(new_soms);
 
-  int newnbelem = NZ*oldsz;
-  IntTab new_elems(newnbelem, 8); // les nouveaux elements
+  int_t newnbelem = NZ*oldsz;
+  IntTab_t new_elems(newnbelem, 8); // les nouveaux elements
 
 
   // definition des nouveaux hexas
   for (i=0; i<oldsz; i++)
     {
-      int i0=les_elems(i,0);
-      int i1=les_elems(i,1);
-      int i2=les_elems(i,2);
-      int i3=les_elems(i,3);
+      int_t i0=les_elems(i,0);
+      int_t i1=les_elems(i,1);
+      int_t i2=les_elems(i,2);
+      int_t i3=les_elems(i,3);
 
 
-      for (int k=0; k<NZ; k++)
+      for (int_t k=0; k<NZ; k++)
         {
           new_elems(k*oldsz+i,0) = i0;
           new_elems(k*oldsz+i,1) = i1;
@@ -538,20 +544,20 @@ void Extruder::extruder_hexa(Domaine& dom)
 
   extruder_dvt_hexa(dom, les_faces,oldnbsom, oldsz);
 }
-
-void Extruder::traiter_faces_dvt_hexa(Faces& les_faces_bord, int oldnbsom)
+template <typename _SIZE_>
+void Extruder_32_64<_SIZE_>::traiter_faces_dvt_hexa(Faces_t& les_faces_bord, int_t oldnbsom)
 {
-  int size_2D = les_faces_bord.nb_faces();
+  int_t size_2D = les_faces_bord.nb_faces();
 
-  IntTab les_sommets(size_2D*NZ, 4);
+  IntTab_t les_sommets(size_2D*NZ, 4);
 
-  for (int i=0; i<size_2D; i++)
+  for (int_t i=0; i<size_2D; i++)
     {
-      int i0=les_faces_bord.sommet(i,0);
-      int i1=les_faces_bord.sommet(i,1);
+      int_t i0=les_faces_bord.sommet(i,0);
+      int_t i1=les_faces_bord.sommet(i,1);
 
 
-      for (int k=0; k<NZ; k++)
+      for (int_t k=0; k<NZ; k++)
         {
           les_sommets(k*size_2D+i,0) = i0;
           les_sommets(k*size_2D+i,1) = i1;
@@ -568,50 +574,51 @@ void Extruder::traiter_faces_dvt_hexa(Faces& les_faces_bord, int oldnbsom)
   les_faces_bord.voisins().resize(size_2D*NZ, 2);
   les_faces_bord.voisins()=-1;
 }
-
-void Extruder::extruder_dvt_hexa(Domaine& dom, Faces& les_faces, int oldnbsom, int oldsz)
+template <typename _SIZE_>
+void Extruder_32_64<_SIZE_>::extruder_dvt_hexa(Domaine_t& dom, Faces_t& les_faces, int_t oldnbsom, int_t oldsz)
 {
 
-  IntTab& les_elems=dom.les_elems();
+  IntTab_t& les_elems=dom.les_elems();
 
   for (auto &itr : dom.faces_bord())
     {
       check_boundary_name(itr.le_nom());
-      Faces& les_faces_bord = itr.faces();
+      Faces_t& les_faces_bord = itr.faces();
       traiter_faces_dvt_hexa(les_faces_bord, oldnbsom);
     }
 
   for (auto &itr : dom.faces_raccord())
     {
       check_boundary_name(itr->le_nom());
-      Faces& les_faces_bord = itr->faces();
+      Frontiere_32_64<_SIZE_>& f = dynamic_cast<Frontiere_32_64<_SIZE_>&>(itr);
+      Faces_t& les_faces_bord = f.faces();
       traiter_faces_dvt_hexa(les_faces_bord, oldnbsom);
     }
 
-  Bord& devant = dom.faces_bord().add(Bord());
+  Bord_t& devant = dom.faces_bord().add(Bord_t());
   devant.nommer("devant");
-  Faces& les_faces_dvt=devant.faces();
+  Faces_t& les_faces_dvt=devant.faces();
   les_faces_dvt.typer(Type_Face::quadrangle_3D);
 
-  IntTab som_dvt(oldsz, 4);
+  IntTab_t som_dvt(oldsz, 4);
   les_faces_dvt.voisins().resize(oldsz, 2);
   les_faces_dvt.voisins()=-1;
 
-  Bord& derriere = dom.faces_bord().add(Bord());
+  Bord_t& derriere = dom.faces_bord().add(Bord_t());
   derriere.nommer("derriere");
-  Faces& les_faces_der=derriere.faces();
+  Faces_t& les_faces_der=derriere.faces();
   les_faces_der.typer(Type_Face::quadrangle_3D);
 
-  IntTab som_der(oldsz, 4);
+  IntTab_t som_der(oldsz, 4);
   les_faces_der.voisins().resize(oldsz, 2);
   les_faces_der.voisins()=-1;
 
-  for (int i=0; i<oldsz; i++)
+  for (int_t i=0; i<oldsz; i++)
     {
-      int i0=les_elems(i,0);
-      int i1=les_elems(i,1);
-      int i2=les_elems(i,2);
-      int i3=les_elems(i,3);
+      int_t i0=les_elems(i,0);
+      int_t i1=les_elems(i,1);
+      int_t i2=les_elems(i,2);
+      int_t i3=les_elems(i,3);
 
       som_dvt(i,0) = i0;
       som_dvt(i,1) = i1;
@@ -631,3 +638,7 @@ void Extruder::extruder_dvt_hexa(Domaine& dom, Faces& les_faces, int oldnbsom, i
 
 }
 
+template class Extruder_32_64<int>;
+#if INT_is_64_ == 2
+template class Extruder_32_64<trustIdType>;
+#endif
