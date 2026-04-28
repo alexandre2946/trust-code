@@ -178,7 +178,7 @@ void Op_Diff_DG_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, cons
   const IntTab& face_voisins = domaine.face_voisins();
 
   const Champ_Elem_DG& ch = ref_cast(Champ_Elem_DG, equation().inconnue());
-  const int dim = ch.get_is_scalar() ? 1 : Objet_U::dimension;
+  const int dim = ch.is_vectorial() ? Objet_U::dimension : 1;
 
   int order = Option_DG::Get_order_for(nom_inco);
 

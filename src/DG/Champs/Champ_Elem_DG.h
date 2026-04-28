@@ -36,8 +36,6 @@ public:
   void associer_domaine_dis_base(const Domaine_dis_base&) override;
 
   inline const int& get_order() const { return order_; }
-  inline const bool& get_is_scalar() const { return is_scalar_; }
-
   inline const int& nb_bfunc() const { return nb_bfunc_; }
 
   /* fonctions pour reconstruire la valeur du champ selon la localisation */
