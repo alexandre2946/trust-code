@@ -1,0 +1,5 @@
+for M in $list_dis
+do
+    cat $M/*/conv_p | awk '{print $1,$2,$3}'| sort -n> $M/conv_glob_p
+    cat $M/*/conv_v | awk '{print $1,$2,$3}'| sort -n> $M/conv_glob_v
+done
