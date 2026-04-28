@@ -29,18 +29,18 @@
 #include <Interpolation_IBM_thermal_wall_law.h>
 
 Implemente_base(Source_PDF_base,"Source_PDF_base",Source_dep_inco_base);
-// XD source_pdf_base Source_dep_inco_base source_pdf_base 1 Basic class of source_PDF terms introduced in the equation.
+// XD source_pdf_base source_base source_pdf_base 1 Basic class of source_PDF terms introduced in the equation.
 
 Entree& Source_PDF_base::readOn(Entree& s)
 {
   Param param(que_suis_je());
-  param.ajouter("prepro_ibm", &prepro_lu_,Param::OPTIONAL); // to realise the PDF IBM preprocessing
+  param.ajouter("prepro_ibm", &prepro_lu_,Param::OPTIONAL); // XD_ADD_P Prepro_IBM_base to realise the PDF IBM preprocessing
   param.ajouter("aire", &champ_aire_lu_,Param::OPTIONAL); // XD_ADD_P field_base volumic field: a boolean for the cell (0 or 1) indicating if the obstacle is in the cell
-  param.ajouter_flag("get_aire_from_prepro", &aire_from_prepro_); // XD_ADD_P get aire IBM from prepro.
+  param.ajouter_flag("get_aire_from_prepro", &aire_from_prepro_); // XD_ADD_P rien get aire IBM from prepro.
   param.ajouter("barycentre", &champ_barycentre_lu_,Param::OPTIONAL); // XD_ADD_P field_base volumic field with 3 components representing the face barycenters
-  param.ajouter_flag("get_barycenter_from_prepro", &barycentre_from_prepro_); // XD_ADD_P get aire IBM from prepro.
+  param.ajouter_flag("get_barycenter_from_prepro", &barycentre_from_prepro_); // XD_ADD_P rien get aire IBM from prepro.
   param.ajouter("rotation", &champ_rotation_lu_,Param::OPTIONAL); // XD_ADD_P field_base volumic field with 9 components representing the change of basis on cells (local to global). Used for rotating cases for example.
-  param.ajouter_flag("get_rotation_from_prepro", &rotation_from_prepro_); // XD_ADD_P get aire IBM from prepro.
+  param.ajouter_flag("get_rotation_from_prepro", &rotation_from_prepro_); // XD_ADD_P rien get aire IBM from prepro.
   param.ajouter_flag("transpose_rotation", &transpose_rotation_); // XD_ADD_P rien  whether to transpose the basis change matrix.
   param.ajouter("modele",&modele_lu_,Param::REQUIRED);   // XD_ADD_P bloc_pdf_model model used for the Penalized Direct Forcing
   temps_relax_ = modele_lu_.temps_relax_;

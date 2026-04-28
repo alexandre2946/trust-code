@@ -22,8 +22,8 @@
 #include <Faces.h>
 #include <stdexcept>
 
-Implemente_base(Prepro_IBM_base, "Prepro_IBM_base", Objet_U); // createur
-// XD Prepro_IBM_base Objet_U Prepro_IBM_base 0 To perform the intersection of an IB (Lagrange mesh) in a MED-format file .med with the Euler computional mesh.
+Implemente_base(Prepro_IBM_base, "Prepro_IBM_base", Objet_U);
+// XD Prepro_IBM_base Objet_U Prepro_IBM_base -1 To perform the intersection of an IB (Lagrange mesh) in a MED-format file .med with the Euler computional mesh.
 
 Entree& Prepro_IBM_base::readOn(Entree& s)
 {
@@ -38,7 +38,7 @@ void Prepro_IBM_base::set_param(Param& param) const
 {
   param.ajouter("epsilon_prepro_IBM",&eps_,Param::OPTIONAL); // XD_ADD_P double geometric precision (<<1)
   param.ajouter("constant_c_IBM",&c_prepro_,Param::OPTIONAL);  // XD_ADD_P double additive coefficient to search the purely fluid point (cf. publications G Billo)
-  param.ajouter_non_std("directions_pt_fluid",(this),Param::OPTIONAL); // XD_ADD_P table corresponding to each direction to search the purely fluid point
+  param.ajouter_non_std("directions_pt_fluid",(this),Param::OPTIONAL); // XD_ADD_P listentier corresponding to each direction to search the purely fluid point
   // Exemples :
   //  *  [True, True, False] if the case is 2D in plane XY
   //  *  [False, True, True] if the case is 2D in plane YZ

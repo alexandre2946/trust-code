@@ -36,7 +36,7 @@ Entree& Interpolation_IBM_power_law_tbl::readOn( Entree& is )
 void Interpolation_IBM_power_law_tbl::set_param(Param& param) const
 {
   Interpolation_IBM_elem_fluid::set_param( param );
-  param.ajouter("formulation_WJSP",&formulation_WJSP_,Param::OPTIONAL);
+  param.ajouter("formulation_WJSP",&formulation_WJSP_,Param::OPTIONAL); // XD_ADD_P entier Choix formulation WJSP ou non
   param.ajouter("formulation_linear_pwl",&formulation_linear_pwl_,Param::OPTIONAL);  // XD_ADD_P entier Choix formulation lineaire ou non
 
 }

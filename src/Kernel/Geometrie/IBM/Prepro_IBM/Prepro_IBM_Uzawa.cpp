@@ -16,13 +16,14 @@
 #include <Prepro_IBM_Uzawa.h>
 
 Implemente_instanciable( Prepro_IBM_Uzawa,"Prepro_IBM_Uzawa|methode_IBM_Uzawa",Prepro_IBM_base );
+// XD Prepro_IBM_Uzawa Prepro_IBM_base methode_IBM_Uzawa 1 To perform the intersection of an IB (Lagrange mesh) in a MED-format file .med with the Euler computional mesh.
 
 Sortie& Prepro_IBM_Uzawa::printOn(Sortie& os) const { return Prepro_IBM_base::printOn(os); }
 
 void Prepro_IBM_Uzawa::set_param(Param& param) const
 {
   Prepro_IBM_base::set_param(param);
-  param.ajouter("choix_de_la_methode_uzawa", &lvl_, Param::OPTIONAL); // choix de la methode d'Uzawa
+  param.ajouter("choix_de_la_methode_uzawa", &lvl_, Param::OPTIONAL); // XD_ADD_P entier choix de la methode d'Uzawa
 }
 
 Entree& Prepro_IBM_Uzawa::readOn(Entree& is)

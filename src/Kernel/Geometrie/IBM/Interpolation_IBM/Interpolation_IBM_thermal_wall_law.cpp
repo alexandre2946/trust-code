@@ -15,20 +15,18 @@
 
 #include <Interpolation_IBM_thermal_wall_law.h>
 
-
 Implemente_instanciable( Interpolation_IBM_thermal_wall_law, "Interpolation_IBM_thermal_wall_law|IBM_thermal_wall_law", Interpolation_IBM_elem_fluid ) ;
+// XD interpolation_ibm_thermal_wall_law interpolation_ibm_elem_fluid ibm_thermal_wall_law 1 Immersed Boundary Method (IBM): Interpolation thermal wall law.
 
 Sortie& Interpolation_IBM_thermal_wall_law::printOn( Sortie& os ) const
 {
-  Interpolation_IBM_elem_fluid::printOn( os );
-  return os;
+  return Interpolation_IBM_elem_fluid::printOn( os );
 }
 
 Entree& Interpolation_IBM_thermal_wall_law::readOn( Entree& is )
 {
   Param param(que_suis_je());
   set_param(param);
-  // Interpolation_IBM_elem_fluid::readOn( is );
   param.lire_avec_accolades_depuis(is);
   return is;
 }

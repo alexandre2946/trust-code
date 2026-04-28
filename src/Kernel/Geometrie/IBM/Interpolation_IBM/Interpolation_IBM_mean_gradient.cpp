@@ -36,10 +36,10 @@ Entree& Interpolation_IBM_mean_gradient::readOn( Entree& is )
   param.ajouter("est_dirichlet",&is_dirichlet_lu_,Param::OPTIONAL);   // XD_ADD_P field_base Node field of booleans indicating whether the node belong to an element where the interface is
   param.ajouter("correspondance_elements",&corresp_elems_lu_,Param::OPTIONAL); // XD_ADD_P field_base Cell field giving the SALOME cell number
   param.ajouter("elements_solides",&solid_elems_lu_,Param::OPTIONAL); // XD_ADD_P field_base Node field giving the element number containing the solid point
-  param.ajouter_flag("get_solid_points_from_prepro", &solid_points_from_prepro_); // XD_ADD_P get IBM solid points from prepro.
-  param.ajouter_flag("get_solid_elems_from_prepro", &solid_elems_from_prepro_); // XD_ADD_P get IBM solid elems from prepro.
-  param.ajouter_flag("get_is_dirichlet_from_prepro", &is_dirichlet_from_prepro_); // XD_ADD_P get IBM is_dirichlet from prepro.
-  param.ajouter_flag("get_corresp_elems_from_prepro", &corresp_elems_from_prepro_); // XD_ADD_P get IBM corresp_elems from prepro.
+  param.ajouter_flag("get_solid_points_from_prepro", &solid_points_from_prepro_); // XD_ADD_P rien get IBM solid points from prepro.
+  param.ajouter_flag("get_solid_elems_from_prepro", &solid_elems_from_prepro_); // XD_ADD_P rien get IBM solid elems from prepro.
+  param.ajouter_flag("get_is_dirichlet_from_prepro", &is_dirichlet_from_prepro_); // XD_ADD_P rien get IBM is_dirichlet from prepro.
+  param.ajouter_flag("get_corresp_elems_from_prepro", &corresp_elems_from_prepro_); // XD_ADD_P rien get IBM corresp_elems from prepro.
   param.lire_avec_accolades_depuis(is);
   return is;
 }

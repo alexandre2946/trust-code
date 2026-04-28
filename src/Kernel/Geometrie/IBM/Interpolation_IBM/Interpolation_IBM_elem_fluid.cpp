@@ -35,8 +35,8 @@ void Interpolation_IBM_elem_fluid::set_param(Param& param) const
   param.ajouter("points_solides",&solid_points_lu_,Param::OPTIONAL); // XD_ADD_P field_base Node field giving the projection of the node on the immersed boundary
   param.ajouter("elements_fluides",&fluid_elems_lu_,Param::OPTIONAL);   // XD_ADD_P field_base Node field giving the number of the element (cell) containing the pure fluid point
   param.ajouter("correspondance_elements",&corresp_elems_lu_,Param::OPTIONAL);   // XD_ADD_P field_base Cell field giving the SALOME cell number
-  param.ajouter_flag("get_fluid_points_from_prepro", &fluid_points_from_prepro_); // XD_ADD_P get IBM fluid points from prepro.
-  param.ajouter_flag("get_fluid_elems_from_prepro", &fluid_elems_from_prepro_); // XD_ADD_P get IBM fluid elems from prepro.
+  param.ajouter_flag("get_fluid_points_from_prepro", &fluid_points_from_prepro_); // XD_ADD_P rien get IBM fluid points from prepro.
+  param.ajouter_flag("get_fluid_elems_from_prepro", &fluid_elems_from_prepro_); // XD_ADD_P rien get IBM fluid elems from prepro.
 }
 
 Entree& Interpolation_IBM_elem_fluid::readOn( Entree& is )

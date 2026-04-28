@@ -23,7 +23,7 @@
 #include <Champ_val_tot_sur_vol_base.h>
 
 Implemente_base(Terme_Derivee_Forme_base,"Terme_Derivee_Forme_base",Source_base);
-// XD  derivee_forme derivee_forme 0 Class to define a source term corresponding to the shape derivative in the projection equation.
+// XD  derivee_forme  source_base derivee_forme 0 Class to define a source term corresponding to the shape derivative in the projection equation.
 
 Entree& Terme_Derivee_Forme_base::readOn(Entree& s)
 {
