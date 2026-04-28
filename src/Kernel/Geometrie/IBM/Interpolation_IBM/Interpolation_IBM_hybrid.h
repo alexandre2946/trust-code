@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,29 +16,15 @@
 #ifndef Interpolation_IBM_hybrid_included
 #define Interpolation_IBM_hybrid_included
 
-#include <Interpolation_IBM_elem_fluid.h>
 #include <Interpolation_IBM_mean_gradient_proto.h>
-
-
-/*! @brief : class Interpolation_IBM_hybrid
- *
- *  <Description of class Interpolation_IBM_hybrid>
- *
- *
- *
- */
+#include <Interpolation_IBM_elem_fluid.h>
 
 class Interpolation_IBM_hybrid : public Interpolation_IBM_elem_fluid, public Interpolation_IBM_mean_gradient_proto
 {
   Declare_instanciable( Interpolation_IBM_hybrid ) ;
-
 public :
   void discretise(const Discretisation_base&, Domaine_dis_base&) override;
-  inline IntList& getSommetsVoisinsOf(int i)
-  {
-    return sommets_voisins_[i];
-  };
-protected :
+  inline IntList& getSommetsVoisinsOf(int i) { return sommets_voisins_[i]; }
 };
 
 #endif /* Interpolation_IBM_hybrid_included */

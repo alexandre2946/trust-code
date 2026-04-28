@@ -13,14 +13,14 @@
 *
 *****************************************************************************/
 
-#include<Prepro_IBM_base.h>
-#include <LireMED.h>
-#include <Ecrire_MED.h>
-#include <Domaine.h>
+#include <Prepro_IBM_base.h>
 #include <Sous_Domaine.h>
 #include <Domaine_VF.h>
-#include <Faces.h>
+#include <Ecrire_MED.h>
+#include <LireMED.h>
+#include <Domaine.h>
 #include <stdexcept>
+#include <Faces.h>
 
 Implemente_base(Prepro_IBM_base, "Prepro_IBM_base", Objet_U);
 // XD Prepro_IBM_base Objet_U Prepro_IBM_base -1 To perform the intersection of an IB (Lagrange mesh) in a MED-format file .med with the Euler computional mesh.

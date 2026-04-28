@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -24,18 +24,13 @@
  *
  *  Pure C++ class to allow multiple inheritance in Interpolation_IBM_hybrid
  *
- *
- *
  */
 
 class Interpolation_IBM_mean_gradient_proto
 {
 
 public :
-  inline IntList& getSommetsVoisinsOf(int i)
-  {
-    return sommets_voisins_[i];
-  };
+  inline IntList& getSommetsVoisinsOf(int i) { return sommets_voisins_[i]; }
 
 protected :
   void computeSommetsVoisins(Domaine_dis_base& le_dom_, const Champ_Don_base& solid_points, const Champ_Don_base& corresp_elems, bool has_corres);

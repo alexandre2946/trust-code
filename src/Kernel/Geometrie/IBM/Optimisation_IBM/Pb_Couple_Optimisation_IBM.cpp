@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,14 +14,13 @@
 *****************************************************************************/
 
 #include <Pb_Couple_Optimisation_IBM.h>
-#include <verif_cast.h>
-#include <Probleme_base.h>
-#include <Equation_IBM_proto.h>
-#include <TRUSTTrav.h>
 #include <Terme_Derivee_Forme_base.h>
 #include <Operateur_Diff_base.h>
-#include <Operateur.h>
+#include <Equation_IBM_proto.h>
 #include <Prepro_IBM_base.h>
+#include <Probleme_base.h>
+#include <Operateur.h>
+#include <TRUSTTrav.h>
 
 Implemente_instanciable(Pb_Couple_Optimisation_IBM,"Pb_Couple_Optimisation_IBM",Probleme_Couple);
 

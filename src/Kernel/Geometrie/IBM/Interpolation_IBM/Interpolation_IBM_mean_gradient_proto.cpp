@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,7 +16,6 @@
 #include <Interpolation_IBM_mean_gradient_proto.h>
 #include <TRUSTTrav.h>
 #include <Domaine.h>
-#include <Process.h>
 
 void Interpolation_IBM_mean_gradient_proto::computeSommetsVoisins(Domaine_dis_base& le_dom_,
                                                                   const Champ_Don_base& solid_points,

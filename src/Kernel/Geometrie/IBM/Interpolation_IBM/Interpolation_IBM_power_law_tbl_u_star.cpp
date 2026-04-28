@@ -15,17 +15,14 @@
 
 #include <Interpolation_IBM_power_law_tbl_u_star.h>
 #include <TRUSTTrav.h>
-
 #include <Domaine.h>
-#include <Param.h>
 
 Implemente_instanciable( Interpolation_IBM_power_law_tbl_u_star, "Interpolation_IBM_power_law_tbl_u_star|IBM_power_law_tbl_u_star", Interpolation_IBM_mean_gradient ) ;
 // XD Interpolation_IBM_power_law_tbl_u_star interpolation_ibm_mean_gradient Interpolation_IBM_power_law_tbl_u_star 1 Immersed Boundary Method (IBM): law u star.
 
 Sortie& Interpolation_IBM_power_law_tbl_u_star::printOn( Sortie& os ) const
 {
-  Objet_U::printOn( os );
-  return os;
+  return Objet_U::printOn( os );
 }
 
 Entree& Interpolation_IBM_power_law_tbl_u_star::readOn( Entree& is )

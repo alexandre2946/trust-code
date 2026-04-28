@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,11 +16,9 @@
 #ifndef Interpolation_IBM_power_law_tbl_proto_included
 #define Interpolation_IBM_power_law_tbl_proto_included
 
-
 /*! @brief : class Interpolation_IBM_power_law_tbl_proto
  *
  *  Pure C++ class to allow multiple inheritance in Interpolation_IBM_power_law_tbl
- *
  *
  *
  */
@@ -33,52 +31,23 @@ public :
   inline double get_A_pwl(int a)
   {
     if (a == 1)
-      {
-        return A_pwl_WJSP_;
-      }
+      return A_pwl_WJSP_;
     else
-      {
-        return  A_pwl_;
-      }
+      return  A_pwl_;
   };
 
-  inline double get_C_pwl_WJSP()
-  {
-    return  C_pwl_WJSP_;
-  };
-
-  inline double get_D_pwl_WJSP()
-  {
-    return  D_pwl_WJSP_;
-  };
+  inline double get_C_pwl_WJSP() { return  C_pwl_WJSP_; }
+  inline double get_D_pwl_WJSP() { return  D_pwl_WJSP_; }
 
 
 // Puissances
-  inline double get_B_pwl()
-  {
-    return  B_pwl_;
-  };
-
-  inline double get_p_pwl_WJSP()
-  {
-    return  p_pwl_WJSP_;
-  };
+  inline double get_B_pwl() { return  B_pwl_; }
+  inline double get_p_pwl_WJSP() { return  p_pwl_WJSP_; }
 
 // Limites
-  inline double get_y_c_p_pwl()
-  {
-    return y_c_p_pwl_;
-  };
-
-  inline double get_y_c1_p_pwl_WJSP()
-  {
-    return y_c1_p_pwl_WJSP_;
-  };
-
-  inline double get_y_c2_p_pwl_WJSP()
-  {
-    return y_c2_p_pwl_WJSP_;
-  };
+  inline double get_y_c_p_pwl() { return y_c_p_pwl_; }
+  inline double get_y_c1_p_pwl_WJSP() { return y_c1_p_pwl_WJSP_; }
+  inline double get_y_c2_p_pwl_WJSP() { return y_c2_p_pwl_WJSP_; }
 
 protected :
   double A_pwl_ = 8.3;

@@ -16,16 +16,15 @@
 #ifndef Prepro_IBM_base_included
 #define Prepro_IBM_base_included
 
-#include <Objet_U.h>
+#include <Discretisation_base.h>
 #include <Champ_Don_base.h>
-#include <Param.h>
-#include <Debog.h>
 #include <Probleme_base.h>
 #include <Equation_base.h>
-#include <Champ_base.h> // Pour Nature_du_champ
-#include <Discretisation_base.h>
-#include <TRUST_Ref.h>
 #include <Octree_Double.h>
+#include <Champ_base.h>
+#include <TRUST_Ref.h>
+#include <Param.h>
+#include <Debog.h>
 
 using namespace std;
 
@@ -34,8 +33,7 @@ class Source_PDF_base;
 
 class Prepro_IBM_base :public Objet_U
 {
-
-  Declare_base(Prepro_IBM_base); // declaration de l'instance a utiliser
+  Declare_base(Prepro_IBM_base);
 
 public:
   virtual void associer_pb(const Probleme_base&);
@@ -74,7 +72,7 @@ protected:
   OBS_PTR(Probleme_base) mon_pb_;
   Nom nom_fichier_med_IB_, nom_maillage_IB_ = "??";
   Domaine dom_med_IB_;
-  const MEDCoupling::MEDCouplingUMesh* aSkinUMesh_; // Mesh MedCoupling IBM
+  const MEDCoupling::MEDCouplingUMesh* aSkinUMesh_ = nullptr; // Mesh MedCoupling IBM
   DoubleTab barySurf_; // Barycentres maillage Lagrangien
   DoubleTab normalArr_; // Normales maillage Lagrangien
   DoubleTab coordsSur3D_; // Coord maillage Lagrangien
@@ -109,6 +107,5 @@ protected:
 
   friend class Source_PDF_base;
 };
-#endif
 
-
+#endif /* Prepro_IBM_base_included */

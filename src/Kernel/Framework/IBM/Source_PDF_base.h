@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -128,8 +128,8 @@ protected:
   double echelle_relax_ = -100.;
   bool penalized_ = false;
   DoubleTab sec_mem_pdf; // part of the source term computed with the imposed variable
-  double dt_computation_pdf_; //time step used for computation of sec_mem_pdf
-  double temps_computation_pdf_; //time of the computation of sec_mem_pdf
+  double dt_computation_pdf_ = -123.; //time step used for computation of sec_mem_pdf
+  double temps_computation_pdf_ = -123.; //time of the computation of sec_mem_pdf
   DoubleTab source_term_PDF; // PDF source term
 
   mutable OWN_PTR(Champ_Fonc_base)  champ_source_term_PDF_; //!< Champ pour postraitement

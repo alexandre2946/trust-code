@@ -18,11 +18,11 @@
 
 #include <Discretisation_base.h>
 #include <Domaine_dis_base.h>
-#include<Probleme_base.h>
+#include <Probleme_base.h>
 #include <Prepro_IBM_base.h>
 #include <TRUSTList.h>
-
 #include <Param.h>
+
 class Interpolation_IBM_base : public Objet_U
 {
 
@@ -33,18 +33,9 @@ public:
   virtual void discretise_PDF_mobile(const Discretisation_base&, Domaine_dis_base&);
   virtual void discretise_pseudo_level_set(const Discretisation_base&, Domaine_dis_base&);
 
-  inline bool get_impr()
-  {
-    return impr_;
-  }
-  inline int get_N_histo()
-  {
-    return N_histo_;
-  }
-  inline const Champ_Don_base& get_solid_points()
-  {
-    return solid_points_;
-  }
+  inline bool get_impr() { return impr_; }
+  inline int get_N_histo() { return N_histo_; }
+  inline const Champ_Don_base& get_solid_points() { return solid_points_; }
   void set_param(Param&) const override;
   void calculer_normal_et_distance_proj_solid();
   void definir_pseudo_level_set();
@@ -83,7 +74,6 @@ protected:
   friend class Source_PDF_base;
   friend class Source_PDF_EF;
   friend class Source_PDF_VDF;
-//  friend class Source_PDF_VDF_P0;
   friend class Source_PDF_VEF;
 };
 

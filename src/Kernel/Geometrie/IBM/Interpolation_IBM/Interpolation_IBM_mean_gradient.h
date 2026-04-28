@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,14 +20,6 @@
 #include <Interpolation_IBM_base.h>
 #include <TRUSTLists.h>
 
-/*! @brief : class Interpolation_IBM_mean_gradient
- *
- *  <Description of class Interpolation_IBM_mean_gradient>
- *
- *
- *
- */
-
 class Interpolation_IBM_mean_gradient : public Interpolation_IBM_base, public Interpolation_IBM_mean_gradient_proto
 {
 
@@ -35,10 +27,7 @@ class Interpolation_IBM_mean_gradient : public Interpolation_IBM_base, public In
 
 public :
   void discretise(const Discretisation_base&, Domaine_dis_base& le_dom_) override;
-  inline IntList& getSommetsVoisinsOf(int i)
-  {
-    return sommets_voisins_[i];
-  };
+  inline IntList& getSommetsVoisinsOf(int i) { return sommets_voisins_[i]; }
   void set_fields_from_prepro_to_interp(Prepro_IBM_base&) override;
 protected :
 

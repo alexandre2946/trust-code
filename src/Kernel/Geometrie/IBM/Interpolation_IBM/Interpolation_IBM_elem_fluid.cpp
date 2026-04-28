@@ -14,18 +14,17 @@
 *****************************************************************************/
 
 #include <Interpolation_IBM_elem_fluid.h>
+#include <Source_PDF_base.h>
 #include <TRUSTTrav.h>
 #include <Domaine.h>
 #include <Param.h>
-#include <Source_PDF_base.h>
 
 Implemente_instanciable( Interpolation_IBM_elem_fluid, "Interpolation_IBM_element_fluide|IBM_element_fluide", Interpolation_IBM_base ) ;
 // XD interpolation_ibm_elem_fluid interpolation_ibm_base ibm_element_fluide 1 Immersed Boundary Method (IBM): fluid element interpolation.
 
 Sortie& Interpolation_IBM_elem_fluid::printOn( Sortie& os ) const
 {
-  Interpolation_IBM_base::printOn( os );
-  return os;
+  return Interpolation_IBM_base::printOn( os );
 }
 
 void Interpolation_IBM_elem_fluid::set_param(Param& param) const

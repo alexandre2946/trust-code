@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,16 +15,13 @@
 
 #include <Interpolation_IBM_hybrid.h>
 #include <TRUSTTab.h>
-#include <Param.h>
-
 
 Implemente_instanciable( Interpolation_IBM_hybrid, "Interpolation_IBM_hybride|IBM_hybride", Interpolation_IBM_elem_fluid ) ;
 // XD interpolation_ibm_hybride interpolation_ibm_elem_fluid ibm_hybride 1 Immersed Boundary Method (IBM): hybrid (fluid/mean gradient) interpolation.
 
 Sortie& Interpolation_IBM_hybrid::printOn( Sortie& os ) const
 {
-  Objet_U::printOn( os );
-  return os;
+  return Objet_U::printOn( os );
 }
 
 Entree& Interpolation_IBM_hybrid::readOn( Entree& is )
@@ -46,15 +43,13 @@ void Interpolation_IBM_hybrid::discretise(const Discretisation_base& dis, Domain
   dis.discretiser_champ("champ_sommets",le_dom_,"solid_elems","none",1,0., solid_elems_);
   solid_elems_->affecter(solid_elems_lu_);
 
-  if(!(is_dirichlet_.non_nul()))
+  if(is_dirichlet_.est_nul())
     {
-      Cerr<<"Interpolation_IBM_hybrid: field est_dirichlet is required. exit()"<<endl;
-      exit();
+      Cerr<<"Interpolation_IBM_hybrid: field est_dirichlet is required. exit()"<<finl;
+      Process::exit();
     }
   else
-    {
-      my_is_dirichlet_ = is_dirichlet_;
-    }
+    my_is_dirichlet_ = is_dirichlet_;
 
   computeSommetsVoisins(le_dom_, solid_points_, corresp_elems_, has_corresp_);
 }

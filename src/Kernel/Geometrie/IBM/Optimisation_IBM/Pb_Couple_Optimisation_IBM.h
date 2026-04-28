@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -63,7 +63,7 @@ protected:
   double alpha_ = 1.;
   double pond_shap_deriv_for_proj_ = 1.;
   int regul_PDF_shape_deriv_ = 0 ;
-  int Numero_eq_optimis_;
+  int Numero_eq_optimis_ = -123;
   int Numero_src_deriv_form_ = -1;
   double modif_aire_pc_low_ = -1.0e+6;
   double modif_aire_pc_high_ = 1.0e+6;

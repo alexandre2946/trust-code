@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,21 +16,19 @@
 #ifndef Terme_Derivee_Forme_base_included
 #define Terme_Derivee_Forme_base_included
 
-#include <TRUST_Ref.h>
-#include <TRUST_Deriv.h>
 #include <TRUSTTabs_forward.h>
-#include <Champ_Don_base.h>
 #include <Champ_Fonc_base.h>
+#include <Champ_Don_base.h>
 #include <Source_base.h>
+#include <TRUST_Deriv.h>
+#include <TRUST_Ref.h>
 
 /*! @brief Classe Terme_Derivee_Forme_base Cette classe represente un terme source de l'equation de projection en optimisation de forme
  *
  */
 class Terme_Derivee_Forme_base : public Source_base
 {
-
   Declare_base(Terme_Derivee_Forme_base);
-
 public :
   DoubleTab& calculer(DoubleTab& ) const override;
   void mettre_a_jour(double ) override;
@@ -51,4 +49,4 @@ protected:
   mutable OWN_PTR(Champ_Fonc_base)  champ_derivee_forme_; //!< Champ pour postraitement
 };
 
-#endif
+#endif /* Terme_Derivee_Forme_base_included */

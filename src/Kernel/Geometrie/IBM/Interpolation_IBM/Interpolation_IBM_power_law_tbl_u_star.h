@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,14 +20,6 @@
 #include <Interpolation_IBM_power_law_tbl_proto.h>
 #include <TRUSTLists.h>
 
-/*! @brief : class Interpolation_IBM_power_law_tbl_u_star
- *
- *  <Description of class Interpolation_IBM_power_law_tbl_u_star>
- *
- *
- *
- */
-
 class Interpolation_IBM_power_law_tbl_u_star : public Interpolation_IBM_mean_gradient, public Interpolation_IBM_power_law_tbl_proto
 {
 
@@ -36,12 +28,7 @@ class Interpolation_IBM_power_law_tbl_u_star : public Interpolation_IBM_mean_gra
 public :
   void discretise(const Discretisation_base&, Domaine_dis_base& la_zone_EF) override;
 
-  inline IntList& getSommetsVoisinsOf(int i)
-  {
-    return sommets_voisins_[i];
-  };
-
-protected :
+  inline IntList& getSommetsVoisinsOf(int i) { return sommets_voisins_[i]; }
 };
 
 #endif /* Interpolation_IBM_power_law_tbl_u_star_included */

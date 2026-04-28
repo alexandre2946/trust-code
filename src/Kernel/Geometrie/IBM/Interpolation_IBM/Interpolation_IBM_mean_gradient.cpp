@@ -25,8 +25,7 @@ Implemente_instanciable( Interpolation_IBM_mean_gradient, "Interpolation_IBM_gra
 
 Sortie& Interpolation_IBM_mean_gradient::printOn( Sortie& os ) const
 {
-  Objet_U::printOn( os );
-  return os;
+  return Objet_U::printOn( os );
 }
 
 Entree& Interpolation_IBM_mean_gradient::readOn( Entree& is )
@@ -68,15 +67,13 @@ void Interpolation_IBM_mean_gradient::discretise(const Discretisation_base& dis,
       if (solid_elems_lu_.non_nul()) solid_elems_->affecter(solid_elems_lu_);
     }
 
-  if(!(is_dirichlet_.non_nul()))
+  if(is_dirichlet_.est_nul())
     {
       Cerr<<"Interpolation_IBM_mean_gradient: field est_dirichlet is required. exit()"<<endl;
-      exit();
+      Process::exit();
     }
   else
-    {
-      my_is_dirichlet_ = is_dirichlet_;
-    }
+    my_is_dirichlet_ = is_dirichlet_;
   computeSommetsVoisins(le_dom_, solid_points_, corresp_elems_, has_corresp_);
 }
 

@@ -31,4 +31,4 @@ private:
   int lvl_= 1 ; // choix de la methode d'Uzawa par defaut
 };
 
-#endif
+#endif /* Prepro_IBM_Uzawa_included */

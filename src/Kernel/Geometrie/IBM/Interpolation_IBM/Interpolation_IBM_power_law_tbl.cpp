@@ -20,15 +20,13 @@ Implemente_instanciable( Interpolation_IBM_power_law_tbl, "Interpolation_IBM_pow
 
 Sortie& Interpolation_IBM_power_law_tbl::printOn( Sortie& os ) const
 {
-  Interpolation_IBM_elem_fluid::printOn( os );
-  return os;
+  return Interpolation_IBM_elem_fluid::printOn( os );
 }
 
 Entree& Interpolation_IBM_power_law_tbl::readOn( Entree& is )
 {
   Param param(que_suis_je());
   set_param(param);
-  // Interpolation_IBM_elem_fluid::readOn( is );
   param.lire_avec_accolades_depuis(is);
   return is;
 }
@@ -38,5 +36,4 @@ void Interpolation_IBM_power_law_tbl::set_param(Param& param) const
   Interpolation_IBM_elem_fluid::set_param( param );
   param.ajouter("formulation_WJSP",&formulation_WJSP_,Param::OPTIONAL); // XD_ADD_P entier Choix formulation WJSP ou non
   param.ajouter("formulation_linear_pwl",&formulation_linear_pwl_,Param::OPTIONAL);  // XD_ADD_P entier Choix formulation lineaire ou non
-
 }

@@ -16,36 +16,15 @@
 #ifndef Interpolation_IBM_power_law_tbl_included
 #define Interpolation_IBM_power_law_tbl_included
 
-#include <Interpolation_IBM_elem_fluid.h>
 #include <Interpolation_IBM_power_law_tbl_proto.h>
-
-#include <Domaine.h>
-#include <Param.h>
-
-/*! @brief : class Interpolation_IBM_power_law_tbl
- *
- *  <Description of class Interpolation_IBM_power_law_tbl>
- *
- *
- *
- */
+#include <Interpolation_IBM_elem_fluid.h>
 
 class Interpolation_IBM_power_law_tbl : public Interpolation_IBM_elem_fluid, public Interpolation_IBM_power_law_tbl_proto
 {
-
   Declare_instanciable( Interpolation_IBM_power_law_tbl ) ;
-
 public :
-
-  inline int get_formulation_linear_pwl()
-  {
-    return formulation_linear_pwl_;
-  };
-
-  inline int get_formulation_WJSP()
-  {
-    return formulation_WJSP_;
-  };
+  inline int get_formulation_linear_pwl() { return formulation_linear_pwl_; }
+  inline int get_formulation_WJSP() { return formulation_WJSP_; }
 
   void set_param(Param&) const override;
 

@@ -17,19 +17,9 @@
 #define Interpolation_IBM_elem_fluid_included
 
 #include <Interpolation_IBM_base.h>
-#include <Param.h>
-
-/*! @brief : class Interpolation_IBM_elem_fluid
- *
- *  <Description of class Interpolation_IBM_elem_fluid>
- *
- *
- *
- */
 
 class Interpolation_IBM_elem_fluid : public Interpolation_IBM_base
 {
-
   Declare_instanciable( Interpolation_IBM_elem_fluid ) ;
 
 public :
@@ -53,7 +43,6 @@ protected :
   friend class Source_PDF_EF;
   friend class Source_PDF_VEF;
   friend class Source_PDF_VDF;
-
 };
 
 #endif /* Interpolation_IBM_elem_fluid_included */

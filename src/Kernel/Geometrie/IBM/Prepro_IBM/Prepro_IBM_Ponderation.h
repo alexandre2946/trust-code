@@ -33,4 +33,4 @@ private:
   int pond_= 2 ; // choix de la methode de ponderation par defaut
 };
 
-#endif
+#endif /* Prepro_IBM_Ponderation_included */

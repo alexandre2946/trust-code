@@ -17,36 +17,17 @@
 #define Interpolation_IBM_thermal_wall_law_included
 
 #include <Interpolation_IBM_elem_fluid.h>
-#include <Domaine.h>
-#include <Param.h>
 
 class Interpolation_IBM_thermal_wall_law : public Interpolation_IBM_elem_fluid
 {
-
   Declare_instanciable( Interpolation_IBM_thermal_wall_law ) ;
-
 public :
   double Kader(double, double);
 
-  inline int get_formulation_Tp()
-  {
-    return formulation_Tp_;
-  };
-
-  inline int get_boundary_type()
-  {
-    return boundary_type_;
-  }
-
-  inline double get_T_inlet()
-  {
-    return T_inlet_;
-  }
-
-  inline double get_Prandlt_mol()
-  {
-    return Prandlt_mol_;
-  }
+  inline int get_formulation_Tp() { return formulation_Tp_; }
+  inline int get_boundary_type() { return boundary_type_; }
+  inline double get_T_inlet() { return T_inlet_; }
+  inline double get_Prandlt_mol() { return Prandlt_mol_; }
 
   void set_param(Param&) const override;
 

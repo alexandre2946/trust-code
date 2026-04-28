@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,22 +18,9 @@
 
 #include <Interpolation_IBM_base.h>
 
-/*! @brief : class Interpolation_IBM_aucune
- *
- *  <Description of class Interpolation_IBM_aucune>
- *
- *
- *
- */
-
 class Interpolation_IBM_aucune : public Interpolation_IBM_base
 {
-
   Declare_instanciable( Interpolation_IBM_aucune ) ;
-
-public :
-protected :
-
 };
 
 #endif /* Interpolation_IBM_aucune_included */
