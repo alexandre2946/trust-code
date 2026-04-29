@@ -35,7 +35,7 @@
 #include <map>
 
 class Geometrie;
-
+extern bool polymac_flica5;
 /*! @brief class Domaine_Poly_base
  *
  *  	Classe instanciable qui derive de Domaine_VF.

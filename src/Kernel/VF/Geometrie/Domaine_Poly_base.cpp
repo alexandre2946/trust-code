@@ -54,7 +54,7 @@
 #include <cfenv>
 #include <set>
 #include <map>
-
+bool polymac_flica5=false;
 Implemente_base(Domaine_Poly_base,"Domaine_Poly_base",Domaine_VF);
 
 Sortie& Domaine_Poly_base::ecrit(Sortie& os) const
