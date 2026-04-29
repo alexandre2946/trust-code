@@ -1597,7 +1597,7 @@ void Source_PDF_EF::creer_champ(const Motcle& motlu)
 {
   Source_PDF_base::creer_champ(motlu);
 
-  if (motlu=="u_star_ibm" && !champ_u_star_ibm_.non_nul() && imm_wall_law_)
+  if (motlu=="u_star_ibm" && !champ_u_star_ibm_ && imm_wall_law_)
     {
       int nb_comp = 1;
       Noms noms(1);
@@ -1627,7 +1627,7 @@ bool Source_PDF_EF::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ)
 {
   if (Source_PDF_base::has_champ(nom)) return Source_PDF_base::has_champ(nom, ref_champ);
 
-  if (nom == "u_star_ibm" && champ_u_star_ibm_.non_nul())
+  if (nom == "u_star_ibm" && champ_u_star_ibm_)
     {
       ref_champ = Source_PDF_EF::get_champ(nom);
       return true;
@@ -1645,7 +1645,7 @@ bool Source_PDF_EF::has_champ(const Motcle& nom) const
 {
   if (Source_PDF_base::has_champ(nom)) return true;
 
-  if (nom == "u_star_ibm" && champ_u_star_ibm_.non_nul())
+  if (nom == "u_star_ibm" && champ_u_star_ibm_)
     return true;
   else if (nom == "y_plus_ibm" && champ_y_plus_ibm_)
     return true;

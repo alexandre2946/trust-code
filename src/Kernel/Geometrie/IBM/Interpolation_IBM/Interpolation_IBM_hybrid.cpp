@@ -43,7 +43,7 @@ void Interpolation_IBM_hybrid::discretise(const Discretisation_base& dis, Domain
   dis.discretiser_champ("champ_sommets",le_dom_,"solid_elems","none",1,0., solid_elems_);
   solid_elems_->affecter(solid_elems_lu_);
 
-  if(is_dirichlet_.est_nul())
+  if(!is_dirichlet_)
     {
       Cerr<<"Interpolation_IBM_hybrid: field est_dirichlet is required. exit()"<<finl;
       Process::exit();

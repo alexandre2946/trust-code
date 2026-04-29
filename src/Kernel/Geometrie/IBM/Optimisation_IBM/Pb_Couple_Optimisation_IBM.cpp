@@ -181,7 +181,7 @@ void Pb_Couple_Optimisation_IBM::initialize( )
 {
   Probleme_Couple::initialize();
 
-  if (!pb_etat_opt_.non_nul())
+  if (!pb_etat_opt_)
     {
       Cerr<<"(IBM) Pb_Couple_Optimisation_IBM : no detected state problem."<<finl;
       Cerr<<"Case not supported"<<finl;
@@ -253,13 +253,13 @@ void Pb_Couple_Optimisation_IBM::initialize( )
 
   const int exist_interp = my_source_PDF_opt_->getInterpolationBool();
   if (exist_interp) my_interpolation_opt_ = my_source_PDF_opt_->getInterpolationLu();
-  if (my_interpolation_opt_.non_nul())
+  if (my_interpolation_opt_)
     {
       Cerr<<"(IBM) Pb_Couple_Optimisation_IBM : interpolation detected."<<finl;
       my_interpolation_opt_->discretise_PDF_mobile(pb_etat_opt_->equation(Numero_eq_optimis_).discretisation(), pb_etat_opt_->equation(Numero_eq_optimis_).domaine_dis());
     }
   my_prepro_opt_ = my_source_PDF_opt_->getpreproLu();
-  if (my_prepro_opt_.non_nul())
+  if (my_prepro_opt_)
     {
       Cerr<<"(IBM) Pb_Couple_Optimisation_IBM : prepro_IBM detected for state equ."<<finl;
     }
@@ -293,7 +293,7 @@ void Pb_Couple_Optimisation_IBM::initialize( )
 
   const int exist_interp_adjt = my_source_PDF_opt_adjt_->getInterpolationBool();
   if (exist_interp_adjt) my_interpolation_opt_adjt_ = my_source_PDF_opt_adjt_->getInterpolationLu();
-  if (my_interpolation_opt_adjt_.non_nul())
+  if (my_interpolation_opt_adjt_)
     {
       Cerr<<"(IBM) Pb_Couple_Optimisation_IBM : interpolation detected for adjoint problem."<<finl;
       my_interpolation_opt_adjt_->discretise_PDF_mobile(pb_adjt_opt_->equation(Numero_eq_optimis_).discretisation(), pb_adjt_opt_->equation(Numero_eq_optimis_).domaine_dis());
@@ -338,7 +338,7 @@ void Pb_Couple_Optimisation_IBM::initialize( )
 
   // Fonction cout scalaire par element
 
-  if (fonction_cout_lu_.non_nul())
+  if (fonction_cout_lu_)
     {
       Champ_Don_base& ch_fonction_cout_lu = ref_cast(Champ_Don_base,fonction_cout_lu_.valeur());
       const int nb_comp = ch_fonction_cout_lu.nb_comp();
@@ -392,7 +392,7 @@ bool Pb_Couple_Optimisation_IBM::initTimeStep(double dt)
   const IntTab& elems = (pb_projection_opt_->equation(0).discretisation().is_ef() ? dom.les_elems() : the_dom_VF.elem_faces());
 
   // Mise a jour de la fonction cout (quantité élémentaire)
-  if (fonction_cout_lu_.non_nul())
+  if (fonction_cout_lu_)
     {
       fonction_cout_lu_->mettre_a_jour(temps);
       fonction_cout_->affecter(fonction_cout_lu_.valeur());

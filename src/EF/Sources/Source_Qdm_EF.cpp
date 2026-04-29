@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -126,7 +126,7 @@ void Source_Qdm_EF::mettre_a_jour(double temps)
 
 void Source_Qdm_EF::creer_champ(const Motcle& motlu)
 {
-  if (motlu=="source_qdm" && !champ_source_qdm_.non_nul())
+  if (motlu=="source_qdm" && !champ_source_qdm_)
     {
       Motcle directive("champ_elem");
       int nb_comp = dimension;
@@ -142,7 +142,7 @@ void Source_Qdm_EF::creer_champ(const Motcle& motlu)
 
 bool Source_Qdm_EF::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const
 {
-  if (nom == "source_qdm" && champ_source_qdm_.non_nul())
+  if (nom == "source_qdm" && champ_source_qdm_)
     {
       ref_champ = Source_Qdm_EF::get_champ(nom);
       return true;
@@ -155,7 +155,7 @@ bool Source_Qdm_EF::has_champ(const Motcle& nom) const
 {
   if (Source_base::has_champ(nom)) return true;
 
-  if (nom == "source_qdm" && champ_source_qdm_.non_nul())
+  if (nom == "source_qdm" && champ_source_qdm_)
     return true;
   else
     return false; /* rien trouve */
@@ -165,7 +165,7 @@ const Champ_base& Source_Qdm_EF::get_champ(const Motcle& nom) const
 {
   if (nom=="source_qdm")
     {
-      if (champ_source_qdm_.est_nul())
+      if (!champ_source_qdm_)
         throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 
       int is_source_unif=0;

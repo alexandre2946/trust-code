@@ -57,7 +57,7 @@ void Interpolation_IBM_elem_fluid::discretise(const Discretisation_base& dis, Do
   if (fluid_elems_from_prepro_)
     {
       OBS_PTR(Prepro_IBM_base) my_prep =  my_source_->getpreproLu();
-      if ((&my_prep)->non_nul())
+      if (my_prep)
         {
           DoubleTab& the_values = ref_cast_non_const(DoubleTab, my_prep->get_champ_fluid_elems());
           fluid_elems_->valeurs() = the_values;
@@ -65,16 +65,16 @@ void Interpolation_IBM_elem_fluid::discretise(const Discretisation_base& dis, Do
     }
   else
     {
-      if (fluid_elems_lu_.non_nul()) fluid_elems_->affecter(fluid_elems_lu_);
+      if (fluid_elems_lu_) fluid_elems_->affecter(fluid_elems_lu_);
     }
 
-  if (corresp_elems_.non_nul()) has_corresp_ = true;
+  if (corresp_elems_) has_corresp_ = true;
 
   dis.discretiser_champ("champ_sommets",le_dom_dis,vectoriel,c_nam,units,nb_comp,0.,fluid_points_);
   if (fluid_points_from_prepro_)
     {
       OBS_PTR(Prepro_IBM_base) my_prep =  my_source_->getpreproLu();
-      if ((&my_prep)->non_nul())
+      if (my_prep)
         {
           DoubleTab& the_values = ref_cast_non_const(DoubleTab, my_prep->get_champ_fluid_points());
           fluid_points_->valeurs() = the_values;
@@ -82,7 +82,7 @@ void Interpolation_IBM_elem_fluid::discretise(const Discretisation_base& dis, Do
     }
   else
     {
-      if (fluid_points_lu_.non_nul()) fluid_points_->affecter(fluid_points_lu_);
+      if (fluid_points_lu_) fluid_points_->affecter(fluid_points_lu_);
     }
   computeFluidElems(le_dom_dis);
 }

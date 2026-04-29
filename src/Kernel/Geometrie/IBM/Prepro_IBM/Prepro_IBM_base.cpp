@@ -155,11 +155,6 @@ Sortie& Prepro_IBM_base::printOn(Sortie& s ) const
 void Prepro_IBM_base::associer_pb(const Probleme_base& pb)
 {
   mon_pb_=pb;
-  if(!mon_pb_.non_nul())
-    {
-      Cerr << "Error : " << que_suis_je() << "not associated to a problem ! " << finl;
-      Process::exit();
-    }
   discretiser();
 }
 

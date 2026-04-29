@@ -29,7 +29,7 @@ void Interpolation_IBM_base::discretise(const Discretisation_base& dis, Domaine_
   if (solid_points_from_prepro_)
     {
       OBS_PTR(Prepro_IBM_base) my_prep = my_source_->getpreproLu();
-      if ((&my_prep)->non_nul())
+      if (my_prep)
         {
           DoubleTab& the_values = ref_cast_non_const(DoubleTab, my_prep->get_champ_solid_points());
           solid_points_->valeurs() = the_values;
@@ -37,13 +37,14 @@ void Interpolation_IBM_base::discretise(const Discretisation_base& dis, Domaine_
     }
   else
     {
-      if (solid_points_lu_.non_nul()) solid_points_->affecter(solid_points_lu_);
+      if (solid_points_lu_)
+        solid_points_->affecter(solid_points_lu_);
     }
 
   if (is_dirichlet_from_prepro_)
     {
       OBS_PTR(Prepro_IBM_base) my_prep = my_source_->getpreproLu();
-      if ((&my_prep)->non_nul())
+      if (my_prep)
         {
           DoubleTab& the_values = ref_cast_non_const(DoubleTab, my_prep->get_isNodeDirichlet());
           dis.discretiser_champ("champ_sommets",le_dom_dis,"is_dirichlet","none",1,0., is_dirichlet_);
@@ -52,7 +53,7 @@ void Interpolation_IBM_base::discretise(const Discretisation_base& dis, Domaine_
     }
   else
     {
-      if(is_dirichlet_lu_.non_nul())
+      if(is_dirichlet_lu_)
         {
           dis.discretiser_champ("champ_sommets",le_dom_dis,"is_dirichlet","none",1,0., is_dirichlet_);
           is_dirichlet_->affecter(is_dirichlet_lu_);
@@ -71,7 +72,7 @@ void Interpolation_IBM_base::discretise(const Discretisation_base& dis, Domaine_
   if (corresp_elems_from_prepro_)
     {
       OBS_PTR(Prepro_IBM_base) my_prep = my_source_->getpreproLu();
-      if ((&my_prep)->non_nul())
+      if (my_prep)
         {
           DoubleTab& the_values = ref_cast_non_const(DoubleTab, my_prep->get_champ_corresp_elems());
           dis.discretiser_champ("champ_elem",le_dom_dis,"corresp_elems","none",1,0., corresp_elems_);
@@ -80,7 +81,7 @@ void Interpolation_IBM_base::discretise(const Discretisation_base& dis, Domaine_
     }
   else
     {
-      if (corresp_elems_lu_.non_nul())
+      if (corresp_elems_lu_)
         {
           dis.discretiser_champ("champ_elem",le_dom_dis,"corresp_elems","none",1,0., corresp_elems_);
           corresp_elems_->affecter(corresp_elems_lu_);
@@ -466,7 +467,7 @@ void Interpolation_IBM_base::set_fields_from_prepro_to_interp(Prepro_IBM_base& u
 {
   solid_points_->valeurs() = un_prepro.get_champ_solid_points();
   corresp_elems_->valeurs() = un_prepro.get_champ_corresp_elems();
-  if(is_dirichlet_.non_nul())
+  if(is_dirichlet_)
     {
       is_dirichlet_->valeurs() = un_prepro.get_isNodeDirichlet();
     }

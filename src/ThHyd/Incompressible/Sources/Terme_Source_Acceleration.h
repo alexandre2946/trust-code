@@ -67,12 +67,9 @@ private:
   // champ d'acceleration impose (lu dans le jeu de donnees)
   // OWN_PTR(Champ_Don_base) lu dans le jeu de donnees, homogene a d/dt(v) en m/(s^2).
   // Ce doit etre un champ vectoriel uniforme a "dimension" composantes.
-  // Si champ_acceleration.non_nul()==0, c'est qu'on n'en a pas mis
-  // dans le jeu de donnees.
   OWN_PTR(Champ_Don_base) champ_acceleration_;
 
   // champ de rotation instationnaire:
-  // Les trois champs suivants peuvent etre nuls (omega_.non_nul()==0).
 
   // Vitesse de rotation: champ uniforme a trois composantes
   // (attention: en 2D, vecteur oriente selon Z)

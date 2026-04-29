@@ -50,13 +50,13 @@ void Interpolation_IBM_mean_gradient::discretise(const Discretisation_base& dis,
   Noms units(nb_comp);
   Noms c_nam(nb_comp);
 
-  if (corresp_elems_.non_nul()) has_corresp_ = true;
+  if (corresp_elems_) has_corresp_ = true;
 
   dis.discretiser_champ("champ_sommets",le_dom_,"solid_elems","none",1,0., solid_elems_);
   if (solid_elems_from_prepro_)
     {
       OBS_PTR(Prepro_IBM_base) my_prep =  my_source_->getpreproLu();
-      if ((&my_prep)->non_nul())
+      if (my_prep)
         {
           DoubleTab& the_values = ref_cast_non_const(DoubleTab, my_prep->get_champ_solid_elems());
           solid_elems_->valeurs() = the_values;
@@ -64,12 +64,12 @@ void Interpolation_IBM_mean_gradient::discretise(const Discretisation_base& dis,
     }
   else
     {
-      if (solid_elems_lu_.non_nul()) solid_elems_->affecter(solid_elems_lu_);
+      if (solid_elems_lu_) solid_elems_->affecter(solid_elems_lu_);
     }
 
-  if(is_dirichlet_.est_nul())
+  if(!is_dirichlet_)
     {
-      Cerr<<"Interpolation_IBM_mean_gradient: field est_dirichlet is required. exit()"<<endl;
+      Cerr<<"Interpolation_IBM_mean_gradient: field est_dirichlet is required. exit()"<<finl;
       Process::exit();
     }
   else

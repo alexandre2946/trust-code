@@ -79,7 +79,7 @@ void Terme_Derivee_Forme_base::creer_champ(const Motcle& motlu)
 {
   const Domaine_dis_base& le_dom_dis = equation().domaine_dis();
   const Probleme_base& pb = equation().probleme();
-  if (motlu=="source_from_shape_deriv" && !champ_derivee_forme_.non_nul())
+  if (motlu=="source_from_shape_deriv" && !champ_derivee_forme_)
     {
       Noms noms(1);
       noms[0]="source_from_shape_deriv";
@@ -102,7 +102,7 @@ void Terme_Derivee_Forme_base::get_noms_champs_postraitables(Noms& nom,Option op
 
 bool Terme_Derivee_Forme_base::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const
 {
-  if (nom == "source_from_shape_deriv" && champ_derivee_forme_.non_nul())
+  if (nom == "source_from_shape_deriv" && champ_derivee_forme_)
     {
       ref_champ = get_champ(nom);
       return true;
@@ -115,7 +115,7 @@ bool Terme_Derivee_Forme_base::has_champ(const Motcle& nom, OBS_PTR(Champ_base) 
 
 bool Terme_Derivee_Forme_base::has_champ(const Motcle& nom) const
 {
-  if (nom == "source_from_shape_deriv" && champ_derivee_forme_.non_nul())
+  if (nom == "source_from_shape_deriv" && champ_derivee_forme_)
     return true;
   else
     return champs_compris_.has_champ(nom);
@@ -125,7 +125,7 @@ const Champ_base& Terme_Derivee_Forme_base::get_champ(const Motcle& nom) const
 {
   if (nom=="source_from_shape_deriv")
     {
-      if (champ_derivee_forme_.est_nul())
+      if (!champ_derivee_forme_)
         throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 
       // Initialisation a 0 du champ_derivee_forme_

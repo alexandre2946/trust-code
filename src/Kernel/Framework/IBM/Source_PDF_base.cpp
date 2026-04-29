@@ -86,7 +86,7 @@ Sortie& Source_PDF_base::printOn(Sortie& s ) const
 
 void Source_PDF_base::associer_pb(const Probleme_base& pb)
 {
-  if (prepro_lu_.non_nul())
+  if (prepro_lu_)
     {
       prepro_lu_->associer_pb(pb);
 
@@ -103,13 +103,13 @@ void Source_PDF_base::associer_pb(const Probleme_base& pb)
   Noms nom_c(nb_comp);
   Noms unites(nb_comp);
   pb.discretisation().discretiser_champ("champ_elem",le_dom_dis,vectoriel,nom_c,unites,nb_comp,0.,champ_rotation_);
-  if (prepro_lu_.non_nul() && rotation_from_prepro_)
+  if (prepro_lu_ && rotation_from_prepro_)
     {
       champ_rotation_->valeurs() = prepro_lu_->get_champ_rotation();
     }
   else
     {
-      if (champ_rotation_lu_.non_nul())
+      if (champ_rotation_lu_)
         {
           champ_rotation_->affecter(champ_rotation_lu_);
         }
@@ -125,13 +125,13 @@ void Source_PDF_base::associer_pb(const Probleme_base& pb)
   Noms nom_c0(nb_comp0);
   Noms unites0(nb_comp0);
   pb.discretisation().discretiser_champ("champ_elem",le_dom_dis,vectoriel,nom_c0,unites0,nb_comp0,0.,champ_barycentre_);
-  if (prepro_lu_.non_nul() && barycentre_from_prepro_)
+  if (prepro_lu_ && barycentre_from_prepro_)
     {
       champ_barycentre_->valeurs() = prepro_lu_->get_champ_barycentre();
     }
   else
     {
-      if (champ_barycentre_lu_.non_nul())
+      if (champ_barycentre_lu_)
         {
           champ_barycentre_->affecter(champ_barycentre_lu_);
         }
@@ -151,13 +151,13 @@ void Source_PDF_base::associer_pb(const Probleme_base& pb)
 
   // Aire
   pb.discretisation().discretiser_champ("champ_elem",le_dom_dis ,"aire","m-1",1,0., champ_aire_);
-  if (prepro_lu_.non_nul() && aire_from_prepro_)
+  if (prepro_lu_ && aire_from_prepro_)
     {
       champ_aire_->valeurs() = prepro_lu_->get_champ_aire();
     }
   else
     {
-      if (champ_aire_lu_.non_nul())
+      if (champ_aire_lu_)
         {
           champ_aire_->affecter(champ_aire_lu_);
         }
@@ -427,7 +427,7 @@ void Source_PDF_base::update_pseudo_level_set_IBM(DoubleTab& vecteur_deplacement
       Cerr << "Source_PDF_base::update_pseudo_level_set_IBM: No Interpolation. Aborting..." << finl;
       abort();
     }
-  if (!(prepro_lu_.non_nul()))
+  if (!prepro_lu_)
     {
       Cerr << "Source_PDF_base::update_pseudo_level_set_IBM: No IBM prepro. Aborting..." << finl;
       abort();
@@ -934,7 +934,7 @@ void Source_PDF_base::update_elem_IBM(DoubleTab& vecteur_deplacement, double alp
   rotation.echange_espace_virtuel();
 
 
-  if (prepro_lu_.non_nul())
+  if (prepro_lu_)
     {
       set_fields_to_prepro(prepro_lu_);
       prepro_lu_->compute_solid_fluid(1);
@@ -949,7 +949,7 @@ void Source_PDF_base::update_elem_IBM(DoubleTab& vecteur_deplacement, double alp
 
 void Source_PDF_base::verify_results_prepro()
 {
-  if ( !((&prepro_lu_)->non_nul()) ) return;
+  if (!prepro_lu_) return;
   Cerr<<"(IBM) source PDF base: Prepro IBM verification if any ...."<<finl;
 
   const DoubleTab& aireArray = prepro_lu_->champ_aire_->valeurs();
@@ -968,7 +968,7 @@ void Source_PDF_base::verify_results_prepro()
 
   ///////////////////////////////// Champs de base /////////////////////////////////
   // Aire
-  if (champ_aire_lu_.non_nul())
+  if (champ_aire_lu_)
     {
       const DoubleTab& aireArray_src_pdf = champ_aire_lu_->valeurs();
       assert(aireArray_src_pdf.dimension(0)==aireArray.dimension(0));
@@ -977,7 +977,7 @@ void Source_PDF_base::verify_results_prepro()
     }
 
   // Barycentre
-  if (champ_barycentre_lu_.non_nul())
+  if (champ_barycentre_lu_)
     {
       const DoubleTab& baryArray_src_pdf = champ_barycentre_lu_->valeurs();
       assert(baryArray_src_pdf.dimension(0)==baryArray.dimension(0));
@@ -987,7 +987,7 @@ void Source_PDF_base::verify_results_prepro()
     }
 
   // Normale
-  if (champ_rotation_lu_.non_nul())
+  if (champ_rotation_lu_)
     {
       const DoubleTab& rotArray_src_pdf = champ_rotation_lu_->valeurs();
       assert(rotArray_src_pdf.dimension(1)==dim_esp*dim_esp);
@@ -1015,7 +1015,7 @@ void Source_PDF_base::verify_results_prepro()
     }
 
   // Rotation
-  if (champ_rotation_lu_.non_nul())
+  if (champ_rotation_lu_)
     {
       const DoubleTab& rotArray_src_pdf = champ_rotation_lu_->valeurs();
       assert(rotArray_src_pdf.dimension(1)==dim_esp*dim_esp);
@@ -1032,7 +1032,7 @@ void Source_PDF_base::verify_results_prepro()
       Cerr<<"Prepro_IBM::verify_results_prepro: Interpolation_IBM"<<finl;
 
       // is_dirichlet
-      if (interpolation_lue_->is_dirichlet_lu_.non_nul())
+      if (interpolation_lue_->is_dirichlet_lu_)
         {
           const DoubleTab& isNodeDirichletArray_src_pdf = interpolation_lue_->is_dirichlet_lu_->valeurs();
           assert(isNodeDirichletArray_src_pdf.dimension(0)==isNodeDirichletArray.dimension(0));
@@ -1042,7 +1042,7 @@ void Source_PDF_base::verify_results_prepro()
         }
 
       // Projection solide
-      if (interpolation_lue_->solid_points_lu_.non_nul())
+      if (interpolation_lue_->solid_points_lu_)
         {
           const DoubleTab& solideArray_src_pdf = interpolation_lue_->solid_points_lu_->valeurs();
           assert(solideArray_src_pdf.dimension(0)==solideArray.dimension(0));
@@ -1052,7 +1052,7 @@ void Source_PDF_base::verify_results_prepro()
         }
 
       // correspondance elems
-      if (interpolation_lue_->corresp_elems_lu_.non_nul())
+      if (interpolation_lue_->corresp_elems_lu_)
         {
           const DoubleTab& corresp_elems_src_pdf = interpolation_lue_->corresp_elems_lu_->valeurs();
           assert(corresp_elems_src_pdf.dimension(1)==1);
@@ -1070,7 +1070,7 @@ void Source_PDF_base::verify_results_prepro()
           Interpolation_IBM_mean_gradient& interp = ref_cast(Interpolation_IBM_mean_gradient,interpolation_lue_.valeur());
 
           // Element projection solide
-          if (interp.solid_elems_lu_.non_nul())
+          if (interp.solid_elems_lu_)
             {
               const DoubleTab& solid_elemsArray_src_pdf = interp.solid_elems_lu_->valeurs();
               assert(solid_elemsArray_src_pdf.dimension(0)==solid_elemsArray.dimension(0));
@@ -1087,7 +1087,7 @@ void Source_PDF_base::verify_results_prepro()
           Interpolation_IBM_elem_fluid& interp = ref_cast(Interpolation_IBM_elem_fluid,interpolation_lue_.valeur());
 
           // Projection fluide
-          if (interp.fluid_points_lu_.non_nul())
+          if (interp.fluid_points_lu_)
             {
               const DoubleTab& fluidArray_src_pdf = interp.fluid_points_lu_->valeurs();
               assert(fluidArray_src_pdf.dimension(0)==fluidArray.dimension(0));
@@ -1097,7 +1097,7 @@ void Source_PDF_base::verify_results_prepro()
             }
 
           // Element projection fluide
-          if (interp.fluid_elems_lu_.non_nul())
+          if (interp.fluid_elems_lu_)
             {
               const DoubleTab& fluid_elemsArray_src_pdf = interp.fluid_elems_lu_->valeurs();
               assert(fluid_elemsArray_src_pdf.dimension(0)==fluid_elemsArray.dimension(0));
@@ -1848,7 +1848,7 @@ void Source_PDF_base::creer_champ(const Motcle& motlu)
   const Domaine_dis_base& le_dom_dis = equation().domaine_dis();
 
   double temps=0.;
-  if (motlu=="source_term_pdf" && !champ_source_term_PDF_.non_nul())
+  if (motlu=="source_term_pdf" && !champ_source_term_PDF_)
     {
       if (nb_comp == 1)
         {
@@ -1869,7 +1869,7 @@ void Source_PDF_base::creer_champ(const Motcle& motlu)
       champs_compris_.ajoute_champ(champ_source_term_PDF_);
     }
 
-  if (motlu=="barycentre_IBM" && !champ_barycentre_IBM_.non_nul())
+  if (motlu=="barycentre_IBM" && !champ_barycentre_IBM_)
     {
       nb_comp = Objet_U::dimension;
       Noms nomsb(nb_comp);
@@ -1880,7 +1880,7 @@ void Source_PDF_base::creer_champ(const Motcle& motlu)
       champs_compris_.ajoute_champ(champ_barycentre_IBM_);
     }
 
-  if (motlu=="normal_IBM" && !champ_normal_IBM_.non_nul())
+  if (motlu=="normal_IBM" && !champ_normal_IBM_)
     {
       nb_comp = Objet_U::dimension;
       Noms nomsn(nb_comp);
@@ -1891,13 +1891,13 @@ void Source_PDF_base::creer_champ(const Motcle& motlu)
       champs_compris_.ajoute_champ(champ_normal_IBM_);
     }
 
-  if (motlu=="aire_IBM" && !champ_aire_IBM_.non_nul())
+  if (motlu=="aire_IBM" && !champ_aire_IBM_)
     {
       pb.discretisation().discretiser_champ("champ_elem",le_dom_dis,"aire_IBM","m^2",1,0., champ_aire_IBM_);
       champs_compris_.ajoute_champ(champ_aire_IBM_);
     }
 
-  if (motlu=="velocity_shape_IBM" && !champ_vitesse_shape_IBM_.non_nul())
+  if (motlu=="velocity_shape_IBM" && !champ_vitesse_shape_IBM_)
     {
       nb_comp = Objet_U::dimension;
       Noms nomsv(nb_comp);
@@ -1908,7 +1908,7 @@ void Source_PDF_base::creer_champ(const Motcle& motlu)
       champs_compris_.ajoute_champ(champ_vitesse_shape_IBM_);
     }
 
-  if (motlu=="pseudo_level_set_IBM" && !champ_pseudo_level_set_IBM_.non_nul())
+  if (motlu=="pseudo_level_set_IBM" && !champ_pseudo_level_set_IBM_)
     {
       nb_comp = 1;
       Noms nompl(nb_comp);
@@ -1938,32 +1938,32 @@ void Source_PDF_base::get_noms_champs_postraitables(Noms& nom,Option opt) const
 
 bool Source_PDF_base::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const
 {
-  if (nom == "source_term_pdf" && champ_source_term_PDF_.non_nul())
+  if (nom == "source_term_pdf" && champ_source_term_PDF_)
     {
       ref_champ = get_champ(nom);
       return true;
     }
-  else if (nom == "barycentre_IBM" && champ_barycentre_IBM_.non_nul())
+  else if (nom == "barycentre_IBM" && champ_barycentre_IBM_)
     {
       ref_champ = get_champ(nom);
       return true;
     }
-  else if (nom == "normal_IBM" && champ_normal_IBM_.non_nul())
+  else if (nom == "normal_IBM" && champ_normal_IBM_)
     {
       ref_champ = get_champ(nom);
       return true;
     }
-  else if (nom == "aire_IBM" && champ_aire_IBM_.non_nul())
+  else if (nom == "aire_IBM" && champ_aire_IBM_)
     {
       ref_champ = get_champ(nom);
       return true;
     }
-  else if (nom == "velocity_shape_IBM" && champ_vitesse_shape_IBM_.non_nul())
+  else if (nom == "velocity_shape_IBM" && champ_vitesse_shape_IBM_)
     {
       ref_champ = get_champ(nom);
       return true;
     }
-  else if (nom == "pseudo_level_set_IBM" && champ_pseudo_level_set_IBM_.non_nul())
+  else if (nom == "pseudo_level_set_IBM" && champ_pseudo_level_set_IBM_)
     {
       ref_champ = get_champ(nom);
       return true;
@@ -1974,17 +1974,17 @@ bool Source_PDF_base::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_cham
 
 bool Source_PDF_base::has_champ(const Motcle& nom) const
 {
-  if (nom == "source_term_pdf" && champ_source_term_PDF_.non_nul())
+  if (nom == "source_term_pdf" && champ_source_term_PDF_)
     return true;
-  else if (nom == "barycentre_IBM" && champ_barycentre_IBM_.non_nul())
+  else if (nom == "barycentre_IBM" && champ_barycentre_IBM_)
     return true;
-  else if (nom == "normal_IBM" && champ_normal_IBM_.non_nul())
+  else if (nom == "normal_IBM" && champ_normal_IBM_)
     return true;
-  else if (nom == "aire_IBM" && champ_aire_IBM_.non_nul())
+  else if (nom == "aire_IBM" && champ_aire_IBM_)
     return true;
-  else if (nom == "velocity_shape_IBM" && champ_vitesse_shape_IBM_.non_nul())
+  else if (nom == "velocity_shape_IBM" && champ_vitesse_shape_IBM_)
     return true;
-  else if (nom == "pseudo_level_set_IBM" && champ_pseudo_level_set_IBM_.non_nul())
+  else if (nom == "pseudo_level_set_IBM" && champ_pseudo_level_set_IBM_)
     return true;
   else
     return false; /* rien trouve */
@@ -1996,7 +1996,7 @@ const Champ_base& Source_PDF_base::get_champ(const Motcle& nom) const
 
   if (nom=="source_term_pdf")
     {
-      if (champ_source_term_PDF_.est_nul())
+      if (!champ_source_term_PDF_)
         throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 
       // Initialisation a 0 du champ_source_term_PDF_
@@ -2016,13 +2016,13 @@ const Champ_base& Source_PDF_base::get_champ(const Motcle& nom) const
     }
   else if (nom=="barycentre_IBM")
     {
-      if (champ_barycentre_IBM_.est_nul())
+      if (!champ_barycentre_IBM_)
         throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 
       // Initialisation a 0 du champ_barycentre_IBM_
       DoubleTab& valeurs = champ_barycentre_IBM_->valeurs();
       valeurs=0.;
-      if (champ_barycentre_.non_nul())
+      if (champ_barycentre_)
         {
           const DoubleTab& barycentre = champ_barycentre_->valeurs();
           int nb_d0 = barycentre.dimension(0);
@@ -2037,13 +2037,13 @@ const Champ_base& Source_PDF_base::get_champ(const Motcle& nom) const
     }
   else if (nom=="normal_IBM")
     {
-      if (champ_normal_IBM_.est_nul())
+      if (!champ_normal_IBM_)
         throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 
       // Initialisation a 0 du champ_normal_IBM_
       DoubleTab& valeurs = champ_normal_IBM_->valeurs();
       valeurs=0.;
-      if (champ_rotation_.non_nul())
+      if (champ_rotation_)
         {
           const DoubleTab& rotation = champ_rotation_->valeurs();
           int nb_d0 = rotation.dimension(0);
@@ -2057,13 +2057,13 @@ const Champ_base& Source_PDF_base::get_champ(const Motcle& nom) const
     }
   else if (nom=="aire_IBM")
     {
-      if (champ_aire_IBM_.est_nul())
+      if (!champ_aire_IBM_)
         throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 
       // Initialisation a 0 du champ_aire_IBM_
       DoubleTab& valeurs = champ_aire_IBM_->valeurs();
       valeurs=0.;
-      if (champ_aire_.non_nul())
+      if (champ_aire_)
         {
           const DoubleTab& aire = champ_aire_->valeurs();
           int nb_d0 = aire.dimension(0);
@@ -2078,13 +2078,13 @@ const Champ_base& Source_PDF_base::get_champ(const Motcle& nom) const
     }
   else if (nom=="velocity_shape_IBM")
     {
-      if (champ_vitesse_shape_IBM_.est_nul())
+      if (!champ_vitesse_shape_IBM_)
         throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 
       // Initialisation a 0 du champ_vitesse_shape_IBM_
       DoubleTab& valeurs = champ_vitesse_shape_IBM_->valeurs();
       valeurs=0.;
-      if (modele_lu_.vitesse_shape_IBM_.non_nul())
+      if (modele_lu_.vitesse_shape_IBM_)
         {
           const DoubleTab& vitesse = modele_lu_.get_vitesse_shape_IBM();
           int nb_d0 = vitesse.dimension(0);
@@ -2099,7 +2099,7 @@ const Champ_base& Source_PDF_base::get_champ(const Motcle& nom) const
     }
   else if (nom=="pseudo_level_set_IBM")
     {
-      if (champ_pseudo_level_set_IBM_.est_nul())
+      if (!champ_pseudo_level_set_IBM_)
         throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 
       // Initialisation a 0 du champ_pseudo_level_set_IBM_
@@ -2107,7 +2107,7 @@ const Champ_base& Source_PDF_base::get_champ(const Motcle& nom) const
       valeurs=0.;
       if (interpolation_bool_)
         {
-          if (interpolation_lue_->pseudo_level_set_.non_nul())
+          if (interpolation_lue_->pseudo_level_set_)
             {
               Interpolation_IBM_base& my_interp = ref_cast_non_const(Interpolation_IBM_base, getInterpolationLu());
               const DoubleTab& pseudo_level_set = my_interp.get_pseudo_level_set();
