@@ -9,9 +9,9 @@ Read_MED { domain dom mesh 2D_tetra_boite_cote_1m file mesh_tetra.med convertall
 # BEGIN PARTITION
 Partition dom
 {
-        Partition_tool metis { nb_parts 4 }
-        Larg_joint 2
-        zones_name DOM
+    Partition_tool metis { nb_parts 4 }
+    Larg_joint 2
+    zones_name DOM
 }
 End
 END PARTITION #
@@ -20,12 +20,10 @@ END PARTITION #
 Scatter DOM.Zones dom
 END SCATTER #
 
-
 Scheme_euler_explicit sch
 Read sch
-
 {
-   tinit 0
+    tinit 0
 	nb_pas_dt_max 3
     dt_min 5.e-40
     dt_max  0.8
@@ -33,8 +31,6 @@ Read sch
     seuil_statio -1
     facsec 0.8
 }
-
-
 
 Coloc dis
 
@@ -45,20 +41,20 @@ Associate  pb sch
 Discretize pb dis
 
 Read pb
-{   Milieu_composite_Euler
-    {     gas StiffenedGas { gamma 1.4 pinf 0 }
-          interface Interface_Baer_Nunziato { vitesse -1 pression -1 }
-    } 
-    
+{
+    Milieu_composite_Euler
+    {
+        gas StiffenedGas { gamma 1.4 pinf 0 }
+    }
+
     Fraction_Euler
     {
-        termes_non_conservatifs { negligeable }
         initial_conditions
         {
             alpha Champ_composite 1
             {
-               Champ_Uniforme 1 1
-            } 
+                Champ_Uniforme 1 1
+            }
         }
         boundary_conditions
         {
@@ -68,7 +64,7 @@ Read pb
             down Sortie_supersonique
         }
     }
-    
+
     Masse_Euler
     {
         convection { hll }
@@ -77,29 +73,25 @@ Read pb
             densite Champ_composite 1
             {
                 Champ_Uniforme 1 1
-            } 
+            }
         }
         boundary_conditions
         {
-           left Sortie_supersonique
+            left Sortie_supersonique
             up Sortie_supersonique
             right Sortie_supersonique
             down Sortie_supersonique
         }
     }
-       
+
     QDM_Euler
     {
-        # evanescence { homogene { alpha_res 1 alpha_res_min 0.5 } } #
-        solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg }  
         convection { hll }
-        termes_non_conservatifs { negligeable }
-        diffusion  { negligeable }
         initial_conditions
         {
             vitesse Champ_composite 1
-            {   
-                 Champ_Uniforme 2 0 0 
+            {
+                Champ_Uniforme 2 0 0
             }
 
             pression Champ_composite 1
@@ -115,18 +107,17 @@ Read pb
             down Sortie_supersonique
         }
     }
-    
-        Energie_Euler
+
+    Energie_Euler
     {
         convection { hll }
-        termes_non_conservatifs { negligeable }
         initial_conditions
         {
             Energie_tot Champ_composite 1
             {
-                 Champ_Uniforme 1 -800
+                Champ_Uniforme 1 -800
             }
-        } 
+        }
         boundary_conditions
         {
             left Sortie_supersonique
@@ -136,18 +127,16 @@ Read pb
         }
     }
 
-    
     Post_processing
     {
+        probes
+        {
+            rho_x grav densite periode 1e8 segment 50 -0.5 0. 0.5 0.
+            rho_y grav densite periode 1e8 segment 50 0. -0.5 0. 0.5
+            rho_xy grav densite periode 1e8 segment 50 0 0 0.35 0.35
 
-	probes
-	{
-		rho_x grav densite periode 1e8 segment 50 -0.5 0. 0.5 0.
-		rho_y grav densite periode 1e8 segment 50 0. -0.5 0. 0.5
-		rho_xy grav densite periode 1e8 segment 50 0 0 0.35 0.35
-		
-	}
-		
+        }
+
         Format lml
         fields dt_post 1e-2
         {
