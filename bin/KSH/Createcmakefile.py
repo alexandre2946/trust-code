@@ -417,7 +417,6 @@ include_directories(SYSTEM
     ${TRUST_LATAFILTER}/include 
     ${TRUST_ICOCOAPI}/include 
     ${TRUST_ROOT}/lib/src/LIBOSQP/include 
-    ${TRUST_ROOT}/lib/src/LIBVC/include 
     ${TRUST_KOKKOS_ROOT}/${TRUST_ARCH}${OPT}/include
 )
 

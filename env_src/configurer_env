@@ -2688,7 +2688,6 @@ $TRUST_ROOT/lib/src/LIBLATAFILTER/include/LataV1_field_definitions.h
 $TRUST_ROOT/lib/src/LIBLATAFILTER/include/LmlReader.h
 $TRUST_ROOT/lib/src/LIBLATAFILTER/include/LataFilter.h
 $MPI_INCLUDE/mpi.h
-$TRUST_ROOT/lib/src/LIBVC/include/Vc/Vc
 $TRUST_ROOT/lib/src/LIBCGNS/include/cgns++.h
 $TRUST_ROOT/lib/src/LIBPDI/include/pdi++.h
 "
