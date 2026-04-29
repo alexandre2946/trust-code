@@ -112,7 +112,18 @@ double Op_Diff_PolyMAC_CDO_base::calculer_dt_stab() const
           const double diffu = valeurs_diffu(elem);
           const double rho = valeurs_rho(elem);
           double dt;
-          if (e_f.dimension(1) == deux_dim || e_f(elem, deux_dim) == -1)
+          bool flag;
+          if (polymac_flica5)
+            {
+              int nb_rf = 0;
+              for (int i = 0; i < e_f.dimension(1); i++)
+                if (e_f(elem, i) != -1)
+                  nb_rf++;
+              flag = (nb_rf == deux_dim); // a ameliorer, ca pourrait ne pas etre un hexa regulier...
+            }
+          else
+            flag = (e_f.dimension(1) == deux_dim || e_f(elem, deux_dim) == -1);
+          if (flag)
             {
               // Maille type VDF (deux_dim faces sur l'element)
               // ToDo: coder dans le cas has_champ_masse_volumique()==false

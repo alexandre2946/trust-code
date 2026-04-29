@@ -18,12 +18,13 @@
 #include <Op_Diff_PolyMAC_CDO_Elem.h>
 #include <Domaine_Cl_PolyMAC_family.h>
 #include <Champ_Elem_PolyMAC_CDO.h>
-#include <Champ_front_calc.h>
 #include <Probleme_base.h>
 #include <Matrix_tools.h>
 #include <Array_tools.h>
+#include <TRUSTTab_parts.h>
+#include <EChaine.h>
 
-Implemente_instanciable( Op_Diff_PolyMAC_CDO_Elem , "Op_Diff_PolyMAC_CDO_Elem|Op_Diff_PolyMAC_CDO_var_Elem" , Op_Diff_PolyMAC_CDO_base );
+Implemente_instanciable_sans_constructeur( Op_Diff_PolyMAC_CDO_Elem , "Op_Diff_PolyMAC_CDO_Elem|Op_Diff_PolyMAC_CDO_var_Elem" , Op_Diff_PolyMAC_CDO_base );
 Implemente_instanciable( Op_Dift_PolyMAC_CDO_Elem , "Op_Dift_PolyMAC_CDO|Op_Dift_PolyMAC_CDO_var_P0_PolyMAC_CDO" , Op_Diff_PolyMAC_CDO_Elem );
 Implemente_instanciable( Op_Diff_Nonlinear_PolyMAC_CDO_Elem, "Op_Diff_nonlinear_PolyMAC_CDO_Elem|Op_Diff_nonlinear_PolyMAC_CDO_var_Elem" , Op_Diff_PolyMAC_CDO_Elem );
 Implemente_instanciable( Op_Dift_Nonlinear_PolyMAC_CDO_Elem, "Op_Dift_PolyMAC_CDO_nonlinear|Op_Dift_PolyMAC_CDO_var_P0_PolyMAC_CDO_nonlinear", Op_Diff_PolyMAC_CDO_Elem );
@@ -38,9 +39,22 @@ Entree& Op_Diff_Nonlinear_PolyMAC_CDO_Elem::readOn(Entree& is) { return Op_Diff_
 Entree& Op_Dift_PolyMAC_CDO_Elem::readOn(Entree& is) { return Op_Diff_PolyMAC_CDO_base::readOn(is); }
 Entree& Op_Dift_Nonlinear_PolyMAC_CDO_Elem::readOn(Entree& is) { return Op_Diff_PolyMAC_CDO_base::readOn(is); }
 
+Op_Diff_PolyMAC_CDO_Elem::Op_Diff_PolyMAC_CDO_Elem()
+{
+  declare_support_masse_volumique(1);
+}
+
 void Op_Diff_PolyMAC_CDO_Elem::completer()
 {
   Op_Diff_PolyMAC_CDO_base::completer();
+  if (polymac_flica5)
+    {
+      // For small systems, a direct factorization can be faster than iterative solvers.
+      bool flag = Process::nproc() == 1 && le_dom_poly_->nb_elem() < 10000;
+      EChaine chl(flag ? "Petsc Cholesky_lapack { quiet }" : "Petsc Cholesky { quiet }");
+      lire_solveur(chl);
+      solveur.nommer("Op_Diff_PolyMAC_CDO_Elem solver");
+    }
   const Champ_Elem_PolyMAC_CDO& ch = ref_cast(Champ_Elem_PolyMAC_CDO, equation().inconnue());
   const Domaine_PolyMAC_CDO& domaine = le_dom_poly_.valeur();
   if (domaine.domaine().nb_joints() && domaine.domaine().joint(0).epaisseur() < 1)
@@ -138,24 +152,45 @@ void Op_Diff_PolyMAC_CDO_Elem::update_delta() const
 
 void Op_Diff_PolyMAC_CDO_Elem::dimensionner(Matrice_Morse& mat) const
 {
+  dimensionner_bloc(mat, -1);
+}
+
+void Op_Diff_PolyMAC_CDO_Elem::dimensionner_bloc(Matrice_Morse& mat, const int p) const
+{
+  /*
+   0 | 1
+   ---+---
+   2 | 3
+   */
+
+  if (p > 3 || p < -1)
+    Process::exit("Op_Diff_PolyMAC_CDO_Elem::dimensionner_bloc : invalid bloc number! p must be in [-1, 3]");
+
   const Champ_Elem_PolyMAC_CDO& ch = ref_cast(Champ_Elem_PolyMAC_CDO, equation().inconnue());
   const Domaine_PolyMAC_CDO& domaine = le_dom_poly_.valeur();
   const IntTab& e_f = domaine.elem_faces();
   int i, j, k, l, e, f, ne_tot = domaine.nb_elem_tot(), nf_tot = domaine.nb_faces_tot(), n, N = ch.valeurs().line_size();
-
   domaine.init_m2();
 
-  Stencil stencil(0, 2);
+  IntTab stencil(0, 2);
+  VECT(IntTab) sp(4);
+  for (int q = 0; q < 4; q++) sp[q].resize(0, 2);
 
   for (e = 0; e < domaine.nb_elem_tot(); e++)
     {
       //dependance en les Te : diagonale -> faces autour de chaque element
       if (e < domaine.nb_elem())
         for (n = 0; n < N; n++)
-          stencil.append_line(N * e + n, N * e + n);
+          {
+            stencil.append_line(N * e + n, N * e + n);
+            sp[0].append_line(N * e + n, N * e + n);
+          }
       for (i = 0; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++)
         for (n = 0; f < domaine.nb_faces() && n < N; n++)
-          stencil.append_line(N * (ne_tot + f) + n, N * e + n);
+          {
+            stencil.append_line(N * (ne_tot + f) + n, N * e + n);
+            sp[2].append_line(N * f + n, N * e + n);
+          }
 
       //dependence en les Tf
       for (j = 0, k = domaine.m2d(e); k < domaine.m2d(e + 1); j++, k++)
@@ -163,16 +198,31 @@ void Op_Diff_PolyMAC_CDO_Elem::dimensionner(Matrice_Morse& mat) const
           {
             //blocs superieurs : divergence
             for (n = 0; e < domaine.nb_elem() && n < N; n++)
-              stencil.append_line(N * e + n, N * (ne_tot + e_f(e, domaine.w2j(l))) + n);
+              {
+                stencil.append_line(N * e + n, N * (ne_tot + e_f(e, domaine.w2j(l))) + n);
+                sp[1].append_line(N * e + n, N * e_f(e, domaine.w2j(l)) + n);
+              }
 
             //blocs inferieurs : continuite
             for (n = 0; f < domaine.nb_faces() && n < N; n++)
-              stencil.append_line(N * (ne_tot + f) + n, N * (ne_tot + e_f(e, domaine.w2j(l))) + n);
+              {
+                stencil.append_line(N * (ne_tot + f) + n, N * (ne_tot + e_f(e, domaine.w2j(l))) + n);
+                sp[3].append_line(N * f + n, N * e_f(e, domaine.w2j(l)) + n);
+              }
           }
     }
-
-  tableau_trier_retirer_doublons(stencil);
-  Matrix_tools::allocate_morse_matrix(N * (ne_tot + nf_tot), N * (ne_tot + nf_tot), stencil, mat);
+  if (p == -1)
+    {
+      tableau_trier_retirer_doublons(stencil);
+      Matrix_tools::allocate_morse_matrix(N * (ne_tot + nf_tot), N * (ne_tot + nf_tot), stencil, mat);
+    }
+  else
+    {
+      tableau_trier_retirer_doublons(sp[p]);
+      const int nx = N * ((p <= 1) ? ne_tot : nf_tot);
+      const int ny = N * ((p == 0 || p == 2) ? ne_tot : nf_tot);
+      Matrix_tools::allocate_morse_matrix(nx, ny, sp[p], mat);
+    }
 }
 
 void Op_Diff_PolyMAC_CDO_Elem::dimensionner_termes_croises(Matrice_Morse& matrice, const Probleme_base& autre_pb, int nl, int nc) const
@@ -276,6 +326,7 @@ DoubleTab& Op_Diff_PolyMAC_CDO_Elem::ajouter(const DoubleTab& inco, DoubleTab& r
   const IntTab& e_f = domaine.elem_faces();
   const DoubleVect& fs = domaine.face_surfaces(), &ve = domaine.volumes();
   int i, j, e, f, fb, ne_tot = domaine.nb_elem_tot(), n, N = inco.line_size();
+  bool elem_only = polymac_flica5 ? resu.dimension_tot(0) == ne_tot : false;
   double fac;
 
   //prerequis : nu, delta en interne + coeffs/delta dans les CL Echange_contact
@@ -296,27 +347,32 @@ DoubleTab& Op_Diff_PolyMAC_CDO_Elem::ajouter(const DoubleTab& inco, DoubleTab& r
             {
               for (fb = e_f(e, domaine.w2j(j)), n = 0, fac = fs(f) * fs(fb) / ve(e) * domaine.w2c(j); n < N; n++)
                 mff(n) = fac * nu_ef(domaine.w2j(j), n);
-              for (n = 0; ch.fcl()(f, 0) < 6 && n < N; n++)
-                resu(ne_tot + f, n) -= mff(n) * inco(ne_tot + fb, n);
-              for (n = 0; f < domaine.premiere_face_int() && n < N; n++)
-                flux_bords_(f, n) -= mff(n) * inco(ne_tot + fb, n);
+              if (!elem_only)
+                for (n = 0; ch.fcl()(f, 0) < 6 && n < N; n++)
+                  resu(ne_tot + f, n) -= mff(n) * inco(ne_tot + fb, n);
+              if (!elem_only)
+                for (n = 0; f < domaine.premiere_face_int() && n < N; n++)
+                  flux_bords_(f, n) -= mff(n) * inco(ne_tot + fb, n);
               for (n = 0; n < N; n++)
                 resu(e, n) += mff(n) * inco(ne_tot + fb, n);
 
               //correction non lineaire : partie "faces/faces"
-              for (n = 0; stab_ && ch.fcl()(f, 0) < 4 && n < N; n++)
-                resu(ne_tot + f, n) -= std::max(delta_f(f, n), delta_f(fb, n)) * (inco(ne_tot + f, n) - inco(ne_tot + fb, n));
+              if (!elem_only)
+                for (n = 0; stab_ && ch.fcl()(f, 0) < 4 && n < N; n++)
+                  resu(ne_tot + f, n) -= std::max(delta_f(f, n), delta_f(fb, n)) * (inco(ne_tot + f, n) - inco(ne_tot + fb, n));
             }
-          for (n = 0; ch.fcl()(f, 0) < 6 && n < N; n++)
-            resu(ne_tot + f, n) += mfe(n) * inco(e, n);
+          if (!elem_only)
+            for (n = 0; ch.fcl()(f, 0) < 6 && n < N; n++)
+              resu(ne_tot + f, n) += mfe(n) * inco(e, n);
           for (n = 0; f < domaine.premiere_face_int() && n < N; n++)
             flux_bords_(f, n) += mfe(n) * inco(e, n);
 
           //Echange_impose_base
-          if (ch.fcl()(f, 0) > 0 && ch.fcl()(f, 0) < 2 && f < domaine.nb_faces())
-            for (n = 0; n < N; n++)
-              resu(ne_tot + f, n) -= fs(f) * ref_cast(Echange_impose_base, cls[ch.fcl()(f, 1)].valeur()).h_imp(ch.fcl()(f, 2), n)
-                                     * (inco(ch.fcl()(f, 0) == 1 ? ne_tot + f : e, n) - ref_cast(Echange_impose_base, cls[ch.fcl()(f, 1)].valeur()).T_ext(ch.fcl()(f, 2), n));
+          if (!elem_only)
+            if (ch.fcl()(f, 0) > 0 && ch.fcl()(f, 0) < 2 && f < domaine.nb_faces())
+              for (n = 0; n < N; n++)
+                resu(ne_tot + f, n) -= fs(f) * ref_cast(Echange_impose_base, cls[ch.fcl()(f, 1)].valeur()).h_imp(ch.fcl()(f, 2), n)
+                                       * (inco(ch.fcl()(f, 0) == 1 ? ne_tot + f : e, n) - ref_cast(Echange_impose_base, cls[ch.fcl()(f, 1)].valeur()).T_ext(ch.fcl()(f, 2), n));
 
           //correction non lineaire : parties "elements/faces" et "faces/elements"
           for (n = 0; stab_ && ch.fcl()(f, 0) < 4 && n < N; n++) //non appliquee aux CLs de Dirichlet ou Neumann
@@ -332,8 +388,11 @@ DoubleTab& Op_Diff_PolyMAC_CDO_Elem::ajouter(const DoubleTab& inco, DoubleTab& r
   return resu;
 }
 
-void Op_Diff_PolyMAC_CDO_Elem::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const
+void Op_Diff_PolyMAC_CDO_Elem::contribuer_bloc(const DoubleTab& inco, Matrice_Morse& matrice, const int ip) const
 {
+  if (ip > 3 || ip < -1)
+    Process::exit("Op_Diff_PolyMAC_CDO_Elem::contribuer_bloc : invalid bloc number! p must be in [-1, 3]");
+
   const Champ_Elem_PolyMAC_CDO& ch = ref_cast(Champ_Elem_PolyMAC_CDO, equation().inconnue());
   const Domaine_PolyMAC_CDO& domaine = le_dom_poly_.valeur();
   const Conds_lim& cls = la_zcl_poly_->les_conditions_limites();
@@ -359,31 +418,66 @@ void Op_Diff_PolyMAC_CDO_Elem::contribuer_a_avec(const DoubleTab& inco, Matrice_
             {
               for (fb = e_f(e, domaine.w2j(j)), n = 0, fac = fs(f) * fs(fb) / ve(e) * domaine.w2c(j); n < N; n++)
                 mff(n) = fac * nu_ef(domaine.w2j(j), n);
-              for (n = 0; f < domaine.nb_faces() && ch.fcl()(f, 0) < 6 && ch.fcl()(fb, 0) < 6 && n < N; n++)
-                matrice(N * (ne_tot + f) + n, N * (ne_tot + fb) + n) += mff(n);
+              for (n = 0; f < domaine.nb_faces() && ((ch.fcl()(f, 0) < 6 && ch.fcl()(fb, 0) < 6) || ip > -1) && n < N; n++)
+                {
+                  if (ip == -1)
+                    matrice(N * (ne_tot + f) + n, N * (ne_tot + fb) + n) += mff(n);
+                  else if (ip == 3)
+                    matrice(N * f + n, N * fb + n) += mff(n);
+                }
               for (n = 0; e < domaine.nb_elem() && ch.fcl()(fb, 0) < 6 && n < N; n++)
-                matrice(N * e + n, N * (ne_tot + fb) + n) -= mff(n);
+                {
+                  if (ip == -1)
+                    matrice(N * e + n, N * (ne_tot + fb) + n) -= mff(n);
+                  else if (ip == 1)
+                    matrice(N * e + n, N * fb + n) -= mff(n);
+                }
 
               //correction non lineaire : partie "faces/faces"
               for (n = 0; stab_ && ch.fcl()(f, 0) < 4 && f < domaine.nb_faces() && n < N; n++)
                 for (k = 0, fac = std::max(delta_f(f, n), delta_f(fb, n)); k < 2; k++)
-                  matrice(N * (ne_tot + f) + n, N * (ne_tot + (k ? fb : f)) + n) += (k ? -1 : 1) * fac;
+                  {
+                    if (ip == -1)
+                      matrice(N * (ne_tot + f) + n, N * (ne_tot + (k ? fb : f)) + n) += (k ? -1 : 1) * fac;
+                    else if (ip == 3)
+                      matrice(N * f + n, N * (k ? fb : f) + n) += (k ? -1 : 1) * fac;
+                  }
             }
-          for (n = 0; f < domaine.nb_faces() && ch.fcl()(f, 0) < 6 && n < N; n++)
-            matrice(N * (ne_tot + f) + n, N * e + n) -= mfe(n);
+          for (n = 0; f < domaine.nb_faces() && (ch.fcl()(f, 0) < 6 || ip > -1) && n < N; n++)
+            {
+              if (ip == -1)
+                matrice(N * (ne_tot + f) + n, N * e + n) -= mfe(n);
+              else if (ip == 2)
+                matrice(N * f + n, N * e + n) -= mfe(n);
+            }
 
           //Echange_impose_base
           if (ch.fcl()(f, 0) == 1 && f < domaine.nb_faces())
             for (n = 0; n < N; n++)
-              matrice(N * (ne_tot + f) + n, N * (ch.fcl()(f, 0) == 1 ? ne_tot + f : e) + n) += fs(f) * ref_cast(Echange_impose_base, cls[ch.fcl()(f, 1)].valeur()).h_imp(ch.fcl()(f, 2), n);
+              {
+                if (ip == -1)
+                  matrice(N * (ne_tot + f) + n, N * (ch.fcl()(f, 0) == 1 ? ne_tot + f : e) + n) += fs(f) * ref_cast(Echange_impose_base, cls[ch.fcl()(f, 1)].valeur()).h_imp(ch.fcl()(f, 2), n);
+                else
+                  Process::exit("Echange_impose_base et diffusion explicite : pas bon!");
+              }
           else if (ch.fcl()(f, 0) == 3 && f < domaine.nb_faces()) //paroi_contact gere en monolithique -> ajout du coeff a la face issu de l'autre cote
             {
               const Echange_contact_PolyMAC_CDO& cl = ref_cast(Echange_contact_PolyMAC_CDO, cls[ch.fcl()(f, 1)].valeur());
               for (j = ch.fcl()(f, 2), n = 0; n < N; n++)
-                matrice(N * (ne_tot + f) + n, N * (ne_tot + f) + n) += cl.coeff(j, 0, n); //coeff de la face elle-meme
+                {
+                  if (ip == -1)
+                    matrice(N * (ne_tot + f) + n, N * (ne_tot + f) + n) += cl.coeff(j, 0, n); //coeff de la face elle-meme
+                  else
+                    Process::exit("Echange_impose_base et diffusion explicite : pas bon!");
+                }
               for (k = 0; stab_ && k < cl.item.dimension(1) && cl.item(j, k) >= 0; k++)
                 for (n = 0; n < N; n++) //correction non lineaire
-                  matrice(N * (ne_tot + f) + n, N * (ne_tot + f) + n) += std::max(delta_f(f, n), cl.delta(j, k, n));
+                  {
+                    if (ip == -1)
+                      matrice(N * (ne_tot + f) + n, N * (ne_tot + f) + n) += std::max(delta_f(f, n), cl.delta(j, k, n));
+                    else
+                      Process::exit("Echange_impose_base et diffusion explicite : pas bon!");
+                  }
             }
 
           //correction non lineaire : parties "elements/faces" et "faces/elements"
@@ -392,10 +486,97 @@ void Op_Diff_PolyMAC_CDO_Elem::contribuer_a_avec(const DoubleTab& inco, Matrice_
               double corr = std::max(delta_e(e, n), delta_f(f, n));
               for (k = 0; k < 2; k++)
                 for (l = 0; (k ? (f < domaine.nb_faces()) : (e < domaine.nb_elem())) && l < 2; l++)
-                  matrice(N * (k ? ne_tot + f : e) + n, N * (l ? ne_tot + f : e) + n) += (k == l ? 1 : -1) * corr;
+                  {
+                    if (ip == -1)
+                      matrice(N * (k ? ne_tot + f : e) + n, N * (l ? ne_tot + f : e) + n) += (k == l ? 1 : -1) * corr;
+                    else
+                      Process::exit("Echange_impose_base et diffusion explicite : pas bon!");
+                  }
             }
         }
       for (n = 0; e < domaine.nb_elem() && n < N; n++)
-        matrice(N * e + n, N * e + n) += mee(n);
+        if (ip == -1 || (ip == 0))
+          matrice(N * e + n, N * e + n) += mee(n);
+    }
+
+}
+
+void Op_Diff_PolyMAC_CDO_Elem::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const
+{
+  const Domaine_PolyMAC_CDO& domaine = le_dom_poly_.valeur();
+  const int ne_tot = domaine.nb_elem_tot(), nf_tot = domaine.nb_faces_tot();
+  int i = -1;
+  if (matrice.nb_lignes() == ne_tot && matrice.nb_colonnes() == ne_tot) i = 0;
+  if (matrice.nb_lignes() == ne_tot && matrice.nb_colonnes() == nf_tot) i = 1;
+  if (matrice.nb_lignes() == nf_tot && matrice.nb_colonnes() == ne_tot) i = 2;
+  if (matrice.nb_lignes() == nf_tot && matrice.nb_colonnes() == nf_tot) i = 3;
+  contribuer_bloc(inco, matrice, i);
+}
+
+void Op_Diff_PolyMAC_CDO_Elem::update_auxiliary_variables()
+{
+  update_auxiliary_variables(le_champ_inco->valeurs());
+}
+
+static Matrice_Morse FE, FF;
+void Op_Diff_PolyMAC_CDO_Elem::update_auxiliary_variables(DoubleTab& inco)
+{
+  if (!polymac_flica5) return;
+// resolution de M_ff T_f = -M_fe T_e
+  DoubleTab sm(inco);
+  sm = 0.;
+  DoubleTab_parts inco_parts(inco);
+  DoubleTab_parts sm_parts(sm);
+
+  // 1. dimensionnement
+  //std::clock_t start = std::clock();
+  if (FF.nb_lignes() == 0)
+    {
+      //Matrice_Morse FE, FF;
+      dimensionner_bloc(FE, 2);
+      dimensionner_bloc(FF, 3);
+    }
+  else
+    {
+      FE.clean();
+      FF.clean();
+    }
+  //Cout << "[Op_Diff_PolyMAC_CDO_Elem] Time to initialize matrix: " << (std::clock() - start) / (double) CLOCKS_PER_SEC << finl;
+  // 2. remplissage
+  contribuer_a_avec(inco, FE);
+  contribuer_a_avec(inco, FF);
+
+  // 3. resolution
+  FE *= -1.;
+  FE.ajouter_multvect(inco_parts[0], sm_parts[1]);
+
+  if (FF.is_diagonal())
+    {
+      const int n = FF.nb_lignes();
+      for (int i = 0; i < n; i++)
+        for (auto k = FF.get_tab1()(i) - 1; k < FF.get_tab1()(i + 1) - 1; k++)
+          inco_parts[1][i] = sm_parts[1][i] / FF.get_coeff()(k);
+      inco_parts[1].echange_espace_virtuel();
+    }
+  else
+    {
+      set_solveur()->reinit();
+      inco_parts[1] = 0.;
+      try
+        {
+          set_solveur().resoudre_systeme(FF, sm_parts[1], inco_parts[1]);
+        }
+      catch(...)
+        {
+          // PL: Crash de Cholesky_lapack sur maillages avec pas de diffusion localement:
+          statistics().end_count(STD_COUNTERS::system_solver,0,0);
+          Nom solv("Petsc Cholesky { quiet }");
+          Cerr << "Echec du solveur dans Op_Diff_PolyMAC_CDO_Elem..." << finl;
+          Cerr << "On change pour un solveur plus robuste (mais plus lent): " << solv << finl;
+          EChaine chl(solv);
+          lire_solveur(chl);
+          solveur.nommer("Op_Diff_PolyMAC_CDO_Elem solver");
+          set_solveur().resoudre_systeme(FF, sm_parts[1], inco_parts[1]);
+        }
     }
 }

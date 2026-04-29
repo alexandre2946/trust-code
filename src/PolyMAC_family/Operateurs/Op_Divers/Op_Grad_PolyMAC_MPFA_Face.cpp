@@ -27,6 +27,11 @@
 #include <Milieu_base.h>
 #include <Periodique.h>
 #include <TRUSTTrav.h>
+#include <Check_espace_virtuel.h>
+#include <Dirichlet_homogene.h>
+#include <Schema_Temps_base.h>
+#include <Dirichlet.h>
+#include <Symetrie.h>
 
 Implemente_instanciable(Op_Grad_PolyMAC_MPFA_Face, "Op_Grad_PolyMAC_MPFA_Face", Op_Grad_PolyMAC_HFV_Face);
 

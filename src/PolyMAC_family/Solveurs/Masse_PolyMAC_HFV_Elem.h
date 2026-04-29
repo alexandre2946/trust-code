@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,12 +18,14 @@
 
 #include <Solveur_Masse_Elem_proto.h>
 #include <Masse_PolyMAC_CDO_base.h>
+#include <Domaine_Poly_base.h>
 
 class Masse_PolyMAC_HFV_Elem : public Masse_PolyMAC_HFV_base, public Solveur_Masse_Elem_proto
 {
   Declare_instanciable(Masse_PolyMAC_HFV_Elem);
 public:
   void preparer_calcul() override;
+  int has_interface_blocs() const override { return !polymac_flica5; }
   DoubleTab& appliquer_impl(DoubleTab& ) const override;
   void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, double dt, const tabs_t& semi_impl, int resoudre_en_increments) const override;

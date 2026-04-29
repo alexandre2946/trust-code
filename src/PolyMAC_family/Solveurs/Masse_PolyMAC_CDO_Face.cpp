@@ -112,7 +112,7 @@ DoubleTab& Masse_PolyMAC_CDO_Face::ajouter_masse(double dt, DoubleTab& secmem, c
 
   //partie vitesses : vitesses imposees par CLs
   for (f = 0; f < domaine.premiere_face_int(); f++)
-    if (ch.fcl()(f, 0) == 3)
+    if (ch.fcl()(f, 0) == 3 && (!polymac_flica5 || sub_type(Dirichlet, cls[ch.fcl()(f, 1)].valeur())))
       for (k = 0, secmem(f) = 0; k < dimension; k++) //valeur imposee par une CL de type Dirichlet
         secmem(f) += nf(f, k) * ref_cast(Dirichlet, cls[ch.fcl()(f, 1)].valeur()).val_imp(ch.fcl()(f, 2), k) / fs(f);
     else if (ch.fcl()(f, 0) > 1)
@@ -124,7 +124,7 @@ DoubleTab& Masse_PolyMAC_CDO_Face::ajouter_masse(double dt, DoubleTab& secmem, c
       for (f = e_f(e, i), k = domaine.m2i(j); ch.fcl()(f, 0) < 2 && f < domaine.nb_faces() && k < domaine.m2i(j + 1); k++)
         if (ch.fcl()(fb = e_f(e, domaine.m2j(k)), 0) < 2) //vfb calcule
           secmem(f) += ve(e) * pe(e) * domaine.m2c(k) * (e == f_e(f, 0) ? 1 : -1) * (e == f_e(fb, 0) ? 1 : -1) * coef(f) * inco(fb) / dt;
-        else if (ch.fcl()(fb, 0) == 3)
+        else if (ch.fcl()(fb, 0) == 3 && (!polymac_flica5 || sub_type(Dirichlet, cls[ch.fcl()(f, 1)].valeur())))
           for (l = 0; l < dimension; l++) //vfb impose par Dirichlet
             secmem(f) += ve(e) * pe(e) * domaine.m2c(k) * (e == f_e(f, 0) ? 1 : -1) * (e == f_e(fb, 0) ? 1 : -1) * coef(f)
                          * ref_cast(Dirichlet, cls[ch.fcl()(fb, 1)].valeur()).val_imp(ch.fcl()(fb, 2), l) * nf(fb, l) / (fs(fb) * dt);

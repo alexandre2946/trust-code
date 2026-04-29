@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -21,9 +21,10 @@ class Matrice_Morse;
 
 class Op_Diff_PolyMAC_CDO_Elem: public Op_Diff_PolyMAC_CDO_base
 {
-  Declare_instanciable( Op_Diff_PolyMAC_CDO_Elem );
-public:
-  DoubleTab& ajouter(const DoubleTab&, DoubleTab&) const override;
+  Declare_instanciable_sans_constructeur( Op_Diff_PolyMAC_CDO_Elem ) ;
+public :
+  Op_Diff_PolyMAC_CDO_Elem();
+  DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const override;
   virtual void calculer_flux_bord(const DoubleTab& inco) const = delete;
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override;
   void modifier_pour_Cl(Matrice_Morse& la_matrice, DoubleTab& secmem) const override { }
@@ -35,10 +36,14 @@ public:
   }
 
   void dimensionner(Matrice_Morse& mat) const override;
+  void dimensionner_bloc(Matrice_Morse& mat, const int p) const;
+  void contribuer_bloc(const DoubleTab& inco, Matrice_Morse& matrice, const int i) const;
 
   void dimensionner_termes_croises(Matrice_Morse&, const Probleme_base& autre_pb, int nl, int nc) const override;
   void ajouter_termes_croises(const DoubleTab& inco, const Probleme_base& autre_pb, const DoubleTab& autre_inco, DoubleTab& resu) const override;
   void contribuer_termes_croises(const DoubleTab& inco, const Probleme_base& autre_pb, const DoubleTab& autre_inco, Matrice_Morse& matrice) const override;
+  void update_auxiliary_variables(DoubleTab& inco);
+  void update_auxiliary_variables();
 
   /* correction non lineaire de Le Potier / Mahamane : facteurs delta_e aux elements, delta_f aux faces */
   int stab_ = 0;                                    //1 si elle est activee

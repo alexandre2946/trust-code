@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -120,7 +120,7 @@ void Champ_Fonc_Face_PolyMAC_CDO::interp_valeurs_elem(const DoubleTab& inco, Dou
       for (j = 0; j < e_f.dimension(1) && (f = e_f(e, j)) >= 0; j++)
         for (d = 0; d < D; d++)
           for (n = 0; n < N; n++)
-            val(e, N * d + n) += fs(f) / ve(e) * (xv(f, d) - xp(e, d)) * (e == f_e(f, 0) ? 1 : -1) * (inco.nb_dim() == 1 ? inco(f) : inco(f, n));
+            val(e, N * d + n) += fs(f) / ve(e) * (xv(f, d) - xp(e, d)) * (e == f_e(f, 0) ? 1 : -1) * (polymac_flica5 ? inco(f, n) : (inco.nb_dim() == 1 ? inco(f) : inco(f, n)));
     }
 }
 
@@ -176,10 +176,53 @@ DoubleTab& Champ_Fonc_Face_PolyMAC_CDO::valeur_aux_faces(DoubleTab& val) const
   return val;
 }
 
-DoubleVect& Champ_Fonc_Face_PolyMAC_CDO::valeur_aux_elems_compo(const DoubleTab& positions, const IntVect& polys, DoubleVect& result, int ncomp) const
+DoubleVect& Champ_Fonc_Face_PolyMAC_CDO::valeur_aux_elems_compo(const DoubleTab& positions, const IntVect& les_polys, DoubleVect& val, int ncomp) const
 {
-  Cerr << "Champ_Fonc_Face_PolyMAC_CDO::" <<__func__ << " is not coded !" << finl;
-  throw;
+  const Champ_base& cha=le_champ();
+  int nb_compo=cha.nb_comp();
+  const Domaine_PolyMAC_CDO& domaine_VF = ref_cast(Domaine_PolyMAC_CDO,domaine_vf());
+  //  const Domaine& domaine_geom = domaine_VDF.domaine();
+  const DoubleTab& normales = domaine_VF.face_normales();
+  //  const DoubleVect& surfaces = domaine_VF.face_surfaces();
+  const IntTab& elem_faces = domaine_VF.elem_faces();
+
+  const DoubleTab& ch = cha.valeurs();
+
+  if (nb_compo == 1)
+    {
+      Cerr<<"Champ_Face_implementation::valeur_aux_elems"<<finl;
+      Cerr <<"A scalar field cannot be of Champ_Face type." << finl;
+      Process::exit();
+    }
+  else // (nb_compo != 1)
+    {
+      ArrOfDouble s(nb_compo);
+      for(int rang_poly=0; rang_poly<les_polys.size(); rang_poly++)
+        {
+          int le_poly=les_polys(rang_poly);
+          if (le_poly == -1)
+            val(rang_poly) = 0;
+          else
+            {
+              double vale=0;
+              s=0;
+              int nb_faces_elem_max=elem_faces.dimension(1);
+              for (int nf=0; nf<nb_faces_elem_max; nf++)
+                {
+                  int face=elem_faces(le_poly,nf);
+                  if(face<0)
+                    break;
+                  else
+                    {
+                      vale += ch(face) * std::fabs(normales(face, ncomp));
+                      s[ncomp] += std::fabs(normales(face, ncomp));
+                    }
+                }
+              val(rang_poly)=vale/s[ncomp];
+            }
+        }
+    }
+  return val;
 }
 
 DoubleTab& Champ_Fonc_Face_PolyMAC_CDO::remplir_coord_noeuds(DoubleTab& positions) const

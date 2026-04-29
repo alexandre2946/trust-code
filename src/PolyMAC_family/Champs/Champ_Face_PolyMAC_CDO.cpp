@@ -35,7 +35,7 @@
 #include <array>
 #include <cmath>
 
-Implemente_instanciable(Champ_Face_PolyMAC_CDO, "Champ_Face_PolyMAC_CDO", Champ_Face_base);
+Implemente_instanciable(Champ_Face_PolyMAC_CDO, "Champ_Face_PolyMAC_CDO|Champ_Face_PolyMAC", Champ_Face_base);
 
 Sortie& Champ_Face_PolyMAC_CDO::printOn(Sortie& os) const { return os << que_suis_je() << " " << le_nom(); }
 
@@ -358,45 +358,60 @@ void Champ_Face_PolyMAC_CDO::init_va() const
 void Champ_Face_PolyMAC_CDO::interp_ve(const DoubleTab& inco, DoubleTab& val, bool is_vit) const
 {
   const Domaine_PolyMAC_CDO& domaine = ref_cast(Domaine_PolyMAC_CDO,domaine_vf());
-  const Conds_lim& cls = domaine_Cl_dis().les_conditions_limites();
-  const DoubleTab& nf = domaine.face_normales();
-  const DoubleVect& fs = domaine.face_surfaces(), *pf = mon_equation_non_nul() ? &equation().milieu().porosite_face() : nullptr, *pe = pf ? &equation().milieu().porosite_elem() : nullptr;
-
   int e, f, j, k, r;
 
   domaine.init_ve();
   val = 0;
-  for (e = 0; e < val.dimension(0); e++)
-    for (j = domaine.vedeb(e); j < domaine.vedeb(e + 1); j++)
-      if (fcl_(f = domaine.veji(j), 0) < 2) //vitesse calculee
-        {
-          const double coef = is_vit && pf ? (*pf)(f) / (*pe)(e) : 1.0;
-          for (r = 0; r < dimension; r++) val(e, r) += domaine.veci(j, r) * inco(f) * coef;
-        }
-      else if (fcl_(f, 0) == 3)
-        for (k = 0; k < dimension; k++)
-          for (r = 0; r < dimension; r++) //Dirichlet
+
+  if (polymac_flica5)
+    {
+      const DoubleVect& pf = equation().milieu().porosite_face(), &pe = equation().milieu().porosite_elem();
+      for (e = 0; e < val.dimension(0); e++)
+        for (j = domaine.vedeb(e); j < domaine.vedeb(e + 1); j++)
+          {
+            f = domaine.veji(j);
+            const double coef = is_vit ? pf(f) / pe(e) : 1.0;
+            for (r = 0; r < dimension; r++) val(e, r) += domaine.veci(j, r) * inco(f) * coef;
+          }
+    }
+  else
+    {
+      const Conds_lim& cls = domaine_Cl_dis().les_conditions_limites();
+      const DoubleTab& nf = domaine.face_normales();
+      const DoubleVect& fs = domaine.face_surfaces(), *pf = mon_equation_non_nul() ? &equation().milieu().porosite_face() : nullptr, *pe = pf ? &equation().milieu().porosite_elem() : nullptr;
+
+      for (e = 0; e < val.dimension(0); e++)
+        for (j = domaine.vedeb(e); j < domaine.vedeb(e + 1); j++)
+          if (fcl_(f = domaine.veji(j), 0) < 2) //vitesse calculee
             {
               const double coef = is_vit && pf ? (*pf)(f) / (*pe)(e) : 1.0;
-              val(e, r) += domaine.veci(j, r) * ref_cast(Dirichlet, cls[fcl_(f, 1)].valeur()).val_imp(fcl_(f, 2), k) * nf(f, k) / fs(f) * coef;
+              for (r = 0; r < dimension; r++) val(e, r) += domaine.veci(j, r) * inco(f) * coef;
             }
+          else if (fcl_(f, 0) == 3)
+            for (k = 0; k < dimension; k++)
+              for (r = 0; r < dimension; r++) //Dirichlet
+                {
+                  const double coef = is_vit && pf ? (*pf)(f) / (*pe)(e) : 1.0;
+                  val(e, r) += domaine.veci(j, r) * ref_cast(Dirichlet, cls[fcl_(f, 1)].valeur()).val_imp(fcl_(f, 2), k) * nf(f, k) / fs(f) * coef;
+                }
+    }
 }
 
 /* vitesse aux elements sur une liste d'elements */
 void Champ_Face_PolyMAC_CDO::interp_ve(const DoubleTab& inco, const IntVect& les_polys, DoubleTab& val, bool is_vit) const
 {
   const Domaine_PolyMAC_CDO& domaine = ref_cast(Domaine_PolyMAC_CDO,domaine_vf());
-  const DoubleVect *pf = mon_equation_non_nul() ? &equation().milieu().porosite_face() : nullptr, *pe = pf ? &equation().milieu().porosite_elem() : nullptr;
   int e, f, j, r;
 
   domaine.init_ve();
+
+  const DoubleVect *pf = mon_equation_non_nul() ? &equation().milieu().porosite_face() : nullptr, *pe = pf ? &equation().milieu().porosite_elem() : nullptr;
   for (int poly = 0; poly < les_polys.size(); poly++)
     {
       e = les_polys(poly);
       if (e!=-1)
         {
-          for (r = 0; r < dimension; r++)
-            val(e, r) = 0;
+          for (r = 0; r < dimension; r++) val(e, r) = 0;
           for (j = domaine.vedeb(e); j < domaine.vedeb(e + 1); j++)
             {
               f = domaine.veji(j);
@@ -479,8 +494,24 @@ DoubleTab& Champ_Face_PolyMAC_CDO::valeur_aux_elems_(const DoubleTab& val_face, 
   const Domaine_VF& domdom = ref_cast(Domaine_VF, domaine_vf());
   domdom.domaine().creer_tableau_elements(ve);
 
-  bool is_vit = cha.le_nom().debute_par("vitesse") && !cha.le_nom().debute_par("vitesse_debitante");
-  interp_ve(val_face, ve, is_vit);
+  if (polymac_flica5)
+    {
+      if (que_suis_je() == "Champ_Face_PolyMAC_CDO")
+        {
+          bool is_vit = false && cha.le_nom().debute_par("vitesse");
+          interp_ve(val_face, les_polys, ve, is_vit);
+        }
+      else
+        {
+          bool is_vit = cha.le_nom().debute_par("vitesse") && !cha.le_nom().debute_par("vitesse_debitante");
+          interp_ve(val_face, ve, is_vit);
+        }
+    }
+  else
+    {
+      bool is_vit = cha.le_nom().debute_par("vitesse") && !cha.le_nom().debute_par("vitesse_debitante");
+      interp_ve(val_face, ve, is_vit);
+    }
 
   for (int p = 0; p < les_polys.size(); p++)
     for (int r = 0, e = les_polys(p); e < domdom.nb_elem() && r < N * D; r++)
@@ -500,7 +531,7 @@ DoubleTab& Champ_Face_PolyMAC_CDO::valeur_aux_elems_passe(const DoubleTab& posit
 
 DoubleVect& Champ_Face_PolyMAC_CDO::valeur_aux_elems_compo(const DoubleTab& positions, const IntVect& les_polys, DoubleVect& val, int ncomp) const
 {
-  fcl();
+  if (!polymac_flica5 || que_suis_je() != "Champ_Face_PolyMAC_CDO") fcl();
   const Champ_base& cha=le_champ();
   assert(val.size_totale() >= les_polys.size());
 
@@ -510,9 +541,21 @@ DoubleVect& Champ_Face_PolyMAC_CDO::valeur_aux_elems_compo(const DoubleTab& posi
 
   //on interpole ve sur tous les elements, puis on se restreint a les_polys
   DoubleTrav ve(0, dimension * cha.valeurs().line_size());
-  ref_cast(Domaine_VF, domaine_vf()).domaine().creer_tableau_elements(ve);
-  interp_ve(cha.valeurs(), ve);
+  if (polymac_flica5)
+    {
+      ref_cast(Domaine_PolyMAC_CDO,domaine_vf()).domaine().creer_tableau_elements(ve);
+      bool is_vit = false && cha.le_nom().debute_par("vitesse");
 
+      if (que_suis_je() == "Champ_Face_PolyMAC_CDO")
+        interp_ve(cha.valeurs(), les_polys, ve, is_vit);
+      else
+        interp_ve(cha.valeurs(), ve);
+    }
+  else
+    {
+      ref_cast(Domaine_VF, domaine_vf()).domaine().creer_tableau_elements(ve);
+      interp_ve(cha.valeurs(), ve);
+    }
   for (int p = 0; p < les_polys.size(); p++) val(p) = (les_polys(p) == -1) ? 0. : ve(les_polys(p), ncomp);
 
   return val;

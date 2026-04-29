@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,13 +20,21 @@
 
 class Op_Diff_PolyMAC_CDO_Face: public Op_Diff_PolyMAC_CDO_base
 {
-  Declare_instanciable( Op_Diff_PolyMAC_CDO_Face );
-public:
+  Declare_instanciable_sans_constructeur( Op_Diff_PolyMAC_CDO_Face ) ;
+public :
+  Op_Diff_PolyMAC_CDO_Face();
   void completer() override;
   DoubleTab& ajouter(const DoubleTab& inco, DoubleTab& resu) const override;
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override;
+  void contribuer_bloc(const DoubleTab&, Matrice_Morse&, const int i) const;
   void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const override { }
   void dimensionner(Matrice_Morse& mat) const override;
+  void dimensionner_bloc(Matrice_Morse& mat, const int p) const;
+  void update_auxiliary_variables(DoubleTab& inco);
+  void update_auxiliary_variables();
+
+protected :
+  DoubleVect porosite_e;
 };
 
 #endif /* Op_Diff_PolyMAC_CDO_Face_included */
