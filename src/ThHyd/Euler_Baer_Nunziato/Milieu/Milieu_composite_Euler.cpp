@@ -13,31 +13,47 @@
 *
 *****************************************************************************/
 
-#include <Fluide_Incompressible.h>
-#include <Discretisation_base.h>
-#include <Schema_Temps_base.h>
+#include <Interface_Baer_Nunziato.h>
 #include <Milieu_composite_Euler.h>
+#include <Discretisation_base.h>
+#include <Fluide_reel_base.h>
 #include <Champ_Uniforme.h>
-#include <Equation_base.h>
-#include <Probleme_base.h>
-#include <Pb_Multiphase.h>
-#include <Interprete.h>
-#include <Domaine_VF.h>
-#include<Fluide_reel_base.h>
-#include <Pb_Euler.h>
 #include <Momentum_Euler.h>
+#include <Pb_Euler.h>
 
 Implemente_instanciable(Milieu_composite_Euler, "Milieu_composite_Euler", Milieu_composite);
 // XD Milieu_composite_Euler Milieu_composite Milieu_composite_Euler -1 Composite medium made of several sub mediums.
 
 Sortie& Milieu_composite_Euler::printOn(Sortie& os) const { return os; }
-Entree& Milieu_composite_Euler::readOn(Entree& is) { return Milieu_composite::readOn(is); }
+Entree& Milieu_composite_Euler::readOn(Entree& is)
+{
+  Milieu_composite::readOn(is);
+
+  // XXX pour le moment on force ca .. a retirer apres
+  if (has_saturation_)
+    Process::exit("We dont accept at present a saturation object in Milieu_composite_Euler ... But we will soon !\n");
+
+  if (static_cast<int>(fluides_.size()) == 1 && has_interface_)
+    {
+      Cerr << "Error while reading Milieu_composite_Euler !!" << finl;
+      Cerr << "You are simulating a Single-Phase Euler problem. No need to define an interface !" << finl;
+      Cerr << "Please remove the object " << inter_lu_->que_suis_je() << " from your data file !" << finl;
+      Process::exit();
+    }
+
+  if (has_interface_ && !sub_type(Interface_Baer_Nunziato, inter_lu_.valeur()))
+    Process::exit("We dont accept at present an interface object with a type different than Interface_Baer_Nunziato !\n");
+
+  return is;
+}
 
 void Milieu_composite_Euler::discretiser(const Probleme_base& pb, const  Discretisation_base& dis)
 {
   Milieu_composite::discretiser(pb, dis);
   res_en_T_ = true;
-  inter_lu_->assoscier_pb(pb);
+
+  if (inter_lu_)
+    inter_lu_->assoscier_pb(pb);
 }
 
 void Milieu_composite_Euler::init_energie_tot(DoubleTab& alpha_energie_tot_jdd) const
@@ -46,7 +62,7 @@ void Milieu_composite_Euler::init_energie_tot(DoubleTab& alpha_energie_tot_jdd) 
   const DoubleTab& rho = ref_cast(Density_Euler,equation("alpha_rho")).densite().valeurs();
   const DoubleTab& alpha = equation("alpha").inconnue().valeurs();
   const DoubleTab& p = qdm.pression().valeurs();
-  const int Nb_phase = (int) fluides_.size();
+  const int Nb_phase = static_cast<int>(fluides_.size());
   const int Nb_elem = qdm.domaine_dis().nb_elem_tot();
 
   for (int n = 0; n < Nb_phase; n++)
@@ -56,7 +72,7 @@ void Milieu_composite_Euler::init_energie_tot(DoubleTab& alpha_energie_tot_jdd) 
       for (int i = 0; i < Nb_elem; i++)
         {
           double nom_u2 = 0;
-          for (int d = 0; d < dimension; d++)
+          for (int d = 0; d < Objet_U::dimension; d++)
             nom_u2 += U(i, d) * U(i, d);
           alpha_energie_tot_jdd(i, n) = alpha(i, n) * phase.init_energie_tot(rho(i, n), nom_u2, p(i, n));
         }
@@ -71,7 +87,7 @@ void Milieu_composite_Euler::calculer_pression(DoubleTab& p) const
   const DoubleTab& alpha_rhoE = equation("alpha_energie_tot").inconnue().valeurs();
   DoubleTab rhoE = alpha_rhoE;
   tab_divide_any_shape(rhoE, alpha); // @suppress("Function cannot be resolved")
-  const int Nb_phase = (int) fluides_.size();
+  const int Nb_phase = static_cast<int>(fluides_.size());
   const int Nb_elem = qdm.domaine_dis().nb_elem_tot();
 
   for (int n = 0; n < Nb_phase; n++)
@@ -81,7 +97,7 @@ void Milieu_composite_Euler::calculer_pression(DoubleTab& p) const
       for (int i = 0; i < Nb_elem; i++)
         {
           double nom_u2 = 0;
-          for (int d = 0; d < dimension; d++)
+          for (int d = 0; d < Objet_U::dimension; d++)
             nom_u2 += U(i, d) * U(i, d);
           p(i, n) = phase.calculer_pression(rho(i, n), nom_u2, rhoE(i, n));
           assert(p(i, n) > 0);
@@ -95,7 +111,7 @@ void Milieu_composite_Euler::calculer_vitesse_son(DoubleTab& c) const
   const DoubleTab& rho = ref_cast(Density_Euler,equation("alpha_rho")).densite().valeurs();
   const DoubleTab& p = qdm.pression().valeurs();
 
-  const int Nb_phase = (int) fluides_.size();
+  const int Nb_phase = static_cast<int>(fluides_.size());
   const int Nb_elem = qdm.domaine_dis().nb_elem_tot();
   for (int n = 0; n < Nb_phase; n++)
     {
