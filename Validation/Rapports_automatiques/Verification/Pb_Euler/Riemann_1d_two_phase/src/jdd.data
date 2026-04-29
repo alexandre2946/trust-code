@@ -47,9 +47,7 @@ Read sch
     facsec 0.4
 }
 
-
-
-$__dis__ dis 
+$__dis__ dis
 
 Pb_Euler pb
 
@@ -58,13 +56,14 @@ Associate  pb sch
 Discretize pb dis
 
 Read pb
-{   Milieu_composite_Euler
-    {     
-         solide StiffenedGas { gamma $__gammaS__ pinf $__pinfS__ }
-         gaz StiffenedGas { gamma $__gammaG__ pinf 0. }
-         interface Interface_Baer_Nunziato { vitesse 0 pression 1 }
-    } 
-    
+{
+    Milieu_composite_Euler
+    {
+        solide StiffenedGas { gamma $__gammaS__ pinf $__pinfS__ }
+        gaz StiffenedGas { gamma $__gammaG__ pinf 0. }
+        interface Interface_Baer_Nunziato { velocity_from_phase solide }
+    }
+
     Fraction_Euler
     {
         termes_non_conservatifs { hll }
@@ -72,9 +71,9 @@ Read pb
         {
             alpha Champ_composite 2
             {
-               Champ_fonc_xyz dom 1 $__alphaSl__*(x[$__x__)+$__alphaSr__*(x>$__x__)
-               Champ_fonc_xyz dom 1 $__alphaGl__*(x[$__x__)+$__alphaGr__*(x>$__x__)
-            } 
+                Champ_fonc_xyz dom 1 $__alphaSl__*(x[$__x__)+$__alphaSr__*(x>$__x__)
+                Champ_fonc_xyz dom 1 $__alphaGl__*(x[$__x__)+$__alphaGr__*(x>$__x__)
+            }
         }
         boundary_conditions
         {
@@ -84,13 +83,7 @@ Read pb
             haut Sortie_supersonique
         }
     }
-    
-    # correlations
-    {
-        flux_interfacial coef_constant { liquide_sodium 1e10 gaz_sodium 1e10 }
-    }
-    #
-    
+
     Masse_Euler
     {
         convection { hll }
@@ -101,9 +94,9 @@ Read pb
                 # Champ_Uniforme 1 1 #
                 Champ_fonc_xyz dom 1 $__rSl__*(x[$__x__)+$__rSr__*(x>$__x__)
                 Champ_fonc_xyz dom 1 $__rGl__*(x[$__x__)+$__rGr__*(x>$__x__)
-            } 
+            }
         }
-       boundary_conditions
+        boundary_conditions
         {
             gauche Sortie_supersonique
             droite Sortie_supersonique
@@ -111,18 +104,15 @@ Read pb
             haut Sortie_supersonique
         }
     }
-       
+
     QDM_Euler
     {
-        # evanescence { homogene { alpha_res 1 alpha_res_min 0.5 } } #
-        solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg }  
         convection { hll }
         termes_non_conservatifs { hll }
-        diffusion  { negligeable }
         initial_conditions
         {
             vitesse Champ_composite 2
-            {   
+            {
                 # Champ_Uniforme 2 0 0 #
                 Champ_fonc_xyz dom 2 $__vSl__*(x[$__x__)+($__vSr__)*(x>$__x__) 0
                 Champ_fonc_xyz dom 2 $__vGl__*(x[$__x__)+($__vGr__)*(x>$__x__) 0
@@ -136,25 +126,25 @@ Read pb
         }
         boundary_conditions
         {
-        gauche Sortie_supersonique
+            gauche Sortie_supersonique
             droite Sortie_supersonique
             bas Sortie_supersonique
             haut Sortie_supersonique
+        }
     }
-    }
-        Energie_Euler
+
+    Energie_Euler
     {
-        # diffusion { negligeable } #
         convection { hll }
         termes_non_conservatifs { hll }
-         initial_conditions
+        initial_conditions
         {
             Energie_tot Champ_composite 2
             {
-                 Champ_Uniforme 1 -800
-                 Champ_Uniforme 1 -800
+                Champ_Uniforme 1 -800
+                Champ_Uniforme 1 -800
             }
-        } 
+        }
         boundary_conditions
         {
             gauche Sortie_supersonique
@@ -162,38 +152,26 @@ Read pb
             bas Sortie_supersonique
             haut Sortie_supersonique
         }
-         # sources
-        {
-            puissance_thermique Champ_composite 2
-            {
-                champ_uniforme 1 1e8
-                champ_uniforme 1 0
-            } ,
-            flux_interfacial
-        } #
     }
 
-    
     Post_processing
     {
-       probes
-        {   
-             alpha_Solide grav alpha_solide periode 1e8 segment 1000 0 0.5 1 0.5 
-             alpha_Gaz grav alpha_gaz periode 1e8 segment 1000 0 0.5 1 0.5 
-             rho_Solide grav densite_solide periode 1e8 segment 1000 0 0.5 1 0.5
-             rho_Gaz grav densite_gaz periode 1e8 segment 1000 0 0.5 1 0.5 
-             v_Solide grav  vitesse_solide  periode 1e8 segment 1000 0 0.5 1 0.5 
-             v_Gaz grav  vitesse_gaz  periode 1e8 segment 1000 0 0.5 1 0.5
-             p_Solide grav pression_solide periode 1e8 segment 1000 0 0.5 1 0.5 
-             p_Gaz grav  pression_gaz periode 1e8 segment 1000 0 0.5 1 0.5 
-            
+        probes
+        {
+            alpha_Solide grav alpha_solide periode 1e8 segment 1000 0 0.5 1 0.5
+            alpha_Gaz grav alpha_gaz periode 1e8 segment 1000 0 0.5 1 0.5
+            rho_Solide grav densite_solide periode 1e8 segment 1000 0 0.5 1 0.5
+            rho_Gaz grav densite_gaz periode 1e8 segment 1000 0 0.5 1 0.5
+            v_Solide grav  vitesse_solide  periode 1e8 segment 1000 0 0.5 1 0.5
+            v_Gaz grav  vitesse_gaz  periode 1e8 segment 1000 0 0.5 1 0.5
+            p_Solide grav pression_solide periode 1e8 segment 1000 0 0.5 1 0.5
+            p_Gaz grav  pression_gaz periode 1e8 segment 1000 0 0.5 1 0.5
         }
-        
 
         Format cgns
         fields dt_post 1e-2
-        {   
-            alpha elem 
+        {
+            alpha elem
             densite elem
             alpha_rho_u elem
             vitesse_gaz elem

@@ -23,9 +23,9 @@ mailler dom
 # BEGIN PARTITION
 Partition dom
 {
-        Partition_tool metis { nb_parts 4 }
-        Larg_joint 2
-        zones_name DOM
+    Partition_tool metis { nb_parts 4 }
+    Larg_joint 2
+    zones_name DOM
 }
 End
 END PARTITION #
@@ -38,15 +38,13 @@ Scheme_euler_explicit sch
 Read sch
 
 {
-   tinit 0
+    tinit 0
     dt_min 5.e-40
     dt_max  0.8
     tmax $__tmax__
     seuil_statio -1
     facsec 0.8
 }
-
-
 
 Coloc dis
 
@@ -57,20 +55,20 @@ Associate  pb sch
 Discretize pb dis
 
 Read pb
-{   Milieu_composite_Euler
-    {     gaz StiffenedGas { gamma $__gamma__ pinf $__pinf__ }
-          interface Interface_Baer_Nunziato { vitesse -1 pression -1 }
-    } 
-    
+{
+    Milieu_composite_Euler
+    {
+        gaz StiffenedGas { gamma $__gamma__ pinf $__pinf__ }
+    }
+
     Fraction_Euler
     {
-        termes_non_conservatifs { negligeable }
         initial_conditions
         {
             alpha Champ_composite 1
             {
-               Champ_Uniforme 1 1
-            } 
+                Champ_Uniforme 1 1
+            }
         }
         boundary_conditions
         {
@@ -80,8 +78,7 @@ Read pb
             haut Sortie_supersonique
         }
     }
-    
-    
+
     Masse_Euler
     {
         convection { hll }
@@ -90,7 +87,7 @@ Read pb
             densite Champ_composite 1
             {
                 Champ_fonc_xyz dom 1 $__rl__*(x[$__x__)+$__rr__*(x>$__x__)
-            } 
+            }
         }
         boundary_conditions
         {
@@ -100,17 +97,14 @@ Read pb
             haut Sortie_supersonique
         }
     }
-       
+
     QDM_Euler
     {
-        # solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg } #
         convection { hll }
-        termes_non_conservatifs { negligeable }
-        diffusion  { negligeable }
         initial_conditions
         {
             vitesse Champ_composite 1
-            { 
+            {
                 Champ_fonc_xyz dom 2 $__vl__*(x[$__x__)+($__vr__)*(x>$__x__) 0
             }
 
@@ -119,26 +113,7 @@ Read pb
                 Champ_fonc_xyz dom 1 $__pl__*(x[$__x__)+$__pr__*(x>$__x__)
             }
         }
-       boundary_conditions
-        {
-        gauche Sortie_supersonique
-            droite Sortie_supersonique
-            bas Sortie_supersonique
-            haut Sortie_supersonique
-    }
-    }
-        Energie_Euler
-    {
-        
-        convection { hll }
-        termes_non_conservatifs { negligeable }
-         initial_conditions
-        {
-            Energie_tot Champ_composite 1
-            {
-                 Champ_Uniforme 1 -800 
-            }
-        } 
+
         boundary_conditions
         {
             gauche Sortie_supersonique
@@ -148,22 +123,37 @@ Read pb
         }
     }
 
-    
+    Energie_Euler
+    {
+        convection { hll }
+        initial_conditions
+        {
+            Energie_tot Champ_composite 1
+            {
+                Champ_Uniforme 1 -800
+            }
+        }
+        boundary_conditions
+        {
+            gauche Sortie_supersonique
+            droite Sortie_supersonique
+            bas Sortie_supersonique
+            haut Sortie_supersonique
+        }
+    }
+
     Post_processing
     {
-       probes
+        probes
         {
             rho grav densite periode 1e8 segment 1000 0 0.5 1 0.5
             v grav         vitesse periode 1e8 segment 1000 0 0.5 1 0.5
             p grav        pression periode 1e8 segment 1000 0 0.5 1 0.5
-            # etot grav energie_interne periode 1e8 segment 1000 0 0.5 1 0.5 #
         }
-        
 
-        Format lml
+        Format cgns
         fields dt_post 1e-2
         {
-            
             densite elem
             vitesse elem
             pression elem
