@@ -417,7 +417,6 @@ void Prepro_IBM_base::computeAire2()
       MCAuto<MEDCoupling::DataArrayDouble> array(MEDCoupling::DataArrayDouble::New());
       array->useArray(surfCoords2D.addr(), false, MEDCoupling::DeallocType::CPP_DEALLOC, nbNodesSur, 2);
       mesh2DSurf->setCoords(array);
-      array->decrRef();
       mesh2DSurf->allocateCells(1);
       IntTrav mesh2DSurf_conect(1, nbNodesSur);
       for (int node =0; node < nbNodesSur; node++) mesh2DSurf_conect(0,node) = node;
@@ -568,7 +567,6 @@ void Prepro_IBM_base::computeAire2()
               MCAuto<MEDCoupling::DataArrayDouble> interPolyarray2D(MEDCoupling::DataArrayDouble::New());
               interPolyarray2D->useArray(interPolyCoords2D.addr(), false, MEDCoupling::DeallocType::CPP_DEALLOC, nbNodesCell1, 2);
               interPoly2D->setCoords(interPolyarray2D);
-              interPolyarray2D->decrRef();
               interPoly2D->allocateCells(1);
               IntTrav Poly2D_conect(1, nbNodesCell1);
               for (int node =0; node < nbNodesCell1; node++) Poly2D_conect(0,node) = node;
@@ -1032,8 +1030,6 @@ void Prepro_IBM_base::intersectSegPoly2D(MEDCouplingUMesh * polyEdgeMesh, Double
           outputCoords->aggregate(MC_p);
         }
     }
-  MC_p->decrRef();
-
   if(outputCoords->getNumberOfTuples () <= 0)
     {
       status = -2;
