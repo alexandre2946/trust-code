@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -36,7 +36,6 @@
 // #include <Op_Conv_VDF.h>
 
 Implemente_instanciable(Source_PDF_VDF,"Source_PDF_VDF_Face",Source_PDF_base);
-// XD source_pdf source_pdf_base source_pdf 1 Source term for Penalised Direct Forcing (PDF) method.
 
 /*##################################################################################################
 ####################################################################################################
