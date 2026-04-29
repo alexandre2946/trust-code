@@ -16,12 +16,12 @@
 #include <Partitionneur_Sous_Domaines.h>
 #include <Synonyme_info.h>
 #include <Domaine.h>
-#include <Sous_Domaine.h>
+#include <Sous_Domaines.h>
 #include <Param.h>
 #include <Interprete.h>
 
 Implemente_instanciable_sans_constructeur(Partitionneur_Sous_Domaines,"Partitionneur_Sous_Domaines",Partitionneur_base);
-// XD partitionneur_sous_domaines partitionneur_deriv sous_zones -1 This algorithm will create one part for each specified subdomaine/domain. All elements contained in the first subdomaine/domain are put in the first part, all remaining elements contained in the second subdomaine/domain in the second part, etc... NL2 If all elements of the current domain are contained in the specified subdomaines/domain, then N parts are created, otherwise, a supplemental part is created with the remaining elements. NL2 If no subdomaine is specified, all subdomaines defined in the domain are used to split the mesh.
+// XD partitionneur_sous_domaines partitionneur_deriv partitionneur_sous_domaines -1 This algorithm will create one part for each specified subdomaine/domain. All elements contained in the first subdomaine/domain are put in the first part, all remaining elements contained in the second subdomaine/domain in the second part, etc... NL2 If all elements of the current domain are contained in the specified subdomaines/domain, then N parts are created, otherwise, a supplemental part is created with the remaining elements. NL2 If no subdomaine is specified, all subdomaines defined in the domain are used to split the mesh.
 Add_synonym(Partitionneur_Sous_Domaines, "Partitionneur_Sous_Zones");
 
 Partitionneur_Sous_Domaines::Partitionneur_Sous_Domaines()
@@ -135,19 +135,26 @@ void Partitionneur_Sous_Domaines::construire_partition(IntVect& elem_part, int& 
     }
   else
     {
+      Noms noms_sous_domaines(noms_sous_domaines_);
+      // Si le nom du seul Sous_Domaine est une liste de Sous_Domaine, on les recupere toutes:
+      if (noms_sous_domaines_.size()==1 && sub_type(Sous_Domaines, Interprete::objet(noms_sous_domaines_[0])))
+        {
+          const Sous_Domaines& liste = ref_cast(Sous_Domaines, Interprete::objet(noms_sous_domaines_[0]));
+          noms_sous_domaines.dimensionner_force(liste.size());
+          for (int i=0; i<liste.size(); i++) noms_sous_domaines[i]=liste[i].le_nom();
+        }
       const int nb_sous_domaines = dom.nb_ss_domaines();
-      const int toutes_sous_domaines = (noms_sous_domaines_.size() == 0);
+      const int toutes_sous_domaines = (noms_sous_domaines.size() == 0);
       if (toutes_sous_domaines)
         Cerr << " No subarea specified, we use all existing subareas." << finl;
       for (int i_sous_domaine = 0; i_sous_domaine < nb_sous_domaines; i_sous_domaine++)
         {
           const Sous_Domaine& sous_domaine = dom.ss_domaine(i_sous_domaine);
           const Nom& nom = sous_domaine.le_nom();
-          bool sous_domaine_trouvee = noms_sous_domaines_.contient_(nom);
+          bool sous_domaine_trouvee = noms_sous_domaines.contient_(nom);
           if (!toutes_sous_domaines && !sous_domaine_trouvee)
             continue;
 
-          Cerr << " Allocation of elements of the subarea " << nom << " to the processor " << pe << finl;
           count = 0;
           const int nb_elem_ssz = sous_domaine.nb_elem_tot();
           for (int i = 0; i < nb_elem_ssz; i++)
@@ -159,11 +166,10 @@ void Partitionneur_Sous_Domaines::construire_partition(IntVect& elem_part, int& 
                   elem_part[elem] = pe;
                 }
             }
-          Cerr << " Number of elements attributed to the processor " << pe << " : " << count << finl;
+          Cerr << " Allocation of " << count << " elements from the subarea " << nom << " to the processor " << pe << finl;
           pe++;
         }
     }
-  Cerr << " Allocation of the remaining elements to the processor " << pe << " : ";
   count = 0;
   for (int elem = 0; elem < nb_elem; elem++)
     {
@@ -173,7 +179,7 @@ void Partitionneur_Sous_Domaines::construire_partition(IntVect& elem_part, int& 
           elem_part[elem] = pe;
         }
     }
-  Cerr << count << " elements." << finl;
+  if (count>0) Cerr << " Allocation of the remaining " << count << " elements to the processor " << pe << finl;
   /*
   if (count==0)
     {

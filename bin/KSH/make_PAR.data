@@ -63,8 +63,10 @@ then
    echo "
 s?[N,n][B,b]_[P,p][A,a][R,r][T,t][S,s][ \t]\+[0-9]\+?Nb_parts $NB_CPUS?
 s?[N,n][B,b]_[P,p][A,a][R,r][T,t][S,s]_[T,t][O,o][T,t][[ \t]\+[0-9]\+?Nb_parts_tot $NB_CPUS?
-s?[T,t][R,r][A,a][N,n][C,c][H,h][E,e][S,s][ \t]\+[0-9]\+[ \t]\+[0-9]\+?Tranches $NB_CPUS 1?
-s?[T,t][R,r][A,a][N,n][C,c][H,h][E,e][S,s][ \t]\+[0-9]\+[ \t]\+[0-9][ \t]\+[0-9]\+?Tranches 1 1 $NB_CPUS?
+s?[T,t][R,r][A,a][N,n][C,c][H,h][E,e][S,s][ \t]\+[2-9]\+[ \t]\+[0-9]\+?Tranches $NB_CPUS 1?
+s?[T,t][R,r][A,a][N,n][C,c][H,h][E,e][S,s][ \t]\+[1]\+[ \t]\+[0-9]\+?Tranches 1 $NB_CPUS?
+s?[T,t][R,r][A,a][N,n][C,c][H,h][E,e][S,s][ \t]\+[2-9]\+[ \t]\+[0-9][ \t]\+[0-9]\+?Tranches $NB_CPUS 1 1?
+s?[T,t][R,r][A,a][N,n][C,c][H,h][E,e][S,s][ \t]\+[1]\+[ \t]\+[0-9][ \t]\+[0-9]\+?Tranches 1 1 $NB_CPUS?
 " >> $tmpdec
 fi
 sed -f $tmpdec $NOM.data > $DEC_NOM.data
