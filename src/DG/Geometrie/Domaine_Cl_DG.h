@@ -16,12 +16,12 @@
 #ifndef Domaine_Cl_DG_included
 #define Domaine_Cl_DG_included
 
-//  Cette classe porte les tableaux qui servent a mettre en oeuvre
-//  les condition aux limites dans la formulation DG
 #include <Domaine_Cl_dis_base.h>
 
 class Domaine_VF;
 
+//  Cette classe porte les tableaux qui servent a mettre en oeuvre
+//  les condition aux limites dans la formulation DG
 class Domaine_Cl_DG : public Domaine_Cl_dis_base
 {
 
@@ -39,6 +39,7 @@ public :
   const Domaine_VF& domaine_vf() const;
 
   int nb_bord_periodicite() const;
+
 protected:
 
   int modif_perio_fait_ = 0;

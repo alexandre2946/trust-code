@@ -15,18 +15,17 @@
 
 #include <Quadrature_Ord1_Polygone.h>
 /****************************************************************/
-/* Formule de quadrature 2D : Formule Gauss-Lobatto Aide-memoire elements finis Ern p.220  */
-/* Formule de quadrature 1D : Formule Gauss-Lobatto Aide-memoire elements finis Ern p.220       */
+/* Formule de quadrature 1D/2D : Formule Gauss-Lobatto Aide-memoire elements finis Ern p.220  */
 /****************************************************************/
 namespace
 {
-static constexpr int nb_pts_integ_tri = {1};
+constexpr int nb_pts_integ_tri = {1};
 // static constexpr int nb_pts_integ_quad = {4};
 static constexpr int nb_pts_integ_facet = {1};
 
 // static constexpr double WEIGHTS_QUAD[4] = {1./4.,1./4.,1./4.,1./4.};
 // static constexpr double WEIGHTS_QUAD_POLY[4] = {1./4.,1./4.,1./4.,1./4.};
-static constexpr double WEIGHTS_FACETS[1] = {1.};
+constexpr double WEIGHTS_FACETS[1] = {1.};
 /*static constexpr double LAMBDA_QUAD[4][4] =
 {
   {1./2,1./2,0.,0.},
@@ -41,29 +40,30 @@ static constexpr double WEIGHTS_FACETS[1] = {1.};
   {0.,0.,1./2.,1./2.},
   {1./2.,0.,0.,1./2.}
 }; // Barycentric coordinates coefficients of integration points in elem */
-static constexpr double LAMBDA_FACETS[1][2] =
+constexpr double LAMBDA_FACETS[1][2] =
 {
   {1. / 2., 1. / 2.},
 }; // Barycentric coordinates coefficients of integration points on facets */
-static constexpr double WEIGHTS_TRI[1] = {1.0};
+constexpr double WEIGHTS_TRI[1] = {1.0};
 
-static constexpr double LAMBDA_TRI[1][3] =
+constexpr double LAMBDA_TRI[1][3] =
 {
   {1. / 3., 1. / 3., 1. / 3.}
 }; // Barycentric coordinates coefficients of integration points in elem */
-}
-static constexpr int N_TRI_IN_QUAD = {2};
-static constexpr int TRI_IN_QUAD[2][3] =
+
+constexpr int N_TRI_IN_QUAD = {2};
+constexpr int TRI_IN_QUAD[2][3] =
 {
   {0, 1, 2},
   {0, 2, 3}
 }; // List of vertices that decomposes quad in tri */*
 
-static constexpr int TRI_IN_CART[2][3] =
+constexpr int TRI_IN_CART[2][3] =
 {
   {0, 1, 2},
   {1, 2, 3}
 }; // List of vertices that decomposes quad in tri */
+}
 
 void Quadrature_Ord1_Polygone::compute_integ_points()
 {

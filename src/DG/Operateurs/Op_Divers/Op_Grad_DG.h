@@ -41,11 +41,8 @@ public:
   void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
 
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = { }) const override;
-  //DoubleTab& ajouter(const DoubleTab&, DoubleTab&) const override;
   DoubleTab& calculer(const DoubleTab&, DoubleTab&) const override;
   int impr(Sortie& os) const override;
-
-  //void contribuer_a_avec(const DoubleTab&, Matrice_Morse& matrice) const override;
 
 protected:
   OBS_PTR(Domaine_DG) le_dom_DG;

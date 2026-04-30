@@ -39,8 +39,6 @@ public:
   void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&, const Champ_Inc_base&) override;
   void completer() override;
   DoubleTab& calculer(const DoubleTab&, DoubleTab&) const override;
-  //DoubleTab& ajouter(const DoubleTab&, DoubleTab&) const override;
-  //void contribuer_a_avec(const DoubleTab&, Matrice_Morse& matrice) const override;
   int impr(Sortie& os) const override;
   void volumique(DoubleTab&) const override;
 

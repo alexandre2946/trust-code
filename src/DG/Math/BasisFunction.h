@@ -58,7 +58,6 @@ public:
       }
     return indices_glob_elem_;
   }
-//  inline const int& indices_glob_elem(int elem) const { return indices_glob_elem_(elem); }
   inline const int& nb_bfunc() const { return nb_bfunc_; }
 
   //Evaluation of the basis functions on integration points for elements and facets
@@ -80,9 +79,6 @@ public:
   inline const DoubleTab& get_eta_facet() const { return eta_facet; }
 
 protected:
-  /*! Compute the mass matrix
-   */
-  void allocate_mass_matrix();
   void allocate_transition_matrix();
   void compute_stab_param();
 
@@ -95,11 +91,11 @@ protected:
   void gramSchmidt(DoubleTab& fbase, const Quadrature_base& quad, const int& num_elem, const int& current_indice, const int& nb_pts_integ, const double& volume, int index);
 
   OBS_PTR(Domaine_DG) dom_;
-  int order_;
-  bool is_orthonormalized_;
-  bool is_diagonal_;
-  int nb_bfunc_;
-  int default_quad_order_;
+  int order_ = 1;
+  bool is_orthonormalized_ = true;
+  bool is_diagonal_ = true;
+  int nb_bfunc_ = -1;
+  int default_quad_order_ = -1;
 
   IntTab indices_glob_elem_;
   mutable IntTab indices_glob_elem_2D_;

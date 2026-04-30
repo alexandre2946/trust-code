@@ -47,7 +47,6 @@ protected:
 
   int order_ = -1;
   int nb_bfunc_ = -1;
-  bool is_scalar_ = true;
 };
 
 

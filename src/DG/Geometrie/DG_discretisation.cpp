@@ -294,9 +294,6 @@ void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
   if ((nature == multi_scalaire) && (champ_fonc))
     {
       throw;
-      //champ_fonc->valeur().fixer_nature_du_champ(nature);
-      //champ_fonc->valeur().fixer_unites(unites);
-      //champ_fonc->valeur().fixer_noms_compo(noms);
     }
   else if ((nature == multi_scalaire) && (champ_don))
     {
@@ -308,73 +305,20 @@ void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
 void DG_discretisation::distance_paroi(const Schema_Temps_base& sch, Domaine_dis_base& z, OWN_PTR(Champ_Fonc_base)& ch) const
 {
   throw;
-//  Cerr << "Discretisation de la distance paroi" << finl;
-//  Domaine_DG& domaine_DG = ref_cast(Domaine_DG, z.valeur());
-//  ch.typer("Champ_Fonc_Elem_DG");
-//  Champ_Fonc_Elem_DG& ch_dist_paroi = ref_cast(Champ_Fonc_Elem_DG, ch.valeur());
-//  ch_dist_paroi.associer_domaine_dis_base(domaine_DG);
-//  ch_dist_paroi.nommer("distance_paroi");
-//  ch_dist_paroi.fixer_nb_comp(1);
-//  ch_dist_paroi.fixer_nb_valeurs_nodales(domaine_DG.nb_elem());
-//  ch_dist_paroi.fixer_unite("m");
-//  ch_dist_paroi.changer_temps(sch.temps_courant());
 }
 
 
 void DG_discretisation::grad_u(const Domaine_dis_base& z, const Domaine_Cl_dis_base& zcl, const Champ_Inc_base& ch_vitesse, OWN_PTR(Champ_Fonc_base)& ch) const
 {
   throw;
-//  const Champ_Face_DG& vit = ref_cast(Champ_Face_DG, ch_vitesse.valeur());
-//  const Domaine_DG& domaine_poly = ref_cast(Domaine_DG, z.valeur());
-//  const Domaine_Cl_DG& domaine_cl_poly = ref_cast(Domaine_Cl_DG, zcl.valeur());
-//  ch.typer("grad_U_Champ_Face_DG");
-//  grad_U_Champ_Face_DG& ch_grad_u = ref_cast(grad_U_Champ_Face_DG, ch.valeur());
-//  ch_grad_u.associer_domaine_dis_base(domaine_poly);
-//  ch_grad_u.associer_domaine_Cl_dis_base(domaine_cl_poly);
-//  ch_grad_u.associer_champ(vit);
-//  ch_grad_u.nommer("gradient_vitesse");
-//  ch_grad_u.fixer_nb_comp(dimension * dimension);
-//
-//  if (dimension == 2)
-//    {
-//      ch_grad_u.fixer_nom_compo(0, "dUdX"); // du/dx
-//      ch_grad_u.fixer_nom_compo(1, "dUdY"); // du/dy
-//      ch_grad_u.fixer_nom_compo(2, "dVdX"); // dv/dx
-//      ch_grad_u.fixer_nom_compo(3, "dVdY"); // dv/dy
-//    }
-//  else
-//    {
-//      ch_grad_u.fixer_nom_compo(0, "dUdX"); // du/dx
-//      ch_grad_u.fixer_nom_compo(1, "dUdY"); // du/dy
-//      ch_grad_u.fixer_nom_compo(2, "dUdZ"); // du/dz
-//      ch_grad_u.fixer_nom_compo(3, "dVdX"); // dv/dx
-//      ch_grad_u.fixer_nom_compo(4, "dVdY"); // dv/dy
-//      ch_grad_u.fixer_nom_compo(5, "dVdZ"); // dv/dz
-//      ch_grad_u.fixer_nom_compo(6, "dWdX"); // dw/dx
-//      ch_grad_u.fixer_nom_compo(7, "dWdY"); // dw/dy
-//      ch_grad_u.fixer_nom_compo(8, "dWdZ"); // dw/dz
-//    }
-//  ch_grad_u.fixer_nature_du_champ(vectoriel);
-//  ch_grad_u.fixer_nb_valeurs_nodales(domaine_poly.nb_elem());
-//  ch_grad_u.fixer_unite("s-1");
-//  ch_grad_u.changer_temps(ch_vitesse.temps());
 }
 
 
 void DG_discretisation::modifier_champ_tabule(const Domaine_dis_base& domaine_poly, Champ_Fonc_Tabule& lambda_tab, const VECT(OBS_PTR(Champ_base)) &champs_param) const
 {
   throw;
-//  Champ_Fonc& lambda_tab_dis = lambda_tab.le_champ_tabule_discretise();
-//  lambda_tab_dis.typer("Champ_Fonc_Tabule_Elem_DG");
-//  Champ_Fonc_Tabule_Elem_DG& ch_tab_lambda_dis = ref_cast(Champ_Fonc_Tabule_Elem_DG, lambda_tab_dis.valeur());
-//  //ch_tab_lambda_dis.nommer(nom_champ);
-//  ch_tab_lambda_dis.associer_domaine_dis_base(domaine_poly);
-//  ch_tab_lambda_dis.associer_param(champs_param, lambda_tab.table());
-//  ch_tab_lambda_dis.fixer_nb_comp(lambda_tab.nb_comp());
-//  ch_tab_lambda_dis.fixer_nb_valeurs_nodales(domaine_poly.nb_elem());
-//  // ch_tab_lambda_dis.fixer_unite(unite);
-//  ch_tab_lambda_dis.changer_temps(champs_param[0]->temps());
 }
+
 /*! @brief Old copy paste, give the name to fields. Name used to allocate size of matrixes in discretiser
  *
  */

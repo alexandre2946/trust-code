@@ -43,19 +43,6 @@ double Quadrature_base::compute_integral_on_elem(int num_elem, DoubleTab& val_pt
   return acc * volume;
 }
 
-/* DoubleTab Quadrature_base::compute_integral_on_elem(DoubleTab& val_pts_integ) const // pas sur que cela serve : je commente jusqu'a destruction
-{
-  int nb_elem_tot = dom_->nb_elem_tot();
-  DoubleTab results(nb_elem_tot);
-  DoubleTab val_pts_elem;
-  for (int num_elem = 0; num_elem < nb_elem_tot; num_elem++)
-    {
-      val_pts_elem.ref_tab(val_pts_integ, num_elem,1);
-      results[num_elem] = compute_integral_on_elem(num_elem, val_pts_elem);
-    }
-  return results;
-} */
-
 double Quadrature_base::compute_integral_on_facet(int num_facet, Parser_U& parser) const
 {
   DoubleTab val_pts_integ(nb_pts_integ_facets_);
@@ -106,7 +93,6 @@ double Quadrature_base::compute_integral(DoubleTab& vals_pts_integ) const
   Process::mp_sum(acc);
   return acc;
 }
-
 
 
 // Function to calculate the area of a triangle from the coordinates of its vertices

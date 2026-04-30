@@ -57,7 +57,9 @@ protected:
 
   DoubleTab les_coeff_pression;
 
-  int has_P_ref = 0, stencil_done = 0;
+  int has_P_ref = 0;
+  int stencil_done = 0;
+
   Matrice_Morse rec; //pour reconstruire les vitesses
 };
 

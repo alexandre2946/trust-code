@@ -36,7 +36,6 @@ public:
 
   inline const IntTab& get_tab_nb_pts_integ() const { return tab_nb_pts_integ_; }
   inline const IntTab& get_ind_pts_integ() const { return ind_pts_integ_; }
-//  void register_quadrature();
 
   /*! Compute for the whole domain the exact location of integration points per element
    */
@@ -86,16 +85,14 @@ protected:
   int nb_pts_integ_quad_; // local numbers of integ points for quadrangles
   int nb_pts_integ_tri_; // // local numbers of integ points for triangles
   int nb_pts_integ_facets_; // local numbers of integ points for facets
-  int nb_pts_integ_max_;
+  int nb_pts_integ_max_; // maximal number of integ points for all geometrical types
 
   IntTab tab_nb_pts_integ_; // numbers of integ points cumulated
 
   IntTab ind_pts_integ_; // numero of the first integ points
 
-  Parser_U parser_; // why not?
-
   DoubleTab integ_points_; // Integ points for quadrature formula
-  DoubleTab integ_points_facets_;
+  DoubleTab integ_points_facets_; // Integ points for quadrature formula for facets
   DoubleTab weights_;      //global weights
   DoubleTab weights_quad_; // local numbers
   DoubleTab weights_tri_; // local numbers
@@ -107,8 +104,6 @@ protected:
   // Computes a weight scale based on tessellation triangle and element volume
   double calculateWeightScale(const IntTab& vert_elems, const DoubleTab& xs, DoubleVect& volumes, int e, int s1, int s2, int s3);
   double calculateWeightScale(double ve, double s1x, double s1y, double s2x, double s2y, double s3x, double s3y);
-
-
 
 };
 

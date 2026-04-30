@@ -77,10 +77,10 @@ public:
   virtual Nature_du_champ nature_du_champ() const { return nature_; } // Renvoie la nature d'un champ (scalaire, multiscalaire, vectoriel).
   virtual Nature_du_champ fixer_nature_du_champ(Nature_du_champ nat);
 
-  bool is_basis_function() const  { return nature_>=basis_function_order_1_scalar; }
+  bool is_basis_function() const  { return nature_ >= basis_function_order_1_scalar; }
   bool is_vectorial() const
   {
-    return  ((nature_==vectoriel) | (nature_ == basis_function_order_1_vectorial) | (nature_ == basis_function_order_2_vectorial) );
+    return nature_==vectoriel or nature_ == basis_function_order_1_vectorial or nature_ == basis_function_order_2_vectorial;
   }
   int order_field() const;
 

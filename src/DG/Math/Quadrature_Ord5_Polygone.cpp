@@ -16,21 +16,20 @@
 #include <Quadrature_Ord5_Polygone.h>
 #include <cmath>
 /****************************************************************/
-/* Formule de quadrature 2D : Formule Gauss-Lobatto Aide-memoire elements finis Ern p.220  */
-/* Formule de quadrature 1D : Formule Gauss-Lobatto Aide-memoire elements finis Ern p.220       */
+/* Formule de quadrature 1D/2D : Formule Gauss-Lobatto Aide-memoire elements finis Ern p.220  */
 /****************************************************************/
 namespace
 {
-static constexpr int nb_pts_integ_tri = {7};
-// static constexpr int nb_pts_integ_quad = {16};
-// static constexpr int nb_pts_integ_quad = {14}; // less expensive
-static constexpr int nb_pts_integ_facet = {5};
-// static constexpr double invsqrt5 = 1./2.2360679774;
-// static constexpr double CONSTP = 0.5+invsqrt5/2.;
-// static constexpr double CONSTM = 0.5-invsqrt5/2.;
-// static constexpr double WEIGHTS_QUAD[16] = {1./144., 1./144., 1./144., 1./144., 5./144.,5./144.,5./144.,5./144.,5./144.,5./144.,5./144.,5./144.,25./144.,25./144.,25./144.,25./144.};
+constexpr int nb_pts_integ_tri = {7};
+// constexpr int nb_pts_integ_quad = {16};
+// constexpr int nb_pts_integ_quad = {14}; // less expensive
+constexpr int nb_pts_integ_facet = {5};
+// constexpr double invsqrt5 = 1./2.2360679774;
+// constexpr double CONSTP = 0.5+invsqrt5/2.;
+// constexpr double CONSTM = 0.5-invsqrt5/2.;
+// constexpr double WEIGHTS_QUAD[16] = {1./144., 1./144., 1./144., 1./144., 5./144.,5./144.,5./144.,5./144.,5./144.,5./144.,5./144.,5./144.,25./144.,25./144.,25./144.,25./144.};
 
-/*static constexpr double LAMBDA_QUAD[16][4] =
+/*constexpr double LAMBDA_QUAD[16][4] =
 {
   {1.,0.,0.,0.},
   {0.,1.,0.,0.},
@@ -49,9 +48,9 @@ static constexpr int nb_pts_integ_facet = {5};
   {0.,::CONSTM,::CONSTM,::invsqrt5},
   {::CONSTM,0.,::invsqrt5,::CONSTM}
 }; // Barycentric coordinates coefficients of integration points in elem */
-// static constexpr double WEIGHTS_QUAD_POLY[16] = {1./144., 1./144., 1./144., 1./144., 5./144.,5./144.,5./144.,5./144.,5./144.,5./144.,5./144.,5./144.,25./144.,25./144.,25./144.,25./144.};
+// constexpr double WEIGHTS_QUAD_POLY[16] = {1./144., 1./144., 1./144., 1./144., 5./144.,5./144.,5./144.,5./144.,5./144.,5./144.,5./144.,5./144.,25./144.,25./144.,25./144.,25./144.};
 
-/*static constexpr double LAMBDA_QUAD_POLY[16][4] =
+/*constexpr double LAMBDA_QUAD_POLY[16][4] =
 {
   {1.,0.,0.,0.},
   {0.,1.,0.,0.},
@@ -71,22 +70,22 @@ static constexpr int nb_pts_integ_facet = {5};
   {::CONSTM,0.,::CONSTM,::invsqrt5}
 }; // Barycentric coordinates coefficients of integration points in elem */
 
-static constexpr int N_TRI_IN_QUAD = {2};
-static constexpr int TRI_IN_QUAD[2][3] =
+constexpr int N_TRI_IN_QUAD = {2};
+constexpr int TRI_IN_QUAD[2][3] =
 {
   {0, 1, 2},
   {0, 2, 3}
 }; // List of vertices that decomposes quad in tri */*
 
-static constexpr int TRI_IN_CART[2][3] =
+constexpr int TRI_IN_CART[2][3] =
 {
   {0, 1, 2},
   {1, 2, 3}
 }; // List of vertices that decomposes quad in tri */
 
-static constexpr double WEIGHTS_TRI[7] = {0.225, 0.125939180544827, 0.125939180544827, 0.125939180544827, 0.132394152788506, 0.132394152788506, 0.132394152788506};
-static constexpr double WEIGHTS_FACETS[5] = {7. / 90., 32. / 90., 12. / 90., 32. / 90., 7. / 90.};
-static constexpr double LAMBDA_TRI[7][3] =
+constexpr double WEIGHTS_TRI[7] = {0.225, 0.125939180544827, 0.125939180544827, 0.125939180544827, 0.132394152788506, 0.132394152788506, 0.132394152788506};
+constexpr double WEIGHTS_FACETS[5] = {7. / 90., 32. / 90., 12. / 90., 32. / 90., 7. / 90.};
+constexpr double LAMBDA_TRI[7][3] =
 {
   {1. / 3, 1. / 3, 1. / 3},
   {0.797426985353087, 0.101286507323456, 0.101286507323456},
@@ -96,7 +95,7 @@ static constexpr double LAMBDA_TRI[7][3] =
   {0.470142064105115, 0.059715871789770, 0.470142064105115},
   {0.470142064105115, 0.470142064105115, 0.059715871789770}
 }; // Barycentric coordinates coefficients of integration points in elem */
-static constexpr double LAMBDA_FACETS[5][2] =
+constexpr double LAMBDA_FACETS[5][2] =
 {
   {1., 0.},
   {3. / 4., 1. / 4.},

@@ -22,6 +22,7 @@ class Matrice_Morse;
 class Op_Diff_DG_Elem: public Op_Diff_DG_base
 {
   Declare_instanciable( Op_Diff_DG_Elem );
+
 public:
   virtual void calculer_flux_bord(const DoubleTab& inco) const = delete; //TODO DG a calculer dans interface_blocs
 
@@ -38,7 +39,6 @@ public:
   void ajouter_termes_croises(const DoubleTab& inco, const Probleme_base& autre_pb, const DoubleTab& autre_inco, DoubleTab& resu) const override;
   void contribuer_termes_croises(const DoubleTab& inco, const Probleme_base& autre_pb, const DoubleTab& autre_inco, Matrice_Morse& matrice) const override;
   void contribuer_au_second_membre(DoubleTab& resu ) const override;
-protected:
 
 };
 

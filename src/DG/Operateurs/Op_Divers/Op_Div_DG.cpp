@@ -409,9 +409,6 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
 
                         for (int pressure_index = 0; pressure_index < nb_bfunc_p; pressure_index++)
                           {
-                            // for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
-                            //   mean_P(k) = f_base_p0(pressure_index, k); // TODO DG ?? we don't have information at this point on P behind the CL ?
-
                             for (int d = 0; d < Objet_U::dimension; d++)
                               {
                                 //eval_jump_on_facet01 = 0.;
@@ -440,9 +437,6 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
 
                     for (int pressure_index = 0; pressure_index < nb_bfunc_p; pressure_index++)
                       {
-                        // for (int k = 0; k < quad.nb_pts_integ_facets(); k++)
-                        //   mean_P(k) = f_base_p0(pressure_index, k); // TODO DG ?? we don't have information at this point on P behind the CL ?
-
                         for (int d = 0; d < Objet_U::dimension; d++)
                           {
                             //eval_jump_on_facet01 = 0.;

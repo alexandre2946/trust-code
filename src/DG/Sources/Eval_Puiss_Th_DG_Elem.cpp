@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,60 +13,12 @@
 *
 *****************************************************************************/
 
-#ifndef Op_Diff_DG_base_included
-#define Op_Diff_DG_base_included
+#include <Eval_Puiss_Th_DG_Elem.h>
 
-#include <Op_Diff_Turbulent_base.h>
-#include <Operateur_Diff_base.h>
-#include <Domaine_DG.h>
-#include <TRUST_Ref.h>
-#include <SFichier.h>
-#include <Champ_Uniforme.h>
 
-class Domaine_Cl_DG;
-
-class Op_Diff_DG_base: public Operateur_Diff_base, public Op_Diff_Turbulent_base
+void Eval_Puiss_Th_DG_Elem::associer_champs(const Champ_Don_base& Q)
 {
-  Declare_base(Op_Diff_DG_base);
-public:
-  void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&, const Champ_Inc_base&) override;
+  la_puissance = Q;
+  puissance.ref(Q.valeurs());
+}
 
-  double calculer_dt_stab() const override;
-
-  void associer_diffusivite(const Champ_base& diffu) override
-  {
-    diffusivite_ = diffu;
-    is_var_ = sub_type(Champ_Uniforme, diffu) ? 0 : 1;
-    is_aniso_ = (diffu.nb_comp() > 1);
-  }
-
-  void completer() override;
-  const Champ_base& diffusivite() const override { return diffusivite_.valeur(); }
-  void mettre_a_jour(double t) override
-  {
-    Operateur_base::mettre_a_jour(t);
-    nu_a_jour_ = 0;
-  }
-
-  void update_nu() const; //met a jour nu
-  inline double nu(int i, int compo) const { return nu_(is_var_ * i, compo); }
-
-  DoubleTab& calculer(const DoubleTab&, DoubleTab&) const override;
-  int impr(Sortie& os) const override;
-
-protected:
-  OBS_PTR(Domaine_DG) le_dom_dg_;
-  OBS_PTR(Domaine_Cl_DG) la_zcl_dg_;
-  mutable SFichier Flux, Flux_moment, Flux_sum; // Fichiers .out
-
-  OBS_PTR(Champ_base) diffusivite_;
-  mutable int nu_a_jour_ = 0; //si on doit mettre a jour nu
-  mutable DoubleTab nu_;
-
-  bool is_var_; //if the diffusivity is Uniforme or heterogeneous
-  bool is_aniso_; //if the diffusivity is anisotropic
-
-};
-
-
-#endif /* Op_Diff_DG_base_included */

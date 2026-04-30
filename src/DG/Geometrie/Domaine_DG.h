@@ -30,7 +30,9 @@ class BasisFunction;
 class Domaine_DG : public Domaine_Poly_base
 {
   Declare_instanciable(Domaine_DG);
+
 public :
+
   void discretiser() override;
   void init_equiv() const override;
 
@@ -77,7 +79,6 @@ protected:
   IntTab nfaces_elem_;
   int order_quad_=-1; // 3*(Option_DG::DEFAULT_ORDER==1)+5*(Option_DG::DEFAULT_ORDER==2)
   bool gram_schmidt_ = true; // init from Option_DG::GRAM_SCHMIDT which is 1 by default
-// DoubleVect h_, sigma;
 
   Stencil stencil_sorted_; //table of stencil sorted for each elements
 
@@ -90,7 +91,6 @@ protected:
     bool operator<(const BasisFunction_Key& other) const
     {
       return order < other.order;
-      //return std::tie(order, is_scalar, is_diagonal) < std::tie(other.order, other.is_scalar, other.is_diagonal);
     }
   };
 

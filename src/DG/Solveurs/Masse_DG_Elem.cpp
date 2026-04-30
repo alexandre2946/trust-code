@@ -57,9 +57,6 @@ DoubleTab& Masse_DG_Elem::appliquer_impl(DoubleTab& sm) const
           Matrice_Dense invM = bfunc.eval_invMassMatrix(quad, num_elem);
           for (int d = 0 ; d<dim; d++)
             {
-              //res.ref_tab(temp_sm, num_elem, 1);
-              //loc.ref_tab(invMsm, num_elem, 1);
-
               res.ref_array(temp_sm, num_elem*dim*nb_bfunc + d*nb_bfunc, nb_bfunc);
               loc.ref_array(invMsm, num_elem*dim*nb_bfunc + d*nb_bfunc, nb_bfunc);
 

@@ -362,57 +362,6 @@ int Assembleur_P_DG::assembler_QC(const DoubleTab& tab_rho, Matrice& matrice)
 
 int Assembleur_P_DG::modifier_secmem(DoubleTab& secmem)
 {
-//  Debog::verifier("secmem dans modifier secmem", secmem);
-//
-//  const Domaine_DG& le_dom = le_dom_dg_.valeur();
-//  const Domaine_Cl_DG& le_dom_cl = le_dom_Cl_dg_.valeur();
-//  int nb_cond_lim = le_dom_cl.nb_cond_lim();
-//  const IntTab& face_voisins = le_dom.face_voisins();
-//
-//  // Modification du second membre :
-//  int i;
-//  for (i = 0; i < nb_cond_lim; i++)
-//    {
-//      const Cond_lim_base& la_cl_base = le_dom_cl.les_conditions_limites(i).valeur();
-//      const Front_VF& la_front_dis = ref_cast(Front_VF, la_cl_base.frontiere_dis());
-//      const Champ_front_base& champ_front = la_cl_base.champ_front();
-//      int ndeb = la_front_dis.num_premiere_face();
-//      int nfin = ndeb + la_front_dis.nb_faces();
-//
-//      // GF on est passe en increment de pression
-//      if ((sub_type(Neumann_sortie_libre, la_cl_base)) && (!get_resoudre_increment_pression()))
-//        {
-//          double Pimp, coDG;
-//          const Neumann_sortie_libre& la_cl_Neumann = ref_cast(Neumann_sortie_libre, la_cl_base);
-//          // const Front_VF& la_front_dis = ref_cast(Front_VF,la_cl_base.frontiere_dis());
-//          //int ndeb = la_front_dis.num_premiere_face();
-//          //int nfin = ndeb + la_front_dis.nb_faces();
-//          for (int num_face = ndeb; num_face < nfin; num_face++)
-//            {
-//              Pimp = la_cl_Neumann.flux_impose(num_face - ndeb);
-//              coDG = les_coeff_pression[num_face] * Pimp;
-//              secmem[face_voisins(num_face, 0)] += coDG;
-//            }
-//        }
-//      else if (sub_type(Dirichlet, la_cl_base) && champ_front.instationnaire() && get_resoudre_en_u() )
-//        {
-//          const DoubleTab& Gpt = champ_front.derivee_en_temps();
-//          bool ch_unif = (Gpt.nb_dim() == 1);
-//          for (int num_face = ndeb; num_face < nfin; num_face++)
-//            {
-//              double Stt = 0.;
-//              for (int k = 0; k < dimension; k++)
-//                {
-//                  double Gpoint = ch_unif ? Gpt(k) : Gpt(num_face - ndeb, k);
-//                  Stt -= Gpoint * le_dom.face_normales(num_face, k);
-//                }
-//              secmem(face_voisins(num_face, 0)) += Stt;
-//            }
-//        }
-//    }
-//
-//  secmem.echange_espace_virtuel();
-//  Debog::verifier("secmem dans modifier secmem fin", secmem);
   return 1;
 }
 

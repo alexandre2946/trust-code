@@ -19,7 +19,6 @@
 #include <Dirichlet_paroi_fixe.h>
 #include <Discretisation_base.h>
 #include <Domaine_Cl_DG.h>
-//#include <Champ_Face_DG.h>
 #include <Dirichlet_homogene.h>
 #include <Champ_Inc_P0_base.h>
 #include <Domaine_DG.h>

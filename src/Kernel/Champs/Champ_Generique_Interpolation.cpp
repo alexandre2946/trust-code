@@ -324,7 +324,7 @@ const Champ_base& Champ_Generique_Interpolation::get_champ_with_calculer_champ_p
     }
 
   int imax = espace_valeurs.dimension(0);
-  if ((localisation_ == "elem") | (localisation_=="elem_DG"))
+  if (localisation_ == "elem" || localisation_=="elem_DG")
     {
       const int nb_elements = domaine.nb_elem();
       nb_comp = espace_stockage_->nb_comp(); // with DG, espace_stockage has smaller dimension than source
@@ -546,18 +546,12 @@ void Champ_Generique_Interpolation::get_copy_values(DoubleTab& values) const
 Entity Champ_Generique_Interpolation::get_localisation(const int index) const
 {
   Entity loc;
-  if ((localisation_=="elem") | (localisation_=="elem_DG"))
-    {
-      loc = Entity::ELEMENT;
-    }
+  if (localisation_=="elem"||localisation_=="elem_DG")
+    loc = Entity::ELEMENT;
   else if (localisation_=="som")
-    {
-      loc = Entity::NODE;
-    }
+    loc = Entity::NODE;
   else if (localisation_=="faces")
-    {
-      loc = Entity::FACE;
-    }
+    loc = Entity::FACE;
   else
     {
       Cerr << "Error of type : localisation should be specified to elem or som or faces for the defined field " << nom_post_ << finl;
@@ -730,17 +724,11 @@ const Motcle Champ_Generique_Interpolation::get_directive_pour_discr() const
         }
     }
   else if (localisation_=="elem_DG")
-    {
-      directive = "champ_elem";
-    }
+    directive = "champ_elem";
   else if (localisation_=="som")
-    {
-      directive = "champ_sommets";
-    }
+    directive = "champ_sommets";
   else if (localisation_=="faces")
-    {
-      directive = "champ_face";
-    }
+    directive = "champ_face";
   else
     {
       Cerr<<"Localisation "<<localisation_<<" is not recognized by "<<que_suis_je()<<finl;
