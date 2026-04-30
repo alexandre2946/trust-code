@@ -5,7 +5,6 @@ General,astyle_2.03_linux.tar.gz,outil,GF,LGPL,http://astyle.sourceforge.net/,ht
 General,doxygen-1.7.4.linux.bin.tar.gz,outil,GF,GPL,https://sourceforge.net/projects/doxygen/,http://sourceforge.net/projects/doxygen/files/rel-1.7.4/doxygen-1.7.4.linux.bin.tar.gz/download,
 General,doxygen-1.9.3.src.tar.gz,outil,ND,GPL,https://sourceforge.net/projects/doxygen/,https://sourceforge.net/projects/doxygen/files/rel-1.9.3/doxygen-1.9.3.src.tar.gz/download,
 General,hwloc-2.7.1.tar.gz,,GF,BSD,http://www.open-mpi.org/projects/hwloc/,https://download.open-mpi.org/release/hwloc/v2.7/hwloc-2.7.1.tar.gz,
-General,Vc-1.4.2.tar.gz,,AK,"BSD-3 Clause",https://github.com/VcDevel/Vc,https://github.com/VcDevel/Vc/releases/download/1.4.2/Vc-1.4.2.tar.gz,
 cudss,libcudss-linux-aarch64-0.6.0.5_cuda12-archive.tar.xz,,RB,"?",https://docs.nvidia.com/cuda/cudss/,https://developer.download.nvidia.com/compute/cudss/redist/libcudss/linux-aarch64/libcudss-libcudss-linux-aarch64-0.6.0.5_cuda12-archive.tar.xz,
 cudss,libcudss-linux-x86_64-0.6.0.5_cuda12-archive.tar.xz,,RB,"?",https://docs.nvidia.com/cuda/cudss/,https://developer.download.nvidia.com/compute/cudss/redist/libcudss/linux-aarch64/libcudss-libcudss-linux-x86_64-0.6.0.5_cuda12-archive.tar.xz,
 ccache,ccache-3.1.4.tar.gz,outil,GF,GPL,https://github.com/ccache/ccache,https://github.com/ccache/ccache/releases/download/v3.1.4/ccache-3.1.4.tar.gz,
