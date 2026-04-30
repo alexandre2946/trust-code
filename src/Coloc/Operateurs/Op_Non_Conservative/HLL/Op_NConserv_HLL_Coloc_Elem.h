@@ -16,9 +16,9 @@
 #ifndef Op_NConserv_HLL_Coloc_Elem_included
 #define Op_NConserv_HLL_Coloc_Elem_included
 
-#include <Op_NConserv_Coloc_Elem_base.h>
+#include <Op_NConserv_Coloc_base.h>
 
-class Op_NConserv_HLL_Coloc_Elem : public Op_NConserv_Coloc_Elem_base
+class Op_NConserv_HLL_Coloc_Elem : public Op_NConserv_Coloc_base
 {
   Declare_instanciable( Op_NConserv_HLL_Coloc_Elem ) ;
 public:

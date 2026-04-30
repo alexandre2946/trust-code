@@ -16,9 +16,9 @@
 #ifndef Op_NConserv_HLL_Coloc_Vect_included
 #define Op_NConserv_HLL_Coloc_Vect_included
 
-#include <Op_NConserv_Coloc_Vect_base.h>
+#include <Op_NConserv_Coloc_base.h>
 
-class Op_NConserv_HLL_Coloc_Vect : public Op_NConserv_Coloc_Vect_base
+class Op_NConserv_HLL_Coloc_Vect : public Op_NConserv_Coloc_base
 {
   Declare_instanciable( Op_NConserv_HLL_Coloc_Vect ) ;
 public:
