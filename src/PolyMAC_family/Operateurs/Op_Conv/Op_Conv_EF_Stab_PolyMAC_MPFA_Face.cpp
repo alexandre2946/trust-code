@@ -77,78 +77,32 @@ void Op_Conv_EF_Stab_PolyMAC_MPFA_Face::completer()
  */
 double Op_Conv_EF_Stab_PolyMAC_MPFA_Face::calculer_dt_stab() const
 {
-  if (polymac_flica5)
-    {
-      double dt = 1e10;
-      const Domaine_Poly_base& domaine = le_dom_poly_.valeur();
-      const DoubleVect& fs = domaine.face_surfaces(), &pf = equation().milieu().porosite_face(), &ve = domaine.volumes(),
-                        &pe = equation().milieu().porosite_elem();
-      const DoubleTab& vit = vitesse_->valeurs(),
-                       *alp = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()).equation_masse().inconnue().passe() : nullptr;
-      const IntTab& e_f = domaine.elem_faces(), &f_e = domaine.face_voisins();
-      const int N = vit.line_size();
-      DoubleTrav flux(N); //somme des flux pf * |f| * vf, volume minimal des mailles d'elements/faces affectes par ce flux
-
-      for (int e = 0; e < domaine.nb_elem(); e++)
-        {
-          // Initialisation du volume et du flux pour chaque element
-          const double vol = pe(e) * ve(e);
-          flux = 0.;
-
-          for (int i = 0; i < e_f.dimension(1); i++)
-            {
-              const int f = e_f(e, i);
-              if (f < 0) continue; // face in-existante
-
-              for (int n = 0; n < N; n++)
-                {
-                  // Calcul du flux entrant
-                  double contribution_flux = pf(f) * fs(f) * std::max((e == f_e(f, 1) ? 1 : -1) * vit(f, n), 0.);
-                  flux(n) += contribution_flux;
-                }
-            }
-
-          // Mise a jour du pas de temps minimal
-          for (int n = 0; n < N; n++)
-            if ((!alp || (*alp)(e, n) > 1e-3) && std::abs(flux(n)) > 1e-12)
-              dt = std::min(dt, vol / flux(n));
-        }
-
-      return Process::mp_min(dt);
-    }
-
   double dt = 1e10;
   const Domaine_Poly_base& domaine = le_dom_poly_.valeur();
-  const Champ_Face_PolyMAC_MPFA& ch = ref_cast(Champ_Face_PolyMAC_MPFA, equation().inconnue());
   const DoubleVect& fs = domaine.face_surfaces(), &pf = equation().milieu().porosite_face(), &ve = domaine.volumes(),
                     &pe = equation().milieu().porosite_elem();
   const DoubleTab& vit = vitesse_->valeurs(),
                    *alp = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()).equation_masse().inconnue().passe() : nullptr;
-  const IntTab& e_f = domaine.elem_faces(), &f_e = domaine.face_voisins(), &fcl = ch.fcl();
+  const IntTab& e_f = domaine.elem_faces(), &f_e = domaine.face_voisins();
+  const IntTab *fcl = polymac_flica5 ? nullptr : &ref_cast(Champ_Face_PolyMAC_MPFA, equation().inconnue()).fcl();
   const int N = vit.line_size();
   DoubleTrav flux(N); //somme des flux pf * |f| * vf, volume minimal des mailles d'elements/faces affectes par ce flux
 
   for (int e = 0; e < domaine.nb_elem(); e++)
     {
-      // Initialisation du volume et du flux pour chaque element
       const double vol = pe(e) * ve(e);
       flux = 0.;
 
       for (int i = 0; i < e_f.dimension(1); i++)
         {
           const int f = e_f(e, i);
-          if (f < 0) continue; // face in-existante
+          if (f < 0) continue;
+          if (fcl && Option_PolyMAC_family::TRAITEMENT_AXI && (*fcl)(f, 0) == 2) continue;
 
-          if ((!Option_PolyMAC_family::TRAITEMENT_AXI || fcl(f, 0) != 2))
-            for (int n = 0; n < N; n++)
-              {
-                // Calcul du flux entrant
-                double contribution_flux = pf(f) * fs(f) * std::max((e == f_e(f, 1) ? 1 : -1) * vit(f, n), 0.);
-                flux(n) += contribution_flux;
-              }
+          for (int n = 0; n < N; n++)
+            flux(n) += pf(f) * fs(f) * std::max((e == f_e(f, 1) ? 1 : -1) * vit(f, n), 0.);
         }
 
-      // Mise a jour du pas de temps minimal
       for (int n = 0; n < N; n++)
         if ((!alp || (*alp)(e, n) > 1e-3) && std::abs(flux(n)) > 1e-12)
           dt = std::min(dt, vol / flux(n));

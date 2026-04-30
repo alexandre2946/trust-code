@@ -494,18 +494,10 @@ DoubleTab& Champ_Face_PolyMAC_CDO::valeur_aux_elems_(const DoubleTab& val_face, 
   const Domaine_VF& domdom = ref_cast(Domaine_VF, domaine_vf());
   domdom.domaine().creer_tableau_elements(ve);
 
-  if (polymac_flica5)
+  if (polymac_flica5 && que_suis_je() == "Champ_Face_PolyMAC_CDO")
     {
-      if (que_suis_je() == "Champ_Face_PolyMAC_CDO")
-        {
-          bool is_vit = false && cha.le_nom().debute_par("vitesse");
-          interp_ve(val_face, les_polys, ve, is_vit);
-        }
-      else
-        {
-          bool is_vit = cha.le_nom().debute_par("vitesse") && !cha.le_nom().debute_par("vitesse_debitante");
-          interp_ve(val_face, ve, is_vit);
-        }
+      bool is_vit = false && cha.le_nom().debute_par("vitesse");
+      interp_ve(val_face, les_polys, ve, is_vit);
     }
   else
     {
@@ -541,21 +533,15 @@ DoubleVect& Champ_Face_PolyMAC_CDO::valeur_aux_elems_compo(const DoubleTab& posi
 
   //on interpole ve sur tous les elements, puis on se restreint a les_polys
   DoubleTrav ve(0, dimension * cha.valeurs().line_size());
-  if (polymac_flica5)
+  ref_cast(Domaine_VF,domaine_vf()).domaine().creer_tableau_elements(ve);
+  if (polymac_flica5 && que_suis_je() == "Champ_Face_PolyMAC_CDO")
     {
-      ref_cast(Domaine_PolyMAC_CDO,domaine_vf()).domaine().creer_tableau_elements(ve);
       bool is_vit = false && cha.le_nom().debute_par("vitesse");
-
-      if (que_suis_je() == "Champ_Face_PolyMAC_CDO")
-        interp_ve(cha.valeurs(), les_polys, ve, is_vit);
-      else
-        interp_ve(cha.valeurs(), ve);
+      interp_ve(cha.valeurs(), les_polys, ve, is_vit);
     }
   else
-    {
-      ref_cast(Domaine_VF, domaine_vf()).domaine().creer_tableau_elements(ve);
-      interp_ve(cha.valeurs(), ve);
-    }
+    interp_ve(cha.valeurs(), ve);
+
   for (int p = 0; p < les_polys.size(); p++) val(p) = (les_polys(p) == -1) ? 0. : ve(les_polys(p), ncomp);
 
   return val;
