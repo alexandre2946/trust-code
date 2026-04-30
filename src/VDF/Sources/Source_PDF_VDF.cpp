@@ -280,14 +280,14 @@ void  Source_PDF_VDF::verif_ajouter_contrib(const DoubleTab& variable, Matrice_M
               if (difmod2 > 1.0e-5)
                 {
                   if (difmod2 > difmax) difmax = difmod2 ;
-                  // for (int k=0; k<dim_var; k++) Cerr << " ajouter multvect diforce x = "<< force(s1,k) << " "<< force2(s1,k) << " " << diforce(s1,k)<<endl;
+                  // for (int k=0; k<dim_var; k++) Cerr << " ajouter multvect diforce x = "<< force(s1,k) << " "<< force2(s1,k) << " " << diforce(s1,k)<<finl;
                 }
             }
         }
     }
   if (difmax > 0.)
     {
-      Cerr<< "Source_PDF: Max norme caree diff. force absolue = "<<difmax<<endl;
+      Cerr<< "Source_PDF: Max norme caree diff. force absolue = "<<difmax<<finl;
     }
 }
 
@@ -417,7 +417,7 @@ void Source_PDF_VDF::calculer_variable_imposee_mean_grad()
               double xp = solid_points(i,j);
               d2 += (x - xp)*(x - xp);
             }
-          Cerr << "On passe ICI" << endl;
+          Cerr << "On passe ICI" << finl;
           for(int j = 0; j <nb_comp ; j++) variable_imposee_sommet(i,j) = variable_imposee_mod(i,j);
           d2 = sqrt(d2);
           if (d2 > eps)
@@ -446,7 +446,7 @@ void Source_PDF_VDF::calculer_variable_imposee_mean_grad()
                             {
                               double vpf = variable_imposee_mod(num_som,j);
                               double vf = variable_inconnue(num_som,j);
-                              Cerr << vf << endl;// calcul de la vitesse à voir comment (besoin d'une fonction d'interp ou moyenne)
+                              Cerr << vf << finl;// calcul de la vitesse a voir comment (besoin d'une fonction d'interp ou moyenne)
                               mean_grad[j] += (vf - vpf)/d1;
                             }
                           nb_contrib += 1;
@@ -607,12 +607,12 @@ void Source_PDF_VDF::calculer_vitesse_imposee_power_law_tbl()
           for(int j = 0; j < nb_comp; j++)
             {
               double xj = dom.coord(i,j);
-              //Cerr << "xj  " << " j " << j << " val " << xj << endl;
+              //Cerr << "xj  " << " j " << j << " val " << xj << finl;
               double xjf = fluid_points(i,j);
-              //Cerr << "xjf  " << " j " << j << " val " << xjf<< endl;
+              //Cerr << "xjf  " << " j " << j << " val " << xjf<< finl;
               xf(0, j) = xjf;
               double xjs = solid_points(i,j);
-              //Cerr << "xjs  " << " j " << j << " val " << xjs<< endl;
+              //Cerr << "xjs  " << " j " << j << " val " << xjs<< finl;
               d1 += (xj-xjs)*(xj-xjs);
               d2 += (xjf-xj)*(xjf-xj);
               normale(0,j) = xjf - xjs;
@@ -621,8 +621,8 @@ void Source_PDF_VDF::calculer_vitesse_imposee_power_law_tbl()
             }
           d1 = sqrt(d1);
           d2 = sqrt(d2);
-          //Cerr << "d1 " << d1 << endl;
-          //Cerr << "d2 " << d2 << endl;
+          //Cerr << "d1 " << d1 << finl;
+          //Cerr << "d2 " << d2 << finl;
           double y_ref= d1+d2;
 
           // traitement des exceptions
@@ -770,7 +770,7 @@ void Source_PDF_VDF::calculer_vitesse_imposee_power_law_tbl()
                 }
               else
                 {
-                  Cerr << "On passe bien dans le WJSP" << endl;
+                  Cerr << "On passe bien dans le WJSP" << finl;
                   //double u_tau;
                   if ( y_ref_p > y_c2_p_pwl_WJSP)  // a partir de la commence l'expression de la loi de paroi polynomiale turbulente
                     {
@@ -859,7 +859,7 @@ void Source_PDF_VDF::calculer_vitesse_imposee_power_law_tbl()
                             {
                               // Incoherence : on n utilise pas de lois de paroi
                               itisok = 0;
-                              Cerr << "Incohérence" << endl;
+                              Cerr << "Incoherence" << finl;
                             }
                         }
                     }
@@ -1160,7 +1160,7 @@ int Source_PDF_VDF::impr(Sortie& os) const
             }
           else if(pdf_dt_conv != 0 )
             {
-              Cerr<<"Source_PDF_VDF: Modele pdf_bilan must be 0; 1 or 2 only"<<endl;
+              Cerr<<"Source_PDF_VDF: Modele pdf_bilan must be 0; 1 or 2 only"<<finl;
               Process::exit();
             }
 

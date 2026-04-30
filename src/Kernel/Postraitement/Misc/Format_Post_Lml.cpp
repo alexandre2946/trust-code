@@ -283,8 +283,8 @@ int Format_Post_Lml::ecrire_domaine_lml(const Domaine& domaine,Nom& nom_fich)
   trustIdType nb_elem_tot0 = static_cast<int>(Process::mp_sum(domaine.nb_elem()));
   if (nb_som_tot0 >= std::numeric_limits<int>::max() || nb_elem_tot0 >= std::numeric_limits<int>::max())
     {
-      Cerr << "Too many items in the domain to be written in LML (exceeds the 32b limit) - the support for this is not implemented." << endl;
-      Cerr << "Please contact TRUST support!" << endl;
+      Cerr << "Too many items in the domain to be written in LML (exceeds the 32b limit) - the support for this is not implemented." << finl;
+      Cerr << "Please contact TRUST support!" << finl;
       Process::exit(-1);
     }
   int nb_som_tot = static_cast<int>(nb_som_tot0);

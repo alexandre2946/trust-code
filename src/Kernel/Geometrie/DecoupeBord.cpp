@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -64,8 +64,8 @@ public:
     int_t tmp=fr.nb_faces();
     if (tmp >= std::numeric_limits<int>::max())
       {
-        Cerr << "Too many faces in frontiere '" << fr.le_nom() << "' (exceed 32b limit) - the support for this is not yet implemented." << endl;
-        Cerr << "Please contact TRUST support!" << endl;
+        Cerr << "Too many faces in frontiere '" << fr.le_nom() << "' (exceed 32b limit) - the support for this is not yet implemented." << finl;
+        Cerr << "Please contact TRUST support!" << finl;
         Process::exit(-1);
       }
     return (int)tmp;

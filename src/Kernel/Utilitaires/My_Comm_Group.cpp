@@ -33,7 +33,7 @@ Sortie& My_Comm_Group::printOn(Sortie& os) const { return Interprete::printOn(os
 //void test()
 //{
 //  Cerr << "TESTING CLASS My_Comm_Group" << finl;
-//  Cerr << endl;
+//  Cerr << finl;
 //  Process::barrier();
 //
 //  // get pb
@@ -53,7 +53,7 @@ Sortie& My_Comm_Group::printOn(Sortie& os) const { return Interprete::printOn(os
 //        }
 //
 //      Cerr << "@@@@@@@@@@ GLOBAL : Process::mp_sum(nb_elem) = " << Process::mp_sum(nb_elem) << finl;
-//      Cerr << endl;
+//      Cerr << finl;
 //      Process::barrier();
 //
 //      std::vector<int> global_nb_elem;
@@ -64,9 +64,9 @@ Sortie& My_Comm_Group::printOn(Sortie& os) const { return Interprete::printOn(os
 //
 //      Cerr << "@@@@@@@@@@ GLOBAL : gather all nb_elem in global_nb_elem : "<< finl;
 //      for (auto& itr : global_nb_elem)
-//        Cerr << "   - " << itr << endl;
+//        Cerr << "   - " << itr << finl;
 //
-//      Cerr << endl;
+//      Cerr << finl;
 //      Process::barrier();
 //
 //      std::vector<int> global_nb_elem2;
@@ -81,11 +81,11 @@ Sortie& My_Comm_Group::printOn(Sortie& os) const { return Interprete::printOn(os
 //          MPI_Allgather(&nb_elem, 1, MPI_ENTIER, global_nb_elem2.data(), 1, MPI_ENTIER, comm_loc.get_mpi_comm());
 //
 //          for (auto& itr : global_nb_elem2)
-//            Cerr << "   - " << itr << endl;
+//            Cerr << "   - " << itr << finl;
 //
 //          PE_Groups::exit_group();
 //        }
-//      Cerr << endl;
+//      Cerr << finl;
 //
 //      Process::barrier();
 //      Process::exit();

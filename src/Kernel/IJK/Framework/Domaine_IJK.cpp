@@ -388,7 +388,7 @@ void Domaine_IJK::initialize_splitting(Domaine_IJK& geom,
       Cerr << "Error in Domaine_IJK::initialize_splitting(nproc_i =" << nproc_i
            << ", nproc_j =" << nproc_j
            << ", nproc_k =" << nproc_k
-           << "): requested splitting larger than available processor number (" << available_nproc << ")" << endl;
+           << "): requested splitting larger than available processor number (" << available_nproc << ")" << finl;
       Process::exit();
     }
 
@@ -403,7 +403,7 @@ void Domaine_IJK::initialize_splitting(Domaine_IJK& geom,
       Cerr << "\n (number of cells: "
            << geom.get_nb_elem_tot(0) << " "
            << geom.get_nb_elem_tot(1) << " "
-           << geom.get_nb_elem_tot(2) << ")" << endl;
+           << geom.get_nb_elem_tot(2) << ")" << finl;
       Process::exit();
     }
 
@@ -979,7 +979,7 @@ void Domaine_IJK::get_local_mesh_delta(int direction, int ghost_cells,
   if (ghost_cells > ntot)
     {
       Cerr << "Error in Domaine_IJK::get_local_mesh_delta(dir = "<<direction<<",ghost_cells = "<<ghost_cells<<")\n"
-           << "Number of ghost cells larger than number of nodes (" << ntot << ") in the domain !" << endl;
+           << "Number of ghost cells larger than number of nodes (" << ntot << ") in the domain !" << finl;
       Process::exit();
     }
 

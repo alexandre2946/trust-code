@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -27,7 +27,7 @@
 
 Implemente_base(Perte_Charge_PolyMAC_CDO, "Perte_Charge_PolyMAC_CDO", Perte_Charge_Gen);
 
-Sortie& Perte_Charge_PolyMAC_CDO::printOn(Sortie& s) const { return s << que_suis_je() << endl; }
+Sortie& Perte_Charge_PolyMAC_CDO::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
 
 Entree& Perte_Charge_PolyMAC_CDO::readOn(Entree& is) { return Perte_Charge_Gen::readOn(is); }
 

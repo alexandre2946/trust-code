@@ -35,16 +35,16 @@ Entree& Prepro_IBM_Ponderation::readOn(Entree& is)
   param.lire_avec_accolades_depuis(is);
 
   if(pond_==1)
-    Cout<<"Weighting method = arimethic weight"<<endl;
+    Cout<<"Weighting method = arimethic weight"<<finl;
   else if(pond_==2)
-    Cout<<"Weighting method = area weight"<<endl;
+    Cout<<"Weighting method = area weight"<<finl;
   else if(pond_==3)
-    Cout<<"Weighting method =  inverse distance weight"<<endl;
+    Cout<<"Weighting method =  inverse distance weight"<<finl;
   else if(pond_==4)
-    Cout<<"Weighting method = area and inverse distance weight"<<endl;
+    Cout<<"Weighting method = area and inverse distance weight"<<finl;
   else
     {
-      Cerr<<"Prepro_IBM_ponderation : Type_de_ponderation : invalide argument = "<<pond_<<endl;
+      Cerr<<"Prepro_IBM_ponderation : Type_de_ponderation : invalide argument = "<<pond_<<finl;
       Process::exit();
     }
   return is;

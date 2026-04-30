@@ -127,7 +127,7 @@ void Source_PDF_EF::volume_source_term_PDF(DoubleTab& volume_term_PDF)
 
   double bilan = 0.0;
   for (int j=0; j<nb_som; j++) bilan += volume_term_PDF(j);
-  Cerr<<"(IBM) volume_source_term_PDF: bilan = "<<bilan<<endl;
+  Cerr<<"(IBM) volume_source_term_PDF: bilan = "<<bilan<<finl;
 }
 
 /*##################################################################################################
@@ -347,14 +347,14 @@ void  Source_PDF_EF::verif_ajouter_contrib(const DoubleTab& variable, Matrice_Mo
               if (difmod2 > 1.0e-5)
                 {
                   if (difmod2 > difmax) difmax = difmod2 ;
-                  // for (int k=0; k<dim_var; k++) Cerr << " ajouter multvect diforce x = "<< force(s1,k) << " "<< force2(s1,k) << " " << diforce(s1,k)<<endl;
+                  // for (int k=0; k<dim_var; k++) Cerr << " ajouter multvect diforce x = "<< force(s1,k) << " "<< force2(s1,k) << " " << diforce(s1,k)<<finl;
                 }
             }
         }
     }
   if (difmax > 0.)
     {
-      Cerr<< "Source_PDF: Max norme caree diff. force absolue = "<<difmax<<endl;
+      Cerr<< "Source_PDF: Max norme caree diff. force absolue = "<<difmax<<finl;
     }
 }
 
@@ -401,7 +401,7 @@ void Source_PDF_EF::calculer_variable_imposee_elem_fluid()
               double xjs = solid_points(i,j);
               d1 += (xj-xjs)*(xj-xjs);
               d2 += (xjf-xj)*(xjf-xj);
-              //Cerr << "xj " << xj << "xjf " << xjf << "xjs " << xjs << endl;
+              //Cerr << "xj " << xj << "xjf " << xjf << "xjs " << xjs << finl;
             }
           d1 = sqrt(d1);
           d2 = sqrt(d2);
@@ -981,7 +981,7 @@ void Source_PDF_EF::calculer_vitesse_imposee_power_law_tbl()
                             {
                               // Incoherence : on n utilise pas de lois de paroi
                               itisok = 0;
-                              Cerr << "Incohérence" << endl;
+                              Cerr << "Incoherence" << finl;
                             }
                         }
                     }
@@ -1557,7 +1557,7 @@ int Source_PDF_EF::impr(Sortie& os) const
             }
           else if(pdf_dt_conv != 0 )
             {
-              Cerr<<"Source_PDF_EF: Modele pdf_bilan must be 0; 1 or 2 only"<<endl;
+              Cerr<<"Source_PDF_EF: Modele pdf_bilan must be 0; 1 or 2 only"<<finl;
               Process::exit();
             }
 

@@ -1307,7 +1307,7 @@ double Source_PDF_base::fonct_coeff(const double rho_m, const double aire, const
       // double coeff_relax = 1.0 - exp(-tps_cour / temps_relax_);
       // double coeff_relax = tanh(tps_cour / temps_relax_);
       val_coeff *= coeff_relax ;
-      // Cerr<< "coeff. relax. pour PDF = "<<coeff_relax<<" val_coeff = "<<val_coeff <<endl;
+      // Cerr<< "coeff. relax. pour PDF = "<<coeff_relax<<" val_coeff = "<<val_coeff <<finl;
     }
   return val_coeff;
 }
@@ -1635,8 +1635,8 @@ DoubleVect& Source_PDF_base::compute_source_term_PDF(int i_traitement_special, D
           source_term_PDF(j,i) = source_term[i](j);
           // if(  (abs(resu(j,i)) > 1.0) )
           //   {
-          //     Cerr<<"i,j = "<<i<<" "<<j<<" ; resu = "<<resu(j,i)<<" ; sec_mem_pdf = "<<sec_mem_pdf(j,i)<<" ; bilan = "<<source_term[i](j)<<endl;
-          //     Cerr<<"added term (secmem_conv) = "<<add_term(j,i)<<endl;
+          //     Cerr<<"i,j = "<<i<<" "<<j<<" ; resu = "<<resu(j,i)<<" ; sec_mem_pdf = "<<sec_mem_pdf(j,i)<<" ; bilan = "<<source_term[i](j)<<finl;
+          //     Cerr<<"added term (secmem_conv) = "<<add_term(j,i)<<finl;
           //   }
         }
       bilan(i) = mp_somme_vect(source_term[i]);

@@ -147,7 +147,7 @@ DoubleTab& Equation_IBM_proto::derivee_en_temps_inco_ibm_proto(DoubleTab& derive
     }
   else if(pdf_bilan != 0 )
     {
-      Cerr<<"Source_PDF_EF: Model pdf_bilan must be 0; 1 or 2 only"<<endl;
+      Cerr<<"Source_PDF_EF: Model pdf_bilan must be 0; 1 or 2 only"<<finl;
       Process::exit();
     }
 

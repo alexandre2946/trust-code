@@ -389,8 +389,7 @@ public:
     assert(direction >= 0 && direction < 3);
     if (!is_uniform(direction))
       {
-        Cerr << "Error in Domaine_IJK::get_constant_delta: grid is not uniform in direction : " << direction << endl;
-        assert(0);
+        Cerr << "Error in Domaine_IJK::get_constant_delta: grid is not uniform in direction : " << direction << finl;
         Process::exit();
       }
     return delta_xyz_[direction][0];

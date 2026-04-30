@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -41,7 +41,7 @@ void Format_Post_base::resetTime(double t, const std::string dirname)
 {
   if (dirname.empty())
     {
-      Cerr << "Format '" << que_suis_je() << " does not support resetTime()!!" << std::endl;
+      Cerr << "Format '" << que_suis_je() << " does not support resetTime()!!" << finl;
       Process::exit(-1);
       // but LATA does :-)
     }

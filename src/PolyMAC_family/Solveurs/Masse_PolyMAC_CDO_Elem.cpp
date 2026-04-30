@@ -62,7 +62,7 @@ DoubleTab& Masse_PolyMAC_CDO_Elem::appliquer_impl(DoubleTab& sm) const
     }
   else
     {
-      Cerr << "Masse_PolyMAC_CDO_Elem::appliquer ne peut pas s'appliquer a un DoubleTab a " << sm.nb_dim() << " dimensions" << endl;
+      Cerr << "Masse_PolyMAC_CDO_Elem::appliquer ne peut pas s'appliquer a un DoubleTab a " << sm.nb_dim() << " dimensions" << finl;
       Process::exit();
     }
   sm.echange_espace_virtuel();

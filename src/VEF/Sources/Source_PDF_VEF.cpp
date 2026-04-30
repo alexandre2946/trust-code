@@ -322,14 +322,14 @@ void  Source_PDF_VEF::verif_ajouter_contrib(const DoubleTab& variable, Matrice_M
               if (difmod2 > 1.0e-5)
                 {
                   if (difmod2 > difmax) difmax = difmod2 ;
-                  // for (int k=0; k<dim_var; k++) Cerr << " ajouter multvect diforce x = "<< force(s1,k) << " "<< force2(s1,k) << " " << diforce(s1,k)<<endl;
+                  // for (int k=0; k<dim_var; k++) Cerr << " ajouter multvect diforce x = "<< force(s1,k) << " "<< force2(s1,k) << " " << diforce(s1,k)<<finl;
                 }
             }
         }
     }
   if (difmax > 0.)
     {
-      Cerr<< "Source_PDF_VEF: Max norme caree diff. force absolue = "<<difmax<<endl;
+      Cerr<< "Source_PDF_VEF: Max norme caree diff. force absolue = "<<difmax<<finl;
     }
 }
 
@@ -536,7 +536,7 @@ void Source_PDF_VEF::calculer_variable_imposee_mean_grad()
 
 void Source_PDF_VEF::calculer_variable_imposee_hybrid()
 {
-  Cerr << "on passe ici" << endl;
+  Cerr << "on passe ici" << finl;
   const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   int nb_faces=domaine_VEF.nb_faces();
   int dim_esp = Objet_U::dimension;
@@ -562,10 +562,10 @@ void Source_PDF_VEF::calculer_variable_imposee_hybrid()
   variable_imposee_calculee = 0.0;
   variable_imposee_sommet = 0.0;
   sommet_interp = 0;
-  Cerr << "on passe ici" << endl;
+  Cerr << "on passe ici" << finl;
   for (int i = 0; i < nb_som; i++)
     {
-      Cerr << "on passe la" << endl;
+      Cerr << "on passe la" << finl;
       if (fluid_elems(i) >= 0.0)
         {
           sommet_interp(0, i) = 1;
@@ -1034,7 +1034,7 @@ void Source_PDF_VEF::calculer_vitesse_imposee_power_law_tbl()
                             {
                               // Incoherence : on n utilise pas de lois de paroi
                               itisok = 0;
-                              Cerr << "Incohérence" << endl;
+                              Cerr << "Incoherence" << finl;
                             }
                         }
                     }
@@ -1588,7 +1588,7 @@ void Source_PDF_VEF::calculer_temperature_imposee_wall_law()
                 }
               else
                 {
-                  Cerr << "Loi non implémentée, choix d'une autre loi obligatoire" << endl;
+                  Cerr << "Loi non implementee, choix d'une autre loi obligatoire" << finl;
                   exit();
                 }
               if ((itisok == 1) and (!boundary_type))
@@ -1611,7 +1611,7 @@ void Source_PDF_VEF::calculer_temperature_imposee_wall_law()
                 }
               else
                 {
-                  Cerr << "Erreur dans le choix du type de condition aux limites" << endl;
+                  Cerr << "Erreur dans le choix du type de condition aux limites" << finl;
                   exit();
                 }
             }
@@ -1746,7 +1746,7 @@ void Source_PDF_VEF::calculer_temperature_imposee_wall_law()
                 }
               else
                 {
-                  Cerr << "Loi non implémentée, choix d'une autre loi obligatoire" << endl;
+                  Cerr << "Loi non implementee, choix d'une autre loi obligatoire" << finl;
                   exit();
                 }
               if ((itisok == 1) and (!boundary_type))
@@ -1769,7 +1769,7 @@ void Source_PDF_VEF::calculer_temperature_imposee_wall_law()
                 }
               else
                 {
-                  Cerr << "Erreur dans le choix du type de condition aux limites" << endl;
+                  Cerr << "Erreur dans le choix du type de condition aux limites" << finl;
                   exit();
                 }
             }
@@ -1984,7 +1984,7 @@ int Source_PDF_VEF::impr(Sortie& os) const
             }
           else if(pdf_dt_conv != 0 )
             {
-              Cerr<<"Source_PDF_VEF: Modele pdf_bilan must be 0; 1 or 2 only"<<endl;
+              Cerr<<"Source_PDF_VEF: Modele pdf_bilan must be 0; 1 or 2 only"<<finl;
               Process::exit();
             }
 

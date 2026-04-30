@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -98,7 +98,7 @@ void VDF_to_IJK::initialize(const Domaine_VF& domaine_vf, const Domaine_IJK& spl
                             int direction_for_y,
                             int direction_for_z)
 {
-  Cerr << "VDF_to_IJK::initialize localisation=" << (int)localisation << endl;
+  Cerr << "VDF_to_IJK::initialize localisation=" << (int)localisation << finl;
   const int np = Process::nproc();
   const int moi = Process::me();
 

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -95,7 +95,7 @@ void IJK_Field_local_template<_TYPE_,_TYPE_ARRAY_>::shift_k_origin(int n)
 template<>
 inline void IJK_Field_local_template<float,ArrOfFloat>::ref_ij(IJK_Field_local_float& src, int k_lay)
 {
-  Cerr << "Error: must implement ArrOfFloat::ref_array() and reset()" << endl;
+  Cerr << "Error: must implement ArrOfFloat::ref_array() and reset()" << finl;
   Process::exit();
 }
 

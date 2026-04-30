@@ -259,8 +259,8 @@ void expect_word(Entree& is, std::string word)
   is>> read;
   if (read != word)
     {
-      Cerr << Nom("From expect_word in Objet_a_lire.cpp: Expected to read: ") + word << endl;
-      Cerr << Nom("Found: ") + read << endl;
+      Cerr << Nom("From expect_word in Objet_a_lire.cpp: Expected to read: ") + word << finl;
+      Cerr << Nom("Found: ") + read << finl;
       Process::exit();
     }
 
@@ -293,7 +293,7 @@ std::vector<T> read_vec_impl(
           catch (std::exception& e)
             {
               Cerr << "In keyword " << motcle
-                   << ", invalid value led to exception: " << e.what() << endl;
+                   << ", invalid value led to exception: " << e.what() << finl;
               Process::exit();
 
             }
@@ -306,7 +306,7 @@ std::vector<T> read_vec_impl(
           else if (token != "]")
             {
               Cerr << "In keyword " << motcle
-                   << ", expected ',' or ']', found: " << token << endl;
+                   << ", expected ',' or ']', found: " << token << finl;
               Process::exit();
             }
         }
@@ -322,14 +322,14 @@ std::vector<T> read_vec_impl(
       catch (...)
         {
           Cerr << "In keyword " << motcle
-               << ", expected '[' or an integer size, found: " << first << endl;
+               << ", expected '[' or an integer size, found: " << first << finl;
           Process::exit();
         }
 
       if (expected_size >= 0 && size != expected_size)
         {
           Cerr << "In keyword " << motcle << ", declared size " << size
-               << " does not match expected size " << expected_size << endl;
+               << " does not match expected size " << expected_size << finl;
           Process::exit();
         }
 
@@ -345,7 +345,7 @@ std::vector<T> read_vec_impl(
           catch (std::exception& e)
             {
               Cerr << "In keyword " << motcle
-                   << ", invalid value led to exception: " << e.what() << endl;
+                   << ", invalid value led to exception: " << e.what() << finl;
               Process::exit();
 
             }
@@ -356,7 +356,7 @@ std::vector<T> read_vec_impl(
   if (expected_size >= 0 && (int)vec.size() != expected_size)
     {
       Cerr << "In keyword " << motcle << ", read " << vec.size()
-           << " elements but expected " << expected_size << endl;
+           << " elements but expected " << expected_size << finl;
       Process::exit();
     }
 
@@ -421,7 +421,7 @@ std::map<std::string, T> read_map_impl(
     {
       if (map.find(key)!=map.end())
         {
-          Cerr << "Duplicate key '" << key << "' found for param: " << motcle << endl;
+          Cerr << "Duplicate key '" << key << "' found for param: " << motcle << finl;
           Process::exit();
         }
       map[key] = val;
@@ -445,7 +445,7 @@ std::map<std::string, T> read_map_impl(
             {
               Cerr << "In keyword " << motcle
                    << ", expected to read either a comma (,) or closing brace (}). Found "
-                   << sep << endl;
+                   << sep << finl;
               Process::exit();
             }
 
@@ -464,7 +464,7 @@ std::map<std::string, T> read_map_impl(
           catch (std::exception& e)
             {
               Cerr << "In keyword " << motcle
-                   << ", invalid value led to exception: " << e.what() << endl;
+                   << ", invalid value led to exception: " << e.what() << finl;
               Process::exit();
 
             }
@@ -485,7 +485,7 @@ std::map<std::string, T> read_map_impl(
           catch (std::exception& e)
             {
               Cerr << "In keyword " << motcle
-                   << ", invalid value led to exception: " << e.what() << endl;
+                   << ", invalid value led to exception: " << e.what() << finl;
               Process::exit();
 
             }

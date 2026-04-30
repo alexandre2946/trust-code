@@ -34,12 +34,12 @@ Entree& Prepro_IBM_Uzawa::readOn(Entree& is)
   param.lire_avec_accolades_depuis(is);
 
   if (lvl_ == 1)
-    Cout << "Uzawa : methode LVL1" << endl;
+    Cout << "Uzawa : methode LVL1" << finl;
   else if (lvl_ == 2)
-    Cout << "Uzawa : methode LVL2" << endl;
+    Cout << "Uzawa : methode LVL2" << finl;
   else
     {
-      Cerr << "Prepro_IBM_Uzawa : choix_de_la_methode_uzawa : invalide argument" << endl;
+      Cerr << "Prepro_IBM_Uzawa : choix_de_la_methode_uzawa : invalide argument" << finl;
       Process::exit();
     }
 

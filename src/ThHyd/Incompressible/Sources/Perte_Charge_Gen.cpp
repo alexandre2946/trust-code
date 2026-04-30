@@ -23,7 +23,7 @@
 
 Implemente_base(Perte_Charge_Gen, "Perte_Charge_Gen", Source_base);
 
-Sortie& Perte_Charge_Gen::printOn(Sortie& s) const { return s << que_suis_je() << endl; }
+Sortie& Perte_Charge_Gen::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
 
 Entree& Perte_Charge_Gen::readOn(Entree& is)
 {

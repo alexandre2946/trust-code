@@ -30,7 +30,7 @@ Entree& Prepro_IBM_base::readOn(Entree& s)
   Cout << "Prepro_IBM => " << finl;
   Param param(que_suis_je());
   set_param(param);
-  Cout<<"constante_prepro_c_IBM = "<<c_prepro_<<endl;
+  Cout<<"constante_prepro_c_IBM = "<<c_prepro_<<finl;
   return s;
 }
 
@@ -62,7 +62,7 @@ int Prepro_IBM_base::lire_motcle_non_standard(const Motcle& un_mot, Entree& is)
       int dim_geom = Objet_U::dimension;
       if(dim_lu != dim_geom)
         {
-          Cerr<<"Prepro_IBM : dim_lu <> dim_geom = "<<dim_geom<<endl;
+          Cerr<<"Prepro_IBM : dim_lu <> dim_geom = "<<dim_geom<<finl;
           Process::exit();
         }
       dimTab_.resize(dim_lu);
@@ -71,7 +71,7 @@ int Prepro_IBM_base::lire_motcle_non_standard(const Motcle& un_mot, Entree& is)
         {
           if (i == 0) Cout<<"directions : "<<dimTab_(0);
           else Cout<<" "<<dimTab_(i);
-          if (i == (dim_lu-1)) Cout<<endl;
+          if (i == (dim_lu-1)) Cout<<finl;
         }
     }
 
@@ -81,7 +81,7 @@ int Prepro_IBM_base::lire_motcle_non_standard(const Motcle& un_mot, Entree& is)
       Cout << "reading MED IB mesh ... " <<nom_fichier_med_IB_ <<finl;
       if (nom_maillage_IB_ == "??")
         {
-          Cerr<<"Name of the IB Lagrange mesh is required. Please, give it using the keyword MESH_Lagrange_name option before MESH_Lagrange_file."<< endl;
+          Cerr<<"Name of the IB Lagrange mesh is required. Please, give it using the keyword MESH_Lagrange_name option before MESH_Lagrange_file."<< finl;
           Process::exit();
         }
 
@@ -95,7 +95,7 @@ int Prepro_IBM_base::lire_motcle_non_standard(const Motcle& un_mot, Entree& is)
       int space_dim = aSkinUMesh_->getSpaceDimension();
       if (space_dim != Objet_U::dimension)
         {
-          Cerr<<"Prepro_IBM: MC space dimension = " << space_dim << " is different from Trust space dimension = "<< Objet_U::dimension << endl;
+          Cerr<<"Prepro_IBM: MC space dimension = " << space_dim << " is different from Trust space dimension = "<< Objet_U::dimension << finl;
           Process::exit();
         }
       int nbElemSur = int(aSkinUMesh_->getNumberOfCells());
@@ -437,14 +437,14 @@ void Prepro_IBM_base::computeAire2()
           for (int n = 0; n <mesh2DSurf->getNumberOfNodes(); n++)
             {
               for (int cc = 0; cc <2; cc++) Cerr <<Surf2DCoordonnes(n, cc) <<" ";
-              Cerr << endl;
+              Cerr << finl;
             }
           Cerr << "mesh2DSurf : nb nodes cell #1 = "<<int(numNodes2D.size())<<finl;
           for (int n = 0; n <int(numNodes2D.size()); n++)
             {
               Cerr <<int(numNodes2D[n]) <<" ";
             }
-          Cerr << endl;
+          Cerr << finl;
         }
 
       // Calcul de la Bounding Box 3D du polygone 2D
@@ -522,10 +522,10 @@ void Prepro_IBM_base::computeAire2()
             {
               Cerr<<"origin element surfacique "<<e<<" = ";
               for (int cc = 0; cc <dim_esp; cc++) Cerr<< origin[cc]<<" ";
-              Cerr << endl;
+              Cerr << finl;
               Cerr<<"vec normal element surfacique "<<e<<" = ";
               for (int cc = 0; cc <dim_esp; cc++) Cerr<< vec[cc]<<" ";
-              Cerr << endl;
+              Cerr << finl;
             }
           MEDCoupling::DataArrayIdType * polycellIds ;
           try
@@ -552,8 +552,8 @@ void Prepro_IBM_base::computeAire2()
               // A priori, les noeuds de mesh3D sont repris dans interPoly3D (en debut de la liste de noeuds)
               if (idebug)
                 {
-                  Cerr << "<Nb cells> interPoly3D = "<<nbCellsPoly3D<<endl;
-                  Cerr << "<Nb nodes> mesh3D, interPoly3D and Cell#1 = "<<NumberOfNodes3D<<" "<<NumberOfNodes<<" "<<nbNodesCell1<<endl;
+                  Cerr << "<Nb cells> interPoly3D = "<<nbCellsPoly3D<<finl;
+                  Cerr << "<Nb nodes> mesh3D, interPoly3D and Cell#1 = "<<NumberOfNodes3D<<" "<<NumberOfNodes<<" "<<nbNodesCell1<<finl;
                 }
               assert((NumberOfNodes - NumberOfNodes3D) == nbNodesCell1);
               MEDCouplingUMesh * interPoly2D = MEDCouplingUMesh::New("interPoly2D_"+std::to_string(my_elem),2);
@@ -587,14 +587,14 @@ void Prepro_IBM_base::computeAire2()
                   for (int n = 0; n <interPoly2D->getNumberOfNodes(); n++)
                     {
                       for (int cc = 0; cc <(dim_esp-1); cc++) Cerr <<interPoly2DCoordonnes(n, cc) <<" ";
-                      Cerr << endl;
+                      Cerr << finl;
                     }
                   Cerr << "interPoly2D : nb nodes cell #1 = "<<int(numNodes2D.size())<<finl;
                   for (int n = 0; n <int(numNodes2D.size()); n++)
                     {
                       Cerr <<int(numNodes2D[n]) <<" ";
                     }
-                  Cerr << endl;
+                  Cerr << finl;
                 }
 
               ////////////////////////////////////////////////////////////////////////////////////
@@ -637,14 +637,14 @@ void Prepro_IBM_base::computeAire2()
                         {
                           Cerr <<int(numNodes2D[n]) <<" ";
                         }
-                      Cerr << endl;
+                      Cerr << finl;
                     }
                   for (int n = 0; n <finalMesh->getNumberOfNodes(); n++)
                     {
                       for (int cc = 0; cc <2; cc++) Cerr <<finalcoords(n, cc) <<" ";
                       Cerr<<" ( ";
                       for (int cc = 0; cc <dim_esp; cc++) Cerr <<interCoordonnes(n, cc) <<" ";
-                      Cerr <<" ) "<< endl;
+                      Cerr <<" ) "<< finl;
                     }
                 }
 
@@ -916,15 +916,15 @@ void Prepro_IBM_base::intersectPolyPoly2D(MEDCouplingUMesh * polyMesh1, MEDCoupl
       coords.resize(int(outputMesh->getNumberOfNodes()), outputMesh->getMeshDimension());
       const double *mc_Coords = outputMesh->getCoords()->begin();
       std::copy(mc_Coords, mc_Coords+coords.size_array(), coords.addr());
-      Cerr << "intersectPolyPoly2D: Element measure outputMesh = "<<aire<<" with tuples : " << endl;
+      Cerr << "intersectPolyPoly2D: Element measure outputMesh = "<<aire<<" with tuples : " << finl;
       for (int n = 0; n <int(outputMesh->getNumberOfNodes()); n++)
         {
           for (int cc = 0; cc < outputMesh->getMeshDimension(); cc++) Cerr <<coords(n, cc) <<" ";
-          Cerr << endl;
+          Cerr << finl;
         }
       outputMesh->getNodeIdsOfCell(0, numNodes2D);
       for (int node =0; node <  int(numNodes2D.size()); node++) Cerr <<int(numNodes2D[node]) <<" ";
-      Cerr << endl;
+      Cerr << finl;
 
       if (int(outputMesh->getCoords()->getNumberOfTuples()) == 4)
         {
@@ -936,7 +936,7 @@ void Prepro_IBM_base::intersectPolyPoly2D(MEDCouplingUMesh * polyMesh1, MEDCoupl
           aire = (outputMesh->getMeasureField(true))->accumulate(0);
           Cerr<<"             Element measure outputMesh = "<<aire<<" with modified cell connectivity => ";
           for (int node =0; node <  int(numNodes2D.size()); node++) Cerr <<int(numNodes2D[node]) <<" ";
-          Cerr << endl;
+          Cerr << finl;
 
           if (aire<eps)
             {
@@ -950,7 +950,7 @@ void Prepro_IBM_base::intersectPolyPoly2D(MEDCouplingUMesh * polyMesh1, MEDCoupl
               aire = (outputMesh->getMeasureField(true))->accumulate(0);
               Cerr<<"             Element measure outputMesh = "<<aire<<" with modified cell connectivity => ";
               for (int node =0; node <  int(numNodes2D.size()); node++) Cerr <<int(numNodes2D[node]) <<" ";
-              Cerr << endl;
+              Cerr << finl;
 
               if (aire<eps)
                 {
@@ -1278,7 +1278,7 @@ void Prepro_IBM_base::compute_NeighNode(int nb_niveau)
 
   if (nb_niveau != 1)
     {
-      Cerr<<"Prepro_IBM_base::compute_NeighNode :  nb_niveau != 1"<<endl;
+      Cerr<<"Prepro_IBM_base::compute_NeighNode :  nb_niveau != 1"<<finl;
       Process::exit();
     }
 
