@@ -15,10 +15,10 @@
 
 #include <Op_NConserv_HLL_Coloc_Vect.h>
 #include <Interface_Baer_Nunziato.h>
+#include <Conservation_Euler_base.h>
 #include <Milieu_composite_Euler.h>
 #include <Coloc_Operator_tools.h>
 #include <Sortie_supersonique.h>
-#include <Conservation_Euler.h>
 #include <Champ_Inc_P0_base.h>
 #include <Fluide_reel_base.h>
 #include <Domaine_Cl_Coloc.h>

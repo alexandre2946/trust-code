@@ -15,12 +15,12 @@
 
 #include <Op_NConserv_HLL_Coloc_Elem.h>
 #include <Interface_Baer_Nunziato.h>
+#include <Conservation_Euler_base.h>
 #include <Milieu_composite_Euler.h>
 #include <Neumann_paroi_flux_nul.h>
 #include <Coloc_Operator_tools.h>
 #include <Entree_supersonique.h>
 #include <Sortie_supersonique.h>
-#include <Conservation_Euler.h>
 #include <Champ_Inc_P0_base.h>
 #include <Fluide_reel_base.h>
 #include <Domaine_Cl_Coloc.h>
@@ -63,7 +63,7 @@ void Op_NConserv_HLL_Coloc_Elem::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
   const IntTab& fcl = ref_cast(Champ_Inc_P0_base, equation().inconnue()).fcl();
 
   const Pb_Euler& pb = ref_cast(Pb_Euler, equation().probleme());
-  const Conservation_Euler& eq = ref_cast(Conservation_Euler, equation());
+  const Conservation_Euler_base& eq = ref_cast(Conservation_Euler_base, equation());
 
   const Interface_Baer_Nunziato& interface = ref_cast(Interface_Baer_Nunziato, ref_cast(Milieu_composite_Euler,pb.milieu()).interface_phase());
   const int n = interface.id_phase_vitesse_inter();

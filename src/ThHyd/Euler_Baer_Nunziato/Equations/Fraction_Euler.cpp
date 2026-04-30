@@ -20,14 +20,14 @@
 #include <Domaine.h>
 #include <Param.h>
 
-Implemente_instanciable(Fraction_Euler, "Fraction_Euler", Conservation_Euler);
+Implemente_instanciable(Fraction_Euler, "Fraction_Euler", Conservation_Euler_base);
 // XD fraction_euler cons_euler fraction_euler -1 Void fraction conservation equation for a multi-phase Euler problem where the unknown is the temperature
 
 Sortie& Fraction_Euler::printOn(Sortie& is) const { return Equation_base::printOn(is); }
 
 Entree& Fraction_Euler::readOn(Entree& is)
 {
-  Conservation_Euler::readOn(is);
+  Conservation_Euler_base::readOn(is);
   terme_nconserv_.associer_eqn(*this);
   return is;
 }

@@ -22,14 +22,14 @@
 #include <Domaine.h>
 #include <Param.h>
 
-Implemente_instanciable(Density_Euler, "Masse_Euler|Density_Euler", Conservation_Euler);
+Implemente_instanciable(Density_Euler, "Masse_Euler|Density_Euler", Conservation_Euler_base);
 // XD masse_euler cons_euler density_euler -1 Mass consevation equation for a multi-phase Euler problem where the unknown is the alpha (void fraction)
 
 Sortie& Density_Euler::printOn(Sortie& is) const { return Equation_base::printOn(is); }
 
 Entree& Density_Euler::readOn(Entree& is)
 {
-  Conservation_Euler::readOn(is);
+  Conservation_Euler_base::readOn(is);
   assert(densite_);
   terme_convectif.associer_eqn(*this);
   terme_convectif.set_fichier("Debit");

@@ -13,11 +13,11 @@
 *
 *****************************************************************************/
 
-#include <Conservation_Euler.h>
+#include <Conservation_Euler_base.h>
 #include <Fluide_base.h>
 #include <Pb_Euler.h>
 
-Implemente_base(Conservation_Euler, "Conservation_Euler", Convection_Diffusion_std);
+Implemente_base(Conservation_Euler_base, "Conservation_Euler_base", Convection_Diffusion_std);
 // XD cons_euler eqn_base cons_euler -1 Base class equation for a multi-phase Euler conservation equations
 // XD attr termes_non_conservatifs bloc_op_non_conservativtifs non_conservative_terms 1 Keyword to alter the non-conservative scheme.
 
@@ -26,9 +26,9 @@ Implemente_base(Conservation_Euler, "Conservation_Euler", Convection_Diffusion_s
 // XD attr operateur op_non_conservativtifs_deriv operateur 0 not_set
 // XD attr acof chaine(into=["}"]) acof 0 Closing curly bracket.
 
-Sortie& Conservation_Euler::printOn(Sortie& is) const { return Equation_base::printOn(is); }
+Sortie& Conservation_Euler_base::printOn(Sortie& is) const { return Equation_base::printOn(is); }
 
-Entree& Conservation_Euler::readOn(Entree& is)
+Entree& Conservation_Euler_base::readOn(Entree& is)
 {
   assert(l_inco_ch_);
   assert(le_fluide_);
@@ -36,7 +36,7 @@ Entree& Conservation_Euler::readOn(Entree& is)
   return Equation_base::readOn(is);
 }
 
-int Conservation_Euler::lire_motcle_non_standard(const Motcle& mot, Entree& is)
+int Conservation_Euler_base::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
   if (mot == "diffusion")
     {
@@ -67,23 +67,23 @@ int Conservation_Euler::lire_motcle_non_standard(const Motcle& mot, Entree& is)
     return Equation_base::lire_motcle_non_standard(mot, is);
 }
 
-void Conservation_Euler::associer_milieu_base(const Milieu_base& un_milieu) //ok
+void Conservation_Euler_base::associer_milieu_base(const Milieu_base& un_milieu) //ok
 {
   const Fluide_base& un_fluide = ref_cast(Fluide_base, un_milieu);
   associer_fluide(un_fluide);
 }
 
-const Milieu_base& Conservation_Euler::milieu() const
+const Milieu_base& Conservation_Euler_base::milieu() const
 {
   return fluide();
 }
 
-Milieu_base& Conservation_Euler::milieu()
+Milieu_base& Conservation_Euler_base::milieu()
 {
   return fluide();
 }
 
-const Fluide_base& Conservation_Euler::fluide() const
+const Fluide_base& Conservation_Euler_base::fluide() const
 {
   if (!le_fluide_)
     {
@@ -93,13 +93,13 @@ const Fluide_base& Conservation_Euler::fluide() const
   return le_fluide_.valeur();
 }
 
-Fluide_base& Conservation_Euler::fluide()
+Fluide_base& Conservation_Euler_base::fluide()
 {
   assert(le_fluide_);
   return le_fluide_.valeur();
 }
 
-void Conservation_Euler::associer_fluide(const Fluide_base& un_fluide)
+void Conservation_Euler_base::associer_fluide(const Fluide_base& un_fluide)
 {
   assert(sub_type(Fluide_base,un_fluide));
   le_fluide_ = ref_cast(Fluide_base, un_fluide);

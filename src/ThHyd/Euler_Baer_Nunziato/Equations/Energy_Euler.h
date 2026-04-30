@@ -17,9 +17,9 @@
 #define Energy_Euler_included
 
 #include <Milieu_composite_Euler.h>
-#include <Conservation_Euler.h>
+#include <Conservation_Euler_base.h>
 
-class Energy_Euler : public Conservation_Euler
+class Energy_Euler : public Conservation_Euler_base
 {
   Declare_instanciable(Energy_Euler);
 public :

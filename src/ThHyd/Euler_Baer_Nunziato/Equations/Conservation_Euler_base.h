@@ -13,33 +13,33 @@
 *
 *****************************************************************************/
 
-#ifndef Conservation_Euler_included
-#define Conservation_Euler_included
+#ifndef Conservation_Euler_base_included
+#define Conservation_Euler_base_included
 
 #include <Convection_Diffusion_std.h>
 #include <Operateur_NConserv.h>
 
 class Fluide_base;
 
-class Conservation_Euler : public Convection_Diffusion_std
+class Conservation_Euler_base : public Convection_Diffusion_std
 {
-  Declare_base(Conservation_Euler);
+  Declare_base(Conservation_Euler_base);
 public:
   int nombre_d_operateurs() const override
   {
-    Process::exit("Conservation_Euler::nombre_d_operateurs !!!  \n");
+    Process::exit("Conservation_Euler_base::nombre_d_operateurs !!!  \n");
     return 1;
   }
 
   const Operateur& operateur(int) const override
   {
-    Process::exit("Conservation_Euler::operateur !!!  \n");
+    Process::exit("Conservation_Euler_base::operateur !!!  \n");
     return terme_convectif;
   }
 
   Operateur& operateur(int) override
   {
-    Process::exit("Conservation_Euler::operateur !!!  \n");
+    Process::exit("Conservation_Euler_base::operateur !!!  \n");
     return terme_convectif;
   }
 
@@ -59,35 +59,35 @@ public:
 
   virtual double flux_bord(const double inco_bord, const double vit_n_bord, const double p_bord) const
   {
-    Process::exit("Conservation_Euler::flux_bord !!!  \n");
+    Process::exit("Conservation_Euler_base::flux_bord !!!  \n");
     return 0;
   }
 
   virtual double termes_NonConservatif(const double alpha_bord, const double vitesse_n_inter, const double p_bord) const
   {
-    Process::exit("Conservation_Euler::termes_NonConservatif !!!  \n");
+    Process::exit("Conservation_Euler_base::termes_NonConservatif !!!  \n");
     return 0;
   }
 
   void dimensionner_matrice_sans_mem(Matrice_Morse& matrice) override
   {
-    Process::exit("Conservation_Euler::dimensionner_matrice_sans_mem !!!  \n");
+    Process::exit("Conservation_Euler_base::dimensionner_matrice_sans_mem !!!  \n");
   }
 
   int has_interface_blocs() const override
   {
-    Process::exit("Conservation_Euler::has_interface_blocs !!!  \n");
+    Process::exit("Conservation_Euler_base::has_interface_blocs !!!  \n");
     return -1;
   }
 
   void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = { }) const override
   {
-    Process::exit("Conservation_Euler::dimensionner_blocs !!!  \n");
+    Process::exit("Conservation_Euler_base::dimensionner_blocs !!!  \n");
   }
 
   void assembler_blocs_avec_inertie(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = { }) override
   {
-    Process::exit("Conservation_Euler::assembler_blocs_avec_inertie !!!  \n");
+    Process::exit("Conservation_Euler_base::assembler_blocs_avec_inertie !!!  \n");
   }
 
 protected :
@@ -96,4 +96,4 @@ protected :
   OBS_PTR(Fluide_base) le_fluide_;
 };
 
-#endif /* Conservation_Euler_included */
+#endif /* Conservation_Euler_base_included */

@@ -16,9 +16,9 @@
 #ifndef Fraction_Euler_included
 #define Fraction_Euler_included
 
-#include <Conservation_Euler.h>
+#include <Conservation_Euler_base.h>
 
-class Fraction_Euler : public Conservation_Euler
+class Fraction_Euler : public Conservation_Euler_base
 {
   Declare_instanciable(Fraction_Euler);
 public :

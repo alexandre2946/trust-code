@@ -13,10 +13,10 @@
 *
 *****************************************************************************/
 
+#include <Conservation_Euler_base.h>
 #include <Op_Conv_HLL_Coloc_Vect.h>
 #include <Milieu_composite_Euler.h>
 #include <Coloc_Operator_tools.h>
-#include <Conservation_Euler.h>
 #include <Champ_Inc_P0_base.h>
 #include <Domaine_Cl_Coloc.h>
 #include <Fluide_reel_base.h>

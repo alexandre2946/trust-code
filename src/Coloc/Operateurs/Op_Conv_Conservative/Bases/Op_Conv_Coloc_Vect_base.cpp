@@ -14,10 +14,10 @@
 *****************************************************************************/
 
 #include <Op_Conv_Coloc_Vect_base.h>
+#include <Conservation_Euler_base.h>
 #include <Milieu_composite_Euler.h>
 #include <Sortie_supersonique.h>
 #include <Entree_supersonique.h>
-#include <Conservation_Euler.h>
 #include <Champ_Inc_P0_base.h>
 #include <Domaine_Cl_Coloc.h>
 #include <Fluide_reel_base.h>
