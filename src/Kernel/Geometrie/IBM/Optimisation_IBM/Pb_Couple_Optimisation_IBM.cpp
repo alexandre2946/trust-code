@@ -227,7 +227,7 @@ void Pb_Couple_Optimisation_IBM::initialize( )
   if (nb_eq_IBM==0)
     {
       Cerr<<"Pb_Couple_Optimisation_IBM : no IBM equation detected."<<finl;
-      Cerr<<"The state probleme needs one IBM equation"<<finl;
+      Cerr<<"The state problem needs one IBM equation"<<finl;
       Cerr<<"Aborting..."<<finl;
       abort();
     }

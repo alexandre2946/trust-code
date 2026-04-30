@@ -165,12 +165,12 @@ void Interpolation_IBM_base::definir_pseudo_level_set()
   DoubleTab& d1 = champ_dis_proj_solid_->valeurs();
   if (! nor.size_array() )
     {
-      Cerr << "Interpolation_IBM_base::definir_pseudo_level_set : pas de champ_normal_proj_solid_. Exit"<< finl;
+      Cerr << "Interpolation_IBM_base::definir_pseudo_level_set : no champ_normal_proj_solid_. Exit"<< finl;
       exit();
     }
   if (! d1.size_array() )
     {
-      Cerr << "Interpolation_IBM_base::definir_pseudo_level_set : pas de champ_dis_proj_solid_. Exit"<< finl;
+      Cerr << "Interpolation_IBM_base::definir_pseudo_level_set : no champ_dis_proj_solid_. Exit"<< finl;
       exit();
     }
 
@@ -279,7 +279,7 @@ void Interpolation_IBM_base::define_pseudo_level_set_for_one_cut_cell(IntLists& 
             }
           else
             {
-              Cerr<<"Interpolation_IBM_base::definir_pseudo_level_set: pas de reference pour l element "<<elem<<finl;
+              Cerr<<"Interpolation_IBM_base::definir_pseudo_level_set: no reference for the element "<<elem<<finl;
               exit();
             }
         }
@@ -305,12 +305,12 @@ void Interpolation_IBM_base::calcul_cluster_pseudo_level_set(IntLists& elem_vois
   DoubleTab& distance_signee = pseudo_level_set_->valeurs();
   if (! nor.size_array() )
     {
-      Cerr << "Interpolation_IBM_base::calcul_cluster_pseudo_level_set : pas de champ_normal_proj_solid_. Exit"<< finl;
+      Cerr << "Interpolation_IBM_base::calcul_cluster_pseudo_level_set : no champ_normal_proj_solid_. Exit"<< finl;
       exit();
     }
   if (! d1.size_array() )
     {
-      Cerr << "Interpolation_IBM_base::calcul_cluster_pseudo_level_set : pas de champ_dis_proj_solid_. Exit"<< finl;
+      Cerr << "Interpolation_IBM_base::calcul_cluster_pseudo_level_set : no champ_dis_proj_solid_. Exit"<< finl;
       exit();
     }
 
@@ -350,7 +350,7 @@ void Interpolation_IBM_base::calcul_cluster_pseudo_level_set(IntLists& elem_vois
 
               if (!exist_ref_e) // Pas de reference pour l element
                 {
-                  Cerr<<"Interpolation_IBM_base::definir_pseudo_level_set: pas de reference pour l element "<<elem_voi<<finl;
+                  Cerr<<"Interpolation_IBM_base::definir_pseudo_level_set: no reference for the element "<<elem_voi<<finl;
                   exit();
                 }
 
@@ -383,7 +383,7 @@ void Interpolation_IBM_base::calculer_normal_et_distance_proj_solid()
   const DoubleTab& solid_points = solid_points_->valeurs();
   if (! solid_points.size_array() )
     {
-      Cerr << "Interpolation_IBM_base::maj_normal_proj_solid : pas de projection solid. Exit"<< finl;
+      Cerr << "Interpolation_IBM_base::maj_normal_proj_solid : no solid projection. Exit"<< finl;
       exit();
     }
   double eps = 1e-12;

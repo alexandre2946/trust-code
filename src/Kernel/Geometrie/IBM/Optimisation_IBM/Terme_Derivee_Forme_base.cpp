@@ -27,7 +27,7 @@ Implemente_base(Terme_Derivee_Forme_base,"Terme_Derivee_Forme_base",Source_base)
 
 Entree& Terme_Derivee_Forme_base::readOn(Entree& s)
 {
-  Cerr << "Lecture Derivee de forme" << finl;
+  Cerr << "Derived shape reading" << finl;
 
   equation().discretisation().discretiser_champ(equation().discretisation().is_poly_family() ? "temperature" : "champ_elem", equation().domaine_dis(), "derivee_forme", ",",1,0., source_derivee_forme);
   source_derivee_forme->nommer("derivee_forme");

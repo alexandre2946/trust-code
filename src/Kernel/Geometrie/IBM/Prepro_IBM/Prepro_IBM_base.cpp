@@ -115,28 +115,28 @@ int Prepro_IBM_base::lire_motcle_non_standard(const Motcle& un_mot, Entree& is)
 
       if (verbose_)
         {
-          Cout << "=== Test : Affichage des 8 premiers sommets ===" << finl;
-          Cout << "--- Coordonnées des sommets (max 8) ---" << finl;
+          Cout << "=== Test: Display of the first 8 vertices ===" << finl;
+          Cout << "--- Coordinates of the vertices (max 8) ---" << finl;
           for (int i = 0; i < std::min(8, coordsSur3D_.dimension(0)); i++)
             {
-              Cout << "Sommet " << i << " : ("
+              Cout << "Vertex " << i << " : ("
                    << coordsSur3D_(i, 0) << ", " << coordsSur3D_(i, 1);
               if (space_dim == 3) Cout << ", " << coordsSur3D_(i, 2);
               Cout << ")" << finl;
             }
-          Cout << "=== Test : Affichage des 2 premiers barycentres/normales ===" << finl;
-          Cout << "Nombre d'éléments surfaciques : " << nbElemSur << finl;
-          Cout << "--- Coordonnées des barycentres/normales (max 2) ---" << finl;
+          Cout << "=== Test: Display of the first 2 barycenters/normals ===" << finl;
+          Cout << "Number of surface elements: " << nbElemSur << finl;
+          Cout << "--- Coordinates of barycenters/normals (max 2) ---" << finl;
           for (int i = 0; i < std::min(2, barySurf_.dimension(0)); i++)
             {
-              Cout << "Barycentres " << i << " : ("
+              Cout << "Barycenters " << i << " : ("
                    << barySurf_(i, 0) << ", " << barySurf_(i, 1);
               if (space_dim == 3) Cout << ", " << barySurf_(i, 2);
               Cout << ")" << finl;
             }
           for (int i = 0; i < std::min(2, normalArr_.dimension(0)); i++)
             {
-              Cout << "Normales " << i << " : ("
+              Cout << "Normals " << i << " : ("
                    << normalArr_(i, 0) << ", " << normalArr_(i, 1);
               if (space_dim == 3) Cout << ", " << normalArr_(i, 2);
               Cout << ")" << finl;
@@ -370,7 +370,7 @@ void Prepro_IBM_base::computeAire2()
 
   Cerr << "<<<<<<<<<<<<<<<< Prepro_IBM: BEGINNING OF AREA COMPUTATION..." << finl;
   Cerr << "Prepro_IBM: Computing intersection... with " << nbElemSur << " elements (Lagrangien) and " << nbElemVol << " / " << nbPtsDom << " elements/nodes (Eulerian)"  << finl;
-  if (idebug) Cerr << "Domaine 3D : "<< le_dom.nb_som() << " nodes and "<< le_dom.nb_som_elem() <<" par element (Eulerian)"  << finl;
+  if (idebug) Cerr << "Domaine 3D : "<< le_dom.nb_som() << " nodes and "<< le_dom.nb_som_elem() <<" per element (Eulerian)"  << finl;
 
   Cerr<<"dimTab_ ("<<dimTab_(0)<<" , "<<dimTab_(1)<<" , "<<dimTab_(2)<<")"<<finl;
 
@@ -386,7 +386,7 @@ void Prepro_IBM_base::computeAire2()
   for (int e = 0; e < nbElemSur; e++)
     {
       Cerr<<" "<<finl;
-      Cerr<<">>>> element de surface numero : "<< e <<finl;
+      Cerr<<">>>> surface element number: "<< e <<finl;
       numNodes.clear();
       aSkinUMesh_->getNodeIdsOfCell(e, numNodes);
       int nbNodesSur = int(numNodes.size());
@@ -1061,7 +1061,7 @@ void Prepro_IBM_base::intersectSegSeg2D(DoubleTab& p11, DoubleTab& p12, DoubleTa
   if(absprodvect < eps) // n1 et n2 colineaires
     {
       status = -2;
-      if (idebug) Cerr<<"> Prepro_IBM_base::intersectSegSeg2D status: "<<status<<" ; p: "<<p(0)<<" "<<p(1)<<" n1 et n2 colineaires"<< finl;
+      if (idebug) Cerr<<"> Prepro_IBM_base::intersectSegSeg2D status: "<<status<<" ; p: "<<p(0)<<" "<<p(1)<<" n1 and n2 are colinear"<< finl;
       return;
     }
   else

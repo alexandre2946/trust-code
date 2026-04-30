@@ -125,7 +125,7 @@ void Prepro_IBM_Ponderation::projectSolidPoints()
   solid_elemsArray = -2.;
 
   Cout << "============================================================================"<<finl;
-  Cout<<"prepro_IBM::projectSolidPoints - Methode de ponderation = "<<pond_<<finl;
+  Cout<<"prepro_IBM::projectSolidPoints - Weighting method = "<<pond_<<finl;
 
   const Domaine_dis_base& le_dom_dis = mon_pb_->domaine_dis();// contient maillage TRUST
   const Domaine& le_dom =  le_dom_dis.domaine();
@@ -248,7 +248,7 @@ void Prepro_IBM_Ponderation::projectSolidPoints()
                         }
                       else
                         {
-                          Cerr << "DIST_PROB : d1 ~ 0 pour voisin " << num_som_v << " de l'élément " << e << finl;
+                          Cerr << "DIST_PROB : d1 ~ 0 for neighbor" << num_som_v << " of the element " << e << finl;
                           pond_v = (pond_ == 4) ? aireArray(e) : 1.0;
                         }
 
