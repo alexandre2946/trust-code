@@ -16,18 +16,20 @@
 #ifndef Energy_Euler_included
 #define Energy_Euler_included
 
-#include <Milieu_composite_Euler.h>
 #include <Conservation_Euler_base.h>
+#include <Milieu_composite_Euler.h>
 
 class Energy_Euler : public Conservation_Euler_base
 {
   Declare_instanciable(Energy_Euler);
 public :
   Entree& lire_cond_init(Entree& is) override;
+
   void discretiser() override;
   void set_param(Param& param) const override;
-  int verif_Cl() const override { return 1; }
-  int nombre_d_operateurs() const override { return 2; }
+
+  inline int verif_Cl() const override { return 1; }
+  inline int nombre_d_operateurs() const override { return 2; } // conv et non-consevative
 
   const Operateur& operateur(int) const override;
   Operateur& operateur(int) override;

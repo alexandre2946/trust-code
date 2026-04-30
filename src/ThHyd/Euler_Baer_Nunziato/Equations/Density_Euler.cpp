@@ -31,37 +31,46 @@ Entree& Density_Euler::readOn(Entree& is)
 {
   Conservation_Euler_base::readOn(is);
   assert(densite_);
-  terme_convectif.associer_eqn(*this);
-  terme_convectif.set_fichier("Debit");
-  terme_convectif.set_description((Nom) "Mass flow rate=Integral(-rho*u*ndS) [kg/s] if SI units used");
   return is;
+}
+
+void Density_Euler::set_param(Param& param) const
+{
+  Equation_base::set_param(param);
+  param.ajouter_non_std("convection", (this));
 }
 
 void Density_Euler::discretiser()
 {
-  int nb_valeurs_temp = schema_temps().nb_valeurs_temporelles();
-  double temps = schema_temps().temps_courant();
+  Cerr << "Density_Euler discretization" << finl;
   const Discret_Thyd& dis = ref_cast(Discret_Thyd, discretisation());
   const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
 
-  Cerr << "Density_Euler discretization" << finl;
+  const double temps = schema_temps().temps_courant();
+  const int nb_valeurs_temp = schema_temps().nb_valeurs_temporelles();
+  const int N = pb.nb_phases();
 
-  dis.discretiser_champ("temperature", domaine_dis(), "alpha_rho", "kg/m3", pb.nb_phases(), nb_valeurs_temp, temps, l_inco_ch_);
-  l_inco_ch_->fixer_nature_du_champ(pb.nb_phases() == 1 ? scalaire : pb.nb_phases() == dimension ? vectoriel : multi_scalaire); //pfft
-  for (int i = 0; i < pb.nb_phases(); i++)
+  dis.discretiser_champ("temperature", domaine_dis(), "alpha_rho", "kg/m3", N, nb_valeurs_temp, temps, l_inco_ch_);
+  l_inco_ch_->fixer_nature_du_champ(N == 1 ? scalaire : multi_scalaire);
+
+  for (int i = 0; i < N; i++)
     l_inco_ch_->fixer_nom_compo(i, Nom("alpha_rho_") + pb.nom_phase(i));
+
   champs_compris_.ajoute_champ(l_inco_ch_);
 
-  dis.discretiser_champ("temperature", domaine_dis(), "densite", "kg/m3", pb.nb_phases(), nb_valeurs_temp, temps, densite_);
-  l_inco_ch_->fixer_nature_du_champ(pb.nb_phases() == 1 ? scalaire : pb.nb_phases() == dimension ? vectoriel : multi_scalaire); //pfft
-  for (int i = 0; i < pb.nb_phases(); i++)
+  dis.discretiser_champ("temperature", domaine_dis(), "densite", "kg/m3", N, nb_valeurs_temp, temps, densite_);
+  densite_->fixer_nature_du_champ(N == 1 ? scalaire : multi_scalaire);
+
+  for (int i = 0; i < N; i++)
     densite_->fixer_nom_compo(i, Nom("densite_") + pb.nom_phase(i));
+
   champs_compris_.ajoute_champ(densite_);
 
   Equation_base::discretiser();
-  Cerr << "Density_Euler::discretiser() ok" << finl;
+  Cerr << "Density_Euler discretization ==> ok" << finl;
 }
 
+// on surcharge pour effecter rho pas inconnue !!
 Entree& Density_Euler::lire_cond_init(Entree& is)
 {
   Cerr << "Reading of initial conditions\n";
@@ -136,10 +145,4 @@ Operateur& Density_Euler::operateur(int i)
       Process::exit();
     }
   return terme_convectif;
-}
-
-void Density_Euler::set_param(Param& param) const
-{
-  Equation_base::set_param(param);
-  param.ajouter_non_std("convection", (this));
 }

@@ -18,8 +18,7 @@
 
 #include <Convection_Diffusion_std.h>
 #include <Operateur_NConserv.h>
-
-class Fluide_base;
+#include <Fluide_base.h>
 
 class Conservation_Euler_base : public Convection_Diffusion_std
 {
@@ -27,19 +26,19 @@ class Conservation_Euler_base : public Convection_Diffusion_std
 public:
   int nombre_d_operateurs() const override
   {
-    Process::exit("Conservation_Euler_base::nombre_d_operateurs !!!  \n");
+    Process::exit("Conservation_Euler_base::nombre_d_operateurs !!!\n");
     return 1;
   }
 
   const Operateur& operateur(int) const override
   {
-    Process::exit("Conservation_Euler_base::operateur !!!  \n");
+    Process::exit("Conservation_Euler_base::operateur !!! \n");
     return terme_convectif;
   }
 
   Operateur& operateur(int) override
   {
-    Process::exit("Conservation_Euler_base::operateur !!!  \n");
+    Process::exit("Conservation_Euler_base::operateur !!! \n");
     return terme_convectif;
   }
 
@@ -52,10 +51,19 @@ public:
 
   void associer_milieu_base(const Milieu_base&) override;
   void associer_fluide(const Fluide_base&);
-  const Milieu_base& milieu() const override;
-  Milieu_base& milieu() override;
-  const Fluide_base& fluide() const;
-  Fluide_base& fluide();
+  inline const Milieu_base& milieu() const override { return fluide(); }
+  inline Milieu_base& milieu() override { return fluide(); }
+  const Fluide_base& fluide() const
+  {
+    assert(le_fluide_);
+    return le_fluide_.valeur();
+  }
+
+  Fluide_base& fluide()
+  {
+    assert(le_fluide_);
+    return le_fluide_.valeur();
+  }
 
   virtual double flux_bord(const double inco_bord, const double vit_n_bord, const double p_bord) const
   {

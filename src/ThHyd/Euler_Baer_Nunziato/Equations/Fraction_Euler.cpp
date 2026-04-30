@@ -27,9 +27,35 @@ Sortie& Fraction_Euler::printOn(Sortie& is) const { return Equation_base::printO
 
 Entree& Fraction_Euler::readOn(Entree& is)
 {
-  Conservation_Euler_base::readOn(is);
-  terme_nconserv_.associer_eqn(*this);
-  return is;
+  return Conservation_Euler_base::readOn(is);
+}
+
+void Fraction_Euler::set_param(Param& param) const
+{
+  Equation_base::set_param(param);
+  param.ajouter_non_std("termes_non_conservatifs|non_conservative_terms", (this));
+}
+
+void Fraction_Euler::discretiser()
+{
+  Cerr << "Fraction_Euler discretization" << finl;
+  const Discret_Thyd& dis = ref_cast(Discret_Thyd, discretisation());
+  const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
+
+  const double temps = schema_temps().temps_courant();
+  const int nb_valeurs_temp = schema_temps().nb_valeurs_temporelles();
+  const int N = pb.nb_phases();
+
+  dis.discretiser_champ("temperature", domaine_dis(), "alpha", "sans_dimension", N, nb_valeurs_temp, temps, l_inco_ch_);
+  l_inco_ch_->fixer_nature_du_champ(N == 1 ? scalaire : multi_scalaire);
+
+  for (int i = 0; i < N; i++)
+    l_inco_ch_->fixer_nom_compo(i, Nom("alpha_") + pb.nom_phase(i));
+
+  champs_compris_.ajoute_champ(l_inco_ch_);
+
+  Equation_base::discretiser();
+  Cerr << "Fraction_Euler discretization ==> ok" << finl;
 }
 
 const Operateur& Fraction_Euler::operateur(int i) const
@@ -50,28 +76,4 @@ Operateur& Fraction_Euler::operateur(int i)
       Process::exit();
     }
   return terme_nconserv_;
-}
-
-void Fraction_Euler::discretiser()
-{
-  int nb_valeurs_temp = schema_temps().nb_valeurs_temporelles();
-  double temps = schema_temps().temps_courant();
-  const Discret_Thyd& dis = ref_cast(Discret_Thyd, discretisation());
-  Cerr << "Volume fraction discretization" << finl;
-
-  const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
-  dis.discretiser_champ("temperature", domaine_dis(), "alpha", "sans_dimension", pb.nb_phases(), nb_valeurs_temp, temps, l_inco_ch_);
-  l_inco_ch_->fixer_nature_du_champ(pb.nb_phases() == 1 ? scalaire : pb.nb_phases() == dimension ? vectoriel : multi_scalaire); //pfft
-  for (int i = 0; i < pb.nb_phases(); i++)
-    l_inco_ch_->fixer_nom_compo(i, Nom("alpha_") + pb.nom_phase(i));
-  champs_compris_.ajoute_champ(l_inco_ch_);
-  Equation_base::discretiser();
-  Cerr << "Fraction_Euler::discretiser() ok" << finl;
-}
-
-void Fraction_Euler::set_param(Param& param) const
-{
-  Equation_base::set_param(param);
-  param.ajouter_non_std("termes_non_conservatifs", (this));
-  param.ajouter_non_std("non_conservative_terms", (this));
 }

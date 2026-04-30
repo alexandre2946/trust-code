@@ -14,7 +14,6 @@
 *****************************************************************************/
 
 #include <Conservation_Euler_base.h>
-#include <Fluide_base.h>
 #include <Pb_Euler.h>
 
 Implemente_base(Conservation_Euler_base, "Conservation_Euler_base", Convection_Diffusion_std);
@@ -32,21 +31,12 @@ Entree& Conservation_Euler_base::readOn(Entree& is)
 {
   assert(l_inco_ch_);
   assert(le_fluide_);
-  champs_compris_.ajoute_champ(l_inco_ch_);
   return Equation_base::readOn(is);
 }
 
 int Conservation_Euler_base::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
-  if (mot == "diffusion")
-    {
-      Cerr << "Reading and typing of the diffusion operator : " << finl;
-      terme_diffusif.associer_diffusivite(diffusivite_pour_transport());
-      is >> terme_diffusif;
-      terme_diffusif.associer_diffusivite_pour_pas_de_temps(diffusivite_pour_pas_de_temps());
-      return 1;
-    }
-  else if (mot == "convection")
+  if (mot == "convection")
     {
       Cerr << "Reading and typing of the convection operator : " << finl;
       const Champ_base& ch_vitesse_transportante = vitesse_pour_transport();
@@ -67,36 +57,9 @@ int Conservation_Euler_base::lire_motcle_non_standard(const Motcle& mot, Entree&
     return Equation_base::lire_motcle_non_standard(mot, is);
 }
 
-void Conservation_Euler_base::associer_milieu_base(const Milieu_base& un_milieu) //ok
+void Conservation_Euler_base::associer_milieu_base(const Milieu_base& un_milieu)
 {
-  const Fluide_base& un_fluide = ref_cast(Fluide_base, un_milieu);
-  associer_fluide(un_fluide);
-}
-
-const Milieu_base& Conservation_Euler_base::milieu() const
-{
-  return fluide();
-}
-
-Milieu_base& Conservation_Euler_base::milieu()
-{
-  return fluide();
-}
-
-const Fluide_base& Conservation_Euler_base::fluide() const
-{
-  if (!le_fluide_)
-    {
-      Cerr << "You forgot to associate the fluid to the problem named " << probleme().le_nom() << finl;
-      Process::exit();
-    }
-  return le_fluide_.valeur();
-}
-
-Fluide_base& Conservation_Euler_base::fluide()
-{
-  assert(le_fluide_);
-  return le_fluide_.valeur();
+  associer_fluide(ref_cast(Fluide_base, un_milieu));
 }
 
 void Conservation_Euler_base::associer_fluide(const Fluide_base& un_fluide)

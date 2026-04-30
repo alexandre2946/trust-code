@@ -22,23 +22,24 @@ class Density_Euler : public Conservation_Euler_base
 {
   Declare_instanciable(Density_Euler);
 public :
-  void discretiser() override;
   Entree& lire_cond_init(Entree& is) override;
+  void discretiser() override;
+  void set_param(Param& param) const override;
+  void mettre_a_jour_champs_conserves(double temps, int reset) override;
+  void init_alpha_rho();
+
+  inline int verif_Cl() const override { return 1; }
+  inline int nombre_d_operateurs() const override { return 1; } // juste convection
+  inline const Champ_Inc_base& densite() const { return densite_.valeur(); }
+  inline Champ_Inc_base& densite() { return densite_.valeur(); }
+
+  const Operateur& operateur(int) const override;
+  Operateur& operateur(int) override;
 
   inline double flux_bord(const double alpha_rho_bord, const double vit_n_bord, const double p_bord ) const override
   {
     return alpha_rho_bord * vit_n_bord;
   }
-
-  int verif_Cl() const override { return 1; }
-  const Champ_Inc_base& densite() const { return densite_.valeur(); }
-  Champ_Inc_base& densite() { return densite_.valeur(); }
-  void mettre_a_jour_champs_conserves(double temps, int reset) override;
-  void init_alpha_rho();
-  void set_param(Param& param) const override;
-  int nombre_d_operateurs() const override { return 1; }
-  const Operateur& operateur(int) const override;
-  Operateur& operateur(int) override;
 
 protected:
   OWN_PTR(Champ_Inc_base) densite_;
