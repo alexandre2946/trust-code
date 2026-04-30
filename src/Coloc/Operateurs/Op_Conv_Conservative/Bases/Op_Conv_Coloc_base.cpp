@@ -17,6 +17,7 @@
 #include <Domaine_Cl_Coloc.h>
 #include <Champ_Inc_base.h>
 #include <Domaine_Coloc.h>
+#include <Pb_Euler.h>
 
 Implemente_base(Op_Conv_Coloc_base,"Op_Conv_Coloc_base",Operateur_Conv_base);
 
@@ -25,6 +26,12 @@ Entree& Op_Conv_Coloc_base::readOn(Entree& is) { Operateur_Conv_base::readOn(is)
 
 void Op_Conv_Coloc_base::completer()
 {
+  if (!sub_type(Pb_Euler, equation().probleme()))
+    {
+      Cerr << "WHAT !! Operator " << que_suis_je() << " is only available for Pb_Euler not " << equation().probleme().que_suis_je() << " !! " << finl;
+      Process::exit();
+    }
+
   Operateur_base::completer();
   assert(le_dom_coloc_);
 }

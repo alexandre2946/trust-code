@@ -13,10 +13,13 @@
 *
 *****************************************************************************/
 
+#include <Op_NConserv_negligeable.h>
 #include <Op_NConserv_Coloc_base.h>
-#include <Champ_Inc_base.h>
+#include <Milieu_composite_Euler.h>
 #include <Domaine_Cl_Coloc.h>
+#include <Champ_Inc_base.h>
 #include <Domaine_Coloc.h>
+#include <Pb_Euler.h>
 
 Implemente_base(Op_NConserv_Coloc_base, "Op_NConserv_Coloc_base", Operateur_NConserv_base);
 
@@ -26,6 +29,24 @@ Entree& Op_NConserv_Coloc_base::readOn(Entree& is) { return Operateur_NConserv_b
 
 void Op_NConserv_Coloc_base::completer()
 {
+  if (!sub_type(Pb_Euler, equation().probleme()))
+    {
+      Cerr << "WHAT !! Operator " << que_suis_je() << " is only available for Pb_Euler not " << equation().probleme().que_suis_je() << " !! " << finl;
+      Process::exit();
+    }
+
+  // Seulement operateur negligeable si mono-phasique
+  if (!sub_type(Op_NConserv_negligeable, *this))
+    {
+      const Milieu_composite_Euler& mil = ref_cast(Milieu_composite_Euler, equation().probleme().milieu());
+      if (mil.noms_phases().size() == 1)
+        {
+          Cerr << "You are simulating a Single-Phase Euler problem. You need to use a negligible non-conservative operator !!!" << finl;
+          Cerr << "Please remove the non-conservative operator " << que_suis_je() << " from your your equation " << equation().que_suis_je() << " !!" << finl;
+          Process::exit();
+        }
+    }
+
   Operateur_base::completer();
   assert(le_dom_coloc_);
 }
