@@ -22,7 +22,6 @@
 #include <Fluide_base.h>
 #include <Pb_Euler.h>
 #include <Param.h>
-#include <vector>
 
 Implemente_instanciable(Momentum_Euler,"Momentum_Euler|QDM_Euler",Navier_Stokes_std);
 // XD momentum_euler eqn_base qdm_euler -1 Momentum conservation equation for a multi-phase Euler problem where the unknown is the velocity
@@ -57,29 +56,50 @@ int Momentum_Euler::lire_motcle_non_standard(const Motcle& mot, Entree& is)
     return Navier_Stokes_std::lire_motcle_non_standard(mot, is);
 }
 
-int Momentum_Euler::has_interface_blocs() const
+const Operateur& Momentum_Euler::operateur(int i) const
 {
-  return Equation_base::has_interface_blocs();
+  switch(i)
+    {
+    case 0:
+      return terme_convectif;
+    case 1:
+      return terme_nconserv_;
+    default :
+      Cerr << "Error for Momentum_Euler::operateur(int i)" << finl;
+      Cerr << "Momentum_Euler has " << nombre_d_operateurs() <<" operators "<<finl;
+      Cerr << "and you are trying to access the " << i <<" th one."<< finl;
+      exit();
+    }
+  // Pour les compilos!!
+  return terme_convectif;
 }
 
-void Momentum_Euler::mettre_a_jour(double temps)
+Operateur& Momentum_Euler::operateur(int i)
 {
-  Equation_base::mettre_a_jour(temps);
+  switch(i)
+    {
+    case 0:
+      return terme_convectif;
+    case 1:
+      return terme_nconserv_;
+    default :
+      Cerr << "Error for Momentum_Euler::operateur(int i)" << finl;
+      Cerr << "Momentum_Euler has " << nombre_d_operateurs() <<" operators "<<finl;
+      Cerr << "and you are trying to access the " << i <<" th one."<< finl;
+      exit();
+    }
+  // Pour les compilos!!
+  return terme_convectif;
 }
 
 bool Momentum_Euler::initTimeStep(double dt)
 {
   Schema_Temps_base& sch = schema_temps();
-  ConstDoubleTab_parts ppart(pression().valeurs());
-  /* si pression_pa() est plus petit que pression() (ex. : variables auxiliaires PolyMAC_P0P1NC), alors on ne copie que la 1ere partie */
-  const DoubleTab& p_red = pression_pa().valeurs().dimension_tot(0) < pression().valeurs().dimension_tot(0) ? ppart[0] : pression().valeurs();
+  // Mise a jour du temps dans la pression
   for (int i = 1; i <= sch.nb_valeurs_futures(); i++)
     {
-      // Mise a jour du temps dans la pression
       pression().changer_temps_futur(sch.temps_futur(i), i);
       pression().futur(i) = pression().valeurs();
-      pression_pa().changer_temps_futur(sch.temps_futur(i), i);
-      pression_pa().futur(i) = p_red;
     }
   return Equation_base::initTimeStep(dt);
 }
@@ -89,60 +109,23 @@ void Momentum_Euler::abortTimeStep()
   Equation_base::abortTimeStep();
 }
 
-void Momentum_Euler::discretiser_vitesse()
-{
-  const Discret_Thyd& dis = ref_cast(Discret_Thyd, discretisation());
-  const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
-
-  dis.vitesse(schema_temps(), domaine_dis(), la_vitesse, ref_cast(Pb_Euler, probleme()).nb_phases());
-
-  noms_vit_phases_.dimensionner(pb.nb_phases()), vit_phases_.resize(pb.nb_phases());
-  for (int i = 0; i < pb.nb_phases(); i++)
-    {
-      noms_vit_phases_[i] = Nom("vitesse_") + pb.nom_phase(i);
-      if (!vit_phases_[i])
-        {
-          discretisation().discretiser_champ("vitesse", domaine_dis(), noms_vit_phases_[i], "m/s", dimension, 1, 0, vit_phases_[i]);
-          champs_compris_.ajoute_champ(vit_phases_[i]);
-        }
-    }
-}
-
-void Momentum_Euler::discretiser_grad_p()
-{
-// Ne fait rien ! Est appele par defaut dans Navier_Stokes_std.discretiser() mais pas requis en Pb_Multiphase
-// La dicretisation par dans le Momentum_Euler.creer_champ()
-}
-
 const Champ_Don_base& Momentum_Euler::diffusivite_pour_transport() const
 {
+  Process::exit("Momentum_Euler::diffusivite_pour_transport() should not be called !!! \n");
   return le_fluide->viscosite_dynamique();
 }
 
 const Champ_base& Momentum_Euler::diffusivite_pour_pas_de_temps() const
 {
+  Process::exit("Momentum_Euler::diffusivite_pour_transport() should not be called !!! \n");
   return le_fluide->viscosite_cinematique();
 }
 
-const Champ_base& Momentum_Euler::vitesse_pour_transport() const
-{
-  return la_vitesse;
-}
-
-/*! @brief Complete l'equation base, associe la pression a l'equation,
- *
- *     complete la divergence, le gradient et le solveur pression.
- *     Ajout de 2 termes sources: l'un representant la force centrifuge
- *     dans le cas axi-symetrique,l'autre intervenant dans la resolution
- *     en 2D axisymetrique
- *
- */
 void Momentum_Euler::completer()
 {
-  Cerr << " Navier_Stokes_std::completer_deb" << finl;
+  Cerr << " Momentum_Euler::completer" << finl;
   Equation_base::completer();
   la_pression->associer_domaine_cl_dis(le_dom_Cl_dis);
-  Cerr << " Navier_Stokes_std::completer_fin" << finl;
   Cerr << "unknow field type  " << inconnue().que_suis_je() << finl;
   Cerr << "unknow field name  " << inconnue().le_nom() << finl;
   Cerr << "equation type " << inconnue().equation().que_suis_je() << finl;
@@ -151,20 +134,19 @@ void Momentum_Euler::completer()
   const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
 
   vitesse_son_.resize(dom.nb_elem_tot(), pb.nb_phases());
-
   vitesse_normale_.resize(dom.nb_faces_tot(), 2 * pb.nb_phases()); // dimension du tab à changer pour 3 pahses
 }
 
 void Momentum_Euler::get_noms_champs_postraitables(Noms& noms, Option opt) const
 {
-  Navier_Stokes_std::get_noms_champs_postraitables(noms, opt);
+  Equation_base::get_noms_champs_postraitables(noms, opt);
 
-  Noms noms_compris;
+  Noms noms_compris = champs_compris_.liste_noms_compris();
+
   const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
   for (int i = 0; i < pb.nb_phases(); i++)
-    {
-      noms_compris.add(noms_vit_phases_[i]);
-    }
+    noms_compris.add(noms_vit_phases_[i]);
+
   if (opt == DESCRIPTION)
     Cerr << " Momentum_Euler : " << noms_compris << finl;
   else
@@ -173,7 +155,7 @@ void Momentum_Euler::get_noms_champs_postraitables(Noms& noms, Option opt) const
 
 void Momentum_Euler::creer_champ(const Motcle& motlu)
 {
-  Navier_Stokes_std::creer_champ(motlu);
+  Equation_base::creer_champ(motlu);
   int i = noms_vit_phases_.rang(motlu);
   if (i >= 0 && !vit_phases_[i])
     {
@@ -217,7 +199,7 @@ Entree& Momentum_Euler::lire_cond_init(Entree& is)
         OWN_PTR(Champ_Don_base) src;
         is >> src, verifie_ch_init_nb_comp(la_pression, src->nb_comp());
         la_pression->affecter(src);
-        la_pression_en_pa->passe() = la_pression_en_pa->valeurs() = la_pression->passe() = la_pression->valeurs();
+        la_pression->passe() = la_pression->valeurs();
         press_lu = 1;
       }
     else
@@ -246,8 +228,7 @@ int Momentum_Euler::preparer_calcul()
 
   // XXX Elie Saikali : utile pour cas reprise !
   const double temps = schema_temps().temps_courant();
-  pression().changer_temps(temps);
-  //pression_pa().changer_temps(temps);
+  la_pression->changer_temps(temps);
 
   return 1;
 }
@@ -262,40 +243,51 @@ double Momentum_Euler::alpha_res() const
 
 void Momentum_Euler::discretiser()
 {
+  Cerr << "Momentum_Euler discretization" << finl;
   const Discret_Thyd& dis = ref_cast(Discret_Thyd, discretisation());
   const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
-  int nb_valeurs_temp = schema_temps().nb_valeurs_temporelles();
-  double temps = schema_temps().temps_courant();
 
-  Cerr << "Hydraulic equation discretization " << finl;
+  const double temps = schema_temps().temps_courant();
+  const int nb_valeurs_temp = schema_temps().nb_valeurs_temporelles();
+  const int N = pb.nb_phases();
 
   Cerr << "Velocity discretization" << finl;
-  discretiser_vitesse();
+  dis.vitesse(schema_temps(), domaine_dis(), la_vitesse, N);
+  la_vitesse->fixer_nature_du_champ(vectoriel);
   la_vitesse->add_synonymous(Nom("velocity"));
   champs_compris_.ajoute_champ(la_vitesse);
 
-  //dis.pression(schema_temps(), domaine_dis(), la_pression);
-  Cerr << "Pressure discretization" << finl;
-  dis.discretiser_champ("pression", domaine_dis(), "pression", "Pa.m3/kg", pb.nb_phases(), nb_valeurs_temp, temps, la_pression);
-  //la_pression->add_synonymous(Nom("P_star"));
+  /* vitesse par phase */
+  noms_vit_phases_.dimensionner(N);
+  vit_phases_.resize(N);
 
-  la_pression->fixer_nature_du_champ(pb.nb_phases() == 1 ? scalaire : pb.nb_phases() == dimension ? vectoriel : multi_scalaire); //pfft
-  for (int i = 0; i < pb.nb_phases(); i++)
-    la_pression->fixer_nom_compo(i, Nom("pression_") + pb.nom_phase(i));
-  champs_compris_.ajoute_champ(la_pression);
+  for (int i = 0; i < N; i++)
+    {
+      noms_vit_phases_[i] = Nom("vitesse_") + pb.nom_phase(i);
+      if (!vit_phases_[i])
+        {
+          discretisation().discretiser_champ("vitesse", domaine_dis(), noms_vit_phases_[i], "m/s", dimension, 1, 0, vit_phases_[i]);
+          champs_compris_.ajoute_champ(vit_phases_[i]);
+        }
+    }
+
+  Cerr << "Pressure discretization" << finl;
+  dis.discretiser_champ("pression", domaine_dis(), "pression", "Pa.m3/kg", N, nb_valeurs_temp, temps, la_pression);
+  la_pression->fixer_nature_du_champ(N == 1 ? scalaire : multi_scalaire);
   la_pression->associer_eqn(*this);
 
-  Cerr << "QDM discretization" << finl;
-  dis.discretiser_champ("vitesse", domaine_dis(), "alpha_rho_u", "kg/sm3", dimension * pb.nb_phases(), nb_valeurs_temp, temps, l_inco_ch_);
+  /* nom pression par phase */
+  for (int i = 0; i < pb.nb_phases(); i++)
+    la_pression->fixer_nom_compo(i, Nom("pression_") + pb.nom_phase(i));
+
+  champs_compris_.ajoute_champ(la_pression);
+
+  Cerr << "Unknown alpha_rho_u discretization" << finl;
+  dis.discretiser_champ("vitesse", domaine_dis(), "alpha_rho_u", "kg/sm3", dimension * N, nb_valeurs_temp, temps, l_inco_ch_);
   champs_compris_.ajoute_champ(l_inco_ch_);
 
-  //////////////////////////////////
-
-  dis.pression_en_pa(schema_temps(), domaine_dis(), la_pression_en_pa);
-  la_pression_en_pa->add_synonymous(Nom("Pressure"));
-  champs_compris_.ajoute_champ(la_pression_en_pa);
-
   Equation_base::discretiser();
+  Cerr << "Momentum_Euler discretization ==> ok" << finl;
 }
 
 int Momentum_Euler::sauvegarder(Sortie& os) const
@@ -305,16 +297,6 @@ int Momentum_Euler::sauvegarder(Sortie& os) const
   sauver();
 
   return bytes;
-}
-
-DoubleTab& Momentum_Euler::corriger_derivee_expl(DoubleTab& derivee)
-{
-  return derivee;
-}
-
-DoubleTab& Momentum_Euler::corriger_derivee_impl(DoubleTab& derivee)
-{
-  return derivee;
 }
 
 void Momentum_Euler::mettre_a_jour_champs_conserves(double temps, int reset)
@@ -442,40 +424,4 @@ void Momentum_Euler::calculer_vitesse_normale()
           u_n(f, n + Nb_phase) = (er >= 0) ? U(er, n) * nx + U(er, n + Nb_phase) * ny : -123.123;
         }
     }
-}
-
-const Operateur& Momentum_Euler::operateur(int i) const
-{
-  switch(i)
-    {
-    case 0:
-      return terme_convectif;
-    case 1:
-      return terme_nconserv_;
-    default :
-      Cerr << "Error for Momentum_Euler::operateur(int i)" << finl;
-      Cerr << "Momentum_Euler has " << nombre_d_operateurs() <<" operators "<<finl;
-      Cerr << "and you are trying to access the " << i <<" th one."<< finl;
-      exit();
-    }
-  // Pour les compilos!!
-  return terme_convectif;
-}
-
-Operateur& Momentum_Euler::operateur(int i)
-{
-  switch(i)
-    {
-    case 0:
-      return terme_convectif;
-    case 1:
-      return terme_nconserv_;
-    default :
-      Cerr << "Error for Momentum_Euler::operateur(int i)" << finl;
-      Cerr << "Momentum_Euler has " << nombre_d_operateurs() <<" operators "<<finl;
-      Cerr << "and you are trying to access the " << i <<" th one."<< finl;
-      exit();
-    }
-  // Pour les compilos!!
-  return terme_convectif;
 }
