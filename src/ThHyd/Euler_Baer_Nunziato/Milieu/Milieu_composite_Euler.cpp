@@ -49,8 +49,10 @@ Entree& Milieu_composite_Euler::readOn(Entree& is)
 
 void Milieu_composite_Euler::discretiser(const Probleme_base& pb, const  Discretisation_base& dis)
 {
-  Milieu_composite::discretiser(pb, dis);
-  champs_compris_.clear_champs_compris(); // no need to visualise anything ...
+  Cerr << "Composite Euler medium discretization" << finl;
+  // on discretise seulement la porosite
+  Milieu_base::discretiser_porosite(pb,dis);
+
   res_en_T_ = true;
 
   if (inter_lu_)

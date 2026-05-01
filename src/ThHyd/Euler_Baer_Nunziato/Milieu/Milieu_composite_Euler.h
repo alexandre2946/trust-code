@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -25,6 +25,7 @@ public :
   int initialiser(const double temps) override {  return 1; }
   void discretiser(const Probleme_base& pb, const  Discretisation_base& dis) override;
   void mettre_a_jour(double temps) override { /* Do nothing */ }
+  bool initTimeStep(double dt) override { return true; }
 
   const Interface_base& interface_phase() const { return inter_lu_.valeur(); }
   Interface_base& interface_phase() { return inter_lu_.valeur(); }

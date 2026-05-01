@@ -103,7 +103,6 @@ Entree& Milieu_composite::readOn(Entree& is)
         }
     }
 
-  // Sais pas s'il faut tester ca ou non ... Yannick, Antoine ! help :/
   if (has_saturation() && has_interface())
     {
       Cerr << "You define both interface and saturation in Milieu_composite ???" << finl;
