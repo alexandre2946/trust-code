@@ -32,34 +32,15 @@ Sortie& Momentum_Euler::printOn(Sortie& is) const { return Equation_base::printO
 
 Entree& Momentum_Euler::readOn(Entree& is)
 {
-  terme_nconserv_.associer_eqn(*this);
-  Equation_base::readOn(is);
-
-  terme_convectif.set_fichier("Convection_qdm");
-  terme_convectif.set_description("Momentum flow rate=Integral(rho*u*u*ndS) [N] if SI units used");
-  terme_diffusif.set_fichier("Contrainte_visqueuse");
-  terme_diffusif.set_description("Friction drag exerted by the fluid=Integral(-mu*(grad(u) +grad(u)^T)*ndS) [N] if SI units used");
-
   assert(le_fluide);
-  if (!sub_type(Fluide_base, le_fluide.valeur()))
-    {
-      Cerr << "ERROR : the Momentum_Euler equation can be associated only to a fluid." << finl;
-      exit();
-    }
-
-  terme_convectif->set_incompressible(1);
-
-  return is;
+  return Equation_base::readOn(is);
 }
 
 void Momentum_Euler::set_param(Param& param) const
 {
   Equation_base::set_param(param);
-  param.ajouter_non_std("diffusion", (this));
   param.ajouter_non_std("convection", (this));
-  param.ajouter_condition("is_read_diffusion", "The diffusion operator must be read, select negligeable type if you want to neglect it.");
   param.ajouter_condition("is_read_convection", "The convection operator must be read, select negligeable type if you want to neglect it.");
-  param.ajouter_non_std("solveur_pression", (this)); // XD attr solveur_pression solveur_sys_base solveur_pression 1 Linear pressure system resolution method.
   param.ajouter_non_std("termes_non_conservatifs|non_conservative_terms", (this));
 }
 
@@ -69,16 +50,16 @@ int Momentum_Euler::lire_motcle_non_standard(const Motcle& mot, Entree& is)
     {
       Cerr << "Reading and typing of the termes_non_conservatifs operator : " << finl;
       is >> terme_nconserv_;
+      terme_nconserv_.associer_eqn(*this);
+      return 1;
     }
   else
     return Navier_Stokes_std::lire_motcle_non_standard(mot, is);
-  return 1;
 }
 
 int Momentum_Euler::has_interface_blocs() const
 {
-  int ok = Navier_Stokes_std::has_interface_blocs();
-  return ok;
+  return Equation_base::has_interface_blocs();
 }
 
 void Momentum_Euler::mettre_a_jour(double temps)
@@ -465,16 +446,36 @@ void Momentum_Euler::calculer_vitesse_normale()
 
 const Operateur& Momentum_Euler::operateur(int i) const
 {
-  if (i == 2)
-    return terme_nconserv_;
-  else
-    return Navier_Stokes_std::operateur(i);
+  switch(i)
+    {
+    case 0:
+      return terme_convectif;
+    case 1:
+      return terme_nconserv_;
+    default :
+      Cerr << "Error for Momentum_Euler::operateur(int i)" << finl;
+      Cerr << "Momentum_Euler has " << nombre_d_operateurs() <<" operators "<<finl;
+      Cerr << "and you are trying to access the " << i <<" th one."<< finl;
+      exit();
+    }
+  // Pour les compilos!!
+  return terme_convectif;
 }
 
 Operateur& Momentum_Euler::operateur(int i)
 {
-  if (i == 2)
-    return terme_nconserv_;
-  else
-    return Navier_Stokes_std::operateur(i);
+  switch(i)
+    {
+    case 0:
+      return terme_convectif;
+    case 1:
+      return terme_nconserv_;
+    default :
+      Cerr << "Error for Momentum_Euler::operateur(int i)" << finl;
+      Cerr << "Momentum_Euler has " << nombre_d_operateurs() <<" operators "<<finl;
+      Cerr << "and you are trying to access the " << i <<" th one."<< finl;
+      exit();
+    }
+  // Pour les compilos!!
+  return terme_convectif;
 }
