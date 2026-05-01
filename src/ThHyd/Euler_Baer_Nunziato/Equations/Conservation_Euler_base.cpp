@@ -15,6 +15,7 @@
 
 #include <Conservation_Euler_base.h>
 #include <Pb_Euler.h>
+#include <EChaine.h>
 
 Implemente_base(Conservation_Euler_base, "Conservation_Euler_base", Convection_Diffusion_std);
 // XD cons_euler eqn_base cons_euler -1 Base class equation for a multi-phase Euler conservation equations
@@ -29,9 +30,15 @@ Sortie& Conservation_Euler_base::printOn(Sortie& is) const { return Equation_bas
 
 Entree& Conservation_Euler_base::readOn(Entree& is)
 {
-  assert(l_inco_ch_);
-  assert(le_fluide_);
-  return Equation_base::readOn(is);
+  assert(l_inco_ch_ && le_fluide_);
+  Equation_base::readOn(is);
+
+  if (!sub_type(Pb_Euler, probleme()))
+    {
+      Cerr << "Equation " << que_suis_je() << " can only used with a pb of type Pb_Euler not " << probleme().que_suis_je() << " !!" << finl;
+      Process::exit();
+    }
+  return is;
 }
 
 int Conservation_Euler_base::lire_motcle_non_standard(const Motcle& mot, Entree& is)
@@ -55,6 +62,24 @@ int Conservation_Euler_base::lire_motcle_non_standard(const Motcle& mot, Entree&
     }
   else
     return Equation_base::lire_motcle_non_standard(mot, is);
+}
+
+void Conservation_Euler_base::add_missing_nconserv_op()
+{
+  assert(sub_type(Pb_Euler, probleme()));
+  // si monophasique et termes_non_conservatifs non-lu ... on type sans error !
+  const bool is_single_phase = (ref_cast(Pb_Euler, probleme()).nb_phases() == 1);
+  if (is_single_phase && !terme_nconserv_)
+    {
+      EChaine str(" { negligeable } ");
+      str >> terme_nconserv_;
+      terme_nconserv_.associer_eqn(*this);
+    }
+  else if (!is_single_phase && !terme_nconserv_)
+    {
+      Cerr << "Error while reading " << que_suis_je() << " !!! non_conservative_terms operator is not read although it is required !!! Fix your data file ..." << finl;
+      Process::exit();
+    }
 }
 
 void Conservation_Euler_base::associer_milieu_base(const Milieu_base& un_milieu)

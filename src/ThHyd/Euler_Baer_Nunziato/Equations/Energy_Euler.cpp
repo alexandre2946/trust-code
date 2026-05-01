@@ -26,7 +26,12 @@ Implemente_instanciable(Energy_Euler, "Energy_Euler|Energie_Euler", Conservation
 
 Sortie& Energy_Euler::printOn(Sortie& is) const { return Equation_base::printOn(is); }
 
-Entree& Energy_Euler::readOn(Entree& is) { return Conservation_Euler_base::readOn(is); }
+Entree& Energy_Euler::readOn(Entree& is)
+{
+  Conservation_Euler_base::readOn(is);
+  add_missing_nconserv_op();
+  return is;
+}
 
 void Energy_Euler::set_param(Param& param) const
 {

@@ -27,7 +27,9 @@ Sortie& Fraction_Euler::printOn(Sortie& is) const { return Equation_base::printO
 
 Entree& Fraction_Euler::readOn(Entree& is)
 {
-  return Conservation_Euler_base::readOn(is);
+  Conservation_Euler_base::readOn(is);
+  add_missing_nconserv_op();
+  return is;
 }
 
 void Fraction_Euler::set_param(Param& param) const

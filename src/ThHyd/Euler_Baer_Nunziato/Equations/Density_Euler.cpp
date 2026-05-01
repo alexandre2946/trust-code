@@ -29,9 +29,8 @@ Sortie& Density_Euler::printOn(Sortie& is) const { return Equation_base::printOn
 
 Entree& Density_Euler::readOn(Entree& is)
 {
-  Conservation_Euler_base::readOn(is);
   assert(densite_);
-  return is;
+  return Conservation_Euler_base::readOn(is);
 }
 
 void Density_Euler::set_param(Param& param) const

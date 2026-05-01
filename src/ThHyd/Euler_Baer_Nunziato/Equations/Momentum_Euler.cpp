@@ -21,6 +21,7 @@
 #include <Discret_Thyd.h>
 #include <Fluide_base.h>
 #include <Pb_Euler.h>
+#include <EChaine.h>
 #include <Param.h>
 
 Implemente_instanciable(Momentum_Euler,"Momentum_Euler|QDM_Euler",Navier_Stokes_std);
@@ -31,8 +32,30 @@ Sortie& Momentum_Euler::printOn(Sortie& is) const { return Equation_base::printO
 
 Entree& Momentum_Euler::readOn(Entree& is)
 {
-  assert(le_fluide);
-  return Equation_base::readOn(is);
+  assert(l_inco_ch_ && le_fluide);
+  Equation_base::readOn(is);
+
+  if (!sub_type(Pb_Euler, probleme()))
+    {
+      Cerr << "Equation " << que_suis_je() << " can only used with a pb of type Pb_Euler not " << probleme().que_suis_je() << " !!" << finl;
+      Process::exit();
+    }
+
+  // si monophasique et termes_non_conservatifs non-lu ... on type sans error !
+  const bool is_single_phase = (ref_cast(Pb_Euler, probleme()).nb_phases() == 1);
+  if (is_single_phase && !terme_nconserv_)
+    {
+      EChaine str(" { negligeable } ");
+      str >> terme_nconserv_;
+      terme_nconserv_.associer_eqn(*this);
+    }
+  else if (!is_single_phase && !terme_nconserv_)
+    {
+      Cerr << "Error while reading " << que_suis_je() << " !!! non_conservative_terms operator is not read although it is required !!! Fix your data file ..." << finl;
+      Process::exit();
+    }
+
+  return is;
 }
 
 void Momentum_Euler::set_param(Param& param) const

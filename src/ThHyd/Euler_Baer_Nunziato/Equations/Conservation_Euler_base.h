@@ -99,6 +99,7 @@ public:
   }
 
 protected :
+  void add_missing_nconserv_op();
   Operateur_NConserv terme_nconserv_;
   OWN_PTR(Champ_Inc_base) l_inco_ch_;
   OBS_PTR(Fluide_base) le_fluide_;
