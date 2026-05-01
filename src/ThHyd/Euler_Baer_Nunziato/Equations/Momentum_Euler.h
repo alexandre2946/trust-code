@@ -43,6 +43,7 @@ public :
   void creer_champ(const Motcle& motlu) override;
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   void mettre_a_jour_champs_conserves(double temps, int reset) override;
+  void verifie_ch_init_nb_comp(const Champ_Inc_base& ch_ref, const int nb_comp) const override;
 
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   int sauvegarder(Sortie& os) const override;

@@ -164,6 +164,26 @@ void Momentum_Euler::creer_champ(const Motcle& motlu)
     }
 }
 
+void Momentum_Euler::verifie_ch_init_nb_comp(const Champ_Inc_base& ch_ref, const int nb_comp) const
+{
+  const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
+  const Nature_du_champ nature = ch_ref.nature_du_champ();
+  const Nom& nom = ch_ref.le_nom();
+
+  if (nature == vectoriel)
+    {
+      if (nb_comp != pb.nb_phases() * Objet_U::dimension)
+        {
+          Cerr << "The nature of the field " << nom << " unknown to the equation name " << le_nom() << " is vector." << finl;
+          Cerr << "The number of components readed for this field " << nb_comp << " is not compatible with its nature." << finl;
+          Cerr << "It should read " << pb.nb_phases() * Objet_U::dimension << " components for this field." << finl;
+          Process::exit();
+        }
+    }
+  else
+    Equation_base::verifie_ch_init_nb_comp(ch_ref, nb_comp);
+}
+
 Entree& Momentum_Euler::lire_cond_init(Entree& is)
 {
   Cerr << "Reading of initial conditions\n";
