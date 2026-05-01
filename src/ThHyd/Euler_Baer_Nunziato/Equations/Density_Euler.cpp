@@ -37,7 +37,7 @@ Entree& Density_Euler::readOn(Entree& is)
 void Density_Euler::set_param(Param& param) const
 {
   Equation_base::set_param(param);
-  param.ajouter_non_std("convection", (this));
+  param.ajouter_non_std("convection", (this), Param::REQUIRED);
 }
 
 void Density_Euler::discretiser()

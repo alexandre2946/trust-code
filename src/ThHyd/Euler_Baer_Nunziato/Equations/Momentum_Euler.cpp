@@ -38,8 +38,7 @@ Entree& Momentum_Euler::readOn(Entree& is)
 void Momentum_Euler::set_param(Param& param) const
 {
   Equation_base::set_param(param);
-  param.ajouter_non_std("convection", (this));
-  param.ajouter_condition("is_read_convection", "The convection operator must be read, select negligeable type if you want to neglect it.");
+  param.ajouter_non_std("convection", (this), Param::REQUIRED);
   param.ajouter_non_std("termes_non_conservatifs|non_conservative_terms", (this));
 }
 

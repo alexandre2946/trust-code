@@ -32,7 +32,7 @@ void Energy_Euler::set_param(Param& param) const
 {
   Equation_base::set_param(param);
   param.ajouter_non_std("termes_non_conservatifs|non_conservative_terms", (this));
-  param.ajouter_non_std("convection", (this));
+  param.ajouter_non_std("convection", (this), Param::REQUIRED);
 }
 
 void Energy_Euler::discretiser()
