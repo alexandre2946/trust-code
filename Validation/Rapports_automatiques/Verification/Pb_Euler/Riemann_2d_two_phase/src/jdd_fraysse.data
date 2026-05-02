@@ -1,0 +1,176 @@
+# PARALLEL OK 8 #
+dimension 2
+Domaine dom
+
+# BEGIN MESH #
+mailler dom
+{
+    pave tube
+    {
+        origine  0.0  0.0
+        nombre_de_noeuds  $nx $ny
+        longueurs 1 1
+    }
+    {
+        bord  bas       Y = 0.0    0.0 <= X <= 1.0
+        bord  haut      Y = 1.0    0.0 <= X <= 1.0
+        bord  gauche    X = 0.0    0.0 <= Y <= 1.0
+        bord  droite    X = 1.0    0.0 <= Y <= 1.0
+    }
+}
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+    Partition_tool metis { nb_parts 4 }
+    Larg_joint 2
+    zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+Scheme_euler_explicit sch
+Read sch
+
+{
+    tinit 0
+    dt_min 5.e-40
+    dt_max  0.5
+    tmax 0.5
+    seuil_statio -1
+    facsec 0.4
+}
+
+Coloc dis
+
+Pb_Euler pb
+
+Associate  pb dom
+Associate  pb sch
+Discretize pb dis
+
+Read pb
+{   Milieu_composite_Euler
+    {
+        solide StiffenedGas { gamma 3 pinf 100 }
+        liquide StiffenedGas { gamma 1.4 pinf 0. }
+        interface Interface_Baer_Nunziato { phase_vitesse solide }
+    }
+
+    Fraction_Euler
+    {
+        termes_non_conservatifs { hll }
+        initial_conditions
+        {
+            alpha Champ_composite 2
+            {
+                Champ_fonc_xyz dom 1 0.3*((x[0.5)_AND_(y[0.5))+0.4*((x>0.5)_AND_(y[0.5))+0.4*((x[0.5)_AND_(y>0.5))+0.3*((x>0.5)_AND_(y>0.5))
+                Champ_fonc_xyz dom 1 0.7*((x[0.5)_AND_(y[0.5))+0.6*((x>0.5)_AND_(y[0.5))+0.6*((x[0.5)_AND_(y>0.5))+0.7*((x>0.5)_AND_(y>0.5))
+            }
+        }
+        boundary_conditions
+        {
+            gauche Sortie_supersonique
+            droite Sortie_supersonique
+            bas Sortie_supersonique
+            haut Sortie_supersonique
+        }
+    }
+
+    Masse_Euler
+    {
+        convection { hll }
+        initial_conditions
+        {
+            densite Champ_composite 2
+            {
+                # Champ_Uniforme 1 1 #
+                Champ_fonc_xyz dom 1 1000*((x[0.5)_AND_(y[0.5))+800*((x>0.5)_AND_(y[0.5))+800*((x[0.5)_AND_(y>0.5))+1000*((x>0.5)_AND_(y>0.5))
+                Champ_fonc_xyz dom 1 1*((x[0.5)_AND_(y[0.5))+1.5*((x>0.5)_AND_(y[0.5))+1.5*((x[0.5)_AND_(y>0.5))+1*((x>0.5)_AND_(y>0.5))
+            }
+        }
+        boundary_conditions
+        {
+            gauche Sortie_supersonique
+            droite Sortie_supersonique
+            bas Sortie_supersonique
+            haut Sortie_supersonique
+        }
+    }
+
+    QDM_Euler
+    {
+        convection { hll }
+        termes_non_conservatifs { hll }
+        initial_conditions
+        {
+            vitesse Champ_composite 2
+            {
+                Champ_fonc_xyz dom 2 0 0
+                Champ_fonc_xyz dom 2 0 0
+            }
+
+            pression Champ_composite 2
+            {
+                Champ_fonc_xyz dom 1 600*((x[0.5)_AND_(y[0.5))+500*((x>0.5)_AND_(y[0.5))+500*((x[0.5)_AND_(y>0.5))+600*((x>0.5)_AND_(y>0.5))
+                Champ_fonc_xyz dom 1 1*((x[0.5)_AND_(y[0.5))+2*((x>0.5)_AND_(y[0.5))+2*((x[0.5)_AND_(y>0.5))+1*((x>0.5)_AND_(y>0.5))
+            }
+        }
+        boundary_conditions
+        {
+            gauche Sortie_supersonique
+            droite Sortie_supersonique
+            bas Sortie_supersonique
+            haut Sortie_supersonique
+        }
+    }
+    Energie_Euler
+    {
+        convection { hll }
+        termes_non_conservatifs { hll }
+        initial_conditions
+        {
+            Energie_tot Champ_composite 2
+            {
+                Champ_Uniforme 1 -800
+                Champ_Uniforme 1 -800
+            }
+        }
+        boundary_conditions
+        {
+            gauche Sortie_supersonique
+            droite Sortie_supersonique
+            bas Sortie_supersonique
+            haut Sortie_supersonique
+        }
+    }
+
+    Post_processing
+    {
+        probes
+        {
+            rho grav densite periode 1e8 segment 1000 0 0 1 1
+            alpha grav alpha periode 1e8 segment 1000 0 0 1 1
+            v_l grav         vitesse_liquide periode 1e8 segment 1000 0 0 1 1
+            v_s grav         vitesse_solide periode 1e8 segment 1000 0 0 1 1
+            p grav        pression periode 1e8 segment 1000 0 0 1 1
+        }
+
+        Format cgns
+        fields dt_post 1e-2
+        {
+            alpha elem
+            densite elem
+            vitesse_liquide elem
+            vitesse_solide elem
+            pression elem
+        }
+    }
+}
+Solve pb
+End
