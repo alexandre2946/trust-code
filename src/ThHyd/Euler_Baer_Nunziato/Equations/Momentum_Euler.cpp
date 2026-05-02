@@ -367,7 +367,7 @@ double Momentum_Euler::calculer_pas_de_temps() const
   const DoubleTab& u_n = vitesse_normale();
   double dt = sh.pas_temps_max();
 
-  DoubleTab dt_e(dom.nb_elem());
+  DoubleTrav dt_e(dom.nb_elem());
   for (int n = 0; n < nb_phases; n++)
     {
       for (int e = 0; e < dom.nb_elem(); e++)
@@ -387,50 +387,54 @@ double Momentum_Euler::calculer_pas_de_temps() const
 
 void Momentum_Euler::init_alpha_rho_u()
 {
+  const Domaine_VF& dom = ref_cast(Domaine_VF, domaine_dis());
   const DoubleTab& alpha_rho = ref_cast(Pb_Euler,probleme()).equation_masse().inconnue().valeurs();
-  DoubleTab& alpha_rhoU = inconnue().valeurs();
-
+  const DoubleTab& vit = vitesse().valeurs();
   const int Nb_phase = ref_cast(Pb_Euler, probleme()).nb_phases(), D = Objet_U::dimension;
+  assert(vit.line_size() == Nb_phase * D);
+  assert(vit.dimension(0) == dom.nb_elem());
+
+  DoubleTab& alpha_rhoU = inconnue().valeurs();
   for (int n = 0; n < Nb_phase; n++)
     {
       assert(vit_phases_[n]);
-      DoubleTab_parts psrc(vitesse().valeurs()), pdst(vit_phases_[n]->valeurs());
-      for (int i = 0; i < std::min(psrc.size(), pdst.size()); i++)
-        {
-          DoubleTab& src = psrc[i], &dst = pdst[i];
-          assert(src.line_size() == Nb_phase * D);
-          for (int j = 0; j < src.dimension_tot(0); j++)
-            for (int d = 0; d < D; d++)
-              {
-                dst(j, d) = src(j, Nb_phase * d + n);
-                alpha_rhoU(j, Nb_phase * d + n) = src(j, Nb_phase * d + n) * alpha_rho(j, n);
-              }
-        }
+      DoubleTab& vit_phase = vit_phases_[n]->valeurs();
+
+      for (int j = 0; j < dom.nb_elem(); j++)
+        for (int d = 0; d < D; d++)
+          {
+            vit_phase(j, d) = vit(j, Nb_phase * d + n);
+            alpha_rhoU(j, Nb_phase * d + n) = vit(j, Nb_phase * d + n) * alpha_rho(j, n);
+          }
+      vit_phase.echange_espace_virtuel();
     }
+  alpha_rhoU.echange_espace_virtuel();
 }
 
 void Momentum_Euler::calculer_vitesse()
 {
+  const Domaine_VF& dom = ref_cast(Domaine_VF, domaine_dis());
+  const DoubleTab& alpha_rho_U = inconnue().valeurs();
   const DoubleTab& alpha_rho = ref_cast(Pb_Euler,probleme()).equation_masse().inconnue().valeurs();
-  DoubleTab& U = vitesse().valeurs();
   const int Nb_phase = ref_cast(Pb_Euler, probleme()).nb_phases(), D = Objet_U::dimension;
+  assert(alpha_rho_U.line_size() == Nb_phase * D);
+  assert(alpha_rho_U.dimension(0) == dom.nb_elem());
 
+  DoubleTab& vit = vitesse().valeurs();
   for (int n = 0; n < Nb_phase; n++)
     {
-      DoubleTab_parts psrc(inconnue().valeurs()), pdst(vit_phases_[n]->valeurs());
+      assert(vit_phases_[n]);
+      DoubleTab& vit_phase = vit_phases_[n]->valeurs();
 
-      for (int i = 0; i < std::min(psrc.size(), pdst.size()); i++)
-        {
-          DoubleTab& src = psrc[i], &dst = pdst[i];
-          assert(src.line_size() == Nb_phase * D);
-          for (int j = 0; j < src.dimension_tot(0); j++)
-            for (int d = 0; d < D; d++)
-              {
-                dst(j, d) = src(j, Nb_phase * d + n) / alpha_rho(j, n);
-                U(j, Nb_phase * d + n) = src(j, Nb_phase * d + n) / alpha_rho(j, n);
-              }
-        }
+      for (int j = 0; j < dom.nb_elem(); j++)
+        for (int d = 0; d < D; d++)
+          {
+            vit_phase(j, d) = alpha_rho_U(j, Nb_phase * d + n) / alpha_rho(j, n);
+            vit(j, Nb_phase * d + n) = alpha_rho_U(j, Nb_phase * d + n) / alpha_rho(j, n);
+          }
+      vit_phase.echange_espace_virtuel();
     }
+  vit.echange_espace_virtuel();
 }
 
 const Champ_Inc_base& Momentum_Euler::vitesse_phase(const int i) const
