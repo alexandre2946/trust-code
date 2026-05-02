@@ -22,21 +22,27 @@ class Interface_Baer_Nunziato : public Interface_base
 {
   Declare_instanciable(Interface_Baer_Nunziato);
 public:
+  void completer() override;
+  void mettre_a_jour(double ) override { /* Do nothing */ }
+  void set_param(Param& param) const override;
+
+  inline int id_phase_vitesse_inter() const { return id_vitesse_interface_; }
+  inline int id_phase_pression_inter() const { return id_pression_interface_; }
+  inline const Nom& nom_phase_vitesse_inter() const { return nom_phase_vitesse_; }
+
+protected:
+  int id_vitesse_interface_ = -123, id_pression_interface_ = -123;
+  Nom nom_phase_vitesse_;
+
   void sigma_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override
   {
     Process::exit("Dont call Interface_Baer_Nunziato::sigma_ !! \n");
   }
+
   void sigma_h_(const SpanD H, const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const override
   {
     Process::exit("Dont call Interface_Baer_Nunziato::sigma_h_ !! \n");
   }
-  void mettre_a_jour(double ) override { }
-  void set_param(Param& param) const override;
-  int id_phase_vitesse_inter() const { return id_vitesse_interface_; }
-  int id_phase_pression_inter() const { return id_pression_interface_; }
-
-private:
-  int id_vitesse_interface_ = -123, id_pression_interface_ = -123;
 };
 
 #endif /* Interface_Baer_nunziato_included */

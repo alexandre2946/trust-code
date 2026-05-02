@@ -14,10 +14,11 @@
 *****************************************************************************/
 
 #include <Interface_Baer_Nunziato.h>
+#include <Pb_Euler.h>
 #include <Param.h>
 
 Implemente_instanciable(Interface_Baer_Nunziato, "Interface_Baer_Nunziato", Interface_base);
-// XD Interface_Baer_Nunziato Interface_base Interface_Baer_Nunziato -1 Liquid-gas interface with a constant surface tension sigma
+// XD Interface_Baer_Nunziato Interface_base Interface_Baer_Nunziato -1 Interface Baer Nunziato class
 
 Sortie& Interface_Baer_Nunziato::printOn(Sortie& os) const { return os; }
 Entree& Interface_Baer_Nunziato::readOn(Entree& is)
@@ -30,6 +31,46 @@ Entree& Interface_Baer_Nunziato::readOn(Entree& is)
 
 void Interface_Baer_Nunziato::set_param(Param& param) const
 {
-  param.ajouter("vitesse", &id_vitesse_interface_ , Param::REQUIRED);
-  param.ajouter("pression", &id_pression_interface_, Param::REQUIRED);
+  param.ajouter("velocity_from_phase|phase_vitesse", &nom_phase_vitesse_ , Param::REQUIRED); // XD_ADD_P chaine Name of phase used to take the velocity at the interface. The pressure is automatically taken from the other phase
+}
+
+void Interface_Baer_Nunziato::completer()
+{
+  assert (pb_);
+  if (!sub_type(Pb_Euler, pb_.valeur()))
+    {
+      Cerr << "Interface_Baer_Nunziato should only be used with a problem of type Pb_Euler, not " << pb_->que_suis_je() << " !!!!" << finl;
+      Process::exit();
+    }
+
+  if (!sub_type(Milieu_composite_Euler, pb_->milieu()))
+    {
+      Cerr << "Milieu_composite_Euler should only be used with a problem of type Pb_Euler, not " << pb_->milieu().que_suis_je() << " !!!!" << finl;
+      Process::exit();
+    }
+
+  const Milieu_composite_Euler& mil = ref_cast(Milieu_composite_Euler, pb_->milieu());
+  const auto& noms_phases = mil.noms_phases();
+
+  if (noms_phases.size() != 2)
+    {
+      Cerr << "Error in Interface_Baer_Nunziato : the class is actually coded only for 2 phase problem. We detect the following phases :\n " << noms_phases << finl;
+      Process::exit();
+    }
+
+  for (int i = 0; i < noms_phases.size(); i++)
+    {
+      if (nom_phase_vitesse_ == noms_phases[i])
+        {
+          id_vitesse_interface_ = i;
+          id_pression_interface_ = 1 - i; // the other is for pressure
+          break;
+        }
+    }
+
+  if (id_vitesse_interface_ == -123 && id_pression_interface_ == -123)
+    {
+      Cerr << "Error in Interface_Baer_Nunziato : the phase name " << nom_phase_vitesse_ << " is not found in the provided phases :\n " << noms_phases << finl;
+      Process::exit();
+    }
 }

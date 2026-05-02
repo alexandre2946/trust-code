@@ -33,7 +33,7 @@ Entree& Milieu_composite_Euler::readOn(Entree& is)
   if (has_saturation_)
     Process::exit("We dont accept at present a saturation object in Milieu_composite_Euler ... But we will soon !\n");
 
-  if (static_cast<int>(fluides_.size()) == 1 && has_interface_)
+  if (static_cast<int>(fluides_.size()) == 1 && inter_lu_)
     {
       Cerr << "Error while reading Milieu_composite_Euler !!" << finl;
       Cerr << "You are simulating a Single-Phase Euler problem. No need to define an interface !" << finl;
@@ -41,7 +41,7 @@ Entree& Milieu_composite_Euler::readOn(Entree& is)
       Process::exit();
     }
 
-  if (has_interface_ && !sub_type(Interface_Baer_Nunziato, inter_lu_.valeur()))
+  if (inter_lu_ && !sub_type(Interface_Baer_Nunziato, inter_lu_.valeur()))
     Process::exit("We dont accept at present an interface object with a type different than Interface_Baer_Nunziato !\n");
 
   return is;
@@ -56,7 +56,10 @@ void Milieu_composite_Euler::discretiser(const Probleme_base& pb, const  Discret
   res_en_T_ = true;
 
   if (inter_lu_)
-    inter_lu_->assoscier_pb(pb);
+    {
+      inter_lu_->assoscier_pb(pb);
+      inter_lu_->completer();
+    }
 }
 
 void Milieu_composite_Euler::init_energie_tot(DoubleTab& alpha_energie_tot_jdd) const

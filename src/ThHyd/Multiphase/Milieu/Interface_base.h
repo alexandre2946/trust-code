@@ -31,6 +31,7 @@ class Interface_base : public Objet_U
 {
   Declare_base(Interface_base);
 public:
+  virtual void completer() { /* Do nothing */ }
   virtual void set_param(Param& param) const override;
   virtual void mettre_a_jour(double );
   void assoscier_pb(const Probleme_base& pb) { pb_ = pb; }
