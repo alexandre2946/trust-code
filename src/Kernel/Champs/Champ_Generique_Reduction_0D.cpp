@@ -242,6 +242,7 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ(OWN_PTR(Champ_base)&) 
           for (int comp=0; comp<nb_comp; comp++)
             {
               {
+                ToDo_Kokkos("Code but check test!");
                 CDoubleTabView valeurs = valeurs_source.view_ro();
                 DoubleArrView vect = static_cast<ArrOfDouble&>(vect_source).view_wo();
                 Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), size_vect, KOKKOS_LAMBDA(const int i)

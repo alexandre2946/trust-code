@@ -352,7 +352,7 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
           }
       }
 
-    DoubleTab u_bord_k(nb_pts_int_fac, dim); // Dirichlet projection
+    /* DoubleTab u_bord_k(nb_pts_int_fac, dim); // Dirichlet projection
     const DoubleTab& integ_points_facets = quad.get_integ_points_facets();
     for (int num_cl = 0; num_cl < le_dom_DG->nb_front_Cl(); num_cl++)
       {
@@ -450,7 +450,7 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
                   }
               }
           }
-      }
+      } */
   }
 
 

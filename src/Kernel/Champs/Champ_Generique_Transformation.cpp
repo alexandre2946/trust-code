@@ -661,6 +661,7 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
       DoubleArrView valeurs = static_cast<ArrOfDouble&>(valeurs_espace).view_wo();
       if (directive == "champ_fonc_quad_dg") //This is for DG
         {
+          ToDo_Kokkos("Code but check test!");
           int nb_elem = valeurs_espace.dimension(0);
           IntTab nb_points, ind_integ_points;
           zvf.get_ind_integ_points(ind_integ_points);
@@ -748,6 +749,7 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
         {
           if (directive=="champ_fonc_quad_dg") //This is for DG
             {
+              ToDo_Kokkos("critical");
               IntTab nb_points, ind_integ_points;
               int nb_elem = valeurs_espace.dimension(0);
               zvf.get_ind_integ_points(ind_integ_points);
@@ -842,6 +844,7 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
         {
           if (directive=="champ_fonc_quad_dg") //This is for DG
             {
+              ToDo_Kokkos("Code but check test!");
               IntTab nb_points, ind_integ_points;
               int nb_elem = valeurs_espace.dimension(0);
               zvf.get_ind_integ_points(ind_integ_points);
@@ -881,6 +884,7 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
 
       if (directive == "champ_fonc_quad_dg") //This is for DG
         {
+          ToDo_Kokkos("Code but check test!");
           int dim = dimension;
           int nb_elem = valeurs_espace.dimension(0);
           Kokkos::Array<CDoubleTabView, max_nb_sources> sources;

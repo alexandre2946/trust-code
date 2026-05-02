@@ -67,7 +67,7 @@ void Op_Diff_DG_Elem::dimensionner(Matrice_Morse& la_matrice) const // TODO a re
 
   const Nom& nom_inco = equation().inconnue().le_nom();
   int nordre = Option_DG::Get_order_for(nom_inco);
-  int dim = nom_inco.debute_par("vitesse") ? Objet_U::dimension : 1;
+  int dim = equation().inconnue().is_vectorial() ? Objet_U::dimension : 1;
 
   const Domaine_DG& domaine = le_dom_dg_.valeur();
 
@@ -511,7 +511,7 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
 
   const Nom& nom_inco = equation().inconnue().le_nom();
   int order = Option_DG::Get_order_for(nom_inco);
-  int dim = nom_inco.debute_par("vitesse") ? Objet_U::dimension : 1;
+  int dim = equation().inconnue().is_vectorial() ? Objet_U::dimension : 1;
 
   const BasisFunction& bfunc = le_dom_dg_->get_basisFunction(order);
   const int nb_bfunc = bfunc.nb_bfunc();
@@ -553,7 +553,7 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
           avec_valeur_aux_points = ch_txyz.valeur_au_temps_et_au_point_disponible();
         }
 
-      if (sub_type(Neumann_paroi, la_cl.valeur()))
+      if (sub_type(Neumann, la_cl.valeur()))
         {
           if (avec_valeur_aux_points)
             {
