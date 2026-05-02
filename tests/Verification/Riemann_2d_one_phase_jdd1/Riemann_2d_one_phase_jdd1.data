@@ -1,0 +1,164 @@
+# PARALLEL OK 8 #
+dimension 2
+Domaine dom
+
+# BEGIN MESH #
+mailler  dom
+{
+    pave tube
+    {
+        origine  -0.5  -0.5
+        nombre_de_noeuds  250 250
+        longueurs 1 1
+    }
+    {
+        bord  bas       Y = -0.5    -1 <= X <= 0.5
+        bord  haut      Y = 0.5     -0.5 <= X <= .5
+        bord  gauche  X = -0.5    -0.5 <= Y <= 0.5
+        bord  droite  X = .5      -0.5 <= Y <= 0.5
+    }
+}
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+    Partition_tool metis { nb_parts 4 }
+    Larg_joint 2
+    zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+Scheme_euler_explicit sch
+Read sch
+
+{
+    tinit 0
+	nb_pas_dt_max 3
+    dt_min 5.e-40
+    dt_max  0.8
+    tmax 0.3
+    seuil_statio -1
+    facsec 0.8
+}
+
+
+Coloc dis
+
+Pb_Euler pb
+
+Associate  pb dom
+Associate  pb sch
+Discretize pb dis
+
+Read pb
+{
+    Milieu_composite_Euler
+    {
+        gaz StiffenedGas { gamma 1.4 pinf 0 }
+    }
+
+    Fraction_Euler
+    {
+        initial_conditions
+        {
+            alpha Champ_composite 1
+            {
+                Champ_Uniforme 1 1
+            }
+        }
+        boundary_conditions
+        {
+            gauche Sortie_supersonique
+            droite Sortie_supersonique
+            bas Sortie_supersonique
+            haut Sortie_supersonique
+        }
+    }
+
+    Masse_Euler
+    {
+        convection { hll }
+        initial_conditions
+        {
+            densite Champ_composite 1
+            {
+                Champ_fonc_xyz dom 1 0.138*((x[0.)_AND_(y[0))+0.5323*((x>0.)_AND_(y[0))+0.5323*((x[0.)_AND_(y>0))+1.5*((x>0.)_AND_(y>0))
+            }
+        }
+        boundary_conditions
+        {
+            gauche Sortie_supersonique
+            droite Sortie_supersonique
+            bas Sortie_supersonique
+            haut Sortie_supersonique
+        }
+    }
+
+    QDM_Euler
+    {
+        convection { hll }
+        initial_conditions
+        {
+            vitesse Champ_composite 1
+            {
+                Champ_fonc_xyz dom 2 1.206*((x[0.)_AND_(y[0))+0*((x>0.)_AND_(y[0))+1.206*((x[0.)_AND_(y>0))+0*((x>0.)_AND_(y>0)) 1.206*((x[0)_AND_(y[0))+1.206*((x>0.)_AND_(y[0))+0*((x[0.)_AND_(y>0))+0*((x>0.)_AND_(y>0))
+            }
+
+            pression Champ_composite 1
+            {
+                Champ_fonc_xyz dom 1 0.029*((x[0.)_AND_(y[0))+0.3*((x>0.)_AND_(y[0))+0.3*((x[0.)_AND_(y>0))+1.5*((x>0.)_AND_(y>0))
+            }
+        }
+        boundary_conditions
+        {
+            gauche Sortie_supersonique
+            droite Sortie_supersonique
+            bas Sortie_supersonique
+            haut Sortie_supersonique
+        }
+    }
+    Energie_Euler
+    {
+        convection { hll }
+        initial_conditions
+        {
+            Energie_tot Champ_composite 1
+            {
+                Champ_Uniforme 1 -800
+            }
+        }
+        boundary_conditions
+        {
+            gauche Sortie_supersonique
+            droite Sortie_supersonique
+            bas Sortie_supersonique
+            haut Sortie_supersonique
+        }
+    }
+
+    Post_processing
+    {
+        probes
+        {
+            rho grav densite periode 1e8 segment 1000 -0.5 -0.5 0.5 0.5
+            v grav         vitesse periode 1e8 segment 1000 -0.5 -0.5 0.5 0.5
+            p grav        pression periode 1e8 segment 1000 -0.5 -0.5 0.5 0.5
+        }
+
+        Format lml
+        fields dt_post 1e-2
+        {
+            densite elem
+            vitesse elem
+            pression elem
+        }
+    }
+}
+Solve pb
+End
