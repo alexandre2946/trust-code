@@ -40,41 +40,46 @@ void Pb_Euler::typer_lire_milieu(Entree& is)
 {
   le_milieu_.resize(1);
   is >> le_milieu_[0];
+
   if (!sub_type(Milieu_composite_Euler, le_milieu_[0].valeur()))
     {
       Cerr << "Error: Fluid of type " << le_milieu_[0]->le_type() << " is not compatible with " << que_suis_je() << " problem which accepts only Milieu_composite_Euler medium !!!" << finl;
       Cerr << "Check your datafile!" << finl;
       Process::exit();
     }
-  noms_phases_ = ref_cast(Milieu_composite_Euler,le_milieu_[0].valeur()).noms_phases();
+
+  noms_phases_ = ref_cast(Milieu_composite_Euler, le_milieu_[0].valeur()).noms_phases();
   associer_milieu_base(le_milieu_[0].valeur());
   Probleme_base::discretiser_equations();
   for (int i = 0; i < nombre_d_equations(); i++)
     equation(i).associer_milieu_equation();
+
   equation(0).milieu().discretiser((*this), la_discretisation_.valeur());
 }
 
 Entree& Pb_Euler::lire_equations(Entree& is, Motcle& mot)
 {
-  bool already_read { true };
-  is >> mot;
-  if (mot == "correlations" || mot == "models")
-    lire_correlations(is), already_read = false;
-
-  Cerr << "Reading of the equations" << finl;
-  for (int i = 0; i < nombre_d_equations(); i++, already_read = false)
+  Cerr << "Pb_Euler : Reading of the equations ..." << finl;
+  for (int i = 0; i < nombre_d_equations(); i++)
     {
-      if (!already_read)
-        is >> mot;
+      is >> mot;
       is >> getset_equation_by_name(mot);
     }
 
+  is >> mot; // XXX read last word just after equations !
+
+  Cerr << "Pb_Euler : Reading of the equations => OK" << finl;
+
   //correction des donnees lu depuis .data
+  Cerr << "Pb_Euler : Initializing mass's equation unknown " << eq_masse_.inconnue().le_nom() << finl;
   eq_masse_.init_alpha_rho(); // init inco car jdd initialise rho !!
+
+  Cerr << "Pb_Euler : Initializing momentum's equation unknown " << eq_qdm_.inconnue().le_nom() << finl;
   eq_qdm_.init_alpha_rho_u(); // init inco + vitesse phase car jdd initialise vitesse !!
+
+  Cerr << "Pb_Euler : Initializing energy's equation unknown " << eq_energie_.inconnue().le_nom() << finl;
   eq_energie_.init_energie_tot(); // init inco car jdd initialise rien car on ne sait pas ...
 
-  read_optional_equations(is, mot);
   return is;
 }
 

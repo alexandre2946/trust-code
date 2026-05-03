@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -39,7 +39,6 @@ public:
   void preparer_calcul() override;
   void mettre_a_jour(double temps) override;
 
-  inline int nb_phases() const { return noms_phases_.size(); }
   inline Momentum_Euler& equation_qdm() { return eq_qdm_; }
   inline const Momentum_Euler& equation_qdm() const { return eq_qdm_; }
   inline Density_Euler& equation_masse() { return eq_masse_; }
@@ -48,13 +47,16 @@ public:
   inline const Energy_Euler& equation_energie() const { return eq_energie_; }
   inline Fraction_Euler& equation_fraction() { return eq_fraction_; }
   inline const Fraction_Euler& equation_fraction() const { return eq_fraction_; }
-  inline const Nom& nom_phase(int i) const { return noms_phases_[i]; }
-  inline const Noms& noms_phases() const { return noms_phases_; }
+
+  inline int nb_phases() const { return noms_phases_->size(); }
+  inline const Nom& nom_phase(int i) const { return noms_phases_.valeur()[i]; }
+  inline const Noms& noms_phases() const { return noms_phases_.valeur(); }
+
   inline int verifier() override { return 1; }
   inline int nombre_d_equations() const override { return 4; }
 
 protected:
-  Noms noms_phases_;
+  OBS_PTR(Noms) noms_phases_;
   Density_Euler eq_masse_;
   Momentum_Euler eq_qdm_;
   Energy_Euler eq_energie_;

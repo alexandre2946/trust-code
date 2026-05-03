@@ -292,7 +292,6 @@ void Momentum_Euler::discretiser()
   const int nb_valeurs_temp = schema_temps().nb_valeurs_temporelles();
   const int N = pb.nb_phases();
 
-  Cerr << "Velocity discretization" << finl;
   dis.vitesse(schema_temps(), domaine_dis(), la_vitesse, N);
   la_vitesse->fixer_nature_du_champ(vectoriel);
   la_vitesse->add_synonymous(Nom("velocity"));
