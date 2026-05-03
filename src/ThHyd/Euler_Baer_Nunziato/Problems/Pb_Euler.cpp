@@ -30,7 +30,7 @@ Entree& Pb_Euler::readOn(Entree& is)
 {
   if (!discretisation().is_coloc())
     {
-      Cerr << "Error: Problem of type " << que_suis_je() << " is only available for Coloc discretizations\n";
+      Cerr << "Error: Problem of type " << que_suis_je() << " is only available for Coloc discretization !!! Update your data file ...\n";
       Process::exit();
     }
   return Pb_Fluide_base::readOn(is);
@@ -42,7 +42,7 @@ void Pb_Euler::typer_lire_milieu(Entree& is)
   is >> le_milieu_[0];
   if (!sub_type(Milieu_composite_Euler, le_milieu_[0].valeur()))
     {
-      Cerr << "Error: Fluid of type " << le_milieu_[0]->le_type() << " is not compatible with " << que_suis_je() << " problem which accepts only Milieu_composite_Euler medium" << finl;
+      Cerr << "Error: Fluid of type " << le_milieu_[0]->le_type() << " is not compatible with " << que_suis_je() << " problem which accepts only Milieu_composite_Euler medium !!!" << finl;
       Cerr << "Check your datafile!" << finl;
       Process::exit();
     }
@@ -69,10 +69,10 @@ Entree& Pb_Euler::lire_equations(Entree& is, Motcle& mot)
       is >> getset_equation_by_name(mot);
     }
 
-  //correction des donnee lu depuis .data
-  eq_masse_.init_alpha_rho();
-  eq_qdm_.init_alpha_rho_u();
-  eq_energie_.init_energie_tot();
+  //correction des donnees lu depuis .data
+  eq_masse_.init_alpha_rho(); // init inco car jdd initialise rho !!
+  eq_qdm_.init_alpha_rho_u(); // init inco + vitesse phase car jdd initialise vitesse !!
+  eq_energie_.init_energie_tot(); // init inco car jdd initialise rien car on ne sait pas ...
 
   read_optional_equations(is, mot);
   return is;
@@ -123,8 +123,7 @@ void Pb_Euler::associer_milieu_base(const Milieu_base& mil)
 void Pb_Euler::preparer_calcul()
 {
   Pb_Fluide_base::preparer_calcul();
-  const double temps = schema_temps().temps_courant();
-  mettre_a_jour(temps);
+  mettre_a_jour(schema_temps().temps_courant());
 }
 
 void Pb_Euler::mettre_a_jour(double temps)

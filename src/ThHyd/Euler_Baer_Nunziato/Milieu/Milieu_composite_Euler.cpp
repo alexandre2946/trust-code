@@ -69,20 +69,24 @@ void Milieu_composite_Euler::init_energie_tot(DoubleTab& alpha_energie_tot_jdd) 
   const DoubleTab& alpha = equation("alpha").inconnue().valeurs();
   const DoubleTab& p = qdm.pression().valeurs();
   const int Nb_phase = static_cast<int>(fluides_.size());
-  const int Nb_elem = qdm.domaine_dis().nb_elem_tot();
+  const int Nb_elem = qdm.domaine_dis().nb_elem();
 
   for (int n = 0; n < Nb_phase; n++)
     {
-      const DoubleTab& U = qdm.vitesse_phase(n).valeurs();
+      const DoubleTab& vit_phase = qdm.vitesse_phase(n).valeurs();
       const Fluide_reel_base& phase = ref_cast(Fluide_reel_base, get_fluid(n));
+
       for (int i = 0; i < Nb_elem; i++)
         {
           double nom_u2 = 0;
           for (int d = 0; d < Objet_U::dimension; d++)
-            nom_u2 += U(i, d) * U(i, d);
+            nom_u2 += vit_phase(i, d) * vit_phase(i, d);
+
           alpha_energie_tot_jdd(i, n) = alpha(i, n) * phase.init_energie_tot(rho(i, n), nom_u2, p(i, n));
         }
     }
+
+  alpha_energie_tot_jdd.echange_espace_virtuel();
 }
 
 void Milieu_composite_Euler::calculer_pression(DoubleTab& p) const
@@ -91,24 +95,31 @@ void Milieu_composite_Euler::calculer_pression(DoubleTab& p) const
   const DoubleTab& rho = ref_cast(Density_Euler,equation("alpha_rho")).densite().valeurs();
   const DoubleTab& alpha = equation("alpha").inconnue().valeurs();
   const DoubleTab& alpha_rhoE = equation("alpha_energie_tot").inconnue().valeurs();
-  DoubleTab rhoE = alpha_rhoE;
+
+  DoubleTrav rhoE(alpha_rhoE);
+  rhoE = alpha_rhoE; // XXX
   tab_divide_any_shape(rhoE, alpha); // @suppress("Function cannot be resolved")
+
   const int Nb_phase = static_cast<int>(fluides_.size());
-  const int Nb_elem = qdm.domaine_dis().nb_elem_tot();
+  const int Nb_elem = qdm.domaine_dis().nb_elem();
 
   for (int n = 0; n < Nb_phase; n++)
     {
-      const DoubleTab& U = qdm.vitesse_phase(n).valeurs();
+      const DoubleTab& vit_phase = qdm.vitesse_phase(n).valeurs();
       const Fluide_reel_base& phase = ref_cast(Fluide_reel_base, get_fluid(n));
-      for (int i = 0; i < Nb_elem; i++)
+
+      for (int e = 0; e < Nb_elem; e++)
         {
           double nom_u2 = 0;
           for (int d = 0; d < Objet_U::dimension; d++)
-            nom_u2 += U(i, d) * U(i, d);
-          p(i, n) = phase.calculer_pression(rho(i, n), nom_u2, rhoE(i, n));
-          assert(p(i, n) > 0);
+            nom_u2 += vit_phase(e, d) * vit_phase(e, d);
+
+          p(e, n) = phase.calculer_pression(rho(e, n), nom_u2, rhoE(e, n));
+          assert(p(e, n) > 0);
         }
     }
+
+  p.echange_espace_virtuel();
 }
 
 void Milieu_composite_Euler::calculer_vitesse_son(DoubleTab& c) const
@@ -118,11 +129,16 @@ void Milieu_composite_Euler::calculer_vitesse_son(DoubleTab& c) const
   const DoubleTab& p = qdm.pression().valeurs();
 
   const int Nb_phase = static_cast<int>(fluides_.size());
-  const int Nb_elem = qdm.domaine_dis().nb_elem_tot();
+  const int Nb_elem = qdm.domaine_dis().nb_elem();
+  assert(c.dimension(0) == Nb_elem && c.line_size() == Nb_phase);
+  assert(c.dimension_tot(0) == qdm.domaine_dis().nb_elem_tot());
+
   for (int n = 0; n < Nb_phase; n++)
     {
       const Fluide_reel_base& phase = ref_cast(Fluide_reel_base, get_fluid(n));
-      for (int i = 0; i < Nb_elem; i++)
-        c(i, n) = phase.calculer_vitesse_son(rho(i, n), p(i, n));
+      for (int e = 0; e < Nb_elem; e++)
+        c(e, n) = phase.calculer_vitesse_son(rho(e, n), p(e, n));
     }
+
+  c.echange_espace_virtuel();
 }

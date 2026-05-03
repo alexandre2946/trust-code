@@ -120,8 +120,8 @@ bool Momentum_Euler::initTimeStep(double dt)
   // Mise a jour du temps dans la pression
   for (int i = 1; i <= sch.nb_valeurs_futures(); i++)
     {
-      pression().changer_temps_futur(sch.temps_futur(i), i);
-      pression().futur(i) = pression().valeurs();
+      la_pression->changer_temps_futur(sch.temps_futur(i), i);
+      la_pression->futur(i) = la_pression->valeurs();
     }
   return Equation_base::initTimeStep(dt);
 }
@@ -155,7 +155,6 @@ void Momentum_Euler::completer()
   const Domaine_VF& dom = ref_cast(Domaine_VF, domaine_dis());
   const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
 
-  vitesse_son_.resize(dom.nb_elem_tot(), pb.nb_phases());
   vitesse_normale_.resize(dom.nb_faces_tot(), 2 * pb.nb_phases()); // dimension du tab à changer pour 3 pahses
 }
 
@@ -324,6 +323,9 @@ void Momentum_Euler::discretiser()
 
   champs_compris_.ajoute_champ(la_pression);
 
+  // on copie la structure //
+  vitesse_son_ = la_pression->valeurs(); // nb_elem_tot * nb_phase
+
   Cerr << "Unknown alpha_rho_u discretization" << finl;
   dis.discretiser_champ("vitesse", domaine_dis(), "alpha_rho_u", "kg/sm3", dimension * N, nb_valeurs_temp, temps, l_inco_ch_);
   champs_compris_.ajoute_champ(l_inco_ch_);
@@ -351,8 +353,8 @@ void Momentum_Euler::mettre_a_jour_champs_conserves(double temps, int reset)
 
 void Momentum_Euler::mettre_a_jour_p_c()
 {
-  ref_cast(Milieu_composite_Euler,milieu()).calculer_pression(pression().valeurs());
-  ref_cast(Milieu_composite_Euler,milieu()).calculer_vitesse_son(vitesse_son());
+  ref_cast(Milieu_composite_Euler,milieu()).calculer_pression(la_pression->valeurs());
+  ref_cast(Milieu_composite_Euler,milieu()).calculer_vitesse_son(vitesse_son_);
 }
 
 double Momentum_Euler::calculer_pas_de_temps() const
@@ -363,7 +365,6 @@ double Momentum_Euler::calculer_pas_de_temps() const
   const DoubleVect& surf = dom.face_surfaces();
   const DoubleVect& vol = dom.volumes();
   const int nb_phases = ref_cast(Pb_Euler,probleme()).nb_phases();
-  const DoubleTab& c = vitesse_son();
   const DoubleTab& u_n = vitesse_normale();
   double dt = sh.pas_temps_max();
 
@@ -376,7 +377,7 @@ double Momentum_Euler::calculer_pas_de_temps() const
           for (int i = 0; i < elem_faces.line_size(); i++)
             {
               int f = elem_faces(e, i);
-              som += (f >= 0) ? (fabs(u_n(f, n)) + c(e, n)) * surf(f) : 0;
+              som += (f >= 0) ? (fabs(u_n(f, n)) + vitesse_son_(e, n)) * surf(f) : 0;
             }
           dt_e(e) = vol(e) / som;
         }
