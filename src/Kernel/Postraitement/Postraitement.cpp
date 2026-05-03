@@ -1823,7 +1823,7 @@ void Postraitement::postprocess_field_values()
 
       //La distinction du type de postraitement (tableau ou tenseur) est fait dans la methode postraiter par la valeur de tenseur
       Nom nature("scalar");
-      if (champ_ecriture.nature_du_champ()==vectoriel) nature="vector";
+      if (champ_ecriture.is_vectorial()) nature="vector";
       postraiter(dom,unites,noms_compo,ncomp,temps_courant,itr,localisation,nature,valeurs_post,tenseur);
     }
 }

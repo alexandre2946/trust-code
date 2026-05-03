@@ -180,7 +180,7 @@ void Source_PDF_base::associer_pb(const Probleme_base& pb)
   // Variable Imposee sur IB
   const DoubleTab& variable=equation().inconnue().valeurs();
   Motcle directive("temperature");
-  if (equation().inconnue().nature_du_champ()==vectoriel) directive="vitesse";
+  if (equation().inconnue().is_vectorial()) directive="vitesse";
   nb_comp=variable.dimension(1);
   assert(nb_comp==modele_lu_.dim_variable_);
   Nom nom_c1(equation().inconnue().le_nom());
@@ -1844,7 +1844,7 @@ void Source_PDF_base::creer_champ(const Motcle& motlu)
   const DoubleTab& variable=equation().inconnue().valeurs();
   int nb_comp = variable.dimension(1);
   Motcle directive("temperature");
-  if (equation().inconnue().nature_du_champ()==vectoriel) directive="vitesse";
+  if (equation().inconnue().is_vectorial()) directive="vitesse";
   const Domaine_dis_base& le_dom_dis = equation().domaine_dis();
 
   double temps=0.;

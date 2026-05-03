@@ -811,7 +811,7 @@ void Equation_base::discretiser()
   if (calculate_time_derivative())
     {
       Motcle directive("temperature");
-      if (inconnue().nature_du_champ()==vectoriel)
+      if (inconnue().is_vectorial())
         directive="vitesse";
 
       Nom nom("derivee_en_temps_");
@@ -1383,6 +1383,10 @@ void Equation_base::verifie_ch_init_nb_comp(const Champ_Inc_base& ch_ref, const 
           exit();
         }
     }
+  else if (nature==quadrature_scalaire)
+    {
+      //DG size depends on the geometry
+    }
   else if (nature==vectoriel)
     {
       if (nb_comp!=Objet_U::dimension)
@@ -1392,6 +1396,10 @@ void Equation_base::verifie_ch_init_nb_comp(const Champ_Inc_base& ch_ref, const 
           Cerr<<"It should read "<<Objet_U::dimension<<" components for this field."<<finl;
           exit();
         }
+    }
+  else if (nature==quadrature_vectoriel)
+    {
+      //DG size depends on the geometry
     }
   else if (nature==multi_scalaire)
     {
@@ -1405,19 +1413,43 @@ void Equation_base::verifie_ch_init_nb_comp(const Champ_Inc_base& ch_ref, const 
     }
   else if (nature==basis_function_order_1_scalar)
     {
-      // Todo DG implement some check for size ?
+      /* if (nb_comp!=3)
+        {
+          Cerr<<"The nature of the field "<<nom<<" unknown to the equation name "<<le_nom()<<" is a basis_function_order_1_scalar."<<finl;
+          Cerr<<"The number of components readed for this field "<<nb_comp<<" does not match the number expected."<<finl;
+          Cerr<<"It should read "<<3<<" components for this field."<<finl;
+          exit();
+        } */
     }
   else if (nature==basis_function_order_2_scalar)
     {
-      // Todo DG implement some check for size ?
+      /* if (nb_comp!=6)
+        {
+          Cerr<<"The nature of the field "<<nom<<" unknown to the equation name "<<le_nom()<<" is a basis_function_order_2_scalar."<<finl;
+          Cerr<<"The number of components readed for this field "<<nb_comp<<" does not match the number expected."<<finl;
+          Cerr<<"It should read "<<6<<" components for this field."<<finl;
+          exit();
+        } */
     }
   else if (nature==basis_function_order_1_vectorial)
     {
-      // Todo DG implement some check for size ?
+      /* if (nb_comp!=3*Objet_U::dimension)
+        {
+          Cerr<<"The nature of the field "<<nom<<" unknown to the equation name "<<le_nom()<<" is a basis_function_order_1_vectorial."<<finl;
+          Cerr<<"The number of components readed for this field "<<nb_comp<<" does not match the number expected."<<finl;
+          Cerr<<"It should read "<<3*Objet_U::dimension<<" components for this field."<<finl;
+          exit();
+        } */
     }
   else if (nature==basis_function_order_2_vectorial)
     {
-      // Todo DG implement some check for size ?
+      /* if (nb_comp!=6*Objet_U::dimension)
+        {
+          Cerr<<"The nature of the field "<<nom<<" unknown to the equation name "<<le_nom()<<" is a basis_function_order_2_vectorial."<<finl;
+          Cerr<<"The number of components readed for this field "<<nb_comp<<" does not match the number expected."<<finl;
+          Cerr<<"It should read "<<6*Objet_U::dimension<<" components for this field."<<finl;
+          exit();
+        } */
     }
   else
     {

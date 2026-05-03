@@ -32,7 +32,7 @@ Champ_base& Champ_Fonc_Quad_DG::affecter_(const Champ_base& ch)
   int nb_elem = domaine.nb_elem();
 
   int dim = 1;
-  if (nature_du_champ() == Nature_du_champ::vectoriel) dim = Objet_U::dimension;
+  if (nature_du_champ() == Nature_du_champ::quadrature_vectoriel) dim = Objet_U::dimension;
 
   DoubleTab values(integ_points.dimension(0),dim);
 
@@ -65,7 +65,7 @@ DoubleTab& Champ_Fonc_Quad_DG::valeur_aux_elems(const DoubleTab& positions, cons
     return result;
 
   int dim = 1;
-  if (nature_ == vectoriel) dim = Objet_U::dimension;
+  if (nature_ == quadrature_vectoriel) dim = Objet_U::dimension;
   ToDo_Kokkos("critical");
 
   DoubleTab value_pts(nb_pts_integ_max);

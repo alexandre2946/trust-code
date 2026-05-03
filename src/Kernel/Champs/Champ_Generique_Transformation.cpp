@@ -239,8 +239,7 @@ void Champ_Generique_Transformation::completer(const Postraitement_base& post)
                   exit();
                 }
             }
-          const Domaine_dis_base& domaine_dis = get_source(0).get_ref_domaine_dis_base();
-          int nb_comp = (domaine_dis.que_suis_je()=="Domaine_DG") ? (source.is_vectorial() ? Objet_U::dimension : 1) : source.nb_comp();
+          int nb_comp = source.nb_vect_comp();
           nb_comp_ = (nb_comp_<nb_comp)?  nb_comp:nb_comp_;
 
           if (source.is_vectorial())
@@ -614,7 +613,7 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
           sources_val[so].resize(nb_pos,nb_compso);
           if (directive == "CHAMP_FACE") source_so.valeur_aux_faces(sources_val[so]);
           else if (directive == "CHAMP_ELEM" && nb_pos==domaine_dis.domaine().nb_elem()) source_so.valeur_aux_centres_de_gravite(domaine_dis.domaine(), sources_val[so]);
-          else if ((directive == "CHAMP_FONC_QUAD_DG") & (directive_so == "CHAMP_ELEM_DG"))
+          else if (directive == "CHAMP_FONC_QUAD_DG" and directive_so == "CHAMP_ELEM_DG")
             {
               int nelem = valeurs_espace.dimension(0);
               int npoints = valeurs_espace.dimension(1);
@@ -1034,8 +1033,9 @@ const Motcle Champ_Generique_Transformation::get_directive_pour_discr() const
   Motcle directive;
   if (localisation_=="elem")
     {
-      const Domaine_dis_base& domaine_dis = get_ref_domaine_dis_base();
-      directive = (domaine_dis.que_suis_je() == "Domaine_DG") ? "champ_fonc_quad_dg" : "champ_elem";
+      OWN_PTR(Champ_base) source_espace_stockage;
+      const Champ_base& source = get_source(0).get_champ_without_evaluation(source_espace_stockage);
+      directive = (source.is_basis_function() || source.is_quadrature()) ? "champ_fonc_quad_dg" : "champ_elem";
     }
   else if (localisation_=="som")
     {
@@ -1136,8 +1136,7 @@ int Champ_Generique_Transformation::preparer_macro()
             {
               OWN_PTR(Champ_base) source_espace_stockage;
               const Champ_base& source = get_source(i).get_champ(source_espace_stockage);
-              const Domaine_dis_base& domaine_dis = get_source(i).get_ref_domaine_dis_base();
-              int nb_comp = (domaine_dis.que_suis_je()=="Domaine_DG") ? (source.is_vectorial() ? Objet_U::dimension : 1) : source.nb_comp();
+              int nb_comp = source.nb_vect_comp();
               const Noms compo = get_source(i).get_property("composantes");
               for (int comp=0; comp<nb_comp; comp++)
                 {

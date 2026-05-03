@@ -56,8 +56,7 @@ Entree& Champ_Post_Operateur_Eqn::readOn(Entree& s )
 void Champ_Post_Operateur_Eqn::verification_cas_compo() const
 {
   // On applique compo a un vecteur
-  const Nature_du_champ& nature_ch=ref_eq_->inconnue().nature_du_champ();
-  if ((nature_ch != vectoriel) && (compo_ != -1 ))
+  if ((ref_eq_->inconnue().is_vectorial()) && (compo_ != -1 ))
     {
       Cerr<<"Error in Champ_Post_Operateur_Eqn::verification_cas_compo()"<<finl;
       Cerr<<"It isn't possible to get a component from a non vectoriel field " <<finl;

@@ -114,9 +114,6 @@ void DG_discretisation::discretiser_champ(const Motcle& directive, const Domaine
   if (nature == multi_scalaire)
     {
       throw;
-      //champ->fixer_nature_du_champ(nature);
-      //champ->fixer_unites(unites);
-      //champ->fixer_noms_compo(noms);
     }
 
   if (nb_comp == 1)
@@ -214,18 +211,15 @@ void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
     case 0:
     case 1:
     case 2:
+    case 4:
+    case 5:
+    case 7:
       type = "Champ_Fonc_Quad_DG";
       nb_points = nb_pts_integ_max; //Option_DG::Nb_col_from_order(order_DG);;
       break;
     case 3:
       type = "Champ_Fonc_Elem_DG";
       nb_points = 1;
-      break;
-    case 4:
-    case 5:
-    case 7:
-      type = "Champ_Fonc_Quad_DG";
-      nb_points = nb_pts_integ_max;
       break;
     case 6:
       type = "Champ_Fonc_Som_DG";
@@ -259,16 +253,22 @@ void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
   else
     assert(0);
 
-  bool vector = ((nature==vectoriel) | (nature == basis_function_order_1_vectorial) | (nature == basis_function_order_2_vectorial) );
+  bool vector = (nature==vectoriel or nature==quadrature_vectoriel or nature == basis_function_order_1_vectorial or nature == basis_function_order_2_vectorial );
   if (vector) nb_comp = dimension;
   else nb_comp = 1;
   if (champ_fonc)
     {
       creer_champ(*champ_fonc, z, type, noms[0], unites[0], nb_comp*nb_points, nb_ddl, temps, directive, que_suis_je());
       if (nb_comp == 1)
-        champ_fonc->valeur().fixer_nature_du_champ(scalaire);
+        {
+          (nb_points == 1) ? champ_fonc->valeur().fixer_nature_du_champ(scalaire)
+          : champ_fonc->valeur().fixer_nature_du_champ(quadrature_scalaire);
+        }
       else if (nb_comp == dimension)
-        champ_fonc->valeur().fixer_nature_du_champ(vectoriel);
+        {
+          (nb_points == 1) ? champ_fonc->valeur().fixer_nature_du_champ(vectoriel)
+          : champ_fonc->valeur().fixer_nature_du_champ(quadrature_vectoriel);
+        }
       else
         {
           Cerr << "multi_scalaire not implemented for now" << finl;
@@ -279,9 +279,15 @@ void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
     {
       creer_champ(*champ_don, z, type, noms[0], unites[0], nb_comp*nb_points, nb_ddl, temps, directive, que_suis_je());
       if (nb_comp == 1)
-        champ_don->valeur().fixer_nature_du_champ(scalaire);
+        {
+          (nb_points == 1) ? champ_don->valeur().fixer_nature_du_champ(scalaire)
+          : champ_don->valeur().fixer_nature_du_champ(quadrature_scalaire);
+        }
       else if (nb_comp == dimension)
-        champ_don->valeur().fixer_nature_du_champ(vectoriel);
+        {
+          (nb_points == 1) ? champ_don->valeur().fixer_nature_du_champ(vectoriel)
+          : champ_don->valeur().fixer_nature_du_champ(quadrature_vectoriel);
+        }
       else
         {
           Cerr << "multi_scalaire not implemented for now" << finl;

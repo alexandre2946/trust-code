@@ -202,7 +202,7 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ(OWN_PTR(Champ_base)&) 
   Nature_du_champ nature_source = source.nature_du_champ();
   bool basis_function = source.is_basis_function();
   int order = source.order_field();
-  int nb_comp = (domaine_dis.que_suis_je()=="Domaine_DG") ? (source.is_vectorial() ? Objet_U::dimension : 1) : source.nb_comp();
+  int nb_comp = source.nb_vect_comp();
 
   // dimension() sur le tableau de valeurs des champs PolyMAC_HFV renvoie -1 (plusieurs supports)
   // ToDo: reecrire completement cette methode (horrible, tres mal ecrite) en deportant les methodes min/max/sum/... pour chaque OWN_PTR(Champ_base) !
@@ -226,7 +226,7 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ(OWN_PTR(Champ_base)&) 
   const Domaine_VF& zvf = ref_cast(Domaine_VF,domaine_dis);
   double val_extraite=-100.;
 
-  if (domaine_dis.que_suis_je() == "Domaine_DG")
+  if (source.is_basis_function() or source.is_quadrature())
     {
       if (nb_comp==1)
         {
@@ -820,8 +820,8 @@ void Champ_Generique_Reduction_0D::nommer_source()
 
 const Motcle Champ_Generique_Reduction_0D::get_directive_pour_discr() const
 {
-  const Domaine_dis_base& domaine_dis = get_source(0).get_ref_domaine_dis_base();
-  if (domaine_dis.que_suis_je() == "Domaine_DG")
+  const Champ_base& source = get_source(0).get_champ_without_evaluation(source_espace_stockage_);
+  if (source.is_basis_function() or source.is_quadrature())
     return "champ_fonc_quad_dg";
 
   return get_source(0).get_directive_pour_discr();

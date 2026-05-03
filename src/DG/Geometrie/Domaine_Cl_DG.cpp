@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -51,7 +51,7 @@ void Domaine_Cl_DG::imposer_cond_lim(Champ_Inc_base& ch, double temps)
 {
 //  DoubleTab& ch_tab = ch.valeurs(temps);
   if (sub_type(Champ_Inc_P0_base, ch)) { /* Do nothing */ }
-  else if (ch.nature_du_champ() == scalaire) { /* Do nothing */ }
+  else if (ch.is_scalar()) { /* Do nothing */ }
   else
     {
       Cerr << "Le type de Champ_Inc " << ch.que_suis_je() << " n'est pas prevu en DG family " << finl;

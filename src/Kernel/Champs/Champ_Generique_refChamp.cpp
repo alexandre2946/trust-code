@@ -474,12 +474,9 @@ const Motcle Champ_Generique_refChamp::get_directive_pour_discr() const
   Motcle directive;
   const Champ_base& ch = get_ref_champ_base();
 
-  const Domaine_dis_base& domaine_dis = get_ref_domaine_dis_base();
   // Champs discrets a une seule localisation :
   if (sub_type(Champ_Inc_P0_base,ch))
-    directive = (domaine_dis.que_suis_je() == "Domaine_DG") ? "champ_elem_DG" : "champ_elem";
-  else if (sub_type(Champ_Fonc_P0_base,ch))
-    directive = (domaine_dis.que_suis_je() == "Domaine_DG") ? "champ_fonc_quad_DG" : "champ_elem";
+    directive = ch.is_basis_function() ? "champ_elem_DG" : (ch.is_quadrature() ? "champ_fonc_quad_DG" : "champ_elem");
   else if (sub_type(Champ_Inc_P1_base,ch) || sub_type(Champ_Fonc_P1_base,ch)
            || sub_type(Champ_Inc_P1_base,ch) || sub_type(Champ_Inc_Q1_base,ch)
            || sub_type(Champ_Fonc_Q1_base,ch))

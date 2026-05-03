@@ -24,7 +24,7 @@
  * It handles all the generic aspect of a field:
  *      - its name and synonyms
  *      - its number and names of components
- *      - its nature (scalar, vectorial, multi_scalar, basis_function_scalar, basis_function_vectorial)
+ *      - its nature (scalar, quadrature_scalaire, vectorial, quadrature_vectoriel,multi_scalaire, basis_function_scalar, basis_function_vectorial)
  *      - the units associated to each component
  *
  *
@@ -32,7 +32,7 @@
  */
 
 // Definition of the nature of a field:
-enum Nature_du_champ { scalaire, multi_scalaire, vectoriel,
+enum Nature_du_champ { scalaire, quadrature_scalaire, multi_scalaire, vectoriel, quadrature_vectoriel,
                        basis_function_order_1_scalar, basis_function_order_2_scalar,
                        basis_function_order_1_vectorial, basis_function_order_2_vectorial
                      };
@@ -55,7 +55,7 @@ public:
   // Component management
   virtual int nb_comp() const { return nb_compo_ ; } // Renvoie le nombre de composantes du champ.
   virtual void fixer_nb_comp(int i);
-
+  virtual int nb_vect_comp() const;
 
   const Noms& noms_compo() const;
   const Nom& nom_compo(int) const;
@@ -78,9 +78,14 @@ public:
   virtual Nature_du_champ fixer_nature_du_champ(Nature_du_champ nat);
 
   bool is_basis_function() const  { return nature_ >= basis_function_order_1_scalar; }
+  bool is_quadrature() const  { return nature_ == quadrature_scalaire or nature_ == quadrature_vectoriel; }
   bool is_vectorial() const
   {
-    return nature_==vectoriel or nature_ == basis_function_order_1_vectorial or nature_ == basis_function_order_2_vectorial;
+    return nature_==vectoriel or nature_==quadrature_vectoriel or nature_ == basis_function_order_1_vectorial or nature_ == basis_function_order_2_vectorial;
+  }
+  bool is_scalar() const
+  {
+    return nature_==scalaire or nature_==quadrature_scalaire;
   }
   int order_field() const;
 

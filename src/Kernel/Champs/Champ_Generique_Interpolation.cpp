@@ -176,15 +176,15 @@ int Champ_Generique_Interpolation::set_domaine(const Nom& nom_domaine, int exit_
  */
 const Champ_base& Champ_Generique_Interpolation::get_champ(OWN_PTR(Champ_base)&) const
 {
-  const Domaine_dis_base& domaine_dis = get_source(0).get_ref_domaine_dis_base();
-  bool is_domaine_DG = (domaine_dis.que_suis_je()=="Domaine_DG");
+  OWN_PTR(Champ_base) espace_stockage_source;
+  const Champ_base& source = get_source(0).get_champ_without_evaluation(espace_stockage_source);
   if (localisation_ == "")
     {
       Cerr << "Error in Champ_Generique_Interpolation::get_champ()\n"
            << " Localisation has not been initialized" << finl;
       exit();
     }
-  else if (is_domaine_DG)
+  else if (source.is_basis_function() or source.is_quadrature())
     {
       if (localisation_=="elem")
         {
@@ -711,17 +711,9 @@ const Motcle Champ_Generique_Interpolation::get_directive_pour_discr() const
 
   if (localisation_=="elem")
     {
-      directive = "champ_elem";
-      const Domaine_dis_base& domaine_dis = get_source(0).get_ref_domaine_dis_base();
-      if (domaine_dis.que_suis_je() == "Domaine_DG")
-        {
-          OWN_PTR(Champ_base) espace_stockage_source;
-          const Champ_base& ch = get_source(0).get_champ_without_evaluation(espace_stockage_source);
-          if (sub_type(Champ_Inc_P0_base,ch))
-            directive = "champ_elem_DG";
-          else if (sub_type(Champ_Fonc_P0_base,ch))
-            directive = "champ_fonc_quad_DG";
-        }
+      OWN_PTR(Champ_base) espace_stockage_source;
+      const Champ_base& ch = get_source(0).get_champ_without_evaluation(espace_stockage_source);
+      directive = ch.is_basis_function() ? "champ_elem_DG" : (ch.is_quadrature() ? "champ_fonc_quad_DG" : "champ_elem");
     }
   else if (localisation_=="elem_DG")
     directive = "champ_elem";
