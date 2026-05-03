@@ -38,11 +38,12 @@ public:
 
   double calculer_dt_stab() const override { return 1.e8; }
 
-  int impr(Sortie& os) const override { return 1; }
+  int impr(Sortie& os) const override;
 
 protected:
   OBS_PTR(Domaine_Coloc) le_dom_coloc_;
   OBS_PTR(Domaine_Cl_Coloc) le_dcl_coloc_;
+  mutable SFichier Flux, Flux_moment, Flux_sum;
 };
 
 #endif /*Op_Conv_Coloc_base_included*/

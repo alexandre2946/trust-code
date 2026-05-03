@@ -42,9 +42,12 @@ public:
     Process::exit("Op_NConserv_Coloc_base::Abgral_scheme not coded ! \n");
   }
 
+  int impr(Sortie& os) const override;
+
 protected:
   OBS_PTR(Domaine_Coloc) le_dom_coloc_;
   OBS_PTR(Domaine_Cl_Coloc) le_dcl_coloc_;
+  mutable SFichier Flux, Flux_moment, Flux_sum;
 };
 
 #endif /*Op_NConserv_Coloc_base_included*/

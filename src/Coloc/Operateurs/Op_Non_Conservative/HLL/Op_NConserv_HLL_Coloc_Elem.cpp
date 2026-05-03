@@ -122,6 +122,9 @@ void Op_NConserv_HLL_Coloc_Elem::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
     }
 
   // faces bords
+  flux_bords_.resize(domaine.nb_faces_bord(), 1);
+  flux_bords_ = 0.;
+
   for (int f = 0; f < domaine.nb_faces(); f++)
     if (fcl(f, 0) != 0)
       {
@@ -129,14 +132,21 @@ void Op_NConserv_HLL_Coloc_Elem::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
         const int e = f_e(f, 0);
 
         if (sub_type(Sortie_supersonique, cls[fcl(f, 1)].valeur()))
-          num_flux_left(f) = eq.termes_NonConservatif(alpha(e, 0), vit_n(f, n), p(e, m));
+          {
+            num_flux_left(f) = eq.termes_NonConservatif(alpha(e, 0), vit_n(f, n), p(e, m));
+            flux_bords_(f, 0) = num_flux_left(f);
+          }
         else if (sub_type(Entree_supersonique, cls[fcl(f, 1)].valeur())) // Dirichlet  : 6
           {
             const double alpha_bord = ref_cast(Dirichlet, cls_alpha[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), 0);
             num_flux_left(f) = eq.termes_NonConservatif(alpha_bord, vit_n(f, n), p(e, m));
+            flux_bords_(f, 0) = num_flux_left(f);
           }
         else if (sub_type(Neumann_paroi_flux_nul, cls[fcl(f, 1)].valeur())) //Neumann_homogene : 5
-          num_flux_left(f) = eq.termes_NonConservatif(alpha(e, 0), vit_n(f, n), p(e, m));
+          {
+            num_flux_left(f) = eq.termes_NonConservatif(alpha(e, 0), vit_n(f, n), p(e, m));
+            flux_bords_(f, 0) = num_flux_left(f);
+          }
         else
           {
             Cerr << "The BC of type " << fcl(f, 0) << " for the equation " << eq.que_suis_je() << " is not available \n";

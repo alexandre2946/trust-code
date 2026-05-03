@@ -79,6 +79,9 @@ void Op_Conv_Coloc_Vect_base::Riemann_solver(DoubleTab& num_flux) const
   scheme(num_flux, flux_l, flux_r);
 
   // Boundary faces treatement
+  flux_bords_.resize(domaine.nb_faces_bord(), num_flux.line_size());
+  flux_bords_ = 0.;
+
   for (int f = 0; f < nb_faces; f++)
     if (fcl(f, 0) != 0)
       {
@@ -109,6 +112,7 @@ void Op_Conv_Coloc_Vect_base::Riemann_solver(DoubleTab& num_flux) const
                   {
                     num_flux(f, n + nb_phase * d) = normal[d] * p_bord + vit(e, n + nb_phase * d) * rho_bord * vit_n(f, n);
                     num_flux(f, n + nb_phase * d) *= alpha_bord;
+                    flux_bords_(f, n + nb_phase * d) = num_flux(f, n + nb_phase * d);
                   }
               }
           }
@@ -137,6 +141,7 @@ void Op_Conv_Coloc_Vect_base::Riemann_solver(DoubleTab& num_flux) const
                   {
                     num_flux(f, n + nb_phase * d) = normal[d] * p_bord + vitesse_bord[d] * rho_bord * vitesse_normale_bord;
                     num_flux(f, n + nb_phase * d) *= alpha_bord;
+                    flux_bords_(f, n + nb_phase * d) = num_flux(f, n + nb_phase * d);
                   }
               }
           }
@@ -156,6 +161,7 @@ void Op_Conv_Coloc_Vect_base::Riemann_solver(DoubleTab& num_flux) const
                   {
                     num_flux(f, n + nb_phase * d) = normal[d] * p_bord + vitesse_bord[d] * rho_bord * vitesse_normale_bord;
                     num_flux(f, n + nb_phase * d) *= alpha_bord;
+                    flux_bords_(f, n + nb_phase * d) = num_flux(f, n + nb_phase * d);
                   }
               }
           }

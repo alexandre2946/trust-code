@@ -30,6 +30,13 @@ Entree& Energy_Euler::readOn(Entree& is)
 {
   Conservation_Euler_base::readOn(is);
   add_missing_nconserv_op();
+
+  terme_convectif.set_fichier("Convection_energie");
+  terme_convectif.set_description("Convective heat transfer rate=Integral(-h*u*ndS) [W] if SI units used");
+
+  terme_nconserv_.set_fichier("Non_conservative_energie");
+  terme_nconserv_.set_description("Conribution of non_conservative operator in energy equation");
+
   return is;
 }
 

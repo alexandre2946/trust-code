@@ -55,6 +55,12 @@ Entree& Momentum_Euler::readOn(Entree& is)
       Process::exit();
     }
 
+  terme_convectif.set_fichier("Convection_qdm");
+  terme_convectif.set_description("Momentum flow rate=Integral(rho*u*u*ndS) [N] if SI units used");
+
+  terme_nconserv_.set_fichier("Non_conservative_qdm");
+  terme_nconserv_.set_description("Conribution of non_conservative operator in QDM equation");
+
   return is;
 }
 

@@ -29,6 +29,10 @@ Entree& Fraction_Euler::readOn(Entree& is)
 {
   Conservation_Euler_base::readOn(is);
   add_missing_nconserv_op();
+
+  terme_nconserv_.set_fichier("Non_conservative_fraction");
+  terme_nconserv_.set_description("Conribution of non_conservative operator in fraction equation");
+
   return is;
 }
 

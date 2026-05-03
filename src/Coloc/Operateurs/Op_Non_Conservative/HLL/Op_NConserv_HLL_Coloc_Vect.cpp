@@ -81,6 +81,9 @@ void Op_NConserv_HLL_Coloc_Vect::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
   const int m = interface.id_phase_pression_inter();
   const int nb_phase = pb.nb_phases();
 
+  flux_bords_.resize(domaine.nb_faces_bord(), num_flux_left.line_size());
+  flux_bords_ = 0.;
+
   for (int f = 0; f < domaine.nb_faces(); f++)
     {
       const int el = f_e(f, 0), er = f_e(f, 1);
@@ -128,20 +131,29 @@ void Op_NConserv_HLL_Coloc_Vect::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
             {
               const double alpha_bord = alpha(e, 0);
               for (int d = 0; d < Objet_U::dimension; d++)
-                num_flux_left(f, d) = -alpha_bord * p(e, m) * normal[d];
+                {
+                  num_flux_left(f, d) = -alpha_bord * p(e, m) * normal[d];
+                  flux_bords_(f, d) = num_flux_left(f, d);
+                }
             }
           else if (sub_type(Dirichlet, cls_qdm[fcl(f, 1)].valeur()))
             {
               const double alpha_bord = ref_cast(Dirichlet, cls_alpha[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), 0);
               for (int d = 0; d < Objet_U::dimension; d++)
-                num_flux_left(f, d) = -alpha_bord * p(e, m) * normal[d];
+                {
+                  num_flux_left(f, d) = -alpha_bord * p(e, m) * normal[d];
+                  flux_bords_(f, d) = num_flux_left(f, d);
+                }
             }
           else if ( sub_type(Symetrie,cls_qdm[fcl(f, 1)].valeur()) && !sub_type(Sortie_supersonique, cls_qdm[fcl(f, 1)].valeur()))
             {
               //Slip wall : u_n=-u_n
               const double alpha_bord = alpha(e, 0);
               for (int d = 0; d < Objet_U::dimension; d++)
-                num_flux_left(f, d) = -alpha_bord * p(e, m) * normal[d];
+                {
+                  num_flux_left(f, d) = -alpha_bord * p(e, m) * normal[d];
+                  flux_bords_(f, d) = num_flux_left(f, d);
+                }
             }
           else
             {
