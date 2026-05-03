@@ -29,10 +29,11 @@ Sortie& Pb_Euler::printOn(Sortie& os) const { return Pb_Fluide_base::printOn(os)
 Entree& Pb_Euler::readOn(Entree& is)
 {
   if (!discretisation().is_coloc())
-    {
-      Cerr << "Error: Problem of type " << que_suis_je() << " is only available for Coloc discretization !!! Update your data file ...\n";
-      Process::exit();
-    }
+    Process::exit("Error: Pb_Euler is only available for Coloc discretization !!! Update your data file ...\n");
+
+  if (Objet_U::dimension != 2)
+    Process::exit("Error: Pb_Euler is currently only available in 2D ...\n");
+
   return Pb_Fluide_base::readOn(is);
 }
 

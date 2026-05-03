@@ -155,7 +155,11 @@ void Momentum_Euler::completer()
   const Domaine_VF& dom = ref_cast(Domaine_VF, domaine_dis());
   const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
 
-  vitesse_normale_.resize(dom.nb_faces_tot(), 2 * pb.nb_phases()); // dimension du tab à changer pour 3 pahses
+  vitesse_normale_.resize(dom.nb_faces(), 2 * pb.nb_phases()); // dimension du tab à changer pour 3 pahses
+  dom.creer_tableau_faces(vitesse_normale_);
+  assert(vitesse_normale_.dimension(0) == dom.nb_faces());
+  assert(vitesse_normale_.dimension_tot(0) == dom.nb_faces_tot());
+  assert(vitesse_normale_.line_size() == 2 * pb.nb_phases());
 }
 
 void Momentum_Euler::get_noms_champs_postraitables(Noms& noms, Option opt) const
@@ -451,23 +455,22 @@ Champ_Inc_base& Momentum_Euler::vitesse_phase(const int i)
 
 void Momentum_Euler::calculer_vitesse_normale()
 {
+  assert(Objet_U::dimension == 2);
   const int Nb_phase = ref_cast(Pb_Euler, probleme()).nb_phases();
   const Domaine_VF& dom = ref_cast(Domaine_VF, domaine_dis());
-  const DoubleTab& U = vitesse().valeurs();
+  const DoubleTab& vit = vitesse().valeurs();
   const IntTab& f_e = dom.face_voisins();
-  DoubleTab& u_n = vitesse_normale();
-  assert(Objet_U::dimension == 2);
   for (int n = 0; n < Nb_phase; n++)
-    {
-      for (int f = 0; f < dom.nb_faces_tot(); f++)
-        {
-          // attention :  u_n( faces ,  0 ) est la vitesse normale left (au sens de la normale sortante) et u_n( faces ,  0 ) est vit norma right
-          // CE N EST PAS	 la dimesion de l espae
-          int el = f_e(f, 0), er = f_e(f, 1);
-          double nx = dom.face_normales(f, 0) / dom.face_surfaces(f);
-          double ny = dom.face_normales(f, 1) / dom.face_surfaces(f);
-          u_n(f, n) = (el >= 0) ? U(el, n) * nx + U(el, n + Nb_phase) * ny : -123.123;
-          u_n(f, n + Nb_phase) = (er >= 0) ? U(er, n) * nx + U(er, n + Nb_phase) * ny : -123.123;
-        }
-    }
+    for (int f = 0; f < dom.nb_faces(); f++)
+      {
+        // attention :  u_n( faces ,  0 ) est la vitesse normale left (au sens de la normale sortante) et u_n( faces ,  0 ) est vit norma right
+        // CE N EST PAS	 la dimesion de l espae
+        int el = f_e(f, 0), er = f_e(f, 1);
+        double nx = dom.face_normales(f, 0) / dom.face_surfaces(f);
+        double ny = dom.face_normales(f, 1) / dom.face_surfaces(f);
+        vitesse_normale_(f, n) = (el >= 0) ? vit(el, n) * nx + vit(el, n + Nb_phase) * ny : -123.123;
+        vitesse_normale_(f, n + Nb_phase) = (er >= 0) ? vit(er, n) * nx + vit(er, n + Nb_phase) * ny : -123.123;
+      }
+
+  vitesse_normale_.echange_espace_virtuel();
 }
