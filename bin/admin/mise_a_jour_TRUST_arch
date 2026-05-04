@@ -343,8 +343,6 @@ option_configure=" -disable-ccache "
 [ "`$TRUST_ROOT/bin/admin/liste_machines "\-enable-petsc-debug" | grep ^$HOST"\."`" != "" ]             && option_configure=$option_configure" -enable-petsc-debug"
 # MEDCoupling debug
 [ "`$TRUST_ROOT/bin/admin/liste_machines "\-enable-mc-debug" | grep ^$HOST"\."`" != "" ]                && option_configure=$option_configure" -enable-mc-debug"
-# without VC
-[ "`$TRUST_ROOT/bin/admin/liste_machines "\-disable-vc" | grep ^$HOST"\."`" != "" ]                     && option_configure=$option_configure" -disable-vc"
 # OpenMPI
 [ "`$TRUST_ROOT/bin/admin/liste_machines "\-force_old_openmpi" | grep ^$HOST"\."`" != "" ]              && option_configure=$option_configure" -force_old_openmpi"
 [ "`$TRUST_ROOT/bin/admin/liste_machines "\-force_provided_openmpi" | grep ^$HOST"\."`" != "" ]         && option_configure=$option_configure" -force_provided_openmpi"
@@ -359,7 +357,7 @@ option_configure=" -disable-ccache "
 [ "`$TRUST_ROOT/bin/admin/liste_machines "\-disable-mpi " | grep ^$HOST"\."`" != "" ]                   && option_configure=$option_configure" -disable-mpi"
 [ "`$TRUST_ROOT/bin/admin/liste_machines "\-disable-mpi4py " | grep ^$HOST"\."`" != "" ]                && option_configure=$option_configure" -disable-mpi4py"
 [ "`$TRUST_ROOT/bin/admin/liste_machines "\-disable-optionals" | grep ^$HOST"\."`" != "" ]              && option_configure="-disable-optionals "$option_configure
-[ "`$TRUST_ROOT/bin/admin/liste_machines "\-for-c3d" | grep ^$HOST"\."`" != "" ]                        && option_configure=$option_configure" -disable-petsc-optionals -disable-gnuplot -disable-vc -disable-valgrind -without-visit -disable-gmsh -disable-plot2d -without-pdflatex -without-doc -disable-jupyter -disable-doxygen -disable-checks -disable-check_sources -disable-openblas -disable-hwloc -disable-trustify -disable-gtest -disable-pdi -without-conda"
+[ "`$TRUST_ROOT/bin/admin/liste_machines "\-for-c3d" | grep ^$HOST"\."`" != "" ]                        && option_configure=$option_configure" -disable-petsc-optionals -disable-gnuplot -disable-valgrind -without-visit -disable-gmsh -disable-plot2d -without-pdflatex -without-doc -disable-jupyter -disable-doxygen -disable-checks -disable-check_sources -disable-openblas -disable-hwloc -disable-trustify -disable-gtest -disable-pdi -without-conda"
 [ "`$TRUST_ROOT/bin/admin/liste_machines "\-disable-check_sources" | grep ^$HOST"\."`" != "" ]          && option_configure=$option_configure" -disable-check_sources"
 [ "`$TRUST_ROOT/bin/admin/liste_machines "\-disable-mpiio" | grep ^$HOST"\."`" != "" ]                  && option_configure=$option_configure" -disable-mpiio"
 [ "`$TRUST_ROOT/bin/admin/liste_machines "\-disable-valgrind" | grep ^$HOST"\."`" != "" ]               && option_configure=$option_configure" -disable-valgrind"

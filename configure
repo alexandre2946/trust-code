@@ -315,7 +315,6 @@ echo "   -disable-petsc-optionals          Disable some PETSc optionals for Cath
 echo "   -disable-petsc                    Disable PETSc library installation."
 echo "   -disable-openblas                 Disable OpenBLAS library installation and use Netlib BLAS instead."
 echo "   -disable-hwloc                    Disable hwloc installation."
-echo "   -disable-vc                       Disable VC installation, might be necessary for intel compilers with lower version than 17."
 echo "   -disable-mpi                      Disable MPI library detection/installation and build a non-parallel version of the application."
 echo "   -disable-mpi4py                   Disable mpi4py installation."
 echo "   -disable-gtest                    Disable GoogleTest library installation."
@@ -377,7 +376,7 @@ if [ "$1" = "-disable-optionals" ]
 then
   shift
   export TRUST_ROOT=$TRUST_ROOT_SA
-  $0 -disable-ccache -disable-openblas -disable-petsc -disable-petsc-optionals -disable-hwloc -disable-gnuplot -disable-vc -disable-valgrind -disable-mpi -disable-cgns -disable-metis -disable-pdi -without-visit -disable-gmsh -disable-plot2d -without-pdflatex -without-doc -disable-jupyter -disable-doxygen -disable-checks -disable-check_sources -disable-trustify -disable-gtest $*
+  $0 -disable-ccache -disable-openblas -disable-petsc -disable-petsc-optionals -disable-hwloc -disable-gnuplot -disable-valgrind -disable-mpi -disable-cgns -disable-metis -disable-pdi -without-visit -disable-gmsh -disable-plot2d -without-pdflatex -without-doc -disable-jupyter -disable-doxygen -disable-checks -disable-check_sources -disable-trustify -disable-gtest $*
   exit $?
 fi
 if [ "$1" = "-disable-tools" ]

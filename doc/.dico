@@ -218,7 +218,7 @@
  Cond_lim Cond_lim Cond_lim.h
  Cond_lim_base Cond_lim_base Cond_lim_base.h
  Cond_lim_utilisateur_base Cond_lim_utilisateur_base Cond_lim_utilisateur_base.h
- Conservation_Euler Conservation_Euler Conservation_Euler.h
+ Conservation_Euler_base Conservation_Euler_base Conservation_Euler_base.h
  Constante Constante Constante.h
  Constituant Constituant Constituant.h
  Convection_Diffusion_Chaleur_Fluide_Dilatable_base Convection_Diffusion_Chaleur_Fluide_Dilatable_base Convection_Diffusion_Chaleur_Fluide_Dilatable_base.h
@@ -875,8 +875,6 @@
  Op_Grad_VEFPreP1B_P1NC|Op_Grad_VEF_P1NC Op_Grad_VEF_P1B_Face Op_Grad_VEF_P1B_Face.h
  Op_Moyenne Op_Moyenne Op_Moyenne.h
  Op_NConserv_Coloc_base Op_NConserv_Coloc_base Op_NConserv_Coloc_base.h
- Op_NConserv_Coloc_Elem_base Op_NConserv_Coloc_Elem_base Op_NConserv_Coloc_Elem_base.h
- Op_NConserv_Coloc_Vect_base Op_NConserv_Coloc_Vect_base Op_NConserv_Coloc_Vect_base.h
  Op_NConserv_HLL_Coloc_Elem Op_NConserv_HLL_Coloc_Elem Op_NConserv_HLL_Coloc_Elem.h
  Op_NConserv_HLL_Coloc_Vect Op_NConserv_HLL_Coloc_Vect Op_NConserv_HLL_Coloc_Vect.h
  Op_NConserv_negligeable Op_NConserv_negligeable Op_NConserv_negligeable.h
