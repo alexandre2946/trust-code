@@ -29,6 +29,7 @@ Entree& Fraction_Euler::readOn(Entree& is)
 {
   Conservation_Euler_base::readOn(is);
   add_missing_nconserv_op();
+  verifier_somme_alpha();
 
   terme_nconserv_.set_fichier("Non_conservative_fraction");
   terme_nconserv_.set_description("Conribution of non_conservative operator in fraction equation");
@@ -82,4 +83,36 @@ Operateur& Fraction_Euler::operateur(int i)
       Process::exit();
     }
   return terme_nconserv_;
+}
+
+void Fraction_Euler::mettre_a_jour(double temps)
+{
+  Conservation_Euler_base::mettre_a_jour(temps);
+#ifndef NDEBUG
+  verifier_somme_alpha();
+#endif
+}
+
+void Fraction_Euler::verifier_somme_alpha()
+{
+  Cerr << "Fraction_Euler::verifier_somme_alpha() ..." ;
+  const DoubleTab& vals = l_inco_ch_->valeurs();
+  const int ne = vals.dimension(0), nl = vals.line_size();
+  DoubleVect vals_somme(ne);
+  vals_somme = 0.;
+
+  for (int i = 0; i < ne; i++)
+    for (int j = 0; j < nl; j++)
+      vals_somme(i) += vals(i, j);
+
+  const double min_a = mp_min_vect(vals_somme), max_a = mp_max_vect(vals_somme);
+
+  if (min_a < 1. - 1.e-12 || max_a > 1. + 1.e-12)
+    {
+      Cerr << " KO !!! " << finl;
+      Cerr << "WHAT ?? The sum of the void fraction (per cell) is not 1 !!!! You should do something !" << finl;
+      Process::exit();
+    }
+  else
+    Cerr << " OK ! " << finl;
 }

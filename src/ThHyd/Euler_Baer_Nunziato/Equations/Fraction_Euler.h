@@ -25,6 +25,7 @@ public :
 
   void set_param(Param& param) const override;
   void discretiser() override;
+  void mettre_a_jour(double temps) override;
 
   inline int verif_Cl() const override {return 1;}
   inline int nombre_d_operateurs() const override { return 1; } // juste op non-conservative
@@ -36,6 +37,9 @@ public :
   {
     return alpha_bord * vitesse_normale_interieur;
   }
+
+private:
+  void verifier_somme_alpha();
 };
 
 #endif /* Fraction_Euler_included */
