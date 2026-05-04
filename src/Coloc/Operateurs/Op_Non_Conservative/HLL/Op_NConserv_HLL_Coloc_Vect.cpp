@@ -133,7 +133,7 @@ void Op_NConserv_HLL_Coloc_Vect::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
               for (int d = 0; d < Objet_U::dimension; d++)
                 {
                   num_flux_left(f, d) = -alpha_bord * p(e, m) * normal[d];
-                  flux_bords_(f, d) = num_flux_left(f, d);
+                  flux_bords_(f, d) = num_flux_left(f, d) * domaine.face_surfaces(f);
                 }
             }
           else if (sub_type(Dirichlet, cls_qdm[fcl(f, 1)].valeur()))
@@ -142,7 +142,7 @@ void Op_NConserv_HLL_Coloc_Vect::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
               for (int d = 0; d < Objet_U::dimension; d++)
                 {
                   num_flux_left(f, d) = -alpha_bord * p(e, m) * normal[d];
-                  flux_bords_(f, d) = num_flux_left(f, d);
+                  flux_bords_(f, d) = num_flux_left(f, d) * domaine.face_surfaces(f);
                 }
             }
           else if ( sub_type(Symetrie,cls_qdm[fcl(f, 1)].valeur()) && !sub_type(Sortie_supersonique, cls_qdm[fcl(f, 1)].valeur()))
@@ -152,7 +152,7 @@ void Op_NConserv_HLL_Coloc_Vect::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
               for (int d = 0; d < Objet_U::dimension; d++)
                 {
                   num_flux_left(f, d) = -alpha_bord * p(e, m) * normal[d];
-                  flux_bords_(f, d) = num_flux_left(f, d);
+                  flux_bords_(f, d) = num_flux_left(f, d) * domaine.face_surfaces(f);
                 }
             }
           else

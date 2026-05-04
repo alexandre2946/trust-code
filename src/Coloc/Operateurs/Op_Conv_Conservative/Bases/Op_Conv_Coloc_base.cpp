@@ -16,6 +16,7 @@
 #include <Op_Conv_Coloc_base.h>
 #include <Domaine_Cl_Coloc.h>
 #include <Champ_Inc_base.h>
+#include <Momentum_Euler.h>
 #include <Domaine_Coloc.h>
 #include <EcrFicPartage.h>
 #include <Pb_Euler.h>
@@ -75,7 +76,7 @@ void Op_Conv_Coloc_base::ajouter_blocs(matrices_t mats, DoubleTab& secmem, const
 int Op_Conv_Coloc_base::impr(Sortie& os) const
 {
   const Domaine& mon_dom = le_dom_coloc_->domaine();
-  const int impr_mom = mon_dom.moments_a_imprimer();
+  const int impr_mom = mon_dom.moments_a_imprimer() && sub_type(Momentum_Euler, equation());
   const int impr_sum = (mon_dom.bords_a_imprimer_sum().est_vide() ? 0 : 1);
   const int impr_bord = (mon_dom.bords_a_imprimer().est_vide() ? 0 : 1);
   const Schema_Temps_base& sch = le_dcl_coloc_->equation().probleme().schema_temps();

@@ -134,18 +134,18 @@ void Op_NConserv_HLL_Coloc_Elem::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
         if (sub_type(Sortie_supersonique, cls[fcl(f, 1)].valeur()))
           {
             num_flux_left(f) = eq.termes_NonConservatif(alpha(e, 0), vit_n(f, n), p(e, m));
-            flux_bords_(f, 0) = num_flux_left(f);
+            flux_bords_(f, 0) = num_flux_left(f) * domaine.face_surfaces(f);
           }
         else if (sub_type(Entree_supersonique, cls[fcl(f, 1)].valeur())) // Dirichlet  : 6
           {
             const double alpha_bord = ref_cast(Dirichlet, cls_alpha[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), 0);
             num_flux_left(f) = eq.termes_NonConservatif(alpha_bord, vit_n(f, n), p(e, m));
-            flux_bords_(f, 0) = num_flux_left(f);
+            flux_bords_(f, 0) = num_flux_left(f) * domaine.face_surfaces(f);
           }
         else if (sub_type(Neumann_paroi_flux_nul, cls[fcl(f, 1)].valeur())) //Neumann_homogene : 5
           {
             num_flux_left(f) = eq.termes_NonConservatif(alpha(e, 0), vit_n(f, n), p(e, m));
-            flux_bords_(f, 0) = num_flux_left(f);
+            flux_bords_(f, 0) = num_flux_left(f) * domaine.face_surfaces(f);
           }
         else
           {

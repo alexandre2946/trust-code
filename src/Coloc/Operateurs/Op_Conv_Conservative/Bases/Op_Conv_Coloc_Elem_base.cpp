@@ -122,7 +122,7 @@ void Op_Conv_Coloc_Elem_base::Riemann_solver(DoubleTab& num_flux) const
             for (int n = 0; n < nb_phases; n++)
               {
                 num_flux(f, n) = eq.flux_bord(w(e, n), vit_n(f, n), alpha(e, n) * p(e, n));
-                flux_bords_(f, n) = num_flux(f, n);
+                flux_bords_(f, n) = num_flux(f, n) * domaine.face_surfaces(f);
               }
           }
         else if (sub_type(Neumann_paroi_flux_nul, cls[fcl(f, 1)].valeur())) //Neumann_homogene : 5
@@ -156,7 +156,7 @@ void Op_Conv_Coloc_Elem_base::Riemann_solver(DoubleTab& num_flux) const
                 const Fluide_reel_base& phase = ref_cast(Fluide_reel_base, ref_cast(Milieu_composite_Euler,eq.milieu()).get_fluid(n));
                 const double inco_bord = (!(sub_type(Energy_Euler, equation()))) ? alpha_bord * rho_bord : alpha_bord * phase.init_energie_tot(rho_bord, norme_vitesse, p_bord);
                 num_flux(f, n) = eq.flux_bord(inco_bord, vitesse_normale_bord, alpha_bord * p_bord);
-                flux_bords_(f, n) = num_flux(f, n);
+                flux_bords_(f, n) = num_flux(f, n) * domaine.face_surfaces(f);
               }
           }
         else
