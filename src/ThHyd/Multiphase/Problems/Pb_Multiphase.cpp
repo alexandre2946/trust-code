@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -110,6 +110,8 @@ void Pb_Multiphase::typer_lire_milieu(Entree& is)
       Process::exit();
     }
   noms_phases_ = ref_cast(Milieu_composite,le_milieu_[0].valeur()).noms_phases();
+  alpha_inf_phases_.resize(noms_phases_.size());
+  alpha_inf_phases_ = 0.0;
   associer_milieu_base(le_milieu_[0].valeur());
 
   // On discretise les equations maintenant ! voir avec Elie si t'es pas d'accord

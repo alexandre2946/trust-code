@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -73,12 +73,17 @@ public:
 
   inline virtual bool resolution_en_T() const { return true; }
 
+  double alpha_inf_phase(int i) const { return alpha_inf_phases_[i]; }
+  void set_alpha_inf_phase(int i, double value) { alpha_inf_phases_[i] = value; }
+
 protected:
   Noms noms_phases_;
   // equations
   QDM_Multiphase eq_qdm_;
   Energie_Multiphase eq_energie_;
   Masse_Multiphase eq_masse_;
+  // taux de presence minimum pour gestion de l'evanescence (nuls par defaut)
+  DoubleVect alpha_inf_phases_;
 };
 
 #endif /* Pb_Multiphase_included */

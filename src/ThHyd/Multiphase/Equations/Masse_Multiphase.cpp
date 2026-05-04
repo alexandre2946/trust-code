@@ -306,7 +306,38 @@ void Masse_Multiphase::calculer_alpha_rho(const Objet_U& obj, DoubleTab& val, Do
 
 void Masse_Multiphase::calculer_alpha_rho_conv(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv)
 {
-  calculer_alpha_rho(obj, val, bval, deriv);
+  const Equation_base& eqn = ref_cast(Equation_base, obj);
+  const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, eqn.probleme());
+  const Champ_base& ch_rho = eqn.milieu().masse_volumique();
+  const Champ_Inc_base& ch_alpha = eqn.inconnue(), *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : nullptr;
+  const DoubleTab& alpha = ch_alpha.valeurs(), &rho = ch_rho.valeurs();
+  int i, nl = val.dimension_tot(0), n, N = val.line_size(), cR = sub_type(Champ_Uniforme, ch_rho);
+
+  /* valeurs du champ */
+  for (i = 0; i < nl; i++)
+    for (n = 0; n < N; n++) val(i, n) = (alpha(i, n) - pbm.alpha_inf_phase(n)) * rho(!cR * i, n);
+
+  /* valeur aux bords */
+  /* on ne peut utiliser valeur_aux_bords que si ch_rho a un domaine_dis_base */
+  ch_rho.a_un_domaine_dis_base() ? bval = ch_rho.valeur_aux_bords() : ch_rho.valeur_aux(ref_cast(Domaine_VF, eqn.domaine_dis()).xv_bord(), bval);
+  // tab_multiply_any_shape(bval, ch_alpha.valeur_aux_bords(), VECT_ALL_ITEMS);
+  DoubleTab calpha(ch_alpha.valeur_aux_bords());
+  int n2 = calpha.dimension_tot(0);
+  for (i = 0; i < n2; i++)
+    for (n = 0; n < N; n++) calpha(i, n) = calpha(i, n) - pbm.alpha_inf_phase(n);
+  tab_multiply_any_shape(bval, calpha, VECT_ALL_ITEMS);
+
+  /* derivees */
+  DoubleTab& d_a = deriv["alpha"]; //derivee en alpha : rho
+  for (d_a.resize(nl, N), i = 0; i < nl; i++)
+    for (n = 0; n < N; n++) d_a(i, n) = rho(!cR * i , n);
+  if (pch_rho)
+    for (auto &&d_c : pch_rho->derivees()) //derivees en les dependances de rho
+      {
+        DoubleTab& der = deriv[d_c.first];
+        for (der.resize(nl, N), i = 0; i < nl; i++)
+          for (n = 0; n < N; n++) der(i, n) = d_c.second(i, n) * alpha(i, n);
+      }
 }
 
 void Masse_Multiphase::init_champ_convecte() const

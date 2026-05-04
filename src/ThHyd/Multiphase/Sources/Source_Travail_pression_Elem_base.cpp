@@ -114,7 +114,7 @@ void Source_Travail_pression_Elem_base::ajouter_blocs(matrices_t matrices, Doubl
               const double v = vit(f, n) ? vit(f, n) : DBL_MIN,
                            fac = pf(f) * fs(f) * (1. + (v * (i ? -1 : 1) > 0 ? 1. : -1) * alp) / 2;
 
-              dv_flux(n) += fac * (e >= 0 ? c_alpha(e, n) : b_alpha(f, n)); //f est reelle -> indice trivial dans b_alpha
+              dv_flux(n) += fac * (e >= 0 ? c_alpha(e, n) - pbm.alpha_inf_phase(n) : b_alpha(f, n) - pbm.alpha_inf_phase(n)); //f est reelle -> indice trivial dans b_alpha
               dc_flux(i, n) = e >= 0 ? fac * vit(f, n) : 0;
             }
 

@@ -170,7 +170,46 @@ void Energie_Multiphase::assembler_blocs_avec_inertie(matrices_t matrices, Doubl
 
 void Energie_Multiphase::calculer_alpha_rho_e_conv(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv)
 {
-  calculer_alpha_rho_e(obj, val, bval, deriv);
+  const Equation_base& eqn = ref_cast(Equation_base, obj);
+  const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, eqn.probleme());
+  const Fluide_base& fl = ref_cast(Fluide_base, eqn.milieu());
+  const Champ_base& ch_rho = fl.masse_volumique();
+  const Champ_Inc_base& ch_alpha = ref_cast(Pb_Multiphase, eqn.probleme()).equation_masse().inconnue(),
+                        &ch_en = ref_cast(Champ_Inc_base, fl.energie_interne()), //toujours un Champ_Inc
+                         *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : nullptr; //pas toujours un Champ_Inc
+  const DoubleTab& alpha = ch_alpha.valeurs(), &rho = ch_rho.valeurs(), &en = ch_en.valeurs();
+
+  /* valeurs du champ */
+  int i, n, N = val.line_size(), Nl = val.dimension_tot(0), cR = sub_type(Champ_Uniforme, ch_rho);
+  for (i = 0; i < Nl; i++)
+    for (n = 0; n < N; n++) val(i, n) = (alpha(i, n) - pbm.alpha_inf_phase(n)) * rho(!cR * i, n) * en(i, n);
+
+  /* on ne peut utiliser valeur_aux_bords que si ch_rho a un domaine_dis_base */
+  DoubleTab b_al = ch_alpha.valeur_aux_bords(), b_rho, b_en = ch_en.valeur_aux_bords();
+  int Nb = b_al.dimension_tot(0);
+  if (ch_rho.a_un_domaine_dis_base()) b_rho = ch_rho.valeur_aux_bords();
+  else b_rho.resize(Nb, N), ch_rho.valeur_aux(ref_cast(Domaine_VF, eqn.domaine_dis()).xv_bord(), b_rho);
+  for (i = 0; i < Nb; i++)
+    for (n = 0; n < N; n++) bval(i, n) = (b_al(i, n) - pbm.alpha_inf_phase(n)) * b_rho(i, n) * b_en(i, n);
+
+  DoubleTab& d_a = deriv["alpha"];//derivee en alpha : rho * en
+  for (d_a.resize(Nl, N), i = 0; i < Nl; i++)
+    for (n = 0; n < N; n++) d_a(i, n) = rho(!cR * i, n) * en(i, n);
+
+  /* derivees a travers rho et en */
+  const tabs_t d_vide = {}, &d_rho = pch_rho ? pch_rho->derivees() : d_vide, &d_en = ch_en.derivees();
+  std::set<std::string> vars; //liste de toutes les derivees possibles
+  for (auto && d_c : d_rho) vars.insert(d_c.first);
+  for (auto && d_c : d_en) vars.insert(d_c.first);
+
+  for (auto && var : vars)
+    {
+      const DoubleTab *dr = d_rho.count(var) ? &d_rho.at(var) : nullptr, *de = d_en.count(var) ? &d_en.at(var) : nullptr;
+      DoubleTab& d_v = deriv[var];
+      for (d_v.resize(Nl, N), i = 0; i < Nl; i++)
+        for (n = 0; n < N; n++)
+          d_v(i, n) = alpha(i, n) * ((dr ? (*dr)(i, n) * en(i, n) : 0) + (de ? rho(!cR * i, n) * (*de)(i, n) : 0));
+    }
 }
 
 void Energie_Multiphase::calculer_alpha_rho_e(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv)
