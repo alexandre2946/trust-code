@@ -26,6 +26,21 @@
 #include <Domaine_DG.h>
 #include <BasisFunction.h>
 
+/**
+ * @brief Evaluator computing the volumetric heat source contribution for DG element unknowns.
+ *
+ * For each element e, this evaluator computes the projection of the volumetric heat
+ * power density Q onto each basis function phi_i:
+ *   S(i) = integral of Q(x) * phi_i(x) dV
+ * using a fixed order-5 quadrature rule. The power field Q is expected to be
+ * pre-evaluated at the quadrature points and stored in the puissance array
+ * (shape: nb_elem x nb_pts_integ_max), as set up by associer_champs().
+ *
+ * calculer_terme_source() is templated on Type_Double to allow both scalar and
+ * small-vector output types
+ *
+ * @sa Terme_Puissance_Thermique_DG_Elem, Evaluateur_Source_Elem
+ */
 class Eval_Puiss_Th_DG_Elem: public Evaluateur_Source_Elem
 {
 public:
@@ -40,6 +55,19 @@ protected:
   DoubleTab puissance;
 };
 
+/**
+ * @brief Computes the heat source projection onto the local DG basis for element e.
+ *
+ * @details Evaluates the integral S(fb) = integral of Q * phi_fb over element e
+ * using a fixed order-5 quadrature. The integrand at each quadrature point k is:
+ *   product(k) = puissance(e, k) * fbase(fb, k)
+ * where puissance contains Q pre-sampled at quadrature points and fbase contains
+ * the basis function values from eval_bfunc().
+ *
+ * @tparam Type_Double Output type (typically a fixed-size array of nb_bfunc values).
+ * @param e  Element index.
+ * @param S  Output array of size nb_bfunc, filled with the projected source values.
+ */
 template <typename Type_Double>
 inline void Eval_Puiss_Th_DG_Elem::calculer_terme_source(const int e, Type_Double& S) const
 {

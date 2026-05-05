@@ -18,6 +18,23 @@
 
 #include <Masse_DG_base.h>
 
+/**
+ * @brief Concrete DG mass operator for element-based unknowns.
+ *
+ * This class provides the implementation of appliquer_impl(), which applies the
+ * inverse mass matrix M^{-1} to a right-hand side vector. It is used for explicit
+ * time stepping or for any operation requiring M^{-1} * v element-by-element.
+ *
+ * Two strategies are used depending on the basis orthonormalization flag:
+ *  - **Orthonormal basis**: M is diagonal with entries equal to element volumes,
+ *    so M^{-1} * v reduces to a simple element-wise division by volume via
+ *    tab_divide_any_shape().
+ *  - **Non-orthonormal basis**: M^{-1} is computed locally per element via
+ *    BasisFunction::eval_invMassMatrix() and applied by a dense matrix-vector
+ *    product for each spatial component independently.
+ *
+ * @sa Masse_DG_base, BasisFunction::eval_invMassMatrix
+ */
 class Masse_DG_Elem: public Masse_DG_base
 {
   Declare_instanciable(Masse_DG_Elem);

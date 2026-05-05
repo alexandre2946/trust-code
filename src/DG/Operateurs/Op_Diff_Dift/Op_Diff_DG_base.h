@@ -24,7 +24,21 @@
 #include <Champ_Uniforme.h>
 
 class Domaine_Cl_DG;
-
+/**
+ * @brief This class provides the common infrastructure shared by all DG diffusion operators in TRUST.
+ * It handles the association with the DG domain and its boundary conditions, the management of
+ * an effective diffusivity field (nu_), and the computation of a stable explicit time step.
+ *
+ * The stable time step calculation (calculer_dt_stab) follows a diffusive CFL criterion:
+ *   dt ~ h^2 / (2 * dim * alpha_max)
+ * with special handling for:
+ *  - Variable-density flows: rho * h^2 / (2 * dim * nu), with VDF-like and general mesh branches.
+ *  - Robin / external-heat-exchange boundary conditions (Echange_externe_impose): the effective
+ *    diffusivity is scaled by the Biot number when Bi > 1, making the criterion more conservative.
+ *
+ * Derived classes are responsible for implementing the actual flux assembly (ajouter()) according
+ * to their specific DG formulation.
+ */
 class Op_Diff_DG_base: public Operateur_Diff_base, public Op_Diff_Turbulent_base
 {
   Declare_base(Op_Diff_DG_base);

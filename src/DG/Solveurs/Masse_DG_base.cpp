@@ -34,6 +34,19 @@ void Masse_DG_base::associer_domaine_cl_dis_base(const Domaine_Cl_dis_base& le_d
   le_dom_Cl_dg_ = ref_cast(Domaine_Cl_DG, le_dom_Cl_dis_base);
 }
 
+/**
+ * @brief Multiplies the mass coefficient vector element-wise by an optional temporal field.
+ *
+ * @details If a temporal coefficient has been registered (has_coefficient_temporel_ == true),
+ * the field named name_of_coefficient_temporel_ is retrieved from the equation and its
+ * values are applied to coef via tab_multiply_any_shape(). Three field types are handled:
+ *  - Champ_Inc_base: uses the first part of the field's values (ConstDoubleTab_parts[0]).
+ *  - Champ_Fonc_base: uses the field's values directly.
+ *  - Champ_Don_base: evaluates the field at the unknown's node coordinates.
+ * If no temporal coefficient is registered, coef is left unchanged.
+ *
+ * @param coef The coefficient vector to scale in-place (typically initialized to 1).
+ */
 void Masse_DG_base::appliquer_coef(DoubleVect& coef) const
 {
   if (has_coefficient_temporel_)
@@ -65,6 +78,21 @@ void Masse_DG_base::appliquer_coef(DoubleVect& coef) const
     }
 }
 
+/**
+ * @brief Builds the sparsity pattern of the mass matrix block.
+ *
+ * @details The pattern depends on whether the basis is orthonormalized:
+ *  - **Orthonormal basis**: purely diagonal — one non-zero per DOF
+ *    (indice(k,0) == indice(k,1) for every k).
+ *  - **Non-orthonormal basis**: full local block — every pair (i,j) within
+ *    the same element and same spatial component is coupled.
+ *
+ * The number of spatial components (dim) is set to Objet_U::dimension for
+ * velocity unknowns and 1 for all other fields (scalar).
+ *
+ * @param matrices  Map of matrix name → Matrice_Morse pointer to be sized.
+ * @param semi_impl Unused here; kept for interface compatibility.
+ */
 void Masse_DG_base::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const Nom& nom_inco = equation().inconnue().le_nom();
@@ -119,6 +147,38 @@ void Masse_DG_base::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_i
   mat.dimensionner(indice);
 }
 
+/**
+ * @brief Assembles the mass matrix contribution (M/dt) into the matrix and right-hand side.
+ *
+ * @details Computes and accumulates the term (M/dt) * u into the global system,
+ * where M is the L2 mass matrix and dt is the time step. The assembly strategy
+ * depends on whether the basis is orthonormalized:
+ *
+ *  - **Orthonormal basis** (gram_schmidt == true):
+ *    The mass matrix is diagonal with entries coef[e] * volume[e]. For each DOF:
+ *      mat(dof, dof) += coef[e] * volume[e] / dt
+ *      secmem(e, dof) += coef[e] * volume[e] * (u^n - delta * u^{n+1}) / dt
+ *    where delta = resoudre_en_increments (1 if solving for the increment, 0 otherwise).
+ *
+ *  - **Non-orthonormal basis, order 0**: reduces to a single scalar per element
+ *    (one DOF), equivalent to the cell-average finite volume mass term.
+ *
+ *  - **Non-orthonormal basis, order > 0**: the full local mass matrix M_ij is
+ *    assembled by Gaussian quadrature (Ern, Finite Elements II, 2021, p.71):
+ *      M_ij = integral of phi_i * phi_j
+ *    accumulated as mat(i,j) += coef[e] * M_ij / dt and the corresponding RHS term.
+ *
+ * The temporal coefficient (e.g., density) is applied via appliquer_coef() before
+ * the loop, and the medium porosity is used as the base coefficient array.
+ *
+ * @param matrices              Map of matrix name → Matrice_Morse pointer to accumulate into.
+ * @param secmem                Right-hand side to accumulate into.
+ * @param dt                    Current time step size.
+ * @param semi_impl             Map of semi-implicit field values; if the unknown is present,
+ *                              its values are used as u^n instead of the stored past values.
+ * @param resoudre_en_increments If 1, the system is solved for the increment (u^{n+1} - u^n);
+ *                              the current solution is subtracted from the RHS accordingly.
+ */
 void Masse_DG_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, double dt, const tabs_t& semi_impl, int resoudre_en_increments) const
 {
   const Nom& nom_inco = equation().inconnue().le_nom();

@@ -29,6 +29,15 @@ Implemente_instanciable(Terme_Source_Qdm_Elem_DG, "Source_Qdm_Elem_DG", Source_b
 
 Sortie& Terme_Source_Qdm_Elem_DG::printOn(Sortie& s) const { return s << que_suis_je(); }
 
+/**
+ * @brief Reads the momentum source term from the input stream.
+ * @details Reads the source field la_source (a Champ_Don_base), then discretizes it
+ * onto the DG quadrature representation la_source_DG (Champ_Fonc_Quad_DG) using the
+ * problem's discretization. la_source_DG is initialized to zero and then filled by
+ * affectation from la_source, pre-sampling the field at all quadrature points.
+ * @param s The input stream.
+ * @return The input stream.
+ */
 Entree& Terme_Source_Qdm_Elem_DG::readOn(Entree& s)
 {
   s >> la_source;
@@ -52,6 +61,20 @@ void Terme_Source_Qdm_Elem_DG::associer_domaines(const Domaine_dis_base& domaine
   le_dom_Cl_DG = ref_cast(Domaine_Cl_DG, domaine_Cl_dis);
 }
 
+/**
+ * @brief Assembles the momentum source contribution into the right-hand side.
+ *
+ * @details For each element and each velocity DOF (fb, d), computes:
+ *   secmem(elem, fb + d*nb_bfunc) += integral of f_d(x) * phi_fb(x) dV
+ * using a fixed order-5 quadrature. The integrand at quadrature point k is:
+ *   product(k) = la_source_DG(elem, k + d*nb_pts_integ_max) * fbase(fb, k)
+ * For Champ_Uniforme sources, element index 0 is used for all elements.
+ * No matrix contribution is made (source terms are purely explicit here).
+ *
+ * @param matrices  Unused (no matrix contribution).
+ * @param secmem    The momentum right-hand side to accumulate into.
+ * @param semi_impl Unused.
+ */
 void Terme_Source_Qdm_Elem_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Domaine_DG& dom = ref_cast(Domaine_DG, le_dom_DG.valeur());

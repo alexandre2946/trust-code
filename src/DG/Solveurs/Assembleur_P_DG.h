@@ -23,6 +23,36 @@
 
 class Domaine_Cl_DG;
 
+/**
+ * @brief Assembles the pressure Laplacian matrix for the DG incompressible Navier-Stokes solver.
+ *
+ * This class builds the global pressure matrix arising from the SIP (Symmetric Interior
+ * Penalty) DG discretization of the pressure Poisson problem. It is the pressure-space
+ * counterpart of the diffusion operator assembly in Op_Diff_DG_Elem, but operates
+ * directly on the pressure unknown without diffusivity weighting (nu = 1).
+ *
+ * The assembled matrix corresponds to the bilinear form:
+ *   a(p_h, q_h) = sum_T  integral_T grad(p_h).grad(q_h)
+ *               - sum_f  0.5 * integral_f { grad(p_h) }.n * [q_h]   (consistency)
+ *               - sum_f  0.5 * integral_f [p_h] * { grad(q_h) }.n   (symmetry)
+ *               + sum_f  (eta_F/h_T) * integral_f [p_h] * [q_h]     (penalty)
+ *
+ * where the sums run over all elements T and all faces f (internal and Dirichlet boundary).
+ *
+ * The matrix is stored as a Matrice_Morse (unsymmetric storage, though the assembled
+ * system is symmetric by construction). The sparsity pattern couples each pressure DOF
+ * to all pressure DOFs in the same element and in all face-neighbouring elements.
+ *
+ * Additionally, the class:
+ *  - Stores a velocity-reconstruction matrix rec (Matrice_Morse) used by
+ *    corriger_vitesses() to apply the pressure correction -grad(dP) to the velocity.
+ *  - Handles pressure referencing via modifier_solution(), which pins the minimum
+ *    pressure to zero when no Dirichlet pressure condition is imposed (has_P_ref == 0).
+ *  - Provides a stub for quasi-compressible flows (assembler_QC) which is not yet
+ *    fully implemented and aborts at runtime.
+ *
+ * @sa Op_Diff_DG_Elem, Op_Grad_DG, Assembleur_base
+ */
 class Assembleur_P_DG: public Assembleur_base
 {
   Declare_instanciable(Assembleur_P_DG);

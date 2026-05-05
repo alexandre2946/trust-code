@@ -22,6 +22,12 @@
 
 class Motcle;
 
+/**
+ * @brief This class enable to change options for DG computation in a .data file
+ *
+ * @details Enable to change the discretization order of the vector and scalar unknowns,
+ * disable ortho-normalisation of the matrix, and the quadrature orders.
+ */
 class Option_DG : public Interprete
 {
   Declare_instanciable(Option_DG);

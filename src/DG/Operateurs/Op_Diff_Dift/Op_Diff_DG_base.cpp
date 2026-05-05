@@ -36,6 +36,27 @@ Sortie& Op_Diff_DG_base::printOn(Sortie& s) const { return s << que_suis_je(); }
 
 Entree& Op_Diff_DG_base::readOn(Entree& s) { return s; }
 
+/**
+ * @brief Computes the maximum stable explicit time step for the diffusion operator.
+ *
+ * @details Two branches are handled depending on whether a variable density field is present:
+ *
+ * - **Constant density** (standard branch): The criterion is
+ *     dt = h_min^2 / (2 * dim * alpha_max),
+ *   where h_min is the minimum mesh size and alpha_max is the maximum diffusivity over all elements.
+ *   This estimate is conservative: if the maximum diffusivity and the minimum mesh size are not
+ *   co-located, the time step will be underestimated.
+ *   Additionally, if a Robin boundary condition (Echange_externe_impose) is present, the Biot number
+ *     Bi = h_imp_max * sqrt(h_min^2) / lambda_max
+ *   is computed. If Bi > 1, alpha_max is scaled by the same factor, further tightening the criterion.
+ *
+ * - **Variable density** (rho field present): A per-element time step is computed as
+ *     dt = 0.5 * rho / (nu * h),   for VDF-like elements (exactly 2*dim faces),
+ *     dt = rho * h^2 / (2 * dim * nu),  for general elements,
+ *   and the global minimum is taken across all elements and MPI processes.
+ *
+ * @return The minimum stable time step across all elements and MPI processes.
+ */
 double Op_Diff_DG_base::calculer_dt_stab() const
 {
   update_nu();
@@ -113,7 +134,6 @@ double Op_Diff_DG_base::calculer_dt_stab() const
       // Champ_Elem_DG : champ aux elems et aux faces
       // Champ de masse volumique variable.
       const IntTab& e_f = le_dom_dg_->elem_faces();
-      //Cerr << e_f << finl;
       for (int elem = 0; elem < nb_elem; elem++)
         {
           const double diffu = valeurs_diffu(elem);
@@ -129,16 +149,13 @@ double Op_Diff_DG_base::calculer_dt_stab() const
                   int face = e_f(elem, f);
                   const double d = le_dom_dg_->volumes(elem) / le_dom_dg_->face_surfaces(face);
                   h += 0.5 / (d * d); // On multiplie par 0.5 car face comptee 2 fois
-                  //Cerr << elem << " " << face << " " << le_dom_poly_->surface(face) << finl;
                 }
               // Voir Op_Diff_VDF_Elem_base::calculer_dt_stab():
               dt = 0.5 * rho / ((diffu + DMINFLOAT) * h);
-              //Cerr << "VDF " << dt << finl;
             }
           else
             {
               dt = le_dom_dg_->carre_pas_maille(elem) * rho / (deux_dim * (diffu + DMINFLOAT));
-              //Cerr << "NC  " << dt << finl;
             }
           if (dt < dt_stab)
             dt_stab = dt;
@@ -154,18 +171,38 @@ int Op_Diff_DG_base::impr(Sortie& os) const
   return 1;
 }
 
+/**
+ * @brief Associates the operator with a DG domain and its boundary conditions.
+ */
 void Op_Diff_DG_base::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& zcl, const Champ_Inc_base&)
 {
   le_dom_dg_ = ref_cast(Domaine_DG, domaine_dis);
   la_zcl_dg_ = ref_cast(Domaine_Cl_DG, zcl);
 }
 
+/**
+ * @brief Computes the diffusion operator applied to inco and stores the result in resu.
+ * @details Initializes resu to zero then delegates to ajouter(), which adds the diffusive
+ *          contribution. This follows the standard TRUST operator pattern where calculer()
+ *          resets the result before calling ajouter().
+ * @param inco  The input field (e.g., temperature, velocity component).
+ * @param resu  The output field, zeroed then filled with the diffusion contribution.
+ * @return A reference to resu.
+ */
 DoubleTab& Op_Diff_DG_base::calculer(const DoubleTab& inco, DoubleTab& resu) const
 {
   resu = 0.;
   return ajouter(inco, resu);
 }
 
+/**
+ * @brief Finalizes the operator setup after all associations have been made.
+ * @details Calls the parent completer(), then allocates and initializes the effective
+ *          diffusivity table nu_. The number of components is set to 2 for the
+ *          Transport_K_Epsilon equation (one per turbulent quantity), or to the
+ *          line size of the diffusivity field for all other equations.
+ *          The nu_a_jour_ flag is reset to 0 to force a recomputation on the first use.
+ */
 void Op_Diff_DG_base::completer()
 {
   Operateur_base::completer();
@@ -174,6 +211,26 @@ void Op_Diff_DG_base::completer()
   nu_a_jour_ = 0;
 }
 
+/**
+ * @brief Updates the cached effective diffusivity field nu_ by combining molecular and turbulent contributions.
+ *
+ * @details This method is a no-op if nu_a_jour_ is already set. Otherwise, it fills nu_ as follows:
+ *
+ *  1. **Molecular diffusivity** (all equations except Transport_K_Epsilon):
+ *     - If the diffusivity has no metadata vector (i.e., it is spatially uniform), nu_ is filled
+ *       by broadcasting the uniform value to all elements, treating both arrays as flat 1D vectors.
+ *     - Otherwise (spatially variable diffusivity), nu_ is directly injected from the diffusivity array,
+ *       after asserting that both share the same parallel metadata vector.
+ *
+ *  2. Not usable for now: **Turbulent diffusivity** (if has_diffusivite_turbulente() is true):
+ *     @warning This branch is currently unreachable: it starts with a throw statement,
+ *              indicating that turbulent diffusivity is not yet supported for DG operators.
+ *     - For Transport_K_Epsilon, nu_(i,j) = nu_molecular(i) + nu_turb(i,j) for j in {0,1}.
+ *     - For other equations, nu_turb is added to nu_ element-wise, handling the uniform case
+ *       (no metadata vector) and the variable case separately.
+ *
+ *  After the update, nu_a_jour_ is set to 1 to prevent redundant recomputations.
+ */
 void Op_Diff_DG_base::update_nu() const
 {
   if (nu_a_jour_) return; // on a deja fait le travail

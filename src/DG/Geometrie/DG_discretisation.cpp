@@ -89,7 +89,7 @@ void DG_discretisation::discretiser_champ(const Motcle& directive, const Domaine
     }
 
   if (directive == DEMANDE_DESCRIPTION)
-    Cerr << "DG_discretisation : " << motcles;
+    Cerr << "DG discretisation : " << motcles;
 
   if (sous_type != NOM_VIDE)
     rang = verifie_sous_type(type, sous_type, directive);
@@ -231,7 +231,7 @@ void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
     }
 
   if (directive == DEMANDE_DESCRIPTION)
-    Cerr << "DG_discretisation : " << motcles;
+    Cerr << "DG discretisation : " << motcles;
 
   // Si on n'a pas compris la directive (ou si c'est une demande_description)
   // alors on appelle l'ancetre :
@@ -403,7 +403,7 @@ Nom DG_discretisation::get_name_of_type_for(const Nom& class_operateur, const No
 
 void DG_discretisation::distance_paroi_globale(const Schema_Temps_base& sch, Domaine_dis_base& z, OWN_PTR(Champ_Fonc_base)& ch) const
 {
-  Cerr << "Discretisation de distance paroi globale" << finl;
+  Cerr << "Global wall distance discretisation" << finl;
   Noms noms(1), unites(1);
   noms[0] = Nom("distance_paroi_globale");
   unites[0] = Nom("m");

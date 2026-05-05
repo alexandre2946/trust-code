@@ -19,6 +19,19 @@
 #include <Terme_Puissance_Thermique.h>
 #include <Terme_Source_DG_base.h>
 
+/**
+ * @brief Abstract base class for volumetric heat source terms in the DG thermal equation.
+ *
+ * This class combines Terme_Puissance_Thermique (the TRUST heat power source interface,
+ * which handles reading the power field Q and computing the integrated heat release)
+ * with Terme_Source_DG_base (which provides the DG iterator/evaluator assembly loop).
+ *
+ * It is constructed with a concrete Iterateur_Source_base that will drive the
+ * element-wise quadrature loop. Derived classes supply the specific evaluator
+ * (e.g., Eval_Puiss_Th_DG_Elem) through that iterator.
+ *
+ * @sa Terme_Puissance_Thermique_DG_Elem, Terme_Source_DG_base, Terme_Puissance_Thermique
+ */
 class Terme_Puissance_Thermique_DG_base: public Terme_Puissance_Thermique, public Terme_Source_DG_base
 {
   Declare_base(Terme_Puissance_Thermique_DG_base);

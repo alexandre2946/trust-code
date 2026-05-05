@@ -19,6 +19,27 @@
 #include <Iterateur_Source_base.h>
 #include <Source_base.h>
 
+/**
+ * @brief Abstract base class for all DG source terms.
+ *
+ * This class provides the minimal common infrastructure for source terms in the DG
+ * framework. It owns an iterator (iter_) of type Iterateur_Source_base which encapsulates
+ * the element-wise loop and delegates the actual source evaluation to a concrete
+ * Evaluateur_Source. The iterator pattern allows the assembly strategy (e.g., looping
+ * over elements) to be reused across different source term types.
+ *
+ * The interface_blocs mechanism is always active (has_interface_blocs() returns 1):
+ *  - dimensionner_blocs() is a no-op since source terms add only RHS contributions
+ *    (no matrix coupling).
+ *  - ajouter_blocs() delegates to iter_->ajouter(secmem), which loops over elements
+ *    and accumulates the evaluator output into the right-hand side.
+ *
+ * Derived classes must supply a concrete Iterateur_Source_base at construction time
+ * and typically override associer_domaines() and associer_pb() to wire up the
+ * evaluator with the domain geometry and physical fields.
+ *
+ * @sa Terme_Puissance_Thermique_DG_base, Terme_Source_Qdm_Elem_DG, Source_base
+ */
 class Terme_Source_DG_base : public Source_base
 {
   Declare_base(Terme_Source_DG_base);

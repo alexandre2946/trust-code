@@ -22,6 +22,34 @@
 class Domaine_Cl_DG;
 class Domaine_DG;
 
+/**
+ * @brief Abstract base class for the DG mass matrix operator.
+ *
+ * This class assembles and applies the element-wise L2 mass matrix arising in the
+ * DG time discretization. The mass term appears in the implicit time scheme as:
+ *   (M/dt) * u^{n+1} = (M/dt) * u^n + RHS
+ *
+ * Two assembly strategies are supported depending on whether the basis is
+ * orthonormalized via Gram-Schmidt (gram_schmidt flag on Domaine_DG):
+ *
+ *  - **Orthonormal basis** (gram_schmidt == true): The mass matrix is diagonal,
+ *    with entries equal to the element volume (since the basis is L2-normalized
+ *    by volume). The sparsity pattern is therefore purely diagonal (nb_bfunc
+ *    entries per element per spatial dimension).
+ *
+ *  - **Non-orthonormal basis** (gram_schmidt == false): The mass matrix is a dense
+ *    nb_bfunc x nb_bfunc block per element, assembled by numerical quadrature as
+ *    M_ij = integral of phi_i * phi_j. The sparsity pattern is a full local block.
+ *
+ * An optional temporal coefficient (e.g., density or porosity) can be applied
+ * element-wise via appliquer_coef(), which multiplies the mass entries by a field
+ * retrieved by name from the equation (name_of_coefficient_temporel_).
+ *
+ * Derived classes must implement appliquer_impl(), which applies M^{-1} to a
+ * right-hand side vector (used for explicit time stepping or lumped-mass inversion).
+ *
+ * @sa Masse_DG_Elem, Solveur_Masse_base
+ */
 class Masse_DG_base : public Solveur_Masse_base
 {
   Declare_base(Masse_DG_base);

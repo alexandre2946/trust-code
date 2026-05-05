@@ -27,6 +27,27 @@ Sortie& Masse_DG_Elem::printOn(Sortie& s) const { return s << que_suis_je() << "
 
 Entree& Masse_DG_Elem::readOn(Entree& s) { return s; }
 
+/**
+ * @brief Applies the inverse mass matrix M^{-1} to the right-hand side vector sm in-place.
+ *
+ * @details Two strategies depending on gram_schmidt:
+ *
+ *  - **Orthonormal basis** (gram_schmidt == true):
+ *    Since M = diag(volume[e]), M^{-1} * sm reduces to dividing each element's
+ *    DOF values by the element volume, handled by tab_divide_any_shape().
+ *
+ *  - **Non-orthonormal basis** (gram_schmidt == false):
+ *    For each element, the local inverse mass matrix M^{-1} is computed on-the-fly
+ *    by BasisFunction::eval_invMassMatrix(). It is then applied independently to
+ *    each spatial component d as a dense matrix-vector product:
+ *      sm[e, d*nb_bfunc : (d+1)*nb_bfunc] = M^{-1} * sm[e, d*nb_bfunc : (d+1)*nb_bfunc]
+ *    using ref_array slices to avoid data copies.
+ *
+ *  After inversion, the ghost cell values are synchronized via echange_espace_virtuel().
+ *
+ * @param sm The right-hand side vector to transform in-place into M^{-1} * sm.
+ * @return A reference to sm.
+ */
 DoubleTab& Masse_DG_Elem::appliquer_impl(DoubleTab& sm) const
 {
   if (le_dom_dg_->gram_schmidt())

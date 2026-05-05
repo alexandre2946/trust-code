@@ -49,6 +49,25 @@ void Op_Div_DG::completer()
   op_diff_ = ref_cast(Op_Diff_DG_base, equation().operateur(0).l_op_base());
 }
 
+/**
+ * @brief Sizes the velocity-pressure and pressure-pressure matrix blocks.
+ *
+ * @details Builds two sparsity patterns depending on what is needed:
+ *
+ *  - **Velocity-pressure block** (matv, always built when the "vitesse" matrix is present):
+ *    Each pressure DOF of element T is coupled to all velocity DOFs of T and its
+ *    face-neighbours, as given by the pre-computed stencil. The block has
+ *    size_p rows and size_v columns.
+ *
+ *  - **Pressure-pressure block** (matp, only built when order_v == order_p):
+ *    Required for the equal-order pressure stabilization term. Each pressure DOF of
+ *    element T is coupled to all pressure DOFs of T and its face-neighbours.
+ *    When order_v != order_p, a minimal dummy pattern (one non-zero) is allocated
+ *    to satisfy the matrix infrastructure without adding real entries.
+ *
+ * @param matrices  Map of matrix name → Matrice_Morse pointer to be sized.
+ * @param semi_impl Map of semi-implicit field names; if "vitesse" is present, returns immediately.
+ */
 void Op_Div_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
 
@@ -203,6 +222,37 @@ void Op_Div_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl)
   matp->nb_colonnes() ? *matp += matp2 : *matp = matp2;
 }
 
+/**
+ * @brief Assembles the DG divergence operator and, if needed, the pressure stabilization term.
+ *
+ * @details The assembly proceeds in two independent parts:
+ *
+ * **1. Divergence part** (always assembled)
+ *
+ * Uses the velocity basis gradient and the pressure basis:
+ *  - *Volume term*: for each element,
+ *      integral of q_h * div(u_h) = integral of grad(q_h) . u_h  (integration by parts)
+ *    i.e., integral of grad(phi_p_j) . phi_v_i over the element.
+ *  - *Internal face jump term*: for each internal face shared by elem0 and elem1,
+ *      integral of [u_h . n]_f * {{q_h}} = 0.5 * integral of (phi_v_i0 - phi_v_i1) . n * (phi_p_j0 + phi_p_j1)
+ *    The four (elem0/elem1) x (elem0/elem1) combinations are assembled with the appropriate sign.
+ *  - *Boundary face term*: for Dirichlet boundaries, the boundary velocity contributes
+ *    to the face normal flux. The commented-out block handles time-varying Dirichlet
+ *    data on the RHS (not yet active).
+ *
+ * **2. Pressure stabilization part** (only when order_v == order_p and matp is allocated)
+ *
+ * Adds a Dohrmann-Bochev-type face stabilization to recover inf-sup stability for
+ * equal-order velocity-pressure pairs:
+ *      nu_f * integral of [p_h]_f * [q_h]_f
+ * where nu_f is the harmonic mean of the diffusivities of the two adjacent elements,
+ * and the jump [.]_f is assembled as the four cross-element combinations.
+ *
+ * @param vit       Velocity field values.
+ * @param matrices  Map of matrix name → Matrice_Morse pointer to accumulate into.
+ * @param secmem    Right-hand side (continuity residual) to accumulate into.
+ * @param semi_impl Map of semi-implicit field values.
+ */
 void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   int order_v = Option_DG::Get_order_for("vitesse");
@@ -533,6 +583,13 @@ int Op_Div_DG::impr(Sortie& os) const
   return 1;
 }
 
+/**
+ * @brief Converts the divergence field from an integrated to a volumetric (per-unit-volume) form.
+ * @details Divides each element's divergence value by the element volume.
+ * @param div The divergence field to scale in-place.
+ * @todo The current scaling is inconsistent for multi-component fields; only div(elem, 0)
+ *       is divided, which needs to be revisited for a proper volumetric normalization.
+ */
 void Op_Div_DG::volumique(DoubleTab& div) const
 {
   const Domaine_DG& domaine_DG = le_dom_DG.valeur();

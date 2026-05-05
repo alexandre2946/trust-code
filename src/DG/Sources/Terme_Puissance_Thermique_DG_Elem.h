@@ -20,11 +20,16 @@
 #include <Eval_Puiss_Th_DG_Elem.h>
 #include <Iterateur_Source_Elem.h>
 
-/*! @brief class Terme_Puissance_Thermique_DG_Elem
+/**
+ * @brief Concrete DG volumetric heat source term for element-based unknowns.
  *
- *  Cette classe represente un terme source de l'equation de la thermique du type degagement volumique de puissance thermique
+ * This class instantiates Terme_Puissance_Thermique_DG_base with an
+ * Iterateur_Source_Elem<Eval_Puiss_Th_DG_Elem> iterator, which drives the
+ * element-wise quadrature loop and delegates evaluation to Eval_Puiss_Th_DG_Elem.
  *
- * @sa Terme_Puissance_Thermique, Terme_Source_DG_base
+ * Instanciable are "Puissance_Thermique_Elem_DG" and "Puissance_Thermique_Elem_DG_P0").
+ *
+ * @sa Eval_Puiss_Th_DG_Elem, Terme_Puissance_Thermique_DG_base
  */
 class Terme_Puissance_Thermique_DG_Elem : public Terme_Puissance_Thermique_DG_base
 {

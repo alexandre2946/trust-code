@@ -22,6 +22,14 @@ Implemente_base(Terme_Puissance_Thermique_DG_base, "Terme_Puissance_Thermique_DG
 
 Sortie& Terme_Puissance_Thermique_DG_base::printOn(Sortie& s) const { return s << que_suis_je(); }
 
+/**
+ * @brief Reads the heat power source term parameters from the input stream.
+ * @details Delegates field reading to Terme_Puissance_Thermique::lire_donnees(), then
+ * registers the power field with champs_compris_, and sets the output file name and
+ * description for the integrated heat release diagnostic (in Watts).
+ * @param s The input stream.
+ * @return The input stream.
+ */
 Entree& Terme_Puissance_Thermique_DG_base::readOn(Entree& s)
 {
   const Equation_base& eqn = equation();
@@ -41,6 +49,14 @@ void Terme_Puissance_Thermique_DG_base::associer_domaines(const Domaine_dis_base
   iter_->associer_domaines(zvdf, zclvdf);
 }
 
+/**
+ * @brief Initializes the heat source term at the given time.
+ * @details Calls Terme_Source_DG_base::initialiser() for base setup, then
+ * initializes the power field by calling initialiser_champ_puissance() from
+ * Terme_Puissance_Thermique.
+ * @param temps The initial time.
+ * @return Always 1.
+ */
 int Terme_Puissance_Thermique_DG_base::initialiser(double temps)
 {
   Terme_Source_DG_base::initialiser(temps);

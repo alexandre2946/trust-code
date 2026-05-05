@@ -22,14 +22,26 @@
 
 class Domaine_Cl_DG;
 
-/*! @brief class Op_Grad_DG
+/**
+ * @brief DG gradient operator acting on a DG pressure field to produce a velocity-space residual.
  *
- *   Cette classe represente l'operateur de gradient La discretisation est DG
- *   On calcule le gradient d'un Champ_Elem_DG (la pression)
+ * This class implements the DG discretization of the pressure gradient operator used in
+ * the incompressible Navier-Stokes momentum equation. It assembles the coupling between
+ * pressure DOFs and velocity DOFs through the interface_blocs mechanism.
  *
- * @sa Operateur_Grad_base
+ * The weak formulation integrates -grad(p_h) against velocity test functions v_h:
+ *  - *Volume term*:        integral of grad(p_h) . v_h  (element-wise, by parts)
+ *  - *Internal face term*: integral of {{p_h}} * [v_h . n]  (average-jump coupling)
+ *
+ * This formulation is the transpose of the divergence operator assembled by Op_Div_DG
+ * in the continuous sense. However, Op_Grad_DG and Op_Div_DG use independent
+ * implementations: Op_Grad_DG integrates grad(phi_p) . phi_v on element volumes and
+ * {{phi_p}} * [phi_v . n] on faces, while Op_Div_DG integrates phi_p * div(phi_v) and
+ * [phi_v . n] * {{phi_p}}. Both produce the same matrix up to a sign when the two
+ * basis sets are compatible, but they are kept separate to allow independent tuning.
+ *
+ * @sa Op_Div_DG, Operateur_Grad_base
  */
-
 class Op_Grad_DG: public Operateur_Grad_base
 {
   Declare_instanciable(Op_Grad_DG);

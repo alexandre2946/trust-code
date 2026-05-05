@@ -54,7 +54,7 @@ void Domaine_Cl_DG::imposer_cond_lim(Champ_Inc_base& ch, double temps)
   else if (ch.is_scalar()) { /* Do nothing */ }
   else
     {
-      Cerr << "Le type de Champ_Inc " << ch.que_suis_je() << " n'est pas prevu en DG family " << finl;
+      Cerr << "This type of Champ Inc: " << ch.que_suis_je() << " is not recognised in DG" << finl;
       Process::exit();
     }
 //  ch_tab.echange_espace_virtuel();

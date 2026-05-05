@@ -42,13 +42,26 @@ Sortie& Op_Diff_DG_Elem::printOn(Sortie& os) const { return Op_Diff_DG_base::pri
 
 Entree& Op_Diff_DG_Elem::readOn(Entree& is) { return Op_Diff_DG_base::readOn(is); }
 
+
+/**
+ * @brief Finalizes operator setup after all associations have been made.
+ *
+ * @details Calls the parent completer(), then:
+ *  - Casts the unknown field to Champ_Elem_DG and checks that the ghost cell layer
+ *    is at least 1 element thick (required for face-neighbour communication in DG).
+ *  - Initializes the face boundary flux array flux_bords_ with the correct number
+ *    of components (2 for Transport_K_Epsilon, otherwise the line size of the unknown).
+ *  - If the operator is a turbulent diffusion operator (name starts with "Op_Dift"),
+ *    retrieves the turbulent conductivity from the turbulence model and registers it
+ *    as the turbulent diffusivity via associer_diffusivite_turbulente().
+ */
 void Op_Diff_DG_Elem::completer()
 {
   Op_Diff_DG_base::completer();
   const Champ_Elem_DG& ch = ref_cast(Champ_Elem_DG, equation().inconnue());
   const Domaine_DG& domaine = le_dom_dg_.valeur();
   if (domaine.domaine().nb_joints() && domaine.domaine().joint(0).epaisseur() < 1)
-    Cerr << "Op_Diff_DG_Elem : largeur de joint insuffisante (minimum 1)!" << finl, Process::exit();
+    Cerr << "Op_Diff_DG_Elem :  ghost cell layer width too small, minimum 1" << finl, Process::exit();
   ch.fcl();
   int nb_comp = (equation().que_suis_je() == "Transport_K_Epsilon") ? 2 : ch.valeurs().line_size();
   flux_bords_.resize(domaine.premiere_face_int(), nb_comp);
@@ -62,6 +75,20 @@ void Op_Diff_DG_Elem::completer()
   associer_diffusivite_turbulente(lambda_t);
 }
 
+/**
+ * @brief Builds the sparsity pattern of the DG diffusion matrix in a Matrice_Morse.
+ *
+ * @details The matrix couples each element to all its face-neighbours as given by the
+ * pre-computed sorted stencil (Domaine_DG::get_stencil_sorted()). The global index
+ * space is built from the BasisFunction index map indices_glob_elem, so that each
+ * element contributes a block of nb_basis_func * dim rows and the column range of a
+ * row spans nb_basis_func columns per neighbour element (including itself).
+ *
+ * The method fills tab1 (row pointers) in a first pass, then tab2 (column indices)
+ * in a second pass, and finally marks the stencil as sorted.
+ *
+ * @param la_matrice The Matrice_Morse whose sparsity pattern is to be set.
+ */
 void Op_Diff_DG_Elem::dimensionner(Matrice_Morse& la_matrice) const // TODO a remonter dans Op_DG_Elem
 {
 
@@ -132,6 +159,18 @@ void Op_Diff_DG_Elem::dimensionner(Matrice_Morse& la_matrice) const // TODO a re
   assert(la_matrice.is_sorted_stencil());
 }
 
+/**
+ * @brief Sizes the block matrices used by the interface_blocs assembly mechanism.
+ *
+ * @details If the unknown is treated semi-implicitly (its name appears in semi_impl),
+ * no matrix needs to be dimensioned and the method returns immediately.
+ * Otherwise, for each external operator registered in op_ext (used for monolithic
+ * thermal coupling), the corresponding sub-matrix is sized by calling dimensionner().
+ * Cross-problem coupling (i > 0) is not yet implemented and throws at runtime.
+ *
+ * @param matrices Map of matrix name → Matrice_Morse pointer to be sized.
+ * @param semi_impl Map of semi-implicit field names to their current values.
+ */
 void Op_Diff_DG_Elem::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const std::string nom_inco = equation().inconnue().le_nom().getString();
@@ -158,11 +197,41 @@ void Op_Diff_DG_Elem::dimensionner_blocs(matrices_t matrices, const tabs_t& semi
     }
 }
 
-/*@brielf Assemble the diffusion operator matrix and the right-hand side
- * @param matrices map of pointers to the matrices to be filled
- * @param secmem right-hand side to be filled
- * @param semi_impl map of pointers to the semi-implicit fields
- * The order of the basis functions is given by phi0.ex phi1.ex phi2.ex phi0.ey phi1.ey phi2.ey ... for vector fields
+/**
+ * @brief Assembles the SIP diffusion operator into the matrix and right-hand side.
+ *
+ * @details This is the core assembly routine. It proceeds in three stages:
+ *
+ * **1. Volume integrals (stiffness term)**
+ * For each element, the term  integral of nu * grad(phi_i) . grad(phi_j)  is integrated
+ * using the element quadrature rule and accumulated into the diagonal block of the
+ * matrix and into secmem.
+ *
+ * **2. Internal face integrals (SIP terms)**
+ * For each internal face shared by elem0 and elem1:
+ *  - *Penalty term*: gamma * (eta_F/h_T) * integral of phi_i * phi_j, added to the
+ *    diagonal blocks (same-element test and trial) and subtracted from the off-diagonal
+ *    blocks (cross-element), enforcing the jump penalization symmetrically.
+ *  - *Consistency + symmetry terms*: 0.5 * integral of { nu * grad(phi_i) } . n * phi_j,
+ *    assembled into all four (elem0/elem1) x (elem0/elem1) block combinations with the
+ *    appropriate sign to yield a symmetric bilinear form.
+ *
+ * **3. Boundary face integrals (Dirichlet enforcement)**
+ * For boundary faces flagged as Dirichlet (fcl flag > 5), the same penalty and
+ * consistency terms are applied to the single adjacent element, imposing the boundary
+ * condition weakly in the SIP sense. The Dirichlet value contribution to secmem is
+ * handled separately by contribuer_au_second_membre().
+ *
+ * Both isotropic and anisotropic diffusivities are supported: for anisotropic cases,
+ * nu_F is computed as the normal projection of the diffusivity tensor onto the face.
+ *
+ * The DOF ordering within an element is: phi0.ex, phi1.ex, ..., phi0.ey, phi1.ey, ...
+ * for vector fields (nb_bfunc DOFs per spatial direction).
+ *
+ * @param matrices  Map of matrix name → Matrice_Morse pointer to accumulate into.
+ * @param secmem    Right-hand side array to accumulate into.
+ * @param semi_impl Map of semi-implicit field values (matrix assembly is skipped if the
+ *                  unknown is present here).
  */
 void Op_Diff_DG_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
@@ -499,6 +568,31 @@ void Op_Diff_DG_Elem::contribuer_termes_croises(const DoubleTab& inco, const Pro
   throw;
 }
 
+/**
+ * @brief Adds boundary condition contributions to the right-hand side.
+ *
+ * @details Loops over all boundary faces and, depending on the boundary condition type,
+ * adds the appropriate weak enforcement term to resu:
+ *
+ *  - **Neumann / Neumann_paroi**: the imposed flux g_N is integrated against each basis
+ *    function on the boundary face:
+ *      resu(elem, i) += integral of phi_i * g_N
+ *    Point-wise flux values are retrieved either from a Champ_front_var_instationnaire
+ *    (using valeur_au_temps_et_au_point) or directly from Neumann::flux_impose().
+ *
+ *  - **Dirichlet** (weak SIP enforcement): the boundary value g_D enters two terms:
+ *      - Symmetry:  -integral of { nu * grad(phi_i) } . n * g_D
+ *      - Penalty:   (nu_F * eta_F / h_T) * integral of phi_i * g_D
+ *    The Dirichlet value is retrieved either point-wise (Champ_front_var_instationnaire)
+ *    or face-wise (Dirichlet::val_imp_au_temps()).
+ *
+ *  - **Dirichlet_homogene**: no contribution (homogeneous condition, nothing to add).
+ *
+ * Both isotropic and anisotropic diffusivities are handled for the Dirichlet terms.
+ * The use of Champ_front_softanalytique is explicitly forbidden and triggers an error.
+ *
+ * @param resu  The right-hand side array to accumulate boundary contributions into.
+ */
 void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
 {
 
@@ -542,7 +636,7 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
 
       if (sub_type(Champ_front_softanalytique, la_cl.valeur().champ_front()))
         {
-          Cerr << " Il faut utiliser Champ_front_fonc_txyz et non " << la_cl.valeur().champ_front().que_suis_je() << finl;
+          Cerr << "You have to use a Champ_front_fonc_txyz and not " << la_cl.valeur().champ_front().que_suis_je() << finl;
           exit();
         }
 

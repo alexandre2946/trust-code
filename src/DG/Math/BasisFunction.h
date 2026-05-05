@@ -22,6 +22,48 @@
 #include <Matrice_Dense.h>
 #include <Matrice_Morse.h>
 
+
+/**
+ * @brief Manages the local polynomial basis functions for Discontinuous Galerkin elements.
+ *
+ * This class builds, stores, and evaluates the local polynomial basis {phi_i} used in
+ * the DG discretization on each element. It supports orders 0, 1, and 2 in 2D
+ * (3D is not yet implemented and throws at runtime).
+ *
+ * **Basis definition**
+ * The raw (non-orthonormalized) basis is defined on each element T as scaled monomials
+ * centered at the element barycenter xp and normalized by the characteristic length h_T:
+ *   - order 0: { 1 }
+ *   - order 1: { 1, (x-xp)/h, (y-yp)/h }
+ *   - order 2: { 1, (x-xp)/h, (y-yp)/h, xy/h^2, x^2/h^2, y^2/h^2 }
+ *
+ * **Gram-Schmidt orthonormalization**
+ * If orthonormalization is requested (gram_schmidt flag in initialize()), the raw basis
+ * is transformed into an L2-orthonormal basis on each element via the modified Gram-Schmidt
+ * process (gramSchmidt()). The change-of-basis coefficients are stored in a sparse
+ * transition_matrix_ (block-diagonal, one nb_bfunc x nb_bfunc block per element), which
+ * is then applied on-the-fly by orthonormalize() whenever a basis or gradient is evaluated.
+ *
+ * **Global DOF indexing**
+ * indices_glob_elem_(e) gives the first global DOF index for element e.  For scalar
+ * fields (dim=1) this maps directly; for vector fields (dim=2 or 3) the index is scaled
+ * accordingly via the indices_glob_elem(dim) accessor.
+ *
+ * **Stabilization parameters**
+ * compute_stab_param() fills two arrays used by the SIP penalty term:
+ *   - eta_elem(e): element-local penalty coefficient, computed from the polynomial order
+ *     and element geometry (sharp formula for triangles, conservative estimate otherwise).
+ *   - eta_facet(f): face-local penalty, equal to eta_elem for boundary faces and to the
+ *     harmonic mean of the two adjacent element values for internal faces.
+ *
+ * **Evaluation methods**
+ * All eval_* methods fill a pre-allocated output DoubleTab with values at the quadrature
+ * points provided by a Quadrature_base object. If the basis is orthonormalized, the
+ * transition matrix is applied automatically after the raw evaluation.
+ *
+ * @note 3D support is declared but not yet implemented; calling any eval_* method in 3D
+ *       will throw at runtime.
+ */
 class BasisFunction
 {
 public:
@@ -53,7 +95,7 @@ public:
           }
         return indices_glob_elem_3D_;
       default:
-        Cerr << "bad dimension indices_glob_elem" << finl;
+        Cerr << "[DG] indices_glob_elem is incorrectly sized" << finl;
         throw;
       }
     return indices_glob_elem_;

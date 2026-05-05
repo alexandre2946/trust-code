@@ -33,12 +33,30 @@ Sortie& Op_Grad_DG::printOn(Sortie& s) const { return s << que_suis_je(); }
 
 Entree& Op_Grad_DG::readOn(Entree& s) { return s; }
 
+/**
+ * @brief Associates the operator with a DG domain and its boundary conditions.
+ * @param domaine_dis    The discretized domain, expected to be a Domaine_DG.
+ * @param domaine_Cl_dis The boundary condition container, expected to be a Domaine_Cl_DG.
+ */
 void Op_Grad_DG::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_Cl_dis, const Champ_Inc_base&)
 {
   le_dom_DG = ref_cast(Domaine_DG, domaine_dis);
   le_dcl_DG = ref_cast(Domaine_Cl_DG, domaine_Cl_dis);
 }
 
+/**
+ * @brief Sizes the velocity-pressure matrix block for the gradient operator.
+ *
+ * @details Builds the sparsity pattern of the rectangular matrix mapping pressure DOFs
+ * to velocity DOFs. Each velocity DOF of element T is coupled to all pressure DOFs of
+ * T and its face-neighbours, as given by the pre-computed stencil. The resulting matrix
+ * has size_v rows (velocity global DOFs) and size_p columns (pressure global DOFs).
+ *
+ * Returns immediately if "pression" is absent from matrices or is treated semi-implicitly.
+ *
+ * @param matrices  Map of matrix name → Matrice_Morse pointer to be sized.
+ * @param semi_impl Map of semi-implicit field names; if "pression" is present, returns immediately.
+ */
 void Op_Grad_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   if (!matrices.count("pression")) return; //rien a faire
@@ -120,6 +138,31 @@ void Op_Grad_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl
   mat->nb_colonnes() ? *mat += mat2 : *mat = mat2;
 }
 
+/**
+ * @brief Assembles the DG gradient operator into the matrix and right-hand side.
+ *
+ * @details The assembly has two stages:
+ *
+ * **1. Volume term** — for each element:
+ *      integral of grad(phi_p_j) . phi_v_i  over the element,
+ * accumulated as (*mat)(v_dof, p_dof) += coeff and secmem(elem, v_dof) -= coeff * p(elem, p_dof).
+ *
+ * **2. Internal face term** — for each internal face shared by elem0 and elem1:
+ *   The average-jump coupling integral of {{phi_p}} * [phi_v . n] is expanded into
+ *   four pointwise products at face quadrature points:
+ *    - coeff00: -0.5 * phi_p0 * n_d * phi_v0  (elem0 pressure, elem0 velocity)
+ *    - coeff01: +0.5 * phi_p1 * n_d * phi_v0  (elem1 pressure, elem0 velocity)
+ *    - coeff10: -0.5 * phi_p0 * n_d * phi_v1  (elem0 pressure, elem1 velocity)
+ *    - coeff11: +0.5 * phi_p1 * n_d * phi_v1  (elem1 pressure, elem1 velocity)
+ *
+ *   The sign convention follows the outward normal of elem0: the jump [v.n] on the
+ *   face is (v0 - v1).n/|f|, hence the minus sign on elem0-side contributions.
+ *
+ * @param matrices  Map of matrix name → Matrice_Morse pointer to accumulate into.
+ * @param secmem    Right-hand side (momentum residual) to accumulate into.
+ * @param semi_impl Map of semi-implicit field values; if "pression" is present,
+ *                  its values are used instead of the current pressure field.
+ */
 void Op_Grad_DG::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
 

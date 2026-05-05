@@ -25,6 +25,24 @@
 class Domaine_Cl_DG;
 class Domaine_DG;
 
+/**
+ * @brief DG momentum source term for element-based velocity unknowns.
+ *
+ * This class adds a volumetric body force f(x) to the momentum right-hand side.
+ * The contribution to the DG weak form for each element e and each velocity DOF (fb, d) is:
+ *   secmem(e, fb + d*nb_bfunc) += integral of f_d(x) * phi_fb(x) dV
+ * using a fixed order-5 quadrature rule.
+ *
+ * The source field is read from the input stream as a Champ_Don_base (la_source),
+ * then projected onto the DG quadrature representation (la_source_DG) of type
+ * Champ_Fonc_Quad_DG, which stores the field values pre-sampled at quadrature points.
+ * Both uniform and spatially varying source fields are supported: for a Champ_Uniforme
+ * the same value is used for all elements (index 0 in la_source_DG).
+ *
+ * The class has no matrix contribution (dimensionner_blocs() is a no-op).
+ *
+ * @sa Source_base, Terme_Source_Qdm
+ */
 class Terme_Source_Qdm_Elem_DG : public Source_base, public Terme_Source_Qdm
 {
   Declare_instanciable(Terme_Source_Qdm_Elem_DG);

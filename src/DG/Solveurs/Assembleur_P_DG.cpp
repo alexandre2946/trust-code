@@ -65,11 +65,44 @@ int Assembleur_P_DG::assembler_rho_variable(Matrice& la_matrice, const Champ_Don
   return 0;
 }
 
+/**
+ * @brief Core routine that builds the SIP pressure Laplacian matrix.
+ *
+ * @details The assembly follows the same three-term SIP structure as Op_Diff_DG_Elem
+ * but with unit diffusivity (no nu weighting) and acting on the pressure unknown only.
+ * It proceeds in three stages:
+ *
+ * **1. Sparsity pattern construction**
+ * tab1 (row pointers) and tab2 (column indices) are filled in two passes using the
+ * pre-computed sorted face-neighbour stencil, yielding a pressure x pressure matrix
+ * of size size_p x size_p where each element block couples to all its face-neighbours.
+ *
+ * **2. Volume stiffness term**
+ * For each element:
+ *   mat(i, j) += integral of grad(phi_i).grad(phi_j)
+ *
+ * **3. Internal face SIP terms**
+ * For each internal face shared by elem0 and elem1:
+ *  - *Penalty term*: (eta_F/h_T) * integral of phi_i * phi_j, added to the diagonal
+ *    blocks and subtracted from the off-diagonal (cross-element) blocks.
+ *  - *Consistency + symmetry terms*: 0.5 * integral of grad(phi_i).n * phi_j,
+ *    assembled into all four block combinations with signs ensuring global symmetry.
+ *
+ * **4. Boundary face SIP terms** (Dirichlet faces: fcl flag 6 or 7)
+ * The same penalty and consistency terms are applied to the single adjacent element,
+ * weakly enforcing the Dirichlet pressure condition in the SIP sense.
+ *
+ * @param la_matrice       The output matrix (typed as Matrice_Morse).
+ * @param diag             Unused diagonal coefficient vector (kept for interface compatibility).
+ * @param incr_pression    If 1, the solver works on pressure increments.
+ * @param resoudre_en_u    If 1, the solver works in velocity units.
+ * @return Always 1.
+ */
 int Assembleur_P_DG::assembler_mat(Matrice& la_matrice, const DoubleVect& diag, int incr_pression, int resoudre_en_u)
 {
   set_resoudre_increment_pression(incr_pression);
   set_resoudre_en_u(resoudre_en_u);
-  Cerr << "Assemblage de la matrice de pression ... ";
+  Cerr << "[DG] Starting the pressure matrix assembly ... ";
   statistics().begin_count(STD_COUNTERS::matrix_assembly,statistics().get_last_opened_counter_level()+1);
   la_matrice.typer("Matrice_Morse");
   Matrice_Morse& mat = ref_cast(Matrice_Morse, la_matrice.valeur());
@@ -341,7 +374,7 @@ int Assembleur_P_DG::assembler_mat(Matrice& la_matrice, const DoubleVect& diag, 
  */
 int Assembleur_P_DG::assembler_QC(const DoubleTab& tab_rho, Matrice& matrice)
 {
-  Cerr << "Assemblage de la matrice de pression pour Quasi Compressible en cours..." << finl;
+  Cerr << "[DG] Starting the pressure matrix assembly for Quasi Compressible" << finl;
   assembler(matrice);
   set_resoudre_increment_pression(1);
   set_resoudre_en_u(0);
@@ -350,13 +383,13 @@ int Assembleur_P_DG::assembler_QC(const DoubleTab& tab_rho, Matrice& matrice)
   Matrice_Morse_Sym& la_matrice = ref_cast(Matrice_Morse_Sym, matrice_bloc.get_bloc(0, 0).valeur());
   if ((la_matrice.get_est_definie() != 1) && (1))
     {
-      Cerr << "Pas de pression imposee  --> P(0)=0" << finl;
+      Cerr << "[DG] No imposed pressure  --> P(0)=0" << finl;
 //      if (je_suis_maitre())
 //        la_matrice(0, 0) *= 2; //TODO dg a adapter
       la_matrice.set_est_definie(1);
     }
 
-  Cerr << "Fin de l'assemblage de la matrice de pression" << finl;
+  Cerr << "[DG] End of pressure matrix assembly" << finl;
   return 1;
 }
 
@@ -365,6 +398,18 @@ int Assembleur_P_DG::modifier_secmem(DoubleTab& secmem)
   return 1;
 }
 
+/**
+ * @brief Removes the arbitrary pressure constant by pinning the minimum pressure to zero.
+ *
+ * @details When no Dirichlet pressure reference is imposed (has_P_ref == 0), the
+ * pressure field is defined only up to a constant. This method makes the solution
+ * unique by subtracting the global minimum pressure value (computed consistently
+ * across MPI processes via mp_min) from all elements, then exchanges ghost values.
+ * If a pressure reference is already set (has_P_ref == 1), the method is a no-op.
+ *
+ * @param pression The pressure field to modify in-place.
+ * @return Always 1.
+ */
 int Assembleur_P_DG::modifier_solution(DoubleTab& pression)
 {
   // Projection :
