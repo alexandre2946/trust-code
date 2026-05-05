@@ -38,7 +38,7 @@ void Constituant_Avec_Vitesse::discretiser(const Probleme_base& pb,
                         sch.temps_courant(),vitesse_transport);
   champs_compris_.ajoute_champ(vitesse_transport.valeur());
   Milieu_base::discretiser(pb,dis);
-  if (C_.non_nul())
+  if (C_)
     vitesse_transport->affecter_(C_.valeur());
   else
     {
@@ -60,7 +60,7 @@ const Champ_Don_base& Constituant_Avec_Vitesse::vit_convection_constituant() con
 void Constituant_Avec_Vitesse::mettre_a_jour(double temps)
 {
   Constituant::mettre_a_jour(temps);
-  if (C_.non_nul())
+  if (C_)
     C_->mettre_a_jour(temps);
   vitesse_transport->affecter_(C_.valeur());
   vitesse_transport->changer_temps(temps);
@@ -69,7 +69,7 @@ void Constituant_Avec_Vitesse::mettre_a_jour(double temps)
 int Constituant_Avec_Vitesse::initialiser(const double temps)
 {
   Constituant::initialiser(temps);
-  if (C_.non_nul())
+  if (C_)
     C_->initialiser(temps);
   return 1;
 }
