@@ -288,6 +288,8 @@
 <TR><TD><SMALL><A HREF="#PETSC_reuse_preconditioner">PETSC_reuse_preconditioner</A></TD><TD><SMALL># PARALLEL OK #</TD></TR>
 <TR><TD><SMALL><A HREF="#POISEUILLE_ALIGNED">POISEUILLE_ALIGNED</A></TD><TD><SMALL># PARALLEL OK #</TD></TR>
 <TR><TD><SMALL><A HREF="#POISEUILLE_ALIGNED_power_law">POISEUILLE_ALIGNED_power_law</A></TD><TD><SMALL># PARALLEL OK #</TD></TR>
+<TR><TD><SMALL><A HREF="#POISEUILLE_ALIGNED_prepro_IBM">POISEUILLE_ALIGNED_prepro_IBM</A></TD><TD><SMALL># PARALLEL NOT #</TD></TR>
+<TR><TD><SMALL><A HREF="#POISEUILLE_ALIGNED_prepro_IBM_PAR">POISEUILLE_ALIGNED_prepro_IBM_PAR</A></TD><TD><SMALL># PARALLEL OK #</TD></TR>
 <TR><TD><SMALL><A HREF="#POISEUILLE_ALIGNED_th">POISEUILLE_ALIGNED_th</A></TD><TD><SMALL># PARALLEL OK #</TD></TR>
 <TR><TD><SMALL><A HREF="#P_out_var_impl">P_out_var_impl</A></TD><TD><SMALL># Hydraulique 2D : Poiseuille 2D  P variable #</TD></TR>
 <TR><TD><SMALL><A HREF="#Parallel_Domain_Cutting">Parallel_Domain_Cutting</A></TD><TD><SMALL># Testing parallel domain cutting with Parmetis and Ptscotch #</TD></TR>
@@ -307,6 +309,7 @@
 <TR><TD><SMALL><A HREF="#Poiseuille_VEF">Poiseuille_VEF</A></TD><TD><SMALL># Hydraulique 2D : Poiseuille 2D #</TD></TR>
 <TR><TD><SMALL><A HREF="#Poiseuille_VEF_impl">Poiseuille_VEF_impl</A></TD><TD><SMALL># Hydraulique 2D : Poiseuille 2D #</TD></TR>
 <TR><TD><SMALL><A HREF="#Poiseuille_VEF_segsol">Poiseuille_VEF_segsol</A></TD><TD><SMALL># Hydraulique 2D : Poiseuille 2D #</TD></TR>
+<TR><TD><SMALL><A HREF="#Poiseuille_tilt_45_VEF">Poiseuille_tilt_45_VEF</A></TD><TD><SMALL># PARALLEL NOT #</TD></TR>
 <TR><TD><SMALL><A HREF="#Polyedre_volume_xg">Polyedre_volume_xg</A></TD><TD><SMALL># PARALLEL RUNS #</TD></TR>
 <TR><TD><SMALL><A HREF="#Polynomes">Polynomes</A></TD><TD><SMALL># Conduction 2D : Sources volumiques de puissance #</TD></TR>
 <TR><TD><SMALL><A HREF="#Poreps">Poreps</A></TD><TD><SMALL># Thermohydraulique 2D : porosites volumiques #</TD></TR>
@@ -388,7 +391,7 @@
 <TR><TD><SMALL><A HREF="#Stop_at_tmax">Stop_at_tmax</A></TD><TD><SMALL># Create a 3D mesh (a prism is cut in 3) from a 2D mesh #</TD></TR>
 <TR><TD><SMALL><A HREF="#SymetrieSomVitesseParallele">SymetrieSomVitesseParallele</A></TD><TD><SMALL># Hydraulique 2D laminaire avec "trou" dans le maillage #</TD></TR>
 <TR><TD><SMALL><A HREF="#Symetrie_Implicite">Symetrie_Implicite</A></TD><TD><SMALL># Cas avec une condition de symetrie non parallele aux axes en implicite #</TD></TR>
-<TR><TD><SMALL><A HREF="#TAYLOR_COUETTE">TAYLOR_COUETTE</A></TD><TD><SMALL># PARALLEL NOT #</TD></TR>
+<TR><TD><SMALL><A HREF="#TAYLOR_COUETTE">TAYLOR_COUETTE</A></TD><TD><SMALL># PARALLEL OK #</TD></TR>
 <TR><TD><SMALL><A HREF="#TP_THI_VDF_LAM">TP_THI_VDF_LAM</A></TD><TD><SMALL># Boite 3D avec periodicite dans les trois directions : suite du calcul #</TD></TR>
 <TR><TD><SMALL><A HREF="#TP_THI_VEF">TP_THI_VEF</A></TD><TD><SMALL># Boite 3D avec periodicite dans les trois directions : Test de Traitement_particulier_NS_THI_VEF #</TD></TR>
 <TR><TD><SMALL><A HREF="#Terme_Source_Dirac_VDF">Terme_Source_Dirac_VDF</A></TD><TD><SMALL># Hydraulique 2D : Couplage Boussinesq et terme source Dirac #</TD></TR>
@@ -1425,6 +1428,12 @@
 <HR><CENTER><B><A NAME=POISEUILLE_ALIGNED_power_law>POISEUILLE_ALIGNED_power_law</A></B></CENTER>
 <CENTER># PARALLEL OK #</CENTER>
 <CENTER><a href=../tests/Reference/POISEUILLE_ALIGNED_power_law/POISEUILLE_ALIGNED_power_law.data>Edit</a> POISEUILLE_ALIGNED_power_law.data </CENTER>
+<HR><CENTER><B><A NAME=POISEUILLE_ALIGNED_prepro_IBM>POISEUILLE_ALIGNED_prepro_IBM</A></B></CENTER>
+<CENTER># PARALLEL NOT #</CENTER>
+<CENTER><a href=../tests/Reference/POISEUILLE_ALIGNED_prepro_IBM/POISEUILLE_ALIGNED_prepro_IBM.data>Edit</a> POISEUILLE_ALIGNED_prepro_IBM.data </CENTER>
+<HR><CENTER><B><A NAME=POISEUILLE_ALIGNED_prepro_IBM_PAR>POISEUILLE_ALIGNED_prepro_IBM_PAR</A></B></CENTER>
+<CENTER># PARALLEL OK #</CENTER>
+<CENTER><a href=../tests/Reference/POISEUILLE_ALIGNED_prepro_IBM_PAR/POISEUILLE_ALIGNED_prepro_IBM_PAR.data>Edit</a> POISEUILLE_ALIGNED_prepro_IBM_PAR.data </CENTER>
 <HR><CENTER><B><A NAME=POISEUILLE_ALIGNED_th>POISEUILLE_ALIGNED_th</A></B></CENTER>
 <CENTER># PARALLEL OK #</CENTER>
 <CENTER><a href=../tests/Reference/POISEUILLE_ALIGNED_th/POISEUILLE_ALIGNED_th.data>Edit</a> POISEUILLE_ALIGNED_th.data </CENTER>
@@ -1482,6 +1491,9 @@
 <HR><CENTER><B><A NAME=Poiseuille_VEF_segsol>Poiseuille_VEF_segsol</A></B></CENTER>
 <CENTER># Hydraulique 2D : Poiseuille 2D #</CENTER>
 <CENTER><a href=../tests/Reference/Poiseuille_VEF_segsol/Poiseuille_VEF_segsol.data>Edit</a> Poiseuille_VEF_segsol.data </CENTER>
+<HR><CENTER><B><A NAME=Poiseuille_tilt_45_VEF>Poiseuille_tilt_45_VEF</A></B></CENTER>
+<CENTER># PARALLEL NOT #</CENTER>
+<CENTER><a href=../tests/Reference/Poiseuille_tilt_45_VEF/Poiseuille_tilt_45_VEF.data>Edit</a> Poiseuille_tilt_45_VEF.data </CENTER>
 <HR><CENTER><B><A NAME=Polyedre_volume_xg>Polyedre_volume_xg</A></B></CENTER>
 <CENTER># PARALLEL RUNS #</CENTER>
 <CENTER><a href=../tests/Reference/Polyedre_volume_xg/Polyedre_volume_xg.data>Edit</a> Polyedre_volume_xg.data </CENTER>
@@ -1752,7 +1764,7 @@
 <CENTER><a href=../tests/Reference/Symetrie_Implicite/Symetrie_Implicite.data>Edit</a> Symetrie_Implicite.data </CENTER>
 <CENTER><a href=../tests/Reference/Symetrie_Implicite/couronne_30.geom>Edit</a> couronne_30.geom </CENTER>
 <HR><CENTER><B><A NAME=TAYLOR_COUETTE>TAYLOR_COUETTE</A></B></CENTER>
-<CENTER># PARALLEL NOT #</CENTER>
+<CENTER># PARALLEL OK #</CENTER>
 <CENTER><a href=../tests/Reference/TAYLOR_COUETTE/TAYLOR_COUETTE.data>Edit</a> TAYLOR_COUETTE.data </CENTER>
 <HR><CENTER><B><A NAME=TP_THI_VDF_LAM>TP_THI_VDF_LAM</A></B></CENTER>
 <CENTER># Boite 3D avec periodicite dans les trois directions : suite du calcul #</CENTER>
