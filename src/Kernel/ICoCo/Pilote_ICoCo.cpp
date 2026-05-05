@@ -539,9 +539,9 @@ Entree& Pilote_ICoCo::interpreter(Entree& is)
   param.dictionnaire("Pilote_ICoCo_2",2);
   param.dictionnaire("Pilote_ICoCo_3",3);
   param.dictionnaire("Pilote_ICoCo_4",4);
-  param.ajouter("nb_pas_dt_reset",&nb_pas_dt_reset);
-  param.ajouter("nstep_stabilized",&nstep_stabilized);
-  param.ajouter("sortie_root_directory",&sortie_root_directory);
+  param.ajouter("nb_pas_dt_reset",&nb_pas_dt_reset); // XD_ADD_P int number of time steps before a single call to resetTime(0) like the Cathare directive (default value 1000000000)
+  param.ajouter("nstep_stabilized",&nstep_stabilized); // XD_ADD_P int number of first iterations in which resetTime(0) is called as a Cathare stabilized transient (default value 0)
+  param.ajouter("sortie_root_directory",&sortie_root_directory); // XD_ADD_P int if enable, no save post before the resetTime(0) call (default value 0)
   param.lire_avec_accolades_depuis(is);
   Probleme_U& pb_to_solve=ref_cast(Probleme_U,objet(nom1));
   switch (methode)
