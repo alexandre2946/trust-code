@@ -64,7 +64,7 @@ void Ecrire_YAML::write_champ_fonc_restart_file(const std::string& yaml_fname)
  * and we also provide the index of the latest backup in time/last_iteration (this is important for restart so we can find the right slot to recover the data).
  *
  */
-void Ecrire_YAML::write_checkpoint_restart_file(int save, const std::string& yaml_fname)
+void Ecrire_YAML::write_checkpoint_restart_file(bool save, const std::string& yaml_fname)
 {
   std::string text = "pdi:";
 
@@ -86,6 +86,7 @@ void Ecrire_YAML::write_checkpoint_restart_file(int save, const std::string& yam
         {
           // if the checkpoint file already exists, we erase it and create a brand new one
           write_file_initialization(i_pb, text);
+          write_config_file_initialization(i_pb, text);
           // block to write the data
           write_data_for_checkpoint(i_pb, 1 /* writing all local data */, text);
           write_data_for_checkpoint(i_pb, 0 /* writing all global data */, text);
@@ -93,61 +94,116 @@ void Ecrire_YAML::write_checkpoint_restart_file(int save, const std::string& yam
           write_time_scheme(1, pbs_[i_pb].filename, text);
           // writing the types of the fields we want to save
           write_fields_types_for_checkpoint(i_pb, text);
+          // writing format of the file
+          write_format_for_checkpoint(pbs_[i_pb].filename, text);
         }
       else
         {
-          write_restart_check(pbs_[i_pb].filename, text);
           write_data_for_restart(i_pb, text);
         }
-      write_format(save, pbs_[i_pb].filename, text);
+      write_config_file(save, i_pb, text);
     }
 
   SFichier fic(yaml_fname.c_str());
   fic << text;
 }
 
+/*! \brief  Writes the block in the YAML file that will trigger the creation of the configuration file
+ */
+void Ecrire_YAML::write_config_file_initialization(int pb_i, std::string& text)
+{
+  std::string para = "- file: " + pbs_[pb_i].configFilename_;
+  begin_bloc(para, text);
+  std::string event = "on_event: InitConfig";
+  add_line(event, text);
+  add_line("collision_policy: replace_and_warn # print a warning if file or any of dataset already exist", text);
+  if (Process::is_parallel())
+    add_line("communicator: $MPI_COMM_SELF", text);
+
+  // we need to dump a single variable with PDI for the collision policy to work
+  begin_bloc("write:", text);
+  declare_scalar("nb_proc", "int", text);
+  end_bloc();
+  end_bloc();
+}
+
+/*! \brief  Writes the block in the YAML file that will trigger IO actions for the configuration file
+ */
+void Ecrire_YAML::write_config_file(bool save, int pb_i, std::string& text)
+{
+  // General information about the number of procs
+  std::string para = "- file: " + pbs_[pb_i].configFilename_;
+  begin_bloc(para, text);
+  std::string event = save ? "on_event: WriteConfig" : "on_event: ReadConfig";
+  add_line(event, text);
+  if(Process::is_parallel())
+    add_line("communicator: $MPI_COMM_SELF", text);
+  std::string ioAction = save ? "write:" : "read:";
+  begin_bloc(ioAction, text);
+  // nb_proc is written during the file initialization
+  if (!save)
+    declare_scalar("nb_proc", "int", text);
+  declare_scalar("nb_nodes", "int", text);
+  end_bloc();
+  end_bloc();
+
+  if(Process::is_parallel())
+    write_partition(save, pb_i, text);
+}
+
+/*! \brief Writes the block in the YAML file to manage the node ids for each processor
+ */
+void Ecrire_YAML::write_partition(bool save, int pb_i, std::string& text)
+{
+  if (save)
+    {
+      add_line("# For every processor in the world, save the rank of its group in a unique file", text);
+      add_line("# (useful if we later chose to resume the computation with a different number of nodes)", text);
+    }
+  else
+    {
+      add_line("# For every processor in the world, read the rank of the group it previously belonged to", text);
+      add_line("# (necessary if we are resuming the computation with a different number of nodes)", text);
+    }
+  std::string para = "- file: " + pbs_[pb_i].configFilename_;
+
+  begin_bloc(para, text);
+  std::string event = save ? "on_event: WriteNodeRanks" : "on_event: ReadNodeRanks";
+  add_line(event, text);
+  if(Process::is_parallel())
+    {
+      add_line("communicator: $MPI_COMM_SELF", text);
+    }
+  if (save)
+    {
+      begin_bloc("datasets:", text);
+      declare_array("nodeRanks", "int", "'$nb_proc'", text);
+      end_bloc();
+    }
+  std::string ioAction = save ? "write:" : "read:";
+  begin_bloc(ioAction, text);
+  write_impl_dataset("nodeRanks", "nodeRanks", text);
+  end_bloc();
+  end_bloc();
+}
+
 /*! @brief Writes the block in the YAML file that will specify the format of the checkpoint file named fname
  */
-void Ecrire_YAML::write_format(int save, const std::string& fname, std::string& text)
+void Ecrire_YAML::write_format_for_checkpoint(const std::string& fname, std::string& text)
 {
   std::string format_sauvegarde = "- file: " + fname;
   begin_bloc(format_sauvegarde, text);
   if(Process::is_parallel())
     add_line("communicator: $master", text);
-  std::string IO = save ? "write:" : "read:";
-  begin_bloc(IO, text);
+  begin_bloc("write:", text);
   write_impl_dataset("format_sauvegarde/version", "version", text);
-  if(save)
-    {
-      write_impl_dataset("format_sauvegarde/nb_nodes", "nb_nodes", text);
-      write_impl_dataset("format_sauvegarde/nb_proc", "nb_proc", text);
-    }
-  end_bloc();
-  end_bloc();
-}
-
-/*! @brief Writes the block in the YAML file that will ensure the restart can be done given the configuration of the checkpoint
- */
-void Ecrire_YAML::write_restart_check(const std::string& fname, std::string& text)
-{
-  std::string config = "- file: " + fname;
-
-  begin_bloc(config, text);
-  std::string event = "on_event: ReadPrevConfiguration";
-  add_line(event, text);
-  if (Process::nproc() > 1)
-    add_line("communicator: $MPI_COMM_SELF", text);
-
-  begin_bloc("read:", text);
-  write_impl_dataset("format_sauvegarde/nb_nodes", "nb_nodes", text);
-  write_impl_dataset("format_sauvegarde/nb_proc", "nb_proc", text);
   end_bloc();
   end_bloc();
 }
 
 /*! @brief Writes the block in the YAML file regarding the time scheme for the checkpoint file fname
  */
-void Ecrire_YAML::write_time_scheme(int save, const std::string& fname, std::string& text)
+void Ecrire_YAML::write_time_scheme(bool save, const std::string& fname, std::string& text)
 {
   std::string time_scheme = "- file: " + fname;
   begin_bloc(time_scheme, text);
@@ -366,7 +422,7 @@ void Ecrire_YAML::write_data_for_restart(int pb_i, std::string& text)
 
 /*! @brief Declaring all metadata (ie data that will be kept in PDI memory) in the YAML file
  */
-void Ecrire_YAML::declare_metadata(int save, std::string& text)
+void Ecrire_YAML::declare_metadata(bool save, std::string& text)
 {
   begin_bloc("metadata:  # small values for which PDI keeps a copy", text);
 
@@ -438,13 +494,15 @@ void Ecrire_YAML::declare_metadata(int save, std::string& text)
       add_line("nodeId : int", text);
       add_line("# MPI communicator for masters of each group", text);
       add_line("master : MPI_Comm", text);
+      add_line("# List of the node ids of every processor in the world", text);
+      declare_array("nodeRanks", "int", "[ \'$nb_proc' ]",text);
     }
   end_bloc();
 }
 
 /*! @brief Declaring all data in the YAML file
  */
-void Ecrire_YAML::declare_data(int save, std::string& text)
+void Ecrire_YAML::declare_data(bool save, std::string& text)
 {
   begin_bloc("data:  # data we want to save/restore (essentially fields of unknown)", text);
 
@@ -654,7 +712,7 @@ void Ecrire_YAML::write_attributes(const std::vector<std::string>& attributes, s
 }
 
 
-/*! @brief Writes the block in the YAML file to select the section in the dataset where the data will be written
+/*! @brief Writes the block in the YAML file to select the section in the TRUST dataset where the data will be written
  *  @param (std::string name)  name of the data
  *  @param (int nb_dim) number of the dimensions of the DoubleTab
  *  @param (bool is_parallel) true if the dataset is parallel, false if not
@@ -662,31 +720,47 @@ void Ecrire_YAML::write_attributes(const std::vector<std::string>& attributes, s
  */
 void Ecrire_YAML::write_TRUST_dataset_selection(const std::string& name, int nb_dim, bool is_parallel, std::string& text)
 {
-  begin_bloc("dataset_selection:", text);
-  std::string size =  "size: [";
+  std::vector<std::string> sizes;
   if(is_parallel)
-    size = size + "1, ";
-  size = size + "1";
-  if(nb_dim > 0)
     {
-      size = size + ", \'$dim_" + name + "[0]\'";
-      for(int d=1; d<nb_dim; d++)
-        size = size + "," + "\'$dim_" + name + "[" + std::to_string(d) + "]\'";
+      // one processor
+      sizes.push_back("1");
     }
-  size = size + "]";
-  add_line(size, text);
+  // one iteration
+  sizes.push_back("1");
+  for(int d=0; d<nb_dim; d++)
+    sizes.push_back("\'$dim_" + name + "[" + std::to_string(d) + "]\'");
 
-  std::string start = "start: [";
+  std::vector<std::string> offsets;
   if(is_parallel)
-    start = start + "\'$nodeRk\',";
-  start = start + "\'$iter\'";
-  if(nb_dim >0)
-    {
-      start = start + ", 0";
-      for(int d=1; d<nb_dim; d++)
-        start = start + "," + "0";
-    }
-  start = start + "]";
+    offsets.push_back("\'$nodeRk\'");
+  offsets.push_back("\'$iter\'");
+  for(int d=0; d<nb_dim; d++)
+    offsets.push_back("0");
+
+  write_dataset_selection(sizes, offsets, text);
+}
+
+/*! @brief Writes the block in the YAML file to select the section in any dataset where the data will be written
+ *  @param const std::vector<std::string>& sizes  array containing the size of the data for each dimension
+ *  @param const std::vector<std::string>& offset array containing the offset from where the data will be written for each dimension
+ *  @param (std::string& text) the string that will be completed by the method
+ */
+void Ecrire_YAML::write_dataset_selection(const std::vector<std::string>& sizes, const std::vector<std::string>& offsets, std::string& text)
+{
+  assert(!sizes.empty() && sizes.size() == offsets.size());
+  begin_bloc("dataset_selection:", text);
+  std::string size = "size: [";
+  size += sizes[0];
+  for (auto sz = std::next(sizes.begin()); sz != sizes.end(); ++sz)
+    size += "," + *sz;
+  size += "]";
+  add_line(size, text);
+  std::string start = "start: [";
+  start += offsets[0];
+  for (auto ofs = std::next(offsets.begin()); ofs != offsets.end(); ++ofs)
+    start += "," + *ofs;
+  start += "]";
   add_line(start, text);
   end_bloc();
 }

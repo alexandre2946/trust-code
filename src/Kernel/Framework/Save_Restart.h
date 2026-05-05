@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -77,6 +77,11 @@ private:
   int restart_version_ = 155;         // Version number, for example 155 (1.5.5) -> used to manage old restart files
   bool restart_in_progress_ = false;  //true variable only during the time step during which a resumption of computation is carried out
   mutable bool ficsauv_created_ = false;      // flag to know if the checkpoint file has been created (useful for PDI)
+  mutable bool config_file_created_ = false;      // flag to know if the file describing the configuration of the checkpoint has been created (useful for PDI)
+  // for PDI:
+  // communicator used to read the checkpoint file
+  // (useful if the current node partition is different than the one for checkpoint)
+  OWN_PTR(Comm_Group) restartComm_;
 
   static long int File_size_;        // Espace disque pris par les sauvegarde XYZ
   static int Bad_allocate_;        // 1 si allocation reussi, 0 sinon

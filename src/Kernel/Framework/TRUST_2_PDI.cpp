@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -102,37 +102,72 @@ void TRUST_2_PDI::get_type(const Nom& name, Nom& type)
 }
 
 /*! @brief Generic method to prepare the restart of a computation
- *
+ * @param (OWN_PTR(Comm_Group)& nodeGroup) communicator that will be used to read data from the checkpoint files
  * @param (int& last_iteration) the index of the backup iteration we want to recover from
  * @param (double& tinit) the time from which we want to resume the calculation
  * @param (int resume_last_time) flag to specify if we want to resume from the last time or we want to recover from a specific time
  */
-void TRUST_2_PDI::prepareRestart(int& last_iteration, double& tinit, int resume_last_time)
+void TRUST_2_PDI::prepareRestart(OWN_PTR(Comm_Group)& nodeGroup, int& last_iteration, double& tinit, int resume_last_time)
 {
-  // Check that we have the same number of procs and same number of nodes used for checkpoint
-  int configOk = 0;
+  // Reading previous parallel configuration
+  int prev_nb_proc = -1;
+  int prev_nb_nodes = -1;
   if(Process::je_suis_maitre()) // if I'm the master (no need for everyone to read)
     {
-      int nb_proc = Process::nproc();
-      int nb_nodes = PE_Groups::get_node_group().get_number_of_nodes();
-
-      int prev_nb_proc = -1;
-      int prev_nb_nodes = -1;
 #ifdef HAS_PDI
-      PDI_multi_expose("ReadPrevConfiguration", "nb_proc", &prev_nb_proc, PDI_INOUT, "nb_nodes", &prev_nb_nodes, PDI_INOUT, nullptr);
+      PDI_multi_expose("ReadConfig", "nb_proc", &prev_nb_proc, PDI_INOUT, "nb_nodes", &prev_nb_nodes, PDI_INOUT, nullptr);
 #endif
-      configOk = nb_proc == prev_nb_proc && nb_nodes == prev_nb_nodes;
-      if(!configOk)
+    }
+  envoyer_broadcast(prev_nb_proc,0);
+  envoyer_broadcast(prev_nb_nodes,0);
+
+  // Check that we have the same number of procs used for checkpoint
+  int nb_proc = Process::nproc();
+  int nb_nodes = PE_Groups::get_node_group().get_number_of_nodes();
+  if(nb_proc != prev_nb_proc)
+    {
+      Cerr << "TRUST_2_PDI::prepareRestart():: PDI Restart Error !" << finl;
+      Cerr << "The backup file has been generated with " << prev_nb_proc << " processors." << finl;
+      Cerr << "The current computation is launched with " << nb_proc << " processors." << finl;
+      Cerr << "With PDI, you need to restart your computation with the same number of processors used for previous computation." << finl;
+      Process::exit();
+    }
+  bool samePartition = nb_nodes == prev_nb_nodes;
+  // If we have the same node partition as the one in the checkpoint files,
+  // then we can use the current nodes for reading as well
+  // otherwise, we need to read the checkpoint configuration file to recreate the proper communicator
+  // and identify which file each MPI comm has to read
+  if (!samePartition)
+    {
+      // array containing the node id of each processor during checkpoint
+      ArrOfInt nodeRanks(nb_proc);
+      if(Process::je_suis_maitre())
         {
-          Cerr << "TRUST_2_PDI::prepareRestart():: PDI Restart Error !" << finl;
-          Cerr << "The backup file has been generated with " << prev_nb_proc << " processors, on " << prev_nb_nodes << " nodes." << finl;
-          Cerr << "The current computation is launched with " << nb_proc << " processors on " << nb_nodes << " nodes." << finl;
-          Cerr << "With PDI, you need to restart your computation with the same configuration (ie same number of processors and same number of nodes) used for previous computation." << finl;
+          // trigger reading of metadata file to figure out to which group each processor should belong to
+          // (reading by master only as the array should be small)
+#ifdef HAS_PDI
+          PDI_multi_expose("ReadNodeRanks", "nodeRanks", nodeRanks.data(), PDI_INOUT, nullptr);
+#endif
+        }
+      // broadcasting the array to everyone
+      envoyer_broadcast_array(nodeRanks.data(), nb_proc, 0);
+      int nodeId = nodeRanks[Process::me()];
+      // Recreating the same communicators as those used at the checkpoint
+      // (every proc of the same MPI group should have the same pe_list)
+      ArrOfInt pe_list;
+      for(int p=0; p<nb_proc; p++)
+        {
+          if(nodeRanks[p] == nodeId)
+            pe_list.append_array(p);
+        }
+      PE_Groups::create_group(pe_list, nodeGroup);
+      if (PE_Groups::enter_group(nodeGroup.valeur()))
+        {
+          share_parallelism(nodeGroup.valeur(), nodeId);
+          // we can exit the group as the communicators are shared with PDI
+          PE_Groups::exit_group();
         }
     }
-  envoyer_broadcast(configOk,0);
-  if(!configOk)
-    Process::exit();
 
   // Get time scheme information
   int nb_sauv = -1;

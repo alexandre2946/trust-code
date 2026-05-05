@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -73,27 +73,24 @@ public:
   // (with the name of the corresponding checkpoint filename)
   // (we can have independent checkpoint files for each problem or a common one)
   // This has to be called before generating the YAML file for checkpoint/restart!
-  void add_pb_base(const Probleme_base& pb_base, const Nom& file_name)
+  void add_pb_base(const Probleme_base& pb_base, const Nom& full_file_name)
   {
     Pb2Save new_pb;
     new_pb.pb = pb_base;
 
-    // if we're in parallel, we need to index the checkpoint filename with the node id
-    if(Process::is_parallel())
-      {
-        const std::string& fname = file_name.getString();
-        std::size_t relative_path = fname.find_last_of("/");
-        std::string path = relative_path != std::string::npos ? fname.substr(0,relative_path+1) : "";
-        std::string basename = relative_path != std::string::npos ? fname.substr(relative_path+1) : fname;
-        std::size_t with_ext = basename.find(".");
-        std::string suffix = with_ext != std::string::npos ? basename.substr(with_ext) : "";
-        std::string prefix = with_ext != std::string::npos ? basename.substr(0,with_ext) : basename;
-        new_pb.filename =  path + prefix + "_${nodeId}" + suffix;
-      }
-    else
-      new_pb.filename = file_name;
+    const std::string& full_fname = full_file_name.getString();
+    std::size_t relative_path = full_fname.find_last_of("/");
+    std::string path     = relative_path != std::string::npos ? full_fname.substr(0, relative_path + 1) : "";
+    std::string fname = relative_path  != std::string::npos ? full_fname.substr(relative_path + 1) : full_fname;
+    std::size_t with_ext = fname.find(".");
+    std::string basename = with_ext != std::string::npos ? fname.substr(0, with_ext) : fname;
+    std::string extension = with_ext != std::string::npos ? fname.substr(with_ext) : "";
+    std::string nodeIndex = Process::is_parallel() ? "_${nodeId}" : "";
 
+    new_pb.filename = path + basename + nodeIndex + extension;
+    new_pb.configFilename_ = path + basename + "_config" + extension;
     pbs_.push_back(new_pb);
+
   }
 
   void add_field(Nom pb, Nom nom, int nb_dim);
@@ -123,11 +120,12 @@ private:
   // Private methods to generate the YAML file that are common
   //                for checkpoint and restart
   // ==============================================================
-  void write_checkpoint_restart_file(int save, const std::string& yaml_fname);
-  void declare_metadata(int save, std::string& text);
-  void declare_data(int save, std::string& text);
-  void write_format(int save, const std::string& fname, std::string& text);
-  void write_time_scheme(int save, const std::string& fname, std::string& text);
+  void write_checkpoint_restart_file(bool save, const std::string& yaml_fname);
+  void declare_metadata(bool save, std::string& text);
+  void declare_data(bool save, std::string& text);
+  void write_time_scheme(bool save, const std::string& fname, std::string& text);
+  void write_config_file(bool save, int pb_i, std::string& text);
+  void write_partition(bool save, int pb_i, std::string& text);
 
   // ==============================================================
   // Private methods to generate the YAML file for checkpoint only
@@ -135,13 +133,14 @@ private:
   void write_data_for_checkpoint(int pb_i, bool is_parallel, std::string& text);
   void write_file_initialization(int pb_i, std::string& text);
   void write_fields_types_for_checkpoint(int pb_i, std::string& text);
+  void write_config_file_initialization(int pb_i, std::string& text);
+  void write_format_for_checkpoint(const std::string& fname, std::string& text);
 
   // ==============================================================
   // Private methods to generate the YAML file for restart only
   // ==============================================================
   void write_data_for_restart(int pb_i, std::string& text);
   void write_fields_types_for_restart(int pb_i, std::string& text);
-  void write_restart_check(const std::string& fname, std::string& text);
 
   // ==============================================================
   // Private methods useful to write generic structures
@@ -154,6 +153,7 @@ private:
   void write_impl_dataset(const std::string& dname, const std::string& fname, const std::vector<std::string>& attribute, std::string& text);
   void write_TRUST_dataset(const std::string& dname, const std::string& name, int nb_dim, const std::string& cond, bool is_parallel, const std::vector<std::string>& attribute, std::string& text);
   void write_TRUST_dataset_selection(const std::string& name, int nb_dim, bool is_parallel, std::string& text);
+  void write_dataset_selection(const std::vector<std::string>& sizes, const std::vector<std::string>& offsets,std::string& text);
   void write_attributes(const std::vector<std::string>& attributes, std::string& text);
 
   // indicates the number of spaces to add at the beginning of the next line to write in the file (so that the YAML file correctly indented)
@@ -164,13 +164,18 @@ private:
     OBS_PTR(Probleme_base) pb;
     std::vector<YAML_data> data;
     std::string filename;
+    std::string configFilename_;
   } Pb2Save;
   // List of all the problems we want to save/restore
   // Each of the problems contain:
   // - a reference to the problem
   // - the list of the fields and the scalars to be saved/restored, with all the corresponding information
   // - the name of the corresponding checkpoint file
+  // - the name of the corresponding configuration checkpoint file
   std::vector<Pb2Save> pbs_;
+
+  // the name of the corresponding checkpoint configuration file
+
 };
 
 #endif

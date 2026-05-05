@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -73,36 +73,9 @@ public:
     PC_tree_t tconf = PC_parse_path(IO_config.c_str());
     PDI_init(PC_get(tconf, ".pdi"));
     PC_tree_destroy(&tconf);
-
-    // sharing node parallelism
-#ifdef MPI_
-    // Retrieve communicator on node
-    const Comm_Group& ngrp = PE_Groups::get_node_group();
-    const Comm_Group_MPI* nodeComm = dynamic_cast<const Comm_Group_MPI*>(&ngrp);
-    if(nodeComm)
-      {
-        const MPI_Comm& comm = nodeComm->get_mpi_comm(); // mpi communicator of my node
-        int nodeSz = nodeComm->nproc();  // number of procs in my node
-        int nodeRk = nodeComm->rank();   // my rank inside the node
-        int nodeId = nodeComm->get_node_id(); // id of my node (among all the other nodes)
-
-        const Comm_Group& nm = PE_Groups::get_node_master(); // Communicator for the master of my node (this communicator is empty if I'm not the master of my node)
-        const Comm_Group_MPI* nodeMaster = dynamic_cast<const Comm_Group_MPI*>(&nm);
-        assert(nodeMaster);
-        const MPI_Comm& masterComm = nodeMaster->get_mpi_comm();  // mpi communicator reserved for the master of my node only
-
-        PDI_multi_expose("Parallelism",
-                         /* only the first data needs to be non const*/
-                         "nodeSize",&nodeSz, PDI_OUT,
-                         "nodeRk",    &nodeRk, PDI_OUT,
-                         "nodeId",    &nodeId, PDI_OUT,
-                         "node",&comm, PDI_OUT,
-                         "master", &masterComm, PDI_OUT,
-                         nullptr);
-
-      }
-#endif /* MPI_ */
 #endif /* HAS_PDI */
+
+    share_node_parallelism();
     PDI_initialized_ = 1;
   }
 
@@ -118,6 +91,36 @@ public:
 #ifdef HAS_PDI
     // finalize PDI
     PDI_finalize();
+#endif
+  }
+
+  // Method to use for sharing all data related to the node's parallelism
+  static void share_node_parallelism()
+  {
+#ifdef MPI_
+    const Comm_Group& ngrp = PE_Groups::get_node_group();
+    const Comm_Group_MPI* nodeComm = dynamic_cast<const Comm_Group_MPI*>(&ngrp);
+    if (nodeComm)
+      {
+        // retrieving the communicators for each master of the node groups
+        const Comm_Group& nm = PE_Groups::get_node_master();
+        const Comm_Group_MPI* nodeMaster = dynamic_cast<const Comm_Group_MPI*>(&nm);
+        assert(nodeMaster);
+        const MPI_Comm& masterComm = nodeMaster->get_mpi_comm();
+
+        int nodeId = nodeComm->get_node_id();
+        share_parallelism_impl(nodeComm, nodeId, &masterComm);
+      }
+#endif
+  }
+
+  // Method to use for sharing all data related to any MPI group parallelism
+  static void share_parallelism(const Comm_Group& grp, int group_rank)
+  {
+#ifdef MPI_
+    const Comm_Group_MPI* comm = dynamic_cast<const Comm_Group_MPI*>(&grp);
+    if (comm)
+      share_parallelism_impl(comm, group_rank);
 #endif
   }
 
@@ -188,9 +191,28 @@ public:
   void share_type(const Nom& name, const Nom& type);
   void get_type(const Nom& name, Nom& type);
   void share_TRUSTTab_dimensions(const DoubleTab& tab, const Nom& name, int write);
-  void prepareRestart(int& last_iteration, double& tinit, int resume_last_time);
+  void prepareRestart(OWN_PTR(Comm_Group)& nodeGroup, int& last_iteration, double& tinit, int resume_last_time);
 
 private:
+
+#ifdef MPI_
+  static void share_parallelism_impl(const Comm_Group_MPI* nodeComm, int nodeId, const MPI_Comm* masterComm = nullptr)
+  {
+#ifdef HAS_PDI
+    const MPI_Comm& comm = nodeComm->get_mpi_comm();
+    int nodeSz = nodeComm->nproc();
+    int nodeRk = nodeComm->rank();
+    PDI_multi_expose("Parallelism",
+                     "nodeSize",  &nodeSz,  PDI_OUT,
+                     "nodeRk",    &nodeRk,  PDI_OUT,
+                     "nodeId",    &nodeId,  PDI_OUT,
+                     "node",      &comm,    PDI_OUT,
+                     nullptr);
+    if (masterComm)
+      PDI_expose("master",    masterComm,    PDI_OUT);
+#endif
+  }
+#endif
 
   // data that are currently shared with PDI
   static std::vector<std::string> shared_data_;

@@ -195,7 +195,9 @@ Entree& Champ_Fonc_reprise::readOn(Entree& s)
       fic_hdf.close();
     }
   else if (format_rep == "pdi")
-    init_pdi(pb, nom_fic, nom_champ_pdi, last_time, un_temps, reprend_champ_moyen);
+    {
+      init_pdi(pb, nom_fic, nom_champ_pdi, last_time, un_temps, reprend_champ_moyen);
+    }
   else
     {
       if (format_rep == "xyz")
@@ -382,7 +384,7 @@ void Champ_Fonc_reprise::init_pdi(const Probleme_base& pb, const Nom& nom_fic, c
   TRUST_2_PDI pdi_interface;
   int last_iteration = -1;
   double tinit = last_time ? -1. : un_temps;
-  pdi_interface.prepareRestart(last_iteration, tinit, last_time);
+  pdi_interface.prepareRestart(restartComm_, last_iteration, tinit, last_time);
 
 }
 

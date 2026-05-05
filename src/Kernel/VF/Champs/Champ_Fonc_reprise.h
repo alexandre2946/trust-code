@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -75,6 +75,9 @@ public:
   }
 
 private:
+  // for PDI, communicator used to read the checkpoint file (useful if the current node partition is different than the one for checkpoint)
+  OWN_PTR(Comm_Group) restartComm_;
+
   OWN_PTR(Champ_Inc_base) vrai_champ_;
   void init_pdi( const Probleme_base& pb, const Nom& nom_fic, const Nom& ch_ident, int last_time, double un_temps, int reprend_champ_moyen);
   void read_field_from_file(Entree& jdd, Entree& file, const Probleme_base& pb, const Nom& nom_ident,

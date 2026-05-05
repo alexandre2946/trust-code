@@ -213,11 +213,12 @@ void Save_Restart::prepare_PDI_restart(int resume_last_time)
 
   int last_iteration = -1;
   double tinit = -1.;
+
   // Restart from the last time
   if (resume_last_time)
     {
       // Look for the last time saved in checkpoint file to init current computation
-      pdi_interface.prepareRestart(last_iteration, tinit, 1 /*resume_last_time */);
+      pdi_interface.prepareRestart(restartComm_, last_iteration, tinit, 1 /*resume_last_time */);
 
       // set last time found in checkpoint file to tinit if tinit not set
       setTinitFromLastTime(tinit);
@@ -226,21 +227,7 @@ void Save_Restart::prepare_PDI_restart(int resume_last_time)
     {
       // looking for tinit in backup file
       tinit = pb_base_->schema_temps().temps_init();
-      pdi_interface.prepareRestart(last_iteration, tinit, 0 /* reprise */);
-    }
-
-  // Check format of checkpoint file
-  if(Process::node_master())
-    {
-      pdi_interface.read("version", &restart_version_);
-
-      if(restart_version_ < version_format_PDI() )
-        {
-          Cerr << "----------------------------------------------------------------------------------------------" << finl;
-          Cerr << "The resumption with PDI format is only available with TRUST versions 1.9.6 and higher " << finl;
-          Cerr << "----------------------------------------------------------------------------------------------" << finl;
-          Process::exit();
-        }
+      pdi_interface.prepareRestart(restartComm_, last_iteration, tinit, 0 /* reprise */);
     }
 }
 
@@ -628,12 +615,35 @@ int Save_Restart::sauver() const
           TRUST_2_PDI::init(yaml_fname);
         }
 
+      if(!config_file_created_)
+        {
+          int nb_proc = Process::nproc();
+          IntTab nodeRanks(nb_proc);
+          nodeRanks = PE_Groups::get_node_group().get_node_id();
+          envoyer_gather(nodeRanks, nodeRanks, 0);
+          // Creating and filling the configuration checkpoint file
+          // which contains all the information about the nodes partition used for checkpoint
+          if (Process::je_suis_maitre())
+            {
+              TRUST_2_PDI pdi_interface;
+              pdi_interface.write("nb_proc", &nb_proc);
+              pdi_interface.trigger("InitConfig");
+
+              int nb_nodes = PE_Groups::get_node_group().get_number_of_nodes();
+              pdi_interface.write("nb_nodes", &nb_nodes);
+              pdi_interface.trigger("WriteConfig");
+              pdi_interface.TRUST_start_sharing("nodeRanks", nodeRanks.data());
+              pdi_interface.trigger("WriteNodeRanks");
+              pdi_interface.stop_sharing_last_variable();
+            }
+          config_file_created_ = true;
+        }
+
       // if we are dealing with a coupled problem, the initialization might have been done twice
       // in which case we don't want to overwrite the file
       if(Process::node_master() && !ficsauv_created_)
         {
           TRUST_2_PDI pdi_interface;
-
           // if a file with the same name already exists, delete it and create a new one
           int non_const_sr = simple_restart_;
           pdi_interface.TRUST_start_sharing("simple_sauvegarde", &non_const_sr);
@@ -643,12 +653,7 @@ int Save_Restart::sauver() const
 
           // format information
           int version = version_format_PDI();
-          int nb_proc = Process::nproc();
-          int nb_nodes = PE_Groups::get_node_group().get_number_of_nodes();
           pdi_interface.write("version", &version);
-          pdi_interface.write("nb_nodes", &nb_nodes);
-          pdi_interface.write("nb_proc", &nb_proc);
-
           ficsauv_created_ = true;
         }
     }
