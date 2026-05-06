@@ -90,7 +90,7 @@ int Prepro_IBM_base::lire_motcle_non_standard(const Motcle& un_mot, Entree& is)
       dom_med_IB_.nommer(nom_dom_);
       liremed.associer_domaine(dom_med_IB_);
       liremed.retrieve_MC_objects();
-      aSkinUMesh_ = liremed.get_mc_mesh();
+      aSkinUMesh_ = liremed.get_mc_mesh()->deepCopy();
 
       int space_dim = aSkinUMesh_->getSpaceDimension();
       if (space_dim != Objet_U::dimension)
@@ -105,11 +105,13 @@ int Prepro_IBM_base::lire_motcle_non_standard(const Motcle& un_mot, Entree& is)
       coordsSur3D_.resize(nbNodeSur, space_dim);
       std::copy(coord, coord+coordsSur3D_.size_array(), coordsSur3D_.addr());
 
-      const double *normal = aSkinUMesh_->buildOrthogonalField()->getArray()->begin();
+      MCAuto<MEDCoupling::MEDCouplingFieldDouble> normalField(aSkinUMesh_->buildOrthogonalField());
+      const double *normal = normalField->getArray()->begin();
       normalArr_.resize(nbElemSur, space_dim);
       std::copy(normal, normal+normalArr_.size_array(), normalArr_.addr());
 
-      const double *bary = aSkinUMesh_->computeIsoBarycenterOfNodesPerCell()->begin();
+      MCAuto<MEDCoupling::DataArrayDouble> baryField(aSkinUMesh_->computeIsoBarycenterOfNodesPerCell());
+      const double *bary = baryField->begin();
       barySurf_.resize(nbElemSur, space_dim);
       std::copy(bary, bary+barySurf_.size_array(), barySurf_.addr());
 
@@ -364,7 +366,7 @@ void Prepro_IBM_base::computeAire2()
   ArrOfDouble mesh2DBBox(2*dim_esp);
   Octree_Double octree_mesh3D;
   octree_mesh3D.build_nodes(le_dom.les_sommets(), 0, eps_); //ne pas inclure les sommets virtuels
-  MEDCouplingFieldDouble *measure_aSkinUMesh = aSkinUMesh_->getMeasureField(true);
+  MCAuto<MEDCouplingFieldDouble> measure_aSkinUMesh(aSkinUMesh_->getMeasureField(true));
   assert(measure_aSkinUMesh->getNumberOfComponents()==1);
   double mesure_tot_aSkinUMesh = measure_aSkinUMesh->accumulate(0);
 
@@ -406,7 +408,7 @@ void Prepro_IBM_base::computeAire2()
       if (idebug) Cerr<<"barySurf[e]_ ("<<barySurf_(e, 0)<<" , "<<barySurf_(e, 1)<<" , "<<barySurf_(e, 2)<<")"<<finl;
 
       // Mesh 2D de la facette 3D numero e
-      MEDCouplingUMesh * mesh2DSurf = MEDCouplingUMesh::New("surf_"+std::to_string(e),2);
+      MCAuto<MEDCouplingUMesh> mesh2DSurf(MEDCouplingUMesh::New("surf_"+std::to_string(e),2));
       DoubleTrav surfCoords2D(nbNodesSur, 2);
       for (int node =0; node < nbNodesSur; node++)
         {
@@ -415,7 +417,9 @@ void Prepro_IBM_base::computeAire2()
           surfCoords2D(node,1) = (coordsSur3D_(numNode,0)-barySurf_(e,0))*t2Arr(e,0) + (coordsSur3D_(numNode,1)-barySurf_(e,1))*t2Arr(e,1) + (coordsSur3D_(numNode,2)-barySurf_(e,2))*t2Arr(e,2);
         }
       MCAuto<MEDCoupling::DataArrayDouble> array(MEDCoupling::DataArrayDouble::New());
-      array->useArray(surfCoords2D.addr(), false, MEDCoupling::DeallocType::CPP_DEALLOC, nbNodesSur, 2);
+      array->alloc(nbNodesSur, 2);
+      std::copy(surfCoords2D.addr(), surfCoords2D.addr() + surfCoords2D.size_array(), array->getPointer());
+      array->declareAsNew();
       mesh2DSurf->setCoords(array);
       mesh2DSurf->allocateCells(1);
       IntTrav mesh2DSurf_conect(1, nbNodesSur);
@@ -424,6 +428,7 @@ void Prepro_IBM_base::computeAire2()
       std::vector<mcIdType> tmp(ptr, ptr+nbNodesSur);
       INTERP_KERNEL::NormalizedCellType typ_fac_mc = INTERP_KERNEL::NORM_POLYGON;
       mesh2DSurf->insertNextCell(typ_fac_mc, nbNodesSur, tmp.data());
+      mesh2DSurf->finishInsertingCells();
 
       if (idebug)
         {
@@ -470,7 +475,7 @@ void Prepro_IBM_base::computeAire2()
 
       // Détection des éléments volumiques dans la Bounding Box
       const double bbox[] = {mesh2DBBox(0), mesh2DBBox(1), mesh2DBBox(2), mesh2DBBox(3), mesh2DBBox(4), mesh2DBBox(5)};
-      MEDCoupling::DataArrayIdType * cellIdsArr = le_mc_mesh->getCellsInBoundingBox(bbox, 0.); //precision = 0 pour ne pas avoir d'element 3D non coupe par la frontiere
+      MCAuto<MEDCoupling::DataArrayIdType> cellIdsArr(le_mc_mesh->getCellsInBoundingBox(bbox, 0.)); //precision = 0 pour ne pas avoir d'element 3D non coupe par la frontiere
       const mcIdType *daP = cellIdsArr->begin();
       int NbCellsInBB = int(cellIdsArr->getNumberOfTuples());
       int NbCompsInBB = int(cellIdsArr->getNumberOfComponents());
@@ -491,7 +496,7 @@ void Prepro_IBM_base::computeAire2()
 
           // maillage 3D Euler MC 1 cell
           const mcIdType cellIds[1]= {my_elem};
-          MEDCouplingUMesh *mesh3D = le_mc_mesh->buildPartOfMySelf(cellIds,cellIds+1,false);
+          MCAuto<MEDCouplingUMesh> mesh3D(le_mc_mesh->buildPartOfMySelf(cellIds,cellIds+1,false));
           assert(mesh3D->getNumberOfCells()==1);
           int NumberOfNodes3D = int(mesh3D->getNumberOfNodes());
 
@@ -527,12 +532,12 @@ void Prepro_IBM_base::computeAire2()
               for (int cc = 0; cc <dim_esp; cc++) Cerr<< vec[cc]<<" ";
               Cerr << finl;
             }
-          MEDCoupling::DataArrayIdType * polycellIds ;
+          MEDCoupling::DataArrayIdType * polycellIds = nullptr;
           try
             {
               // Intersection par un plan infini
-              MEDCouplingUMesh * interPoly3D = mesh3D->buildSlice3D(origin, vec, 0., polycellIds);
-              polycellIds->decrRef();
+              MCAuto<MEDCouplingUMesh> interPoly3D(mesh3D->buildSlice3D(origin, vec, 0., polycellIds));
+              MCAuto<MEDCoupling::DataArrayIdType> polycellIdsAuto(polycellIds);
               int nbCellsPoly3D = int(interPoly3D->getNumberOfCells());
               int NumberOfNodes = int(interPoly3D->getNumberOfNodes());
               const double *interCoords3D = interPoly3D->getCoords()->begin();
@@ -556,7 +561,7 @@ void Prepro_IBM_base::computeAire2()
                   Cerr << "<Nb nodes> mesh3D, interPoly3D and Cell#1 = "<<NumberOfNodes3D<<" "<<NumberOfNodes<<" "<<nbNodesCell1<<finl;
                 }
               assert((NumberOfNodes - NumberOfNodes3D) == nbNodesCell1);
-              MEDCouplingUMesh * interPoly2D = MEDCouplingUMesh::New("interPoly2D_"+std::to_string(my_elem),2);
+              MCAuto<MEDCouplingUMesh> interPoly2D(MEDCouplingUMesh::New("interPoly2D_"+std::to_string(my_elem),2));
               DoubleTrav interPolyCoords2D(nbNodesCell1, (dim_esp - 1));
               for (int node = 0; node <nbNodesCell1 ; node++)
                 {
@@ -565,7 +570,9 @@ void Prepro_IBM_base::computeAire2()
                   interPolyCoords2D(node,1) = (interCoordonnes3D(numNode,0)-barySurf_(e,0))*t2Arr(e,0) + (interCoordonnes3D(numNode,1)-barySurf_(e,1))*t2Arr(e,1) + (interCoordonnes3D(numNode,2)-barySurf_(e,2))*t2Arr(e,2);
                 }
               MCAuto<MEDCoupling::DataArrayDouble> interPolyarray2D(MEDCoupling::DataArrayDouble::New());
-              interPolyarray2D->useArray(interPolyCoords2D.addr(), false, MEDCoupling::DeallocType::CPP_DEALLOC, nbNodesCell1, 2);
+              interPolyarray2D->alloc(nbNodesCell1, 2);
+              std::copy(interPolyCoords2D.addr(), interPolyCoords2D.addr() + interPolyCoords2D.size_array(), interPolyarray2D->getPointer());
+              interPolyarray2D->declareAsNew();
               interPoly2D->setCoords(interPolyarray2D);
               interPoly2D->allocateCells(1);
               IntTrav Poly2D_conect(1, nbNodesCell1);
@@ -574,6 +581,7 @@ void Prepro_IBM_base::computeAire2()
               std::vector<mcIdType> Poly2D_tmp(Poly2D_ptr, Poly2D_ptr+ nbNodesCell1);
               typ_fac_mc = INTERP_KERNEL::NORM_POLYGON;
               interPoly2D->insertNextCell(typ_fac_mc, nbNodesCell1, Poly2D_tmp.data());
+              interPoly2D->finishInsertingCells();
 
               if (idebug)
                 {
@@ -607,11 +615,13 @@ void Prepro_IBM_base::computeAire2()
               if (idebug && (status_polypoly != 0)) Cerr<<"status intersectPolyPoly2D : "<<status_polypoly<<finl;
               if (status_polypoly != 0) continue; // next cell
 
-              MEDCouplingUMesh * finalMesh = MEDCouplingUMesh::New("output_mesh",(dim_esp-1));
+              MCAuto<MEDCouplingUMesh> finalMesh(MEDCouplingUMesh::New("output_mesh",(dim_esp-1)));
               finalMesh->allocateCells(1);
 
               MCAuto<MEDCoupling::DataArrayDouble> outputCoords(MEDCoupling::DataArrayDouble::New());
-              outputCoords->useArray(finalcoords.addr(), false, MEDCoupling::DeallocType::CPP_DEALLOC, finalcoords.dimension(0), finalcoords.dimension(1));
+              outputCoords->alloc(finalcoords.dimension(0), finalcoords.dimension(1));
+              std::copy(finalcoords.addr(), finalcoords.addr() + finalcoords.size_array(), outputCoords->getPointer());
+              outputCoords->declareAsNew();
               finalMesh->setCoords(outputCoords);
               auto connect_ptr = Tab_conect.addr();
               std::vector<mcIdType> finalConnect(connect_ptr, connect_ptr+Tab_conect.dimension(1) );
@@ -664,7 +674,7 @@ void Prepro_IBM_base::computeAire2()
                   for (int cc = 0; cc <dim_esp; cc++) Cerr << baryMean(cc) <<" ";
                   Cerr << finl;
                 }
-              MEDCouplingFieldDouble * measure = finalMesh->getMeasureField(true);
+              MCAuto<MEDCouplingFieldDouble> measure(finalMesh->getMeasureField(true));
               assert(measure->getNumberOfValues()==1);
               double aire = measure->accumulate(0);
               if (idebug) Cerr<<"Element measure finalMesh = "<<aire<<finl;
@@ -766,7 +776,7 @@ void Prepro_IBM_base::intersectPolyPoly2D(MEDCouplingUMesh * polyMesh1, MEDCoupl
   DoubleTrav coords1;
   coords1.resize(nbNodes1, (dim_esp-1));
   std::copy(mc_coords1, mc_coords1+coords1.size_array(), coords1.addr());
-  MEDCouplingUMesh * polyEdgeMesh1 = polyMesh1->buildBoundaryMesh(false);
+  MCAuto<MEDCouplingUMesh> polyEdgeMesh1(polyMesh1->buildBoundaryMesh(false));
   int nbEdge1 = int(polyEdgeMesh1->getNumberOfCells());
   if (idebug)
     {
@@ -779,7 +789,7 @@ void Prepro_IBM_base::intersectPolyPoly2D(MEDCouplingUMesh * polyMesh1, MEDCoupl
   DoubleTrav coords2;
   coords2.resize(nbNodes2, (dim_esp-1));
   std::copy(mc_coords2, mc_coords2+coords2.size_array(), coords2.addr());
-  MEDCouplingUMesh * polyEdgeMesh2 = polyMesh2->buildBoundaryMesh(false);
+  MCAuto<MEDCouplingUMesh> polyEdgeMesh2(polyMesh2->buildBoundaryMesh(false));
   if (idebug)
     {
       Cerr<<">>> Prepro_IBM_base::intersectPolyPoly2D: Cell and node nb polyEdgeMesh2 = "<<int(polyEdgeMesh2->getNumberOfCells())<<" "<<int(polyEdgeMesh2->getNumberOfNodes())<<finl;
@@ -792,7 +802,9 @@ void Prepro_IBM_base::intersectPolyPoly2D(MEDCouplingUMesh * polyMesh1, MEDCoupl
       for (int k=0; k<(dim_esp-1); k++) p_test(k) = coords1(i,k);
       if (polyMesh2->getCellContainingPoint(p_test.addr(), eps) != -1)
         {
-          MC_p_test->useArray(p_test.addr(), false, MEDCoupling::DeallocType::CPP_DEALLOC, 1, (dim_esp-1));
+          MC_p_test->alloc(1, (dim_esp-1));
+          std::copy(p_test.addr(), p_test.addr() + (dim_esp-1), MC_p_test->getPointer());
+          MC_p_test->declareAsNew();
           if (outputCoords->isAllocated())
             {
               outputCoords->aggregate(MC_p_test);
@@ -812,7 +824,9 @@ void Prepro_IBM_base::intersectPolyPoly2D(MEDCouplingUMesh * polyMesh1, MEDCoupl
       for (int k=0; k<(dim_esp-1); k++) p_test(k) = coords2(i,k);
       if (polyMesh1->getCellContainingPoint(p_test.addr(), eps) != -1)
         {
-          MC_p_test->useArray(p_test.addr(), false, MEDCoupling::DeallocType::CPP_DEALLOC, 1, (dim_esp-1));
+          MC_p_test->alloc(1, (dim_esp-1));
+          std::copy(p_test.addr(), p_test.addr() + (dim_esp-1), MC_p_test->getPointer());
+          MC_p_test->declareAsNew();
           if (outputCoords->isAllocated())
             {
               outputCoords->aggregate(MC_p_test);
@@ -859,11 +873,13 @@ void Prepro_IBM_base::intersectPolyPoly2D(MEDCouplingUMesh * polyMesh1, MEDCoupl
     }
   if (idebug) Cerr<<">>> Prepro_IBM_base::intersectPolyPoly2D(): outputCoords nodes after intersectSegPoly2D = "<<int(outputCoords->getNumberOfTuples())<<finl;
 
-  MEDCouplingUMesh * outputMesh = MEDCouplingUMesh::New("output_mesh",(dim_esp-1));
+  MCAuto<MEDCouplingUMesh> outputMesh(MEDCouplingUMesh::New("output_mesh",(dim_esp-1)));
   outputMesh->allocateCells(1);
 
   MEDCoupling::DataArrayIdType *connect = 0, *connInd = 0;
   outputCoords->findCommonTuples(eps, -1, connect, connInd);
+  MCAuto<MEDCoupling::DataArrayIdType> connectAuto(connect);
+  MCAuto<MEDCoupling::DataArrayIdType> connIndAuto(connInd);
   if (idebug) Cerr<<"             connect and connInd tuples after findCommonTuples = "<<int(connect->getNumberOfTuples())<<" "<<int(connInd->getNumberOfTuples())<<finl;
   if(int(connect->getNumberOfTuples()) > 0)
     {
@@ -873,7 +889,7 @@ void Prepro_IBM_base::intersectPolyPoly2D(MEDCouplingUMesh * polyMesh1, MEDCoupl
     }
   else outputMesh->setCoords(outputCoords);
 
-  MCAuto<MEDCoupling::DataArrayDouble> finalCoords = outputMesh->getCoords();
+  const MEDCoupling::DataArrayDouble *finalCoords = outputMesh->getCoords();
   int finalCoords_len = int(finalCoords->getNumberOfTuples());
   if (idebug) Cerr<<"             Nb of tuples in finalCoords = "<<finalCoords_len<<finl;
   if (finalCoords_len < 3)
@@ -888,6 +904,7 @@ void Prepro_IBM_base::intersectPolyPoly2D(MEDCouplingUMesh * polyMesh1, MEDCoupl
   std::vector<mcIdType> Connect(connect_ptr, connect_ptr+Tab_conect.dimension(1));
   INTERP_KERNEL::NormalizedCellType typ_fac_mc = INTERP_KERNEL::NORM_POLYGON;
   outputMesh->insertNextCell(typ_fac_mc, Tab_conect.dimension(1), Connect.data());
+  outputMesh->finishInsertingCells();
 
   // Butterfly ?
   // std::vector<mcIdType> cells;
@@ -908,7 +925,7 @@ void Prepro_IBM_base::intersectPolyPoly2D(MEDCouplingUMesh * polyMesh1, MEDCoupl
   numNodes2D.clear();
 
   // Test aire < eps ;
-  MEDCouplingFieldDouble * measure = outputMesh->getMeasureField(true);
+  MCAuto<MEDCouplingFieldDouble> measure(outputMesh->getMeasureField(true));
   double aire = measure->accumulate(0);
   if (aire<eps)
     {
@@ -933,7 +950,8 @@ void Prepro_IBM_base::intersectPolyPoly2D(MEDCouplingUMesh * polyMesh1, MEDCoupl
           outputMesh->renumberNodesInConn(old2newIds);
           numNodes2D.clear();
           outputMesh->getNodeIdsOfCell(0, numNodes2D);
-          aire = (outputMesh->getMeasureField(true))->accumulate(0);
+          MCAuto<MEDCouplingFieldDouble> measure_modified(outputMesh->getMeasureField(true));
+          aire = measure_modified->accumulate(0);
           Cerr<<"             Element measure outputMesh = "<<aire<<" with modified cell connectivity => ";
           for (int node =0; node <  int(numNodes2D.size()); node++) Cerr <<int(numNodes2D[node]) <<" ";
           Cerr << finl;
@@ -947,7 +965,8 @@ void Prepro_IBM_base::intersectPolyPoly2D(MEDCouplingUMesh * polyMesh1, MEDCoupl
               outputMesh->renumberNodesInConn(old2newIds_ter);
               numNodes2D.clear();
               outputMesh->getNodeIdsOfCell(0, numNodes2D);
-              aire = (outputMesh->getMeasureField(true))->accumulate(0);
+              MCAuto<MEDCouplingFieldDouble> measure_modified_bis(outputMesh->getMeasureField(true));
+              aire = measure_modified_bis->accumulate(0);
               Cerr<<"             Element measure outputMesh = "<<aire<<" with modified cell connectivity => ";
               for (int node =0; node <  int(numNodes2D.size()); node++) Cerr <<int(numNodes2D[node]) <<" ";
               Cerr << finl;
@@ -1025,7 +1044,9 @@ void Prepro_IBM_base::intersectSegPoly2D(MEDCouplingUMesh * polyEdgeMesh, Double
       intersectSegSeg2D(pe1, pe2, p1, p2, p, eps, status_segseg);
       if (status_segseg == 0)
         {
-          MC_p->useArray(p.addr(), false, MEDCoupling::DeallocType::CPP_DEALLOC, 1, (dim_esp-1));
+          MC_p->alloc(1, (dim_esp-1));
+          std::copy(p.addr(), p.addr() + (dim_esp-1), MC_p->getPointer());
+          MC_p->declareAsNew();
           MC_p->rearrange((dim_esp-1));
           outputCoords->aggregate(MC_p);
         }

@@ -72,7 +72,7 @@ protected:
   OBS_PTR(Probleme_base) mon_pb_;
   Nom nom_fichier_med_IB_, nom_maillage_IB_ = "??";
   Domaine dom_med_IB_;
-  const MEDCoupling::MEDCouplingUMesh* aSkinUMesh_ = nullptr; // Mesh MedCoupling IBM
+  MCAuto<MEDCoupling::MEDCouplingUMesh> aSkinUMesh_ = nullptr; // Mesh MedCoupling IBM
   DoubleTab barySurf_; // Barycentres maillage Lagrangien
   DoubleTab normalArr_; // Normales maillage Lagrangien
   DoubleTab coordsSur3D_; // Coord maillage Lagrangien
