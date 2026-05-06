@@ -1,0 +1,127 @@
+# Degenerated upwind case, just to test Extruder_64 #
+# PARALLEL OK 2 #
+dimension 2
+Pb_hydraulique pb
+
+# BEGIN MESH #
+Domaine dom
+Mailler dom
+{
+    Pave Cavite
+    {
+        Origine 0. 0.
+        Nombre_de_Noeuds  5 5
+        Longueurs 1. 1.
+    }
+    {
+        Bord Gauche X = 0. 0. <= Y <= 1.
+        Bord Haut   Y = 1. 0. <= X <= 1.
+        Bord Bas    Y = 0. 0. <= X <= 1.
+        Bord Droit  X = 1. 0. <= Y <= 1.
+    }
+}
+Extruder { domaine dom nb_tranches 20 direction 0 0 10 }
+ecrire_fichier dom dom3D.geom
+# END MESH #
+
+# BEGIN PARTITION
+dimension 2   /*  because  extruder switches dimension ... */
+Domaine_64 dom2
+Mailler_64 dom2
+{
+    Pave_64 Cavite2
+    {
+        Origine 0. 0.
+        Nombre_de_Noeuds  5 5
+        Longueurs 1. 1.
+    }
+    {
+        Bord Gauche X = 0. 0. <= Y <= 1.
+        Bord Haut   Y = 1. 0. <= X <= 1.
+        Bord Bas    Y = 0. 0. <= X <= 1.
+        Bord Droit  X = 1. 0. <= Y <= 1.
+    }
+}
+Extruder_64 { domaine dom2 nb_tranches 20 direction 0 0 10 }
+ecrire_fichier dom2 dom3D.geom
+
+dimension 3
+
+Partition_64 dom2
+{
+    Partition_tool Tranche_64 { tranches 2 1 1 }
+    Larg_joint 1
+    zones_name DOM
+}
+
+END PARTITION #
+
+# BEGIN SCATTER
+dimension 3
+Domaine dom
+Scatter DOM.Zones dom
+END SCATTER #
+
+VDF dis
+
+Scheme_euler_explicit sch
+Read sch
+{
+    tinit 0
+    tmax 2.5
+    /* dt_min identique au dt_max alors dt=dt_min=dt_max */
+    dt_min 5.e-3
+    dt_max 5.e-3
+    dt_impr 5.e-1
+    dt_sauv 1
+    seuil_statio 1.e-8
+    Nb_pas_dt_max 0   # do not actually run - we are only interested in Extruder #
+}
+
+Associate pb dom
+Associate pb sch
+Discretize pb dis
+
+Read pb
+{
+
+    fluide_incompressible {
+        mu Champ_Uniforme 1 3.7e-05
+        rho Champ_Uniforme 1 2
+    }
+
+    Navier_Stokes_standard
+    {
+        solveur_pression GCP {
+            precond ssor { omega 1.5 }
+            seuil 1.e-8 impr
+        }
+        convection { amont }
+        diffusion {  }
+        # Conditions initiales sur la vitesse #
+        initial_conditions {
+            vitesse Champ_Uniforme 3 0. 0. 0.
+        }
+        boundary_conditions {
+            Gauche symetrie
+            Bas symetrie
+            Haut symetrie
+            Droit symetrie
+            devant symetrie
+            derriere symetrie
+        }
+    }
+
+    Post_processing
+    {
+        Format lml
+        fields dt_post 1.3
+        {
+            pression elem
+            vitesse elem
+        }
+    }
+}
+Solve pb
+End
+
