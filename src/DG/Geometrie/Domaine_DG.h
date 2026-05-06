@@ -108,7 +108,7 @@ const Quadrature_base& Domaine_DG::get_quadrature(int order) const
     case 5:
       return *quad5_;
     default:
-        Process::exit("Quadrature order not implemented yet");
+      Process::exit("Quadrature order not implemented yet");
     }
 
   return *quad1_;
