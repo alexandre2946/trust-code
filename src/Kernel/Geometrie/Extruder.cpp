@@ -85,11 +85,12 @@ void Extruder_32_64<_SIZE_>::extruder(Domaine_t& dom)
 {
 
 
-  if((dom.type_elem()->que_suis_je() == "Rectangle" || dom.type_elem()->que_suis_je() ==  "Quadrangle" ))
+  if(dom.type_elem()->que_suis_je() == "Rectangle" || dom.type_elem()->que_suis_je() ==  "Quadrangle"
+      || dom.type_elem()->que_suis_je() == "Rectangle_64" || dom.type_elem()->que_suis_je() ==  "Quadrangle_64" )
     {
       extruder_hexa(dom);
     }
-  else if( dom.type_elem()->que_suis_je() == "Triangle")
+  else if( dom.type_elem()->que_suis_je() == "Triangle" || dom.type_elem()->que_suis_je() == "Triangle_64")
     {
       int_t oldnbsom = dom.nb_som();
       IntTab_t& les_elems=dom.les_elems();
