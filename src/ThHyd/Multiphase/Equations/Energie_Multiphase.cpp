@@ -53,11 +53,13 @@ Entree& Energie_Multiphase::readOn(Entree& is)
   // We enforce the presence of a source term related to the interfacial flux automatically.
   if (sub_type(Pb_Multiphase_HEM, probleme()))
     {
-      int check_source_FICC(0);
+      bool check_source_FICC = false;
+
       for (int ii = 0; ii < sources().size(); ii++)
         if (sources()(ii)->que_suis_je().debute_par("Flux_interfacial"))
-          check_source_FICC = 1;
-      if (check_source_FICC == 0)
+          check_source_FICC = true;
+
+      if (!check_source_FICC)
         {
           EChaine source_FI("{ flux_interfacial }");
           lire_sources(source_FI);
@@ -177,37 +179,63 @@ void Energie_Multiphase::calculer_alpha_rho_e_conv(const Objet_U& obj, DoubleTab
   const Champ_Inc_base& ch_alpha = ref_cast(Pb_Multiphase, eqn.probleme()).equation_masse().inconnue(),
                         &ch_en = ref_cast(Champ_Inc_base, fl.energie_interne()), //toujours un Champ_Inc
                          *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : nullptr; //pas toujours un Champ_Inc
-  const DoubleTab& alpha = ch_alpha.valeurs(), &rho = ch_rho.valeurs(), &en = ch_en.valeurs();
+  const DoubleTab& alpha = ch_alpha.valeurs(),
+                   &rho = ch_rho.valeurs(),
+                    &en = ch_en.valeurs();
 
   /* valeurs du champ */
-  int i, n, N = val.line_size(), Nl = val.dimension_tot(0), cR = sub_type(Champ_Uniforme, ch_rho);
-  for (i = 0; i < Nl; i++)
-    for (n = 0; n < N; n++) val(i, n) = (alpha(i, n) - pbm.alpha_inf_phase(n)) * rho(!cR * i, n) * en(i, n);
+  const int N = val.line_size(),
+            Nl = val.dimension_tot(0),
+            cR = sub_type(Champ_Uniforme, ch_rho);
+  for (int i = 0; i < Nl; i++)
+    for (int n = 0; n < N; n++)
+      val(i, n) = (alpha(i, n) - pbm.alpha_inf_phase(n)) * rho(!cR * i, n) * en(i, n);
 
   /* on ne peut utiliser valeur_aux_bords que si ch_rho a un domaine_dis_base */
-  DoubleTab b_al = ch_alpha.valeur_aux_bords(), b_rho, b_en = ch_en.valeur_aux_bords();
-  int Nb = b_al.dimension_tot(0);
-  if (ch_rho.a_un_domaine_dis_base()) b_rho = ch_rho.valeur_aux_bords();
-  else b_rho.resize(Nb, N), ch_rho.valeur_aux(ref_cast(Domaine_VF, eqn.domaine_dis()).xv_bord(), b_rho);
-  for (i = 0; i < Nb; i++)
-    for (n = 0; n < N; n++) bval(i, n) = (b_al(i, n) - pbm.alpha_inf_phase(n)) * b_rho(i, n) * b_en(i, n);
+  DoubleTrav b_al, b_rho, b_en;
+  b_al = ch_alpha.valeur_aux_bords();
+  b_en = ch_en.valeur_aux_bords();
 
-  DoubleTab& d_a = deriv["alpha"];//derivee en alpha : rho * en
-  for (d_a.resize(Nl, N), i = 0; i < Nl; i++)
-    for (n = 0; n < N; n++) d_a(i, n) = rho(!cR * i, n) * en(i, n);
+  const int Nb = b_al.dimension_tot(0);
+  if (ch_rho.a_un_domaine_dis_base())
+    b_rho = ch_rho.valeur_aux_bords();
+  else
+    {
+      b_rho.resize(Nb, N);
+      ch_rho.valeur_aux(ref_cast(Domaine_VF, eqn.domaine_dis()).xv_bord(), b_rho);
+    }
+  for (int i = 0; i < Nb; i++)
+    for (int n = 0; n < N; n++)
+      bval(i, n) = (b_al(i, n) - pbm.alpha_inf_phase(n)) * b_rho(i, n) * b_en(i, n);
+
+  DoubleTab& d_a = deriv["alpha"]; //derivee en alpha : rho * en
+  d_a.resize(Nl, N);
+
+  for (int i = 0; i < Nl; i++)
+    for (int n = 0; n < N; n++)
+      d_a(i, n) = rho(!cR * i, n) * en(i, n);
 
   /* derivees a travers rho et en */
-  const tabs_t d_vide = {}, &d_rho = pch_rho ? pch_rho->derivees() : d_vide, &d_en = ch_en.derivees();
+  const tabs_t d_vide = {},
+               &d_rho = pch_rho ? pch_rho->derivees() : d_vide,
+                &d_en = ch_en.derivees();
+
   std::set<std::string> vars; //liste de toutes les derivees possibles
-  for (auto && d_c : d_rho) vars.insert(d_c.first);
-  for (auto && d_c : d_en) vars.insert(d_c.first);
+  for (auto &&d_c : d_rho)
+    vars.insert(d_c.first);
+  for (auto &&d_c : d_en)
+    vars.insert(d_c.first);
 
   for (auto && var : vars)
     {
-      const DoubleTab *dr = d_rho.count(var) ? &d_rho.at(var) : nullptr, *de = d_en.count(var) ? &d_en.at(var) : nullptr;
+      const DoubleTab *dr = d_rho.count(var) ? &d_rho.at(var) : nullptr,
+                       *de = d_en.count(var) ? &d_en.at(var) : nullptr;
+
       DoubleTab& d_v = deriv[var];
-      for (d_v.resize(Nl, N), i = 0; i < Nl; i++)
-        for (n = 0; n < N; n++)
+      d_v.resize(Nl, N);
+
+      for (int i = 0; i < Nl; i++)
+        for (int n = 0; n < N; n++)
           d_v(i, n) = alpha(i, n) * ((dr ? (*dr)(i, n) * en(i, n) : 0) + (de ? rho(!cR * i, n) * (*de)(i, n) : 0));
     }
 }
@@ -220,37 +248,64 @@ void Energie_Multiphase::calculer_alpha_rho_e(const Objet_U& obj, DoubleTab& val
   const Champ_Inc_base& ch_alpha = ref_cast(Pb_Multiphase, eqn.probleme()).equation_masse().inconnue(),
                         &ch_en = ref_cast(Champ_Inc_base, fl.energie_interne()), //toujours un Champ_Inc
                          *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : nullptr; //pas toujours un Champ_Inc
-  const DoubleTab& alpha = ch_alpha.valeurs(), &rho = ch_rho.valeurs(), &en = ch_en.valeurs();
+  const DoubleTab& alpha = ch_alpha.valeurs(),
+                   &rho = ch_rho.valeurs(),
+                    &en = ch_en.valeurs();
 
   /* valeurs du champ */
-  int i, n, N = val.line_size(), Nl = val.dimension_tot(0), cR = sub_type(Champ_Uniforme, ch_rho);
-  for (i = 0; i < Nl; i++)
-    for (n = 0; n < N; n++) val(i, n) = alpha(i, n) * rho(!cR * i, n) * en(i, n);
+  const int N = val.line_size(),
+            Nl = val.dimension_tot(0),
+            cR = sub_type(Champ_Uniforme, ch_rho);
+  for (int i = 0; i < Nl; i++)
+    for (int n = 0; n < N; n++)
+      val(i, n) = alpha(i, n) * rho(!cR * i, n) * en(i, n);
 
   /* on ne peut utiliser valeur_aux_bords que si ch_rho a un domaine_dis_base */
-  DoubleTab b_al = ch_alpha.valeur_aux_bords(), b_rho, b_en = ch_en.valeur_aux_bords();
-  int Nb = b_al.dimension_tot(0);
-  if (ch_rho.a_un_domaine_dis_base()) b_rho = ch_rho.valeur_aux_bords();
-  else b_rho.resize(Nb, N), ch_rho.valeur_aux(ref_cast(Domaine_VF, eqn.domaine_dis()).xv_bord(), b_rho);
-  for (i = 0; i < Nb; i++)
-    for (n = 0; n < N; n++) bval(i, n) = b_al(i, n) * b_rho(i, n) * b_en(i, n);
+  DoubleTrav b_al, b_rho, b_en;
+  b_al = ch_alpha.valeur_aux_bords();
+  b_en = ch_en.valeur_aux_bords();
 
-  DoubleTab& d_a = deriv["alpha"];//derivee en alpha : rho * en
-  for (d_a.resize(Nl, N), i = 0; i < Nl; i++)
-    for (n = 0; n < N; n++) d_a(i, n) = rho(!cR * i, n) * en(i, n);
+  const int Nb = b_al.dimension_tot(0);
+  if (ch_rho.a_un_domaine_dis_base())
+    b_rho = ch_rho.valeur_aux_bords();
+  else
+    {
+      b_rho.resize(Nb, N);
+      ch_rho.valeur_aux(ref_cast(Domaine_VF, eqn.domaine_dis()).xv_bord(), b_rho);
+    }
+
+  for (int i = 0; i < Nb; i++)
+    for (int n = 0; n < N; n++)
+      bval(i, n) = b_al(i, n) * b_rho(i, n) * b_en(i, n);
+
+  DoubleTab& d_a = deriv["alpha"]; //derivee en alpha : rho * en
+  d_a.resize(Nl, N);
+
+  for (int i = 0; i < Nl; i++)
+    for (int n = 0; n < N; n++)
+      d_a(i, n) = rho(!cR * i, n) * en(i, n);
 
   /* derivees a travers rho et en */
-  const tabs_t d_vide = {}, &d_rho = pch_rho ? pch_rho->derivees() : d_vide, &d_en = ch_en.derivees();
-  std::set<std::string> vars; //liste de toutes les derivees possibles
-  for (auto && d_c : d_rho) vars.insert(d_c.first);
-  for (auto && d_c : d_en) vars.insert(d_c.first);
+  const tabs_t d_vide = { },
+               &d_rho = pch_rho ? pch_rho->derivees() : d_vide,
+                &d_en = ch_en.derivees();
 
-  for (auto && var : vars)
+  std::set < std::string > vars; //liste de toutes les derivees possibles
+  for (auto &&d_c : d_rho)
+    vars.insert(d_c.first);
+  for (auto &&d_c : d_en)
+    vars.insert(d_c.first);
+
+  for (auto &&var : vars)
     {
-      const DoubleTab *dr = d_rho.count(var) ? &d_rho.at(var) : nullptr, *de = d_en.count(var) ? &d_en.at(var) : nullptr;
+      const DoubleTab *dr = d_rho.count(var) ? &d_rho.at(var) : nullptr,
+                       *de = d_en.count(var) ? &d_en.at(var) : nullptr;
+
       DoubleTab& d_v = deriv[var];
-      for (d_v.resize(Nl, N), i = 0; i < Nl; i++)
-        for (n = 0; n < N; n++)
+      d_v.resize(Nl, N);
+
+      for (int i = 0; i < Nl; i++)
+        for (int n = 0; n < N; n++)
           d_v(i, n) = alpha(i, n) * ((dr ? (*dr)(i, n) * en(i, n) : 0) + (de ? rho(!cR * i, n) * (*de)(i, n) : 0));
     }
 }
@@ -263,47 +318,81 @@ void Energie_Multiphase::calculer_alpha_rho_h(const Objet_U& obj, DoubleTab& val
   const Champ_Inc_base& ch_alpha = ref_cast(Pb_Multiphase, eqn.probleme()).equation_masse().inconnue(),
                         &ch_h = ref_cast(Champ_Inc_base, fl.enthalpie()), //toujours un Champ_Inc
                          *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : nullptr; //pas toujours un Champ_Inc
-  const DoubleTab& alpha = ch_alpha.valeurs(), &rho = ch_rho.valeurs(), &h = ch_h.valeurs();
+  const DoubleTab& alpha = ch_alpha.valeurs(),
+                   &rho = ch_rho.valeurs(),
+                    &h = ch_h.valeurs();
 
   /* valeurs du champ */
-  int i, n, N = val.line_size(), Nl = val.dimension_tot(0), cR = sub_type(Champ_Uniforme, ch_rho);
-  for (i = 0; i < Nl; i++)
-    for (n = 0; n < N; n++) val(i, n) = alpha(i, n) * rho(!cR * i, n) * h(i, n);
+  const int N = val.line_size(),
+            Nl = val.dimension_tot(0),
+            cR = sub_type(Champ_Uniforme, ch_rho);
+
+  for (int i = 0; i < Nl; i++)
+    for (int n = 0; n < N; n++)
+      val(i, n) = alpha(i, n) * rho(!cR * i, n) * h(i, n);
 
   /* on ne peut utiliser valeur_aux_bords que si ch_rho a un domaine_dis_base */
-  DoubleTab b_al = ch_alpha.valeur_aux_bords(), b_rho, b_h = ch_h.valeur_aux_bords();
-  int Nb = b_al.dimension_tot(0);
-  if (ch_rho.a_un_domaine_dis_base()) b_rho = ch_rho.valeur_aux_bords();
-  else b_rho.resize(Nb, N), ch_rho.valeur_aux(ref_cast(Domaine_VF, eqn.domaine_dis()).xv_bord(), b_rho);
-  for (i = 0; i < Nb; i++)
-    for (n = 0; n < N; n++) bval(i, n) = b_al(i, n) * b_rho(i, n) * b_h(i, n);
+  DoubleTrav b_al, b_rho, b_h ;
+  b_al = ch_alpha.valeur_aux_bords();
+  b_h = ch_h.valeur_aux_bords();
 
-  DoubleTab& d_a = deriv["alpha"];//derivee en alpha : rho * h
-  for (d_a.resize(Nl, N), i = 0; i < Nl; i++)
-    for (n = 0; n < N; n++) d_a(i, n) = rho(!cR * i, n) * h(i, n);
+  const int Nb = b_al.dimension_tot(0);
+  if (ch_rho.a_un_domaine_dis_base())
+    b_rho = ch_rho.valeur_aux_bords();
+  else
+    {
+      b_rho.resize(Nb, N);
+      ch_rho.valeur_aux(ref_cast(Domaine_VF, eqn.domaine_dis()).xv_bord(), b_rho);
+    }
+
+  for (int i = 0; i < Nb; i++)
+    for (int n = 0; n < N; n++)
+      bval(i, n) = b_al(i, n) * b_rho(i, n) * b_h(i, n);
+
+  DoubleTab& d_a = deriv["alpha"]; //derivee en alpha : rho * h
+  d_a.resize(Nl, N);
+
+  for (int i = 0; i < Nl; i++)
+    for (int n = 0; n < N; n++)
+      d_a(i, n) = rho(!cR * i, n) * h(i, n);
 
   /* derivees a travers rho et en */
-  const tabs_t d_vide = {}, &d_rho = pch_rho ? pch_rho->derivees() : d_vide, &d_h = ch_h.derivees();
-  std::set<std::string> vars; //liste de toutes les derivees possibles
-  for (auto && d_c : d_rho) vars.insert(d_c.first);
-  for (auto && d_c : d_h) vars.insert(d_c.first);
+  const tabs_t d_vide = { },
+               &d_rho = pch_rho ? pch_rho->derivees() : d_vide,
+                &d_h = ch_h.derivees();
 
-  for (auto && var : vars)
+  std::set < std::string > vars; //liste de toutes les derivees possibles
+  for (auto &&d_c : d_rho)
+    vars.insert(d_c.first);
+  for (auto &&d_c : d_h)
+    vars.insert(d_c.first);
+
+  for (auto &&var : vars)
     {
-      const DoubleTab *dr = d_rho.count(var) ? &d_rho.at(var) : nullptr, *dh = d_h.count(var) ? &d_h.at(var) : nullptr;
+      const DoubleTab *dr = d_rho.count(var) ? &d_rho.at(var) : nullptr,
+                       *dh = d_h.count(var) ? &d_h.at(var) : nullptr;
+
       DoubleTab& d_v = deriv[var];
-      for (d_v.resize(Nl, N), i = 0; i < Nl; i++)
-        for (n = 0; n < N; n++)
+      d_v.resize(Nl, N);
+
+      for (int i = 0; i < Nl; i++)
+        for (int n = 0; n < N; n++)
           d_v(i, n) = alpha(i, n) * ((dr ? (*dr)(i, n) * h(i, n) : 0) + (dh ? rho(!cR * i, n) * (*dh)(i, n) : 0));
     }
 }
 
 void Energie_Multiphase::init_champ_convecte() const
 {
-  if (champ_convecte_) return; //deja fait
-  int Nt = inconnue().nb_valeurs_temporelles(), Nl = inconnue().valeurs().size_reelle_ok() ? inconnue().valeurs().dimension(0) : -1, Nc = inconnue().valeurs().line_size();
+  if (champ_convecte_)
+    return; //deja fait
+
+  const int Nt = inconnue().nb_valeurs_temporelles(),
+            Nl = inconnue().valeurs().size_reelle_ok() ? inconnue().valeurs().dimension(0) : -1,
+            Nc = inconnue().valeurs().line_size();
+
   //champ_convecte_ : meme type / support que l'inconnue
   discretisation().creer_champ(champ_convecte_, domaine_dis(), inconnue().que_suis_je(), "N/A", "N/A", Nc, Nl, Nt, schema_temps().temps_courant());
+
   champ_convecte_->associer_eqn(*this);
   auto nom_fonc = get_fonc_champ_convecte();
   champ_convecte_->nommer(nom_fonc.first);
