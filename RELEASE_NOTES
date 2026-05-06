@@ -1,6 +1,7 @@
 -------------------------------------------------------------------------------------------------
 Release notes version 1.9.8_beta : Enhancements, modifications and corrected bugs since version 1.9.7 :
 --------------------------------------------------------------------------------------------------
+06/05/26 (TRUST) New keyword  : Option to reorder mesh nodes/cells/faces to favour data locality thus improving performance: Lire dis { reorder { none|hilbert|morton } }
 30/04/26 (TRUST) New feature  : Introducing an IBM pre-processor + optimisations
 27/04/26 (TRUST) New feature  : Add new colocalised discretization that currently works with a compressible single-phase Euler or two-phase Baer-Nunziato problem integrating a Riemann solver (HLL & Rusanov).
 08/04/26 (TRUST) Change       : 'corriger_frontiere_periodique' becomes 'declarer_bord_perio'. Old keyword remains valid as a synonym. A periodic boundary must now **always** be declared with this keyword. The 'periodic' option in Partitioners is no longer necessary.
