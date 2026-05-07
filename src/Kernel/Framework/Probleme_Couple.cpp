@@ -177,7 +177,7 @@ bool Probleme_Couple_Point_Fixe::solveTimeStep()
       return false;
     }
 
-  Cout << "Convergence du point fixe a t = " << schema_temps().temps_courant() << " en " << compteur << " iterations." << finl;
+  Cout << "Fixed-point convergence at t = " << schema_temps().temps_courant() << " in " << compteur << " iterations." << finl;
   for (int i = 0; i < nb_problemes(); i++)
     per_pb_schemas[i]->test_stationnaire(ref_cast(Probleme_base, probleme(i)));
 
