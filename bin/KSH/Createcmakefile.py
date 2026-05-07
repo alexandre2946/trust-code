@@ -406,7 +406,7 @@ endif()
 include_directories(SYSTEM 
     ${TRUST_MED_ROOT}/include 
     ${TRUST_HDF5_ROOT}/include 
-    ${TRUST_CGNS_ROOT}/include 
+    ${TRUST_ROOT}/lib/src/LIBCGNS/include
     ${TRUST_MEDCOUPLING_ROOT}/${TRUST_ARCH}${OPT}/include 
     ${MPI_INCLUDE} 
     ${TRUST_ROOT}/lib/src/LIBAMGX/AmgXWrapper/include 
