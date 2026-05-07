@@ -74,6 +74,11 @@ options=$options" -DHDF5_USE_STATIC_LIBRARIES=ON -DHDF5_PREFER_PARALLEL=ON -DHDF
 # in this script for pdi/CMakeLists.txt and vendor/paraconf-1.0.0/paraconf/CMakeLists.txt
 options=$options" -DCMAKE_INSTALL_LIBDIR=lib -DINSTALL_PDIPLUGINDIR=$install_dir/lib"
 
+
+# ND: on fedora 44, gcc 16, set CXX_STANDARD=17 since issue with C++20 in PDI 1.9.0.
+# fixed in PDI 1.11.0
+options=$options" -DCMAKE_CXX_STANDARD=17"
+
 [ "$TRUST_DISABLE_MPI" = 1 ] &&  options="$options -DBUILD_MPI_PLUGIN=OFF -DBUILD_HDF5_PARALLEL=OFF"
 
 if [ "$debug_mode" != "0" ]; then
