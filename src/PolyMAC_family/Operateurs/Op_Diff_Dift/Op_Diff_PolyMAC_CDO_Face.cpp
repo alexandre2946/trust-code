@@ -138,8 +138,8 @@ void Op_Diff_PolyMAC_CDO_Face::dimensionner_bloc(Matrice_Morse& mat, const int p
 
   domaine.init_m2();
 
-  IntTab stencil(0, 2);
-  VECT(IntTab) sp(4);
+  Stencil stencil(0, 2);
+  VECT(Stencil) sp(4);
   for (int q = 0; q < 4; q++)
     {
       sp[q].resize(0, 2);

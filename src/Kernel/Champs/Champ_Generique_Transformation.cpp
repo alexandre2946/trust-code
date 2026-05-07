@@ -156,8 +156,8 @@ void Champ_Generique_Transformation::verifier_localisation()
     {
       if (!(localisation_=="elem"))
         {
-          Cerr << "Error in Champ_Generique_Transformation::verifier_localisation\n"
-               << "with DG the only possible localisation for Transformation is \"elem\"" << finl;
+          Cerr << "Error in Champ_Generique_Transformation::verifier_localisation" << finl;
+          Cerr << "with DG the only possible localisation for Transformation is \"elem\"" << finl;
           exit();
         }
     }
@@ -849,11 +849,14 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
               zvf.get_ind_integ_points(ind_integ_points);
               zvf.get_nb_integ_points(nb_points);
               int nb_pts_integ_max = zvf.get_max_nb_integ_points();
+              CIntArrView ind_integ_points_w = static_cast<const ArrOfInt&>(ind_integ_points).view_ro();
+              CIntArrView nb_points_w = static_cast<const ArrOfInt&>(nb_points).view_ro();
+
               Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_elem, KOKKOS_LAMBDA(const int i)
               {
-                for (int pt=0; pt<nb_points[i]; pt++)
+                for (int pt=0; pt<nb_points_w[i]; pt++)
                   {
-                    int k = ind_integ_points[i]+pt;
+                    int k = ind_integ_points_w[i]+pt;
                     v(k) = source_so_val(i, num_compo*nb_pts_integ_max+pt);
                   }
               });

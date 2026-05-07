@@ -87,12 +87,12 @@ void Op_Grad_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl
 
   mat2.dimensionner(size_row, size_col, 0);
 
-  IntVect& tab1 = mat2.get_set_tab1();
-  IntVect& tab2 = mat2.get_set_tab2();
-  DoubleVect& coeff = mat2.get_set_coeff();
+  auto& tab1 = mat2.get_set_tab1();
+  auto& tab2 = mat2.get_set_tab2();
+  auto& coeff = mat2.get_set_coeff();
   coeff = 0;
 
-  const IntTab& stencil_sorted = domaine.get_stencil_sorted();
+  const Stencil& stencil_sorted = domaine.get_stencil_sorted();
   const int nb_stencil_max = stencil_sorted.dimension(1);
 
   int nb_indices_line;

@@ -120,12 +120,12 @@ int Assembleur_P_DG::assembler_mat(Matrice& la_matrice, const DoubleVect& diag, 
   int nb_elem_tot = le_dom_dg_->nb_elem_tot();
   int size_inc = indices_glob_elem(nb_elem_tot);
 
-  const IntTab& stencil_sorted = domaine.get_stencil_sorted();
+  const Stencil& stencil_sorted = domaine.get_stencil_sorted();
   const int nb_stencil_max = stencil_sorted.dimension(1);
 
   mat.dimensionner(size_inc, size_inc, 0);
-  IntVect& tab1 = mat.get_set_tab1();
-  IntVect& tab2 = mat.get_set_tab2();
+  auto& tab1 = mat.get_set_tab1();
+  auto& tab2 = mat.get_set_tab2();
 
   int nb_indices_line;
   int row, col, indice;

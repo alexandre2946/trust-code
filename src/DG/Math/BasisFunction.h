@@ -98,7 +98,6 @@ public:
         Cerr << "[DG] indices_glob_elem is incorrectly sized" << finl;
         throw;
       }
-    return indices_glob_elem_;
   }
   inline const int& nb_bfunc() const { return nb_bfunc_; }
 

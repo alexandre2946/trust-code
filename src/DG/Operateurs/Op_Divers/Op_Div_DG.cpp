@@ -100,7 +100,7 @@ void Op_Div_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl)
   int size_row = indices_glob_elem_p(nb_elem_tot);
   int size_col = indices_glob_elem_v(nb_elem_tot);
 
-  const IntTab& stencil_sorted = domaine.get_stencil_sorted();
+  const Stencil& stencil_sorted = domaine.get_stencil_sorted();
   const int nb_stencil_max = stencil_sorted.dimension(1);
 
   int nb_indices_line;
@@ -110,9 +110,9 @@ void Op_Div_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl)
     {
       matv2.dimensionner(size_row, size_col, 0);
 
-      IntVect& tabv1 = matv2.get_set_tab1();
-      IntVect& tabv2 = matv2.get_set_tab2();
-      DoubleVect& coeff = matv2.get_set_coeff();
+      auto& tabv1 = matv2.get_set_tab1();
+      auto& tabv2 = matv2.get_set_tab2();
+      auto& coeff = matv2.get_set_coeff();
       coeff = 0;
       tabv1(0) = 1;
       for (int nelem = 0; nelem < nb_elem_tot; nelem++)
@@ -159,9 +159,9 @@ void Op_Div_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl)
 
       matp2.dimensionner(size_p, size_p, 0);
 
-      IntVect& tabp1 = matp2.get_set_tab1();
-      IntVect& tabp2 = matp2.get_set_tab2();
-      DoubleVect& coeffp = matp2.get_set_coeff();
+      auto& tabp1 = matp2.get_set_tab1();
+      auto& tabp2 = matp2.get_set_tab2();
+      auto& coeffp = matp2.get_set_coeff();
       coeffp = 0.;
 
       tabp1(0) = 1;
@@ -208,12 +208,12 @@ void Op_Div_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl)
   else // no stabilization term, but we still need to dimension the matrix
     {
       matp2.dimensionner(size_row, 1);
-      IntVect& tabp1 = matp2.get_set_tab1();
+      auto& tabp1 = matp2.get_set_tab1();
       tabp1 = 2;
       tabp1(0) = 1;
-      IntVect& tabp2 = matp2.get_set_tab2();
+      auto& tabp2 = matp2.get_set_tab2();
       tabp2(0) = 1;
-      DoubleVect& coeffp = matp2.get_set_coeff();
+      auto& coeffp = matp2.get_set_coeff();
       coeffp = 0;
     }
   matp2.is_sorted_stencil();

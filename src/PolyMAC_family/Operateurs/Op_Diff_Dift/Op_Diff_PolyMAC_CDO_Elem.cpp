@@ -172,8 +172,8 @@ void Op_Diff_PolyMAC_CDO_Elem::dimensionner_bloc(Matrice_Morse& mat, const int p
   int i, j, k, l, e, f, ne_tot = domaine.nb_elem_tot(), nf_tot = domaine.nb_faces_tot(), n, N = ch.valeurs().line_size();
   domaine.init_m2();
 
-  IntTab stencil(0, 2);
-  VECT(IntTab) sp(4);
+  Stencil stencil(0, 2);
+  VECT(Stencil) sp(4);
   for (int q = 0; q < 4; q++) sp[q].resize(0, 2);
 
   for (e = 0; e < domaine.nb_elem_tot(); e++)
