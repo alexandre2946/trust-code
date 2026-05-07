@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -68,7 +68,7 @@ public:
   void echange_espace_virtuel(int ghost);
   //_TYPE_ interpolation_for_shear_periodicity(const int phase, const int send_j, const int send_k);
   _TYPE_ interpolation_for_shear_periodicity_IJK_Field(const int send_j, const int send_k);
-  void interpolation_for_shear_periodicity_I_sig_kappa(const int send_j, const int send_k_zmin, const int send_k_zmax, _TYPE_ Isigkappazmin, _TYPE_ Isigkappazmax);
+  void interpolation_for_shear_periodicity_I_sig_kappa(const int send_j, const int send_k_zmin, const int send_k_zmax, _TYPE_& Isigkappazmin, _TYPE_& Isigkappazmax);
   void redistribute_with_shear_domain_ft(const IJK_Field_double& input, double DU_perio, const int ft_extension);
   void ajouter_second_membre_shear_perio(IJK_Field_double& resu);
 

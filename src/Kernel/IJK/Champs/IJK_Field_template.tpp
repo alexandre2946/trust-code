@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -372,7 +372,7 @@ _TYPE_ IJK_Field_template<_TYPE_, _TYPE_ARRAY_>::interpolation_for_shear_periodi
   return resu;
 }
 template<typename _TYPE_, typename _TYPE_ARRAY_>
-void IJK_Field_template<_TYPE_, _TYPE_ARRAY_>::interpolation_for_shear_periodicity_I_sig_kappa(const int send_j, const int send_k_zmin, const int send_k_zmax, _TYPE_ Isigkappazmin, _TYPE_ Isigkappazmax)
+void IJK_Field_template<_TYPE_, _TYPE_ARRAY_>::interpolation_for_shear_periodicity_I_sig_kappa(const int send_j, const int send_k_zmin, const int send_k_zmax, _TYPE_& Isigkappazmin, _TYPE_& Isigkappazmax)
 {
   // execute the shear-periodicity interpolation.
   // prepare_interpolation_for_shear_periodicity has to be called before
