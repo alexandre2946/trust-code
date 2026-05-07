@@ -227,8 +227,8 @@ void Champ_Generique_Transformation::completer(const Postraitement_base& post)
     {
       for (int i=0; i<nb_sources; i++)
         {
-          OWN_PTR(Champ_base) source_espace_stockage;
-          const Champ_base& source = get_source(i).get_champ_without_evaluation(source_espace_stockage);
+          OWN_PTR(Champ_base) source_espace_stockage_tmp;
+          const Champ_base& source = get_source(i).get_champ_without_evaluation(source_espace_stockage_tmp);
 
           if ((Motcle(methode_) == "vecteur"))
             {

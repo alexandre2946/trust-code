@@ -181,8 +181,8 @@ void Champ_Generique_Reduction_0D::completer(const Postraitement_base& post)
 const Champ_base& Champ_Generique_Reduction_0D::get_champ_without_evaluation(OWN_PTR(Champ_base)& espace_stockage) const
 {
 
-  OWN_PTR(Champ_base) source_espace_stockage;
-  const Champ_base& source = get_source(0).get_champ_without_evaluation(source_espace_stockage);
+  OWN_PTR(Champ_base) source_espace_stockage_tmp;
+  const Champ_base& source = get_source(0).get_champ_without_evaluation(source_espace_stockage_tmp);
   Nature_du_champ nature_source = source.nature_du_champ();
   int nb_comp = source.nb_comp();
 
@@ -820,7 +820,8 @@ void Champ_Generique_Reduction_0D::nommer_source()
 
 const Motcle Champ_Generique_Reduction_0D::get_directive_pour_discr() const
 {
-  const Champ_base& source = get_source(0).get_champ_without_evaluation(source_espace_stockage_);
+  OWN_PTR(Champ_base) espace_stockage_tmp;
+  const Champ_base& source = get_source(0).get_champ_without_evaluation(espace_stockage_tmp);
   if (source.is_basis_function() or source.is_quadrature())
     return "champ_fonc_quad_dg";
 

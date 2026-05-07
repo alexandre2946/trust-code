@@ -84,8 +84,8 @@ const Motcle Champ_Generique_Extraction::get_directive_pour_discr() const
 
 const Champ_base& Champ_Generique_Extraction::get_champ_without_evaluation(OWN_PTR(Champ_base)& espace_stockage) const
 {
-  OWN_PTR(Champ_base) source_espace_stockage;
-  const Champ_base& source = get_source(0).get_champ_without_evaluation(source_espace_stockage);
+  OWN_PTR(Champ_base) source_espace_stockage_tmp;
+  const Champ_base& source = get_source(0).get_champ_without_evaluation(source_espace_stockage_tmp);
   Nature_du_champ nature_source = source.nature_du_champ();
   int nb_comp = source.nb_comp();
 

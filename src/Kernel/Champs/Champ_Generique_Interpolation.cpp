@@ -176,8 +176,8 @@ int Champ_Generique_Interpolation::set_domaine(const Nom& nom_domaine, int exit_
  */
 const Champ_base& Champ_Generique_Interpolation::get_champ(OWN_PTR(Champ_base)&) const
 {
-  OWN_PTR(Champ_base) espace_stockage_source;
-  const Champ_base& source = get_source(0).get_champ_without_evaluation(espace_stockage_source);
+  OWN_PTR(Champ_base) espace_stockage_source_tmp;
+  const Champ_base& source = get_source(0).get_champ_without_evaluation(espace_stockage_source_tmp);
   if (localisation_ == "")
     {
       Cerr << "Error in Champ_Generique_Interpolation::get_champ()\n"
@@ -214,8 +214,8 @@ const Champ_base& Champ_Generique_Interpolation::get_champ(OWN_PTR(Champ_base)&)
 const Champ_base& Champ_Generique_Interpolation::get_champ_without_evaluation(OWN_PTR(Champ_base)& espace_stockage) const
 {
 
-  OWN_PTR(Champ_base) espace_stockage_source;
-  const Champ_base& source = get_source(0).get_champ_without_evaluation(espace_stockage_source);
+  OWN_PTR(Champ_base) espace_stockage_source_tmp;
+  const Champ_base& source = get_source(0).get_champ_without_evaluation(espace_stockage_source_tmp);
   // Domaine sur lequel on interpole le champ :
   //  si domaine_ est une ref nulle, on prend le domaine natif du champ.
 
@@ -711,8 +711,8 @@ const Motcle Champ_Generique_Interpolation::get_directive_pour_discr() const
 
   if (localisation_=="elem")
     {
-      OWN_PTR(Champ_base) espace_stockage_source;
-      const Champ_base& ch = get_source(0).get_champ_without_evaluation(espace_stockage_source);
+      OWN_PTR(Champ_base) espace_stockage_source_tmp;
+      const Champ_base& ch = get_source(0).get_champ_without_evaluation(espace_stockage_source_tmp);
       directive = ch.is_basis_function() ? "champ_elem_DG" : (ch.is_quadrature() ? "champ_fonc_quad_DG" : "champ_elem");
     }
   else if (localisation_=="elem_DG")
