@@ -129,6 +129,21 @@ class Abstract_Parser:
             ret = False
         return ret
 
+    def get_token_range(self, key):
+        """Return the source range of the slice registered under ``key`` in
+        ``self._tokens``, or ``None`` if the slice was filled synthetically
+        (e.g. a default brace inserted by ``__init__``) or is absent.
+
+        Used by IDE / LSP tooling to map a parsed sub-tree back to its
+        source position. The returned range is a
+        :class:`trustify.trust_parser.SourceRange` (0-based line/char,
+        LSP-style half-open at the end).
+        """
+        tokens = self._tokens.get(key)
+        if tokens is None:
+            return None
+        return tokens.range
+
     def getBraceTokens(self, brace):
         """ Get output tokens for opening/closing brace """
         if self.checkToken(brace, brace):

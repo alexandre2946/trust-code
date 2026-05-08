@@ -7,6 +7,21 @@ Allows the manipulation of a TRUST dataset.
 Authors: A Bruneton, E Saikali
 """
 
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class SourceRange:
+    """LSP-style range. (start_line, start_char) is the first position
+    inside the slice; (end_line, end_char) is one past the last position —
+    matching lsprotocol.types.Range semantics. All values 0-based.
+    """
+    start_line: int
+    start_char: int
+    end_line: int
+    end_char: int
+
+
 class TObject(object):
     """ An object in the dataset. To be derived. Mostly used in the dataset conversion scripts, not
     in trustify stuff.
@@ -35,9 +50,10 @@ class TRUSTTokens(object):
     """ Handy class representing a slice of a TRUSTStream (see below).
     Allows to synchronously deal with lower case and original tokens.
     """
-    def __init__(self, low=[], orig=[]):
+    def __init__(self, low=[], orig=[], range=None):
         self._orig = orig[:]
         self._low = low[:]
+        self.range = range  # SourceRange | None — None for synthetic / empty slices
 
     def orig(self):
         return self._orig
@@ -47,12 +63,21 @@ class TRUSTTokens(object):
 
     @classmethod
     def Join(cls, lst):
-        """ Merge a list of TRUSTTokens objects into a single TRUSTTokens object """
-        l_low, l_orig = [], []
+        """ Merge a list of TRUSTTokens objects into a single TRUSTTokens object.
+        The merged range spans from the first input's start to the last input's end.
+        If any input has range=None or the input list is empty, the merged range
+        is None — partial information is not synthesized."""
+        l_low, l_orig, ranges = [], [], []
         for ttk in lst:
             l_low.extend(ttk._low)
             l_orig.extend(ttk._orig)
-        return TRUSTTokens(l_low, l_orig)
+            ranges.append(ttk.range)
+        if not ranges or any(r is None for r in ranges):
+            joined = None
+        else:
+            joined = SourceRange(ranges[0].start_line,  ranges[0].start_char,
+                                 ranges[-1].end_line,   ranges[-1].end_char)
+        return TRUSTTokens(l_low, l_orig, range=joined)
 
 class TRUSTStream(object):
     """ Handy class for scanning the tokens once the parsing has been done.
@@ -67,10 +92,14 @@ class TRUSTStream(object):
         self.tok = []        # Original version, as found in the dataset
         self.tokLow = []     # Lower-case, stripped version, with comments blanked out
         self.lineNum = []    # Line number of the token (for error display)
+        self.contentLine = []  # 0-based line where each token's content starts
+        self.contentCol = []   # 0-based column where each token's content starts
         if not parser is None:
             self.tok = parser.tabToken[:]       # Better take copies ...
             self.tokLow = parser.tabTokenLow[:]
             self.lineNum = parser.lineNum[:]
+            self.contentLine = parser.contentLine[:]
+            self.contentCol = parser.contentCol[:]
         self.idx = 0            # Current position in the stream
         # Internal stuff:
         self._probing = False    # whether we are trying to move ahead in the stream, but have not validated the move yet.
@@ -84,6 +113,8 @@ class TRUSTStream(object):
         ret.tok = self.tok[:]
         ret.tokLow = self.tokLow[:]
         ret.lineNum = self.lineNum[:]
+        ret.contentLine = self.contentLine[:]
+        ret.contentCol = self.contentCol[:]
         ret.idx = self.idx
         ret._probing = self._probing
         ret._probeIdx = self._probeIdx
@@ -148,12 +179,44 @@ class TRUSTStream(object):
 
     def lastReadTokens(self):
         """ Return the last tokens read tokens when invoking nextLow() or validateNext().
-        This returns a couple: 1. part of the list in lowercase, no-comment mode, 2. full original version
+        This returns a TRUSTTokens carrying both the lower-case and original
+        slice, plus a SourceRange covering the consumed region (or None if
+        nothing has been consumed yet).
         """
         if self._prevIdx < 0:
-            return []
+            return TRUSTTokens()
+        # Find the first non-blank token in the consumed slice — that is the
+        # content start. (Leading whitespace-only tokens are skipped by
+        # probeNextLow, so the actual content starts at the probe hit.)
+        first_content_idx = self._prevIdx
+        for i in range(self._prevIdx, self.idx):
+            if self.tokLow[i] != "":
+                first_content_idx = i
+                break
+        sl, sc = self._zeroBasedStart(first_content_idx)
+        last_idx = self.idx - 1
+        el, ec = self._zeroBasedEnd(last_idx)
+        rng = SourceRange(sl, sc, el, ec)
         return TRUSTTokens(low=self.tokLow[self._prevIdx:self.idx],
-                           orig=self.tok[self._prevIdx:self.idx])
+                           orig=self.tok[self._prevIdx:self.idx],
+                           range=rng)
+
+    def _zeroBasedStart(self, idx):
+        """Return (line, col) of the start of tabToken[idx]'s content
+        (after its leading whitespace), 0-based."""
+        return self.contentLine[idx], self.contentCol[idx]
+
+    def _zeroBasedEnd(self, idx):
+        """Return (line, col) one past the last character of tabToken[idx]'s
+        content body, 0-based. Token bodies contain no '\\n' (the tokenizer
+        splits on whitespace) so the end stays on the same line as the start."""
+        t = self.tok[idx]
+        # Length of the leading whitespace prefix.
+        i = 0
+        while i < len(t) and t[i] in (' ', '\t', '\n'):
+            i += 1
+        body_len = len(t) - i
+        return self.contentLine[idx], self.contentCol[idx] + body_len
 
     def save(self, tag):
         """ Save the current state of the stream in a internal dict under key 'tag'. This state can be restored
@@ -174,6 +237,8 @@ class TRUSTStream(object):
         self.tok = self.tok[:idx+1]
         self.tokLow = self.tokLow[:idx+1]
         self.lineNum = self.lineNum[:idx+1]
+        self.contentLine = self.contentLine[:idx+1]
+        self.contentCol = self.contentCol[:idx+1]
 
 class TRUSTParser(object):
     """ Main class allowing the parsing of a TRUST dataset.
@@ -183,6 +248,8 @@ class TRUSTParser(object):
         self.tabToken = []     # The list of tokens, with case, tabs and line returns preserved
         self.tabTokenLow = []  # Same as above, but all lowercase, and no tabs, no LR. Comment tokens are also empty.
         self.lineNum = []      # A list with exactly the same size as self.tabToken indicating on which line in the original dataset the token is found
+        self.contentLine = []  # 0-based line where each token's content starts (after leading whitespace)
+        self.contentCol = []   # 0-based column where each token's content starts (after leading whitespace)
 
     def _mergeQuoted(self):
         """ Merge back tokens containing quotes so that
@@ -242,6 +309,26 @@ class TRUSTParser(object):
         for t in self.tabToken:
             self.lineNum.append(lin)
             lin += t.count("\n")
+
+        # Extract per-token content positions (0-based line/col where actual
+        # content starts after leading whitespace). Tokens themselves contain
+        # no internal '\n' in their *body* — only their leading whitespace
+        # may contain '\n' / ' ' / '\t' (separators were prepended during
+        # tokenize). So we only need to walk the leading whitespace.
+        cur_line, cur_col = 0, 0
+        for t in self.tabToken:
+            i = 0
+            while i < len(t) and t[i] in (' ', '\t', '\n'):
+                if t[i] == '\n':
+                    cur_line += 1
+                    cur_col = 0
+                else:
+                    cur_col += 1
+                i += 1
+            self.contentLine.append(cur_line)
+            self.contentCol.append(cur_col)
+            # Advance through the body (no '\n' inside, see comment above).
+            cur_col += len(t) - i
 
         # Now validate the tokens, and empty slots of tabTokenLow where we have comments
         # Rules: - inside a pair of '#' everything is ignored (even '/*' or '*/')

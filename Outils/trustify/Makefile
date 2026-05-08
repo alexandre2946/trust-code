@@ -22,6 +22,7 @@ test:
 	@echo ""
 	@(. $(org)/env_dev.sh && env python -m unittest test.test_rw_elementary.TestCase )
 	@(. $(org)/env_dev.sh && env python -m unittest test.test_rw_full_datasets.TestCase )
+	@(. $(org)/env_dev.sh && env python -m unittest test.test_source_ranges.TestCase )
 ifeq ($(TRUST_DISABLE_JUPYTER),0)
 	@(. $(org)/env_dev.sh && env jupyter-nbconvert --to html --no-input --output $(TRUST_TMP)/trustify_ex.html --execute doc/examples/hello_world/HelloWorld.ipynb ) 
 endif
@@ -29,6 +30,7 @@ endif
 test_debug: install_dev
 	@(. $(org)/env_dev.sh && env TRUSTIFY_DEBUG=1 python -m unittest test.test_rw_elementary.TestCase )
 	@(. $(org)/env_dev.sh && env TRUSTIFY_DEBUG=1 python -m unittest test.test_rw_full_datasets.TestCase )
+	@(. $(org)/env_dev.sh && env TRUSTIFY_DEBUG=1 python -m unittest test.test_source_ranges.TestCase )
 
 help:
 	@echo The following make targets are available
