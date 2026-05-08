@@ -306,5 +306,27 @@ class TestCase(unittest.TestCase, mutil.UnitUtils):
         dataset = trustify.load_dataset("test/datasets/diffusion_implicite_jdd6.data", parser)
         self.assertEqual(dataset.entries[2].obj.nb_pas_dt_max, 3)
 
+    def test_unexpected_attribute_via_problem_read_generic(self):
+        """ Regression: hacks.py's `Unexpected attribute or equation alias` path
+        used to raise TypeError after the GenErr signature was changed to require
+        a keyword-only `kind`. We feed a Probleme_FT_Disc_gen-shaped dataset with
+        an unknown attribute (not in solved_equations either) so
+        handleUnexpectedAttribute_pb_generic dispatches into the migrated branch.
+        Asserts the exception type is TrustifyParseError, not TypeError.
+        """
+        from trustify.misc_utilities import TrustifyParseError
+        snippet = (
+            "dimension 3\n"
+            "Probleme_FT_Disc_gen pb\n"
+            "Read pb {\n"
+            "    not_a_real_attr 0\n"
+            "}\n"
+        )
+        with self.assertRaises(TrustifyParseError) as cm:
+            self.generic_test(snippet, fnam="regression.data")
+        self.assertEqual(cm.exception.kind, "unexpected-attribute")
+        self.assertEqual(cm.exception.token, "not_a_real_attr")
+        self.assertEqual(cm.exception.attr_name, "not_a_real_attr")
+
 if __name__ == '__main__':
     unittest.main()

@@ -103,8 +103,13 @@ def handleUnexpectedAttribute_pb_generic(self, stream, tok, nams):
         slv_eq[two_words.mot_2] = two_words.mot_1
     if tok not in slv_eq:
         # A genuine unexpected attribute:
-        err = self.GenErr(stream, f"Unexpected attribute or equation alias '{tok}' in keyword '{nams}'")
-        raise TrustifyException(err) from None
+        raise self.GenErr(
+            stream,
+            f"Unexpected attribute or equation alias '{tok}' in keyword '{nams}'",
+            token=tok,
+            attr=tok,
+            kind="unexpected-attribute",
+        ) from None
     # Save the full description of the token that brought us here (=the equation alias):
     tok_full = stream.lastReadTokens()
     # At least one equation has been read:

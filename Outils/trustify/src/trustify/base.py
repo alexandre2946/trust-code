@@ -9,10 +9,64 @@ Authors: A Bruneton, C Van Wambeke, G Sutra
 """
 
 import trustify.misc_utilities as mutil
-from trustify.misc_utilities import ClassFactory, TrustifyException, get_single_parser_base
+from trustify.misc_utilities import (
+    ClassFactory, TrustifyException, TrustifyParseError, get_single_parser_base,
+)
 from trustify.trust_parser import TRUSTTokens
 
 ########################################################################
+
+
+def _render_genErr_message(cls, stream, msg, attr):
+    """Render the human-readable error block. Bit-for-bit equivalent to
+    the body of the original ``GenErr`` so existing ``assertRaisesRegex``
+    tests keep matching.
+    """
+    err = "\n" + mutil.RED + msg + mutil.END + "\n"
+    ctx = mutil.YELLOW
+    ctx += "=> This error was triggered in the following context:\n"
+    ctx += "   Dataset: line %d  in file  '%s'\n" % (
+        stream.currentLine(), stream.fileName()
+    )
+    s = ""
+    if len(cls._infoMain) > 0:
+        s = "   Model:   line %d  in file  '%s'\n" % (
+            cls._infoMain[1], cls._infoMain[0]
+        )
+    if attr is not None:
+        ze_cls = cls
+        while not (attr in ze_cls._infoAttr or ze_cls is BaseCommon_Parser):
+            ze_cls = get_single_parser_base(ze_cls)
+        if attr in ze_cls._infoAttr:
+            fnam, lineno = ze_cls._infoAttr[attr]
+            s = f"   Model:   line {lineno}  in file  '{fnam}'\n"
+    ctx += s + mutil.END
+    return err + ctx
+
+
+def _stream_pos(stream):
+    """Best-effort 0-based ``(line, col, end_col)`` of the stream's
+    current token. Returns ``(stream.currentLine() - 1, None, None)``
+    when contentLine/contentCol are not available (corner cases:
+    consumed past EOF, synthetic stream)."""
+    cur_line_1based = stream.currentLine()
+    line0 = max(0, cur_line_1based - 1)
+    idx = stream.idx
+    try:
+        if 0 <= idx < len(stream.contentLine):
+            line0 = stream.contentLine[idx]
+            col = stream.contentCol[idx]
+            tok = stream.tok[idx]
+            # Strip leading whitespace exactly the way TRUSTStream._zeroBasedEnd does.
+            i = 0
+            while i < len(tok) and tok[i] in (' ', '\t', '\n'):
+                i += 1
+            end_col = col + (len(tok) - i)
+            return line0, col, end_col
+    except Exception:
+        pass
+    return line0, None, None
+
 
 class Abstract_Parser:
     """ Root class for all parsers 
@@ -42,30 +96,33 @@ class Abstract_Parser:
         raise NotImplementedError
 
     @classmethod
-    def GenErr(cls, stream, msg, attr=None):
-        """ Useful method to generate nice error message when an exception is raised.
-        It provides the file name and line number of:
-          - the faulty dataset (.data file)
-          - the point in the C++ source code (or in the TRAD2.org) where the concerned grammar element
-          was defined.
-        """
-        err = "\n" + mutil.RED + msg + mutil.END + "\n"
-        ctx = mutil.YELLOW
-        ctx +=  "=> This error was triggered in the following context:\n"
-        ctx += "   Dataset: line %d  in file  '%s'\n" % (stream.currentLine(), stream.fileName())
+    def GenErr(cls, stream, msg, *, attr=None, token=None, kind):
+        """Build a ``TrustifyParseError`` for a parser-time error.
 
-        s = ""
-        if len(cls._infoMain) > 0:  # automatic classes (like base types int, float...) do not have debug info
-            s =  "   Model:   line %d  in file  '%s'\n" % (cls._infoMain[1], cls._infoMain[0])
-        if not attr is None:
-            ze_cls = cls
-            while not (attr in ze_cls._infoAttr or ze_cls is BaseCommon_Parser):
-                ze_cls = get_single_parser_base(ze_cls)
-            if attr in ze_cls._infoAttr:
-                fnam, lineno = ze_cls._infoAttr[attr]
-            s = f"   Model:   line {lineno}  in file  '{fnam}'\n"
-        ctx += s + mutil.END
-        return err + ctx
+        Caller raises it directly:
+
+            raise cls.GenErr(stream, "...", kind="invalid-keyword", token=tok)
+
+        Args:
+            stream:  the active TRUSTStream (for line/col/file_name).
+            msg:     the human-readable English error message.
+            attr:    name of the attribute under fault, when applicable.
+            token:   the offending raw token, when there is one to point at.
+            kind:    machine-readable code (see kind table in the spec).
+        """
+        rendered = _render_genErr_message(cls, stream, msg, attr)
+        line0, col, end_col = _stream_pos(stream)
+        return TrustifyParseError(
+            rendered,
+            file_name=stream.fileName(),
+            line=line0,
+            col=col,
+            end_line=line0,
+            end_col=end_col,
+            token=token,
+            attr_name=attr,
+            kind=kind,
+        )
 
     @classmethod
     def GetAllClassesFromSyno(cls, kw, stream):
@@ -83,8 +140,12 @@ class Abstract_Parser:
             # (neither an original keyword, nor a synonym)
             # If we arrive here we are in fact most likely to hit a point where a previous (non-brace) keyword
             # was missing an attribute, and we treat the next token (for example '}') as a class to be read ...
-            err = cls.GenErr(stream, f"Invalid TRUST keyword: '{kw}' (or maybe, did you forget an attribute on the previous line?)")
-            raise TrustifyException(err)
+            raise cls.GenErr(
+                stream,
+                f"Invalid TRUST keyword: '{kw}' (or maybe, did you forget an attribute on the previous line?)",
+                token=kw,
+                kind="invalid-keyword",
+            )
         ret.extend(ClassFactory._SYNO_ORIG_NAME.get(kw,[]))
         return ret
 
@@ -109,8 +170,12 @@ class Abstract_Parser:
                 if len(l):
                     return l[0]
             if not ClassFactory.Exist(ClassFactory.ToPydName(kw)):
-                err = cls.GenErr(stream, f"Keyword '{kw}' is an ambiguous synonym! Can not determine which class this corresponds to (but I tried hard).")
-                raise TrustifyException(err)
+                raise cls.GenErr(
+                    stream,
+                    f"Keyword '{kw}' is an ambiguous synonym! Can not determine which class this corresponds to (but I tried hard).",
+                    token=kw,
+                    kind="ambiguous-synonym",
+                )
             ret = ClassFactory.GetPydClassFromName(kw)
         return ret
 
@@ -169,8 +234,12 @@ class Abstract_Parser:
         brac_nam = {'{':"opening", '}': "closing"}[brace]
         tok = stream.probeNextLow()
         if tok != brace:
-            err = cls.GenErr(stream, f"Keyword '{nams}' expected a {brac_nam} brace '{brace}' (but we read: '{tok}')")
-            raise TrustifyException(err)
+            raise cls.GenErr(
+                stream,
+                f"Keyword '{nams}' expected a {brac_nam} brace '{brace}' (but we read: '{tok}')",
+                token=tok,
+                kind="expected-brace",
+            )
         stream.validateNext()
 
     @classmethod
@@ -473,8 +542,13 @@ class ConstrainBase_Parser(BaseCommon_Parser):
         have in the datasets blocks/attributes which are directly named with an equation label.  
         By default, raise an error.
         """
-        err = self.GenErr(stream, f"Unexpected attribute '{tok}' in keyword '{nams}'")
-        raise TrustifyException(err) from None
+        raise self.GenErr(
+            stream,
+            f"Unexpected attribute '{tok}' in keyword '{nams}'",
+            token=tok,
+            attr=tok,
+            kind="unexpected-attribute",
+        ) from None
 
     def _readFromTokens_braces(self, stream):
         """ Read from a stream of tokens using the key/value syntax of TRUST keyword, i.e. keywords
@@ -510,8 +584,12 @@ class ConstrainBase_Parser(BaseCommon_Parser):
         # Have we parsed all mandatory attributes?
         for k, v in self._attr_ok.items():
             if not v:
-                err = cls.GenErr(stream, f"Attribute '{k}' is mandatory for keyword '{nams}' and was not read", attr=k)
-                raise TrustifyException(err) from None
+                raise cls.GenErr(
+                    stream,
+                    f"Attribute '{k}' is mandatory for keyword '{nams}' and was not read",
+                    attr=k,
+                    kind="mandatory-missing",
+                ) from None
 
         # Parse closing brace
         cls.ConsumeBrace(stream, "}")
@@ -561,8 +639,12 @@ class ConstrainBase_Parser(BaseCommon_Parser):
             for attr_nam, _ in ca[attr_idx:]:
                 if not cls.IsOptional(attr_nam):
                     # But actually most of the time (always?) a TRUSTEndOfStreamException will be raised before:
-                    err = cls.GenErr(stream, f"Keyword '{nams}' - mandatory attribute '{attr_nam}' missing or ill-formed", attr=attr_nam)
-                    raise TrustifyException(err)
+                    raise cls.GenErr(
+                        stream,
+                        f"Keyword '{nams}' - mandatory attribute '{attr_nam}' missing or ill-formed",
+                        attr=attr_nam,
+                        kind="mandatory-missing",
+                    )
 
     @classmethod
     def _ReadClassName(cls, stream):
@@ -584,8 +666,12 @@ class ConstrainBase_Parser(BaseCommon_Parser):
             if issubclass(r, me_as_pyd):
                 return r.__name__
         # See comment above when testing key in _SYNO_ORIG_NAME:
-        err = cls.GenErr(stream, f"Invalid TRUST keyword: '{kw}' (or maybe, did you forget an attribute on the previous line?)")
-        raise TrustifyException(err)
+        raise cls.GenErr(
+            stream,
+            f"Invalid TRUST keyword: '{kw}' (or maybe, did you forget an attribute on the previous line?)",
+            token=kw,
+            kind="invalid-keyword",
+        )
 
     @classmethod
     def ReadFromTokens(cls, stream, pars_cls=None):
@@ -764,8 +850,12 @@ class ListOfBase_Parser(Builtin_Parser):
         nams = cls.GetAllTrustNames()
         tok = stream.probeNextLow()
         if tok != ',':
-            err = cls.GenErr(stream, f"Keyword '{nams}' expected a comma (',') to separate list items, but '{tok}' was read")
-            raise TrustifyException(err)
+            raise cls.GenErr(
+                stream,
+                f"Keyword '{nams}' expected a comma (',') to separate list items, but '{tok}' was read",
+                token=tok,
+                kind="list-syntax",
+            )
         stream.validateNext()
 
     def getFormattedType(self):
@@ -779,12 +869,20 @@ class ListOfBase_Parser(Builtin_Parser):
         try:
             n = int(t)
         except:
-            err = self.GenErr(stream, f"Invalid number of elements in list: '{t}', expected an integer")
-            raise TrustifyException(err)
+            raise self.GenErr(
+                stream,
+                f"Invalid number of elements in list: '{t}', expected an integer",
+                token=t,
+                kind="list-syntax",
+            )
         stream.validateNext()
         if n < 0:
-            err = self.GenErr(stream, f"Invalid number of elements in list: '{t}', expected a positive integer")
-            raise TrustifyException(err)
+            raise self.GenErr(
+                stream,
+                f"Invalid number of elements in list: '{t}', expected a positive integer",
+                token=t,
+                kind="list-syntax",
+            )
         return n
 
     def initItemParserType(self):
@@ -806,8 +904,12 @@ class ListOfBase_Parser(Builtin_Parser):
         if stream.pos() == pos_0:
             pyd_typ = ClassFactory.GetPydFromParser(self.__class__)
             w = stream.probeNextLow()
-            err = self.GenErr(stream, f"Could not read object of type '{pyd_typ.__name__}' inside list! Word '{w}' was unexpected!")
-            raise TrustifyException(err)
+            raise self.GenErr(
+                stream,
+                f"Could not read object of type '{pyd_typ.__name__}' inside list! Word '{w}' was unexpected!",
+                token=w,
+                kind="list-syntax",
+            )
 
         lst.append(item_val)
 
@@ -826,7 +928,7 @@ class ListOfBase_Parser(Builtin_Parser):
             n = self.readListSize(stream)
             self._tokens["len"] = stream.lastReadTokens()
         elif not cls.WithBraces():
-            err = cls.GenErr(stream, f"Internal error: Can not read list with no brace and no size info.")
+            err = _render_genErr_message(cls, stream, f"Internal error: Can not read list with no brace and no size info.", None)
             raise Exception(err)
 
         if cls.WithBraces():
@@ -963,7 +1065,17 @@ class AbstractSizeIsDim(object):
     def readListSize(self, stream):
         """ Size is fixed and does not need to be provided """
         if Dimension_Parser._DIMENSION not in [2, 3]:
-            raise TrustifyException("Invalid dataset: It seems the dimension has not been defined")
+            raise TrustifyParseError(
+                "Invalid dataset: It seems the dimension has not been defined",
+                file_name=stream.fileName(),
+                line=0,
+                col=0,
+                end_line=0,
+                end_col=0,
+                token=None,
+                attr_name=None,
+                kind="dimension-undefined",
+            )
         return Dimension_Parser._DIMENSION
 
     def extendWithSize(self, ret):
@@ -1177,8 +1289,12 @@ class Declaration_Parser(ConstrainBase_Parser):
         ident = Chaine_Parser.ParseOneWord(stream)
         # Basic checks on the identifier:
         if ident.startswith("{") or ident.startswith("}") or ident[0].isnumeric():
-            err = self.GenErr(stream, f"Invalid identifier '{ident}' in forward declaration of type '{kw}'")
-            raise TrustifyException(err)
+            raise self.GenErr(
+                stream,
+                f"Invalid identifier '{ident}' in forward declaration of type '{kw}'",
+                token=ident,
+                kind="invalid-value",
+            )
         decl.identifier = ident
         self._tokens["identifier"] = stream.lastReadTokens()
         return decl
@@ -1222,8 +1338,12 @@ class Dataset_Parser(ListOfBase_Parser):
         identif = stream.nextLow() # identifier, like 'pb' in 'read pb { ...'
         # Is this a valid identifier in the dataset (i.e. is there a matching forward declaration)?
         if not identif in self._pyd_value._declarations:
-            err = self.GenErr(stream, f"Referencing object '{identif}' (with a 'read|lire' instruction) which was not declared before")
-            raise TrustifyException(err)
+            raise self.GenErr(
+                stream,
+                f"Referencing object '{identif}' (with a 'read|lire' instruction) which was not declared before",
+                token=identif,
+                kind="invalid-value",
+            )
         # Retrieve real underlying parser class from initial forward declaration
         decl, _ = self._pyd_value._declarations[identif]
         ze_cls = decl._parser._pars_cls
@@ -1363,8 +1483,12 @@ class Chaine_Parser(AbstractChaine_Parser):
         lst_rd = stream.lastReadTokens()
         s = ''.join(lst_rd.low())
         if s.strip().startswith("{") or s.strip().startswith("}"):
-            err = self.GenErr(stream, f"Misformatted string or block within braces -> '{s}'")
-            raise TrustifyException(err)
+            raise self.GenErr(
+                stream,
+                f"Misformatted string or block within braces -> '{s}'",
+                token=s,
+                kind="invalid-value",
+            )
         self._tokens["val"] = lst_rd
         return s
 
@@ -1435,8 +1559,12 @@ class ChaineConstrained_Parser(AbstractChaine_Parser):
 
     def validateValue(self, val, stream):
         if val not in self._allowedValues:
-            err = self.GenErr(stream, f"Invalid value: '{val}', not in allowed list: '%s'" % str(self._allowedValues))
-            raise TrustifyException(err)
+            raise self.GenErr(
+                stream,
+                f"Invalid value: '{val}', not in allowed list: '%s'" % str(self._allowedValues),
+                token=val,
+                kind="invalid-value",
+            )
 
 class Fin_Parser(Interprete_Parser):
     """ The 'end' keyword at the end of the dataset. It is an 'interprete'.
@@ -1463,8 +1591,12 @@ class Int_Parser(Builtin_Parser):
         try:
             val = int(s)  # Build the actual int
         except:
-            err = self.GenErr(stream, f"Invalid int value: '{s}'")
-            raise TrustifyException(err) from None
+            raise self.GenErr(
+                stream,
+                f"Invalid int value: '{s}'",
+                token=s,
+                kind="invalid-value",
+            ) from None
         self._tokens["val"] = stream.lastReadTokens()
         return val
 
@@ -1493,11 +1625,19 @@ class IntConstrained_Parser(Int_Parser):
         try:
             i = int(val)
         except:
-            err = self.GenErr(stream, f"Invalid value: '{val}', could not be interpreted as an integer")
-            raise TrustifyException(err)
+            raise self.GenErr(
+                stream,
+                f"Invalid value: '{val}', could not be interpreted as an integer",
+                token=val,
+                kind="invalid-value",
+            )
         if i not in self._allowedValues:
-            err = self.GenErr(stream, f"Invalid value: '{val}', not in allowed list: '%s'" % str(self._allowedValues))
-            raise TrustifyException(err)
+            raise self.GenErr(
+                stream,
+                f"Invalid value: '{val}', not in allowed list: '%s'" % str(self._allowedValues),
+                token=val,
+                kind="invalid-value",
+            )
 
 class Float_Parser(Builtin_Parser):
     def getFormattedType(self):
@@ -1510,8 +1650,12 @@ class Float_Parser(Builtin_Parser):
         try:
             val = float(s)  # Build the actual float
         except:
-            err = self.GenErr(stream, f"Invalid float value: '{s}'")
-            raise TrustifyException(err) from None
+            raise self.GenErr(
+                stream,
+                f"Invalid float value: '{s}'",
+                token=s,
+                kind="invalid-value",
+            ) from None
         self._tokens["val"] = stream.lastReadTokens()
         return val
 

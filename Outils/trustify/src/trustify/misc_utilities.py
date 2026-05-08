@@ -60,6 +60,41 @@ class TrustifyException(Exception):
     def __init__(self, msg="Error!"):
         Exception.__init__(self, msg)
 
+class TrustifyParseError(TrustifyException):
+    """Schema/grammar error with structured source location.
+
+    Subclasses TrustifyException so existing `except TrustifyException`
+    handlers keep working. The first positional arg is the same human-
+    readable message ``GenErr`` produces today; structured fields are
+    populated alongside it for tools (LSP) that need exact ranges.
+
+    All location fields use 0-based dataset coordinates. ``col`` /
+    ``end_col`` may be ``None`` when the parser is past EOF or when no
+    token can be pointed at; consumers must degrade gracefully.
+    """
+    def __init__(
+        self,
+        message,
+        *,
+        file_name,
+        line,
+        col,
+        end_line,
+        end_col,
+        token,
+        attr_name,
+        kind,
+    ):
+        TrustifyException.__init__(self, message)
+        self.file_name = file_name
+        self.line = line
+        self.col = col
+        self.end_line = end_line
+        self.end_col = end_col
+        self.token = token
+        self.attr_name = attr_name
+        self.kind = kind
+
 ################################################################
 # Module dynamic import
 ################################################################
