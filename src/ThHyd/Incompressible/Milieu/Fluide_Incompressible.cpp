@@ -26,14 +26,14 @@
 #include <Champ_Fonc_MED.h>
 
 Implemente_instanciable_sans_constructeur(Fluide_Incompressible,"Fluide_Incompressible",Fluide_base);
-// XD fluide_incompressible fluide_base fluide_incompressible -1 Class for non-compressible fluids.
-// XD attr beta_th field_base beta_th 1 Thermal expansion (K-1).
-// XD attr mu field_base mu 1 Dynamic viscosity (kg.m-1.s-1).
-// XD attr beta_co field_base beta_co 1 Volume expansion coefficient values in concentration.
-// XD attr rho field_base rho 1 Density (kg.m-3).
-// XD attr cp field_base cp 1 Specific heat (J.kg-1.K-1).
-// XD attr lambda field_base lambda_u 1 Conductivity (W.m-1.K-1).
-// XD attr porosites bloc_lecture porosites 1 Porosity (optional)
+// XD fluide_incompressible fluide_base fluide_incompressible INHERITS_BRACE Class for non-compressible fluids.
+// XD attr beta_th field_base beta_th OPT Thermal expansion (K-1).
+// XD attr mu field_base mu OPT Dynamic viscosity (kg.m-1.s-1).
+// XD attr beta_co field_base beta_co OPT Volume expansion coefficient values in concentration.
+// XD attr rho field_base rho OPT Density (kg.m-3).
+// XD attr cp field_base cp OPT Specific heat (J.kg-1.K-1).
+// XD attr lambda field_base lambda_u OPT Conductivity (W.m-1.K-1).
+// XD attr porosites bloc_lecture porosites OPT Porosity (optional)
 
 Fluide_Incompressible::Fluide_Incompressible() { }
 

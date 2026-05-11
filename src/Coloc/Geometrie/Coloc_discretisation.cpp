@@ -20,7 +20,7 @@
 
 Implemente_instanciable(Coloc_discretisation, "Coloc", Discret_Thyd);
 
-// XD coloc discretisation_base coloc -1 Co-localised cell-center discretization
+// XD coloc discretisation_base coloc INHERITS_BRACE Co-localised cell-center discretization
 
 Entree& Coloc_discretisation::readOn(Entree& s) { return s;}
 

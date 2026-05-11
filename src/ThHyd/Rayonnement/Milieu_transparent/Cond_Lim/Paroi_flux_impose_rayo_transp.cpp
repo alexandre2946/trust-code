@@ -17,7 +17,7 @@
 
 Implemente_base(Paroi_flux_impose_rayo_transp, "Paroi_flux_impose_rayo_transp", Paroi_rayo_transp);
 
-// XD Paroi_flux_impose_rayo_transp Neumann_paroi Paroi_flux_impose_rayo_transp -1 Radiation neumann boundary condition (imposed flux)
+// XD Paroi_flux_impose_rayo_transp Neumann_paroi Paroi_flux_impose_rayo_transp INHERITS_BRACE Radiation neumann boundary condition (imposed flux)
 
 
 Sortie& Paroi_flux_impose_rayo_transp::printOn(Sortie& s) const { return s; }

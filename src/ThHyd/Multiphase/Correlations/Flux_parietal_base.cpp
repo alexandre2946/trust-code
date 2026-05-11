@@ -15,7 +15,7 @@
 
 #include <Flux_parietal_base.h>
 Implemente_base(Flux_parietal_base, "Flux_parietal_base", Correlation_base);
-// XD flux_parietal_base correlation_base flux_parietal_base -1 not_set
+// XD flux_parietal_base correlation_base flux_parietal_base INHERITS_BRACE not_set
 
 Sortie& Flux_parietal_base::printOn(Sortie& os) const
 {

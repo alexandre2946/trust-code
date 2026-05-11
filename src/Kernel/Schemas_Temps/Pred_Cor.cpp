@@ -18,7 +18,8 @@
 #include <Pred_Cor.h>
 
 Implemente_instanciable(Pred_Cor,"Schema_Predictor_Corrector",Schema_Temps_base);
-// XD schema_predictor_corrector schema_temps_base schema_predictor_corrector -1 This is the predictor-corrector scheme (second order). It is more accurate and economic than MacCormack scheme. It gives best results with a second ordre convective scheme like quick, centre (VDF).
+// XD schema_predictor_corrector schema_temps_base schema_predictor_corrector INHERITS_BRACE This is the predictor-corrector scheme (second order). It is more accurate and economic than MacCormack scheme. It gives best results with a second ordre convective
+// XD_CONT scheme like quick, centre (VDF).
 
 Sortie& Pred_Cor::printOn(Sortie& s) const
 {

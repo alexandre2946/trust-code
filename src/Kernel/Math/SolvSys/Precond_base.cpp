@@ -17,7 +17,7 @@
 #include <Motcle.h>
 
 Implemente_base_sans_constructeur(Precond_base,"Precond_base",Objet_U);
-// XD precond_base objet_u precond_base -1 Basic class for preconditioning.
+// XD precond_base objet_u precond_base INHERITS_BRACE Basic class for preconditioning.
 
 
 Precond_base::Precond_base()

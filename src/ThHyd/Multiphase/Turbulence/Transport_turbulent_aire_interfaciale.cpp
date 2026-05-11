@@ -22,7 +22,7 @@
 // Nuclear Engineering and Design, Volume 253, 2012, Pages 322-330, https://doi.org/10.1016/j.nucengdes.2011.08.062.
 
 Implemente_instanciable(Transport_turbulent_aire_interfaciale, "Transport_turbulent_aire_interfaciale", Transport_turbulent_base);
-// XD type_diffusion_turbulente_multiphase_aire_interfaciale type_diffusion_turbulente_multiphase_deriv aire_interfaciale 1 not_set
+// XD type_diffusion_turbulente_multiphase_aire_interfaciale type_diffusion_turbulente_multiphase_deriv aire_interfaciale BRACE not_set
 
 Sortie& Transport_turbulent_aire_interfaciale::printOn(Sortie& os) const
 {

@@ -24,7 +24,7 @@
 #include <map>
 
 Implemente_base(Source_base,"Source_base",Objet_U);
-// XD source_base objet_u source_base -1 Basic class of source terms introduced in the equation.
+// XD source_base objet_u source_base INHERITS_BRACE Basic class of source terms introduced in the equation.
 
 /*! @brief DOES NOTHING - to override in derived classes.
  *

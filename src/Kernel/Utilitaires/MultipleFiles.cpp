@@ -27,8 +27,8 @@ Entree& MultipleFiles::readOn(Entree& is)
 }
 Entree& MultipleFiles::interpreter(Entree& is)
 {
-  // XD MultipleFiles interprete MultipleFiles -1 Change MPI rank limit for multiple files during I/O
-  // XD attr type entier type 0 New MPI rank limit
+  // XD MultipleFiles interprete MultipleFiles INHERITS_BRACE Change MPI rank limit for multiple files during I/O
+  // XD attr type entier type REQ New MPI rank limit
   is >> multiple_files;
   Cerr << "MultipleFiles::interpreter : Above " << multiple_files << " MPI ranks, all I/O should be done with single file." << finl;
   return is;

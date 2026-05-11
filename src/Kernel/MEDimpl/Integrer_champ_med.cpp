@@ -19,7 +19,9 @@
 #include <SFichier.h>
 
 Implemente_instanciable(Integrer_champ_med,"Integrer_champ_med",Interprete);
-// XD integrer_champ_med interprete integrer_champ_med 1 his keyword is used to calculate a flow rate from a velocity MED field read before. The method is either debit_total to calculate the flow rate on the whole surface, either integrale_en_z to calculate flow rates between z=zmin and z=zmax on nb_tranche surfaces. The output file indicates first the flow rate for the whole surface and then lists for each tranche : the height z, the surface average value, the surface area and the flow rate. For the debit_total method, only one tranche is considered.NL2 file :z Sum(u.dS)/Sum(dS) Sum(dS) Sum(u.dS)
+// XD integrer_champ_med interprete integrer_champ_med BRACE his keyword is used to calculate a flow rate from a velocity MED field read before. The method is either debit_total to calculate the flow rate on the whole surface, either integrale_en_z to
+// XD_CONT calculate flow rates between z=zmin and z=zmax on nb_tranche surfaces. The output file indicates first the flow rate for the whole surface and then lists for each tranche : the height z, the surface average value, the surface area and the flow rate. For the
+// XD_CONT debit_total method, only one tranche is considered.NL2 file :z Sum(u.dS)/Sum(dS) Sum(dS) Sum(u.dS)
 
 /*! @brief Simple appel a: Interprete::printOn(Sortie&)
  *
@@ -106,12 +108,12 @@ Entree& Integrer_champ_med::interpreter(Entree& is)
   int nb_tranche=1;
   Param param(que_suis_je());
 
-  param.ajouter("champ_med",&nom_champ_fonc_med,Param::REQUIRED);    // XD attr champ_med ref_champ_fonc_med champ_med 0 not_set
-  param.ajouter("methode",&nom_methode,Param::REQUIRED); // XD attr methode chaine(into=["integrale_en_z","debit_total"]) methode 0 to choose between the integral following z or over the entire height (debit_total corresponds to zmin=-DMAXFLOAT, ZMax=DMAXFLOAT, nb_tranche=1)
-  param.ajouter("zmin",&zmin);                   // XD attr zmin floattant zmin 1 not_set
-  param.ajouter("zmax",&zmax);                   // XD attr zmax floattant zmax 1 not_set
-  param.ajouter("nb_tranche",&nb_tranche);       // XD attr nb_tranche entier nb_tranche 1 not_set
-  param.ajouter("fichier_sortie",&nom_fichier);  // XD attr fichier_sortie chaine fichier_sortie 1 name of the output file, by default: integrale.
+  param.ajouter("champ_med",&nom_champ_fonc_med,Param::REQUIRED);    // XD attr champ_med ref_champ_fonc_med champ_med REQ not_set
+  param.ajouter("methode",&nom_methode,Param::REQUIRED); // XD attr methode chaine(into=["integrale_en_z","debit_total"]) methode REQ to choose between the integral following z or over the entire height (debit_total corresponds to zmin=-DMAXFLOAT, ZMax=DMAXFLOAT, nb_tranche=1)
+  param.ajouter("zmin",&zmin);                   // XD attr zmin floattant zmin OPT not_set
+  param.ajouter("zmax",&zmax);                   // XD attr zmax floattant zmax OPT not_set
+  param.ajouter("nb_tranche",&nb_tranche);       // XD attr nb_tranche entier nb_tranche OPT not_set
+  param.ajouter("fichier_sortie",&nom_fichier);  // XD attr fichier_sortie chaine fichier_sortie OPT name of the output file, by default: integrale.
   param.lire_avec_accolades_depuis(is);
   if ((nom_methode!="integrale_en_z")&&(nom_methode!="debit_total"))
     {

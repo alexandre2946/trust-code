@@ -23,13 +23,13 @@
 #include <EChaine.h>
 
 Implemente_instanciable_sans_constructeur( Echange_couplage_thermique, "Echange_couplage_thermique", Echange_global_impose ) ;
-// XD Echange_couplage_thermique paroi_echange_global_impose Echange_couplage_thermique 1 Thermal coupling boundary condition
-// XD attr text  suppress_param text  1 suppress
-// XD attr h_imp suppress_param h_imp 1 suppress
-// XD attr himpc suppress_param himpc 1 suppress
-// XD attr ch    suppress_param ch    1 suppress
-// XD attr temperature_paroi field_base temperature_paroi 1 Temperature
-// XD attr flux_paroi  field_base flux_paroi  1 Wall heat flux
+// XD Echange_couplage_thermique paroi_echange_global_impose Echange_couplage_thermique BRACE Thermal coupling boundary condition
+// XD attr text  suppress_param text  OPT suppress
+// XD attr h_imp suppress_param h_imp OPT suppress
+// XD attr himpc suppress_param himpc OPT suppress
+// XD attr ch    suppress_param ch    OPT suppress
+// XD attr temperature_paroi field_base temperature_paroi OPT Temperature
+// XD attr flux_paroi  field_base flux_paroi  OPT Wall heat flux
 
 Echange_couplage_thermique::Echange_couplage_thermique()
 {

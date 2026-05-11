@@ -51,7 +51,7 @@ static KOKKOS_INLINE_FUNCTION double optimum(double a, double b)
 }
 
 Implemente_instanciable(Op_Conv_Muscl_New_VEF_Face,"Op_Conv_Muscl_New_VEF_P1NC",Op_Conv_VEF_Face);
-// XD convection_muscl_new convection_deriv muscl_new 0 Only for VEF discretization.
+// XD convection_muscl_new convection_deriv muscl_new NO_BRACE Only for VEF discretization.
 
 Sortie& Op_Conv_Muscl_New_VEF_Face::printOn(Sortie& s ) const
 {

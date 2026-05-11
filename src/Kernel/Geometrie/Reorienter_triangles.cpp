@@ -17,8 +17,8 @@
 #include <Scatter.h>
 
 Implemente_instanciable_32_64(Reorienter_triangles_32_64,"Reorienter_triangles",Interprete_geometrique_base_32_64<_T_>);
-// XD reorienter_triangles interprete reorienter_triangles -1 not_set
-// XD attr domain_name ref_domaine domain_name 0 Name of domain.
+// XD reorienter_triangles interprete reorienter_triangles INHERITS_BRACE not_set
+// XD attr domain_name ref_domaine domain_name REQ Name of domain.
 
 template <typename _SIZE_>
 Sortie& Reorienter_triangles_32_64<_SIZE_>::printOn(Sortie& os) const

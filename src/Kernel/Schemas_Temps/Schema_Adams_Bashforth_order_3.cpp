@@ -18,7 +18,7 @@
 #include <TRUSTTrav.h>
 
 Implemente_instanciable(Schema_Adams_Bashforth_order_3,"Schema_Adams_Bashforth_order_3",Schema_Adams_Bashforth_base);
-// XD schema_adams_bashforth_order_3 schema_temps_base schema_adams_bashforth_order_3 -1 not_set
+// XD schema_adams_bashforth_order_3 schema_temps_base schema_adams_bashforth_order_3 INHERITS_BRACE not_set
 
 Sortie& Schema_Adams_Bashforth_order_3::printOn(Sortie& s) const
 {

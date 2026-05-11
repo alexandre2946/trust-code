@@ -20,8 +20,8 @@
 #include <Milieu_base.h>
 
 Implemente_instanciable(Neumann_paroi, "Neumann_paroi", Neumann);
-// XD Neumann_paroi condlim_base Neumann_paroi -1 Neumann boundary condition for mass equation (multiphase problem)
-// XD attr ch front_field_base ch 0 Boundary field type.
+// XD Neumann_paroi condlim_base Neumann_paroi INHERITS_BRACE Neumann boundary condition for mass equation (multiphase problem)
+// XD attr ch front_field_base ch REQ Boundary field type.
 
 Sortie& Neumann_paroi::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
 

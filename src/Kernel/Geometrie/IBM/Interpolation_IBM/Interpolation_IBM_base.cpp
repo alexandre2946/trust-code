@@ -17,7 +17,7 @@
 #include <Source_PDF_base.h>
 
 Implemente_base(Interpolation_IBM_base, "Interpolation_IBM_base", Objet_U);
-// XD interpolation_ibm_base objet_u interpolation_ibm_base 0 Base class for all the interpolation methods available in the Immersed Boundary Method (IBM).
+// XD interpolation_ibm_base objet_u interpolation_ibm_base NO_BRACE Base class for all the interpolation methods available in the Immersed Boundary Method (IBM).
 
 void Interpolation_IBM_base::discretise(const Discretisation_base& dis, Domaine_dis_base& le_dom_dis)
 {

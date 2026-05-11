@@ -26,7 +26,7 @@
 #include <MD_Vector_composite.h>
 
 Implemente_instanciable_sans_constructeur(Champ_Post_Operateur_Eqn,"Operateur_Eqn|Champ_Post_Operateur_Eqn",Champ_Generique_Operateur_base);
-// XD champ_post_operateur_eqn champ_post_de_champs_post operateur_eqn 1 Post-process equation operators/sources
+// XD champ_post_operateur_eqn champ_post_de_champs_post operateur_eqn BRACE Post-process equation operators/sources
 
 Sortie& Champ_Post_Operateur_Eqn::printOn(Sortie& s ) const
 {

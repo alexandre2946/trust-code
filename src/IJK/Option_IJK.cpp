@@ -17,7 +17,7 @@
 #include <Param.h>
 
 Implemente_instanciable(Option_IJK, "Option_IJK", Interprete);
-// XD Option_IJK interprete Option_IJK 1 Class of IJK options.
+// XD Option_IJK interprete Option_IJK BRACE Class of IJK options.
 
 bool Option_IJK::CHECK_DIVERGENCE = false;
 bool Option_IJK::DISABLE_DIPHASIQUE = false;

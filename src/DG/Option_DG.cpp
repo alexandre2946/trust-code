@@ -24,7 +24,7 @@ std::map<std::string, int> Option_DG::ORDERS = {};
 int Option_DG::GRAM_SCHMIDT = 1;
 
 Implemente_instanciable(Option_DG,"Option_DG",Interprete);
-// XD Option_DG interprete Option_DG 1 Class for DG options.
+// XD Option_DG interprete Option_DG BRACE Class for DG options.
 
 
 Sortie& Option_DG::printOn(Sortie& os) const { return Interprete::printOn(os); }

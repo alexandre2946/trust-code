@@ -19,7 +19,7 @@
 #include <EChaine.h>
 
 Implemente_instanciable(Echange_interne_global_parfait,"Paroi_echange_interne_global_parfait",Echange_interne_global_impose);
-// XD Echange_interne_global_parfait condlim_base Paroi_echange_interne_global_parfait -1 Internal heat exchange boundary condition with perfect (infinite) exchange coefficient.
+// XD Echange_interne_global_parfait condlim_base Paroi_echange_interne_global_parfait INHERITS_BRACE Internal heat exchange boundary condition with perfect (infinite) exchange coefficient.
 
 /*! @brief Ecrit le type de l'objet sur un flot de sortie
  *

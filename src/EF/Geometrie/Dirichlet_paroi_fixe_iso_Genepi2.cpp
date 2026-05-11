@@ -17,7 +17,7 @@
 
 Implemente_instanciable( Dirichlet_paroi_fixe_iso_Genepi2, "paroi_fixe_iso_Genepi2_sans_contribution_aux_vitesses_sommets", Dirichlet_paroi_fixe ) ;
 
-// XD paroi_fixe_iso_Genepi2_sans_contribution_aux_vitesses_sommets paroi_fixe paroi_fixe_iso_Genepi2_sans_contribution_aux_vitesses_sommets -1 Boundary condition to obtain iso Geneppi2, without interest
+// XD paroi_fixe_iso_Genepi2_sans_contribution_aux_vitesses_sommets paroi_fixe paroi_fixe_iso_Genepi2_sans_contribution_aux_vitesses_sommets INHERITS_BRACE Boundary condition to obtain iso Geneppi2, without interest
 
 Sortie& Dirichlet_paroi_fixe_iso_Genepi2::printOn( Sortie& os ) const { return Dirichlet_paroi_fixe::printOn( os ); }
 

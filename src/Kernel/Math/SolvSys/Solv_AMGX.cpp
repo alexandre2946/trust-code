@@ -22,9 +22,9 @@
 #include <Device.h>
 
 Implemente_instanciable_sans_constructeur(Solv_AMGX,"Solv_AMGX",Solv_Petsc);
-// XD amgx petsc amgx 0 Solver via AmgX API
-// XD attr solveur chaine solveur 0 not_set
-// XD attr option_solveur bloc_lecture option_solveur 0 not_set
+// XD amgx petsc amgx NO_BRACE Solver via AmgX API
+// XD attr solveur chaine solveur REQ not_set
+// XD attr option_solveur bloc_lecture option_solveur REQ not_set
 
 
 // printOn

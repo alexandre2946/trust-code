@@ -22,10 +22,10 @@
 #include <Front_VF.h>
 
 Implemente_instanciable(Champ_Front_Fonction,"Champ_Front_Fonction",Ch_front_var_instationnaire_dep);
-// XD champ_front_fonction front_field_base champ_front_fonction 0 boundary field that is function of another field
-// XD attr dim entier dim 0 Number of field components.
-// XD attr inco chaine inco 0 Name of the field (for example: temperature).
-// XD attr expression chaine expression 0 keyword to use a analytical expression like 10.*EXP(-0.1*val) where val be the keyword for the field.
+// XD champ_front_fonction front_field_base champ_front_fonction NO_BRACE boundary field that is function of another field
+// XD attr dim entier dim REQ Number of field components.
+// XD attr inco chaine inco REQ Name of the field (for example: temperature).
+// XD attr expression chaine expression REQ keyword to use a analytical expression like 10.*EXP(-0.1*val) where val be the keyword for the field.
 
 
 /*! @brief NE FAIT RIEN

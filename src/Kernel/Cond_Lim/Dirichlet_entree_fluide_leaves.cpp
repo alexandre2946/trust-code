@@ -32,8 +32,8 @@ Entree& Entree_fluide_Flux_Chaleur_Turbulente_imposee::readOn(Entree& s)
 /* ========================================================================================= */
 
 Implemente_instanciable(Entree_fluide_vitesse_imposee, "Frontiere_ouverte_vitesse_imposee", Dirichlet_entree_fluide);
-// XD frontiere_ouverte_vitesse_imposee dirichlet frontiere_ouverte_vitesse_imposee -1 Class for velocity-inlet boundary condition. The imposed velocity field at the inlet is vectorial and the imposed velocity values are expressed in m.s-1.
-// XD attr ch front_field_base ch 0 Boundary field type.
+// XD frontiere_ouverte_vitesse_imposee dirichlet frontiere_ouverte_vitesse_imposee INHERITS_BRACE Class for velocity-inlet boundary condition. The imposed velocity field at the inlet is vectorial and the imposed velocity values are expressed in m.s-1.
+// XD attr ch front_field_base ch REQ Boundary field type.
 
 Sortie& Entree_fluide_vitesse_imposee::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
 Entree& Entree_fluide_vitesse_imposee::readOn(Entree& s)
@@ -45,7 +45,8 @@ Entree& Entree_fluide_vitesse_imposee::readOn(Entree& s)
 /* ========================================================================================= */
 
 Implemente_instanciable(Entree_fluide_vitesse_imposee_libre, "Frontiere_ouverte_vitesse_imposee_sortie", Entree_fluide_vitesse_imposee);
-// XD frontiere_ouverte_vitesse_imposee_sortie frontiere_ouverte_vitesse_imposee frontiere_ouverte_vitesse_imposee_sortie -1 Sub-class for velocity boundary condition. The imposed velocity field at the open boundary is vectorial and the imposed velocity values are expressed in m.s-1.
+// XD frontiere_ouverte_vitesse_imposee_sortie frontiere_ouverte_vitesse_imposee frontiere_ouverte_vitesse_imposee_sortie INHERITS_BRACE Sub-class for velocity boundary condition. The imposed velocity field at the open boundary is vectorial and the imposed
+// XD_CONT velocity values are expressed in m.s-1.
 
 Sortie& Entree_fluide_vitesse_imposee_libre::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
 Entree& Entree_fluide_vitesse_imposee_libre::readOn(Entree& s)
@@ -56,8 +57,8 @@ Entree& Entree_fluide_vitesse_imposee_libre::readOn(Entree& s)
 /* ========================================================================================= */
 
 Implemente_instanciable(Entree_fluide_alpha_impose, "Frontiere_ouverte_alpha_impose", Dirichlet_entree_fluide);
-// XD frontiere_ouverte_alpha_impose dirichlet frontiere_ouverte_alpha_impose -1 Imposed alpha condition at the open boundary.
-// XD attr ch front_field_base ch 0 Boundary field type.
+// XD frontiere_ouverte_alpha_impose dirichlet frontiere_ouverte_alpha_impose INHERITS_BRACE Imposed alpha condition at the open boundary.
+// XD attr ch front_field_base ch REQ Boundary field type.
 Sortie& Entree_fluide_alpha_impose::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
 Entree& Entree_fluide_alpha_impose::readOn(Entree& s)
 {
@@ -78,8 +79,8 @@ Entree& Entree_fluide_Fluctu_Temperature_imposee::readOn(Entree& s)
 /* ========================================================================================= */
 
 Implemente_instanciable(Entree_fluide_fraction_massique_imposee, "Frontiere_ouverte_fraction_massique_imposee", Dirichlet_entree_fluide);
-// XD frontiere_ouverte_fraction_massique_imposee condlim_base frontiere_ouverte_fraction_massique_imposee -1 not_set
-// XD attr ch front_field_base ch 0 Boundary field type.
+// XD frontiere_ouverte_fraction_massique_imposee condlim_base frontiere_ouverte_fraction_massique_imposee INHERITS_BRACE not_set
+// XD attr ch front_field_base ch REQ Boundary field type.
 
 Sortie& Entree_fluide_fraction_massique_imposee::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
 Entree& Entree_fluide_fraction_massique_imposee::readOn(Entree& s)
@@ -91,8 +92,9 @@ Entree& Entree_fluide_fraction_massique_imposee::readOn(Entree& s)
 /* ========================================================================================= */
 
 Implemente_instanciable(Entree_fluide_temperature_imposee, "Frontiere_ouverte_temperature_imposee|Frontiere_ouverte_enthalpie_imposee", Dirichlet_entree_fluide);
-// XD frontiere_ouverte_temperature_imposee dirichlet frontiere_ouverte_temperature_imposee -1 Imposed temperature condition at the open boundary called bord (edge) (in the case of fluid inlet). This condition must be associated with an imposed inlet velocity condition. The imposed temperature value is expressed in oC or K.
-// XD attr ch front_field_base ch 0 Boundary field type.
+// XD frontiere_ouverte_temperature_imposee dirichlet frontiere_ouverte_temperature_imposee INHERITS_BRACE Imposed temperature condition at the open boundary called bord (edge) (in the case of fluid inlet). This condition must be associated with an imposed
+// XD_CONT inlet velocity condition. The imposed temperature value is expressed in oC or K.
+// XD attr ch front_field_base ch REQ Boundary field type.
 
 Sortie& Entree_fluide_temperature_imposee::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
 Entree& Entree_fluide_temperature_imposee::readOn(Entree& s)

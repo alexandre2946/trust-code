@@ -16,7 +16,7 @@
 #include <Bidim_Axi.h>
 
 Implemente_instanciable(Bidim_Axi,"Bidim_Axi",Interprete);
-// XD bidim_axi interprete bidim_axi -1 Keyword allowing a 2D calculation to be executed using axisymetric coordinates (R, Z). If this instruction is not included, calculations are carried out using Cartesian coordinates.
+// XD bidim_axi interprete bidim_axi INHERITS_BRACE Keyword allowing a 2D calculation to be executed using axisymetric coordinates (R, Z). If this instruction is not included, calculations are carried out using Cartesian coordinates.
 
 /*! @brief Simple appel a: Interprete::printOn(Sortie&)
  *

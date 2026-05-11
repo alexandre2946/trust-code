@@ -16,8 +16,8 @@
 #include <Tayl_Green.h>
 
 Implemente_instanciable_sans_constructeur(Tayl_Green,"Tayl_Green",TRUSTChamp_Divers_generique<Champ_Divers_Type::INUTILE>);
-// XD tayl_green champ_don_base tayl_green 0 Class Tayl_green.
-// XD attr dim entier dim 0 Dimension.
+// XD tayl_green champ_don_base tayl_green NO_BRACE Class Tayl_green.
+// XD attr dim entier dim REQ Dimension.
 
 
 Sortie& Tayl_Green::printOn(Sortie& os) const { return os; }

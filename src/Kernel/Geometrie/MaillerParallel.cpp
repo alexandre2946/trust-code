@@ -34,7 +34,8 @@
 #include <Perf_counters.h>
 
 Implemente_instanciable(MaillerParallel, "MaillerParallel", Interprete);
-// XD maillerparallel interprete maillerparallel 1 creates a parallel distributed hexaedral mesh of a parallelipipedic box. It is equivalent to creating a mesh with a single Pave, splitting it with Decouper and reloading it in parallel with Scatter. It only works in 3D at this time. It can also be used for a sequential computation (with all NPARTS=1)}
+// XD maillerparallel interprete maillerparallel BRACE creates a parallel distributed hexaedral mesh of a parallelipipedic box. It is equivalent to creating a mesh with a single Pave, splitting it with Decouper and reloading it in parallel with Scatter. It
+// XD_CONT only works in 3D at this time. It can also be used for a sequential computation (with all NPARTS=1)}
 
 Entree& MaillerParallel::readOn(Entree& is)
 {

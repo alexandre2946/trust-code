@@ -19,14 +19,14 @@
 #include <Champ_Uniforme.h>
 
 Implemente_instanciable(Pb_Thermohydraulique, "Pb_Thermohydraulique", Pb_Hydraulique);
-// XD pb_thermohydraulique Pb_base pb_thermohydraulique -1 Resolution of thermohydraulic problem.
-// XD   attr fluide_incompressible fluide_incompressible fluide_incompressible 1 The fluid medium associated with the problem (only one possibility).
-// XD   attr fluide_ostwald fluide_ostwald fluide_ostwald 1 The fluid medium associated with the problem (only one possibility).
-// XD   attr fluide_sodium_liquide fluide_sodium_liquide fluide_sodium_liquide 1 The fluid medium associated with the problem (only one possibility).
-// XD   attr fluide_sodium_gaz fluide_sodium_gaz fluide_sodium_gaz 1 The fluid medium associated with the problem (only one possibility).
-// XD   attr correlations bloc_lecture correlations 1 List of correlations used in specific source terms (i.e. interfacial flux,  interfacial friction, ...)
-// XD   attr navier_stokes_standard navier_stokes_standard navier_stokes_standard 1 Navier-Stokes equations.
-// XD   attr convection_diffusion_temperature convection_diffusion_temperature convection_diffusion_temperature 1 Energy equation (temperature diffusion convection).
+// XD pb_thermohydraulique Pb_base pb_thermohydraulique INHERITS_BRACE Resolution of thermohydraulic problem.
+// XD   attr fluide_incompressible fluide_incompressible fluide_incompressible OPT The fluid medium associated with the problem (only one possibility).
+// XD   attr fluide_ostwald fluide_ostwald fluide_ostwald OPT The fluid medium associated with the problem (only one possibility).
+// XD   attr fluide_sodium_liquide fluide_sodium_liquide fluide_sodium_liquide OPT The fluid medium associated with the problem (only one possibility).
+// XD   attr fluide_sodium_gaz fluide_sodium_gaz fluide_sodium_gaz OPT The fluid medium associated with the problem (only one possibility).
+// XD   attr correlations bloc_lecture correlations OPT List of correlations used in specific source terms (i.e. interfacial flux,  interfacial friction, ...)
+// XD   attr navier_stokes_standard navier_stokes_standard navier_stokes_standard OPT Navier-Stokes equations.
+// XD   attr convection_diffusion_temperature convection_diffusion_temperature convection_diffusion_temperature OPT Energy equation (temperature diffusion convection).
 
 Sortie& Pb_Thermohydraulique::printOn(Sortie& os) const { return Pb_Hydraulique::printOn(os); }
 Entree& Pb_Thermohydraulique::readOn(Entree& is) { return Pb_Hydraulique::readOn(is); }

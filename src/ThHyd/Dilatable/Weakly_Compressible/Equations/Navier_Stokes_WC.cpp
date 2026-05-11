@@ -18,8 +18,8 @@
 #include <Discretisation_base.h>
 
 Implemente_instanciable(Navier_Stokes_WC,"Navier_Stokes_WC",Navier_Stokes_Fluide_Dilatable_base);
-// XD navier_stokes_WC navier_stokes_standard navier_stokes_WC -1 Navier-Stokes equation for a weakly-compressible fluid.
-// XD attr mass_source mass_source mass_source 1 Mass source used in a dilatable simulation to add/reduce a mass at the boundary (volumetric source in the first cell of a given boundary).
+// XD navier_stokes_WC navier_stokes_standard navier_stokes_WC INHERITS_BRACE Navier-Stokes equation for a weakly-compressible fluid.
+// XD attr mass_source mass_source mass_source OPT Mass source used in a dilatable simulation to add/reduce a mass at the boundary (volumetric source in the first cell of a given boundary).
 
 Sortie& Navier_Stokes_WC::printOn(Sortie& is) const
 {

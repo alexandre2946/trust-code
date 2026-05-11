@@ -18,8 +18,8 @@
 
 Implemente_instanciable(Ecrire,"Ecrire",Interprete);
 
-// XD write interprete ecrire -1 Keyword to write the object of name name_obj to a standard outlet.
-// XD   attr name_obj chaine name_obj 0 Name of the object to be written.
+// XD write interprete ecrire INHERITS_BRACE Keyword to write the object of name name_obj to a standard outlet.
+// XD   attr name_obj chaine name_obj REQ Name of the object to be written.
 
 Sortie& Ecrire::printOn(Sortie& os) const { return Interprete::printOn(os); }
 

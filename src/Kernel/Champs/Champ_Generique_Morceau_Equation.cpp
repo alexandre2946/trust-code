@@ -23,7 +23,8 @@
 
 Implemente_instanciable_sans_constructeur(Champ_Generique_Morceau_Equation,"Morceau_Equation",Champ_Gen_de_Champs_Gen);
 Add_synonym(Champ_Generique_Morceau_Equation,"Champ_Post_Morceau_Equation");
-// XD morceau_equation champ_post_de_champs_post morceau_equation 1 To calculate a field related to a piece of equation. For the moment, the field which can be calculated is the stability time step of an operator equation. The problem name and the unknown of the equation should be given by Source refChamp { Pb_Champ problem_name unknown_field_of_equation }
+// XD morceau_equation champ_post_de_champs_post morceau_equation BRACE To calculate a field related to a piece of equation. For the moment, the field which can be calculated is the stability time step of an operator equation. The problem name and the unknown
+// XD_CONT of the equation should be given by Source refChamp { Pb_Champ problem_name unknown_field_of_equation }
 
 Champ_Generique_Morceau_Equation::Champ_Generique_Morceau_Equation()
 {

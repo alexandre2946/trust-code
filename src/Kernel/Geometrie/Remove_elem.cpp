@@ -21,9 +21,11 @@
 #include <Param.h>
 
 Implemente_instanciable(Remove_elem, "Remove_elem", Interprete_geometrique_base);
-// XD remove_elem interprete remove_elem -1 Keyword to remove element from a VDF mesh (named domaine_name), either from an explicit list of elements or from a geometric condition defined by a condition f(x,y)>0 in 2D and f(x,y,z)>0 in 3D. All the new borders generated are gathered in one boundary called : newBord (to rename it, use RegroupeBord keyword. To split it to different boundaries, use decoupebord keyword). Example of a removed zone of radius 0.2 centered at (x,y)=(0.5,0.5): NL2 Remove_elem dom { fonction $0.2*0.2-(x-0.5)^2-(y-0.5)^2>0$ } NL2 Warning : the thickness of removed zone has to be large enough to avoid singular nodes as decribed below : \includepng{{removeelem.jpeg}}{{11.234}}
-// XD  attr domaine ref_domaine domain 0 Name of domain
-// XD  attr bloc remove_elem_bloc bloc 0 not_set
+// XD remove_elem interprete remove_elem INHERITS_BRACE Keyword to remove element from a VDF mesh (named domaine_name), either from an explicit list of elements or from a geometric condition defined by a condition f(x,y)>0 in 2D and f(x,y,z)>0 in 3D. All the
+// XD_CONT new borders generated are gathered in one boundary called : newBord (to rename it, use RegroupeBord keyword. To split it to different boundaries, use decoupebord keyword). Example of a removed zone of radius 0.2 centered at (x,y)=(0.5,0.5): NL2 Remove_elem dom
+// XD_CONT { fonction $0.2*0.2-(x-0.5)^2-(y-0.5)^2>0$ } NL2 Warning : the thickness of removed zone has to be large enough to avoid singular nodes as decribed below : \includepng{{removeelem.jpeg}}{{11.234}}
+// XD  attr domaine ref_domaine domain REQ Name of domain
+// XD  attr bloc remove_elem_bloc bloc REQ not_set
 
 Sortie& Remove_elem::printOn(Sortie& os) const { return Interprete::printOn(os); }
 
@@ -48,7 +50,7 @@ int Remove_elem::lire_motcle_non_standard(const Motcle& mot, Entree& is)
   return retval;
 }
 
-// XD remove_elem_bloc objet_lecture nul 1 not_set
+// XD remove_elem_bloc objet_lecture nul BRACE not_set
 Entree& Remove_elem::interpreter_(Entree& is)
 {
   associer_domaine(is);

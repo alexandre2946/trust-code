@@ -34,9 +34,9 @@ static int global_count_dump_in_file = 0;
 #endif
 
 Implemente_base_sans_constructeur(Multigrille_base, "Multigrille_base", SolveurSys_base);
-// XD multigrid_solver interprete nul 1 Object defining a multigrid solver in IJK discretization
-// XD   attr coarsen_operators coarsen_operators coarsen_operators 1 Definition of the number of grids that will be used, in addition to the finest (original) grid, followed by the list of the coarsen operators that will be applied to get those grids
-// XD   attr ghost_size entier ghost_size 1 Number of ghost cells known by each processor in each of the three directions
+// XD multigrid_solver interprete nul BRACE Object defining a multigrid solver in IJK discretization
+// XD   attr coarsen_operators coarsen_operators coarsen_operators OPT Definition of the number of grids that will be used, in addition to the finest (original) grid, followed by the list of the coarsen operators that will be applied to get those grids
+// XD   attr ghost_size entier ghost_size OPT Number of ghost cells known by each processor in each of the three directions
 
 Sortie& Multigrille_base::printOn(Sortie& os) const { return os; }
 

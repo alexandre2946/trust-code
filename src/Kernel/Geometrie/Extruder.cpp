@@ -23,7 +23,7 @@
 #include <Param.h>
 
 Implemente_instanciable_sans_constructeur_32_64(Extruder_32_64, "Extruder", Interprete_geometrique_base_32_64<_T_>);
-// XD extruder interprete extruder 1 Class to create a 3D tetrahedral/hexahedral mesh (a prism is cut in 14) from a 2D triangular/quadrangular mesh.
+// XD extruder interprete extruder BRACE Class to create a 3D tetrahedral/hexahedral mesh (a prism is cut in 14) from a 2D triangular/quadrangular mesh.
 
 template <typename _SIZE_>
 Extruder_32_64<_SIZE_>::Extruder_32_64() { direction.resize(3, RESIZE_OPTIONS::NOCOPY_NOINIT); }
@@ -51,9 +51,9 @@ Entree&  Extruder_32_64<_SIZE_>::interpreter_(Entree& is)
 {
   Nom nom_dom;
   Param param(this->que_suis_je());
-  param.ajouter("domaine",&nom_dom,Param::REQUIRED);  // XD attr domaine ref_domaine domain_name 0 Name of the domain.
-  param.ajouter("nb_tranches",&NZ,Param::REQUIRED);   // XD attr nb_tranches entier nb_tranches 0 Number of elements in the extrusion direction.
-  param.ajouter_arr_size_predefinie("direction",&direction,Param::REQUIRED); // XD attr direction troisf direction 0 Direction of the extrude operation.
+  param.ajouter("domaine",&nom_dom,Param::REQUIRED);  // XD attr domaine ref_domaine domain_name REQ Name of the domain.
+  param.ajouter("nb_tranches",&NZ,Param::REQUIRED);   // XD attr nb_tranches entier nb_tranches REQ Number of elements in the extrusion direction.
+  param.ajouter_arr_size_predefinie("direction",&direction,Param::REQUIRED); // XD attr direction troisf direction REQ Direction of the extrude operation.
   param.lire_avec_accolades_depuis(is);
   this->associer_domaine(nom_dom);
   Scatter::uninit_sequential_domain(this->domaine());

@@ -17,9 +17,9 @@
 #include <Fluide_Incompressible.h>
 
 Implemente_instanciable(Pb_Hydraulique_IBM_Turbulent, "Pb_Hydraulique_IBM_Turbulent", Pb_Fluide_base);
-// XD Pb_Hydraulique_IBM_Turbulent Pb_base Pb_Hydraulique_IBM_Turbulent -1 Resolution of Navier-Stokes equations with turbulence modelling.
-// XD attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem.
-// XD attr navier_stokes_ibm_turbulent navier_stokes_ibm_turbulent navier_stokes_ibm_turbulent 0 IBM Navier-Stokes equations as well as the associated turbulence model equations.
+// XD Pb_Hydraulique_IBM_Turbulent Pb_base Pb_Hydraulique_IBM_Turbulent INHERITS_BRACE Resolution of Navier-Stokes equations with turbulence modelling.
+// XD attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the problem.
+// XD attr navier_stokes_ibm_turbulent navier_stokes_ibm_turbulent navier_stokes_ibm_turbulent REQ IBM Navier-Stokes equations as well as the associated turbulence model equations.
 
 Sortie& Pb_Hydraulique_IBM_Turbulent::printOn(Sortie& os) const { return Pb_Fluide_base::printOn(os); }
 

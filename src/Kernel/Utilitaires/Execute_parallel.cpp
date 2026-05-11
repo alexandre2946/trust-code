@@ -23,7 +23,8 @@
 #include <Param.h>
 
 Implemente_instanciable(Execute_parallel,"Execute_parallel",Interprete);
-// XD execute_parallel interprete execute_parallel 1 This keyword allows to run several computations in parallel on processors allocated to TRUST. The set of processors is split in N subsets and each subset will read and execute a different data file. Error messages usualy written to stderr and stdout are redirected to .log files (journaling must be activated).
+// XD execute_parallel interprete execute_parallel BRACE This keyword allows to run several computations in parallel on processors allocated to TRUST. The set of processors is split in N subsets and each subset will read and execute a different data file.
+// XD_CONT Error messages usualy written to stderr and stdout are redirected to .log files (journaling must be activated).
 
 Entree& Execute_parallel::readOn(Entree& is)
 {

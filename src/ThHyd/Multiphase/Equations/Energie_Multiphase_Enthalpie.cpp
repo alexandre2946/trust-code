@@ -18,7 +18,7 @@
 #include <Discret_Thyd.h>
 
 Implemente_instanciable(Energie_Multiphase_Enthalpie, "Energie_Multiphase_Enthalpie|Energie_Multiphase_h", Energie_Multiphase);
-// XD Energie_Multiphase_Enthalpie eqn_base Energie_Multiphase_h -1 Internal energy conservation equation for a multi-phase problem where the unknown is the enthalpy
+// XD Energie_Multiphase_Enthalpie eqn_base Energie_Multiphase_h INHERITS_BRACE Internal energy conservation equation for a multi-phase problem where the unknown is the enthalpy
 
 Sortie& Energie_Multiphase_Enthalpie::printOn(Sortie& is) const { return Energie_Multiphase::printOn(is); }
 

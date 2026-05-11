@@ -20,7 +20,7 @@
 #include <SFichier.h>
 
 Implemente_instanciable(ScatterMED,"ScatterMED",Scatter);
-// XD scattermed scatter scattermed 0 This keyword will read the partition of the domain_name domain into a the MED format files file.med created by Medsplitter.
+// XD scattermed scatter scattermed NO_BRACE This keyword will read the partition of the domain_name domain into a the MED format files file.med created by Medsplitter.
 
 /*! @brief Simple appel a: Interprete::printOn(Sortie&)
  *

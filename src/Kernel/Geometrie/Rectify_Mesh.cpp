@@ -21,8 +21,8 @@
 
 Implemente_instanciable(Rectify_Mesh,"Rectify_Mesh",Interprete_geometrique_base) ;
 Add_synonym(Rectify_Mesh,"Orienter_Simplexes");
-// XD rectify_mesh interprete rectify_mesh -1 Keyword to raffine a mesh
-// XD  attr domain_name ref_domaine domain_name 0 Name of domain.
+// XD rectify_mesh interprete rectify_mesh INHERITS_BRACE Keyword to raffine a mesh
+// XD  attr domain_name ref_domaine domain_name REQ Name of domain.
 
 Sortie& Rectify_Mesh::printOn(Sortie& os) const
 {

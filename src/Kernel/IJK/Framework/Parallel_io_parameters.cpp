@@ -22,7 +22,7 @@
 
 Implemente_instanciable(Parallel_io_parameters, "Parallel_io_parameters", Interprete);
 
-// XD Parallel_io_parameters interprete Parallel_io_parameters 1 Object to handle parallel files in IJK discretization
+// XD Parallel_io_parameters interprete Parallel_io_parameters BRACE Object to handle parallel files in IJK discretization
 
 // Reasonable default value for typical machines nowadays
 Size_t Parallel_io_parameters::max_block_size_ = (Size_t) 0; // for the moment, deactivate parallel write by default 1024*1024*64;

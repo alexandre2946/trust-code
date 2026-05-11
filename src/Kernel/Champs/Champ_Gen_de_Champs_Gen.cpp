@@ -22,7 +22,7 @@
 
 Implemente_base(Champ_Gen_de_Champs_Gen,"Champ_Gen_de_Champs_Gen",Champ_Generique_base);
 
-// XD champ_post_de_champs_post champ_generique_base champ_post_de_champs_post -1 not_set
+// XD champ_post_de_champs_post champ_generique_base champ_post_de_champs_post INHERITS_BRACE not_set
 
 Entree& Champ_Gen_de_Champs_Gen::readOn(Entree& is)
 {
@@ -41,11 +41,11 @@ Sortie& Champ_Gen_de_Champs_Gen::printOn(Sortie& os) const
 //  nom_source : option pour nommer le champ en tant que source (sinon nommer par defaut)
 void Champ_Gen_de_Champs_Gen::set_param(Param& param) const
 {
-  param.ajouter_non_std("source",(this)); // XD attr source champ_generique_base source 1 the source field.
-  param.ajouter_non_std("sources",(this)); // XD attr sources listchamp_generique sources 1 sources { Champ_Post.... { ... } Champ_Post.. { ... }}
-  param.ajouter_non_std("nom_source",(this)); // XD attr nom_source chaine nom_source 1 To name a source field with the nom_source keyword
-  param.ajouter_non_std("source_reference",(this)); // XD attr source_reference chaine source_reference 1 not_set
-  param.ajouter("sources_reference",&noms_sources_ref_); // XD attr sources_reference list_nom_virgule sources_reference 1 not_set
+  param.ajouter_non_std("source",(this)); // XD attr source champ_generique_base source OPT the source field.
+  param.ajouter_non_std("sources",(this)); // XD attr sources listchamp_generique sources OPT sources { Champ_Post.... { ... } Champ_Post.. { ... }}
+  param.ajouter_non_std("nom_source",(this)); // XD attr nom_source chaine nom_source OPT To name a source field with the nom_source keyword
+  param.ajouter_non_std("source_reference",(this)); // XD attr source_reference chaine source_reference OPT not_set
+  param.ajouter("sources_reference",&noms_sources_ref_); // XD attr sources_reference list_nom_virgule sources_reference OPT not_set
 }
 
 int Champ_Gen_de_Champs_Gen::lire_motcle_non_standard(const Motcle& mot, Entree& is)

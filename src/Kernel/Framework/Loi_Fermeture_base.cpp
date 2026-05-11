@@ -21,7 +21,7 @@
 #include <Schema_Temps_base.h>
 
 Implemente_base_sans_constructeur(Loi_Fermeture_base, "Loi_Fermeture_base", Objet_U);
-// XD loi_fermeture_base objet_u loi_fermeture_base 1 Class for appends fermeture to problem
+// XD loi_fermeture_base objet_u loi_fermeture_base BRACE Class for appends fermeture to problem
 
 Loi_Fermeture_base::Loi_Fermeture_base()
 {

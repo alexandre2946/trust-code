@@ -27,7 +27,7 @@
 // IT IS STILL USEFUL (in v1.9.7) TO READ OLD ICEM FILES (ND, 07/11/2025)
 
 Implemente_instanciable(Read_unsupported_ASCII_file_from_ICEM,"Read_unsupported_ASCII_file_from_ICEM",Lire_Fichier);
-// XD read_unsupported_ascii_file_from_icem read_file read_unsupported_ascii_file_from_icem -1 not_set
+// XD read_unsupported_ascii_file_from_icem read_file read_unsupported_ascii_file_from_icem INHERITS_BRACE not_set
 
 Sortie& Read_unsupported_ASCII_file_from_ICEM::printOn(Sortie& os) const
 {

@@ -16,7 +16,7 @@
 #include <Neumann_homogene.h>
 
 Implemente_base(Neumann_homogene,"Neumann_homogene",Cond_lim_base);
-// XD Neumann_homogene condlim_base Neumann_homogene -1 Homogeneous neumann boundary condition
+// XD Neumann_homogene condlim_base Neumann_homogene INHERITS_BRACE Homogeneous neumann boundary condition
 
 Sortie& Neumann_homogene::printOn(Sortie& s ) const { return s << que_suis_je() << finl; }
 

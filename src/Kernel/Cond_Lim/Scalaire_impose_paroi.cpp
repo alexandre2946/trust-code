@@ -16,8 +16,8 @@
 #include <Scalaire_impose_paroi.h>
 
 Implemente_instanciable(Scalaire_impose_paroi, "Scalaire_impose_paroi", Dirichlet);
-// XD scalaire_impose_paroi dirichlet scalaire_impose_paroi 0 Imposed temperature condition at the wall called bord (edge).
-// XD   attr ch front_field_base ch 0 Boundary field type.
+// XD scalaire_impose_paroi dirichlet scalaire_impose_paroi NO_BRACE Imposed temperature condition at the wall called bord (edge).
+// XD   attr ch front_field_base ch REQ Boundary field type.
 
 Sortie& Scalaire_impose_paroi::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
 

@@ -17,7 +17,7 @@
 #include <Domaine.h>
 
 Implemente_instanciable_32_64(Point_32_64,"Point",Elem_geom_base_32_64<_T_>);
-// XD point points point 0 Point as class-daughter of Points.
+// XD point points point NO_BRACE Point as class-daughter of Points.
 
 /*! @brief NE FAIT RIEN
  *

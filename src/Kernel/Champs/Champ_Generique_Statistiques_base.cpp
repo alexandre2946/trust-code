@@ -20,7 +20,7 @@
 
 Implemente_base_sans_constructeur(Champ_Generique_Statistiques_base,"Champ_Generique_Statistiques_base",Champ_Gen_de_Champs_Gen);
 
-// XD champ_post_statistiques_base champ_post_de_champs_post champ_post_statistiques_base -1 not_set
+// XD champ_post_statistiques_base champ_post_de_champs_post champ_post_statistiques_base INHERITS_BRACE not_set
 
 Champ_Generique_Statistiques_base::Champ_Generique_Statistiques_base()
 {
@@ -46,8 +46,8 @@ void Champ_Generique_Statistiques_base::set_param(Param& param) const
   //ex : Postraitement::creer_champ_post_stat()
   //Mais specification obligatoire a conserver dans la doc pour l utilisateur
   //qui specifie son champ statistique de facon standard dans definition_champs.
-  param.ajouter("t_deb",&tstat_deb_); // XD attr t_deb floattant t_deb 0 Start of integration time
-  param.ajouter("t_fin",&tstat_fin_); // XD attr t_fin floattant t_fin 0 End of integration time
+  param.ajouter("t_deb",&tstat_deb_); // XD attr t_deb floattant t_deb REQ Start of integration time
+  param.ajouter("t_fin",&tstat_fin_); // XD attr t_fin floattant t_fin REQ End of integration time
 }
 
 int Champ_Generique_Statistiques_base::completer_post_statistiques(const Domaine& dom,const int is_axi,Format_Post_base& format)

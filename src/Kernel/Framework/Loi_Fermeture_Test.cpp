@@ -20,7 +20,7 @@
 #include <Param.h>
 
 Implemente_instanciable( Loi_Fermeture_Test, "Loi_Fermeture_Test", Loi_Fermeture_base ) ;
-// XD loi_fermeture_test loi_fermeture_base loi_fermeture_test -1 Loi for test only
+// XD loi_fermeture_test loi_fermeture_base loi_fermeture_test INHERITS_BRACE Loi for test only
 
 Sortie& Loi_Fermeture_Test::printOn( Sortie& os ) const
 {

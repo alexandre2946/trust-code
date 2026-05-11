@@ -17,11 +17,13 @@
 #include <Champ_Fonc_Tabule.h>
 
 Implemente_instanciable(Champ_Fonc_Fonction_txyz_Morceaux,"Champ_Fonc_Fonction_txyz_Morceaux",TRUSTChamp_Morceaux_generique<Champ_Morceaux_Type::FONC_TXYZ>);
-// XD champ_fonc_fonction_txyz_morceaux champ_don_base champ_fonc_fonction_txyz_morceaux 0 Field defined by analytical functions in each sub-domaine. On each zone, the value is defined as a function of x,y,z,t and of scalar value taken from a parameter field. This values is associated to the variable 'val' in the expression.
-// XD   attr problem_name ref_Pb_base problem_name 0 Name of the problem.
-// XD   attr inco chaine inco 0 Name of the field (for example: temperature).
-// XD   attr nb_comp entier nb_comp 0 Number of field components.
-// XD   attr data bloc_lecture data 0 { Defaut val_def sous_domaine_1 val_1 ... sous_domaine_i val_i } By default, the value val_def is assigned to the field. It takes the sous_domaine_i identifier Sous_Domaine (sub_area) type object function, val_i. Sous_Domaine (sub_area) type objects must have been previously defined if the operator wishes to use a champ_fonc_fonction_txyz_morceaux type object.
+// XD champ_fonc_fonction_txyz_morceaux champ_don_base champ_fonc_fonction_txyz_morceaux NO_BRACE Field defined by analytical functions in each sub-domaine. On each zone, the value is defined as a function of x,y,z,t and of scalar value taken from a parameter
+// XD_CONT field. This values is associated to the variable 'val' in the expression.
+// XD   attr problem_name ref_Pb_base problem_name REQ Name of the problem.
+// XD   attr inco chaine inco REQ Name of the field (for example: temperature).
+// XD   attr nb_comp entier nb_comp REQ Number of field components.
+// XD attr data bloc_lecture data REQ { Defaut val_def sous_domaine_1 val_1 ... sous_domaine_i val_i } By default, the value val_def is assigned to the field. It takes the sous_domaine_i identifier Sous_Domaine (sub_area) type object function, val_i.
+// XD_CONT Sous_Domaine (sub_area) type objects must have been previously defined if the operator wishes to use a champ_fonc_fonction_txyz_morceaux type object.
 
 Sortie& Champ_Fonc_Fonction_txyz_Morceaux::printOn(Sortie& os) const { return os << valeurs(); }
 

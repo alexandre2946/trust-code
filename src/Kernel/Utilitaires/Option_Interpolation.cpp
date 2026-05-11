@@ -18,7 +18,7 @@
 #include <Param.h>
 
 Implemente_instanciable(Option_Interpolation, "Option_Interpolation", Interprete);
-// XD Option_Interpolation interprete Option_Interpolation 1 Class for interpolation fields using MEDCoupling.
+// XD Option_Interpolation interprete Option_Interpolation BRACE Class for interpolation fields using MEDCoupling.
 
 int Option_Interpolation::USE_DEC = 1;
 int Option_Interpolation::SHARING_ALGO = 0;

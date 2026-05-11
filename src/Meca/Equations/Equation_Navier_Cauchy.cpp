@@ -21,7 +21,7 @@
 #include <Process.h>
 
 Implemente_instanciable(Equation_Navier_Cauchy,"Equation_Navier_Cauchy",Equation_base);
-// XD Equation_Navier_Cauchy eqn_base Equation_Navier_Cauchy -1 Equation_Navier_Cauchy equation
+// XD Equation_Navier_Cauchy eqn_base Equation_Navier_Cauchy INHERITS_BRACE Equation_Navier_Cauchy equation
 
 Sortie& Equation_Navier_Cauchy::printOn(Sortie& os) const { return Equation_base::printOn(os); }
 

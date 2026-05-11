@@ -22,27 +22,32 @@
 #include <Param.h>
 
 Implemente_instanciable(Fluide_Quasi_Compressible,"Fluide_Quasi_Compressible",Fluide_Dilatable_base);
-// XD fluide_quasi_compressible fluide_base fluide_quasi_compressible -1 Quasi-compressible flow with a low mach number assumption; this means that the thermo-dynamic pressure (used in state law) is uniform in space.
-// XD attr sutherland bloc_sutherland sutherland 1 Sutherland law for viscosity and for conductivity.
-// XD attr pression double pression 1 Initial thermo-dynamic pressure used in the assosciated state law.
-// XD attr loi_etat loi_etat_base loi_etat 1 The state law that will be associated to the Quasi-compressible fluid.
-// XD attr traitement_pth chaine(into=["edo","constant","conservation_masse"]) traitement_pth 1 Particular treatment for the thermodynamic pressure Pth ; there are three possibilities: NL2 1) with the keyword \'edo\' the code computes Pth solving an O.D.E. ; in this case, the mass is not strictly conserved (it is the default case for quasi compressible computation): NL2 2) the keyword \'conservation_masse\' forces the conservation of the mass (closed geometry or with periodic boundaries condition) NL2 3) the keyword \'constant\' makes it possible to have a constant Pth ; it\'s the good choice when the flow is open (e.g. with pressure boundary conditions). NL2 It is possible to monitor the volume averaged value for temperature and density, plus Pth evolution in the .evol_glob file.
-// XD attr traitement_rho_gravite chaine(into=["standard","moins_rho_moyen"]) traitement_rho_gravite 1 It may be :1) \`standard\` : the gravity term is evaluted with rho*g (It is the default). 2) \`moins_rho_moyen\` : the gravity term is evaluated with (rho-rhomoy) *g. Unknown pressure is then P*=P+rhomoy*g*z. It is useful when you apply uniforme pressure boundary condition like P*=0.
-// XD attr temps_debut_prise_en_compte_drho_dt double temps_debut_prise_en_compte_drho_dt 1 While time<value, dRho/dt is set to zero (Rho, volumic mass). Useful for some calculation during the first time steps with big variation of temperature and volumic mass.
-// XD attr omega_relaxation_drho_dt double omega_relaxation_drho_dt 1 Optional option to have a relaxed algorithm to solve the mass equation. value is used (1 per default) to specify omega.
-// XD attr lambda field_base lambda_u 1 Conductivity (W.m-1.K-1).
-// XD attr mu field_base mu 1 Dynamic viscosity (kg.m-1.s-1).
+// XD fluide_quasi_compressible fluide_base fluide_quasi_compressible INHERITS_BRACE Quasi-compressible flow with a low mach number assumption; this means that the thermo-dynamic pressure (used in state law) is uniform in space.
+// XD attr sutherland bloc_sutherland sutherland OPT Sutherland law for viscosity and for conductivity.
+// XD attr pression double pression OPT Initial thermo-dynamic pressure used in the assosciated state law.
+// XD attr loi_etat loi_etat_base loi_etat OPT The state law that will be associated to the Quasi-compressible fluid.
+// XD attr traitement_pth chaine(into=["edo","constant","conservation_masse"]) traitement_pth OPT Particular treatment for the thermodynamic pressure Pth ; there are three possibilities: NL2 1) with the keyword \'edo\' the code computes Pth solving an O.D.E. ;
+// XD_CONT in this case, the mass is not strictly conserved (it is the default case for quasi compressible computation): NL2 2) the keyword \'conservation_masse\' forces the conservation of the mass (closed geometry or with periodic boundaries condition) NL2 3) the
+// XD_CONT keyword \'constant\' makes it possible to have a constant Pth ; it\'s the good choice when the flow is open (e.g. with pressure boundary conditions). NL2 It is possible to monitor the volume averaged value for temperature and density, plus Pth evolution in the
+// XD_CONT .evol_glob file.
+// XD attr traitement_rho_gravite chaine(into=["standard","moins_rho_moyen"]) traitement_rho_gravite OPT It may be :1) \`standard\` : the gravity term is evaluted with rho*g (It is the default). 2) \`moins_rho_moyen\` : the gravity term is evaluated with
+// XD_CONT (rho-rhomoy) *g. Unknown pressure is then P*=P+rhomoy*g*z. It is useful when you apply uniforme pressure boundary condition like P*=0.
+// XD attr temps_debut_prise_en_compte_drho_dt double temps_debut_prise_en_compte_drho_dt OPT While time<value, dRho/dt is set to zero (Rho, volumic mass). Useful for some calculation during the first time steps with big variation of temperature and volumic
+// XD_CONT mass.
+// XD attr omega_relaxation_drho_dt double omega_relaxation_drho_dt OPT Optional option to have a relaxed algorithm to solve the mass equation. value is used (1 per default) to specify omega.
+// XD attr lambda field_base lambda_u OPT Conductivity (W.m-1.K-1).
+// XD attr mu field_base mu OPT Dynamic viscosity (kg.m-1.s-1).
 
-// XD bloc_sutherland objet_lecture nul 0 Sutherland law for viscosity mu(T)=mu0*((T0+C)/(T+C))*(T/T0)**1.5 and (optional) for conductivity lambda(T)=mu0*Cp/Prandtl*((T0+Slambda)/(T+Slambda))*(T/T0)**1.5
-// XD attr problem_name ref_Pb_base problem_name 0 Name of problem.
-// XD attr mu0 chaine(into=["mu0"]) mu0 0 not_set
-// XD attr mu0_val double mu0_val 0 not_set
-// XD attr t0 chaine(into=["T0"]) t0 0 not_set
-// XD attr t0_val double t0_val 0 not_set
-// XD attr Slambda chaine(into=["Slambda"]) Slambda 1 not_set
-// XD attr s double s 1 not_set
-// XD attr C chaine(into=["C"]) C 0 not_set
-// XD attr c_val double c_val 0 not_set
+// XD bloc_sutherland objet_lecture nul NO_BRACE Sutherland law for viscosity mu(T)=mu0*((T0+C)/(T+C))*(T/T0)**1.5 and (optional) for conductivity lambda(T)=mu0*Cp/Prandtl*((T0+Slambda)/(T+Slambda))*(T/T0)**1.5
+// XD attr problem_name ref_Pb_base problem_name REQ Name of problem.
+// XD attr mu0 chaine(into=["mu0"]) mu0 REQ not_set
+// XD attr mu0_val double mu0_val REQ not_set
+// XD attr t0 chaine(into=["T0"]) t0 REQ not_set
+// XD attr t0_val double t0_val REQ not_set
+// XD attr Slambda chaine(into=["Slambda"]) Slambda OPT not_set
+// XD attr s double s OPT not_set
+// XD attr C chaine(into=["C"]) C REQ not_set
+// XD attr c_val double c_val REQ not_set
 
 Sortie& Fluide_Quasi_Compressible::printOn(Sortie& os) const { return Fluide_Dilatable_base::printOn(os); }
 

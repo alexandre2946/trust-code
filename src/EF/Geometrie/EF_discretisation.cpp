@@ -38,7 +38,7 @@
 #include <Domaine_Cl_dis_base.h>
 
 Implemente_instanciable(EF_discretisation, "EF", Discret_Thyd);
-// XD ef discretisation_base ef -1 Element Finite discretization.
+// XD ef discretisation_base ef INHERITS_BRACE Element Finite discretization.
 
 Entree& EF_discretisation::readOn(Entree& s)
 {

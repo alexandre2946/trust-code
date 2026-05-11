@@ -21,7 +21,7 @@
 #include <Param.h>
 
 Implemente_instanciable(PDF_model,"PDF_model",Objet_U) ;
-// XD bloc_pdf_model objet_lecture nul 1 not_set
+// XD bloc_pdf_model objet_lecture nul BRACE not_set
 
 Sortie& PDF_model::printOn(Sortie& os) const
 {

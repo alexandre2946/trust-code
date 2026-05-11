@@ -42,14 +42,14 @@
 #include <Param.h>
 #include <Perf_counters.h>
 
-// XD condinit objet_lecture nul 0 Initial condition.
-// XD attr nom chaine nom 0 Name of initial condition field.
-// XD attr ch field_base ch 0 Type field and the initial values.
+// XD condinit objet_lecture nul NO_BRACE Initial condition.
+// XD attr nom chaine nom REQ Name of initial condition field.
+// XD attr ch field_base ch REQ Type field and the initial values.
 
-// XD condinits listobj condinits -1 condinit 0 Initial conditions.
+// XD condinits listobj condinits INHERITS_BRACE condinit NO_COMMA Initial conditions.
 
 Implemente_base_sans_constructeur(Equation_base,"Equation_base",Objet_U);
-// XD eqn_base mor_eqn eqn_base 1 Basic class for equations.
+// XD eqn_base mor_eqn eqn_base BRACE Basic class for equations.
 /* Attributes further down in the cpp: */
 
 Equation_base::Equation_base()
@@ -246,24 +246,24 @@ Entree& Equation_base::readOn(Entree& is)
   Param param(que_suis_je());
   set_param(param);
   Nom expr_equation_non_resolue="0";
-  param.ajouter("disable_equation_residual",&disable_equation_residual_); // XD attr disable_equation_residual entier disable_equation_residual 1 The equation residual will not be used for the problem residual used when checking time convergence or computing dynamic time-step
+  param.ajouter("disable_equation_residual",&disable_equation_residual_); // XD attr disable_equation_residual entier disable_equation_residual OPT The equation residual will not be used for the problem residual used when checking time convergence or computing dynamic time-step
   equation_non_resolue_.setString(expr_equation_non_resolue);
   param.lire_avec_accolades_depuis(is);
   matrice_init = 0;
   return is;
 }
 
-// XD attr convection bloc_convection convection 1 Keyword to alter the convection scheme.
-// XD attr diffusion bloc_diffusion diffusion 1 Keyword to specify the diffusion operator.
+// XD attr convection bloc_convection convection OPT Keyword to alter the convection scheme.
+// XD attr diffusion bloc_diffusion diffusion OPT Keyword to specify the diffusion operator.
 void Equation_base::set_param(Param& param) const
 {
-  param.ajouter_non_std("conditions_limites|boundary_conditions",(this),Param::REQUIRED);  // XD attr conditions_limites|boundary_conditions condlims conditions_limites 1 Boundary conditions.
-  param.ajouter_non_std("conditions_initiales|initial_conditions",(this),Param::REQUIRED); // XD attr conditions_initiales|initial_conditions condinits conditions_initiales 1 Initial conditions.
-  param.ajouter_non_std("sources",(this)); // XD attr sources sources sources 1 To introduce a source term into an equation (in case of several source terms into the same equation, the blocks corresponding to the various terms need to be separated by a comma)
-  param.ajouter_non_std("ecrire_fichier_xyz_valeur",(this)); // XD attr ecrire_fichier_xyz_valeur ecrire_fichier_xyz_valeur ecrire_fichier_xyz_valeur 1 This keyword is used to write the values of a field only for some boundaries in a text file
-  param.ajouter("parametre_equation",&parametre_equation_); // XD attr parametre_equation parametre_equation_base parametre_equation 1 Keyword used to specify additional parameters for the equation
-  param.ajouter_non_std("equation_non_resolue",(this)); // XD attr equation_non_resolue chaine equation_non_resolue 1 The equation will not be solved while condition(t) is verified if equation_non_resolue keyword is used. Exemple: The Navier-Stokes equations are not solved between time t0 and t1. NL2 Navier_Sokes_Standard NL2 { equation_non_resolue (t>t0)*(t<t1) }
-  param.ajouter_non_std("rename_equation|renommer_equation",(this)); // XD attr renommer_equation chaine rename_equation 1 Rename the equation with a specific name.
+  param.ajouter_non_std("conditions_limites|boundary_conditions",(this),Param::REQUIRED);  // XD attr conditions_limites|boundary_conditions condlims conditions_limites OPT Boundary conditions.
+  param.ajouter_non_std("conditions_initiales|initial_conditions",(this),Param::REQUIRED); // XD attr conditions_initiales|initial_conditions condinits conditions_initiales OPT Initial conditions.
+  param.ajouter_non_std("sources",(this)); // XD attr sources sources sources OPT To introduce a source term into an equation (in case of several source terms into the same equation, the blocks corresponding to the various terms need to be separated by a comma)
+  param.ajouter_non_std("ecrire_fichier_xyz_valeur",(this)); // XD attr ecrire_fichier_xyz_valeur ecrire_fichier_xyz_valeur ecrire_fichier_xyz_valeur OPT This keyword is used to write the values of a field only for some boundaries in a text file
+  param.ajouter("parametre_equation",&parametre_equation_); // XD attr parametre_equation parametre_equation_base parametre_equation OPT Keyword used to specify additional parameters for the equation
+  param.ajouter_non_std("equation_non_resolue",(this)); // XD attr equation_non_resolue chaine equation_non_resolue OPT The equation will not be solved while condition(t) is verified if equation_non_resolue keyword is used. Exemple: The Navier-Stokes equations are not solved between time t0 and t1. NL2 Navier_Sokes_Standard NL2 { equation_non_resolue (t>t0)*(t<t1) }
+  param.ajouter_non_std("rename_equation|renommer_equation",(this)); // XD attr renommer_equation chaine rename_equation OPT Rename the equation with a specific name.
 }
 
 int Equation_base::lire_motcle_non_standard(const Motcle& mot, Entree& is)

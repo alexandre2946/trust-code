@@ -16,7 +16,7 @@
 #include <Milieu_MUSIG.h>
 
 Implemente_instanciable( Milieu_MUSIG, "Milieu_MUSIG", Milieu_composite ) ;
-// XD Milieu_MUSIG listobj Milieu_MUSIG -1 milieu_base 0 MUSIG medium made of several sub mediums.
+// XD Milieu_MUSIG listobj Milieu_MUSIG INHERITS_BRACE milieu_base NO_COMMA MUSIG medium made of several sub mediums.
 
 Sortie& Milieu_MUSIG::printOn(Sortie& os) const { return Objet_U::printOn(os); }
 

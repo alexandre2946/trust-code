@@ -16,7 +16,7 @@
 #include <Disable_TU.h>
 
 Implemente_instanciable(Disable_TU,"Disable_TU",Interprete);
-// XD disable_TU interprete disable_TU -1 Flag to disable the writing of the .TU files
+// XD disable_TU interprete disable_TU INHERITS_BRACE Flag to disable the writing of the .TU files
 
 /*! @brief Simple appel a: Interprete::printOn(Sortie&)
  *

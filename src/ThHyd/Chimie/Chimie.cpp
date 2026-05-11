@@ -24,10 +24,10 @@
 #include <dlsinterf.h>
 #include <Constituant.h>
 
-// XD reactions listobj nul 1 reaction 1 list of reactions
+// XD reactions listobj nul BRACE reaction COMMA list of reactions
 
 Implemente_instanciable(Chimie,"Chimie",Objet_U_With_Params);
-// XD chimie objet_u chimie 1 Keyword to describe the chmical reactions
+// XD chimie objet_u chimie BRACE Keyword to describe the chmical reactions
 
 
 Sortie& Chimie::printOn(Sortie& os) const
@@ -39,10 +39,10 @@ Sortie& Chimie::printOn(Sortie& os) const
 
 void Chimie::set_param(Param& param) const
 {
-  param.ajouter("reactions",&reactions_,Param::REQUIRED);                           // XD attr reactions reactions reactions 0 list of reactions
-  param.ajouter("modele_micro_melange",&modele_micro_melange_);                     // XD attr modele_micro_melange entier modele_micro_melange 1 modele_micro_melange (0 by default)
-  param.ajouter("constante_modele_micro_melange",&constante_modele_micro_melange_); // XD attr constante_modele_micro_melange floattant constante_modele_micro_melange 1 constante of modele (1 by default)
-  param.ajouter("espece_en_competition_micro_melange",&espece_en_competition_micro_melange_);  // XD attr espece_en_competition_micro_melange chaine espece_en_competition_micro_melange 1 espece in competition in reactions
+  param.ajouter("reactions",&reactions_,Param::REQUIRED);                           // XD attr reactions reactions reactions REQ list of reactions
+  param.ajouter("modele_micro_melange",&modele_micro_melange_);                     // XD attr modele_micro_melange entier modele_micro_melange OPT modele_micro_melange (0 by default)
+  param.ajouter("constante_modele_micro_melange",&constante_modele_micro_melange_); // XD attr constante_modele_micro_melange floattant constante_modele_micro_melange OPT constante of modele (1 by default)
+  param.ajouter("espece_en_competition_micro_melange",&espece_en_competition_micro_melange_);  // XD attr espece_en_competition_micro_melange chaine espece_en_competition_micro_melange OPT espece in competition in reactions
 }
 
 double Chimie::calculer_pas_de_temps() const

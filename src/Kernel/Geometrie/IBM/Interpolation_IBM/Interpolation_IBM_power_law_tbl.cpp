@@ -16,7 +16,7 @@
 #include <Interpolation_IBM_power_law_tbl.h>
 
 Implemente_instanciable( Interpolation_IBM_power_law_tbl, "Interpolation_IBM_power_law_tbl|IBM_power_law_tbl", Interpolation_IBM_elem_fluid ) ;
-// XD interpolation_ibm_power_law_tbl interpolation_ibm_elem_fluid ibm_power_law_tbl 1 Immersed Boundary Method (IBM): power law interpolation.
+// XD interpolation_ibm_power_law_tbl interpolation_ibm_elem_fluid ibm_power_law_tbl BRACE Immersed Boundary Method (IBM): power law interpolation.
 
 Sortie& Interpolation_IBM_power_law_tbl::printOn( Sortie& os ) const
 {

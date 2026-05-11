@@ -19,12 +19,12 @@
 #include <Verif_Cl.h>
 
 Implemente_instanciable(Pb_Thermohydraulique_Concentration, "Pb_Thermohydraulique_Concentration", Pb_Thermohydraulique);
-// XD pb_thermohydraulique_concentration Pb_base pb_thermohydraulique_concentration -1 Resolution of Navier-Stokes/energy/multiple constituent transport equations.
-// XD   attr fluide_incompressible fluide_incompressible fluide_incompressible 0 The fluid medium associated with the problem.
-// XD   attr constituant constituant constituant 1 Constituents.
-// XD   attr navier_stokes_standard navier_stokes_standard navier_stokes_standard 1 Navier-Stokes equations.
-// XD   attr convection_diffusion_concentration convection_diffusion_concentration convection_diffusion_concentration 1 Constituent transport equations (concentration diffusion convection).
-// XD   attr convection_diffusion_temperature convection_diffusion_temperature convection_diffusion_temperature 1 Energy equation (temperature diffusion convection).
+// XD pb_thermohydraulique_concentration Pb_base pb_thermohydraulique_concentration INHERITS_BRACE Resolution of Navier-Stokes/energy/multiple constituent transport equations.
+// XD   attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the problem.
+// XD   attr constituant constituant constituant OPT Constituents.
+// XD   attr navier_stokes_standard navier_stokes_standard navier_stokes_standard OPT Navier-Stokes equations.
+// XD   attr convection_diffusion_concentration convection_diffusion_concentration convection_diffusion_concentration OPT Constituent transport equations (concentration diffusion convection).
+// XD   attr convection_diffusion_temperature convection_diffusion_temperature convection_diffusion_temperature OPT Energy equation (temperature diffusion convection).
 
 Sortie& Pb_Thermohydraulique_Concentration::printOn(Sortie& os) const { return Pb_Thermohydraulique::printOn(os); }
 Entree& Pb_Thermohydraulique_Concentration::readOn(Entree& is) { return Pb_Thermohydraulique::readOn(is); }

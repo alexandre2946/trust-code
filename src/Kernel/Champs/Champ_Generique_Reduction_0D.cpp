@@ -25,7 +25,8 @@
 
 Implemente_instanciable(Champ_Generique_Reduction_0D,"Reduction_0D",Champ_Gen_de_Champs_Gen);
 Add_synonym(Champ_Generique_Reduction_0D,"Champ_Post_Reduction_0D");
-// XD reduction_0d champ_post_de_champs_post reduction_0d -1 To calculate the min, max, sum, average, weighted sum, weighted average, weighted sum by porosity, weighted average by porosity, euclidian norm, normalized euclidian norm, L1 norm, L2 norm of a field.
+// XD reduction_0d champ_post_de_champs_post reduction_0d INHERITS_BRACE To calculate the min, max, sum, average, weighted sum, weighted average, weighted sum by porosity, weighted average by porosity, euclidian norm, normalized euclidian norm, L1 norm, L2
+// XD_CONT norm of a field.
 
 Sortie& Champ_Generique_Reduction_0D::printOn(Sortie& s ) const
 {

@@ -21,9 +21,9 @@
 #include <Champ_base.h>
 
 Implemente_instanciable( Testeur_MEDCoupling, "Testeur_MEDCoupling", Interprete ) ;
-// XD testeur_medcoupling interprete testeur_medcoupling 0 not_set
-// XD  attr pb_name chaine pb_name 0 Name of domain.
-// XD  attr field_name chaine filed_name 0 Name of domain.
+// XD testeur_medcoupling interprete testeur_medcoupling NO_BRACE not_set
+// XD  attr pb_name chaine pb_name REQ Name of domain.
+// XD  attr field_name chaine filed_name REQ Name of domain.
 
 Sortie& Testeur_MEDCoupling::printOn( Sortie& os ) const
 {

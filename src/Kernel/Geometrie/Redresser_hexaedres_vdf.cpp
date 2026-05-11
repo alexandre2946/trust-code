@@ -22,8 +22,8 @@
 #include <Hexaedre_VEF.h>
 
 Implemente_instanciable(Redresser_hexaedres_vdf,"Redresser_hexaedres_vdf",Interprete_geometrique_base);
-// XD redresser_hexaedres_vdf interprete redresser_hexaedres_vdf -1 Keyword to convert a domain (named domain_name) with quadrilaterals/VEF hexaedras which looks like rectangles/VDF hexaedras into a domain with real rectangles/VDF hexaedras.
-// XD  attr domain_name ref_domaine domain_name 0 Name of domain to resequence.
+// XD redresser_hexaedres_vdf interprete redresser_hexaedres_vdf INHERITS_BRACE Keyword to convert a domain (named domain_name) with quadrilaterals/VEF hexaedras which looks like rectangles/VDF hexaedras into a domain with real rectangles/VDF hexaedras.
+// XD  attr domain_name ref_domaine domain_name REQ Name of domain to resequence.
 
 Sortie& Redresser_hexaedres_vdf::printOn(Sortie& os) const
 {

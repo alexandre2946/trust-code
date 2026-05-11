@@ -20,7 +20,7 @@
 #include <Param.h>
 
 Implemente_instanciable( Interpolation_IBM_elem_fluid, "Interpolation_IBM_element_fluide|IBM_element_fluide", Interpolation_IBM_base ) ;
-// XD interpolation_ibm_elem_fluid interpolation_ibm_base ibm_element_fluide 1 Immersed Boundary Method (IBM): fluid element interpolation.
+// XD interpolation_ibm_elem_fluid interpolation_ibm_base ibm_element_fluide BRACE Immersed Boundary Method (IBM): fluid element interpolation.
 
 Sortie& Interpolation_IBM_elem_fluid::printOn( Sortie& os ) const
 {

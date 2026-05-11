@@ -21,8 +21,8 @@
 #include <cmath>
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Nom,"Nom",Objet_U);
-// XD nom objet_u nom 0 Class to name the TRUST objects.
-// XD attr mot chaine mot 1 Chain of characters.
+// XD nom objet_u nom NO_BRACE Class to name the TRUST objects.
+// XD attr mot chaine mot OPT Chain of characters.
 
 /*! @brief Surcharge Objet_U::printOn(Sortie&) Ecriture d'un Nom sur un flot de sortie
  *

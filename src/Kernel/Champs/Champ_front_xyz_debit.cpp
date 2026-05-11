@@ -25,7 +25,7 @@
 
 
 Implemente_instanciable(Champ_front_xyz_debit,"Champ_front_xyz_debit",Champ_front_normal);
-// XD champ_front_xyz_debit front_field_base champ_front_xyz_debit 1 This field is used to define a flow rate field with a velocity profil which will be normalized to match the flow rate chosen.
+// XD champ_front_xyz_debit front_field_base champ_front_xyz_debit BRACE This field is used to define a flow rate field with a velocity profil which will be normalized to match the flow rate chosen.
 
 Sortie& Champ_front_xyz_debit::printOn(Sortie& os) const
 {

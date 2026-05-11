@@ -28,7 +28,7 @@
 #include <Postraitement.h>
 
 Implemente_instanciable(Champ_Generique_refChamp,"refChamp",Champ_Generique_base);
-// XD refchamp champ_generique_base refchamp -1 Field of prolem
+// XD refchamp champ_generique_base refchamp INHERITS_BRACE Field of prolem
 
 Add_synonym(Champ_Generique_refChamp,"Champ_Post_refChamp");
 
@@ -49,8 +49,8 @@ Entree& Champ_Generique_refChamp::readOn(Entree& is)
  */
 void Champ_Generique_refChamp::set_param(Param& param) const
 {
-  param.ajouter_non_std("nom_source",(this)); // XD attr nom_source chaine nom_source 1 The alias name for the field
-  param.ajouter_non_std("Pb_champ",(this),Param::REQUIRED); // XD attr pb_champ deuxmots pb_champ 0 { Pb_champ nom_pb nom_champ } : nom_pb is the problem name and nom_champ is the selected field name.
+  param.ajouter_non_std("nom_source",(this)); // XD attr nom_source chaine nom_source OPT The alias name for the field
+  param.ajouter_non_std("Pb_champ",(this),Param::REQUIRED); // XD attr pb_champ deuxmots pb_champ REQ { Pb_champ nom_pb nom_champ } : nom_pb is the problem name and nom_champ is the selected field name.
 }
 
 int Champ_Generique_refChamp::lire_motcle_non_standard(const Motcle& mot, Entree& is)

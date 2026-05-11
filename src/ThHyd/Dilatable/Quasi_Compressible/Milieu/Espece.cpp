@@ -18,12 +18,13 @@
 #include <Param.h>
 
 Implemente_instanciable_sans_constructeur(Espece,"Espece",Fluide_Quasi_Compressible);
-// XD espece milieu_base nul 1 not_set
-// XD attr gravite suppress_param gravite 1 Gravity field (optional).
-// XD attr porosites_champ suppress_param porosites_champ 1 The porosity is given at each element and the porosity at each face, Psi(face), is calculated by the average of the porosities of the two neighbour elements Psi(elem1), Psi(elem2) : Psi(face)=2/(1/Psi(elem1)+1/Psi(elem2)). This keyword is optional.
-// XD attr diametre_hyd_champ suppress_param diametre_hyd_champ 1 Hydraulic diameter field (optional).
-// XD attr porosites suppress_param porosites 1 Porosities.
-// XD attr rho suppress_param rho 1 Density (kg.m-3).
+// XD espece milieu_base nul BRACE not_set
+// XD attr gravite suppress_param gravite OPT Gravity field (optional).
+// XD attr porosites_champ suppress_param porosites_champ OPT The porosity is given at each element and the porosity at each face, Psi(face), is calculated by the average of the porosities of the two neighbour elements Psi(elem1), Psi(elem2) :
+// XD_CONT Psi(face)=2/(1/Psi(elem1)+1/Psi(elem2)). This keyword is optional.
+// XD attr diametre_hyd_champ suppress_param diametre_hyd_champ OPT Hydraulic diameter field (optional).
+// XD attr porosites suppress_param porosites OPT Porosities.
+// XD attr rho suppress_param rho OPT Density (kg.m-3).
 
 Espece::Espece() : Masse_mol_(-1.) { }
 

@@ -19,8 +19,8 @@
 #include <SFichier.h>
 
 Implemente_instanciable_32_64(Verifier_Qualite_Raffinements_32_64,"Verifier_Qualite_Raffinements",Interprete_geometrique_base_32_64<_T_>) ;
-// XD verifier_qualite_raffinements interprete verifier_qualite_raffinements 0 not_set
-// XD  attr domain_names vect_nom domain_names 0 not_set
+// XD verifier_qualite_raffinements interprete verifier_qualite_raffinements NO_BRACE not_set
+// XD  attr domain_names vect_nom domain_names REQ not_set
 
 template <typename _SIZE_>
 Sortie& Verifier_Qualite_Raffinements_32_64<_SIZE_>::printOn(Sortie& os) const

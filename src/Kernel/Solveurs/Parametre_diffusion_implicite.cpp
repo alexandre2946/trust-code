@@ -32,12 +32,13 @@ Sortie& Parametre_diffusion_implicite::printOn(Sortie& os) const
 {
   return os;
 }
-// XD parametre_diffusion_implicite parametre_equation_base parametre_diffusion_implicite -1 To specify additional parameters for the equation when using impliciting diffusion
-// XD attr crank entier(into=[0,1]) crank 1 Use (1) or not (0, default) a Crank Nicholson method for the diffusion implicitation algorithm. Setting crank to 1 increases the order of the algorithm from 1 to 2.
-// XD attr preconditionnement_diag entier(into=[0,1]) preconditionnement_diag 1 The CG used to solve the implicitation of the equation diffusion operator is not preconditioned by default. If this option is set to 1, a diagonal preconditionning is used. Warning: this option is not necessarily more efficient, depending on the treated case.
-// XD attr niter_max_diffusion_implicite entier niter_max_diffusion_implicite 1 Change the maximum number of iterations for the CG (Conjugate Gradient) algorithm when solving the diffusion implicitation of the equation.
-// XD attr seuil_diffusion_implicite floattant seuil_diffusion_implicite 1 Change the threshold convergence value used by default for the CG resolution for the diffusion implicitation of this equation.
-// XD attr solveur solveur_sys_base solveur 1 Method (different from the default one, Conjugate Gradient) to solve the linear system.
+// XD parametre_diffusion_implicite parametre_equation_base parametre_diffusion_implicite INHERITS_BRACE To specify additional parameters for the equation when using impliciting diffusion
+// XD attr crank entier(into=[0,1]) crank OPT Use (1) or not (0, default) a Crank Nicholson method for the diffusion implicitation algorithm. Setting crank to 1 increases the order of the algorithm from 1 to 2.
+// XD attr preconditionnement_diag entier(into=[0,1]) preconditionnement_diag OPT The CG used to solve the implicitation of the equation diffusion operator is not preconditioned by default. If this option is set to 1, a diagonal preconditionning is used.
+// XD_CONT Warning: this option is not necessarily more efficient, depending on the treated case.
+// XD attr niter_max_diffusion_implicite entier niter_max_diffusion_implicite OPT Change the maximum number of iterations for the CG (Conjugate Gradient) algorithm when solving the diffusion implicitation of the equation.
+// XD attr seuil_diffusion_implicite floattant seuil_diffusion_implicite OPT Change the threshold convergence value used by default for the CG resolution for the diffusion implicitation of this equation.
+// XD attr solveur solveur_sys_base solveur OPT Method (different from the default one, Conjugate Gradient) to solve the linear system.
 Entree& Parametre_diffusion_implicite::readOn(Entree& is)
 {
   Param param(que_suis_je());

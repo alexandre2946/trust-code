@@ -26,9 +26,9 @@
 #include <EChaine.h>
 
 Implemente_instanciable(Echange_interne_impose,"Paroi_echange_interne_impose",Echange_externe_impose);
-// XD Echange_interne_impose condlim_base Paroi_echange_interne_impose -1 Internal heat exchange boundary condition with exchange coefficient.
-// XD attr h_imp chaine h_imp 0 Exchange coefficient value expressed in W.m-2.K-1.
-// XD attr ch front_field_base ch 0 Boundary field type.
+// XD Echange_interne_impose condlim_base Paroi_echange_interne_impose INHERITS_BRACE Internal heat exchange boundary condition with exchange coefficient.
+// XD attr h_imp chaine h_imp REQ Exchange coefficient value expressed in W.m-2.K-1.
+// XD attr ch front_field_base ch REQ Boundary field type.
 
 Sortie& Echange_interne_impose::printOn(Sortie& s ) const { return s << que_suis_je() << finl; }
 

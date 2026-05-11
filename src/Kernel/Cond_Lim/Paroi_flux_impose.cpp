@@ -18,8 +18,9 @@
 #include <Equation_base.h>
 
 Implemente_instanciable(Paroi_flux_impose, "paroi_flux_impose", Cond_lim_utilisateur_base);
-// XD paroi_flux_impose condlim_base paroi_flux_impose 0 Normal flux condition at the wall called bord (edge). The surface area of the flux (W.m-1 in 2D or W.m-2 in 3D) is imposed at the boundary according to the following convention: a positive flux is a flux that enters into the domain according to convention.
-// XD attr ch front_field_base ch 0 Boundary field type.
+// XD paroi_flux_impose condlim_base paroi_flux_impose NO_BRACE Normal flux condition at the wall called bord (edge). The surface area of the flux (W.m-1 in 2D or W.m-2 in 3D) is imposed at the boundary according to the following convention: a positive flux is
+// XD_CONT a flux that enters into the domain according to convention.
+// XD attr ch front_field_base ch REQ Boundary field type.
 
 Sortie& Paroi_flux_impose::printOn(Sortie& s ) const { return s << que_suis_je() ; }
 

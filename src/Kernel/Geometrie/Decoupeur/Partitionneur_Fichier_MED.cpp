@@ -29,7 +29,7 @@
 
 #endif
 
-// XD Partitionneur_Fichier_MED partitionneur_deriv fichier_med -1 Partitioning a domain using a MED file containing an integer field providing for each element the processor number on which the element should be located.
+// XD Partitionneur_Fichier_MED partitionneur_deriv fichier_med INHERITS_BRACE Partitioning a domain using a MED file containing an integer field providing for each element the processor number on which the element should be located.
 Implemente_instanciable_sans_constructeur(Partitionneur_Fichier_MED,"Partitionneur_Fichier_MED",Partitionneur_base);
 
 Partitionneur_Fichier_MED::Partitionneur_Fichier_MED()

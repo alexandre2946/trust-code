@@ -17,7 +17,7 @@
 
 Implemente_instanciable(Sortie_supersonique, "Sortie_supersonique", Symetrie);
 
-// XD sortie_supersonique symetrie sortie_supersonique -1 Outlet supersonic boundary condition
+// XD sortie_supersonique symetrie sortie_supersonique INHERITS_BRACE Outlet supersonic boundary condition
 
 Sortie& Sortie_supersonique::printOn(Sortie& s) const
 {

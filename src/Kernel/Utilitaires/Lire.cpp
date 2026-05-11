@@ -18,9 +18,9 @@
 #include <Interprete_bloc.h>
 
 Implemente_instanciable(Lire,"Lire|Read",Interprete);
-// XD read interprete lire 0 Interpretor to read the a_object objet defined between the braces.
-// XD attr a_object chaine a_object 0 Object to be read.
-// XD attr bloc chaine bloc 0 Definition of the object.
+// XD read interprete lire NO_BRACE Interpretor to read the a_object objet defined between the braces.
+// XD attr a_object chaine a_object REQ Object to be read.
+// XD attr bloc chaine bloc REQ Definition of the object.
 
 
 /*! @brief appel a la methode printOn de la classe Interprete

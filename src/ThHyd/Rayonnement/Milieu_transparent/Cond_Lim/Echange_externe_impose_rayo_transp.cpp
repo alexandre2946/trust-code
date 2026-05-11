@@ -18,7 +18,7 @@
 #include <Front_VF.h>
 
 Implemente_instanciable(Echange_externe_impose_rayo_transp, "Paroi_Echange_externe_impose_rayo_transp", Echange_externe_impose);
-// XD paroi_echange_externe_impose_rayo_transp paroi_echange_externe_impose paroi_echange_externe_impose_rayo_transp -1 Radiation External type exchange condition with a heat exchange coefficient and an imposed external temperature.
+// XD paroi_echange_externe_impose_rayo_transp paroi_echange_externe_impose paroi_echange_externe_impose_rayo_transp INHERITS_BRACE Radiation External type exchange condition with a heat exchange coefficient and an imposed external temperature.
 
 
 Sortie& Echange_externe_impose_rayo_transp::printOn(Sortie& is) const { return is; }

@@ -19,7 +19,7 @@
 #include <cmath>
 
 Implemente_instanciable(Flux_parietal_Nusselt, "Flux_parietal_Nusselt", Flux_parietal_base);
-// XD flux_parietal_nusselt flux_parietal_base nusselt -1 not_set
+// XD flux_parietal_nusselt flux_parietal_base nusselt INHERITS_BRACE not_set
 
 Sortie& Flux_parietal_Nusselt::printOn(Sortie& os) const
 {

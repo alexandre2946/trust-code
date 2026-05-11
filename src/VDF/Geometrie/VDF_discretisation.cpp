@@ -37,7 +37,7 @@
 #include <T_paroi_Champ_P0_VDF.h>
 
 Implemente_instanciable(VDF_discretisation, "VDF", Discret_Thyd);
-// XD vdf discretisation_base vdf -1 Finite difference volume discretization.
+// XD vdf discretisation_base vdf INHERITS_BRACE Finite difference volume discretization.
 
 Entree& VDF_discretisation::readOn(Entree& s)
 {

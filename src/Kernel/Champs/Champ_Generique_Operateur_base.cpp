@@ -17,7 +17,7 @@
 
 Implemente_base_sans_constructeur(Champ_Generique_Operateur_base,"Champ_Generique_Operateur_base",Champ_Gen_de_Champs_Gen);
 
-// XD champ_post_operateur_base champ_post_de_champs_post champ_post_operateur_base -1 not_set
+// XD champ_post_operateur_base champ_post_de_champs_post champ_post_operateur_base INHERITS_BRACE not_set
 
 Sortie& Champ_Generique_Operateur_base::printOn(Sortie& s ) const
 {

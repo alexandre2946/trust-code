@@ -24,7 +24,7 @@
 #include <MEDCouplingFieldDouble.hxx>
 
 Implemente_base(Prepro_IBM_base, "Prepro_IBM_base", Objet_U);
-// XD Prepro_IBM_base objet_u Prepro_IBM_base -1 To perform the intersection of an IB (Lagrange mesh) in a MED-format file .med with the Euler computional mesh.
+// XD Prepro_IBM_base objet_u Prepro_IBM_base INHERITS_BRACE To perform the intersection of an IB (Lagrange mesh) in a MED-format file .med with the Euler computional mesh.
 
 Entree& Prepro_IBM_base::readOn(Entree& s)
 {

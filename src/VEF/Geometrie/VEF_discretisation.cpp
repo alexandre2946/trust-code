@@ -39,7 +39,9 @@
 #include <Tri_VEF.h>
 
 Implemente_instanciable(VEF_discretisation, "VEFPreP1B|VEF", Discret_Thyd);
-// XD vef discretisation_base vefprep1b -1 Finite element volume discretization (P1NC/P1-bubble element). Since the 1.5.5 version, several new discretizations are available thanks to the optional keyword Read. By default, the VEFPreP1B keyword is equivalent to the former VEFPreP1B formulation (v1.5.4 and sooner). P0P1 (if used with the strong formulation for imposed pressure boundary) is equivalent to VEFPreP1B but the convergence is slower. VEFPreP1B dis is equivalent to VEFPreP1B dis Read dis { P0 P1 Changement_de_base_P1Bulle 1 Cl_pression_sommet_faible 0 }
+// XD vef discretisation_base vefprep1b INHERITS_BRACE Finite element volume discretization (P1NC/P1-bubble element). Since the 1.5.5 version, several new discretizations are available thanks to the optional keyword Read. By default, the VEFPreP1B keyword is
+// XD_CONT equivalent to the former VEFPreP1B formulation (v1.5.4 and sooner). P0P1 (if used with the strong formulation for imposed pressure boundary) is equivalent to VEFPreP1B but the convergence is slower. VEFPreP1B dis is equivalent to VEFPreP1B dis Read dis { P0 P1
+// XD_CONT Changement_de_base_P1Bulle 1 Cl_pression_sommet_faible 0 }
 
 // By default, P0+P1 and changing basis to do P0+P1->P1Bulle
 // REMEMBER: we don't necessarily go through the readOn() piece of code if we just write

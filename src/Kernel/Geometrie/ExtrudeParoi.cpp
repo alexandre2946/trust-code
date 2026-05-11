@@ -25,7 +25,7 @@
 #include <Param.h>
 
 Implemente_instanciable_sans_constructeur(ExtrudeParoi,"ExtrudeParoi",Interprete_geometrique_base);
-// XD extrudeparoi interprete extrudeparoi 1 Keyword dedicated in 3D (VEF) to create prismatic layer at wall. Each prism is cut into 3 tetraedra.
+// XD extrudeparoi interprete extrudeparoi BRACE Keyword dedicated in 3D (VEF) to create prismatic layer at wall. Each prism is cut into 3 tetraedra.
 
 ExtrudeParoi::ExtrudeParoi()
 {

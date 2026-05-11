@@ -40,7 +40,7 @@
 Implemente_instanciable(Op_Conv_EF_Stab_PolyMAC_HFV_Elem, "Op_Conv_EF_Stab_PolyMAC_HFV_Elem|Op_Conv_EF_Stab_PolyMAC_MPFA_Elem", Op_Conv_PolyMAC_CDO_base);
 Implemente_instanciable_sans_constructeur(Op_Conv_Amont_PolyMAC_HFV_Elem, "Op_Conv_Amont_PolyMAC_HFV_Elem|Op_Conv_Amont_PolyMAC_MPFA_Elem", Op_Conv_EF_Stab_PolyMAC_HFV_Elem);
 Implemente_instanciable_sans_constructeur(Op_Conv_Centre_PolyMAC_HFV_Elem, "Op_Conv_Centre_PolyMAC_HFV_Elem|Op_Conv_Centre_PolyMAC_MPFA_Elem", Op_Conv_EF_Stab_PolyMAC_HFV_Elem);
-// XD Op_Conv_EF_Stab_PolyMAC_HFV_Elem interprete Op_Conv_EF_Stab_PolyMAC_HFV_Elem 1 Class Op_Conv_EF_Stab_PolyMAC_HFV_Elem
+// XD Op_Conv_EF_Stab_PolyMAC_HFV_Elem interprete Op_Conv_EF_Stab_PolyMAC_HFV_Elem BRACE Class Op_Conv_EF_Stab_PolyMAC_HFV_Elem
 
 Op_Conv_Amont_PolyMAC_HFV_Elem::Op_Conv_Amont_PolyMAC_HFV_Elem() { alpha_ = 1.0; }
 Op_Conv_Centre_PolyMAC_HFV_Elem::Op_Conv_Centre_PolyMAC_HFV_Elem() { alpha_ = 0.0; }

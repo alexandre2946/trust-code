@@ -18,8 +18,8 @@
 #include <Domaine_VF.h>
 
 Implemente_instanciable(Champ_front_softanalytique,"Champ_front_fonc_xyz",Ch_front_var_stationnaire);
-// XD champ_front_fonc_xyz front_field_base champ_front_fonc_xyz 0 Boundary field which is not constant in space.
-// XD attr val listchaine val 0 Values of field components (mathematical expressions).
+// XD champ_front_fonc_xyz front_field_base champ_front_fonc_xyz NO_BRACE Boundary field which is not constant in space.
+// XD attr val listchaine val REQ Values of field components (mathematical expressions).
 
 /*! @brief Imprime le champ sur flot de sortie.
  *

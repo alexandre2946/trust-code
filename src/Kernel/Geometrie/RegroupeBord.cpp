@@ -17,12 +17,12 @@
 #include <EFichier.h>
 
 Implemente_instanciable_32_64(RegroupeBord_32_64,"RegroupeBord",Interprete_geometrique_base_32_64<_T_>);
-// XD regroupebord interprete regroupebord -1 Keyword to build one boundary new_bord with several boundaries of the domain named domaine.
-// XD   attr domaine ref_domaine domain 0 Name of domain
-// XD   attr new_bord chaine new_bord 0 Name of the new boundary
-// XD   attr bords bloc_lecture bords 0 { Bound1 Bound2 }
+// XD regroupebord interprete regroupebord INHERITS_BRACE Keyword to build one boundary new_bord with several boundaries of the domain named domaine.
+// XD   attr domaine ref_domaine domain REQ Name of domain
+// XD   attr new_bord chaine new_bord REQ Name of the new boundary
+// XD   attr bords bloc_lecture bords REQ { Bound1 Bound2 }
 
-// XD regroupebord_64 regroupebord  regroupebord_64 -1 Keyword to build one boundary new_bord with several boundaries of the big (64b) domain named domaine.
+// XD regroupebord_64 regroupebord  regroupebord_64 INHERITS_BRACE Keyword to build one boundary new_bord with several boundaries of the big (64b) domain named domaine.
 template <typename _SIZE_>
 Sortie& RegroupeBord_32_64<_SIZE_>::printOn(Sortie& os) const
 {

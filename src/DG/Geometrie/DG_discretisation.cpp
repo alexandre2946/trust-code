@@ -30,7 +30,7 @@
 #include <Quadrature_Ord5_Polygone.h>
 
 Implemente_instanciable(DG_discretisation, "DG", Discret_Thyd);
-// XD DG discretisation_base DG -1 DG discretization
+// XD DG discretisation_base DG INHERITS_BRACE DG discretization
 
 
 Entree& DG_discretisation::readOn(Entree& s)

@@ -17,9 +17,9 @@
 #include <Domaine.h>
 
 Implemente_instanciable(Dilate,"Dilate",Interprete_geometrique_base);
-// XD dilate interprete dilate -1 Keyword to multiply the whole coordinates of the geometry.
-// XD  attr domain_name ref_domaine domain_name 0 Name of domain.
-// XD  attr alpha floattant alpha 0 Value of dilatation coefficient.
+// XD dilate interprete dilate INHERITS_BRACE Keyword to multiply the whole coordinates of the geometry.
+// XD  attr domain_name ref_domaine domain_name REQ Name of domain.
+// XD  attr alpha floattant alpha REQ Value of dilatation coefficient.
 
 
 /*! @brief Simple appel a: Interprete::printOn(Sortie&)

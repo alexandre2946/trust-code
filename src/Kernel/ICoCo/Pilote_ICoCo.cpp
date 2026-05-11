@@ -32,9 +32,9 @@ using ICoCo::TrioField;
 extern void TRUST_set_library_mode(bool);
 
 Implemente_instanciable(Pilote_ICoCo,"Pilote_ICoCo",Interprete);
-// XD pilote_icoco interprete pilote_icoco 1 not_set
-// XD  attr pb_name chaine pb_name 0 not_set
-// XD  attr main chaine main 0 not_set
+// XD pilote_icoco interprete pilote_icoco BRACE not_set
+// XD  attr pb_name chaine pb_name REQ not_set
+// XD  attr main chaine main REQ not_set
 
 
 /*! @brief Simple appel a: Interprete::printOn(Sortie&)

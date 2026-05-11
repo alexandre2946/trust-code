@@ -18,7 +18,7 @@
 #include <Param.h>
 
 Implemente_instanciable(Transport_turbulent_Prandtl, "Transport_turbulent_Prandtl", Transport_turbulent_base);
-// XD type_diffusion_turbulente_multiphase_Prandtl type_diffusion_turbulente_multiphase_deriv Prandtl 1 Scalar Prandtl model.
+// XD type_diffusion_turbulente_multiphase_Prandtl type_diffusion_turbulente_multiphase_deriv Prandtl BRACE Scalar Prandtl model.
 
 Sortie& Transport_turbulent_Prandtl::printOn(Sortie& os) const
 {

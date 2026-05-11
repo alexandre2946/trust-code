@@ -21,7 +21,7 @@
 #include <TRUSTTrav.h>
 
 Implemente_instanciable(Transport_turbulent_SGDH, "Transport_turbulent_SGDH|Transport_turbulent_isotrope", Transport_turbulent_base);
-// XD type_diffusion_turbulente_multiphase_SGDH type_diffusion_turbulente_multiphase_deriv SGDH 1 not_set
+// XD type_diffusion_turbulente_multiphase_SGDH type_diffusion_turbulente_multiphase_deriv SGDH BRACE not_set
 
 Sortie& Transport_turbulent_SGDH::printOn(Sortie& os) const
 {
@@ -32,7 +32,7 @@ Entree& Transport_turbulent_SGDH::readOn(Entree& is)
 {
   Param param(que_suis_je());
   double Pr_t = -1;
-  param.ajouter("Pr_t|Prandtl_turbulent|Schmitt_turbulent", &Pr_t); // XD attr Pr_t floattant Prandtl_turbulent 1 not_set
+  param.ajouter("Pr_t|Prandtl_turbulent|Schmitt_turbulent", &Pr_t); // XD attr Pr_t floattant Prandtl_turbulent OPT not_set
   param.ajouter("sigma|sigma_turbulent", &sigma_); // XD_ADD_P floattant not_set
   param.ajouter("no_alpha", &no_alpha_); // XD_ADD_P flag not_set
   param.ajouter("gas_turb", &gas_turb_); // XD_ADD_P flag not_set

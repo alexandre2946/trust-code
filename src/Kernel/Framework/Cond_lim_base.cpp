@@ -19,7 +19,7 @@
 #include <Equation_base.h>
 
 Implemente_base(Cond_lim_base, "Cond_lim_base", Objet_U);
-// XD condlim_base objet_u condlim_base 0 Basic class of boundary conditions.
+// XD condlim_base objet_u condlim_base NO_BRACE Basic class of boundary conditions.
 
 Sortie& Cond_lim_base::printOn(Sortie& s) const { return s << le_champ_front; }
 

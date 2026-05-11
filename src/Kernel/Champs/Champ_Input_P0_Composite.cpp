@@ -22,9 +22,9 @@
 #include <Param.h>
 
 Implemente_instanciable(Champ_Input_P0_Composite,"Champ_Input_P0_Composite",Champ_Fonc_P0_base);
-// XD champ_input_p0_composite champ_input_base champ_input_p0_composite 1 Field used to define a classical champ input p0 field (for ICoCo), but with a predefined field for the initial state.
-// XD attr initial_field field_base initial_field 1 The field used for initialization
-// XD attr input_field champ_input_p0 input_field 1 The input field for ICoCo
+// XD champ_input_p0_composite champ_input_base champ_input_p0_composite BRACE Field used to define a classical champ input p0 field (for ICoCo), but with a predefined field for the initial state.
+// XD attr initial_field field_base initial_field OPT The field used for initialization
+// XD attr input_field champ_input_p0 input_field OPT The input field for ICoCo
 
 Sortie& Champ_Input_P0_Composite::printOn(Sortie& os) const { return os; }
 

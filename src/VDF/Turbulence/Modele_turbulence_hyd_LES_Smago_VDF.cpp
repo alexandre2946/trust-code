@@ -24,7 +24,7 @@
 
 Implemente_instanciable(Modele_turbulence_hyd_LES_Smago_VDF, "Modele_turbulence_hyd_sous_maille_Smago_VDF", Modele_turbulence_hyd_LES_VDF_base);
 
-// XD sous_maille_smago mod_turb_hyd_ss_maille sous_maille_smago -1 Smagorinsky sub-grid turbulence model. NL2 Nut=Cs1*Cs1*l*l*sqrt(2*S*S) NL2 K=Cs2*Cs2*l*l*2*S
+// XD sous_maille_smago mod_turb_hyd_ss_maille sous_maille_smago INHERITS_BRACE Smagorinsky sub-grid turbulence model. NL2 Nut=Cs1*Cs1*l*l*sqrt(2*S*S) NL2 K=Cs2*Cs2*l*l*2*S
 
 Sortie& Modele_turbulence_hyd_LES_Smago_VDF::printOn(Sortie& s) const { return s << que_suis_je() << " " << le_nom(); }
 

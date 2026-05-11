@@ -17,7 +17,7 @@
 #include <MorEqn.h>
 #include <Motcle.h>
 
-// XD mor_eqn objet_u mor_eqn -1 Class of equation pieces (morceaux d\'equation).
+// XD mor_eqn objet_u mor_eqn INHERITS_BRACE Class of equation pieces (morceaux d\'equation).
 /*! @brief Associe une equation a l'objet.
  *
  * Affecte le membre MorEqn::mon_equation avec l'objet

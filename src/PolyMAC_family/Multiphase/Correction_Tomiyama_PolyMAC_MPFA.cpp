@@ -20,7 +20,7 @@
 #include <math.h>
 
 Implemente_instanciable(Correction_Tomiyama_PolyMAC_MPFA, "Correction_Tomiyama_Face_PolyMAC_MPFA", Source_base);
-// XD Correction_Tomiyama source_base Correction_Tomiyama 1 Tomiyama correction source term for multiphase problem
+// XD Correction_Tomiyama source_base Correction_Tomiyama BRACE Tomiyama correction source term for multiphase problem
 
 Sortie& Correction_Tomiyama_PolyMAC_MPFA::printOn(Sortie& os) const
 {

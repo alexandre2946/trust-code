@@ -28,7 +28,7 @@
 #include <Flux_parietal_base.h>
 
 Implemente_instanciable(Echange_Thermique_Volumique_Elem, "Echange_Thermique_Volumique_Elem", Source_base);
-// XD echange_thermique_volumique source_base echange_thermique_volumique 1 Source term that exchanges heat volumetrically between two overlapping domains using interfacial area and thermal resistances.
+// XD echange_thermique_volumique source_base echange_thermique_volumique BRACE Source term that exchanges heat volumetrically between two overlapping domains using interfacial area and thermal resistances.
 
 Add_synonym(Echange_Thermique_Volumique_Elem, "echange_thermique_volumique_VDF_P0_VDF");
 Add_synonym(Echange_Thermique_Volumique_Elem, "Echange_Thermique_Volumique_Elem_PolyMAC_MPFA");

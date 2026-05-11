@@ -23,7 +23,7 @@
 #include <Param.h>
 
 Implemente_instanciable_sans_constructeur(Convection_Diffusion_Concentration,"Convection_Diffusion_Concentration",Convection_Diffusion_std);
-// XD convection_diffusion_concentration eqn_base convection_diffusion_concentration -1 Constituent transport vectorial equation (concentration diffusion convection).
+// XD convection_diffusion_concentration eqn_base convection_diffusion_concentration INHERITS_BRACE Constituent transport vectorial equation (concentration diffusion convection).
 
 Convection_Diffusion_Concentration::Convection_Diffusion_Concentration():nb_constituants_(-1), masse_molaire_(-1.) { }
 

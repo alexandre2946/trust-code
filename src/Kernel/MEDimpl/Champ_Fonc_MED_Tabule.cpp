@@ -16,7 +16,7 @@
 #include <Champ_Fonc_MED_Tabule.h>
 
 Implemente_instanciable( Champ_Fonc_MED_Tabule, "Champ_Fonc_MED_Tabule", Champ_Fonc_MED );
-// XD Champ_Fonc_MED_Tabule champ_fonc_med Champ_Fonc_MED_Tabule -1 not_set
+// XD Champ_Fonc_MED_Tabule champ_fonc_med Champ_Fonc_MED_Tabule INHERITS_BRACE not_set
 Sortie& Champ_Fonc_MED_Tabule::printOn(Sortie& os) const
 {
   Champ_Fonc_MED::printOn(os);

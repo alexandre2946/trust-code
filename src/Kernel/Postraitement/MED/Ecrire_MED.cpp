@@ -88,9 +88,9 @@ void Ecrire_MED_32_64<_SIZE_>::set_file_name_and_dom(const Nom& file_name, const
     domaine_dis_ = ref_cast(Domaine_VF, *dom_dis);
 }
 
-// XD Ecrire_MED interprete Write_MED -1 Write a domain to MED format into a file.
-// XD attr nom_dom ref_domaine nom_dom 0 Name of domain.
-// XD attr file chaine file 0 Name of file.
+// XD Ecrire_MED interprete Write_MED INHERITS_BRACE Write a domain to MED format into a file.
+// XD attr nom_dom ref_domaine nom_dom REQ Name of domain.
+// XD attr file chaine file REQ Name of file.
 template <typename _SIZE_>
 Entree& Ecrire_MED_32_64<_SIZE_>::interpreter(Entree& is)
 {

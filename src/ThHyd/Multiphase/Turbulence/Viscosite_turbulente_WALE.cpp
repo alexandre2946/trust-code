@@ -21,7 +21,7 @@
 #include <Param.h>
 
 Implemente_instanciable(Viscosite_turbulente_WALE, "Viscosite_turbulente_WALE", Viscosite_turbulente_LES_base);
-// XD type_diffusion_turbulente_multiphase_wale type_diffusion_turbulente_multiphase_deriv wale 1 LES WALE type.
+// XD type_diffusion_turbulente_multiphase_wale type_diffusion_turbulente_multiphase_deriv wale BRACE LES WALE type.
 
 Sortie& Viscosite_turbulente_WALE::printOn(Sortie& os) const { return os; }
 

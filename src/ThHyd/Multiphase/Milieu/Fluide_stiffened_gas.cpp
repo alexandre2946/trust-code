@@ -16,7 +16,7 @@
 #include <Fluide_stiffened_gas.h>
 
 Implemente_instanciable_sans_constructeur(Fluide_stiffened_gas, "StiffenedGas", Fluide_reel_base);
-// XD fluide_stiffened_gas fluide_base fluide_stiffened_gas -1 Class for Stiffened Gas
+// XD fluide_stiffened_gas fluide_base fluide_stiffened_gas INHERITS_BRACE Class for Stiffened Gas
 
 Fluide_stiffened_gas::Fluide_stiffened_gas() : pinf_(0.), Cv_(-1.), q_(0.), q_prim_(0.), gamma_(1.4), R_(8.31446261815324), mu__(0.), lambda__(0.) { }
 

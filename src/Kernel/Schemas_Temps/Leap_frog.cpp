@@ -18,7 +18,7 @@
 #include <Leap_frog.h>
 
 Implemente_instanciable(Leap_frog,"Leap_frog",Schema_Temps_base);
-// XD leap_frog schema_temps_base leap_frog -1 This is the leap-frog scheme.
+// XD leap_frog schema_temps_base leap_frog INHERITS_BRACE This is the leap-frog scheme.
 
 Sortie& Leap_frog::printOn(Sortie& s) const
 {

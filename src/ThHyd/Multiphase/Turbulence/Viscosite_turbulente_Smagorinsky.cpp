@@ -19,7 +19,7 @@
 #include <Param.h>
 
 Implemente_instanciable(Viscosite_turbulente_Smagorinsky, "Viscosite_turbulente_Smago", Viscosite_turbulente_LES_base);
-// XD type_diffusion_turbulente_multiphase_smago type_diffusion_turbulente_multiphase_deriv smago 1 LES Smagorinsky type.
+// XD type_diffusion_turbulente_multiphase_smago type_diffusion_turbulente_multiphase_deriv smago BRACE LES Smagorinsky type.
 
 Sortie& Viscosite_turbulente_Smagorinsky::printOn(Sortie& os) const { return os; }
 

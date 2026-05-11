@@ -18,8 +18,8 @@
 #include <Param.h>
 
 Implemente_base(Terme_Source_Coriolis_base,"Terme_Source_Coriolis_base",Source_base);
-// XD coriolis source_base coriolis 1 Keyword for a Coriolis term in hydraulic equation. Warning: Only available in VDF.
-// XD   attr omega list omega 0 Value of omega.
+// XD coriolis source_base coriolis BRACE Keyword for a Coriolis term in hydraulic equation. Warning: Only available in VDF.
+// XD   attr omega list omega REQ Value of omega.
 
 Sortie& Terme_Source_Coriolis_base::printOn(Sortie& s ) const { return s << que_suis_je() ; }
 

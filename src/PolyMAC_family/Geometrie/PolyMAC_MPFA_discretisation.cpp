@@ -30,7 +30,7 @@
 #include <Motcle.h>
 
 Implemente_instanciable(PolyMAC_MPFA_discretisation, "PolyMAC_MPFA|PolyMAC_P0", PolyMAC_HFV_discretisation);
-// XD PolyMAC_MPFA discretisation_base PolyMAC_P0 -1 PolyMAC_MPFA discretization (previously covimac discretization compatible with pb_multi).
+// XD PolyMAC_MPFA discretisation_base PolyMAC_P0 INHERITS_BRACE PolyMAC_MPFA discretization (previously covimac discretization compatible with pb_multi).
 
 Entree& PolyMAC_MPFA_discretisation::readOn(Entree& s) { return s; }
 

@@ -16,9 +16,9 @@
 #include <Saturation_sodium.h>
 
 Implemente_instanciable(Saturation_sodium, "Saturation_sodium", Saturation_base);
-// XD saturation_sodium saturation_base saturation_sodium -1 Class for saturation sodium
-// XD attr P_ref floattant P_ref 1 Use to fix the pressure value in the closure law. If not specified, the value of the pressure unknown will be used
-// XD attr T_ref floattant T_ref 1 Use to fix the temperature value in the closure law. If not specified, the value of the temperature unknown will be used
+// XD saturation_sodium saturation_base saturation_sodium INHERITS_BRACE Class for saturation sodium
+// XD attr P_ref floattant P_ref OPT Use to fix the pressure value in the closure law. If not specified, the value of the pressure unknown will be used
+// XD attr T_ref floattant T_ref OPT Use to fix the temperature value in the closure law. If not specified, the value of the temperature unknown will be used
 
 Sortie& Saturation_sodium::printOn(Sortie& os) const { return os; }
 Entree& Saturation_sodium::readOn(Entree& is) { return Saturation_base::readOn(is); }

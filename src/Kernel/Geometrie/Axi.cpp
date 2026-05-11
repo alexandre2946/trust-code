@@ -16,7 +16,7 @@
 #include <Axi.h>
 
 Implemente_instanciable(Axi,"Axi",Interprete);
-// XD axi interprete axi -1 This keyword allows a 3D calculation to be executed using cylindrical coordinates (R,$\jolitheta$,Z). If this instruction is not included, calculations are carried out using Cartesian coordinates.
+// XD axi interprete axi INHERITS_BRACE This keyword allows a 3D calculation to be executed using cylindrical coordinates (R,$\jolitheta$,Z). If this instruction is not included, calculations are carried out using Cartesian coordinates.
 
 /*! @brief Simple appel a: Interprete::printOn(Sortie&)
  *

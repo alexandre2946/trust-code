@@ -28,10 +28,10 @@
 #include <Param.h>
 
 Implemente_instanciable(Perte_Charge_Circulaire_VEF_P1NC,"Perte_Charge_Circulaire_VEF_P1NC",Perte_Charge_VEF);
-// XD perte_charge_circulaire source_base perte_charge_circulaire 1 New pressure loss.
-// XD   attr lambda chaine lambda_u 0 Function f(Re_tot, Re_long, t, x, y, z) for loss coefficient in the longitudinal direction
-// XD   attr diam_hydr champ_don_base diam_hydr 0 Hydraulic diameter value.
-// XD   attr sous_zone chaine sous_zone 1 Optional sub-area where pressure loss applies.
+// XD perte_charge_circulaire source_base perte_charge_circulaire BRACE New pressure loss.
+// XD   attr lambda chaine lambda_u REQ Function f(Re_tot, Re_long, t, x, y, z) for loss coefficient in the longitudinal direction
+// XD   attr diam_hydr champ_don_base diam_hydr REQ Hydraulic diameter value.
+// XD   attr sous_zone chaine sous_zone OPT Optional sub-area where pressure loss applies.
 
 Sortie& Perte_Charge_Circulaire_VEF_P1NC::printOn(Sortie& s ) const
 {

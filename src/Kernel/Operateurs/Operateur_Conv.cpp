@@ -20,21 +20,22 @@
 #include <Champ_base.h>
 
 Implemente_instanciable(Operateur_Conv,"Operateur_Conv",OWN_PTR(Operateur_Conv_base));
-// XD convection_deriv objet_lecture convection_deriv 0 not_set
-// XD bloc_convection objet_lecture nul 0 not_set
-// XD attr aco chaine(into=["{"]) aco 0 Opening curly bracket.
-// XD attr operateur convection_deriv operateur 0 not_set
-// XD attr acof chaine(into=["}"]) acof 0 Closing curly bracket.
+// XD convection_deriv objet_lecture convection_deriv NO_BRACE not_set
+// XD bloc_convection objet_lecture nul NO_BRACE not_set
+// XD attr aco chaine(into=["{"]) aco REQ Opening curly bracket.
+// XD attr operateur convection_deriv operateur REQ not_set
+// XD attr acof chaine(into=["}"]) acof REQ Closing curly bracket.
 
 /* Here we put the doc for all shared (VDF, VEF,...) keywords: */
 
-// XD convection_negligeable convection_deriv negligeable 0 For VDF and VEF discretizations. Suppresses the convection operator.
+// XD convection_negligeable convection_deriv negligeable NO_BRACE For VDF and VEF discretizations. Suppresses the convection operator.
 
-// XD convection_amont convection_deriv amont 0 Keyword for upwind scheme for VDF or VEF discretizations. In VEF discretization equivalent to generic amont for TRUST version 1.5 or later. The previous upwind scheme can be used with the obsolete in future amont_old keyword.
+// XD convection_amont convection_deriv amont NO_BRACE Keyword for upwind scheme for VDF or VEF discretizations. In VEF discretization equivalent to generic amont for TRUST version 1.5 or later. The previous upwind scheme can be used with the obsolete in
+// XD_CONT future amont_old keyword.
 
-// XD convection_centre convection_deriv centre 0 For VDF and VEF discretizations.
+// XD convection_centre convection_deriv centre NO_BRACE For VDF and VEF discretizations.
 
-// XD convection_centre4 convection_deriv centre4 0 For VDF and VEF discretizations.
+// XD convection_centre4 convection_deriv centre4 NO_BRACE For VDF and VEF discretizations.
 
 Sortie& Operateur_Conv::printOn(Sortie& os) const
 {

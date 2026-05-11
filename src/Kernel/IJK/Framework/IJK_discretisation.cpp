@@ -16,7 +16,7 @@
 #include <IJK_discretisation.h>
 
 Implemente_instanciable(IJK_discretisation, "IJK", Discretisation_base);
-// XD ijk discretisation_base ijk -1 IJK discretization.
+// XD ijk discretisation_base ijk INHERITS_BRACE IJK discretization.
 
 Entree& IJK_discretisation::readOn(Entree& s) { return s; }
 

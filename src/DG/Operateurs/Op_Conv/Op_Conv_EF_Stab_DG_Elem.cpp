@@ -29,7 +29,7 @@ Implemente_instanciable( Op_Conv_EF_Stab_DG_Elem, "Op_Conv_EF_Stab_DG_Elem", Op_
 Implemente_instanciable( Op_Conv_Amont_DG_Elem, "Op_Conv_Amont_DG_Elem", Op_Conv_EF_Stab_DG_Elem );
 Implemente_instanciable( Op_Conv_Centre_DG_Elem, "Op_Conv_Centre_DG_Elem", Op_Conv_EF_Stab_DG_Elem );
 
-// XD Op_Conv_EF_Stab_DG_Elem interprete Op_Conv_EF_Stab_DG_Elem 1 Class Op_Conv_EF_Stab_DG_Elem
+// XD Op_Conv_EF_Stab_DG_Elem interprete Op_Conv_EF_Stab_DG_Elem BRACE Class Op_Conv_EF_Stab_DG_Elem
 
 Sortie& Op_Conv_EF_Stab_DG_Elem::printOn(Sortie& os) const { return Op_Conv_DG_base::printOn(os); }
 Sortie& Op_Conv_Amont_DG_Elem::printOn(Sortie& os) const { return Op_Conv_DG_base::printOn(os); }

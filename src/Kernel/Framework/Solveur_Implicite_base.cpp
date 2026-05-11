@@ -19,7 +19,7 @@
 #include <EChaine.h>
 
 Implemente_base(Solveur_Implicite_base, "Solveur_Implicite_base", Objet_U);
-// XD solveur_implicite_base objet_u solveur_implicite_base -1 not_set
+// XD solveur_implicite_base objet_u solveur_implicite_base INHERITS_BRACE not_set
 
 Sortie& Solveur_Implicite_base::printOn(Sortie& os) const { return os; }
 

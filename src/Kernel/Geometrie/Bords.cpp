@@ -16,7 +16,7 @@
 #include <Bords.h>
 
 Implemente_instanciable_32_64(Bords_32_64, "Bords", LIST(Bord_32_64<_T_>));
-// XD list_bord listobj list_bord 1 bord_base 0 The block sides.
+// XD list_bord listobj list_bord BRACE bord_base NO_COMMA The block sides.
 
 template <typename _SIZE_>
 Sortie& Bords_32_64<_SIZE_>::printOn(Sortie& os) const { return LIST(Bord_32_64<_SIZE_>)::printOn(os); }

@@ -18,20 +18,20 @@
 #include <unordered_set>
 
 Implemente_instanciable(Postraitements,"Postraitements|Post_processings",LIST(OWN_PTR(Postraitement_base)));
-// XD postraitements listobj postraitements -1 un_postraitement 0 Keyword to use several results files. List of objects of post-processing (with name).
+// XD postraitements listobj postraitements INHERITS_BRACE un_postraitement NO_COMMA Keyword to use several results files. List of objects of post-processing (with name).
 
-// XD type_postraitement_ft_lata objet_lecture nul 0 not_set
-// XD attr type chaine(into=["postraitement_ft_lata"]) type 0 not_set
-// XD attr nom chaine nom 0 Name of the post-processing.
-// XD attr bloc bloc_lecture bloc 0 not_set
+// XD type_postraitement_ft_lata objet_lecture nul NO_BRACE not_set
+// XD attr type chaine(into=["postraitement_ft_lata"]) type REQ not_set
+// XD attr nom chaine nom REQ Name of the post-processing.
+// XD attr bloc bloc_lecture bloc REQ not_set
 
-// XD un_postraitement_spec objet_lecture nul 0 An object of post-processing (with type +name).
-// XD attr type_un_post type_un_post type_un_post 1 not_set
-// XD attr type_postraitement_ft_lata type_postraitement_ft_lata type_postraitement_ft_lata 1 not_set
+// XD un_postraitement_spec objet_lecture nul NO_BRACE An object of post-processing (with type +name).
+// XD attr type_un_post type_un_post type_un_post OPT not_set
+// XD attr type_postraitement_ft_lata type_postraitement_ft_lata type_postraitement_ft_lata OPT not_set
 
-// XD liste_post listobj liste_post -1 un_postraitement_spec 0 Keyword to use several results files. List of objects of post-processing (with name)
+// XD liste_post listobj liste_post INHERITS_BRACE un_postraitement_spec NO_COMMA Keyword to use several results files. List of objects of post-processing (with name)
 
-// XD liste_post_ok listobj liste_post_ok -1 nom_postraitement 0 Keyword to use several results files. List of objects of post-processing (with name)
+// XD liste_post_ok listobj liste_post_ok INHERITS_BRACE nom_postraitement NO_COMMA Keyword to use several results files. List of objects of post-processing (with name)
 
 Entree& Postraitements::readOn(Entree& s)
 {

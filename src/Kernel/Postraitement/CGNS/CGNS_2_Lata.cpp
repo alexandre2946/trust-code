@@ -19,9 +19,9 @@
 #include <Motcle.h>
 
 Implemente_instanciable(CGNS_2_Lata, "CGNS_to_lata|CGNS_2_Lata", Interprete);
-// XD cgns_to_lata interprete cgns_to_lata -1 To convert results file written with CGNS format to a single LATA file.
-// XD attr file_cgns chaine file_cgns 0 CGNS file to convert to the new format.
-// XD attr file_lata chaine file_lata 0 Name of the single LATA file.
+// XD cgns_to_lata interprete cgns_to_lata INHERITS_BRACE To convert results file written with CGNS format to a single LATA file.
+// XD attr file_cgns chaine file_cgns REQ CGNS file to convert to the new format.
+// XD attr file_lata chaine file_lata REQ Name of the single LATA file.
 
 Sortie& CGNS_2_Lata::printOn(Sortie& os) const { return Interprete::printOn(os); }
 Entree& CGNS_2_Lata::readOn(Entree& is) { return Interprete::readOn(is); }

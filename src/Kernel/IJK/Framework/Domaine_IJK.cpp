@@ -20,16 +20,16 @@
 #define print_vect(x) (Nom("[") + Nom(x[0]) + Nom(" ") + Nom(x[1]) + Nom(" ") + Nom(x[2]) + Nom("]"))
 
 
-// XD domaine_IJK domaine_base domaine_ijk -1 domain for IJK simulation (used in TrioCFD)
+// XD domaine_IJK domaine_base domaine_ijk INHERITS_BRACE domain for IJK simulation (used in TrioCFD)
 Implemente_instanciable_sans_constructeur(Domaine_IJK, "Domaine_IJK", Domaine_base);
 
-// XD attr nbelem listentierf nbelem 0 Number of elements in each direction  (integers, 2 or 3 values depending on dimension)
-// XD attr size_dom listf size_dom 0 Domain size in each direction  (floats, 2 or 3 values depending on dimension)
-// XD attr perio listentierf perio 0 Is the direction periodic ? (0 or 1, 2 or 3 values depending on dimension)
-// XD attr nproc listentierf nproc 0 Number of procs in each direction (integers, 2 or 3 values depending on dimension)
-// XD attr origin listf origin 1 Domain origin in each direction (floats, 2 or 3 values depending on dimension)
-// XD attr ijk_splitting_ft_extension entier ijk_splitting_ft_extension 1 not_set
-// XD attr file_coords troismots file_coords 1 not_set
+// XD attr nbelem listentierf nbelem REQ Number of elements in each direction  (integers, 2 or 3 values depending on dimension)
+// XD attr size_dom listf size_dom REQ Domain size in each direction  (floats, 2 or 3 values depending on dimension)
+// XD attr perio listentierf perio REQ Is the direction periodic ? (0 or 1, 2 or 3 values depending on dimension)
+// XD attr nproc listentierf nproc REQ Number of procs in each direction (integers, 2 or 3 values depending on dimension)
+// XD attr origin listf origin OPT Domain origin in each direction (floats, 2 or 3 values depending on dimension)
+// XD attr ijk_splitting_ft_extension entier ijk_splitting_ft_extension OPT not_set
+// XD attr file_coords troismots file_coords OPT not_set
 
 Domaine_IJK::Domaine_IJK()
 {

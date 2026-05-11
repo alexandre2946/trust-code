@@ -19,7 +19,8 @@
 
 Implemente_instanciable(Frontiere_ouverte_rayo_transp, "Frontiere_ouverte_rayo_transp", Neumann_sortie_libre);
 
-// XD frontiere_ouverte_rayo_transp frontiere_ouverte frontiere_ouverte_rayo_transp -1 Radiation boundary outlet condition on the boundary called bord (edge) (diffusion flux zero). This condition must be associated with a boundary outlet hydraulic condition.
+// XD frontiere_ouverte_rayo_transp frontiere_ouverte frontiere_ouverte_rayo_transp INHERITS_BRACE Radiation boundary outlet condition on the boundary called bord (edge) (diffusion flux zero). This condition must be associated with a boundary outlet hydraulic
+// XD_CONT condition.
 
 Sortie& Frontiere_ouverte_rayo_transp::printOn(Sortie& is) const { return is; }
 

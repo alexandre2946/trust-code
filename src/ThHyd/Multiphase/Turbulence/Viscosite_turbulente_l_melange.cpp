@@ -21,7 +21,7 @@
 #include <Noms.h>
 
 Implemente_instanciable(Viscosite_turbulente_l_melange, "Viscosite_turbulente_l_melange", Viscosite_turbulente_base);
-// XD type_diffusion_turbulente_multiphase_l_melange type_diffusion_turbulente_multiphase_deriv l_melange 1 not_set
+// XD type_diffusion_turbulente_multiphase_l_melange type_diffusion_turbulente_multiphase_deriv l_melange BRACE not_set
 
 Sortie& Viscosite_turbulente_l_melange::printOn(Sortie& os) const { return os; }
 

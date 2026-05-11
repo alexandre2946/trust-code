@@ -20,11 +20,11 @@ Implemente_base_32_64(Raccord_local_32_64,"Raccord_local",Raccord_base_32_64<_T_
 Implemente_base_32_64(Raccord_distant_32_64,"Raccord_distant",Raccord_base_32_64<_T_>);
 Implemente_instanciable_32_64(Raccord_local_homogene_32_64,"Raccord_local_homogene",Raccord_local_32_64<_T_>);
 
-// XD raccord bord_base raccord 0 The block side is in contact with the block of another domain (case of two coupled problems).
-// XD attr type1 chaine(into=["local","distant"]) type1 0 Contact type.
-// XD attr type2 chaine(into=["homogene"]) type2 0 Contact type.
-// XD attr nom chaine nom 0 Name of block side.
-// XD attr defbord defbord defbord 0 Definition of block side.
+// XD raccord bord_base raccord NO_BRACE The block side is in contact with the block of another domain (case of two coupled problems).
+// XD attr type1 chaine(into=["local","distant"]) type1 REQ Contact type.
+// XD attr type2 chaine(into=["homogene"]) type2 REQ Contact type.
+// XD attr nom chaine nom REQ Name of block side.
+// XD attr defbord defbord defbord REQ Definition of block side.
 
 template <typename _SIZE_>
 Sortie& Raccord_base_32_64<_SIZE_>::printOn(Sortie& s ) const

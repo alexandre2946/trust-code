@@ -19,11 +19,12 @@
 #include <Equation_base.h>
 
 Implemente_instanciable(Paroi_contact_fictif, "paroi_contact_fictif", Cond_lim_utilisateur_base);
-// XD paroi_contact_fictif condlim_base paroi_contact_fictif -1 This keyword is derivated from paroi_contact and is especially dedicated to compute coupled fluid/solid/fluid problem in case of thin material. Thanks to this option, solid is considered as a fictitious media (no mesh, no domain associated), and coupling is performed by considering instantaneous thermal equilibrium in it (for the moment).
-// XD attr autrepb ref_Pb_base autrepb 0 Name of other problem.
-// XD attr nameb chaine nameb 0 Name of bord.
-// XD attr conduct_fictif floattant conduct_fictif 0 thermal conductivity
-// XD attr ep_fictive floattant ep_fictive 0 thickness of the fictitious media
+// XD paroi_contact_fictif condlim_base paroi_contact_fictif INHERITS_BRACE This keyword is derivated from paroi_contact and is especially dedicated to compute coupled fluid/solid/fluid problem in case of thin material. Thanks to this option, solid is
+// XD_CONT considered as a fictitious media (no mesh, no domain associated), and coupling is performed by considering instantaneous thermal equilibrium in it (for the moment).
+// XD attr autrepb ref_Pb_base autrepb REQ Name of other problem.
+// XD attr nameb chaine nameb REQ Name of bord.
+// XD attr conduct_fictif floattant conduct_fictif REQ thermal conductivity
+// XD attr ep_fictive floattant ep_fictive REQ thickness of the fictitious media
 
 Sortie& Paroi_contact_fictif::printOn(Sortie& s) const
 {

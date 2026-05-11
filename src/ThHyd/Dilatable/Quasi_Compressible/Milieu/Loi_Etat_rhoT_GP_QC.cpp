@@ -20,7 +20,7 @@
 #include <ParserView.h>
 
 Implemente_instanciable_sans_constructeur( Loi_Etat_rhoT_GP_QC, "Loi_Etat_rhoT_Gaz_Parfait_QC", Loi_Etat_GP_base ) ;
-// XD rhoT_gaz_parfait_QC loi_etat_gaz_parfait_base rhoT_gaz_parfait_QC -1 Class for perfect gas used with a quasi-compressible fluid where the state equation is defined as rho = f(T).
+// XD rhoT_gaz_parfait_QC loi_etat_gaz_parfait_base rhoT_gaz_parfait_QC INHERITS_BRACE Class for perfect gas used with a quasi-compressible fluid where the state equation is defined as rho = f(T).
 
 Loi_Etat_rhoT_GP_QC::Loi_Etat_rhoT_GP_QC() { }
 

@@ -30,9 +30,9 @@
 
 
 Implemente_instanciable(Fluide_base, "Fluide_base", Milieu_base);
-// XD fluide_base milieu_base fluide_base 1 Basic class for fluids.
-// XD attr indice field_base indice 1 Refractivity of fluid.
-// XD attr kappa field_base kappa 1 Absorptivity of fluid (m-1).
+// XD fluide_base milieu_base fluide_base BRACE Basic class for fluids.
+// XD attr indice field_base indice OPT Refractivity of fluid.
+// XD attr kappa field_base kappa OPT Absorptivity of fluid (m-1).
 
 Sortie& Fluide_base::printOn(Sortie& os) const
 {

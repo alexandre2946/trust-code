@@ -20,7 +20,7 @@
 #include <Param.h>
 
 Implemente_instanciable(Test_SSE_Kernels, "Test_SSE_Kernels", Interprete);
-// XD Test_SSE_Kernels interprete Test_SSE_Kernels 1 Object to test the different kernel methods used in the multigrid solver in IJK discretization
+// XD Test_SSE_Kernels interprete Test_SSE_Kernels BRACE Object to test the different kernel methods used in the multigrid solver in IJK discretization
 
 Sortie& Test_SSE_Kernels::printOn(Sortie& s ) const
 {

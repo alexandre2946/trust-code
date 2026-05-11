@@ -52,17 +52,19 @@ Entree& Porosites_champ::interpreter(Entree& is)
 
 
 Implemente_instanciable(Porosites,"Porosites",Objet_U);
-// XD porosites objet_u porosites 0 To define the volume porosity and surface porosity that are uniform in every direction in space on a sub-area. NL2 Porosity was only usable in VDF discretization, and now available for VEF P1NC/P0. NL2 Observations : NL2 - Surface porosity values must be given in every direction in space (set this value to 1 if there is no porosity), NL2 - Prior to defining porosity, the problem must have been discretized.NL2 Can \'t be used in VEF discretization, use Porosites_champ instead.
-// XD attr aco chaine(into=["{"]) aco 0 Opening curly bracket.
-// XD attr sous_zone|sous_zone1 chaine sous_zone 0 Name of the sub-area to which porosity are allocated.
-// XD attr bloc bloc_lecture_poro bloc 0 Surface and volume porosity values.
-// XD attr sous_zone2 chaine sous_zone2 1 Name of the 2nd sub-area to which porosity are allocated.
-// XD attr bloc2 bloc_lecture_poro bloc2 1 Surface and volume porosity values.
-// XD attr acof chaine(into=["}"]) acof 0 Closing curly bracket.
+// XD porosites objet_u porosites NO_BRACE To define the volume porosity and surface porosity that are uniform in every direction in space on a sub-area. NL2 Porosity was only usable in VDF discretization, and now available for VEF P1NC/P0. NL2 Observations :
+// XD_CONT NL2 - Surface porosity values must be given in every direction in space (set this value to 1 if there is no porosity), NL2 - Prior to defining porosity, the problem must have been discretized.NL2 Can \'t be used in VEF discretization, use Porosites_champ
+// XD_CONT instead.
+// XD attr aco chaine(into=["{"]) aco REQ Opening curly bracket.
+// XD attr sous_zone|sous_zone1 chaine sous_zone REQ Name of the sub-area to which porosity are allocated.
+// XD attr bloc bloc_lecture_poro bloc REQ Surface and volume porosity values.
+// XD attr sous_zone2 chaine sous_zone2 OPT Name of the 2nd sub-area to which porosity are allocated.
+// XD attr bloc2 bloc_lecture_poro bloc2 OPT Surface and volume porosity values.
+// XD attr acof chaine(into=["}"]) acof REQ Closing curly bracket.
 
-// XD bloc_lecture_poro objet_lecture nul 1 Surface and volume porosity values.
-// XD  attr volumique floattant volumique 0 Volume porosity value.
-// XD  attr surfacique list surfacique 0 Surface porosity values (in X, Y, Z directions).
+// XD bloc_lecture_poro objet_lecture nul BRACE Surface and volume porosity values.
+// XD  attr volumique floattant volumique REQ Volume porosity value.
+// XD  attr surfacique list surfacique REQ Surface porosity values (in X, Y, Z directions).
 
 Sortie& Porosites::printOn(Sortie& os) const { return Objet_U::printOn(os); }
 

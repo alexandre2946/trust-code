@@ -27,8 +27,8 @@ Sortie& Refine_Mesh::printOn(Sortie& os) const { return Interprete::printOn(os);
 
 Entree& Refine_Mesh::readOn(Entree& is) { return Interprete::readOn(is); }
 
-// XD refine_mesh interprete refine_mesh 0 not_set
-// XD attr domaine ref_domaine domaine 0 not_set
+// XD refine_mesh interprete refine_mesh NO_BRACE not_set
+// XD attr domaine ref_domaine domaine REQ not_set
 Entree& Refine_Mesh::interpreter_(Entree& is)
 {
   associer_domaine(is);

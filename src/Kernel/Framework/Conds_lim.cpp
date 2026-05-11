@@ -21,11 +21,11 @@
 #include <Domaine.h>
 
 Implemente_instanciable(Conds_lim,"Conds_lim",VECT(Cond_lim));
-// XD condlimlu objet_lecture nul 0 Boundary condition specified.
-// XD  attr bord chaine bord 0 Name of the edge where the boundary condition applies.
-// XD  attr cl condlim_base cl 0 Boundary condition at the boundary called bord (edge).
+// XD condlimlu objet_lecture nul NO_BRACE Boundary condition specified.
+// XD  attr bord chaine bord REQ Name of the edge where the boundary condition applies.
+// XD  attr cl condlim_base cl REQ Boundary condition at the boundary called bord (edge).
 
-// XD condlims listobj condlims -1 condlimlu 0 Boundary conditions.
+// XD condlims listobj condlims INHERITS_BRACE condlimlu NO_COMMA Boundary conditions.
 
 Sortie& Conds_lim::printOn(Sortie& s ) const { return s << que_suis_je() << " " << le_nom(); }
 

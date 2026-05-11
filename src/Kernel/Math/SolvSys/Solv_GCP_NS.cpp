@@ -21,9 +21,9 @@
 #include <Perf_counters.h>
 
 Implemente_instanciable(Solv_GCP_NS, "Solv_GCP_NS", solv_iteratif);
-// XD gcp_ns solv_gcp gcp_ns -1 not_set
-// XD attr solveur0 solveur_sys_base solveur0 0 Solver type.
-// XD attr solveur1 solveur_sys_base solveur1 0 Solver type.
+// XD gcp_ns solv_gcp gcp_ns INHERITS_BRACE not_set
+// XD attr solveur0 solveur_sys_base solveur0 REQ Solver type.
+// XD attr solveur1 solveur_sys_base solveur1 REQ Solver type.
 
 Sortie& Solv_GCP_NS::printOn(Sortie& s) const
 {

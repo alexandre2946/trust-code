@@ -28,8 +28,9 @@ Add_synonym(Terme_Source_Decroissance_Radioactive_Elem_PolyMAC_CDO, "Decroissanc
 Add_synonym(Terme_Source_Decroissance_Radioactive_Elem_PolyMAC_CDO, "radioactive_decay_Elem_PolyMAC_HFV");
 Add_synonym(Terme_Source_Decroissance_Radioactive_Elem_PolyMAC_CDO, "radioactive_decay_Elem_PolyMAC_MPFA");
 Add_synonym(Terme_Source_Decroissance_Radioactive_Elem_PolyMAC_CDO, "radioactive_decay_Elem_PolyMAC_CDO");
-// XD radioactive_decay source_base radioactive_decay 0 Radioactive decay source term of the form $-\lambda_i c_i$, where $0 \leq i \leq N$, N is the number of component of the constituent, $c_i$ and $\lambda_i$ are the concentration and the decay constant of the i-th component of the constituant.
-// XD attr val list val 0 n is the number of decay constants to read (int), and val1, val2... are the decay constants (double)
+// XD radioactive_decay source_base radioactive_decay NO_BRACE Radioactive decay source term of the form $-\lambda_i c_i$, where $0 \leq i \leq N$, N is the number of component of the constituent, $c_i$ and $\lambda_i$ are the concentration and the decay
+// XD_CONT constant of the i-th component of the constituant.
+// XD attr val list val REQ n is the number of decay constants to read (int), and val1, val2... are the decay constants (double)
 
 Sortie& Terme_Source_Decroissance_Radioactive_Elem_PolyMAC_CDO::printOn(Sortie& s) const { return s << que_suis_je(); }
 

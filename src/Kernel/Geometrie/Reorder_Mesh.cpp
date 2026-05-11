@@ -26,7 +26,7 @@
 #include <fstream>
 
 Implemente_instanciable(Reorder_Mesh, "Reorder_Mesh", Objet_U);
-// XD reorder_mesh objet_u reorder_mesh 1 Reordering option to be used in a discretisation : the geometrical entities (nodes, elems, faces) of a mesh can be reordered to follow a Z-curve (Hilbert or Morton) improving data locality in memory.
+// XD reorder_mesh objet_u reorder_mesh BRACE Reordering option to be used in a discretisation : the geometrical entities (nodes, elems, faces) of a mesh can be reordered to follow a Z-curve (Hilbert or Morton) improving data locality in memory.
 
 namespace // Anonymous namespace
 {

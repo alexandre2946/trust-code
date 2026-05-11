@@ -18,7 +18,7 @@
 #include <Sondes.h>
 
 Implemente_instanciable(Sondes, "Sondes|Probes", LIST(OWN_PTR(Sonde)));
-// XD sondes listobj nul 1 sonde 0 List of probes.
+// XD sondes listobj nul BRACE sonde NO_COMMA List of probes.
 
 
 Sortie& Sondes::printOn(Sortie& s ) const { return s ; }

@@ -18,7 +18,7 @@
 #include <Sources.h>
 
 Implemente_instanciable(Sources, "Sources", LIST(Source));
-// XD sources listobj sources -1 source_base -1 The sources.
+// XD sources listobj sources INHERITS_BRACE source_base INHERITS_COMMA The sources.
 
 Sortie& Sources::printOn(Sortie& os) const { return LIST(Source)::printOn(os); }
 

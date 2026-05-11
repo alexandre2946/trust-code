@@ -21,7 +21,7 @@
 #include <Param.h>
 
 Implemente_instanciable(Source_Meca_Grad_Pression_Thermique_EF, "Source_Meca_Grad_Pression_Thermique_EF", Source_base);
-// XD source_meca_grad_pression_thermique source_base source_meca_grad_pression_thermique 1 Source term that applies the gradient of thermal pressure as an equivalent body force in the linear elasticity momentum equation.
+// XD source_meca_grad_pression_thermique source_base source_meca_grad_pression_thermique BRACE Source term that applies the gradient of thermal pressure as an equivalent body force in the linear elasticity momentum equation.
 
 Sortie& Source_Meca_Grad_Pression_Thermique_EF::printOn(Sortie& os) const { return Source_base::printOn(os); }
 

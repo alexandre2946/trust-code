@@ -27,7 +27,7 @@
 #include <Perf_counters.h>
 
 Implemente_instanciable(Convection_Diffusion_Espece_Multi_QC,"Convection_Diffusion_Espece_Multi_QC",Convection_Diffusion_Espece_Multi_base);
-// XD convection_diffusion_espece_multi_QC eqn_base convection_diffusion_espece_multi_QC -1 Species conservation equation for a multi-species quasi-compressible fluid.
+// XD convection_diffusion_espece_multi_QC eqn_base convection_diffusion_espece_multi_QC INHERITS_BRACE Species conservation equation for a multi-species quasi-compressible fluid.
 
 Sortie& Convection_Diffusion_Espece_Multi_QC::printOn(Sortie& is) const
 {

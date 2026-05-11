@@ -19,7 +19,7 @@
 #include <Synonyme_info.h>
 
 Implemente_instanciable(Champ_Generique_Divergence,"Divergence",Champ_Generique_Operateur_base);
-// XD divergence champ_post_operateur_base divergence -1 To calculate divergency of a given field.
+// XD divergence champ_post_operateur_base divergence INHERITS_BRACE To calculate divergency of a given field.
 
 Add_synonym(Champ_Generique_Divergence,"Champ_Post_Operateur_Divergence");
 

@@ -17,7 +17,7 @@
 #include <Param.h>
 
 Implemente_instanciable(Option_CGNS, "Option_CGNS", Interprete);
-// XD Option_CGNS interprete Option_CGNS 1 Class for CGNS options.
+// XD Option_CGNS interprete Option_CGNS BRACE Class for CGNS options.
 
 bool Option_CGNS::PARALLEL_OVER_ZONE = false; /* NOT BY DEFAULT */
 bool Option_CGNS::USE_LINKS = false; /* NOT BY DEFAULT */

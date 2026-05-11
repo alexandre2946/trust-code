@@ -17,8 +17,8 @@
 #include <Convection_tools.h>
 
 Implemente_instanciable_sans_constructeur(Op_Conv_Muscl3_VEF_Face,"Op_Conv_Muscl3_VEF_P1NC",Op_Conv_VEF_Face);
-// XD convection_muscl3 convection_deriv muscl3 1 Keyword for a scheme using a ponderation between muscl and center schemes in VEF.
-// XD attr alpha floattant alpha 1 To weight the scheme centering with the factor double (between 0 (full centered) and 1 (muscl), by default 1).
+// XD convection_muscl3 convection_deriv muscl3 BRACE Keyword for a scheme using a ponderation between muscl and center schemes in VEF.
+// XD attr alpha floattant alpha OPT To weight the scheme centering with the factor double (between 0 (full centered) and 1 (muscl), by default 1).
 
 Sortie& Op_Conv_Muscl3_VEF_Face::printOn(Sortie& s ) const
 {

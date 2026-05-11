@@ -18,7 +18,7 @@
 #include <Param.h>
 
 Implemente_instanciable(Interface_Baer_Nunziato, "Interface_Baer_Nunziato", Interface_base);
-// XD Interface_Baer_Nunziato Interface_base Interface_Baer_Nunziato -1 Interface Baer Nunziato class
+// XD Interface_Baer_Nunziato Interface_base Interface_Baer_Nunziato INHERITS_BRACE Interface Baer Nunziato class
 
 Sortie& Interface_Baer_Nunziato::printOn(Sortie& os) const { return os; }
 Entree& Interface_Baer_Nunziato::readOn(Entree& is)

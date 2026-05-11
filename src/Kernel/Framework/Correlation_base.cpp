@@ -16,7 +16,7 @@
 #include <Correlation_base.h>
 
 Implemente_base(Correlation_base, "Correlation_base", Objet_U);
-// XD correlation_base objet_u correlation_base -1 not_set
+// XD correlation_base objet_u correlation_base INHERITS_BRACE not_set
 
 Sortie& Correlation_base::printOn(Sortie& os) const { return os; }
 

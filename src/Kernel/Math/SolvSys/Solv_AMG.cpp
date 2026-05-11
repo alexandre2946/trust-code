@@ -25,9 +25,9 @@
 #include <MD_Vector_composite.h>
 
 Implemente_instanciable(Solv_AMG,"Solv_AMG",SolveurSys_base);
-// XD amg solveur_sys_base amg 0 Wrapper for AMG preconditioner-based solver which switch for the best one on CPU/GPU Nvidia/GPU AMD
-// XD attr solveur chaine solveur 0 not_set
-// XD attr option_solveur bloc_lecture option_solveur 0 not_set
+// XD amg solveur_sys_base amg NO_BRACE Wrapper for AMG preconditioner-based solver which switch for the best one on CPU/GPU Nvidia/GPU AMD
+// XD attr solveur chaine solveur REQ not_set
+// XD attr option_solveur bloc_lecture option_solveur REQ not_set
 
 // printOn
 Sortie& Solv_AMG::printOn(Sortie& s ) const

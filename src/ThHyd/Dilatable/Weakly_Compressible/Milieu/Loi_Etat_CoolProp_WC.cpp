@@ -17,10 +17,10 @@
 #include <Loi_Etat_CoolProp_WC.h>
 
 Implemente_instanciable(Loi_Etat_CoolProp_WC, "Loi_Etat_CoolProp_WC", Loi_Etat_TPPI_WC_base);
-// XD coolprop_WC loi_etat_tppi_base coolprop_WC 1 Class for using CoolProp with WC problem
-// XD attr Cp double Cp 0 Specific heat at constant pressure (J/kg/K).
-// XD attr fluid chaine fluid 0 Fluid name in the CoolProp model
-// XD attr model chaine model 0 CoolProp model name
+// XD coolprop_WC loi_etat_tppi_base coolprop_WC BRACE Class for using CoolProp with WC problem
+// XD attr Cp double Cp REQ Specific heat at constant pressure (J/kg/K).
+// XD attr fluid chaine fluid REQ Fluid name in the CoolProp model
+// XD attr model chaine model REQ CoolProp model name
 
 Sortie& Loi_Etat_CoolProp_WC::printOn(Sortie& os) const { return os << que_suis_je() << finl; }
 

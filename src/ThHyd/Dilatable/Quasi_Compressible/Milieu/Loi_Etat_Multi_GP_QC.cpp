@@ -23,7 +23,7 @@
 #include <Param.h>
 
 Implemente_instanciable_sans_constructeur(Loi_Etat_Multi_GP_QC,"Loi_Etat_Multi_Gaz_Parfait_QC",Loi_Etat_Multi_GP_base);
-// XD multi_gaz_parfait_QC loi_etat_gaz_parfait_base multi_gaz_parfait_QC -1 Class for perfect gas multi-species mixtures state law used with a quasi-compressible fluid.
+// XD multi_gaz_parfait_QC loi_etat_gaz_parfait_base multi_gaz_parfait_QC INHERITS_BRACE Class for perfect gas multi-species mixtures state law used with a quasi-compressible fluid.
 
 Loi_Etat_Multi_GP_QC::Loi_Etat_Multi_GP_QC() : Sc_(-1),dtol_fraction_(1.e-6) { }
 

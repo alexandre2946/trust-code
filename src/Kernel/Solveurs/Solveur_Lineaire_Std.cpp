@@ -23,8 +23,8 @@
 #include <Param.h>
 
 Implemente_instanciable(Solveur_Lineaire_Std,"Solveur_lineaire_std",Solveur_lineaire);
-// XD solveur_lineaire_std solveur_implicite_base solveur_lineaire_std 1 not_set
-// XD attr solveur solveur_sys_base solveur 1 not_set
+// XD solveur_lineaire_std solveur_implicite_base solveur_lineaire_std BRACE not_set
+// XD attr solveur solveur_sys_base solveur OPT not_set
 
 
 Sortie& Solveur_Lineaire_Std::printOn(Sortie& os ) const

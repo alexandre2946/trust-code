@@ -25,7 +25,7 @@
 #include <TRUSTArray_kokkos.tpp>
 
 Implemente_base_sans_constructeur(Loi_Etat_base,"Loi_Etat_base",Objet_U);
-// XD loi_etat_base objet_u loi_etat_base -1 Basic class for state laws used with a dilatable fluid.
+// XD loi_etat_base objet_u loi_etat_base INHERITS_BRACE Basic class for state laws used with a dilatable fluid.
 
 Loi_Etat_base::Loi_Etat_base() : Pr_(-1.), debug(0) { }
 

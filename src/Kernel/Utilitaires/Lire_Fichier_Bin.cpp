@@ -16,7 +16,7 @@
 #include <Lire_Fichier_Bin.h>
 
 Implemente_instanciable(Lire_Fichier_Bin,"Lire_Fichier_Bin|Read_File_Binary",Lire_Fichier);
-// XD read_file_bin read_file lire_fichier_bin -1 Keyword to read an object name_obj in the unformatted type file filename.
+// XD read_file_bin read_file lire_fichier_bin INHERITS_BRACE Keyword to read an object name_obj in the unformatted type file filename.
 
 /*! @brief appel a la methode printOn de la classe Interprete
  *

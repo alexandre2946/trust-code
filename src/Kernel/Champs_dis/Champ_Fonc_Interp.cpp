@@ -26,7 +26,7 @@
 #endif
 
 Implemente_instanciable(Champ_Fonc_Interp, "Champ_Fonc_Interp", Champ_Fonc_P0_base);
-// XD Champ_Fonc_Interp champ_don_base Champ_Fonc_Interp 1 Field that is interpolated from a distant domain via MEDCoupling (remapper).
+// XD Champ_Fonc_Interp champ_don_base Champ_Fonc_Interp BRACE Field that is interpolated from a distant domain via MEDCoupling (remapper).
 
 Sortie& Champ_Fonc_Interp::printOn(Sortie& os) const { return Champ_Fonc_P0_base::printOn(os); }
 

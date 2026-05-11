@@ -18,13 +18,13 @@
 #include <EChaine.h>
 
 Implemente_base(Conservation_Euler_base, "Conservation_Euler_base", Convection_Diffusion_std);
-// XD cons_euler eqn_base cons_euler -1 Base class equation for a multi-phase Euler conservation equations
-// XD attr termes_non_conservatifs bloc_op_non_conservativtifs non_conservative_terms 1 Keyword to alter the non-conservative scheme.
+// XD cons_euler eqn_base cons_euler INHERITS_BRACE Base class equation for a multi-phase Euler conservation equations
+// XD attr termes_non_conservatifs bloc_op_non_conservativtifs non_conservative_terms OPT Keyword to alter the non-conservative scheme.
 
-// XD bloc_op_non_conservativtifs objet_lecture nul 0 not_set
-// XD attr aco chaine(into=["{"]) aco 0 Opening curly bracket.
-// XD attr operateur op_non_conservativtifs_deriv operateur 0 not_set
-// XD attr acof chaine(into=["}"]) acof 0 Closing curly bracket.
+// XD bloc_op_non_conservativtifs objet_lecture nul NO_BRACE not_set
+// XD attr aco chaine(into=["{"]) aco REQ Opening curly bracket.
+// XD attr operateur op_non_conservativtifs_deriv operateur REQ not_set
+// XD attr acof chaine(into=["}"]) acof REQ Closing curly bracket.
 
 Sortie& Conservation_Euler_base::printOn(Sortie& is) const { return Equation_base::printOn(is); }
 

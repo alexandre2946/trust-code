@@ -25,25 +25,25 @@
 #include <SETS.h>
 
 Implemente_instanciable(Pb_Multiphase, "Pb_Multiphase", Pb_Fluide_base);
-// XD Pb_Multiphase Pb_base Pb_Multiphase -1 A problem that allows the resolution of N-phases with 3*N equations
-// XD attr milieu_composite bloc_lecture milieu_composite 1 The composite medium associated with the problem.
-// XD attr Milieu_MUSIG bloc_lecture Milieu_MUSIG 1 The composite medium associated with the problem.
-// XD attr correlations bloc_lecture correlations 1 List of correlations used in specific source terms (i.e. interfacial flux,  interfacial friction, ...)
-// XD attr models bloc_lecture models 1 List of models used in specific source terms (i.e. interfacial flux,  interfacial friction, ...)
-// XD attr QDM_Multiphase QDM_Multiphase QDM_Multiphase 0 Momentum conservation equation for a multi-phase problem where the unknown is the velocity
-// XD attr Masse_Multiphase Masse_Multiphase Masse_Multiphase 0 Mass consevation equation for a multi-phase problem where the unknown is the alpha (void fraction)
-// XD attr Energie_Multiphase Energie_Multiphase Energie_Multiphase 0 Internal energy conservation equation for a multi-phase problem where the unknown is the temperature
-// XD attr Echelle_temporelle_turbulente Echelle_temporelle_turbulente Echelle_temporelle_turbulente 1 Turbulent Dissipation time scale equation for a turbulent mono/multi-phase problem (available in TrioCFD)
-// XD attr Energie_cinetique_turbulente Energie_cinetique_turbulente Energie_cinetique_turbulente 1 Turbulent kinetic Energy conservation equation for a turbulent mono/multi-phase problem (available in TrioCFD)
-// XD attr Energie_cinetique_turbulente_WIT Energie_cinetique_turbulente_WIT Energie_cinetique_turbulente_WIT 1 Bubble Induced Turbulent kinetic Energy equation for a turbulent multi-phase problem (available in TrioCFD)
-// XD attr Taux_dissipation_turbulent Taux_dissipation_turbulent Taux_dissipation_turbulent 1 Turbulent Dissipation frequency equation for a turbulent mono/multi-phase problem (available in TrioCFD)
+// XD Pb_Multiphase Pb_base Pb_Multiphase INHERITS_BRACE A problem that allows the resolution of N-phases with 3*N equations
+// XD attr milieu_composite bloc_lecture milieu_composite OPT The composite medium associated with the problem.
+// XD attr Milieu_MUSIG bloc_lecture Milieu_MUSIG OPT The composite medium associated with the problem.
+// XD attr correlations bloc_lecture correlations OPT List of correlations used in specific source terms (i.e. interfacial flux,  interfacial friction, ...)
+// XD attr models bloc_lecture models OPT List of models used in specific source terms (i.e. interfacial flux,  interfacial friction, ...)
+// XD attr QDM_Multiphase QDM_Multiphase QDM_Multiphase REQ Momentum conservation equation for a multi-phase problem where the unknown is the velocity
+// XD attr Masse_Multiphase Masse_Multiphase Masse_Multiphase REQ Mass consevation equation for a multi-phase problem where the unknown is the alpha (void fraction)
+// XD attr Energie_Multiphase Energie_Multiphase Energie_Multiphase REQ Internal energy conservation equation for a multi-phase problem where the unknown is the temperature
+// XD attr Echelle_temporelle_turbulente Echelle_temporelle_turbulente Echelle_temporelle_turbulente OPT Turbulent Dissipation time scale equation for a turbulent mono/multi-phase problem (available in TrioCFD)
+// XD attr Energie_cinetique_turbulente Energie_cinetique_turbulente Energie_cinetique_turbulente OPT Turbulent kinetic Energy conservation equation for a turbulent mono/multi-phase problem (available in TrioCFD)
+// XD attr Energie_cinetique_turbulente_WIT Energie_cinetique_turbulente_WIT Energie_cinetique_turbulente_WIT OPT Bubble Induced Turbulent kinetic Energy equation for a turbulent multi-phase problem (available in TrioCFD)
+// XD attr Taux_dissipation_turbulent Taux_dissipation_turbulent Taux_dissipation_turbulent OPT Turbulent Dissipation frequency equation for a turbulent mono/multi-phase problem (available in TrioCFD)
 // attr aire_interfaciale aire_interfaciale aire_interfaciale 1 not set
 
-// XD Energie_cinetique_turbulente eqn_base Energie_cinetique_turbulente 1 Turbulent kinetic Energy conservation equation for a turbulent mono/multi-phase problem (available in TrioCFD)
+// XD Energie_cinetique_turbulente eqn_base Energie_cinetique_turbulente BRACE Turbulent kinetic Energy conservation equation for a turbulent mono/multi-phase problem (available in TrioCFD)
 // aire_interfaciale eqn_base aire_interfaciale 1 not set (in TrioCFD)
-// XD Echelle_temporelle_turbulente eqn_base Echelle_temporelle_turbulente -1 Turbulent Dissipation time scale equation for a turbulent mono/multi-phase problem (available in TrioCFD)
-// XD Energie_cinetique_turbulente_WIT eqn_base Energie_cinetique_turbulente_WIT -1 Bubble Induced Turbulent kinetic Energy equation for a turbulent multi-phase problem (available in TrioCFD)
-// XD Taux_dissipation_turbulent eqn_base Taux_dissipation_turbulent -1 Turbulent Dissipation frequency equation for a turbulent mono/multi-phase problem (available in TrioCFD)
+// XD Echelle_temporelle_turbulente eqn_base Echelle_temporelle_turbulente INHERITS_BRACE Turbulent Dissipation time scale equation for a turbulent mono/multi-phase problem (available in TrioCFD)
+// XD Energie_cinetique_turbulente_WIT eqn_base Energie_cinetique_turbulente_WIT INHERITS_BRACE Bubble Induced Turbulent kinetic Energy equation for a turbulent multi-phase problem (available in TrioCFD)
+// XD Taux_dissipation_turbulent eqn_base Taux_dissipation_turbulent INHERITS_BRACE Turbulent Dissipation frequency equation for a turbulent mono/multi-phase problem (available in TrioCFD)
 
 Sortie& Pb_Multiphase::printOn(Sortie& os) const
 {

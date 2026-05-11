@@ -23,7 +23,8 @@
 #include <Synonyme_info.h>
 
 Implemente_instanciable(Create_domain_from_sub_domain,"Create_domain_from_sub_domain|Create_domain_from_sub_domains",Interprete_geometrique_base);
-// XD Create_domain_from_sub_domain interprete_geometrique_base Create_domain_from_sub_domain 1 This keyword fills the domain domaine_final with the subdomaine par_sous_zone from the domain domaine_init. It is very useful when meshing several mediums with Gmsh. Each medium will be defined as a subdomaine into Gmsh. A MED mesh file will be saved from Gmsh and read with Lire_Med keyword by the TRUST data file. And with this keyword, a domain will be created for each medium in the TRUST data file.
+// XD Create_domain_from_sub_domain interprete_geometrique_base Create_domain_from_sub_domain BRACE This keyword fills the domain domaine_final with the subdomaine par_sous_zone from the domain domaine_init. It is very useful when meshing several mediums with
+// XD_CONT Gmsh. Each medium will be defined as a subdomaine into Gmsh. A MED mesh file will be saved from Gmsh and read with Lire_Med keyword by the TRUST data file. And with this keyword, a domain will be created for each medium in the TRUST data file.
 
 Add_synonym(Create_domain_from_sub_domain, "Create_domain_from_sous_zone");
 

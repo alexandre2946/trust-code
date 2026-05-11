@@ -29,7 +29,7 @@
 #include <Interpolation_IBM_thermal_wall_law.h>
 
 Implemente_base(Source_PDF_base,"Source_PDF_base",Source_dep_inco_base);
-// XD source_pdf source_base source_pdf 1 Source term for Penalised Direct Forcing (PDF) method.
+// XD source_pdf source_base source_pdf BRACE Source term for Penalised Direct Forcing (PDF) method.
 
 Entree& Source_PDF_base::readOn(Entree& s)
 {

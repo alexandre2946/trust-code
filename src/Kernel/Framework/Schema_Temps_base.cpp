@@ -29,16 +29,16 @@
 #include <DeviceMemory.h>
 #include <Perf_counters.h>
 
-// XD dt_start class_generic dt_start 0 not_set
-// XD dt_calc_dt_calc dt_start dt_calc 0 The time step at first iteration is calculated in agreement with CFL condition.
-// XD dt_calc_dt_min dt_start dt_min 0 The first iteration is based on dt_min.
+// XD dt_start class_generic dt_start NO_BRACE not_set
+// XD dt_calc_dt_calc dt_start dt_calc NO_BRACE The time step at first iteration is calculated in agreement with CFL condition.
+// XD dt_calc_dt_min dt_start dt_min NO_BRACE The first iteration is based on dt_min.
 
-// XD dt_calc_dt_fixe dt_start dt_fixe 0 The first time step is fixed by the user (recommended when resuming calculation with Crank Nicholson temporal scheme to ensure continuity).
-// XD   attr value floattant value 0 first time step.
+// XD dt_calc_dt_fixe dt_start dt_fixe NO_BRACE The first time step is fixed by the user (recommended when resuming calculation with Crank Nicholson temporal scheme to ensure continuity).
+// XD   attr value floattant value REQ first time step.
 
 
 Implemente_base_sans_constructeur(Schema_Temps_base,"Schema_Temps_base",Objet_U);
-// XD schema_temps_base objet_u schema_temps_base -1 Basic class for time schemes. This scheme will be associated with a problem and the equations of this problem.
+// XD schema_temps_base objet_u schema_temps_base INHERITS_BRACE Basic class for time schemes. This scheme will be associated with a problem and the equations of this problem.
 /* Attributes further down in the cpp: */
 
 /*! @brief Constructeur par defaut d'un schema en temps.
@@ -303,9 +303,10 @@ void Schema_Temps_base::set_param(Param& param) const
   param.ajouter_flag("adapt_dt_tmax", &adapt_dt_tmax_); // XD_ADD_P flag Use to adapt final dt when approaching tmax.
   param.ajouter( "gnuplot_header",&gnuplot_header_); // XD_ADD_P entier Optional keyword to modify the header of the .out files. Allows to use the column title instead of columns number.
 
-  // XD  residuals interprete nul 1 To specify how the residuals will be computed.
-  // XD attr norm chaine(into=["L2","max"]) norm 1 allows to choose the norm we want to use (max norm by default). Possible to specify L2-norm.
-  // XD attr relative chaine(into=["0","1","2"]) relative 1 This is the old keyword seuil_statio_relatif_deconseille. If it is set to 1, it will normalize the residuals with the residuals of the first 5 timesteps (default is 0). if set to 2, residual will be computed as R/(max-min).
+  // XD  residuals interprete nul BRACE To specify how the residuals will be computed.
+  // XD attr norm chaine(into=["L2","max"]) norm OPT allows to choose the norm we want to use (max norm by default). Possible to specify L2-norm.
+// XD attr relative chaine(into=["0","1","2"]) relative OPT This is the old keyword seuil_statio_relatif_deconseille. If it is set to 1, it will normalize the residuals with the residuals of the first 5 timesteps (default is 0). if set to 2, residual will be
+// XD_CONT computed as R/(max-min).
 }
 
 /*! @brief Surcharge Objet_U::printOn(Sortie&) Imprime le schema en temps sur un flot de sortie.

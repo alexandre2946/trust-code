@@ -16,7 +16,7 @@
 #include <Parametre_equation_base.h>
 
 Implemente_base(Parametre_equation_base,"Parametre_equation_base",Objet_U);
-// XD parametre_equation_base objet_lecture parametre_equation_base -1 Basic class for parametre_equation
+// XD parametre_equation_base objet_lecture parametre_equation_base INHERITS_BRACE Basic class for parametre_equation
 
 Sortie& Parametre_equation_base::printOn(Sortie& os) const
 {

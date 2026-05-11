@@ -18,8 +18,8 @@
 #include <sys/stat.h>
 
 Implemente_instanciable(Mkdir,"Mkdir",Interprete);
-// XD mkdir interprete mkdir 0 equivalent to system mkdir
-// XD attr directory chaine directory 0 directory to create
+// XD mkdir interprete mkdir NO_BRACE equivalent to system mkdir
+// XD attr directory chaine directory REQ directory to create
 
 /*! @brief call to the printOn method of the Interpreter class
  *

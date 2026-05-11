@@ -36,9 +36,9 @@
     } while(0);
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Solv_cuDSS, "Solv_cuDSS", Solv_Externe);
-// XD cuDSS petsc cuDSS 0 Solver via cuDSS API
-// XD attr solveur chaine solveur 0 not_set
-// XD attr option_solveur bloc_lecture option_solveur 0 not_set
+// XD cuDSS petsc cuDSS NO_BRACE Solver via cuDSS API
+// XD attr solveur chaine solveur REQ not_set
+// XD attr option_solveur bloc_lecture option_solveur REQ not_set
 
 // printOn
 Sortie& Solv_cuDSS::printOn(Sortie& s ) const

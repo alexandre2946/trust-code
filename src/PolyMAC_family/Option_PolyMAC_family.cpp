@@ -19,7 +19,7 @@
 
 Implemente_instanciable(Option_PolyMAC_family,"Option_PolyMAC_family|Option_PolyMAC",Interprete);
 
-// XD Option_PolyMAC_family interprete Option_PolyMAC 1 Class of PolyMAC options.
+// XD Option_PolyMAC_family interprete Option_PolyMAC BRACE Class of PolyMAC options.
 
 int Option_PolyMAC_family::USE_NEW_M2 = 1;
 int Option_PolyMAC_family::MAILLAGE_VDF = 0;

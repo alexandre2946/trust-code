@@ -21,7 +21,7 @@
 #include <Param.h>
 
 Implemente_instanciable(Conduction,"Conduction",Equation_base);
-// XD Conduction eqn_base Conduction -1 Heat equation.
+// XD Conduction eqn_base Conduction INHERITS_BRACE Heat equation.
 
 Sortie& Conduction::printOn(Sortie& s ) const
 {

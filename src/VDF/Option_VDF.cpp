@@ -18,7 +18,7 @@
 #include <Param.h>
 
 Implemente_instanciable(Option_VDF, "Option_VDF", Interprete);
-// XD option_vdf interprete option_vdf 1 Class of VDF options.
+// XD option_vdf interprete option_vdf BRACE Class of VDF options.
 
 double Option_VDF::coeff_P_neumann = 1.;
 int Option_VDF::traitement_coins = 0;

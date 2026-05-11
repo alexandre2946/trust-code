@@ -17,9 +17,10 @@
 #include <Domaine.h>
 
 Implemente_instanciable(Imprimer_flux,"Imprimer_flux",Interprete_geometrique_base);
-// XD imprimer_flux interprete imprimer_flux -1 This keyword prints the flux per face at the specified domain boundaries in the data set. The fluxes are written to the .face files at a frequency defined by dt_impr, the evaluation printing frequency (refer to time scheme keywords). By default, fluxes are incorporated onto the edges before being displayed.
-// XD  attr domain_name ref_domaine domain_name 0 Name of the domain.
-// XD  attr noms_bord bloc_lecture noms_bord 0 List of boundaries, for ex: { Bord1 Bord2 }
+// XD imprimer_flux interprete imprimer_flux INHERITS_BRACE This keyword prints the flux per face at the specified domain boundaries in the data set. The fluxes are written to the .face files at a frequency defined by dt_impr, the evaluation printing frequency
+// XD_CONT (refer to time scheme keywords). By default, fluxes are incorporated onto the edges before being displayed.
+// XD  attr domain_name ref_domaine domain_name REQ Name of the domain.
+// XD  attr noms_bord bloc_lecture noms_bord REQ List of boundaries, for ex: { Bord1 Bord2 }
 
 Sortie& Imprimer_flux::printOn(Sortie& s ) const
 {

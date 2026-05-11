@@ -42,8 +42,8 @@
 #include <Perf_counters.h>
 
 Implemente_instanciable_sans_constructeur_32_64( Domaine_32_64, "Domaine", Domaine_base );
-// XD domaine domaine_base domaine -1 Keyword to create a domain.
-// XD domaine_64 domaine_base domaine_64 -1 Keyword to create a big (64b) domain.
+// XD domaine domaine_base domaine INHERITS_BRACE Keyword to create a domain.
+// XD domaine_64 domaine_base domaine_64 INHERITS_BRACE Keyword to create a big (64b) domain.
 
 // Anonymous namespace for all local methods to this translation unit
 namespace

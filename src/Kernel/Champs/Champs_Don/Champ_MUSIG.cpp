@@ -17,9 +17,9 @@
 #include <Motcle.h>
 
 Implemente_instanciable(Champ_MUSIG, "Champ_MUSIG", Champ_Composite ) ;
-// XD champ_musig champ_composite champ_musig 0 MUSIG field. Used in multiphase problems to associate data to each phase.
-// XD attr dim suppress_param dim 1 del
-// XD attr bloc bloc_lecture bloc 0 Not set
+// XD champ_musig champ_composite champ_musig NO_BRACE MUSIG field. Used in multiphase problems to associate data to each phase.
+// XD attr dim suppress_param dim OPT del
+// XD attr bloc bloc_lecture bloc REQ Not set
 
 Sortie& Champ_MUSIG::printOn(Sortie& os) const { return Champ_Composite::printOn(os); }
 

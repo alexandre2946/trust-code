@@ -23,7 +23,7 @@
 #include <Debog.h>
 
 Implemente_instanciable_sans_constructeur(Loi_Etat_Multi_GP_WC,"Loi_Etat_Multi_Gaz_Parfait_WC",Loi_Etat_Multi_GP_base);
-// XD multi_gaz_parfait_WC loi_etat_gaz_parfait_base multi_gaz_parfait_WC -1 Class for perfect gas multi-species mixtures state law used with a weakly-compressible fluid.
+// XD multi_gaz_parfait_WC loi_etat_gaz_parfait_base multi_gaz_parfait_WC INHERITS_BRACE Class for perfect gas multi-species mixtures state law used with a weakly-compressible fluid.
 
 Loi_Etat_Multi_GP_WC::Loi_Etat_Multi_GP_WC() : num_espece_(-1) { }
 

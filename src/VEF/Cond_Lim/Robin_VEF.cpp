@@ -21,7 +21,7 @@
 #include <Param.h>
 
 Implemente_instanciable( Robin_VEF, "Robin_VEF", Cond_lim_base ) ;
-// XD robin_vef condlim_base robin_vef 1 Robin condition at the boundary (edge)
+// XD robin_vef condlim_base robin_vef BRACE Robin condition at the boundary (edge)
 
 Sortie& Robin_VEF::printOn( Sortie& os ) const
 {

@@ -43,7 +43,8 @@ using MEDCoupling::MEDFileField1TS;
 using MEDCoupling::MEDFileMesh;
 #endif
 
-// XD champ_fonc_med field_base champ_fonc_med 1 Field to read a data field in a MED-format file .med at a specified time. It is very useful, for example, to resume a calculation with a new or refined geometry. The field post-processed on the new geometry at med format is used as initial condition for the resume.
+// XD champ_fonc_med field_base champ_fonc_med BRACE Field to read a data field in a MED-format file .med at a specified time. It is very useful, for example, to resume a calculation with a new or refined geometry. The field post-processed on the new geometry
+// XD_CONT at med format is used as initial condition for the resume.
 Implemente_instanciable(Champ_Fonc_MED,"Champ_Fonc_MED",Champ_Fonc_base);
 
 Sortie& Champ_Fonc_MED::printOn(Sortie& s) const

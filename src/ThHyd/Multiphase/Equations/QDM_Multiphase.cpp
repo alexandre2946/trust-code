@@ -28,9 +28,9 @@
 #include <Nom.h>
 
 Implemente_instanciable(QDM_Multiphase,"QDM_Multiphase",Navier_Stokes_std);
-// XD QDM_Multiphase eqn_base QDM_Multiphase -1 Momentum conservation equation for a multi-phase problem where the unknown is the velocity
-// XD attr solveur_pression solveur_sys_base solveur_pression 1 Linear pressure system resolution method.
-// XD attr evanescence bloc_lecture evanescence 1 Management of the vanishing phase (when alpha tends to 0 or 1)
+// XD QDM_Multiphase eqn_base QDM_Multiphase INHERITS_BRACE Momentum conservation equation for a multi-phase problem where the unknown is the velocity
+// XD attr solveur_pression solveur_sys_base solveur_pression OPT Linear pressure system resolution method.
+// XD attr evanescence bloc_lecture evanescence OPT Management of the vanishing phase (when alpha tends to 0 or 1)
 
 // evanescence interprete evanescence 1 Management of the vanishing phase (when alpha tends to 0 or 1)
 // attr homogene chaine homogene 1 Vanishing phases management : tends to homogeneous model when a phase vanishes (vl = vg)

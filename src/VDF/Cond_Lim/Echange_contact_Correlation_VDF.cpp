@@ -27,7 +27,8 @@
 #include <Param.h>
 
 Implemente_instanciable(Echange_contact_Correlation_VDF,"Paroi_Echange_contact_Correlation_VDF",Echange_global_impose);
-// XD paroi_echange_contact_correlation_vdf condlim_base paroi_echange_contact_correlation_vdf 1 Class to define a thermohydraulic 1D model which will apply to a boundary of 2D or 3D domain. NL2 Warning : For parallel calculation, the only possible partition will be according the axis of the model with the keyword Tranche.
+// XD paroi_echange_contact_correlation_vdf condlim_base paroi_echange_contact_correlation_vdf BRACE Class to define a thermohydraulic 1D model which will apply to a boundary of 2D or 3D domain. NL2 Warning : For parallel calculation, the only possible
+// XD_CONT partition will be according the axis of the model with the keyword Tranche.
 
 Sortie& Echange_contact_Correlation_VDF::printOn(Sortie& s ) const { return s << que_suis_je() << finl; }
 

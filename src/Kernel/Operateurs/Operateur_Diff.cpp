@@ -18,19 +18,19 @@
 #include <Champ_base.h>
 
 Implemente_instanciable(Operateur_Diff,"Operateur_Diff",OWN_PTR(Operateur_Diff_base));
-// XD diffusion_deriv objet_lecture diffusion_deriv 0 not_set
-// XD bloc_diffusion objet_lecture nul 0 not_set
-// XD attr aco chaine(into=["{"]) aco 0 Opening curly bracket.
-// XD attr operateur diffusion_deriv operateur 1 if none is specified, the diffusive scheme used is a 2nd-order scheme.
-// XD attr op_implicite op_implicite op_implicite 1 To have diffusive implicitation, it use Uzawa algorithm. Very useful when viscosity has large variations.
-// XD attr acof chaine(into=["}"]) acof 0 Closing curly bracket.
+// XD diffusion_deriv objet_lecture diffusion_deriv NO_BRACE not_set
+// XD bloc_diffusion objet_lecture nul NO_BRACE not_set
+// XD attr aco chaine(into=["{"]) aco REQ Opening curly bracket.
+// XD attr operateur diffusion_deriv operateur OPT if none is specified, the diffusive scheme used is a 2nd-order scheme.
+// XD attr op_implicite op_implicite op_implicite OPT To have diffusive implicitation, it use Uzawa algorithm. Very useful when viscosity has large variations.
+// XD attr acof chaine(into=["}"]) acof REQ Closing curly bracket.
 
 /* Here we put the doc for all shared (VDF, VEF,...) keywords: */
 
-// XD diffusion_negligeable diffusion_deriv negligeable 0 the diffusivity will not taken in count
+// XD diffusion_negligeable diffusion_deriv negligeable NO_BRACE the diffusivity will not taken in count
 
-// XD diffusion_option diffusion_deriv option 0 not_set
-// XD attr bloc_lecture bloc_lecture bloc_lecture 0 not_set
+// XD diffusion_option diffusion_deriv option NO_BRACE not_set
+// XD attr bloc_lecture bloc_lecture bloc_lecture REQ not_set
 
 Sortie& Operateur_Diff::printOn(Sortie& os) const
 {

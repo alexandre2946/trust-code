@@ -19,9 +19,9 @@
 #include <Nom.h>
 
 Implemente_instanciable(Lata_2_CGNS, "Lata_To_CGNS|Lata_2_CGNS", Interprete);
-// XD lata_to_CGNS interprete lata_to_CGNS -1 To convert results file written with LATA format to CGNS file. Warning: Fields located on faces are not supported yet.
-// XD attr file chaine file 0 LATA file to convert to the new format.
-// XD attr file_CGNS chaine file_CGNS 0 Name of the CGNS file.
+// XD lata_to_CGNS interprete lata_to_CGNS INHERITS_BRACE To convert results file written with LATA format to CGNS file. Warning: Fields located on faces are not supported yet.
+// XD attr file chaine file REQ LATA file to convert to the new format.
+// XD attr file_CGNS chaine file_CGNS REQ Name of the CGNS file.
 
 Sortie& Lata_2_CGNS::printOn(Sortie& os) const { return Interprete::printOn(os); }
 Entree& Lata_2_CGNS::readOn(Entree& is) { return Interprete::readOn(is); }

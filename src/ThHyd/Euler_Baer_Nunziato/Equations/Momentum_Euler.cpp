@@ -25,8 +25,8 @@
 #include <Param.h>
 
 Implemente_instanciable(Momentum_Euler,"Momentum_Euler|QDM_Euler",Navier_Stokes_std);
-// XD momentum_euler eqn_base qdm_euler -1 Momentum conservation equation for a multi-phase Euler problem where the unknown is the velocity
-// XD attr termes_non_conservatifs bloc_op_non_conservativtifs non_conservative_terms 1 Keyword to alter the non-conservative scheme.
+// XD momentum_euler eqn_base qdm_euler INHERITS_BRACE Momentum conservation equation for a multi-phase Euler problem where the unknown is the velocity
+// XD attr termes_non_conservatifs bloc_op_non_conservativtifs non_conservative_terms OPT Keyword to alter the non-conservative scheme.
 
 Sortie& Momentum_Euler::printOn(Sortie& is) const { return Equation_base::printOn(is); }
 

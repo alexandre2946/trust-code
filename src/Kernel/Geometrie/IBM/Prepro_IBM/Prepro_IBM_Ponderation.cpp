@@ -19,7 +19,7 @@
 Implemente_instanciable( Prepro_IBM_Ponderation,"Prepro_IBM_Ponderation|methode_IBM_ponderation",Prepro_IBM_base );
 
 Sortie& Prepro_IBM_Ponderation::printOn(Sortie& os) const { return Prepro_IBM_base::printOn(os); }
-// XD Prepro_IBM_Ponderation Prepro_IBM_base methode_IBM_ponderation 1 To perform the intersection of an IB (Lagrange mesh) in a MED-format file .med with the Euler computional mesh.
+// XD Prepro_IBM_Ponderation Prepro_IBM_base methode_IBM_ponderation BRACE To perform the intersection of an IB (Lagrange mesh) in a MED-format file .med with the Euler computional mesh.
 
 void Prepro_IBM_Ponderation::set_param(Param& param) const
 {

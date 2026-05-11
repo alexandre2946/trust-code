@@ -17,7 +17,7 @@
 #include <Domaine_dis_base.h>
 
 Implemente_instanciable(Champ_Ostwald,"Champ_Ostwald",Champ_Fonc_P0_base);
-// XD champ_ostwald field_base champ_ostwald 0 This keyword is used to define the viscosity variation law: NL2 Mu(T)= K(T)*(D:D/2)**((n-1)/2)
+// XD champ_ostwald field_base champ_ostwald NO_BRACE This keyword is used to define the viscosity variation law: NL2 Mu(T)= K(T)*(D:D/2)**((n-1)/2)
 
 
 Sortie& Champ_Ostwald::printOn(Sortie& os) const { return os; }

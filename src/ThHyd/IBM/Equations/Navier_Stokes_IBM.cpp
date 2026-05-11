@@ -24,16 +24,16 @@
 #include <Nom.h>
 
 Implemente_instanciable(Navier_Stokes_IBM, "Navier_Stokes_IBM", Navier_Stokes_std);
-// XD navier_stokes_ibm navier_stokes_standard navier_stokes_ibm -1 IBM Navier-Stokes equations.
-// XD attr correction_matrice_projection_initiale entier correction_matrice_projection_initiale 1 (IBM advanced) fix matrix of initial projection for PDF
-// XD attr correction_calcul_pression_initiale entier correction_calcul_pression_initiale 1 (IBM advanced) fix initial pressure computation for PDF
-// XD attr correction_vitesse_projection_initiale entier correction_vitesse_projection_initiale 1 (IBM advanced) fix initial velocity computation for PDF
-// XD attr correction_matrice_pression entier correction_matrice_pression 1 (IBM advanced) fix pressure matrix for PDF
-// XD attr matrice_pression_penalisee_H1 entier matrice_pression_penalisee_H1 1 (IBM advanced) fix pressure matrix for PDF
-// XD attr correction_vitesse_modifie entier correction_vitesse_modifie 1 (IBM advanced) fix velocity for PDF
-// XD attr correction_pression_modifie entier correction_pression_modifie 1 (IBM advanced) fix pressure for PDF
-// XD attr gradient_pression_qdm_modifie entier gradient_pression_qdm_modifie 1 (IBM advanced) fix pressure gradient
-// XD attr correction_variable_initiale entier correction_variable_initiale 1 Modify initial variable
+// XD navier_stokes_ibm navier_stokes_standard navier_stokes_ibm INHERITS_BRACE IBM Navier-Stokes equations.
+// XD attr correction_matrice_projection_initiale entier correction_matrice_projection_initiale OPT (IBM advanced) fix matrix of initial projection for PDF
+// XD attr correction_calcul_pression_initiale entier correction_calcul_pression_initiale OPT (IBM advanced) fix initial pressure computation for PDF
+// XD attr correction_vitesse_projection_initiale entier correction_vitesse_projection_initiale OPT (IBM advanced) fix initial velocity computation for PDF
+// XD attr correction_matrice_pression entier correction_matrice_pression OPT (IBM advanced) fix pressure matrix for PDF
+// XD attr matrice_pression_penalisee_H1 entier matrice_pression_penalisee_H1 OPT (IBM advanced) fix pressure matrix for PDF
+// XD attr correction_vitesse_modifie entier correction_vitesse_modifie OPT (IBM advanced) fix velocity for PDF
+// XD attr correction_pression_modifie entier correction_pression_modifie OPT (IBM advanced) fix pressure for PDF
+// XD attr gradient_pression_qdm_modifie entier gradient_pression_qdm_modifie OPT (IBM advanced) fix pressure gradient
+// XD attr correction_variable_initiale entier correction_variable_initiale OPT Modify initial variable
 
 Sortie& Navier_Stokes_IBM::printOn(Sortie& is) const
 {

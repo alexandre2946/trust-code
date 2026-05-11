@@ -119,7 +119,7 @@ int Schema_Euler_Implicite::lire_motcle_non_standard(const Motcle& mot, Entree& 
 }
 
 
-// XD facsec_expert interprete nul 1 To parameter the safety factor for the time step during the simulation.
+// XD facsec_expert interprete nul BRACE To parameter the safety factor for the time step during the simulation.
 Entree& Schema_Euler_Implicite::lire_facsec_expert(Entree& is)
 {
   Param param("facsec_expert");
@@ -150,7 +150,7 @@ void Schema_Euler_Implicite::lire_facsec_func(Entree& is)
 
 void Schema_Euler_Implicite::set_param(Param& param) const
 {
-  // XD schema_euler_implicite schema_implicite_base schema_euler_implicite -1 This is the Euler implicit scheme.
+  // XD schema_euler_implicite schema_implicite_base schema_euler_implicite INHERITS_BRACE This is the Euler implicit scheme.
   param.ajouter("max_iter_implicite",&nb_ite_max);
   param.ajouter_flag("facsec_cfl",&facsec_cfl_);    // XD_ADD_P rien Flag to compute time step based on CFL: dt=min(facsec,facsec_max)*dt(convection)X/
   param.ajouter_non_std("facsec_max", (this)); // XD_ADD_P floattant For old syntax, see the complete parameters of facsec for details

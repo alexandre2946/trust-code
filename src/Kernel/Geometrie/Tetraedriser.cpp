@@ -16,8 +16,9 @@
 #include <Tetraedriser.h>
 
 Implemente_instanciable(Tetraedriser, "Tetraedriser", Triangulation_base);
-// XD tetraedriser interprete tetraedriser -1 To achieve a tetrahedral mesh based on a mesh comprising blocks, the Tetraedriser (Tetrahedralise) interpretor is used in VEF discretization. Initial block is divided in 6 tetrahedra: \includepng{{tetraedriser.jpeg}}{{5}}
-// XD attr domain_name ref_domaine domain_name 0 Name of domain.
+// XD tetraedriser interprete tetraedriser INHERITS_BRACE To achieve a tetrahedral mesh based on a mesh comprising blocks, the Tetraedriser (Tetrahedralise) interpretor is used in VEF discretization. Initial block is divided in 6 tetrahedra:
+// XD_CONT \includepng{{tetraedriser.jpeg}}{{5}}
+// XD attr domain_name ref_domaine domain_name REQ Name of domain.
 
 
 Sortie& Tetraedriser::printOn(Sortie& os) const { return Interprete::printOn(os); }

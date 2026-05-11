@@ -20,8 +20,8 @@
 #include <Perf_counters.h>
 
 Implemente_instanciable(Resoudre,"Resoudre|Solve",Interprete);
-// XD solve interprete resoudre 0 Interpretor to start calculation with TRUST.
-// XD  attr pb ref_pb_gen_base pb 0 Name of problem to be solved.
+// XD solve interprete resoudre NO_BRACE Interpretor to start calculation with TRUST.
+// XD  attr pb ref_pb_gen_base pb REQ Name of problem to be solved.
 
 /*! @brief Simple appel a: Interprete::printOn(Sortie&)
  *

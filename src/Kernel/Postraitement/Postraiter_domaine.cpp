@@ -22,7 +22,7 @@
 #include <Param.h>
 
 Implemente_instanciable(Postraiter_domaine, "Postraiter_domaine", Interprete_geometrique_base);
-// XD postraiter_domaine interprete postraiter_domaine 1 To write one or more domains in a file with a specified format (MED,LML,LATA,SINGLE_LATA,CGNS).
+// XD postraiter_domaine interprete postraiter_domaine BRACE To write one or more domains in a file with a specified format (MED,LML,LATA,SINGLE_LATA,CGNS).
 
 Sortie& Postraiter_domaine::printOn(Sortie& os) const { return Interprete::printOn(os); }
 

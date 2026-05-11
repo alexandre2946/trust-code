@@ -29,7 +29,7 @@
 
 
 Implemente_base(Milieu_base,"Milieu_base",Objet_U);
-// XD milieu_base objet_u milieu_base -1 Basic class for medium (physics properties of medium).
+// XD milieu_base objet_u milieu_base INHERITS_BRACE Basic class for medium (physics properties of medium).
 
 Sortie& Milieu_base::printOn(Sortie& os) const
 {

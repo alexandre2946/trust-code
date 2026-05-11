@@ -16,16 +16,16 @@
 #include <Operateur_NConserv.h>
 
 Implemente_instanciable(Operateur_NConserv, "Operateur_NConserv", OWN_PTR(Operateur_NConserv_base));
-// XD op_non_conservativtifs_deriv objet_lecture op_non_conservativtifs_deriv 0 not_set
+// XD op_non_conservativtifs_deriv objet_lecture op_non_conservativtifs_deriv NO_BRACE not_set
 
 
-// XD termes_non_conservatifs_negligeable op_non_conservativtifs_deriv negligeable 0 For Coloc discretization. Suppresses the non_conservative operator.
+// XD termes_non_conservatifs_negligeable op_non_conservativtifs_deriv negligeable NO_BRACE For Coloc discretization. Suppresses the non_conservative operator.
 
-// XD termes_non_conservatifs_hll op_non_conservativtifs_deriv hll 0 Keyword for Coloc discretization. Activates the HLL non-conservative scheme.
+// XD termes_non_conservatifs_hll op_non_conservativtifs_deriv hll NO_BRACE Keyword for Coloc discretization. Activates the HLL non-conservative scheme.
 
-// XD convection_hll convection_deriv hll 0 Keyword for Coloc discretization. Activates the HLL conservative scheme.
+// XD convection_hll convection_deriv hll NO_BRACE Keyword for Coloc discretization. Activates the HLL conservative scheme.
 
-// XD convection_rusanov convection_deriv rusanov 0 Keyword for Coloc discretization. Activates the Rusanov conservative scheme.
+// XD convection_rusanov convection_deriv rusanov NO_BRACE Keyword for Coloc discretization. Activates the Rusanov conservative scheme.
 
 Sortie& Operateur_NConserv::printOn(Sortie& os) const { return Operateur::ecrire(os); }
 

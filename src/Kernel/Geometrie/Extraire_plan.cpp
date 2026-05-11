@@ -25,9 +25,14 @@
 #include <Param.h>
 
 Implemente_instanciable(Extraire_plan,"Extraire_plan",Interprete_geometrique_base);
-// XD extraire_plan interprete extraire_plan 1 This keyword extracts a plane mesh named domain_name (this domain should have been declared before) from the mesh of the pb_name problem. The plane can be either a triangle (defined by the keywords Origine, Point1, Point2 and Triangle), either a regular quadrangle (with keywords Origine, Point1 and Point2), or either a generalized quadrangle (with keywords Origine, Point1, Point2, Point3). The keyword Epaisseur specifies the thickness of volume around the plane which contains the faces of the extracted mesh. The keyword via_extraire_surface will create a plan and use Extraire_surface algorithm. Inverse_condition_element keyword then will be used in the case where the plane is a boundary not well oriented, and avec_certains_bords_pour_extraire_surface is the option related to the Extraire_surface option named avec_certains_bords.
+// XD extraire_plan interprete extraire_plan BRACE This keyword extracts a plane mesh named domain_name (this domain should have been declared before) from the mesh of the pb_name problem. The plane can be either a triangle (defined by the keywords Origine,
 // XD_CONT Point1, Point2 and Triangle), either a regular quadrangle (with keywords Origine, Point1 and Point2), or either a generalized quadrangle (with keywords Origine, Point1, Point2, Point3). The keyword Epaisseur specifies the thickness of volume around the plane
 // XD_CONT which contains the faces of the extracted mesh. The keyword via_extraire_surface will create a plan and use Extraire_surface algorithm. Inverse_condition_element keyword then will be used in the case where the plane is a boundary not well oriented, and
+// XD_CONT avec_certains_bords_pour_extraire_surface is the option related to the Extraire_surface option named avec_certains_bords.
+// XD_CONT Point1, Point2 and Triangle), either a regular quadrangle (with keywords Origine, Point1 and Point2), or either a generalized quadrangle (with keywords Origine, Point1, Point2, Point3). The keyword Epaisseur specifies the thickness of volume around
+// XD_CONT the plane
+// XD_CONT which contains the faces of the extracted mesh. The keyword via_extraire_surface will create a plan and use Extraire_surface algorithm. Inverse_condition_element keyword then will be used in the case where the plane is a boundary not well oriented,
+// XD_CONT and
 // XD_CONT avec_certains_bords_pour_extraire_surface is the option related to the Extraire_surface option named avec_certains_bords.
 
 Sortie& Extraire_plan::printOn(Sortie& os) const { return Interprete::printOn(os); }

@@ -16,7 +16,7 @@
 #include <Neumann_paroi_adiabatique.h>
 
 Implemente_instanciable(Neumann_paroi_adiabatique, "Neumann_Paroi_adiabatique", Neumann_homogene);
-// XD Neumann_paroi_adiabatique Neumann_homogene Neumann_paroi_adiabatique -1 Adiabatic wall neumann boundary condition
+// XD Neumann_paroi_adiabatique Neumann_homogene Neumann_paroi_adiabatique INHERITS_BRACE Adiabatic wall neumann boundary condition
 
 Sortie& Neumann_paroi_adiabatique::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
 

@@ -24,7 +24,8 @@
 #include <Param.h>
 
 Implemente_instanciable(Modele_turbulence_scal_Prandtl, "Modele_turbulence_scal_Prandtl", Modele_turbulence_scal_diffturb_base);
-// XD prandtl modele_turbulence_scal_base prandtl -1 The Prandtl model. For the scalar equations, only the model based on Reynolds analogy is available. If K_Epsilon was selected in the hydraulic equation, Prandtl must be selected for the convection-diffusion temperature equation coupled to the hydraulic equation and Schmidt for the concentration equations.
+// XD prandtl modele_turbulence_scal_base prandtl INHERITS_BRACE The Prandtl model. For the scalar equations, only the model based on Reynolds analogy is available. If K_Epsilon was selected in the hydraulic equation, Prandtl must be selected for the
+// XD_CONT convection-diffusion temperature equation coupled to the hydraulic equation and Schmidt for the concentration equations.
 
 Sortie& Modele_turbulence_scal_Prandtl::printOn(Sortie& s) const { return Modele_turbulence_scal_diffturb_base::printOn(s); }
 

@@ -22,7 +22,7 @@
 
 Implemente_base(Discret_Thyd, "Discret_Thyd", Discret_Thermique);
 
-// XD discretisation_base objet_u discretisation_base -1 Basic class for space discretization of thermohydraulic turbulent problems.
+// XD discretisation_base objet_u discretisation_base INHERITS_BRACE Basic class for space discretization of thermohydraulic turbulent problems.
 
 Sortie& Discret_Thyd::printOn(Sortie& s) const { return s; }
 

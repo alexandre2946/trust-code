@@ -30,7 +30,7 @@
 
 Implemente_instanciable(Modele_rayo_transp, "Modele_rayonnement_milieu_transparent|Transparent_medium_radiation_model", Objet_U);
 
-// XD transparent_medium_radiation_model objet_u modele_rayonnement_milieu_transparent 1 Transparent medium radiation model associated to a fluid problem
+// XD transparent_medium_radiation_model objet_u modele_rayonnement_milieu_transparent BRACE Transparent medium radiation model associated to a fluid problem
 
 Sortie& Modele_rayo_transp::printOn(Sortie& os) const { return os; }
 

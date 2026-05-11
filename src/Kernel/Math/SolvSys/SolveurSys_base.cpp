@@ -21,7 +21,7 @@
 #include <Motcle.h>
 
 Implemente_base_sans_constructeur(SolveurSys_base,"SolveurSys_base",Objet_U);
-// XD solveur_sys_base class_generic solveur_sys_base -1 Basic class to solve the linear system.
+// XD solveur_sys_base class_generic solveur_sys_base INHERITS_BRACE Basic class to solve the linear system.
 
 SolveurSys_base::SolveurSys_base()
 {

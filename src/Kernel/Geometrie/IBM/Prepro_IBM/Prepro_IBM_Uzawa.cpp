@@ -16,7 +16,7 @@
 #include <Prepro_IBM_Uzawa.h>
 
 Implemente_instanciable( Prepro_IBM_Uzawa,"Prepro_IBM_Uzawa|methode_IBM_Uzawa",Prepro_IBM_base );
-// XD Prepro_IBM_Uzawa Prepro_IBM_base methode_IBM_Uzawa 1 To perform the intersection of an IB (Lagrange mesh) in a MED-format file .med with the Euler computional mesh.
+// XD Prepro_IBM_Uzawa Prepro_IBM_base methode_IBM_Uzawa BRACE To perform the intersection of an IB (Lagrange mesh) in a MED-format file .med with the Euler computional mesh.
 
 Sortie& Prepro_IBM_Uzawa::printOn(Sortie& os) const { return Prepro_IBM_base::printOn(os); }
 

@@ -24,7 +24,7 @@
 #include <Param.h>
 
 Implemente_instanciable(Moyenne_volumique,"Moyenne_volumique",Interprete);
-// XD moyenne_volumique interprete moyenne_volumique 1 This keyword should be used after Resoudre keyword. It computes the convolution product of one or more fields with a given filtering function.
+// XD moyenne_volumique interprete moyenne_volumique BRACE This keyword should be used after Resoudre keyword. It computes the convolution product of one or more fields with a given filtering function.
 
 Sortie& Moyenne_volumique::printOn(Sortie& s ) const
 {

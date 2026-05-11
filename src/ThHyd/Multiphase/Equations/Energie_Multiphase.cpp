@@ -32,7 +32,7 @@
 #include <SETS.h>
 
 Implemente_instanciable(Energie_Multiphase, "Energie_Multiphase", Convection_Diffusion_Temperature_base);
-// XD Energie_Multiphase eqn_base Energie_Multiphase -1 Internal energy conservation equation for a multi-phase problem where the unknown is the temperature
+// XD Energie_Multiphase eqn_base Energie_Multiphase INHERITS_BRACE Internal energy conservation equation for a multi-phase problem where the unknown is the temperature
 
 Sortie& Energie_Multiphase::printOn(Sortie& is) const { return Convection_Diffusion_Temperature_base::printOn(is); }
 

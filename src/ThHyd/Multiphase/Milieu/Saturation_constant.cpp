@@ -16,12 +16,12 @@
 #include <Saturation_constant.h>
 
 Implemente_instanciable(Saturation_constant, "Saturation_constant", Saturation_base);
-// XD saturation_constant saturation_base saturation_constant -1 Class for saturation constant
-// XD attr P_sat floattant P_sat 1 Define the saturation pressure value (this is a required parameter)
-// XD attr T_sat floattant T_sat 1 Define the saturation temperature value (this is a required parameter)
-// XD attr Lvap floattant Lvap 1 Latent heat of vaporization
-// XD attr Hlsat floattant Hlsat 1 Liquid saturation enthalpy
-// XD attr Hvsat floattant Hvsat 1 Vapor saturation enthalpy
+// XD saturation_constant saturation_base saturation_constant INHERITS_BRACE Class for saturation constant
+// XD attr P_sat floattant P_sat OPT Define the saturation pressure value (this is a required parameter)
+// XD attr T_sat floattant T_sat OPT Define the saturation temperature value (this is a required parameter)
+// XD attr Lvap floattant Lvap OPT Latent heat of vaporization
+// XD attr Hlsat floattant Hlsat OPT Liquid saturation enthalpy
+// XD attr Hvsat floattant Hvsat OPT Vapor saturation enthalpy
 
 Sortie& Saturation_constant::printOn(Sortie& os) const { return os; }
 

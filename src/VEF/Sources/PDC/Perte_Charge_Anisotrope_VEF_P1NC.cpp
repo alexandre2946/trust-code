@@ -19,12 +19,12 @@
 #include <Param.h>
 
 Implemente_instanciable(Perte_Charge_Anisotrope_VEF_P1NC,"Perte_Charge_Anisotrope_VEF_P1NC",Perte_Charge_VEF);
-// XD perte_charge_anisotrope source_base perte_charge_anisotrope 1 Anisotropic pressure loss.
-// XD  attr lambda chaine lambda_u 0 Function for loss coefficient which may be Reynolds dependant (Ex: 64/Re).
-// XD  attr lambda_ortho chaine lambda_ortho 0 Function for loss coefficient in transverse direction which may be Reynolds dependant (Ex: 64/Re).
-// XD  attr diam_hydr champ_don_base diam_hydr 0 Hydraulic diameter value.
-// XD  attr direction champ_don_base direction 0 Field which indicates the direction of the pressure loss.
-// XD  attr sous_zone chaine sous_zone 1 Optional sub-area where pressure loss applies.
+// XD perte_charge_anisotrope source_base perte_charge_anisotrope BRACE Anisotropic pressure loss.
+// XD  attr lambda chaine lambda_u REQ Function for loss coefficient which may be Reynolds dependant (Ex: 64/Re).
+// XD  attr lambda_ortho chaine lambda_ortho REQ Function for loss coefficient in transverse direction which may be Reynolds dependant (Ex: 64/Re).
+// XD  attr diam_hydr champ_don_base diam_hydr REQ Hydraulic diameter value.
+// XD  attr direction champ_don_base direction REQ Field which indicates the direction of the pressure loss.
+// XD  attr sous_zone chaine sous_zone OPT Optional sub-area where pressure loss applies.
 
 Sortie& Perte_Charge_Anisotrope_VEF_P1NC::printOn(Sortie& s ) const
 {

@@ -21,7 +21,7 @@
 #include <Synonyme_info.h>
 
 Implemente_instanciable(Champ_Generique_Correlation,"Champ_Post_Statistiques_Correlation|Correlation",Champ_Generique_Statistiques_base);
-// XD correlation champ_post_statistiques_base correlation -1 to calculate the correlation between the two fields.
+// XD correlation champ_post_statistiques_base correlation INHERITS_BRACE to calculate the correlation between the two fields.
 
 Sortie& Champ_Generique_Correlation::printOn(Sortie& s ) const
 {

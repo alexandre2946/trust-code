@@ -17,8 +17,9 @@
 #include <Scatter.h>
 
 Implemente_instanciable_32_64(Raffiner_anisotrope_32_64,"Raffiner_anisotrope",Interprete_geometrique_base_32_64<_T_>);
-// XD raffiner_anisotrope interprete raffiner_anisotrope -1 Only for VEF discretizations, allows to cut triangle elements in 3, or tetrahedra in 4 parts, by defining a new summit located at the center of the element: \includepng{{raffineranisotri.pdf}}{{4}} \includepng{{raffineranisotetra.jpeg}}{{6}} NL2 Note that such a cut creates flat elements (anisotropic).
-// XD attr domain_name ref_domaine domain_name 0 Name of domain.
+// XD raffiner_anisotrope interprete raffiner_anisotrope INHERITS_BRACE Only for VEF discretizations, allows to cut triangle elements in 3, or tetrahedra in 4 parts, by defining a new summit located at the center of the element:
+// XD_CONT \includepng{{raffineranisotri.pdf}}{{4}} \includepng{{raffineranisotetra.jpeg}}{{6}} NL2 Note that such a cut creates flat elements (anisotropic).
+// XD attr domain_name ref_domaine domain_name REQ Name of domain.
 
 
 template <typename _SIZE_>

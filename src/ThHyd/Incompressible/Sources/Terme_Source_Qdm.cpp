@@ -16,8 +16,8 @@
 #include <Terme_Source_Qdm.h>
 
 
-// XD source_qdm source_base source_qdm 0 Momentum source term in the Navier-Stokes equations.
-// XD  attr ch field_base champ 0 Field type.
+// XD source_qdm source_base source_qdm NO_BRACE Momentum source term in the Navier-Stokes equations.
+// XD  attr ch field_base champ REQ Field type.
 
 /*! @brief Renvoie le champ donne representant le terme source
  *

@@ -21,8 +21,9 @@
 #include <Param.h>
 
 Implemente_instanciable(Partitionneur_Partition,"Partitionneur_Partition",Partitionneur_base);
-// XD partitionneur_partition partitionneur_deriv PARTITION -1 This algorithm re-use the partition of the domain named DOMAINE_NAME. It is useful to partition for example a post processing domain. The partition should match with the calculation domain.
-// XD attr domaine ref_domaine domaine 0 domain name
+// XD partitionneur_partition partitionneur_deriv PARTITION INHERITS_BRACE This algorithm re-use the partition of the domain named DOMAINE_NAME. It is useful to partition for example a post processing domain. The partition should match with the calculation
+// XD_CONT domain.
+// XD attr domaine ref_domaine domaine REQ domain name
 
 
 

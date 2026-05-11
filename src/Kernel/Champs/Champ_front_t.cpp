@@ -21,8 +21,8 @@
 #include <TRUSTTrav.h>
 
 Implemente_instanciable(Champ_front_t,"Champ_front_fonc_t",Ch_front_var_instationnaire_indep);
-// XD champ_front_fonc_t front_field_base champ_front_fonc_t 0 Boundary field that depends only on time.
-// XD attr val listchaine val 0 Values of field components (mathematical expressions).
+// XD champ_front_fonc_t front_field_base champ_front_fonc_t NO_BRACE Boundary field that depends only on time.
+// XD attr val listchaine val REQ Values of field components (mathematical expressions).
 
 
 /*! @brief Imprime le champ sur flot de sortie.

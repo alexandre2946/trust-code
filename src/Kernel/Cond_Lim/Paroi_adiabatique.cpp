@@ -18,7 +18,7 @@
 #include <Equation_base.h>
 
 Implemente_instanciable(Paroi_adiabatique, "paroi_adiabatique", Cond_lim_utilisateur_base);
-// XD paroi_adiabatique condlim_base paroi_adiabatique -1 Normal zero flux condition at the wall called bord (edge).
+// XD paroi_adiabatique condlim_base paroi_adiabatique INHERITS_BRACE Normal zero flux condition at the wall called bord (edge).
 
 Sortie& Paroi_adiabatique::printOn(Sortie& s ) const { return s << que_suis_je() ; }
 Entree& Paroi_adiabatique::readOn(Entree& s ) { return s; }

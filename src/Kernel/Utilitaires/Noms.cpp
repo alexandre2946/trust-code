@@ -16,14 +16,14 @@
 #include <Noms.h>
 Implemente_instanciable(Noms,"Noms",VECT(Nom));
 
-// XD nom_anonyme nom nul -1 not_set
-// XD vect_nom listobj vect_nom 0 nom_anonyme 0 Vect of name.
-// XD list_nom listobj list_nom 1 nom_anonyme 0 List of name.
-// XD list_nom_virgule listobj list_nom_virgule 1 nom_anonyme 1 List of name.
+// XD nom_anonyme nom nul INHERITS_BRACE not_set
+// XD vect_nom listobj vect_nom NO_BRACE nom_anonyme NO_COMMA Vect of name.
+// XD list_nom listobj list_nom BRACE nom_anonyme NO_COMMA List of name.
+// XD list_nom_virgule listobj list_nom_virgule BRACE nom_anonyme COMMA List of name.
 
-// XD un_pb objet_lecture nul 0 pour les groupes
-// XD   attr mot ref_Pb_base mot 0 the string
-// XD list_un_pb listobj nul 1 un_pb 1 pour les groupes
+// XD un_pb objet_lecture nul NO_BRACE pour les groupes
+// XD   attr mot ref_Pb_base mot REQ the string
+// XD list_un_pb listobj nul BRACE un_pb COMMA pour les groupes
 
 Sortie& Noms::printOn(Sortie& s) const
 {

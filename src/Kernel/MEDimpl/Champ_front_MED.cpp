@@ -20,7 +20,7 @@
 #include <Param.h>
 
 Implemente_instanciable(Champ_front_MED,"Champ_front_MED",Champ_front_txyz);
-// XD champ_front_MED front_field_base champ_front_MED 0 Field allowing the loading of a boundary condition from a MED file using Champ_fonc_med
+// XD champ_front_MED front_field_base champ_front_MED NO_BRACE Field allowing the loading of a boundary condition from a MED file using Champ_fonc_med
 
 Sortie& Champ_front_MED::printOn(Sortie& os) const
 {
@@ -31,7 +31,7 @@ Sortie& Champ_front_MED::printOn(Sortie& os) const
 Entree& Champ_front_MED::readOn(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter("champ_volumique",&champ_volumique_,Param::REQUIRED);  // XD attr champ_fonc_med field_base champ_fonc_med 0 a champ_fonc_med loading the values of the unknown on a domain boundary
+  param.ajouter("champ_volumique",&champ_volumique_,Param::REQUIRED);  // XD attr champ_fonc_med field_base champ_fonc_med REQ a champ_fonc_med loading the values of the unknown on a domain boundary
   param.lire_sans_accolade(is);
 
   fixer_nb_comp(champ_volumique_->nb_comp());

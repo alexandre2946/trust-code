@@ -22,7 +22,7 @@
 #include <TRUSTTrav.h>
 
 Implemente_base(Interface_base, "Interface_base", Objet_U);
-// XD Interface_base objet_u Interface_base -1 Basic class for a liquid-gas interface (used in pb_multiphase)
+// XD Interface_base objet_u Interface_base INHERITS_BRACE Basic class for a liquid-gas interface (used in pb_multiphase)
 
 Sortie& Interface_base::printOn(Sortie& os) const { return os; }
 

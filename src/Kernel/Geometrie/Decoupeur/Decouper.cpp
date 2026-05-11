@@ -217,20 +217,27 @@ template<> int Decouper_32_64<int>::print_more_infos_ = 0;
 template<> int Decouper_32_64<trustIdType>::print_more_infos_ = 0;
 #endif
 
-// XD partition interprete decouper -1 Class for parallel calculation to cut a domain for each processor. By default, this keyword is commented in the reference test cases.
-// XD attr domaine ref_domaine domaine 0 Name of the domain to be cut.
-// XD attr bloc_decouper bloc_decouper bloc_decouper 0 Description how to cut a domain.
-// XD bloc_decouper objet_lecture nul 1 Auxiliary class to cut a domain.
-// XD attr partitionneur|Partition_tool partitionneur_deriv partitionneur 1 Defines the partitionning algorithm (the effective C++ object used is \'Partitionneur_ALGORITHM_NAME\').
-// XD attr larg_joint entier larg_joint 1 This keyword specifies the thickness of the virtual ghost domaine (data known by one processor though not owned by it). The default value is 1 and is generally correct for all algorithms except the QUICK convection scheme that require a thickness of 2. Since the 1.5.5 version, the VEF discretization imply also a thickness of 2 (except VEF P0). Any non-zero positive value can be used, but the amount of data to store and exchange between processors grows quickly with the thickness.
-// XD attr nom_zones chaine zones_name 1 Name of the files containing the different partition of the domain. The files will be : NL2 name_0001.Zones NL2 name_0002.Zones NL2 ... NL2 name_000n.Zones. If this keyword is not specified, the geometry is not written on disk (you might just want to generate a \'ecrire_decoupage\' or \'ecrire_lata\').
-// XD attr ecrire_decoupage chaine ecrire_decoupage 1 After having called the partitionning algorithm, the resulting partition is written on disk in the specified filename. See also partitionneur Fichier_Decoupage. This keyword is useful to change the partition numbers: first, you write the partition into a file with the option ecrire_decoupage. This file contains the domaine number for each element\'s mesh. Then you can easily permute domaine numbers in this file. Then read the new partition to create the .Zones files with the Fichier_Decoupage keyword.
-// XD attr ecrire_lata chaine ecrire_lata 1 Save the partition field in a LATA format file for visualization
-// XD attr ecrire_med chaine ecrire_med 1 Save the partition field in a MED format file for visualization
-// XD attr nb_parts_tot entier nb_parts_tot 1 Keyword to generates N .Domaine files, instead of the default number M obtained after the partitionning algorithm. N must be greater or equal to M. This option might be used to perform coupled parallel computations. Supplemental empty domaines from M to N-1 are created. This keyword is used when you want to run a parallel calculation on several domains with for example, 2 processors on a first domain and 10 on the second domain because the first domain is very small compare to second one. You will write Nb_parts 2 and Nb_parts_tot 10 for the first domain and Nb_parts 10 for the second domain.
-// XD attr reorder entier reorder 1 If this option is set to 1 (0 by default), the partition is renumbered in order that the processes which communicate the most are nearer on the network. This may slighlty improves parallel performance.
-// XD attr single_hdf rien single_hdf 1 Optional keyword to enable you to write the partitioned domaines in a single file in hdf5 format.
-// XD attr print_more_infos entier print_more_infos 1 If this option is set to 1 (0 by default), print infos about number of remote elements (ghosts) and additional infos about the quality of partitionning. Warning, it slows down the cutting operations.
+// XD partition interprete decouper INHERITS_BRACE Class for parallel calculation to cut a domain for each processor. By default, this keyword is commented in the reference test cases.
+// XD attr domaine ref_domaine domaine REQ Name of the domain to be cut.
+// XD attr bloc_decouper bloc_decouper bloc_decouper REQ Description how to cut a domain.
+// XD bloc_decouper objet_lecture nul BRACE Auxiliary class to cut a domain.
+// XD attr partitionneur|Partition_tool partitionneur_deriv partitionneur OPT Defines the partitionning algorithm (the effective C++ object used is \'Partitionneur_ALGORITHM_NAME\').
+// XD attr larg_joint entier larg_joint OPT This keyword specifies the thickness of the virtual ghost domaine (data known by one processor though not owned by it). The default value is 1 and is generally correct for all algorithms except the QUICK convection
+// XD_CONT scheme that require a thickness of 2. Since the 1.5.5 version, the VEF discretization imply also a thickness of 2 (except VEF P0). Any non-zero positive value can be used, but the amount of data to store and exchange between processors grows quickly with the
+// XD_CONT thickness.
+// XD attr nom_zones chaine zones_name OPT Name of the files containing the different partition of the domain. The files will be : NL2 name_0001.Zones NL2 name_0002.Zones NL2 ... NL2 name_000n.Zones. If this keyword is not specified, the geometry is not
+// XD_CONT written on disk (you might just want to generate a \'ecrire_decoupage\' or \'ecrire_lata\').
+// XD attr ecrire_decoupage chaine ecrire_decoupage OPT After having called the partitionning algorithm, the resulting partition is written on disk in the specified filename. See also partitionneur Fichier_Decoupage. This keyword is useful to change the
+// XD_CONT partition numbers: first, you write the partition into a file with the option ecrire_decoupage. This file contains the domaine number for each element\'s mesh. Then you can easily permute domaine numbers in this file. Then read the new partition to create the
+// XD_CONT .Zones files with the Fichier_Decoupage keyword.
+// XD attr ecrire_lata chaine ecrire_lata OPT Save the partition field in a LATA format file for visualization
+// XD attr ecrire_med chaine ecrire_med OPT Save the partition field in a MED format file for visualization
+// XD attr nb_parts_tot entier nb_parts_tot OPT Keyword to generates N .Domaine files, instead of the default number M obtained after the partitionning algorithm. N must be greater or equal to M. This option might be used to perform coupled parallel
+// XD_CONT computations. Supplemental empty domaines from M to N-1 are created. This keyword is used when you want to run a parallel calculation on several domains with for example, 2 processors on a first domain and 10 on the second domain because the first domain is
+// XD_CONT very small compare to second one. You will write Nb_parts 2 and Nb_parts_tot 10 for the first domain and Nb_parts 10 for the second domain.
+// XD attr reorder entier reorder OPT If this option is set to 1 (0 by default), the partition is renumbered in order that the processes which communicate the most are nearer on the network. This may slighlty improves parallel performance.
+// XD attr single_hdf rien single_hdf OPT Optional keyword to enable you to write the partitioned domaines in a single file in hdf5 format.
+// XD attr print_more_infos entier print_more_infos OPT If this option is set to 1 (0 by default), print infos about number of remote elements (ghosts) and additional infos about the quality of partitionning. Warning, it slows down the cutting operations.
 template <typename _SIZE_>
 Entree& Decouper_32_64<_SIZE_>::interpreter(Entree& is)
 {

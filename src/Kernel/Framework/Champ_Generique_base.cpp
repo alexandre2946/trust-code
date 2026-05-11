@@ -21,13 +21,13 @@
 #include <Param.h>
 
 Implemente_base(Champ_Generique_base,"Champ_Generique_base",Objet_U);
-// XD champ_generique_base objet_u champ_generique_base 1 not_set
+// XD champ_generique_base objet_u champ_generique_base BRACE not_set
 
-// XD definition_champ objet_lecture nul 0 Keyword to create new complex field for advanced postprocessing.
-// XD   attr name chaine name 0 The name of the new created field.
-// XD   attr champ_generique champ_generique_base champ_generique 0 not_set
+// XD definition_champ objet_lecture nul NO_BRACE Keyword to create new complex field for advanced postprocessing.
+// XD   attr name chaine name REQ The name of the new created field.
+// XD   attr champ_generique champ_generique_base champ_generique REQ not_set
 
-// XD definition_champs listobj nul 1 definition_champ 0 List of definition champ
+// XD definition_champs listobj nul BRACE definition_champ NO_COMMA List of definition champ
 
 Sortie& Champ_Generique_base::printOn(Sortie& os) const
 {

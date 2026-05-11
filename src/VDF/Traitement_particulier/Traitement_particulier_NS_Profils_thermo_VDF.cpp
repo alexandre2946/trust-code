@@ -24,8 +24,8 @@
 #include <communications.h>
 
 Implemente_instanciable_sans_constructeur(Traitement_particulier_NS_Profils_thermo_VDF,"Traitement_particulier_NS_Profils_thermo_VDF",Traitement_particulier_NS_Profils_VDF);
-// XD profils_thermo traitement_particulier_base profils_thermo 0 non documente
-// XD attr bloc bloc_lecture bloc 0 not_set
+// XD profils_thermo traitement_particulier_base profils_thermo NO_BRACE non documente
+// XD attr bloc bloc_lecture bloc REQ not_set
 
 Traitement_particulier_NS_Profils_thermo_VDF::Traitement_particulier_NS_Profils_thermo_VDF():oui_repr_stats_thermo(0)
 {
