@@ -18,7 +18,7 @@
 
 #include <Bords.h>
 #include <Bords_Internes.h>
-#include <Elem/Poly_geom_base.h>
+#include <Poly_geom_base.h>
 #include <Joint.h>
 #include <NettoieNoeuds.h>
 #include <Polyedriser.h>
