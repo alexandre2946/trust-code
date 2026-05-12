@@ -43,11 +43,11 @@ class MorEqn;
 class Champ_Generique_Morceau_Equation : public Champ_Gen_de_Champs_Gen
 {
 
-  Declare_instanciable_sans_constructeur(Champ_Generique_Morceau_Equation);
+  Declare_instanciable(Champ_Generique_Morceau_Equation);
 
 public:
 
-  Champ_Generique_Morceau_Equation();
+
   void set_param(Param& param) const override;
   const Noms get_property(const Motcle& query) const override;
   Entity  get_localisation(const int index = -1) const override;
@@ -65,10 +65,10 @@ public:
 
 protected:
 
-  int numero_morceau_;              //numero du morceau d equation
+  int numero_morceau_=-1;              //numero du morceau d equation
   Nom type_morceau_;                //type du morceau d equation (ex : Operateur)
   Nom option_;                      //Pour selectionner la quantite a postraiter
-  int compo_;                            //Pour identifier la composante a recuperer pour l option flux_bords
+  int compo_=0;                            //Pour identifier la composante a recuperer pour l option flux_bords
   OBS_PTR(Equation_base) ref_eq_;       //REF vers l equation qui porte le morceau
   Motcle  localisation_;            //localisation correspondant au support du champ postraite
   Nom unite_;                 //unite du champ obtenu (a specifier par l'utilisateur)
@@ -76,4 +76,3 @@ protected:
 };
 
 #endif
-

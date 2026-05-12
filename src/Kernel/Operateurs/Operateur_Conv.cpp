@@ -30,12 +30,14 @@ Implemente_instanciable(Operateur_Conv,"Operateur_Conv",OWN_PTR(Operateur_Conv_b
 
 // XD convection_negligeable convection_deriv negligeable NO_BRACE For VDF and VEF discretizations. Suppresses the convection operator.
 
-// XD convection_amont convection_deriv amont NO_BRACE Keyword for upwind scheme for VDF or VEF discretizations. In VEF discretization equivalent to generic amont for TRUST version 1.5 or later. The previous upwind scheme can be used with the obsolete in
-// XD_CONT future amont_old keyword.
+// XD convection_amont convection_deriv amont NO_BRACE Keyword for upwind scheme for VDF or VEF discretizations.
+// XD_CONT In VEF discretization equivalent to generic amont for TRUST version 1.5 or later.
+// XD_CONT The previous upwind scheme can be used with the obsolete in future amont_old keyword.
 
 // XD convection_centre convection_deriv centre NO_BRACE For VDF and VEF discretizations.
 
 // XD convection_centre4 convection_deriv centre4 NO_BRACE For VDF and VEF discretizations.
+
 
 Sortie& Operateur_Conv::printOn(Sortie& os) const
 {
