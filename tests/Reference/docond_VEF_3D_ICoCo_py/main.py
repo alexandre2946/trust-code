@@ -19,10 +19,6 @@ import trusticoco as ti
 import medcoupling as mc
 import ParaMEDMEM as pm
 import time
-import gc
-import os
-import mpi4py
-mpi4py.rc.finalize = False
 from mpi4py import MPI
 
 def synchronize_dt(val):
@@ -73,8 +69,9 @@ def initGroupsProblems(file1, file2, procs1, procs2):
     else:
         raise
 
-    pbT = ti.getProblem()
+    pbT = ti.ProblemTrio()
     pbT.name = "TRUST"
+    pbT.deactivate_multiple_runs()
     pbT.setDataFile(data_file)
     pbT.setMPIComm(mpicomm)
     pbT.initialize()
@@ -179,7 +176,7 @@ def validateResolution(ok,pbT):
 def finishAllCorrectly(pbT,dec1,dec2,g1,g2):
     """
     Finish the coupled simulation correctly: terminate both problems, release
-    DECs and MPI groups.
+    DECs, MPI groups and finalize MPI.
     """
     pbT.terminate()
     dec1.release()
@@ -187,6 +184,7 @@ def finishAllCorrectly(pbT,dec1,dec2,g1,g2):
     g1.release()
     g2.release()
     MPI.COMM_WORLD.Barrier()
+    MPI.Finalize()
 
 # THIS IS THE MAIN
 if __name__ == "__main__":
@@ -262,9 +260,6 @@ if __name__ == "__main__":
             # iterate or stop ?
             validateResolution(ok,pbT)
 
-        if stop:
-            break
-
         stat = pbT.isStationary()
         stat = synchronize_bool_and(stat)
 
@@ -274,8 +269,3 @@ if __name__ == "__main__":
 
     # finalize correctly
     finishAllCorrectly(pbT,dec_flux,dec_temperature,dom1_group,dom2_group)
-    del dec_flux, dec_temperature
-    del field_flux, field_temperature
-    del dom1_group, dom2_group, pbT
-    gc.collect()
-    os._exit(0)
