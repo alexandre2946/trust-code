@@ -61,7 +61,8 @@ ProblemTrio::~ProblemTrio()
   p=0;
   delete (my_params);
 
-  TRUST_global_finalize();
+  if (supports_multiple_runs_)
+    TRUST_global_finalize();
 }
 
 ////////////////////////////
@@ -90,6 +91,12 @@ extern "C" Problem* getProblem()
  */
 
 extern void TRUST_set_library_mode(bool);
+
+void ProblemTrio::deactivate_multiple_runs()
+{
+  supports_multiple_runs_ = false;
+  TRUST_set_library_mode(false);
+}
 
 ProblemTrio::ProblemTrio() :
   pb(nullptr), p(nullptr)
@@ -140,9 +147,11 @@ bool ProblemTrio::initialize()
         throw WrongArgument((*my_params).problem_name,"initialize","comm","This process should belong to comm");
 
       Comm_Group_MPI::set_trio_u_world((*my_params).comm);
-      Comm_Group_MPI::set_must_mpi_initialize(false); // ???
-      TRUST_MPI_COMM_SET = true;
+
+      if (supports_multiple_runs_)
+        TRUST_MPI_COMM_SET = true;
     }
+  Comm_Group_MPI::set_must_mpi_initialize(false); // ???
 
 #endif
   int argc=2;
@@ -220,6 +229,12 @@ void ProblemTrio::terminate()
       pb->postraiter(1);
       pb->terminate();
       statistics().end_count(STD_COUNTERS::total_execution_time);
+    }
+
+  if (!supports_multiple_runs_ && p)
+    {
+      delete p;
+      p = 0;
     }
 }
 

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -48,6 +48,7 @@ class ProblemTrio : public Problem
 public :
   // interface specifique
   bool initialize_pb(Probleme_U& pb);
+  void deactivate_multiple_runs();
 
   // interface Problem
   ProblemTrio();
@@ -136,6 +137,7 @@ protected :
   Init_Params* my_params;
   Probleme_U* pb;
   mon_main* p;
+  bool supports_multiple_runs_ = true;
 
 };
 } // namespace ICoCo
