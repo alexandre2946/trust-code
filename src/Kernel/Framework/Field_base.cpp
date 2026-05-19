@@ -233,10 +233,20 @@ int Field_base::order_field() const
 
 int Field_base::nb_vect_comp() const
 {
-  if (is_vectorial())
-    return Objet_U::dimension;
-  else if (nature_==multi_scalaire)
-    return nb_comp();
-  else
-    return 1;
+  switch (nature_)
+    {
+    case scalaire:
+    case multi_scalaire:
+      return nb_compo_;
+    case quadrature_scalaire:
+    case basis_function_order_1_scalar:
+    case basis_function_order_2_scalar:
+      return 1;
+    case vectoriel:
+    case quadrature_vectoriel:
+    case basis_function_order_1_vectorial:
+    case basis_function_order_2_vectorial:
+      return Objet_U::dimension;
+    }
+  return 0;
 }
