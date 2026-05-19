@@ -1,0 +1,27 @@
+Parameters {
+	Title "PAR_Kernel_polygone 2D calculation, renamed into PAR_Kernel_Visit_PRM"
+	Author "fauchet"
+	VersionTrio_U 1.7.3
+ 	TestCase . PAR_Kernel_Visit_PRM.data
+}
+
+Chapter {
+	Title "Visualization via lata" 
+	visu {
+		title "MESH"
+		mesh PAR_Kernel_Visit_PRM.lata dom2
+	}
+	Title "Visualization via med" 
+	description visu fichier med // ne marche pas
+#	visu {
+#		title "MESH"
+#		mesh PAR_Kernel_Visit_PRM_0000.med dom2
+#	}
+	Title "Visualization via lml" 
+	Description "La visu via lml ne correspond pas au maillage !" 
+	visu {
+		title "MESH"
+		mesh PAR_Kernel_Visit_PRM.lml dom2
+	}
+}
+

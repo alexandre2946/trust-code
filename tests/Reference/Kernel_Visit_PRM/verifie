@@ -9,9 +9,9 @@ echo Generation rapport.pdf
 KO=0
 
 PAR=""
-[ -f PAR_Kernel_polygone.lata ] && PAR=PAR_
+[ -f PAR_Kernel_Visit_PRM.lata ] && PAR=PAR_
 
-python $TRUST_ROOT/Validation/Outils/Genere_courbe/src/genererCourbes.py -p ${PAR}Kernel_polygone.prm  1>${PAR}log 2>&1
+python $TRUST_ROOT/Validation/Outils/Genere_courbe/src/genererCourbes.py -p ${PAR}Kernel_Visit_PRM.prm  1>${PAR}log 2>&1
 [ $? -ne 0 ] && KO=1 && cat ${PAR}log
 exit $KO
 
