@@ -9,9 +9,9 @@ cp $DIR/* $proj/build/rapport
 
 cd $proj
 baltik_build_configure -execute
-make check_all_optim validation check_gui #  doxygen 
+make check_all_optim validation
 
-[ $? -ne 0 ] && echo "pb ? make check_all_optim validation check_gui  " && exit
+[ $? -ne 0 ] && echo "pb ? make check_all_optim validation" && exit
 
 
 

@@ -1,15 +1,10 @@
-FILE2=mini_Reference_Manual
 FILE3=mini_prm
 FILE4=mini_jupyter
 
 
-default:  $(FILE2) $(FILE3)
+default:  $(FILE3)
 
 jupyter: $(FILE4)
-
-$(FILE2): $(FILE2).pdf
-$(FILE2).pdf: $(FILE2).tex Makefile 
-	pdflatex -interaction=nonstopmode $(FILE2).tex > LOG
 
 $(FILE3): $(FILE3).pdf
 $(FILE3).pdf: $(FILE3).tex Makefile 

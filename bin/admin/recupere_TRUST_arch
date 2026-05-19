@@ -91,7 +91,6 @@ do
 <TD>lata2</TD>
 <TD>plot2</TD>
 <TD>ICoCo</TD>
-<TD>trioxd</TD>
 <TD>gnuplt</TD>
 <TD>Gmsh</TD>
 <TD>VisIt</TD>
@@ -268,8 +267,6 @@ do
 	BLANC="BGCOLOR=#FEFEFE";ROUGE="BGCOLOR=#C42111";VERT="BGCOLOR=3D\"#E47833\""
 	comp="Echec";COL1=$ROUGE
 	[ "`grep BUILD_EXEC=OK $CR`" != "" ] && comp="Succes" && COL1=$VERT
-    TRIOXDATA="<TD $BLANC>NOT</TD>" && [ "`grep TRIOXDATA:OK $CR`" != "" ] && TRIOXDATA="<TD $VERT>OK</TD>"
-	TRIOXDATA=$TRIOXDATA && [ "`grep TRIOXDATA:error $CR`" != "" ] && TRIOXDATA="<TD $ROUGE>KO</TD>"
 	GNUPLOT="<TD $BLANC>NOT</TD>" && [ "`grep gnuplot:OK $CR`" != "" ] && GNUPLOT="<TD $VERT>OK</TD>"
 	GNUPLOT=$GNUPLOT && [ "`grep gnuplot:error $CR`" != "" ] && GNUPLOT="<TD $ROUGE>KO</TD>"
 	GPU=`grep " Device " $CR | grep -v "Device compiler exited with error" | cut -d: -f 2 | sed "s/^ //" | sed "s/\"//g"`
@@ -397,7 +394,6 @@ $MEDCOUPL
 $LATATOOLS
 $PLOT2D
 $ICOCO
-$TRIOXDATA
 $GNUPLOT
 $GMSH
 $VISIT
@@ -420,7 +416,6 @@ $bench
         echo "
 <TR>
 $TD_CR<A HREF="$CR">$HOST</A>$FTD
-<TD>$vide</TD>
 <TD>$vide</TD>
 <TD>$vide</TD>
 <TD>$vide</TD>

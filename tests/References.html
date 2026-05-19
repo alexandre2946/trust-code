@@ -195,6 +195,7 @@
 <TR><TD><SMALL><A HREF="#Kernel_ExtrudeBord_3D">Kernel_ExtrudeBord_3D</A></TD><TD><SMALL># Exemple d'utilisation du mot cle ExtrudeBord #</TD></TR>
 <TR><TD><SMALL><A HREF="#Kernel_ExtrudeBord_3tetra">Kernel_ExtrudeBord_3tetra</A></TD><TD><SMALL># fichier de creation du canal par extrusion de la face perio #</TD></TR>
 <TR><TD><SMALL><A HREF="#Kernel_Extrusion">Kernel_Extrusion</A></TD><TD><SMALL># Test de l'interprete Extruder sur un maillage triangle #</TD></TR>
+<TR><TD><SMALL><A HREF="#Kernel_Extrusion_64">Kernel_Extrusion_64</A></TD><TD><SMALL># Degenerated upwind case, just to test Extruder_64 #</TD></TR>
 <TR><TD><SMALL><A HREF="#Kernel_Extrusion_en20">Kernel_Extrusion_en20</A></TD><TD><SMALL># Test de l'interprete Extruder avec un prisme decoupe en 3 sur un maillage triangle #</TD></TR>
 <TR><TD><SMALL><A HREF="#Kernel_Extrusion_en3">Kernel_Extrusion_en3</A></TD><TD><SMALL># Test de l'interprete Extruder avec un prisme decoupe en 3 sur un maillage triangle #</TD></TR>
 <TR><TD><SMALL><A HREF="#Kernel_Facteur_forme">Kernel_Facteur_forme</A></TD><TD><SMALL># Ne fait rien d'autre que calculer des facteurs de forme #</TD></TR>
@@ -272,6 +273,7 @@
 <TR><TD><SMALL><A HREF="#PCS">PCS</A></TD><TD><SMALL># Hydraulique 2D pertes de charges singulieres #</TD></TR>
 <TR><TD><SMALL><A HREF="#PCS_med_VEF">PCS_med_VEF</A></TD><TD><SMALL># Perte_Charge_Singuliere MED 3D VEF #</TD></TR>
 <TR><TD><SMALL><A HREF="#PDI_Pb_couple">PDI_Pb_couple</A></TD><TD><SMALL># GPU NOT # # RND in Parser not supported yet on GPU #</TD></TR>
+<TR><TD><SMALL><A HREF="#PDI_different_partition">PDI_different_partition</A></TD><TD><SMALL># Teste la reprise PDI avec une partition de noeud differente de celle de la sauvegarde #</TD></TR>
 <TR><TD><SMALL><A HREF="#PETSC_C-AMG">PETSC_C-AMG</A></TD><TD><SMALL># Hydraulique 2D : Paroi defilante #</TD></TR>
 <TR><TD><SMALL><A HREF="#PETSC_Canal_perio_VEF_3D">PETSC_Canal_perio_VEF_3D</A></TD><TD><SMALL># SIMULATION D UN CANAL 3D #</TD></TR>
 <TR><TD><SMALL><A HREF="#PETSC_DECIDE">PETSC_DECIDE</A></TD><TD><SMALL># Test de PETSC_DECIDE=1 in PETSc solver. Warning, it is slower than PETSC_DECIDE=0 even if it is better load balanced #</TD></TR>
@@ -1117,6 +1119,9 @@
 <HR><CENTER><B><A NAME=Kernel_Extrusion>Kernel_Extrusion</A></B></CENTER>
 <CENTER># Test de l'interprete Extruder sur un maillage triangle #</CENTER>
 <CENTER><a href=../tests/Reference/Kernel_Extrusion/Kernel_Extrusion.data>Edit</a> Kernel_Extrusion.data </CENTER>
+<HR><CENTER><B><A NAME=Kernel_Extrusion_64>Kernel_Extrusion_64</A></B></CENTER>
+<CENTER># Degenerated upwind case, just to test Extruder_64 #</CENTER>
+<CENTER><a href=../tests/Reference/Kernel_Extrusion_64/Kernel_Extrusion_64.data>Edit</a> Kernel_Extrusion_64.data </CENTER>
 <HR><CENTER><B><A NAME=Kernel_Extrusion_en20>Kernel_Extrusion_en20</A></B></CENTER>
 <CENTER># Test de l'interprete Extruder avec un prisme decoupe en 3 sur un maillage triangle #</CENTER>
 <CENTER><a href=../tests/Reference/Kernel_Extrusion_en20/Kernel_Extrusion_en20.data>Edit</a> Kernel_Extrusion_en20.data </CENTER>
@@ -1376,6 +1381,9 @@
 <HR><CENTER><B><A NAME=PDI_Pb_couple>PDI_Pb_couple</A></B></CENTER>
 <CENTER># GPU NOT # # RND in Parser not supported yet on GPU #</CENTER>
 <CENTER><a href=../tests/Reference/PDI_Pb_couple/PDI_Pb_couple.data>Edit</a> PDI_Pb_couple.data </CENTER>
+<HR><CENTER><B><A NAME=PDI_different_partition>PDI_different_partition</A></B></CENTER>
+<CENTER># Teste la reprise PDI avec une partition de noeud differente de celle de la sauvegarde #</CENTER>
+<CENTER><a href=../tests/Reference/PDI_different_partition/PDI_different_partition.data>Edit</a> PDI_different_partition.data </CENTER>
 <HR><CENTER><B><A NAME=PETSC_C-AMG>PETSC_C-AMG</A></B></CENTER>
 <CENTER># Hydraulique 2D : Paroi defilante #</CENTER>
 <CENTER><a href=../tests/Reference/PETSC_C-AMG/PETSC_C-AMG.data>Edit</a> PETSC_C-AMG.data </CENTER>

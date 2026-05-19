@@ -8,6 +8,7 @@
  Array_base Array_base Array_base.h
  ArrOfBit ArrOfBit_32_64 ArrOfBit.h
  Assembleur_base Assembleur_base Assembleur_base.h
+ Assembleur_P_DG Assembleur_P_DG Assembleur_P_DG.h
  Assembleur_P_EF Assembleur_P_EF Assembleur_P_EF.h
  Assembleur_P_PolyMAC_CDO Assembleur_P_PolyMAC_CDO Assembleur_P_PolyMAC_CDO.h
  Assembleur_P_PolyMAC_HFV Assembleur_P_PolyMAC_HFV Assembleur_P_PolyMAC_HFV.h
@@ -53,7 +54,7 @@
  Champ_Elem_PolyMAC_HFV Champ_Elem_PolyMAC_HFV Champ_Elem_PolyMAC_HFV.h
  Champ_Elem_PolyMAC_MPFA Champ_Elem_PolyMAC_MPFA Champ_Elem_PolyMAC_MPFA.h
  Champ_Face_base Champ_Face_base Champ_Face_base.h
- Champ_Face_PolyMAC_CDO Champ_Face_PolyMAC_CDO Champ_Face_PolyMAC_CDO.h
+ Champ_Face_PolyMAC_CDO|Champ_Face_PolyMAC Champ_Face_PolyMAC_CDO Champ_Face_PolyMAC_CDO.h
  Champ_Face_PolyMAC_HFV Champ_Face_PolyMAC_HFV Champ_Face_PolyMAC_HFV.h
  Champ_Face_PolyMAC_MPFA Champ_Face_PolyMAC_MPFA Champ_Face_PolyMAC_MPFA.h
  Champ_Face|Champ_Face_VDF Champ_Face_VDF Champ_Face_VDF.h
@@ -80,7 +81,6 @@
  Champ_Fonc_P0_VEF Champ_Fonc_P0_VEF Champ_Fonc_P0_VEF.h
  Champ_Fonc_P1NC Champ_Fonc_P1NC Champ_Fonc_P1NC.h
  Champ_Fonc_P1_base Champ_Fonc_P1_base Champ_Fonc_P1_base.h
- Champ_Fonc_P1_DG Champ_Fonc_P1_DG Champ_Fonc_P1_DG.h
  Champ_Fonc_P1_EF Champ_Fonc_P1_EF Champ_Fonc_P1_EF.h
  Champ_Fonc_P1_isoP1Bulle Champ_Fonc_P1_isoP1Bulle Champ_Fonc_P1_isoP1Bulle.h
  Champ_Fonc_P1_MED Champ_Fonc_P1_MED Champ_Fonc_P1_MED.h
@@ -92,6 +92,7 @@
  Champ_Fonc_Q1_MED Champ_Fonc_Q1_MED Champ_Fonc_Q1_MED.h
  Champ_Fonc_Q1_VDF Champ_Fonc_Q1_VDF Champ_Fonc_Q1_VDF.h
  Champ_Fonc_Q1_VEF Champ_Fonc_Q1_VEF Champ_Fonc_Q1_VEF.h
+ Champ_Fonc_Quad_DG Champ_Fonc_Quad_DG Champ_Fonc_Quad_DG.h
  Champ_Fonc_reprise Champ_Fonc_reprise Champ_Fonc_reprise.h
  Champ_Fonc_Som_PolyMAC_CDO Champ_Fonc_Som_PolyMAC_CDO Champ_Fonc_Som_PolyMAC_CDO.h
  Champ_Fonc_t Champ_Fonc_t Champ_Fonc_t.h
@@ -391,7 +392,7 @@
  Extraire_surface Extraire_surface Extraire_surface.h
  ExtrudeBord ExtrudeBord ExtrudeBord.h
  ExtrudeParoi ExtrudeParoi ExtrudeParoi.h
- Extruder Extruder Extruder.h
+ Extruder Extruder_32_64 Extruder.h
  Extruder_en20 Extruder_en20 Extruder_en20.h
  Extruder_en3 Extruder_en3 Extruder_en3.h
  Faces Faces_32_64 Faces.h
@@ -723,6 +724,7 @@
  Option_PolyMAC_family|Option_PolyMAC Option_PolyMAC_family Option_PolyMAC_family.h
  Option_VDF Option_VDF Option_VDF.h
  Op_Conv_AmontNew_VEF_P1NC Op_Conv_AmontNew_VEF_Face Op_Conv_AmontNew_VEF_Face.h
+ Op_Conv_Amont_DG_Elem Op_Conv_Amont_DG_Elem Op_Conv_EF_Stab_DG_Elem.h
  Op_Conv_Amont_old_VEF_P1NC Op_Conv_Amont_old_VEF_Face Op_Conv_Amont_old_VEF_Face.h
  Op_Conv_Amont_PolyMAC_CDO_Elem Op_Conv_Amont_PolyMAC_CDO_Elem Op_Conv_Amont_PolyMAC_CDO_Elem.h
  Op_Conv_Amont_PolyMAC_CDO_Face Op_Conv_Amont_PolyMAC_CDO_Face Op_Conv_EF_Stab_PolyMAC_CDO_Face.h
@@ -737,6 +739,7 @@
  Op_Conv_Centre4_VDF_Face Op_Conv_Centre4_VDF_Face Op_Conv_VDF_Face_leaves.h
  Op_Conv_Centre4_VDF_P0_VDF Op_Conv_Centre4_VDF_Elem Op_Conv_VDF_Elem_leaves.h
  Op_Conv_Centre4_VEF_P1NC OpVEF_Centre4 OpVEF_Centre4.h
+ Op_Conv_Centre_DG_Elem Op_Conv_Centre_DG_Elem Op_Conv_EF_Stab_DG_Elem.h
  Op_Conv_Centre_EF_VEF_P1NC Op_Conv_Centre_EF_VEF_Face Op_Conv_Centre_EF_VEF_Face.h
  Op_Conv_Centre_old_VEF_P1NC Op_Conv_Centre_old_VEF_Face Op_Conv_Centre_old_VEF_Face.h
  Op_Conv_Centre_PolyMAC_CDO_Elem_PolyMAC_CDO Op_Conv_Centre_PolyMAC_CDO_Elem Op_Conv_Centre_PolyMAC_CDO_Elem.h
@@ -751,8 +754,10 @@
  Op_Conv_Coloc_Elem_base Op_Conv_Coloc_Elem_base Op_Conv_Coloc_Elem_base.h
  Op_Conv_Coloc_Vect_base Op_Conv_Coloc_Vect_base Op_Conv_Coloc_Vect_base.h
  Op_Conv_Conserve_Ec_VEF_P1NC Op_Conv_Vort_VEF_Face Op_Conv_Vort_VEF_Face.h
+ Op_Conv_DG_base Op_Conv_DG_base Op_Conv_DG_base.h
  Op_Conv_DI_L2_VEF_P1NC Op_Conv_DI_L2_VEF_Face Op_Conv_DI_L2_VEF_Face.h
  Op_Conv_EF_base Op_Conv_EF_base Op_Conv_EF_base.h
+ Op_Conv_EF_Stab_DG_Elem Op_Conv_EF_Stab_DG_Elem Op_Conv_EF_Stab_DG_Elem.h
  Op_Conv_EF_Stab_PolyMAC_CDO_Face Op_Conv_EF_Stab_PolyMAC_CDO_Face Op_Conv_EF_Stab_PolyMAC_CDO_Face.h
  Op_Conv_EF_Stab_PolyMAC_HFV_Elem|Op_Conv_EF_Stab_PolyMAC_MPFA_Elem Op_Conv_EF_Stab_PolyMAC_HFV_Elem Op_Conv_EF_Stab_PolyMAC_HFV_Elem.h
  Op_Conv_EF_Stab_PolyMAC_HFV_Face Op_Conv_EF_Stab_PolyMAC_HFV_Face Op_Conv_EF_Stab_PolyMAC_HFV_Face.h
@@ -849,6 +854,7 @@
  Op_Dift_VEF_P1NC_stab Op_Dift_Stab_VEF_Face Op_Dift_Stab_VEF_Face.h
  Op_Dift_VEF_P1NC_standard Op_Dift_standard_VEF_Face Op_Dift_standard_VEF_Face.h
  Op_Dift_VEF_Q1NC Op_Dift_VEF_Face_Q1 Op_Dift_VEF_Face_Q1.h
+ Op_Div_DG Op_Div_DG Op_Div_DG.h
  Op_Div_EF Op_Div_EF Op_Div_EF.h
  Op_Div_PolyMAC_CDO Op_Div_PolyMAC_CDO Op_Div_PolyMAC_CDO.h
  Op_Div_PolyMAC_HFV Op_Div_PolyMAC_HFV Op_Div_PolyMAC_HFV.h
@@ -864,6 +870,7 @@
  Op_Evanescence_HOMOGENE_PolyMAC_MPFA_Face Op_Evanescence_Homogene_PolyMAC_MPFA_Face Op_Evanescence_Homogene_PolyMAC_MPFA_Face.h
  Op_Evanescence_Homogene_VDF_Elem Op_Evanescence_Homogene_VDF_Elem Op_Evanescence_Homogene_VDF_Elem.h
  Op_Evanescence_HOMOGENE_VDF_Face Op_Evanescence_Homogene_VDF_Face Op_Evanescence_Homogene_VDF_Face.h
+ Op_Grad_DG Op_Grad_DG Op_Grad_DG.h
  Op_Grad_EF Op_Grad_EF Op_Grad_EF.h
  Op_Grad_P0_to_Face Op_Grad_P0_to_Face Op_Grad_P0_to_Face.h
  Op_Grad_P1NC_to_P0 Op_Grad_P1NC_to_P0 Op_Grad_P1NC_to_P0.h
@@ -1255,6 +1262,7 @@
  Source_QC_Gravite_VEF Source_QC_Gravite_VEF Source_QC_Gravite_VEF.h
  Source_QC_QDM_Gen_QC Source_QC_QDM_Gen Source_QC_QDM_Gen.h
  Source_Qdm_EF Source_Qdm_EF Source_Qdm_EF.h
+ Source_Qdm_Elem_DG Terme_Source_Qdm_Elem_DG Terme_Source_Qdm_Elem_DG.h
  Source_Qdm_face_PolyMAC_CDO Terme_Source_Qdm_Face_PolyMAC_CDO Terme_Source_Qdm_Face_PolyMAC_CDO.h
  Source_Qdm_face_PolyMAC_HFV|Source_Qdm_face_PolyMAC_MPFA Terme_Source_Qdm_Face_PolyMAC_HFV Terme_Source_Qdm_Face_PolyMAC_HFV.h
  Source_Qdm_lambdaup_VEF_P1NC Terme_Source_Qdm_lambdaup_VEF_Face Terme_Source_Qdm_lambdaup_VEF_Face.h
@@ -1273,6 +1281,7 @@
  Source_WC_Gravite_VDF Source_WC_Gravite_VDF Source_WC_Gravite_VDF.h
  Source_WC_Gravite_VEF Source_WC_Gravite_VEF Source_WC_Gravite_VEF.h
  Sous_Domaine Sous_Domaine_32_64 Sous_Domaine.h
+ Sous_Domaines Sous_Domaines Sous_Domaines.h
  Sous_domaine_dis_base Sous_domaine_dis_base Sous_domaine_dis_base.h
  Sous_domaine_VF Sous_domaine_VF Sous_domaine_VF.h
  SSOR SSOR SSOR.h

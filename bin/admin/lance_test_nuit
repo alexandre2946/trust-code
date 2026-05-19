@@ -120,17 +120,11 @@ check_components()
             if [ $* != tuleap/Kernel ] && [ "$COMPOSANT_BUILD_OK" = 1 ] 
             then
                echo " "
-               # Pas de check_gui sur baltiks sans XD
-               make gui 1>$Gui_log 2>&1 && echo $Composant"_Reference_Manual.pdf OK" && DOC_PDF_OK=1
-               [ "$DOC_PDF_OK" = 1 ] && make trustify_check 1>>$Gui_log 2>&1
+               make trustify_check 1>>$Gui_log 2>&1
                grep "Error" $Gui_log
                [ "`grep "Error" $Gui_log`" != "" ] && DOC_PDF_OK=0 && echo DOC_PDF_OK=0
                if [[ "$ComposantsOfficial" = *"$Composant"* ]] || [[ "$ComposantsLns" = *"$Composant"* ]] # Test si Composant n est pas dans la liste des composants Beta
                then
-                  if [ "$Composant" != Test_Baltik ] && [ "$Composant" != "mpcube" ] && [ "$Composant" != "TRUST_NK" ] && [ "$Composant" != "sides" ] && [ "$Composant" != "scorpio" ] && [ "$Composant" != "sympy_to_TRUST" ] && [ "$Composant" != "pemfc" ] && [ "$Composant" != "triomc" ] && [ "$Composant" != "mathys" ]
-                  then
-                     ([ "`date '+%u'`" -gt 5 ] || ([ "`date '+%u'`" = 5 ] && [ `date '+%H'` -gt 17 ])) && make check_gui 1>>$Gui_log 2>&1 &
-                  fi
                   if [ "$Composant" != "triomc" ] && [ "$Composant" != "mathys" ]
                   then
                      make doxygen 1>$Doc_log 2>&1
@@ -1053,7 +1047,7 @@ echo "###############################################"
               fi
            done
            cd $TRUST_ROOT
-           git commit doc/.dico Outils/TRIOXDATA/XTriou/syno.py -m"Commit in Kernel before git rebase TMA" --u=no 1>>$rebase_log 2>&1
+           git commit doc/.dico -m"Commit in Kernel before git rebase TMA" --u=no 1>>$rebase_log 2>&1
            git rebase Livraison 1>>$rebase_log 2>&1
            rebase_error=$?
            if [ $rebase_error != 0 ]

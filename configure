@@ -265,7 +265,6 @@ echo " "
 echo -e "\033[1m\033[4mCompilation options/flags\033[0m"
 echo " "
 echo "   -force_even_unsupported           Force the configure even the compiler/OS is not supported."
-echo "   -std=c++14                        Force the use of C++14 (else: C++17)."
 echo "   -c++=<prog>                       Force the use of a specified C++ compiler. For clang for example: -c++=clang++"
 echo "   -cc=<prog>                        Force the use of a specified C compiler. For clang for example: -cc=clang"
 echo "   -fc=<prog>                        Force the use of a specified Fortran compiler."
@@ -467,7 +466,6 @@ do
    elif [ "${1#-std=}" != "$1" ]
    then
       export TRUST_FORCE_STDCPP=${1#-std=}
-      [ "$TRUST_FORCE_STDCPP" = c++14 ] && TRUST_USE_KOKKOS_SIMD=0
 
    elif [ "${1#-c++=}" != "$1" ]
    then
@@ -1117,8 +1115,6 @@ then
    echo $ECHO_OPTS "ctest_rerun_failed_optim:\n\t(source ./env_TRUST.sh && env CTEST_OPTS=\"--rerun-failed\" lance_test -ctest \${exec_opt})" >> $TRUST_ROOT/Makefile
    echo $ECHO_OPTS "ctest_rerun_failed_semi_opt:\n\t(source ./env_TRUST.sh && env CTEST_OPTS=\"--rerun-failed\" lance_test -ctest \${exec_semi_opt})" >> $TRUST_ROOT/Makefile
    echo $ECHO_OPTS "ctest_rerun_failed_semi_optim:\t ctest_rerun_failed_semi_opt"  >> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "gui:\n\t(source ./env_TRUST.sh && cd Outils/TRIOXDATA && ./Install_all)" >> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "check_gui:\n\t(source ./env_TRUST.sh && cd Outils/TRIOXDATA && ./check_jdd)" >> $TRUST_ROOT/Makefile
    echo $ECHO_OPTS "check_perf:\n\t(source ./env_TRUST.sh && compare_TU)" >> $TRUST_ROOT/Makefile
    [ "${#ECHO_OPTS}" = 0 ] && echo "Error: Check "$TRUST_ROOT"/Makefile !!! (ECHO_OPTS="$ECHO_OPTS")" && exit -1
    ##################################

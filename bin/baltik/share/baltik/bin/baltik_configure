@@ -681,22 +681,6 @@ printf "\t@echo \"########################\"\n"                 >> $project_make
 printf "\t@env TRUST_ROOT_ORG=$TRUST_ROOT $BALTIK_ROOT/bin/baltik_make_distrib -git $distrib_path\n"                     >> $project_makefile
 printf "\n"                                                     >> $project_makefile
 
-printf "# help gui \t\t: Building gui (XDATA compilation) \n" >> $project_makefile
-printf "gui : optim\n"                                              >> $project_makefile
-printf "\t@echo \"########################\"\n"                 >> $project_makefile
-printf "\t@echo \"# building gui         #\"\n"                 >> $project_makefile
-printf "\t@echo \"########################\"\n"                 >> $project_makefile
-printf "\t@source $env_file; env TRUST_ROOT_ORG=$TRUST_ROOT project_name=$project_name $BALTIK_ROOT/bin/baltik_make_xdata\n"                >> $project_makefile
-printf "\n"                                                     >> $project_makefile
-
-printf "# help check_gui \t: Checking gui (XDATA validation)\n" >> $project_makefile
-printf "check_gui : gui\n"                                              >> $project_makefile
-printf "\t@echo \"########################\"\n"                 >> $project_makefile
-printf "\t@echo \"# Checking gui         #\"\n"                 >> $project_makefile
-printf "\t@echo \"########################\"\n"                 >> $project_makefile
-printf "\t@source $env_file; check_jdd \$(OPTIONS_GUI)\n"                       >> $project_makefile
-printf "\n"                                                     >> $project_makefile
-
 printf "# help check_perf \t: Checking performance\n" >> $project_makefile
 printf "check_perf : optim\n"                                              >> $project_makefile
 printf "\t@echo \"########################\"\n"                 >> $project_makefile
@@ -796,7 +780,7 @@ do
  phony="$phony check_$type $type"
 done
 [  "$swig" = "1" ] && phony="$phony swig_optim swig_debug swig_semi_optim swig_ctest"
-printf ".PHONY : $phony validation clean distrib install gui terminal\n"   >> $project_makefile
+printf ".PHONY : $phony validation clean distrib install terminal\n"   >> $project_makefile
 
 echo "Done."
 echo ""
