@@ -113,9 +113,14 @@ class ICoCoValueType(object):
     Int = ValueType_Int
     String = ValueType_String
     
+_ProblemTrio_setMPIComm_swig = ProblemTrio.setMPIComm
+
 def _setMPIComm_internal(self, com):
     from mpi4py import MPI
-    self._setMPIComm_cpp(MPI._addressof(com))
+    if isinstance(com, MPI.Comm):
+        self._setMPIComm_cpp(MPI._addressof(com))
+    else:
+        _ProblemTrio_setMPIComm_swig(self, com)
     
 ProblemTrio.setMPIComm = _setMPIComm_internal
     
