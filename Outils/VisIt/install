@@ -76,12 +76,13 @@ then
    # Sur Ubuntu 22, je rebascule sur 3_3_2 car fonctionne mieux sur les nouveaux portables que la 3_3_3
    [ "`grep 'Ubuntu 22'    /etc/issue 2>/dev/null`" != "" ]                     && os=ubuntu20 && version=3_3_2
    [ "`grep 'Ubuntu 24'    /etc/issue 2>/dev/null`" != "" ]                     && os=ubuntu20 && version=3_3_2
+   [ "`grep 'Ubuntu 26'    /etc/issue 2>/dev/null`" != "" ]                     && os=ubuntu20 && version=3_3_2
    [ "`grep 'Debian GNU/Linux 9'  /etc/issue.net 2>/dev/null`" != "" ]          && os=debian9 && version=3_1_1
    [ "`grep 'Debian GNU/Linux 10' /etc/issue.net 2>/dev/null`" != "" ]          && os=debian10 && version=3_1_3
    [ "`grep 'Debian GNU/Linux 11' /etc/issue.net 2>/dev/null`" != "" ]          && os=debian11 && version=3_3_3
    [ "`grep 'Debian GNU/Linux 12' /etc/issue.net 2>/dev/null`" != "" ]          && os=debian11 && version=3_3_3
    [ "`grep 'Debian GNU/Linux 13' /etc/issue.net 2>/dev/null`" != "" ]  	&& os=debian12 && version=3_4_2  && TRUST_DOWNLOAD_VISIT=1 # Binaire marche meme avec OpenMPI 5.0.5
-   [ "`grep 'Debian GNU/Linux forky/sid' /etc/issue.net 2>/dev/null`" != "" ] 	&& os=debian12 && version=3_4_2
+   [ "`grep 'Debian GNU/Linux forky/sid' /etc/issue.net 2>/dev/null`" != "" ] 	&& os=debian12 && version=3_5_0
    [ "`grep 'CentOS Linux release 8' /etc/centos-release 2>/dev/null`" != "" ] 	&& os=centos8 && version=3_1_1
    [ "`grep 'Rocky Linux release 8' /etc/centos-release 2>/dev/null`" != "" ]   && os=centos8 && version=3_1_1
    [ "`grep 'Rocky Linux 9' /etc/os-release 2>/dev/null`" != "" ]   		&& os=rocky9 && version=3_4_2
