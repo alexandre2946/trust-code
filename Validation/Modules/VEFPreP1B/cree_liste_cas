@@ -1,3 +1,0 @@
-#!/bin/bash
-cherche.ksh VEFPreP1B@dis cholesky 1>/dev/null
-mv -f liste_cherche liste_cas

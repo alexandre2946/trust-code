@@ -1,3 +1,0 @@
-#!/bin/bash
-cherche.ksh solveur_pression@cholesky 1>/dev/null
-mv liste_cherche liste_cas

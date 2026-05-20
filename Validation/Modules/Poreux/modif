@@ -1,9 +1,0 @@
-#!/bin/bash
-
-echo "iiiiiiiiiiiiii" $1
-cas=`basename $1 .data`
-. $(which IHMTRIO.sh)
-export PYTHONPATH=`dirname $0`:$PYTHONPATH
-python `dirname $0`/modif.py $cas  >modif.log
-#mv $1 org_$1
-mv mod_$1 Poreux_$1
