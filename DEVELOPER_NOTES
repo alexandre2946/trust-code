@@ -1,6 +1,7 @@
 -------------------------------------------------------------
 Developer notes version 1.9.8_beta : Changes since version 1.9.7 :
 -------------------------------------------------------------
+18/05/26 (TRUST) Minor change : gui and check_gui targets in baltiks Makefile are removed. Use make trustify and make trustify_check instead.
 27/04/26 (TRUST) New feature  : XD comments in the C++ code can now be written on several lines: use the tag 'XD_CONT' at the begining of the line for this.
 27/04/26 (TRUST) trustify     : trustify unit tests are now passed everytime the tool trustify is built.
 23/04/26 (TRUST) Change       : Objet_U_ptr and OWN_PTR forbid direct use of `ptr.le_nom` and `nommer`. Use ptr->le_nom instead. Check ptr.non_nul() before if needed.
