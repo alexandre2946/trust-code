@@ -215,8 +215,8 @@ void Op_Diff_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const ta
   tableau_trier_retirer_doublons(stencil);
   const double face_t = static_cast<double>(domaine.md_vector_faces()->nb_items_seq_tot()),
                elem_t = static_cast<double>(domaine.domaine().md_vector_elements()->nb_items_seq_tot());
-  const double width = mp_sum_as_double(stencil.dimension(0)) / (N * (face_t + D * elem_t));
 #ifndef TRUST_USE_GPU
+  const double width = mp_sum_as_double(stencil.dimension(0)) / (N * (face_t + D * elem_t));
   const double perc = mp_somme_vect_as_double(tpfa) * 100. / (N * face_t);
   Cerr << "width " << width << " " << perc  << "% TPFA " << finl;
 #endif
