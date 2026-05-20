@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -23,7 +23,7 @@
 #include <Synonyme_info.h>
 
 
-extern double calculer_coef_som(True_int elem, True_int dimension, True_int& nb_face_diri, True_int* indice_diri);
+extern double calculer_coef_som(int elem, int dimension, int& nb_face_diri, int* indice_diri);
 
 Implemente_instanciable(Terme_Boussinesq_VEFPreP1B_Face,"Boussinesq_VEFPreP1B_P1NC",Terme_Boussinesq_VEF_Face);
 Add_synonym(Terme_Boussinesq_VEFPreP1B_Face,"Boussinesq_temperature_VEFPreP1B_P1NC");
@@ -200,12 +200,12 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& tab_resu) const
                          const int elem)
   {
     /*
-        True_int nb_face_diri = 0;
-        True_int indice_diri[4];
+        int nb_face_diri = 0;
+        int indice_diri[4];
         if (modif_traitement_diri)
           {
-            True_int rang_elem = (True_int) rang_elem_non_std(elem);
-            True_int type_elem = rang_elem < 0 ? 0 : (True_int) type_elem_Cl(rang_elem);
+            int rang_elem = (int) rang_elem_non_std(elem);
+            int type_elem = rang_elem < 0 ? 0 : (int) type_elem_Cl(rang_elem);
             calculer_coef_som(type_elem, dim, nb_face_diri, indice_diri);
           } */
 

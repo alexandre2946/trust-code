@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -33,7 +33,7 @@ public :
   PNode* left;
   PNode* right;
   int type;
-  True_int value;
+  int value;
   double nvalue = -100.;
 
   PNode();
@@ -49,7 +49,7 @@ public :
   int left;
   int right;
   int type;
-  True_int value;
+  int value;
   double nvalue = -100.;
 
 //    PNodePod();

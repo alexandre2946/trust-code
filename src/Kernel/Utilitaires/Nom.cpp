@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -81,7 +81,7 @@ Nom::Nom(char c)
  *
  * @param (int i) l'entier a utiliser
  */
-Nom::Nom(True_int i)
+Nom::Nom(int i)
 {
   nom_ = "";
   // 22 caracteres suffisent pour stocker n'importe quel entier

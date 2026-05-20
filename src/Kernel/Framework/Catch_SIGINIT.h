@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -24,7 +24,7 @@
 class Catch_SIGINIT
 {
 public:
-  static void signal_callback_handler(True_int signum);
+  static void signal_callback_handler(int signum);
   inline void set_nom_cas_pour_signal(const Nom& cas) { NOM_DU_CAS_ = cas ; }
 
 protected:

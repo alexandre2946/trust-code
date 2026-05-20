@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -157,7 +157,7 @@ void read_med_field_names(const Nom& nom_fic, Noms& noms_chps, ArrOfDouble& temp
 #if defined(MEDCOUPLING_) && defined(MED_)
   using namespace std;
   using namespace MEDCoupling;
-  using MCTimeLabel = pair< pair<True_int,True_int>, double>;
+  using MCTimeLabel = pair< pair<int,int>, double>;
   const string fnam(nom_fic.getString());
 
   vector<string> nams(GetAllFieldNames(fnam));

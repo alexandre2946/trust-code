@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -49,14 +49,14 @@ template<typename T> void TablePrinter::OutputDecimalNumber(T input)
 {
 
   // determine what precision we need
-  True_int precision = column_widths_.at(j_) - 1; // leave room for the decimal point
+  int precision = column_widths_.at(j_) - 1; // leave room for the decimal point
   if (input < 0)
     --precision; // leave room for the minus sign
 
   // leave room for digits before the decimal?
   if (input < -1 || input > 1)
     {
-      True_int num_digits_before_decimal = 1 + (True_int)log10(std::abs(input));
+      int num_digits_before_decimal = 1 + (int)log10(std::abs(input));
       precision -= num_digits_before_decimal;
     }
   else

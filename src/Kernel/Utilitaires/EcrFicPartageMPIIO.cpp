@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -26,7 +26,7 @@ Implemente_instanciable_sans_constructeur_ni_destructeur(EcrFicPartageMPIIO,"Ecr
 static void handle_error(int errcode, const char *str)
 {
   char msg[MPI_MAX_ERROR_STRING];
-  True_int resultlen;
+  int resultlen;
   MPI_Error_string(errcode, msg, &resultlen);
   Cerr << "======================" << finl;
   Cerr << str << ": " << msg << finl;
@@ -142,7 +142,7 @@ void EcrFicPartageMPIIO::write(MPI_Datatype MPI_TYPE, const void* ob)
     {
       if (MPI_TYPE == MPI_INT)
         {
-          l_val = *(static_cast<const True_int *>(ob)); // upcast
+          l_val = *(static_cast<const int *>(ob)); // upcast
           MPI_TYPE2 = MPI_LONG;
           ob2 = &l_val;
 
@@ -156,7 +156,7 @@ void EcrFicPartageMPIIO::write(MPI_Datatype MPI_TYPE, const void* ob)
       else
         Process::exit("EcrFicPartageMPIIO::write() -- Unexpected type!!");
     }
-  True_int size;
+  int size;
   MPI_Type_size(MPI_TYPE2, &size);
   MPI_File_write(mpi_file_, ob2, 1, MPI_TYPE2, &mpi_status_);
   disp_+=size;
@@ -199,7 +199,7 @@ Sortie& EcrFicPartageMPIIO::operator <<(const std::string& str)
   return (*this) << str.c_str();
 }
 
-Sortie& EcrFicPartageMPIIO::operator <<(const True_int ob)
+Sortie& EcrFicPartageMPIIO::operator <<(const int ob)
 {
   if (bin_)
     write(MPI_INT, &ob);
@@ -269,42 +269,42 @@ Sortie& EcrFicPartageMPIIO::operator <<(const Objet_U& ob)
 
 int EcrFicPartageMPIIO::put(const unsigned* ob, std::streamsize n, std::streamsize pas)
 {
-  assert(n < std::numeric_limits<True_int>::max());
+  assert(n < std::numeric_limits<int>::max());
   if (is_64b_)
     Process::exit("EcrFicPartageMPIIO::put() not implemented for cross bitness (writing 'int' in a 64b file for example!");
-  return put(MPI_UNSIGNED, ob, (True_int)n);
+  return put(MPI_UNSIGNED, ob, (int)n);
 }
 
-int EcrFicPartageMPIIO::put(const True_int* ob, std::streamsize n, std::streamsize pas)
+int EcrFicPartageMPIIO::put(const int* ob, std::streamsize n, std::streamsize pas)
 {
-  assert(n < std::numeric_limits<True_int>::max());
+  assert(n < std::numeric_limits<int>::max());
   if (is_64b_)
     Process::exit("EcrFicPartageMPIIO::put() not implemented for cross bitness (writing 'int' in a 64b file for example!");
-  return put(MPI_INT, ob, (True_int)n);
+  return put(MPI_INT, ob, (int)n);
 }
 
 int EcrFicPartageMPIIO::put(const long* ob, std::streamsize n, std::streamsize pas)
 {
-  assert(n < std::numeric_limits<True_int>::max());
-  return put(MPI_LONG, ob, (True_int)n);
+  assert(n < std::numeric_limits<int>::max());
+  return put(MPI_LONG, ob, (int)n);
 }
 
 int EcrFicPartageMPIIO::put(const long long* ob, std::streamsize n, std::streamsize pas)
 {
-  assert(n < std::numeric_limits<True_int>::max());
-  return put(MPI_LONG_LONG, ob, (True_int)n);
+  assert(n < std::numeric_limits<int>::max());
+  return put(MPI_LONG_LONG, ob, (int)n);
 }
 
 int EcrFicPartageMPIIO::put(const float* ob, std::streamsize n, std::streamsize pas)
 {
-  assert(n < std::numeric_limits<True_int>::max());
-  return put(MPI_FLOAT, ob, (True_int)n);
+  assert(n < std::numeric_limits<int>::max());
+  return put(MPI_FLOAT, ob, (int)n);
 }
 
 int EcrFicPartageMPIIO::put(const double* ob, std::streamsize n, std::streamsize pas)
 {
-  assert(n < std::numeric_limits<True_int>::max());
-  return put(MPI_DOUBLE, ob, (True_int)n);
+  assert(n < std::numeric_limits<int>::max());
+  return put(MPI_DOUBLE, ob, (int)n);
 }
 
 
@@ -322,7 +322,7 @@ int EcrFicPartageMPIIO::put(MPI_Datatype MPI_TYPE, const void* ob, int n)
 {
   MPI_Datatype etype;
   etype=MPI_TYPE;
-  True_int sizeof_etype;
+  int sizeof_etype;
   MPI_Type_size(etype,&sizeof_etype);
 
   // filetype is n etype contigous:

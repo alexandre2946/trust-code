@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -32,7 +32,7 @@ class Nom : public Objet_U
   Declare_instanciable_sans_constructeur_ni_destructeur(Nom);
 public:
   Nom();                                         // construit "??"
-  Nom(True_int i);                                // Nom(485)="485"
+  Nom(int i);                                // Nom(485)="485"
   Nom(long i);                                    // Nom(485)="485"
   Nom(long long i);                                    // Nom(485)="485"
   Nom(const char* nom);

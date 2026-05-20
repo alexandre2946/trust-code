@@ -101,7 +101,7 @@ void Partitionneur_Fichier_MED::construire_partition(IntVect& elem_part, int& nb
     {
       // Lecture d'une partition exacte du domaine donnee par un champ d'entiers
       DataArrayInt32 *da = field->getArray();
-      const True_int *field_values = da->begin();
+      const int *field_values = da->begin();
 
       const mcIdType sz0 = field->getNumberOfTuplesExpected();
       assert(sz0 < std::numeric_limits<int>::max());

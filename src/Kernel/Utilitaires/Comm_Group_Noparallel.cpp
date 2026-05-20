@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -107,7 +107,7 @@ void Comm_Group_Noparallel::all_gather(const void *src_buffer, void *dest_buffer
   memcpy(dest_buffer, src_buffer, data_size);
 }
 
-void Comm_Group_Noparallel::all_gatherv(const void *src_buffer, void *dest_buffer, int send_size, const True_int* recv_size, const True_int* displs) const
+void Comm_Group_Noparallel::all_gatherv(const void *src_buffer, void *dest_buffer, int send_size, const int* recv_size, const int* displs) const
 {
   memcpy(dest_buffer, src_buffer, recv_size[0]);
 }

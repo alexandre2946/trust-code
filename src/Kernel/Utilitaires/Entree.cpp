@@ -160,11 +160,11 @@ void error_convert(const char * s, const char * type)
 /*! @brief methode de conversion
  *
  */
-void convert_to(const char *s, True_int& ob)
+void convert_to(const char *s, int& ob)
 {
   errno = 0;
   char * errorptr = 0;
-  ob = (True_int)strtol(s, &errorptr, 0 /* base 10 par defaut */);
+  ob = (int)strtol(s, &errorptr, 0 /* base 10 par defaut */);
   if (errno || *errorptr != 0) error_convert(s,"int");
 }
 
@@ -218,8 +218,8 @@ Entree& Entree::operator>>(double& ob) { return operator_template<double>(ob); }
 // methode virtuelle pour lire un tableau d'ints ou reels (le tableau doit avoir la bonne dimension: attention pas de verification possible)
 int Entree::get(double * ob, std::streamsize n) { return get_template<double>(ob,n); }
 
-Entree& Entree::operator>>(True_int& ob) { return operator_template<True_int>(ob); }
-int Entree::get(True_int * ob, std::streamsize n) { return get_template<True_int>(ob,n); }
+Entree& Entree::operator>>(int& ob) { return operator_template<int>(ob); }
+int Entree::get(int * ob, std::streamsize n) { return get_template<int>(ob,n); }
 
 Entree& Entree::operator>>(float& ob) { return operator_template<float>(ob); }
 int Entree::get(float * ob, std::streamsize n) { return get_template<float>(ob,n); }
@@ -446,7 +446,7 @@ int Entree::get_template(_TYPE_ *ob, std::streamsize n)
 }
 
 // Explicit instanciations:
-template int Entree::get_template(True_int *ob, std::streamsize n);
+template int Entree::get_template(int *ob, std::streamsize n);
 template int Entree::get_template(long *ob, std::streamsize n);
 template int Entree::get_template(long long *ob, std::streamsize n);
 template int Entree::get_template(double *ob, std::streamsize n);
@@ -477,12 +477,12 @@ Entree& Entree::operator_template(_TYPE_& ob)
               // It's ok, we passed the check above, we can safely downcast:
               ob = static_cast<_TYPE_>(pr);
             }
-          // Case 2: requested _TYPE_ is 64b and file is 32b -> this is always OK, just need True_int to make sure we really read a 32b value
+          // Case 2: requested _TYPE_ is 64b and file is 32b -> this is always OK, just need int to make sure we really read a 32b value
           else
             {
-              True_int pr;
+              int pr;
               char * ptr = (char*) &pr;
-              istream_->read(ptr, sizeof(True_int));
+              istream_->read(ptr, sizeof(int));
               ob=(_TYPE_)pr;
             }
         }
@@ -512,7 +512,7 @@ Entree& Entree::operator_template(_TYPE_& ob)
 }
 
 // Explicit instanciations:
-template Entree& Entree::operator_template(True_int& ob);
+template Entree& Entree::operator_template(int& ob);
 template Entree& Entree::operator_template(long& ob);
 template Entree& Entree::operator_template(long long& ob);
 template Entree& Entree::operator_template(double& ob);

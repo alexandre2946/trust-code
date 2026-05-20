@@ -41,7 +41,7 @@ int exec_cmd_and_get_output(const char* cmd, std::string& result)
 }
 
 static bool crit_err_hdlr_done = false;
-void crit_err_hdlr(True_int sig_num, siginfo_t * info, void * ucontext)
+void crit_err_hdlr(int sig_num, siginfo_t * info, void * ucontext)
 {
   if (crit_err_hdlr_done) return;
   crit_err_hdlr_done = true;
@@ -100,7 +100,7 @@ void crit_err_hdlr(True_int sig_num, siginfo_t * info, void * ucontext)
 
       // Call 'addr2line' system utility to extract line number in the source code:
       char syscom[256];
-      snprintf(syscom, 256, "addr2line %p --functions -e %.*s | tr '\n' ' ' | c++filt", array[i], (True_int)p, messages[i]);
+      snprintf(syscom, 256, "addr2line %p --functions -e %.*s | tr '\n' ' ' | c++filt", array[i], (int)p, messages[i]);
       std::string output;
       int ret = exec_cmd_and_get_output(syscom, output);
       if(!ret)

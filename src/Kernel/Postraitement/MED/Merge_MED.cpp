@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -64,7 +64,7 @@ std::vector<std::string> glob_med_files(const std::string& fileName)
 void Merge_MED::mergeFields(const std::vector< std::string >& field_names,
                             const std::vector< std::string >& meshes_names,
                             const std::vector<std::string>& listmed,
-                            const std::vector< std::pair< std::pair< True_int,True_int>,double >>& lst_dt,
+                            const std::vector< std::pair< std::pair< int,int>,double >>& lst_dt,
                             const int mesh_numb,
                             const int iter_numb,
                             Nom out_file,
@@ -166,7 +166,7 @@ Entree& Merge_MED::interpreter(Entree& is)
 
   // we use all_field_names[0] to check the iterations hoping that the med files are written correctly
   // with same number of iterations for all fields ...
-  std::vector< std::pair< std::pair< True_int,True_int>,double >> lst_dt=GetAllFieldIterations(listmed[0],all_field_names[0]);
+  std::vector< std::pair< std::pair< int,int>,double >> lst_dt=GetAllFieldIterations(listmed[0],all_field_names[0]);
   // Sort the iterations incrementally ...
   std::sort(lst_dt.begin(), lst_dt.end(), less_than_key());
 
@@ -228,7 +228,7 @@ Entree& Merge_MED::interpreter(Entree& is)
 void Merge_MED::mergeFields(const std::vector< std::string >& field_names,
                             const std::vector< std::string >& meshes_names,
                             const std::vector<std::string>& listmed,
-                            const std::vector< std::pair< std::pair< True_int,True_int>,double >>& lst_dt,
+                            const std::vector< std::pair< std::pair< int,int>,double >>& lst_dt,
                             const int mesh_numb,
                             const int iter_numb,
                             Nom out_file,

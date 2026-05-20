@@ -45,9 +45,9 @@ public:
 };
 
 KOKKOS_INLINE_FUNCTION void calcul_vc_tri_views(const int* Face, double *vc, const double * vs, const double * vsom,
-                                                CDoubleTabView vitesse,True_int type_cl, CDoubleArrView porosite_face)
+                                                CDoubleTabView vitesse,int type_cl, CDoubleArrView porosite_face)
 {
-  True_int comp;
+  int comp;
   switch(type_cl)
     {
     case 0: // le triangle n'a pas de Face de Dirichlet

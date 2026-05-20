@@ -1102,25 +1102,25 @@ void construire_nom_fichier_sous_domaine(const Nom& basename,
   if (partie < 0)
     {
       if (nb_parties_ > 10000)
-        snprintf(s, 30, "_p%05d.Zones", (True_int)nb_parties_);
+        snprintf(s, 30, "_p%05d.Zones", (int)nb_parties_);
       else
-        snprintf(s, 30, "_p%04d.Zones",(True_int) nb_parties_);
+        snprintf(s, 30, "_p%04d.Zones",(int) nb_parties_);
     }
   else
     {
       if (nb_parties_ > 10000)
         {
           if(original_proc < 0)
-            snprintf(s, 30, "_%05d.Zones", (True_int)partie);
+            snprintf(s, 30, "_%05d.Zones", (int)partie);
           else
-            snprintf(s, 30, "_%05d_%d.Zones", (True_int)partie, (True_int)original_proc);
+            snprintf(s, 30, "_%05d_%d.Zones", (int)partie, (int)original_proc);
         }
       else
         {
           if(original_proc < 0)
-            snprintf(s, 30, "_%04d.Zones", (True_int)partie);
+            snprintf(s, 30, "_%04d.Zones", (int)partie);
           else
-            snprintf(s, 30, "_%04d_%d.Zones", (True_int)partie, (True_int)original_proc);
+            snprintf(s, 30, "_%04d_%d.Zones", (int)partie, (int)original_proc);
         }
     }
   fichier += Nom(s);

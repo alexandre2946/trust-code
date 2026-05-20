@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 
 // fichier genere en cas d'atelier par cree_info_atelier.sh
 #include <info_atelier.h>
-True_int info_atelier(Sortie& s)
+int info_atelier(Sortie& s)
 {
 
   return 0;

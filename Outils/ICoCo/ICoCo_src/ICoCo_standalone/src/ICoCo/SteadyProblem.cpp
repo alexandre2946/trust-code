@@ -60,7 +60,7 @@ bool SteadyProblem::initialize()
 {
 
   // exception if I don't belong to comm !
-  True_int rank_in_comm=0;
+  int rank_in_comm=0;
   if (MPI_Comm_rank((*my_params).comm,&rank_in_comm)!=MPI_SUCCESS)
     throw WrongArgument((*my_params).problem_name,"initialize","comm","This process should belong to comm");
   if (rank_in_comm==MPI_UNDEFINED)

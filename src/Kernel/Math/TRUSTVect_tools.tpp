@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -43,7 +43,7 @@ struct Block_Iter
   {
     return start == -1 ? (_SIZE_)*int_ptr : start;  // potentially casting!
   }
-  Block_Iter operator++(True_int)   // Postfix operator
+  Block_Iter operator++(int)   // Postfix operator
   {
     Block_Iter ret = *this;
     if(int_ptr) int_ptr++;

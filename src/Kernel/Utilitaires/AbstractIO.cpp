@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -55,7 +55,7 @@ bool AbstractIO::must_convert() const
     }
 }
 
-template bool AbstractIO::must_convert<True_int>() const;
+template bool AbstractIO::must_convert<int>() const;
 template bool AbstractIO::must_convert<unsigned>() const;
 template bool AbstractIO::must_convert<unsigned long>() const;
 template bool AbstractIO::must_convert<long>() const;

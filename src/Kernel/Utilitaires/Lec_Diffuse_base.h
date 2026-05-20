@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -40,13 +40,13 @@ class Lec_Diffuse_base: public EFichier
 public:
   using Entree::operator>>;
 
-  Entree& operator>>(True_int& ob) override;
+  Entree& operator>>(int& ob) override;
   Entree& operator>>(long& ob) override;
   Entree& operator>>(long long& ob) override;
   Entree& operator>>(float& ob) override;
   Entree& operator>>(double& ob) override;
 
-  int get(True_int *ob, std::streamsize n) override;
+  int get(int *ob, std::streamsize n) override;
   int get(long *ob, std::streamsize n) override;
   int get(long long *ob, std::streamsize n) override;
   int get(float *ob, std::streamsize n) override;
@@ -94,9 +94,9 @@ int Lec_Diffuse_base::get_template(_TYPE_ *ob, std::streamsize n)
   if (diffuse_)
     {
       envoyer_broadcast(ok, 0);
-      assert(n < std::numeric_limits<True_int>::max());
+      assert(n < std::numeric_limits<int>::max());
       if (ok)
-        envoyer_broadcast_array(ob, (True_int)n, 0);
+        envoyer_broadcast_array(ob, (int)n, 0);
     }
   return error_handle(!ok);
 }

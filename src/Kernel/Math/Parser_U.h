@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -76,7 +76,7 @@ public :
   /**
    * Fixe la valeur de la variable de numero specifie. Ce numero correspondt a l'ordre de l'ajout des variables par la methode addVar().
    */
-  inline void setVar(True_int i, double val);
+  inline void setVar(int i, double val);
 #ifdef INT_is_64_
   inline void setVar(trustIdType i, double val)
   {
@@ -162,7 +162,7 @@ inline void Parser_U::setVar(const std::string& v, double val)
 /**
  * Fixe la valeur de la variable de numero specifie. Ce numero correspond a l'ordre de l'ajout des variables par la methode addVar().
  */
-inline void Parser_U::setVar(True_int i, double val)
+inline void Parser_U::setVar(int i, double val)
 {
   parser->setVar(i, val);
 }

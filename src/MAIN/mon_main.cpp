@@ -80,7 +80,7 @@ mon_main::mon_main(int verbose_level, bool journal_master, Nom log_directory, bo
   change_disable_stop(disable_stop);
 }
 
-static int init_petsc(True_int argc, char **argv, bool with_mpi,bool& trio_began_mpi_)
+static int init_petsc(int argc, char **argv, bool with_mpi,bool& trio_began_mpi_)
 {
 #ifdef PETSCKSP_H
   PetscBool isInitialized;
@@ -92,7 +92,7 @@ static int init_petsc(True_int argc, char **argv, bool with_mpi,bool& trio_began
   Nom pwd(::pwd());
   // On initialise Petsc
 #ifdef MPI_INIT_NEEDS_MPIRUN
-  True_int flag;
+  int flag;
   MPI_Initialized(&flag);
   // si MPI initialise ou si argc>2
   if ((argc>2)||(flag))
@@ -133,7 +133,7 @@ static int init_petsc(True_int argc, char **argv, bool with_mpi,bool& trio_began
 #else
 #ifdef MPI_
   // MPI_Init pour les machines ou Petsc n'est pas installe
-  True_int flag;
+  int flag;
   MPI_Initialized(&flag);
   if (!flag)
     {
@@ -202,7 +202,7 @@ void mon_main::init_parallel(const int argc, char **argv, bool with_mpi, bool ch
   if (init_kokkos_before_mpi && !Kokkos::is_initialized())
     {
       // Kokkos initialization
-      True_int argc2 = argc;
+      int argc2 = argc;
       Kokkos::initialize(argc2, argv);
     }
   Nom arguments_info = "";
@@ -263,7 +263,7 @@ void mon_main::init_parallel(const int argc, char **argv, bool with_mpi, bool ch
   if (!init_kokkos_before_mpi && !Kokkos::is_initialized())
     {
       // Kokkos initialization
-      True_int argc2 = argc;
+      int argc2 = argc;
       Kokkos::initialize(argc2, argv);
       if (Process::je_suis_maitre())
         Cerr << "Kokkos initialized after MPI !" << finl;
@@ -326,7 +326,7 @@ void mon_main::finalize()
   if (!TRUST_LIBRARY_MODE && trio_began_mpi_)
     {
       // On MPI_Finalize si MPI_Initialized and not MPI_Finalized
-      True_int flag;
+      int flag;
       MPI_Initialized(&flag);
       if (flag)
         {
@@ -373,7 +373,7 @@ void mon_main::dowork(const Nom& nom_du_cas)
       {
         filename += "_";
         char s[20];
-        snprintf(s, 20, "%05d", (True_int)Process::me());
+        snprintf(s, 20, "%05d", (int)Process::me());
         filename += s;
       }
     filename += ".log";

@@ -483,7 +483,7 @@ void Ecrire_MED_32_64<_SIZE_>::ecrire_champ(const Nom& type, const Nom& nom_cha1
       std::vector<std::string> field_names = GetAllFieldNames(file_name);
       if (std::find(field_names.begin(), field_names.end(), field_name) != field_names.end())
         {
-          std::vector<std::pair<std::pair<True_int, True_int>, double> > ts = GetAllFieldIterations(file_name, field_name);
+          std::vector<std::pair<std::pair<int, int>, double> > ts = GetAllFieldIterations(file_name, field_name);
           timestep = ts[ts.size() - 1].first.first + 1;
         }
       timestep_.insert({field_name,timestep});

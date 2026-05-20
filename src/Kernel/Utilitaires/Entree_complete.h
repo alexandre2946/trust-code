@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -33,13 +33,13 @@ public:
 
   using Entree::operator>>;
 
-  Entree& operator>>(True_int& ob) override;
+  Entree& operator>>(int& ob) override;
   Entree& operator>>(long& ob) override;
   Entree& operator>>(long long& ob) override;
   Entree& operator>>(float& ob) override;
   Entree& operator>>(double& ob) override;
 
-  int get(True_int *ob, std::streamsize n) override;
+  int get(int *ob, std::streamsize n) override;
   int get(long *ob, std::streamsize n) override;
   int get(long long*ob, std::streamsize n) override;
   int get(float *ob, std::streamsize n) override;

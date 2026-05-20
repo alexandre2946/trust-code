@@ -423,7 +423,7 @@ void LireMED_32_64<_SIZE_>::retrieve_MC_objects()
 
   axis_type_ = mfumesh_->getAxisType();
   // Some checks:
-  std::vector<True_int> nel = mfumesh_->getNonEmptyLevels();
+  std::vector<int> nel = mfumesh_->getNonEmptyLevels();
   assert(nel[0] == 0);
   // Get the volume mesh:
   mcumesh_ = mfumesh_->getMeshAtLevel(nel[0]); // ToDo can not make it const because of ArrOfInt
@@ -941,7 +941,7 @@ void LireMED_32_64<_SIZE_>::lire_geom(bool subDom)
   // Detect boundary meshes:
   BigArrOfInt_ fac_grp_id;
   IntTab_t all_faces_bords;
-  std::vector<True_int> nel = mfumesh_->getNonEmptyLevels();
+  std::vector<int> nel = mfumesh_->getNonEmptyLevels();
   if (nel.size() > 1)
     {
       assert(nel[1] == -1);

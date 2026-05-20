@@ -365,7 +365,7 @@ public:
     for (auto k=k1; k<k2; k++)
       if (tab2_(k)-1 == j)
         return coeff_(k);
-    printf("Error Matrice_Morse_View(%d, %d) not defined!\n", (True_int)i, (True_int)j);
+    printf("Error Matrice_Morse_View(%d, %d) not defined!\n", (int)i, (int)j);
     Process::Kokkos_exit("Error");
     return coeff_(0);
   }
@@ -396,7 +396,7 @@ public:
           else coeff_(k) = coeff;
           return;
         }
-    printf("Error Matrice_Morse_View::store(%d, %d, value) not defined!\n", (True_int)i, (True_int)j);
+    printf("Error Matrice_Morse_View::store(%d, %d, value) not defined!\n", (int)i, (int)j);
     Process::Kokkos_exit("Error");
   }
 
@@ -436,7 +436,7 @@ public:
           else coeff_(k) += coeff;
           return;
         }
-    printf("Error Matrice_Morse_View::add(%d, %d, value) not defined!\n", (True_int)i, (True_int)j);
+    printf("Error Matrice_Morse_View::add(%d, %d, value) not defined!\n", (int)i, (int)j);
     Process::Kokkos_exit("Error");
   }
 };

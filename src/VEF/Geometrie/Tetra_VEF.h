@@ -44,10 +44,10 @@ public:
 };
 
 KOKKOS_INLINE_FUNCTION void calcul_vc_tetra(const int* Face, double *vc, const double * vs, const double * vsom,
-                                            const double* vitesse,True_int type_cl, const double* poro)
+                                            const double* vitesse,int type_cl, const double* poro)
 {
-  // Passage (justifie vue la taille) en True_int de type_cl et comp car bug nvc++ sinon
-  True_int comp;
+  // Passage (justifie vue la taille) en int de type_cl et comp car bug nvc++ sinon
+  int comp;
   switch(type_cl)
     {
 
@@ -161,10 +161,10 @@ KOKKOS_INLINE_FUNCTION void calcul_vc_tetra(const int* Face, double *vc, const d
 }
 
 KOKKOS_INLINE_FUNCTION void calcul_vc_tetra_views(const int* Face, double *vc, const double * vs, const double * vsom,
-                                                  CDoubleTabView vitesse,True_int type_cl, CDoubleArrView porosite_face)
+                                                  CDoubleTabView vitesse,int type_cl, CDoubleArrView porosite_face)
 {
-  // Passage (justifie vue la taille) en True_int de type_cl et comp car bug nvc++ sinon
-  True_int comp;
+  // Passage (justifie vue la taille) en int de type_cl et comp car bug nvc++ sinon
+  int comp;
   switch(type_cl)
     {
 
@@ -281,10 +281,10 @@ KOKKOS_INLINE_FUNCTION void calcul_vc_tetra_views(const int* Face, double *vc, c
  *
  */
 KOKKOS_INLINE_FUNCTION
-void calcul_xg_tetra(double * xg, const double *x, const True_int type_elem_Cl, int& idirichlet,int& n1,int& n2,int& n3)
+void calcul_xg_tetra(double * xg, const double *x, const int type_elem_Cl, int& idirichlet,int& n1,int& n2,int& n3)
 {
-  // Passage (justifie vue la taille) en True_int de type_elem_cl et comp car bug nvc++ sinon
-  True_int dim = 3;
+  // Passage (justifie vue la taille) en int de type_elem_cl et comp car bug nvc++ sinon
+  int dim = 3;
   switch(type_elem_Cl)
     {
     case 0:  // le tetraedre n'a pas de Face de Dirichlet. Il a 6 Facettes

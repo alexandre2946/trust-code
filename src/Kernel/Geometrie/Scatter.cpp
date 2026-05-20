@@ -2329,7 +2329,7 @@ void Scatter::calculer_espace_distant_elements(Domaine& dom)
   }
 }
 
-static inline True_int fct_cmp_coordonnees(const double * s1, const double *s2, int dim, const double epsilon)
+static inline int fct_cmp_coordonnees(const double * s1, const double *s2, int dim, const double epsilon)
 {
   assert(dim==2 || dim==3);
   if (s1[0] < s2[0] - epsilon)

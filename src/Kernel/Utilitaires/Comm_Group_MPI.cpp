@@ -47,7 +47,7 @@ void mpi_print_error(int error_code)
 {
   Cerr << "mpi_error in Comm_Group_MPI : error_code = " << error_code << finl;
   Process::Journal() << "mpi_error in Comm_Group_MPI : error_code = " << error_code << finl;
-  True_int length = 0;
+  int length = 0;
   char message[MPI_MAX_ERROR_STRING];
   MPI_Error_string(error_code, message, & length);
   if (length > 0)
@@ -516,7 +516,7 @@ void Comm_Group_MPI::all_gather(const void *src_buffer, void *dest_buffer, int d
 #endif
 }
 
-void Comm_Group_MPI::all_gatherv(const void *src_buffer, void *dest_buffer, int send_size, const True_int* recv_size, const True_int* displs) const
+void Comm_Group_MPI::all_gatherv(const void *src_buffer, void *dest_buffer, int send_size, const int* recv_size, const int* displs) const
 {
 #ifdef MPI_
   statistics().begin_count(STD_COUNTERS::mpi_allgather);
@@ -556,7 +556,7 @@ void Comm_Group_MPI::init_group_trio()
           exit();
         }
       must_finalize_ = 1;
-      True_int argc=0;
+      int argc=0;
       char** argv=nullptr;
       int errcode = MPI_Init(&argc, &argv);
       //int errcode = MPI_Init(0,0); Message d'erreur sur MPI Voltaire
@@ -568,8 +568,8 @@ void Comm_Group_MPI::init_group_trio()
         }
     }
 
-  True_int arank;
-  True_int nbproc;
+  int arank;
+  int nbproc;
 
   mpi_error(MPI_Comm_size (trio_u_world_, & nbproc));
   mpi_error(MPI_Comm_rank (trio_u_world_, & arank));
@@ -639,12 +639,12 @@ void Comm_Group_MPI::all_to_allv(const void *src_buffer, int *send_data_size, in
   int size;
 
 #ifdef INT_is_64_
-  std::vector<True_int> send_data_size_int(n);
-  std::vector<True_int> send_data_offset_int(n);
-  std::vector<True_int> recv_data_size_int(n);
-  std::vector<True_int> recv_data_offset_int(n);
+  std::vector<int> send_data_size_int(n);
+  std::vector<int> send_data_offset_int(n);
+  std::vector<int> recv_data_size_int(n);
+  std::vector<int> recv_data_offset_int(n);
 
-  auto cast_func = [](int i) -> True_int { return static_cast<True_int>(i); };
+  auto cast_func = [](int i) -> int { return static_cast<int>(i); };
   std::transform(send_data_size,   send_data_size + n,   send_data_size_int.begin(),   cast_func);
   std::transform(send_data_offset, send_data_offset + n, send_data_offset_int.begin(), cast_func);
   std::transform(recv_data_size,   recv_data_size + n,   recv_data_size_int.begin(),   cast_func);
@@ -756,8 +756,8 @@ void Comm_Group_MPI::init_group(const ArrOfInt& pe_list)
   const MPI_Group& current_mpi_group = cg.mpi_group_;
   const MPI_Comm& current_mpi_comm  = cg.mpi_comm_;
   // Copie de pe_list au cas ou int != int...
-  const True_int nbproc = this->nproc();
-  True_int *ranks = new True_int[nbproc];
+  const int nbproc = this->nproc();
+  int *ranks = new int[nbproc];
   for (int i = 0; i < nbproc; i++)
     ranks[i] = pe_list[i];
   assert(mpi_group_==MPI_GROUP_NULL);
@@ -790,8 +790,8 @@ void Comm_Group_MPI::init_comm_on_numa_node()
   mpi_error(MPI_Comm_split_type(current_mpi_comm, MPI_COMM_TYPE_SHARED, current_rank, MPI_INFO_NULL, &mpi_comm_));
   mpi_error(MPI_Comm_group(mpi_comm_, &mpi_group_));
 
-  True_int loc_rank;
-  True_int nbproc;
+  int loc_rank;
+  int nbproc;
   mpi_error(MPI_Comm_size(mpi_comm_, &nbproc));
   mpi_error(MPI_Comm_rank(mpi_comm_, &loc_rank));
 
@@ -838,7 +838,7 @@ void Comm_Group_MPI::init_comm_on_node_master()
   mpi_error(MPI_Comm_create(current_mpi_comm, mpi_group_, & mpi_comm_));
 
   int world_rank = ref_cast(Comm_Group_MPI, PE_Groups::current_group()).rank();
-  True_int loc_rank = cg.rank() == 0 ? 0 : -1;
+  int loc_rank = cg.rank() == 0 ? 0 : -1;
   Comm_Group::init_group_node(1, loc_rank, world_rank);
 }
 

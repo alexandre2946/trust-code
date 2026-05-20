@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -118,7 +118,7 @@ Entree& Execute_parallel::interpreter(Entree& is)
       Nom log1(Objet_U::nom_du_cas());
       log1+="_";
       char s[20];
-      snprintf(s, 20, "%05d", (True_int)count);
+      snprintf(s, 20, "%05d", (int)count);
       log1+=s;
       log1+=".log";
       if (n==1)
@@ -131,7 +131,7 @@ Entree& Execute_parallel::interpreter(Entree& is)
           Nom log2(Objet_U::nom_du_cas());
           log2+="_";
           char s2[20];
-          snprintf(s2, 20, "%05d", (True_int)(count+n-1));
+          snprintf(s2, 20, "%05d", (int)(count+n-1));
           log2+=s2;
           log2+=".log";
           log="log files from ";

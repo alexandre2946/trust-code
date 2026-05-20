@@ -66,7 +66,7 @@ public:
 
   Entree& operator>>(const TRUST_Ref_Objet_U& ) { std::cerr << __func__ << " :: SHOULD NOT BE CALLED ! Use -> !! " << std::endl ; throw; }
 
-  virtual Entree& operator>>(True_int& ob);
+  virtual Entree& operator>>(int& ob);
   virtual Entree& operator>>(long& ob);
   virtual Entree& operator>>(long long& ob);
   virtual Entree& operator>>(float& ob);
@@ -76,7 +76,7 @@ public:
   // final
   virtual Entree& operator>>(Objet_U& ob) final;
 
-  virtual int get(True_int *ob, std::streamsize n);
+  virtual int get(int *ob, std::streamsize n);
   virtual int get(long *ob, std::streamsize n);
   virtual int get(long long *ob, std::streamsize n);
   virtual int get(float *ob, std::streamsize n);
@@ -125,7 +125,7 @@ private:
 
 int is_a_binary_file(Nom&);
 
-void convert_to(const char *s, True_int& ob);
+void convert_to(const char *s, int& ob);
 void convert_to(const char *s, long& ob);
 void convert_to(const char *s, long long& ob);
 void convert_to(const char *s, float& ob);

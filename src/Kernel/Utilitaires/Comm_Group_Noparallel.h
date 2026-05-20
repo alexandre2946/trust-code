@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -51,7 +51,7 @@ public:
   void all_to_all(const void *src_buffer, void *dest_buffer, int data_size) const override;
   void all_gather(const void *src_buffer, void *dest_buffer, int data_size) const override;
   void gather(const void *src_buffer, void *dest_buffer, int data_size, int root) const override;
-  void all_gatherv(const void *src_buffer, void *dest_buffer, int send_size, const True_int* recv_size, const True_int* displs) const override;
+  void all_gatherv(const void *src_buffer, void *dest_buffer, int send_size, const int* recv_size, const int* displs) const override;
 
 protected:
   void init_group(const ArrOfInt& pe_list) override;

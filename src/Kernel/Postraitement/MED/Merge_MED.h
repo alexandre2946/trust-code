@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -36,7 +36,7 @@ private:
   void mergeFields(const std::vector< std::string >& field_names,
                    const std::vector< std::string >& meshes_names,
                    const std::vector<std::string>& listmed,
-                   const std::vector< std::pair< std::pair< True_int,True_int>,double >>& lst_dt,
+                   const std::vector< std::pair< std::pair< int,int>,double >>& lst_dt,
                    const int mesh_numb,
                    const int iter_numb,
                    Nom out_file,

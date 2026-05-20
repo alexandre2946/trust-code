@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,7 +18,7 @@
 Nom Catch_SIGINIT::NOM_DU_CAS_ = "";
 int Catch_SIGINIT::NB_CAUGHT_SIGNALS_=0;
 
-void Catch_SIGINIT::signal_callback_handler(True_int signum)
+void Catch_SIGINIT::signal_callback_handler(int signum)
 {
   if (NB_CAUGHT_SIGNALS_ < 2)
     {

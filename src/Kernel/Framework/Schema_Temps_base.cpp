@@ -1053,7 +1053,7 @@ void Schema_Temps_base::write_progress(bool init)
               if (limpr())
                 {
                   double seconds_to_finish = statistics().get_time_since_last_open(STD_COUNTERS::total_execution_time) * (1. - dpercent) / dpercent;
-                  int integer_limit = (int) (pow(2.0, (double) ((sizeof(True_int) * 8) - 1)) - 1);
+                  int integer_limit = (int) (pow(2.0, (double) ((sizeof(int) * 8) - 1)) - 1);
                   if (seconds_to_finish < integer_limit)
                     {
                       int h = int(seconds_to_finish / 3600);

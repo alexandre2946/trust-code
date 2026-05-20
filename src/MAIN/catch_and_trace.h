@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -61,7 +61,7 @@ int exec_cmd_and_get_output(const char* cmd, std::string& result);
 /*
  * Custom error handler printing out in the journal the backtrace of the exception.
  */
-void crit_err_hdlr(True_int sig_num, siginfo_t * info, void * ucontext);
+void crit_err_hdlr(int sig_num, siginfo_t * info, void * ucontext);
 
 /*
  * Install error handlers catching SIGABRT and SIGFPE

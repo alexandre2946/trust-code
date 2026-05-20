@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -33,7 +33,7 @@ public:
   Sortie& operator <<(const Separateur& ob) override { return *this; }
   Sortie& operator <<(const Objet_U& ob) override { return *this; }
   Sortie& operator <<(const std::string& str) override { return *this; }
-  Sortie& operator <<(const True_int ob) override { return *this; }
+  Sortie& operator <<(const int ob) override { return *this; }
   Sortie& operator <<(const unsigned ob) override { return *this; };
   Sortie& operator <<(const float ob) override { return *this; }
   Sortie& operator <<(const double ob) override { return *this; }
@@ -43,7 +43,7 @@ public:
   Sortie& operator <<(const unsigned long ob) override { return *this; }
 
   int put(const unsigned* ob, std::streamsize n, std::streamsize pas=1) override { return 1; }
-  int put(const True_int* ob, std::streamsize n, std::streamsize pas=1) override { return 1; }
+  int put(const int* ob, std::streamsize n, std::streamsize pas=1) override { return 1; }
   int put(const long* ob, std::streamsize n, std::streamsize pas=1) override { return 1; }
   int put(const long long* ob, std::streamsize n, std::streamsize pas=1) override { return 1; }
   int put(const float* ob, std::streamsize n, std::streamsize pas=1) override { return 1; }

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -179,7 +179,7 @@ KOKKOS_INLINE_FUNCTION double Parser::evalFunc(const PNodePod& node, double x)
   /* OC : Nouvelle version : */
   if (node.value<=0)
     {
-      True_int unary_function = -node.value-1; // OC attention, dans node->value c est l'oppose de l'indice de la func dans la liste
+      int unary_function = -node.value-1; // OC attention, dans node->value c est l'oppose de l'indice de la func dans la liste
       // afin de distinguer operateur binaire (>0) et fonctions unaires (<0>
       // Il est donc necessaire de prendre -node->value ici pour referencer un element de la liste
       // De plus, on rajoute +1 car le zero ne doit pas etre utiliser pour les fonctions
@@ -307,7 +307,7 @@ double Parser::evalOp(const PNodePod& node, double x, double y)
 #ifdef TRUST_USE_GPU
       Process::Kokkos_exit("Method evalOp : Unknown operation during expression parsing!");
 #else
-      Cerr << "Method evalOp : Unknown op " << (True_int)node.value << "!!!" << finl;
+      Cerr << "Method evalOp : Unknown op " << (int)node.value << "!!!" << finl;
       Process::exit();
 #endif
       return 0;

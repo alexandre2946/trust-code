@@ -86,7 +86,7 @@ void Champ_Fonc_MED_Table_Temps::lire_donnees_champ(const std::string& fileName,
 #ifdef MEDCOUPLING_
   MCAuto<MEDFileFieldMultiTS> ft1(MEDFileFieldMultiTS::New(fileName,fieldName));
   std::vector<double> tps;
-  std::vector< std::pair<True_int,True_int> > tst = ft1->getTimeSteps(tps);
+  std::vector< std::pair<int,int> > tst = ft1->getTimeSteps(tps);
 
   temps_sauv.resize_array(1);
 

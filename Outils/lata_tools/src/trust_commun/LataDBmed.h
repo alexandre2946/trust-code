@@ -119,12 +119,12 @@ ArrOfInt renum_conn(const LataDB::Element& type)
 extern med_geometry_type typmai3[MED_N_CELL_FIXED_GEO];
 
 void latadb_get_info_mesh_med(const char* filename,const char* meshname,med_geometry_type& type_geo,trustIdType& ncells,
-                              trustIdType& nnodes,True_int& spacedim, True_int& nbcomp,bool& is_structured, std::vector<int>& NIJK)
+                              trustIdType& nnodes,int& spacedim, int& nbcomp,bool& is_structured, std::vector<int>& NIJK)
 {
   using namespace MEDCoupling;
 
   is_structured=false;
-  True_int meshDim;
+  int meshDim;
   try
     {
       // In 32b, MEDCoupling is 32b, but if we are in LATATOOLS mode (lata_tools and VisIt plugin, trustIdType is 64b ...)
@@ -238,7 +238,7 @@ void LataDB::read_master_file_med(const char *prefix, const char *filename)
       dom.name_=geoms[i];
       med_geometry_type type_geo;
       trustIdType ncells,nnodes;
-      True_int nbcomp, spacedim;
+      int nbcomp, spacedim;
       bool is_structured;
       std::vector<int> NIJK;
       latadb_get_info_mesh_med(filename,geoms[i].c_str(),type_geo,ncells,nnodes,spacedim,nbcomp,is_structured,NIJK);
@@ -519,7 +519,7 @@ void LataDB::read_data2_med_(const LataDBField& fld, C_Tab * const data, // cons
       auto vtimes = GetAllFieldIterations(fld.filename_.getString(),fieldname.getString());
 
       int it=fld.timestep_-1;
-      pair<True_int, True_int> iter(fld.timestep_-1,-1);
+      pair<int, int> iter(fld.timestep_-1,-1);
       if (fld.timestep_==1) it=0;
       //Cerr<<iter.first <<" 00 "<<vtimes.size()<<finl;
 

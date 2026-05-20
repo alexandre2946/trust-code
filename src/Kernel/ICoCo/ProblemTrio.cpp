@@ -138,7 +138,7 @@ bool ProblemTrio::initialize()
 
 #ifdef MPI_
   // exception if I don't belong to comm !
-  True_int rank_in_comm=0;
+  int rank_in_comm=0;
   if ((*my_params).is_mpi!=0 && !TRUST_MPI_COMM_SET)
     {
       if (MPI_Comm_rank((*my_params).comm,&rank_in_comm)!=MPI_SUCCESS)

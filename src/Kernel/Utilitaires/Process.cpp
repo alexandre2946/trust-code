@@ -527,7 +527,7 @@ void Process::exit(const Nom& message ,int i)
           sleep(1);
 
           // Test si me() a recu de me()-1
-          True_int ok;
+          int ok;
           MPI_Status status;
           MPI_Test(&request,&ok,&status);
           if (!ok)
@@ -546,7 +546,7 @@ void Process::exit(const Nom& message ,int i)
         {
 #ifdef MPI_
           // On MPI_Finalize si MPI_Initialized and not MPI_Finalized
-          True_int flag;
+          int flag;
           MPI_Initialized(&flag);
           if (flag)
             {

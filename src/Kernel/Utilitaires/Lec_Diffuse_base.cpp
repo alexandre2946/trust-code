@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -45,8 +45,8 @@ Lec_Diffuse_base& Lec_Diffuse_base::operator=(const Lec_Diffuse_base& )
   return *this;
 }
 
-Entree& Lec_Diffuse_base::operator>>(True_int& ob) { return operator_template<True_int>(ob); }
-int Lec_Diffuse_base::get(True_int* ob, std::streamsize n) { return get_template<True_int>(ob, n); }
+Entree& Lec_Diffuse_base::operator>>(int& ob) { return operator_template<int>(ob); }
+int Lec_Diffuse_base::get(int* ob, std::streamsize n) { return get_template<int>(ob, n); }
 
 Entree& Lec_Diffuse_base::operator>>(long& ob) { return operator_template<long>(ob); }
 int Lec_Diffuse_base::get(long* ob, std::streamsize n) { return get_template<long>(ob, n); }

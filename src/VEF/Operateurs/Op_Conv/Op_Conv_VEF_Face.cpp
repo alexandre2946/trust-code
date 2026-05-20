@@ -284,7 +284,7 @@ void compute_flux_tetra_kernel(const FluxTetraKernelData& kernel_data)
         int les_elems_[4] = { les_elems_v(poly,0), les_elems_v(poly,1), les_elems_v(poly,2), les_elems_v(poly,3) };
         // Gestion de la porosite
         double coeff = (marq == 0) ? 1. / porosite_elem_v(poly) : 1.0;
-        True_int itypcl = type_elem_Cl_v(poly);
+        int itypcl = type_elem_Cl_v(poly);
         // Determination du type de CL selon le rang
         int rang = rang_elem_non_std_v(poly);
         double xc[3];

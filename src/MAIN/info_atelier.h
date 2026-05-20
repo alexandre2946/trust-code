@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,7 +20,7 @@ class Sortie;
 /*! @brief donne le nombre et le nom des fichiers modifies
  *
  */
-True_int info_atelier(Sortie&);
+int info_atelier(Sortie&);
 /*! @brief permet de stocker l'atelier et de le reecrire
  *
  */

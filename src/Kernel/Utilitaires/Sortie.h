@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -83,7 +83,7 @@ public:
 
   virtual Sortie& operator<<(const Separateur& );
   virtual Sortie& operator<<(const Objet_U&    ob);
-  virtual Sortie& operator<<(const True_int    ob);
+  virtual Sortie& operator<<(const int    ob);
   virtual Sortie& operator<<(const unsigned ob);
   virtual Sortie& operator<<(const long      ob);
   virtual Sortie& operator<<(const long long      ob);
@@ -99,7 +99,7 @@ public:
   // The put methods can potentially write long stream of data (std::streamsize == ptrdiff_t == long)
   // but in many derived classes only used after the Scatter (e.g. LecFicDiffuse) we downcast to int inside impl.
   virtual int put(const unsigned* ob, std::streamsize n, std::streamsize nb_colonnes=1);
-  virtual int put(const True_int* ob, std::streamsize n, std::streamsize nb_colonnes=1);
+  virtual int put(const int* ob, std::streamsize n, std::streamsize nb_colonnes=1);
   virtual int put(const float * ob, std::streamsize n, std::streamsize nb_colonnes=1);
   virtual int put(const double* ob, std::streamsize n, std::streamsize nb_colonnes=1);
   virtual int put(const long  * ob, std::streamsize n, std::streamsize nb_colonnes=1);

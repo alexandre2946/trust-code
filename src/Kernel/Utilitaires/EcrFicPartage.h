@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -57,7 +57,7 @@ public:
   Sortie& operator <<(const std::string& ob) override;
   Sortie& operator <<(const Separateur& ) override;
 
-  Sortie& operator <<(const True_int ob) override;
+  Sortie& operator <<(const int ob) override;
   Sortie& operator <<(const unsigned ob) override;
   Sortie& operator <<(const long ob) override;
   Sortie& operator <<(const long long ob) override;
@@ -66,7 +66,7 @@ public:
   Sortie& operator <<(const double ob) override;
 
   int put(const unsigned* ob, std::streamsize n, std::streamsize pas) override;
-  int put(const True_int* ob, std::streamsize n, std::streamsize pas) override;
+  int put(const int* ob, std::streamsize n, std::streamsize pas) override;
   int put(const long* ob, std::streamsize n, std::streamsize pas) override;
   int put(const long long* ob, std::streamsize n, std::streamsize pas) override;
   int put(const float* ob, std::streamsize n, std::streamsize pas) override;

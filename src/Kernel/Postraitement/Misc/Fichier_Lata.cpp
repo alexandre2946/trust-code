@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -70,7 +70,7 @@ Fichier_Lata::Fichier_Lata(const char * basename, const char * extension,
         is_parallel_ = 0;
         fichier_ = new SFichier;
         const int moi = Process::me();
-        snprintf(s, 20, "_%05d", (True_int)moi);
+        snprintf(s, 20, "_%05d", (int)moi);
         break;
       }
     default:

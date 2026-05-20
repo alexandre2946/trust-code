@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -99,14 +99,14 @@ int Sortie::add_col(const char * ob)
 }
 
 int Sortie::put(const unsigned * ob, std::streamsize n, std::streamsize nb_col) { return put_template<unsigned>(ob,n,nb_col); }
-int Sortie::put(const True_int * ob, std::streamsize n, std::streamsize nb_col) { return put_template<True_int>(ob,n,nb_col); }
+int Sortie::put(const int * ob, std::streamsize n, std::streamsize nb_col) { return put_template<int>(ob,n,nb_col); }
 int Sortie::put(const long * ob, std::streamsize n, std::streamsize nb_col) { return put_template<long>(ob,n,nb_col); }
 int Sortie::put(const long long * ob, std::streamsize n, std::streamsize nb_col) { return put_template<long long>(ob,n,nb_col); }
 int Sortie::put(const float * ob, std::streamsize n, std::streamsize nb_col) { return put_template<float>(ob,n,nb_col); }
 int Sortie::put(const double * ob, std::streamsize n, std::streamsize nb_col) { return put_template<double>(ob,n,nb_col); }
 
 Sortie& Sortie::operator<<(const unsigned ob) { return operator_template<unsigned>(ob); }
-Sortie& Sortie::operator<<(const True_int ob) { return operator_template<True_int>(ob); }
+Sortie& Sortie::operator<<(const int ob) { return operator_template<int>(ob); }
 Sortie& Sortie::operator<<(const float ob) { return operator_template<float>(ob); }
 Sortie& Sortie::operator<<(const double ob) { return operator_template<double>(ob); }
 Sortie& Sortie::operator<<(const long ob) { return operator_template<long>(ob); }
@@ -313,7 +313,7 @@ int Sortie::put_template(const _TYPE_ *ob, std::streamsize n, std::streamsize nb
 
 // Explicit instanciations
 template int Sortie::put_template(const unsigned *ob, std::streamsize n, std::streamsize nb_col);
-template int Sortie::put_template(const True_int *ob, std::streamsize n, std::streamsize nb_col);
+template int Sortie::put_template(const int *ob, std::streamsize n, std::streamsize nb_col);
 template int Sortie::put_template(const long *ob, std::streamsize n, std::streamsize nb_col);
 template int Sortie::put_template(const long long *ob, std::streamsize n, std::streamsize nb_col);
 template int Sortie::put_template(const float *ob, std::streamsize n, std::streamsize nb_col);
@@ -345,7 +345,7 @@ Sortie& Sortie::operator_template(const _TYPE_ &ob)
 
 // Explicit instanciations
 template Sortie& Sortie::operator_template(const unsigned& ob);
-template Sortie& Sortie::operator_template(const True_int& ob);
+template Sortie& Sortie::operator_template(const int& ob);
 template Sortie& Sortie::operator_template(const long& ob);
 template Sortie& Sortie::operator_template(const long long& ob);
 template Sortie& Sortie::operator_template(const float& ob);

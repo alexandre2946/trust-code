@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -301,9 +301,9 @@ void FichierHDF::set_int_size()
   hid_t space_id = H5Screate(H5S_SCALAR);
   hid_t attr_id = H5Acreate(file_id_, "int_size_in_bits", H5T_NATIVE_INT32, space_id, H5P_DEFAULT, H5P_DEFAULT);
 #ifdef INT_is_64_
-  True_int int_size = 64;
+  int int_size = 64;
 #else
-  True_int int_size = 32;
+  int int_size = 32;
 #endif
   H5Awrite(attr_id, H5T_NATIVE_INT32, &int_size);
   H5Aclose(attr_id);
@@ -338,7 +338,7 @@ void  FichierHDF::check_int_size(Nom filename)
   else
     {
       hid_t attr_id = H5Aopen(file_id_, "int_size_in_bits", H5P_DEFAULT);
-      True_int int_size_in_bits;
+      int int_size_in_bits;
       H5Aread(attr_id, H5T_NATIVE_INT32, &int_size_in_bits);
       Cerr << "[HDF5] We read that "<< filename << " was written in -int" << (int)int_size_in_bits << finl;
 

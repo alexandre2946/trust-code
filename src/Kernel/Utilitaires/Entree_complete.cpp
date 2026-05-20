@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -55,8 +55,8 @@ int Entree_complete::get(char* ob, std::streamsize bufsize)
   return is.get(ob, bufsize);
 }
 
-Entree& Entree_complete::operator>>(True_int& ob) { return operator_template<True_int>(ob); }
-int Entree_complete::get(True_int * ob, std::streamsize n) { return get_template<True_int>(ob,n); }
+Entree& Entree_complete::operator>>(int& ob) { return operator_template<int>(ob); }
+int Entree_complete::get(int * ob, std::streamsize n) { return get_template<int>(ob,n); }
 
 Entree& Entree_complete::operator>>(long& ob) { return operator_template<long>(ob); }
 int Entree_complete::get(long * ob, std::streamsize n) { return get_template<long>(ob,n); }
