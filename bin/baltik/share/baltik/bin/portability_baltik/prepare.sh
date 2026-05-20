@@ -134,7 +134,7 @@ echo "./configure" >> configure.sh
 echo "make $MODE" >> make.sh
 echo "ret=\$?" >> make.sh
 echo "SWIG_MODE=$SWIG_MODE" >> make.sh
-echo '[ "`grep swig Makefile 2>/dev/null`" != "" ] && make swig_$SWIG_MODE' >> make.sh
+echo '[ "`grep swig Makefile 2>/dev/null`" != "" ] && [ "$TRUST_USE_GPU" != "1" ] && make swig_$SWIG_MODE' >> make.sh
 #[ "`ls */share/swig/makefile 2>/dev/null`" != "" ] && echo "make swig_$SWIG_MODE" >> make.sh
 
 # droits apres la compilation

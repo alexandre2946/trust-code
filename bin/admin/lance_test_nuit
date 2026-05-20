@@ -1592,59 +1592,6 @@ while [ "`date '+%u'`" = 5 ] && [ `date '+%H'` -gt 20 ]
 do
    sleep 30
 done
-echo " "
-echo "###################################"
-echo "# Create the matrix of validation #"
-echo "###################################"
-echo "---> Begin at "`date '+%H:%M:%S %d/%m'`
-(
-matrice_validation=0 # Non actualise
-# Changement 164, on cree la matrice de validation le week-end
-if [ $matrice_validation = 1 ] && [ "`date '+%u'`" -gt 5 ]
-then
-   cd $TRUST_ROOT/doc/Validation
-   echo "-> Start of "$TRUST_ROOT"/doc/Validation/Matrice.sh"
-   echo "  See `pwd`/Matrice_Validation.pdf"
-   ./Matrice.sh -no_verbose # Utiliser l'option -no_verbose permet de conserve une trace dans le fichier Matrice.log du lance_test_modifie
-   if [ -f Matrice.pdf ] && [ "`diff Matrice.pdf Matrice_Validation.pdf`" != "" ]
-   then
-      CHECKOUT Matrice_Validation.pdf 1>/dev/null 2>&1
-      mv -f Matrice.pdf Matrice_Validation.pdf
-   fi
-   cd - 1>/dev/null 2>&1
-else
-   echo "NOT executed"
-fi
-) &
-echo "<--- End at "`date '+%H:%M:%S %d/%m'`
-
-echo " "
-echo "#####################################"
-echo "# Use and execute cpplint.py script #"
-echo "#####################################"
-#echo "---> Begin at "`date '+%H:%M:%S %d/%m'`
-## le week-end uniquement
-#if [ "`date '+%u'`" -gt 5 ]
-#then
-#   cd $TRUST_ROOT
-#   echo "Call to $TRUST_ROOT/bin/KSH/cpplint.py"
-#   echo "from `pwd`"
-#   cpplint_log=$REP_NUIT"/cpplint_$HOST.log"
-#   echo "  See $cpplint_log"
-#   echo "TRUST script on $HOST the `date` ...">$cpplint_log
-#   filter="--filter=-whitespace,-legal/copyright,-build/header_guard,-runtime/references,-readability/casting,\
-#-build/include_what_you_use,-runtime/sizeof,-runtime/explicit,-runtime/printf,-runtime/int,\
-#-readability/function,-readability/braces,-readability/streams,-readability/multiline_comment"
-#   echo "====================================
-#Running cpplint by filtering with --filter=$filter
-#====================================" >> $cpplint_log
-#   python $TRUST_ROOT/bin/KSH/cpplint.py $filter src/*/*.cpp src/*/*/*.cpp src/*/*/*/*.cpp src/*/*/*/*/*.cpp include/*.h 2>&1 | grep -v "Done processing" >> $cpplint_log
-#   tail -n1 $cpplint_log
-#   cat $cpplint_log | mail_ -s\"[lance_test_nuit] Google rules with cpplint on TRUST $new\" $TRUST_MAIL
-#else
-   echo "NOT executed since upgrade to python3"
-#fi
-#echo "<--- End at "`date '+%H:%M:%S %d/%m'`
 
 echo " "
 echo "######################"
