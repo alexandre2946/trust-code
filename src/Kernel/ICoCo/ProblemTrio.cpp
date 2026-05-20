@@ -150,8 +150,9 @@ bool ProblemTrio::initialize()
 
       if (supports_multiple_runs_)
         TRUST_MPI_COMM_SET = true;
+
+      Comm_Group_MPI::set_must_mpi_initialize(false); // ???
     }
-  Comm_Group_MPI::set_must_mpi_initialize(false); // ???
 
 #endif
   int argc=2;
