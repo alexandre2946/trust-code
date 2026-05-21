@@ -64,6 +64,10 @@ if (loadercpp)
 	find_package(SWIG REQUIRED)
 	include(${SWIG_USE_FILE})
 
+	if(NOT ${SWIG_VERSION} VERSION_LESS "3.4.0")
+		remove_definitions("-Wconversion")
+	endif()
+
     set_source_files_properties(TRUST_Post_Loader.i PROPERTIES CPLUSPLUS ON)
     set_source_files_properties(TRUST_Post_Loader.i PROPERTIES SWIG_FLAGS "-shadow")
 
