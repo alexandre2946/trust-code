@@ -257,7 +257,8 @@ then
    pdf_par_office
 elif [ "$1" = -xdata ]
 then
-   pdf_par_xdata
+   #pdf_par_xdata
+   echo "disabled since the removal of TRIOXDATA"
 elif [ "$1" = -cree_References ]
 then
    cree_References

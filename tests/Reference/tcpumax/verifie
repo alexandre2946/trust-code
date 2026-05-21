@@ -7,14 +7,15 @@ time=$(expr ${end} - ${start})
 test_name="$1"
 
 echo "Test case ${test_name}"
-echo "Time taken: ${time} ms"
+echo "Time taken: ${time} ns"
 
 erreur=0
 
 # Verify that the computation stopped after the correct time
 # tcpumax 1e-3 in jdd should give 3600 ms exection time
 # leave a margin for final postprocessing. Number may need tweaking
-if [ "${time}" -gt "4000" ]; then
+# ND: use ns instead of ms because of a bug in Ubuntu 26
+if [ "${time}" -gt "4000000000" ]; then # 4000000000 ns corresponds to 4000 ms
     echo "Error: tcpumax keyword did not work correctly"
     erreur=1
 fi

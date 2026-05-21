@@ -1,12 +1,12 @@
 # Test for keyword tcpumax: checks that the calculation stops quickly after reaching tcpumax of 3600 ms (1e-3 hours) #
-# test may stop at different timesteps depending on run condition, hence the following tags for lance_test: #
+# test may stop at different timesteps depending on run condition, hence the following tags #
 # PARALLEL OK 8 #
 # lance_test 1000 ecarts #
 
 dimension 2
 
 # for testing keyword tcpumax #
-System "date +%s%3N > start_time"
+System "date +%s%N > start_time"
 
 
 Pb_hydraulique pb
@@ -102,7 +102,7 @@ EcritureLectureSpecial 1
 Solve pb
 
 # for testing keyword tcpumax #
-System "date +%s%3N > end_time"
+System "date +%s%N > end_time"
 
 End
 

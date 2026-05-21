@@ -76,7 +76,7 @@ then
    # Sur Ubuntu 22, je rebascule sur 3_3_2 car fonctionne mieux sur les nouveaux portables que la 3_3_3
    [ "`grep 'Ubuntu 22'    /etc/issue 2>/dev/null`" != "" ]                     && os=ubuntu20 && version=3_3_2
    [ "`grep 'Ubuntu 24'    /etc/issue 2>/dev/null`" != "" ]                     && os=ubuntu20 && version=3_3_2
-   [ "`grep 'Ubuntu 26'    /etc/issue 2>/dev/null`" != "" ]                     && os=ubuntu20 && version=3_3_2
+   [ "`grep 'Ubuntu 26'    /etc/issue 2>/dev/null`" != "" ]                     && os=ubuntu22 && version=3_5_0  # Ubuntu20 v3.3.2 OK, mais pb de processus lances par visit pas tues
    [ "`grep 'Debian GNU/Linux 9'  /etc/issue.net 2>/dev/null`" != "" ]          && os=debian9 && version=3_1_1
    [ "`grep 'Debian GNU/Linux 10' /etc/issue.net 2>/dev/null`" != "" ]          && os=debian10 && version=3_1_3
    [ "`grep 'Debian GNU/Linux 11' /etc/issue.net 2>/dev/null`" != "" ]          && os=debian11 && version=3_3_3
