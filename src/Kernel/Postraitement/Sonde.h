@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -67,9 +67,9 @@ public :
   inline void nommer(const Nom& n) override { nom_ = n; }
 
   // Traitement des bords (option "gravcl")
-  void ajouter_bords(const DoubleTab& coords_bords);
-  void init_bords();
-  void mettre_a_jour_bords();
+  virtual void ajouter_bords(const DoubleTab& coords_bords);
+  virtual void init_bords();
+  virtual void mettre_a_jour_bords();
   void resetTime(double time) { nb_bip = time/periode; };
 
 protected :
