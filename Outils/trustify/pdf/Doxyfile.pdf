@@ -1,0 +1,40 @@
+# Minimal Doxyfile for building a PDF of the trustify-generated
+# keyword reference.  Driven by build_pdf.py: KW_INPUT_DIR points at
+# the `trustify generate_markdown --out` directory; KW_OUTPUT_DIR is a
+# scratch build dir owned by the script.  Both are exported into
+# doxygen's environment by the script and expanded via $(VAR) below.
+
+PROJECT_NAME           = "TRUST Keywords Reference"
+OUTPUT_DIRECTORY       = $(KW_OUTPUT_DIR)
+INPUT                  = $(KW_INPUT_DIR)
+IMAGE_PATH             = $(KW_INPUT_DIR)/figures
+FILE_PATTERNS          = *.md
+RECURSIVE              = NO
+# keyword_reference.md already carries an @page directive; leaving
+# USE_MDFILE_AS_MAINPAGE empty avoids a conflict.
+USE_MDFILE_AS_MAINPAGE =
+
+QUIET                  = YES
+WARN_LOGFILE           = $(KW_OUTPUT_DIR)/doxygen_warnings.log
+
+# Disable everything we don't need for a PDF of pure markdown.
+GENERATE_HTML          = NO
+GENERATE_XML           = NO
+GENERATE_RTF           = NO
+GENERATE_MAN           = NO
+HAVE_DOT               = NO
+SOURCE_BROWSER         = NO
+ALPHABETICAL_INDEX     = NO
+
+# LaTeX -> PDF (clickable cross-references via PDF_HYPERLINKS).
+GENERATE_LATEX         = YES
+LATEX_OUTPUT           = latex
+USE_PDFLATEX           = YES
+PDF_HYPERLINKS         = YES
+LATEX_BATCHMODE        = YES
+COMPACT_LATEX          = YES
+PAPER_TYPE             = a4
+# Trustify-generated markdown uses \text and \overline (amsmath) plus
+# \langle / \rangle (amssymb) inside math mode; without these, pdflatex
+# errors out on every formula even though it still emits a (broken) PDF.
+EXTRA_PACKAGES         = amsmath amssymb

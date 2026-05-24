@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61", "setuptools-git-versioning>=2,<3"]
+requires = ["setuptools>=61"]
 # __legacy__ is required to have access to package during build step
 build-backend = "setuptools.build_meta:__legacy__"
 
@@ -10,13 +10,94 @@ description = "Python Parser for TRUST datasets"
 authors = [
   {email = "trust@cea.fr"}
 ]
+requires-python = ">=3.10"
 dependencies = [
-  "pydantic",
+  "pydantic>=2,<3",
 ]
 
-[tool.setuptools-git-versioning]
-enabled = true
-template = "{env:TRUST_VERSION}"
-dev_template = "{env:TRUST_VERSION}+{sha}"
-dirty_template = "{env:TRUST_VERSION}+{sha}"
-    
+[project.optional-dependencies]
+lint = ["ruff"]
+
+# argcomplete powers `trustify install-completion` (tab completion).
+# Optional — TRUST does not bundle it (configurer_env attempts to
+# pip-install it as a courtesy, but warns rather than failing on
+# offline sites / restricted networks).
+optional = ["argcomplete"]
+
+# `coverage[toml]>=7` so coverage reads its config from this
+# pyproject.toml. Drives `make coverage` (see Makefile).
+coverage = ["coverage[toml]>=7"]
+
+# Meta-extra: pulls in every other extra. Keep this in sync when adding new
+# groups so `pip install -e .[dev]` always grabs the full developer toolchain.
+dev = ["trustify[lint,optional,coverage]"]
+
+[project.scripts]
+trustify = "trustify.cli:main"
+
+# Version is read statically from the VERSION file by stock setuptools
+# (no build-time plugin). This is what lets the offline TRUST build work:
+# configurer_env installs trustify with `--no-build-isolation`, so pip does
+# NOT provision the build env from PyPI. A dynamic-versioning backend like
+# setuptools-git-versioning would therefore be missing at build time and the
+# wheel would carry the 0.0.0 fallback. setuptools normalises the file
+# content to PEP 440 (`1.9.8_beta` -> `1.9.8b0`), the same string the old
+# plugin produced (trustify is not independently git-tagged in this repo, so
+# the plugin only ever read VERSION here anyway).
+[tool.setuptools.dynamic]
+version = { file = "VERSION" }
+
+[tool.ruff]
+line-length = 120
+extend-exclude = ["build", "tests/generated"]
+
+[tool.ruff.lint]
+# Defaults (E, F) + pycodestyle warnings (W), isort (I), pyupgrade (UP),
+# bugbear (B), comprehensions (C4), pie (PIE), perflint (PERF), tidy-imports
+# (TID), type-checking-only-imports (TCH), simplify (SIM), unused-arguments
+# (ARG), ruff-specific (RUF).
+extend-select = ["W", "I", "UP", "B", "C4", "PIE", "PERF", "TID", "TCH", "SIM", "ARG", "RUF"]
+ignore = [
+  # B008: pydantic models legitimately use Field() / default factories in defaults.
+  "B008",
+  # W291/W293: trailing-whitespace rules. `ruff format` already strips trailing
+  # whitespace on real source lines; the linter rules additionally fire inside
+  # multi-line string literals, where --unsafe-fixes would strip whitespace
+  # that's intentional fixture content (e.g. byte-for-byte `.data` round-trip
+  # expectations in tests).
+  "W291",
+  "W293",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Generated parser modules are emitted by trad2_pydantic.py; don't lint style.
+"**/trustify_gen*.py" = ["ALL"]
+
+[tool.coverage.run]
+# Restrict to the in-tree package. The generated parser/pyd modules
+# land in `~/.cache/trustify/<hash>/` outside this tree, so they're
+# naturally excluded.
+source = ["src/trustify"]
+# Branch coverage in addition to line coverage — catches conditionals
+# whose else / non-taken branch is never exercised.
+branch = true
+# `parallel = true` + `concurrency = ["multiprocessing", "thread"]`
+# names per-process data files (.coverage.<host>.<pid>.<random>) so
+# multiprocessing.Pool workers (batch_check, batch_format) and
+# sitecustomize-instrumented subprocesses (the CLI / LANG=C tests)
+# don't trample each other. `coverage combine` after the run merges
+# them into a single .coverage file.
+parallel = true
+concurrency = ["multiprocessing", "thread"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    # Module-level CLI entry guard at the bottom of CLI scripts.
+    "if __name__ == .__main__.:",
+    # TYPE_CHECKING-only imports are by design never executed.
+    "if TYPE_CHECKING:",
+]
+show_missing = true
+skip_covered = false

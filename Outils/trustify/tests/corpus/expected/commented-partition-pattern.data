@@ -1,0 +1,8 @@
+# BEGIN PARTITION
+Partition DOM
+{
+Nb_parts 2
+}
+Fin
+END PARTITION #
+foo

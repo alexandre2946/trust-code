@@ -1,59 +1,35 @@
-import contextlib
+try:
+    from importlib.metadata import version as _pkg_version
 
-@contextlib.contextmanager
-def temporary_sys_path(path):
-    import sys
-    original_path = sys.path.copy()
-    sys.path.insert(0, path)
-    try:
-        yield
-    finally:
-        sys.path[:] = original_path
-        
-        
-def load_dataset(filename, parser_module=None):
-    """
-    Load a TRUST dataset from file.data using the TRUST parser module.
+    __version__ = _pkg_version("trustify")
+except Exception:
+    # Source checkout that hasn't been pip-installed, or a runtime where
+    # importlib.metadata can't find the dist info — fall back to a sentinel
+    # rather than crashing the import chain.
+    __version__ = "0.0.0+unknown"
 
-    Arguments
-    ---------
-    filename: path-like
-        The trust.data filename.
-    parser_module: path-like
-        The python filename containing TRUST Parsers.
-        Usually a file named TRAD2_*_pars.py.
-        Leave it None if TRAD2_*_pars.py is already imported.
+from trustify.api import (  # noqa: F401
+    batch_check,
+    check,
+    format_dataset_file,
+    generate_schema,
+    init_config,
+    load_dataset,
+    modernize,
+)
+from trustify.core.base import Dataset_Parser  # noqa: F401
+from trustify.core.misc_utilities import TrustifyInternalError, TrustifyParseError  # noqa: F401
+from trustify.core.trust_parser import SourceRange, TRUSTParser, TRUSTStream  # noqa: F401
+from trustify.formatter import format_dataset  # noqa: F401
 
-    Returns
-    -------
-    pydantic.BaseModel
-        The TRUST dataset as a pydantic.BaseModel instance.
-    """
-
-    # read the file.data
-    with open(filename, "r") as file:        
-        data = file.read().rstrip()
-    
-    # import the parser module if argument is provided
-    if parser_module is not None:
-        import pathlib
-        parser_module = pathlib.Path(parser_module)
-        if not parser_module.exists():
-            raise ModuleNotFoundError(parser_module)
-        import importlib
-        with temporary_sys_path(str(parser_module.parent.resolve())):
-            module_name = parser_module.stem
-            spec = importlib.util.spec_from_file_location(module_name, str(parser_module))
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-    
-    # parse dataset
-    from trustify import trust_parser, misc_utilities
-    parser = trust_parser.TRUSTParser()
-    parser.tokenize(data)
-    stream = trust_parser.TRUSTStream(parser=parser)
-    cls = misc_utilities.ClassFactory.GetParserClassFromName("Dataset")
-    model = cls.ReadFromTokens(stream)
-
-    return model
-
+# Public opt-in for programmatic callers that want CLI-style workspace
+# resolution (see docs/project-resolution.md). The api.* entry points
+# never walk the filesystem on their own — pass `discover_config(path)`
+# results through explicitly when needed.
+from trustify.projects import (  # noqa: F401
+    ConfigError,
+    TrustifyConfig,
+    detect_baltik_root,
+    discover_config,
+    expand_dependencies,
+)

@@ -1,0 +1,27 @@
+# Excerpt from Validation/Rapports_automatiques/Verification/Verification_codage/Diffusion_DG/src/jdd_test.data — Python string.Template ${key} substitutions used by the Jupyter / validation harness. #
+# PARALLEL OK 4 #
+dimension 2
+
+Pb_conduction pb
+Domaine dom
+Lire_MED {
+    domaine dom
+    file ${mesh}.med
+    convertAllToPoly
+}
+
+DG dis
+
+Option_DG
+{
+    order ${order}
+    gram_schmidt 1
+}
+
+Scheme_euler_explicit sch_expl
+Read sch_expl
+{
+    tinit 0
+    nb_pas_dt_max ${nmax}
+    tmax 300.
+}

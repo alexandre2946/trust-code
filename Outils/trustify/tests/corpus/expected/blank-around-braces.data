@@ -1,0 +1,18 @@
+dimension 3
+
+Lire dom
+{
+    Pave Cavite
+    {
+        origine 0. 0. 0.
+        longueurs 1. 1.
+
+        nb_pas_dt_max 1
+    }
+
+    {
+        Bord left X = 0. 0. <= Y <= 1.
+
+        Bord right X = 1. 0. <= Y <= 1.
+    }
+}

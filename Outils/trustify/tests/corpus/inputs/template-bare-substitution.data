@@ -1,0 +1,24 @@
+# Excerpt from Validation/Rapports_automatiques/Verification/Multiphase/canal_axi/src/jdd_pbmulti.data — Python string.Template $key (bare-dollar) substitutions, including a stand-alone $key on its own line. #
+# PARALLEL OK 8 #
+dimension 2
+$axi
+pb_multiphase pbt
+Domaine dom
+
+# BEGIN MESH #
+Mailler dom
+{
+Pave tube
+{
+Origine 0. 0.
+Nombre_de_Noeuds 10 30
+Longueurs $r $h
+}
+{
+bord axi    X = 0   0 <= Y <= $h
+bord haut   Y = $h   0 <= X <= $r
+bord bas    Y = 0   0 <= X <= $r
+bord wall   X = $r 0 <= Y <= $h
+}
+}
+# END MESH #
