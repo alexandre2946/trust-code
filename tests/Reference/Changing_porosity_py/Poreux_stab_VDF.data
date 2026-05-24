@@ -1,3 +1,4 @@
+# TRUSTIFY NOT: input_field uses a hand-rolled parser (Champ_Input_Proto::read) that trustify cannot model out of the box — fixing the C++ to use a standard Param-based parser is out of scope here #
 dimension 2
 Domaine dom
 

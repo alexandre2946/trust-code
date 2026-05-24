@@ -1,4 +1,4 @@
-# test nombre d'accolade doit faire une erreur #
+# TRUSTIFY NOT: test nombre d'accolade doit faire une erreur #
 domaine dom
 {
 

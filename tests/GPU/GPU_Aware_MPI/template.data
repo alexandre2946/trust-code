@@ -1,3 +1,4 @@
+# TRUSTIFY NOT: this is a sed-substitution template (__solver__ placeholder), not a standalone TRUST dataset #
 # PARALLEL ONLY 2 #
 dimension 3
 Pb_Hydraulique pb
