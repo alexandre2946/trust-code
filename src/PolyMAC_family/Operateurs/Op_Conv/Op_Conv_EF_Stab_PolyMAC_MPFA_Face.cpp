@@ -35,7 +35,8 @@ Implemente_instanciable( Op_Conv_EF_Stab_PolyMAC_MPFA_Face, "Op_Conv_EF_Stab_Pol
 Implemente_instanciable(Op_Conv_Amont_PolyMAC_MPFA_Face, "Op_Conv_Amont_PolyMAC_MPFA_Face", Op_Conv_EF_Stab_PolyMAC_MPFA_Face);
 Implemente_instanciable(Op_Conv_Centre_PolyMAC_MPFA_Face, "Op_Conv_Centre_PolyMAC_MPFA_Face", Op_Conv_EF_Stab_PolyMAC_MPFA_Face);
 
-// XD Op_Conv_EF_Stab_PolyMAC_MPFA_Face interprete Op_Conv_EF_Stab_PolyMAC_MPFA_Face BRACE Class Op_Conv_EF_Stab_PolyMAC_MPFA_Face
+// XD Op_Conv_EF_Stab_PolyMAC_MPFA_Face interprete Op_Conv_EF_Stab_PolyMAC_MPFA_Face BRACE Class
+// XD_CONT Op_Conv_EF_Stab_PolyMAC_MPFA_Face
 Sortie& Op_Conv_EF_Stab_PolyMAC_MPFA_Face::printOn(Sortie& os) const { return Op_Conv_PolyMAC_CDO_base::printOn(os); }
 Sortie& Op_Conv_Amont_PolyMAC_MPFA_Face::printOn(Sortie& os) const { return Op_Conv_PolyMAC_CDO_base::printOn(os); }
 Sortie& Op_Conv_Centre_PolyMAC_MPFA_Face::printOn(Sortie& os) const { return Op_Conv_PolyMAC_CDO_base::printOn(os); }

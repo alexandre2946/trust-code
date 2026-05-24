@@ -39,14 +39,19 @@
 #endif
 
 Implemente_instanciable_sans_constructeur(Op_Conv_VEF_Face,"Op_Conv_Generic_VEF_P1NC",Op_Conv_VEF_base);
-// XD convection_generic convection_deriv generic NO_BRACE Keyword for generic calling of upwind and muscl convective scheme in VEF discretization. For muscl scheme, limiters and order for fluxes calculations have to be specified. The available limiters are :
-// XD_CONT minmod - vanleer -vanalbada - chakravarthy - superbee, and the order of accuracy is 1 or 2. Note that chakravarthy is a non-symmetric limiter and superbee may engender results out of physical limits. By consequence, these two limiters are not recommended. NL2
-// XD_CONT Examples: NL2 convection { generic amont }NL2 convection { generic muscl minmod 1 }NL2 convection { generic muscl vanleer 2 }NL2 NL2 In case of results out of physical limits with muscl scheme (due for instance to strong non-conformal velocity flow field),
-// XD_CONT user can redefine in data file a lower order and a smoother limiter, as : convection { generic muscl minmod 1 }
-// XD   attr type chaine(into=["amont","muscl","centre"]) type REQ type of scheme
-// XD   attr limiteur chaine(into=["minmod","vanleer","vanalbada","chakravarthy","superbee"]) limiteur OPT type of limiter
-// XD   attr ordre entier(into=[1,2,3]) ordre OPT order of accuracy
-// XD   attr alpha floattant alpha OPT alpha
+// XD convection_generic convection_deriv generic NO_BRACE Keyword for generic calling of upwind and muscl convective
+// XD_CONT scheme in VEF discretization. For muscl scheme, limiters and order for fluxes calculations have to be
+// XD_CONT specified. The available limiters are : minmod - vanleer -vanalbada - chakravarthy - superbee, and the order
+// XD_CONT of accuracy is 1 or 2. Note that chakravarthy is a non-symmetric limiter and superbee may engender results
+// XD_CONT out of physical limits. By consequence, these two limiters are not recommended. NL2 Examples: NL2 convection
+// XD_CONT { generic amont }NL2 convection { generic muscl minmod 1 }NL2 convection { generic muscl vanleer 2 }NL2 NL2
+// XD_CONT In case of results out of physical limits with muscl scheme (due for instance to strong non-conformal
+// XD_CONT velocity flow field), user can redefine in data file a lower order and a smoother limiter, as : convection {
+// XD_CONT generic muscl minmod 1 }
+// XD attr type chaine(into=["amont","muscl","centre"]) type REQ type of scheme
+// XD attr limiteur chaine(into=["minmod","vanleer","vanalbada","chakravarthy","superbee"]) limiteur OPT type of limiter
+// XD attr ordre entier(into=[1,2,3]) ordre OPT order of accuracy
+// XD attr alpha floattant alpha OPT alpha
 
 Sortie& Op_Conv_VEF_Face::printOn(Sortie& s ) const
 {

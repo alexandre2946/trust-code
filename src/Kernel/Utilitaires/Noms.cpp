@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -22,8 +22,9 @@ Implemente_instanciable(Noms,"Noms",VECT(Nom));
 // XD list_nom_virgule listobj list_nom_virgule BRACE nom_anonyme COMMA List of name.
 
 // XD un_pb objet_lecture nul NO_BRACE pour les groupes
-// XD   attr mot ref_Pb_base mot REQ the string
+// XD attr mot ref_Pb_base mot REQ the string
 // XD list_un_pb listobj nul BRACE un_pb COMMA pour les groupes
+// XD list_list_nom listobj nul BRACE list_un_pb COMMA pour les groupes
 
 Sortie& Noms::printOn(Sortie& s) const
 {

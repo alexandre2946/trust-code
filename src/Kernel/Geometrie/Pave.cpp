@@ -22,39 +22,60 @@ Implemente_instanciable_32_64(Pave_32_64,"Pave",Domaine_32_64<_T_>);
 // XD mailler_base objet_lecture mailler_base INHERITS_BRACE Basic class to mesh.
 
 // XD pave mailler_base pave NO_BRACE Class to create a pave (block) with boundaries.
-// XD  attr name chaine name REQ Name of the pave (block).
-// XD  attr bloc bloc_pave bloc REQ Definition of the pave (block).
-// XD  attr list_bord list_bord list_bord REQ Domain boundaries definition.
+// XD attr name chaine name REQ Name of the pave (block).
+// XD attr bloc bloc_pave bloc REQ Definition of the pave (block).
+// XD attr list_bord list_bord list_bord REQ Domain boundaries definition.
 
 // XD pave_64 pave pave_64 NO_BRACE Same as Pave for big (64b) domain
 
 // XD bloc_pave objet_lecture nul INHERITS_BRACE Class to create a pave.
-// XD attr Origine listf Origine OPT Keyword to define the pave (block) origin, that is to say one of the 8 block points (or 4 in a 2D coordinate system).
-// XD attr longueurs listf longueurs OPT Keyword to define the block dimensions, that is to say knowing the origin, length along the axes.
-// XD attr nombre_de_noeuds listentierf nombre_de_noeuds OPT Keyword to define the discretization (nodenumber) in each direction.
-// XD attr facteurs listf facteurs OPT Keyword to define stretching factors for mesh discretization in each direction. This is a real number which must be positive (by default 1.0). A stretching factor other than 1 allows refinement on one edge in one
+// XD attr Origine listf Origine OPT Keyword to define the pave (block) origin, that is to say one of the 8 block points
+// XD_CONT (or 4 in a 2D coordinate system).
+// XD attr longueurs listf longueurs OPT Keyword to define the block dimensions, that is to say knowing the origin,
+// XD_CONT length along the axes.
+// XD attr nombre_de_noeuds listentierf nombre_de_noeuds OPT Keyword to define the discretization (nodenumber) in each
 // XD_CONT direction.
-// XD attr symx rien symx OPT Keyword to define a block mesh that is symmetrical with respect to the YZ plane (respectively Y-axis in 2D) passing through the block centre.
-// XD attr symy rien symy OPT Keyword to define a block mesh that is symmetrical with respect to the XZ plane (respectively X-axis in 2D) passing through the block centre.
-// XD attr symz rien symz OPT Keyword defining a block mesh that is symmetrical with respect to the XY plane passing through the block centre.
-// XD attr xtanh floattant xtanh OPT Keyword to generate mesh with tanh (hyperbolic tangent) variation in the X-direction.
-// XD attr xtanh_dilatation entier(into=[-1,0,1]) xtanh_dilatation OPT Keyword to generate mesh with tanh (hyperbolic tangent) variation in the X-direction. xtanh_dilatation: The value may be -1,0,1 (0 by default): 0: coarse mesh at the middle of the channel
-// XD_CONT and smaller near the walls -1: coarse mesh at the left side of the channel and smaller at the right side 1: coarse mesh at the right side of the channel and smaller near the left side of the channel.
-// XD attr xtanh_taille_premiere_maille floattant xtanh_taille_premiere_maille OPT Size of the first cell of the mesh with tanh (hyperbolic tangent) variation in the X-direction.
-// XD attr ytanh floattant ytanh OPT Keyword to generate mesh with tanh (hyperbolic tangent) variation in the Y-direction.
-// XD attr ytanh_dilatation entier(into=[-1,0,1]) ytanh_dilatation OPT Keyword to generate mesh with tanh (hyperbolic tangent) variation in the Y-direction. ytanh_dilatation: The value may be -1,0,1 (0 by default): 0: coarse mesh at the middle of the channel
-// XD_CONT and smaller near the walls -1: coarse mesh at the bottom of the channel and smaller near the top 1: coarse mesh at the top of the channel and smaller near the bottom.
-// XD attr ytanh_taille_premiere_maille floattant ytanh_taille_premiere_maille OPT Size of the first cell of the mesh with tanh (hyperbolic tangent) variation in the Y-direction.
-// XD attr ztanh floattant ztanh OPT Keyword to generate mesh with tanh (hyperbolic tangent) variation in the Z-direction.
-// XD attr ztanh_dilatation entier(into=[-1,0,1]) ztanh_dilatation OPT Keyword to generate mesh with tanh (hyperbolic tangent) variation in the Z-direction. tanh_dilatation: The value may be -1,0,1 (0 by default): 0: coarse mesh at the middle of the channel
-// XD_CONT and smaller near the walls -1: coarse mesh at the back of the channel and smaller near the front 1: coarse mesh at the front of the channel and smaller near the back.
-// XD attr ztanh_taille_premiere_maille floattant ztanh_taille_premiere_maille OPT Size of the first cell of the mesh with tanh (hyperbolic tangent) variation in the Z-direction.
+// XD attr facteurs listf facteurs OPT Keyword to define stretching factors for mesh discretization in each direction.
+// XD_CONT This is a real number which must be positive (by default 1.0). A stretching factor other than 1 allows
+// XD_CONT refinement on one edge in one direction.
+// XD attr symx rien symx OPT Keyword to define a block mesh that is symmetrical with respect to the YZ plane
+// XD_CONT (respectively Y-axis in 2D) passing through the block centre.
+// XD attr symy rien symy OPT Keyword to define a block mesh that is symmetrical with respect to the XZ plane
+// XD_CONT (respectively X-axis in 2D) passing through the block centre.
+// XD attr symz rien symz OPT Keyword defining a block mesh that is symmetrical with respect to the XY plane passing
+// XD_CONT through the block centre.
+// XD attr xtanh floattant xtanh OPT Keyword to generate mesh with tanh (hyperbolic tangent) variation in the
+// XD_CONT X-direction.
+// XD attr xtanh_dilatation entier(into=[-1,0,1]) xtanh_dilatation OPT Keyword to generate mesh with tanh (hyperbolic
+// XD_CONT tangent) variation in the X-direction. xtanh_dilatation: The value may be -1,0,1 (0 by default): 0: coarse
+// XD_CONT mesh at the middle of the channel and smaller near the walls -1: coarse mesh at the left side of the channel
+// XD_CONT and smaller at the right side 1: coarse mesh at the right side of the channel and smaller near the left side
+// XD_CONT of the channel.
+// XD attr xtanh_taille_premiere_maille floattant xtanh_taille_premiere_maille OPT Size of the first cell of the mesh
+// XD_CONT with tanh (hyperbolic tangent) variation in the X-direction.
+// XD attr ytanh floattant ytanh OPT Keyword to generate mesh with tanh (hyperbolic tangent) variation in the
+// XD_CONT Y-direction.
+// XD attr ytanh_dilatation entier(into=[-1,0,1]) ytanh_dilatation OPT Keyword to generate mesh with tanh (hyperbolic
+// XD_CONT tangent) variation in the Y-direction. ytanh_dilatation: The value may be -1,0,1 (0 by default): 0: coarse
+// XD_CONT mesh at the middle of the channel and smaller near the walls -1: coarse mesh at the bottom of the channel and
+// XD_CONT smaller near the top 1: coarse mesh at the top of the channel and smaller near the bottom.
+// XD attr ytanh_taille_premiere_maille floattant ytanh_taille_premiere_maille OPT Size of the first cell of the mesh
+// XD_CONT with tanh (hyperbolic tangent) variation in the Y-direction.
+// XD attr ztanh floattant ztanh OPT Keyword to generate mesh with tanh (hyperbolic tangent) variation in the
+// XD_CONT Z-direction.
+// XD attr ztanh_dilatation entier(into=[-1,0,1]) ztanh_dilatation OPT Keyword to generate mesh with tanh (hyperbolic
+// XD_CONT tangent) variation in the Z-direction. tanh_dilatation: The value may be -1,0,1 (0 by default): 0: coarse
+// XD_CONT mesh at the middle of the channel and smaller near the walls -1: coarse mesh at the back of the channel and
+// XD_CONT smaller near the front 1: coarse mesh at the front of the channel and smaller near the back.
+// XD attr ztanh_taille_premiere_maille floattant ztanh_taille_premiere_maille OPT Size of the first cell of the mesh
+// XD_CONT with tanh (hyperbolic tangent) variation in the Z-direction.
 
-// XD epsilon mailler_base epsilon NO_BRACE Two points will be confused if the distance between them is less than eps. By default, eps is set to 1e-12. The keyword Epsilon allows an alternative value to be assigned to eps.
-// XD   attr eps floattant eps REQ New value of precision.
+// XD epsilon mailler_base epsilon NO_BRACE Two points will be confused if the distance between them is less than eps.
+// XD_CONT By default, eps is set to 1e-12. The keyword Epsilon allows an alternative value to be assigned to eps.
+// XD attr eps floattant eps REQ New value of precision.
 
 // XD domain mailler_base domain NO_BRACE Class to reuse a domain.
-// XD   attr domain_name ref_domaine domain_name REQ Name of domain.
+// XD attr domain_name ref_domaine domain_name REQ Name of domain.
 
 // XD list_bloc_mailler listobj list_bloc_mailler BRACE mailler_base COMMA List of block mesh.
 

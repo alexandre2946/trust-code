@@ -27,11 +27,15 @@
 #include <Param.h>
 
 Implemente_instanciable(Fluide_Weakly_Compressible,"Fluide_Weakly_Compressible",Fluide_Dilatable_base);
-// XD fluide_weakly_compressible fluide_base fluide_weakly_compressible INHERITS_BRACE Weakly-compressible flow with a low mach number assumption; this means that the thermo-dynamic pressure (used in state law) can vary in space.
+// XD fluide_weakly_compressible fluide_base fluide_weakly_compressible INHERITS_BRACE Weakly-compressible flow with a
+// XD_CONT low mach number assumption; this means that the thermo-dynamic pressure (used in state law) can vary in
+// XD_CONT space.
 // XD attr loi_etat loi_etat_base loi_etat OPT The state law that will be associated to the Weakly-compressible fluid.
 // XD attr sutherland bloc_sutherland sutherland OPT Sutherland law for viscosity and for conductivity.
-// XD attr traitement_pth chaine(into=["constant"]) traitement_pth OPT Particular treatment for the thermodynamic pressure Pth ; there is currently one possibility: NL2 1) the keyword \'constant\' makes it possible to have a constant Pth but not uniform in
-// XD_CONT space ; it\'s the good choice when the flow is open (e.g. with pressure boundary conditions).
+// XD attr traitement_pth chaine(into=["constant"]) traitement_pth OPT Particular treatment for the thermodynamic
+// XD_CONT pressure Pth ; there is currently one possibility: NL2 1) the keyword \'constant\' makes it possible to have
+// XD_CONT a constant Pth but not uniform in space ; it\'s the good choice when the flow is open (e.g. with pressure
+// XD_CONT boundary conditions).
 // XD attr lambda field_base lambda_u OPT Conductivity (W.m-1.K-1).
 // XD attr mu field_base mu OPT Dynamic viscosity (kg.m-1.s-1).
 
@@ -46,12 +50,23 @@ Entree& Fluide_Weakly_Compressible::readOn(Entree& is)
 void Fluide_Weakly_Compressible::set_param(Param& param) const
 {
   Fluide_Dilatable_base::set_param(param);
-  param.ajouter("pression_thermo", &Pth_); // XD_ADD_P double Initial thermo-dynamic pressure used in the assosciated state law.
-  param.ajouter("pression_xyz", &ch_Pth_xyz_); // XD_ADD_P field_base Initial thermo-dynamic pressure used in the assosciated state law. It should be defined with as a Champ_Fonc_xyz.
-  param.ajouter("use_total_pressure", &use_total_pressure_); // XD_ADD_P entier Flag (0 or 1) used to activate and use the total pressure in the assosciated state law. The default value of this Flag is 0.
-  param.ajouter("use_hydrostatic_pressure", &use_hydrostatic_pressure_); // XD_ADD_P entier Flag (0 or 1) used to activate and use the hydro-static pressure in the assosciated state law. The default value of this Flag is 0.
-  param.ajouter("use_grad_pression_eos", &use_grad_pression_eos_); // XD_ADD_P entier Flag (0 or 1) used to specify whether or not the gradient of the thermo-dynamic pressure will be taken into account in the source term of the temperature equation (case of a non-uniform pressure). The default value of this Flag is 1 which means that the gradient is used in the source.
-  param.ajouter("time_activate_ptot", &time_activate_ptot_); // XD_ADD_P double Time (in seconds) at which the total pressure will be used in the assosciated state law.
+  param.ajouter("pression_thermo", &Pth_); // XD_ADD_P double
+  // XD_CONT Initial thermo-dynamic pressure used in the assosciated state law.
+  param.ajouter("pression_xyz", &ch_Pth_xyz_); // XD_ADD_P field_base
+  // XD_CONT Initial thermo-dynamic pressure used in the assosciated state law. It should be defined with as a
+  // XD_CONT Champ_Fonc_xyz.
+  param.ajouter("use_total_pressure", &use_total_pressure_); // XD_ADD_P entier
+  // XD_CONT Flag (0 or 1) used to activate and use the total pressure in the assosciated state law. The default value
+  // XD_CONT of this Flag is 0.
+  param.ajouter("use_hydrostatic_pressure", &use_hydrostatic_pressure_); // XD_ADD_P entier
+  // XD_CONT Flag (0 or 1) used to activate and use the hydro-static pressure in the assosciated state law. The default
+  // XD_CONT value of this Flag is 0.
+  param.ajouter("use_grad_pression_eos", &use_grad_pression_eos_); // XD_ADD_P entier
+  // XD_CONT Flag (0 or 1) used to specify whether or not the gradient of the thermo-dynamic pressure will be taken into
+  // XD_CONT account in the source term of the temperature equation (case of a non-uniform pressure). The default value
+  // XD_CONT of this Flag is 1 which means that the gradient is used in the source.
+  param.ajouter("time_activate_ptot", &time_activate_ptot_); // XD_ADD_P double
+  // XD_CONT Time (in seconds) at which the total pressure will be used in the assosciated state law.
 }
 
 /*! @brief Complete le fluide avec les champs inconnus associes au probleme

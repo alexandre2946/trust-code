@@ -16,7 +16,8 @@
 #include <Temperature_imposee_paroi.h>
 
 Implemente_instanciable(Temperature_imposee_paroi, "Temperature_imposee_paroi|Enthalpie_imposee_paroi", Scalaire_impose_paroi);
-// XD temperature_imposee_paroi paroi_temperature_imposee temperature_imposee_paroi NO_BRACE Imposed temperature condition at the wall called bord (edge).
+// XD temperature_imposee_paroi paroi_temperature_imposee temperature_imposee_paroi NO_BRACE Imposed temperature
+// XD_CONT condition at the wall called bord (edge).
 
 Sortie& Temperature_imposee_paroi::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
 

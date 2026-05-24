@@ -17,10 +17,12 @@
 #include <Champ_Don_lu.h>
 
 Implemente_instanciable(Champ_Don_lu,"Champ_Don_lu",TRUSTChamp_Don_generique<Champ_Don_Type::LU>);
-// XD champ_don_lu champ_don_base champ_don_lu NO_BRACE Field to read a data field (values located at the center of the cells) in a file.
+// XD champ_don_lu champ_don_base champ_don_lu NO_BRACE Field to read a data field (values located at the center of the
+// XD_CONT cells) in a file.
 // XD attr dom ref_domaine dom REQ Name of the domain.
 // XD attr nb_comp entier nb_comp REQ Number of field components.
-// XD attr file chaine file REQ Name of the file. NL2 This file has the following format: NL2 nb_val_lues -> Number of values readen in th file NL2 Xi Yi Zi -> Coordinates readen in the file NL2 Ui Vi Wi -> Value of the field
+// XD attr file chaine file REQ Name of the file. NL2 This file has the following format: NL2 nb_val_lues -> Number of
+// XD_CONT values readen in th file NL2 Xi Yi Zi -> Coordinates readen in the file NL2 Ui Vi Wi -> Value of the field
 
 
 Sortie& Champ_Don_lu::printOn(Sortie& os) const { return TRUSTChamp_Don_generique::printOn(os); }

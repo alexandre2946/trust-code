@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -21,9 +21,10 @@
 #include <Param.h>
 
 Implemente_instanciable(Remove_Invalid_Internal_Boundaries,"Remove_Invalid_Internal_Boundaries",Interprete_geometrique_base);
-// XD remove_invalid_internal_boundaries interprete remove_invalid_internal_boundaries INHERITS_BRACE Keyword to suppress an internal boundary of the domain_name domain. Indeed, some mesh tools may define internal boundaries (eg: for post processing task after
-// XD_CONT the calculation) but TRUST does not support it yet.
-// XD  attr domain_name ref_domaine domain_name REQ Name of domain.
+// XD remove_invalid_internal_boundaries interprete remove_invalid_internal_boundaries INHERITS_BRACE Keyword to
+// XD_CONT suppress an internal boundary of the domain_name domain. Indeed, some mesh tools may define internal
+// XD_CONT boundaries (eg: for post processing task after the calculation) but TRUST does not support it yet.
+// XD attr domain_name ref_domaine domain_name REQ Name of domain.
 
 Sortie& Remove_Invalid_Internal_Boundaries::printOn(Sortie& os) const { return Interprete::printOn(os); }
 

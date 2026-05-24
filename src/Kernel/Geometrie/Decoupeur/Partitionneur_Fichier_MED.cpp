@@ -29,7 +29,9 @@
 
 #endif
 
-// XD Partitionneur_Fichier_MED partitionneur_deriv fichier_med INHERITS_BRACE Partitioning a domain using a MED file containing an integer field providing for each element the processor number on which the element should be located.
+// XD Partitionneur_Fichier_MED partitionneur_deriv fichier_med INHERITS_BRACE Partitioning a domain using a MED file
+// XD_CONT containing an integer field providing for each element the processor number on which the element should be
+// XD_CONT located.
 Implemente_instanciable_sans_constructeur(Partitionneur_Fichier_MED,"Partitionneur_Fichier_MED",Partitionneur_base);
 
 Partitionneur_Fichier_MED::Partitionneur_Fichier_MED()
@@ -52,8 +54,10 @@ Sortie& Partitionneur_Fichier_MED::printOn(Sortie& os) const
  */
 void Partitionneur_Fichier_MED::set_param(Param& param) const
 {
-  param.ajouter("file",&filename_,Param::REQUIRED); // XD_ADD_P chaine file name of the MED file to load
-  param.ajouter("field",&fieldname_,Param::OPTIONAL); // XD_ADD_P chaine field name of the integer (or double) field to load
+  param.ajouter("file",&filename_,Param::REQUIRED); // XD_ADD_P chaine
+  // XD_CONT file name of the MED file to load
+  param.ajouter("field",&fieldname_,Param::OPTIONAL); // XD_ADD_P chaine
+  // XD_CONT field name of the integer (or double) field to load
 }
 
 void Partitionneur_Fichier_MED::associer_domaine(const Domaine& domaine)

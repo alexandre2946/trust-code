@@ -1,0 +1,54 @@
+// Generic schema declarations for syntax helpers used by the TRUST dataset
+// parser. These keywords have no associated C++ class — they describe
+// parser-only grammar fragments (comment markers, opaque block readers,
+// fixed-size word / number tuples) referenced by name from other attr
+// declarations throughout the codebase. Moved here from
+// Outils/trustify/doc/TRAD_2.org during the trustify reshaping. See
+// Outils/trustify/docs/superpowers/specs/2026-05-19-trustify-reshaping-gap-analysis-design.md.
+
+// XD comment objet_u # NO_BRACE Comments in a data file.
+// XD attr comm chaine comm REQ Text to be commented.
+
+// XD bloc_comment objet_u /* NO_BRACE bloc of Comment in a data file.
+// XD attr comm chaine comm REQ Text to be commented.
+
+// XD listobj listobj_impl listobj INHERITS_BRACE List of objects.
+
+// XD objet_lecture objet_u objet_lecture INHERITS_BRACE Auxiliary class for reading.
+
+// XD bloc_lecture objet_lecture nul NO_BRACE to read between two braces
+// XD attr bloc_lecture chaine bloc_lecture REQ not_set
+
+// XD deuxmots objet_lecture nul NO_BRACE Two words.
+// XD attr mot_1 chaine mot_1 REQ First word.
+// XD attr mot_2 chaine mot_2 REQ Second word.
+
+// XD troismots objet_lecture nul NO_BRACE Three words.
+// XD attr mot_1 chaine mot_1 REQ First word.
+// XD attr mot_2 chaine mot_2 REQ Snd word.
+// XD attr mot_3 chaine mot_3 REQ Third word.
+
+// XD quatremots objet_lecture nul NO_BRACE Three words.
+// XD attr mot_1 chaine mot_1 REQ First word.
+// XD attr mot_2 chaine mot_2 REQ Snd word.
+// XD attr mot_3 chaine mot_3 REQ Third word.
+// XD attr mot_4 chaine mot_4 REQ Fourth word.
+
+// XD deuxentiers objet_lecture nul NO_BRACE Two integers.
+// XD attr int1 entier int1 REQ First integer.
+// XD attr int2 entier int2 REQ Second integer.
+
+// XD floatfloat objet_lecture nul NO_BRACE Two reals.
+// XD attr a floattant a REQ First real.
+// XD attr b floattant b REQ Second real.
+
+// XD entierfloat objet_lecture nul NO_BRACE An integer and a real.
+// XD attr the_int entier the_int REQ Integer.
+// XD attr the_float floattant the_float REQ Real.
+
+// XD class_generic objet_u class_generic INHERITS_BRACE not_set
+
+// XD troisf objet_lecture nul NO_BRACE Auxiliary class to extrude.
+// XD attr lx floattant lx REQ X direction of the extrude operation.
+// XD attr ly floattant ly REQ Y direction of the extrude operation.
+// XD attr lz floattant lz REQ Z direction of the extrude operation.

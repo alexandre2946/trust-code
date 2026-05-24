@@ -18,7 +18,8 @@
 #include <Equation_base.h>
 
 Implemente_instanciable(Paroi_Temperature_imposee, "Paroi_Temperature_imposee", Cond_lim_utilisateur_base);
-// XD paroi_temperature_imposee dirichlet paroi_temperature_imposee NO_BRACE Imposed temperature condition at the wall called bord (edge).
+// XD paroi_temperature_imposee dirichlet paroi_temperature_imposee NO_BRACE Imposed temperature condition at the wall
+// XD_CONT called bord (edge).
 // XD attr ch front_field_base ch REQ Boundary field type.
 
 Sortie& Paroi_Temperature_imposee::printOn(Sortie& s ) const { return s << que_suis_je() ; }

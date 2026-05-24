@@ -18,7 +18,8 @@
 #include <Navier_Stokes_QC.h>
 
 Implemente_instanciable(Navier_Stokes_QC,"Navier_Stokes_QC",Navier_Stokes_Fluide_Dilatable_base);
-// XD navier_stokes_QC navier_stokes_standard navier_stokes_QC INHERITS_BRACE Navier-Stokes equation for a quasi-compressible fluid.
+// XD navier_stokes_QC navier_stokes_standard navier_stokes_QC INHERITS_BRACE Navier-Stokes equation for a
+// XD_CONT quasi-compressible fluid.
 
 Sortie& Navier_Stokes_QC::printOn(Sortie& is) const
 {

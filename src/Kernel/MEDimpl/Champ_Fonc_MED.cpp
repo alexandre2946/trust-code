@@ -43,8 +43,9 @@ using MEDCoupling::MEDFileField1TS;
 using MEDCoupling::MEDFileMesh;
 #endif
 
-// XD champ_fonc_med field_base champ_fonc_med BRACE Field to read a data field in a MED-format file .med at a specified time. It is very useful, for example, to resume a calculation with a new or refined geometry. The field post-processed on the new geometry
-// XD_CONT at med format is used as initial condition for the resume.
+// XD champ_fonc_med field_base champ_fonc_med BRACE Field to read a data field in a MED-format file .med at a specified
+// XD_CONT time. It is very useful, for example, to resume a calculation with a new or refined geometry. The field
+// XD_CONT post-processed on the new geometry at med format is used as initial condition for the resume.
 Implemente_instanciable(Champ_Fonc_MED,"Champ_Fonc_MED",Champ_Fonc_base);
 
 Sortie& Champ_Fonc_MED::printOn(Sortie& s) const
@@ -54,15 +55,28 @@ Sortie& Champ_Fonc_MED::printOn(Sortie& s) const
 
 void Champ_Fonc_MED::set_param(Param& param) const
 {
-  param.ajouter_flag("use_existing_domain", &use_existing_domain_); // XD_ADD_P flag whether to optimize the field loading by indicating that the field is supported by the same mesh that was initially loaded as the domain
-  param.ajouter_flag("last_time", &last_time_only_);                // XD_ADD_P flag to use the last time of the MED file instead of the specified time. Mutually exclusive with 'time' parameter.
-  param.ajouter("decoup", &nom_decoup_, Param::OPTIONAL);           // XD_ADD_P chaine specify a partition file.
-  param.ajouter("mesh", &nom_maillage_, Param::OPTIONAL);           // XD_ADD_P chaine Name of the mesh supporting the field. This is the name of the mesh in the MED file, and if this mesh was also used to create the TRUST domain, loading can be optimized with option 'use_existing_domain'.
-  param.ajouter("domain", &nom_dom_, Param::REQUIRED);              // XD_ADD_P chaine Name of the domain supporting the field. This is the name of the mesh in the MED file, and if this mesh was also used to create the TRUST domain, loading can be optimized with option 'use_existing_domain'.
-  param.ajouter("file", &nom_fichier_med_, Param::REQUIRED);        // XD_ADD_P chaine Name of the .med file.
-  param.ajouter("field", &nom_champ_, Param::REQUIRED);             // XD_ADD_P chaine Name of field to load.
-  param.ajouter("loc", &loc_, Param::OPTIONAL);                     // XD_ADD_P chaine(into=["som","elem"]) To indicate where the field is localised. Default to 'elem'.
-  param.ajouter("time", &temps_, Param::OPTIONAL);                  // XD_ADD_P double Timestep to load from the MED file. Mutually exclusive with 'last_time' flag.
+  param.ajouter_flag("use_existing_domain", &use_existing_domain_); // XD_ADD_P flag
+  // XD_CONT whether to optimize the field loading by indicating that the field is supported by the same mesh that was
+  // XD_CONT initially loaded as the domain
+  param.ajouter_flag("last_time", &last_time_only_);                // XD_ADD_P flag
+  // XD_CONT to use the last time of the MED file instead of the specified time. Mutually exclusive with 'time'
+  // XD_CONT parameter.
+  param.ajouter("decoup", &nom_decoup_, Param::OPTIONAL);           // XD_ADD_P chaine
+  // XD_CONT specify a partition file.
+  param.ajouter("mesh", &nom_maillage_, Param::OPTIONAL);           // XD_ADD_P chaine
+  // XD_CONT Name of the mesh supporting the field. This is the name of the mesh in the MED file, and if this mesh was
+  // XD_CONT also used to create the TRUST domain, loading can be optimized with option 'use_existing_domain'.
+  param.ajouter("domain", &nom_dom_, Param::REQUIRED);              // XD_ADD_P chaine
+  // XD_CONT Name of the domain supporting the field. This is the name of the mesh in the MED file, and if this mesh was
+  // XD_CONT also used to create the TRUST domain, loading can be optimized with option 'use_existing_domain'.
+  param.ajouter("file", &nom_fichier_med_, Param::REQUIRED);        // XD_ADD_P chaine
+  // XD_CONT Name of the .med file.
+  param.ajouter("field", &nom_champ_, Param::REQUIRED);             // XD_ADD_P chaine
+  // XD_CONT Name of field to load.
+  param.ajouter("loc", &loc_, Param::OPTIONAL);                     // XD_ADD_P chaine(into=["som","elem"])
+  // XD_CONT To indicate where the field is localised. Default to 'elem'.
+  param.ajouter("time", &temps_, Param::OPTIONAL);                  // XD_ADD_P double
+  // XD_CONT Timestep to load from the MED file. Mutually exclusive with 'last_time' flag.
 }
 
 Entree& Champ_Fonc_MED::readOn(Entree& is)

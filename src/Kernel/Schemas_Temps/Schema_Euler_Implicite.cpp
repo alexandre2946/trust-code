@@ -123,10 +123,29 @@ int Schema_Euler_Implicite::lire_motcle_non_standard(const Motcle& mot, Entree& 
 Entree& Schema_Euler_Implicite::lire_facsec_expert(Entree& is)
 {
   Param param("facsec_expert");
-  param.ajouter("facsec_ini",&facsec_);               // XD_ADD_P floattant Initial facsec taken into account at the beginning of the simulation.
-  param.ajouter("facsec_max",&facsec_max_);           // XD_ADD_P floattant Maximum ratio allowed between time step and stability time returned by CFL condition. The initial ratio given by facsec keyword is changed during the calculation with the implicit scheme but it couldn\'t be higher than facsec_max value.NL2 Warning: Some implicit schemes do not permit high facsec_max, example Schema_Adams_Moulton_order_3 needs facsec=facsec_max=1. NL2 Advice:NL2 The calculation may start with a facsec specified by the user and increased by the algorithm up to the facsec_max limit. But the user can also choose to specify a constant facsec (facsec_max will be set to facsec value then). Faster convergence has been seen and depends on the kind of calculation: NL2-Hydraulic only or thermal hydraulic with forced convection and low coupling between velocity and temperature (Boussinesq value beta low), facsec between 20-30NL2-Thermal hydraulic with forced convection and strong coupling between velocity and temperature (Boussinesq value beta high), facsec between 90-100 NL2-Thermohydralic with natural convection, facsec around 300NL2 -Conduction only, facsec can be set to a very high value (1e8) as if the scheme was unconditionally stableNL2These values can also be used as rule of thumb for initial facsec with a facsec_max limit higher.
-  param.ajouter("rapport_residus",&rapport_residus_); // XD_ADD_P floattant Ratio between the residual at time n and the residual at time n+1 above which the facsec is increased by multiplying by sqrt(rapport_residus) (1.2 by default).
-  param.ajouter("nb_ite_sans_accel_max",&nb_ite_sans_accel_max_); // XD_ADD_P entier Maximum number of iterations without facsec increases (20000 by default): if facsec does not increase with the previous condition (ration between 2 consecutive residuals too high), we increase it by force after nb_ite_sans_accel_max iterations.
+  param.ajouter("facsec_ini",&facsec_);               // XD_ADD_P floattant
+  // XD_CONT Initial facsec taken into account at the beginning of the simulation.
+  param.ajouter("facsec_max",&facsec_max_);           // XD_ADD_P floattant
+  // XD_CONT Maximum ratio allowed between time step and stability time returned by CFL condition. The initial ratio
+  // XD_CONT given by facsec keyword is changed during the calculation with the implicit scheme but it couldn\'t be
+  // XD_CONT higher than facsec_max value.NL2 Warning: Some implicit schemes do not permit high facsec_max, example
+  // XD_CONT Schema_Adams_Moulton_order_3 needs facsec=facsec_max=1. NL2 Advice:NL2 The calculation may start with a
+  // XD_CONT facsec specified by the user and increased by the algorithm up to the facsec_max limit. But the user can
+  // XD_CONT also choose to specify a constant facsec (facsec_max will be set to facsec value then). Faster convergence
+  // XD_CONT has been seen and depends on the kind of calculation: NL2-Hydraulic only or thermal hydraulic with forced
+  // XD_CONT convection and low coupling between velocity and temperature (Boussinesq value beta low), facsec between
+  // XD_CONT 20-30NL2-Thermal hydraulic with forced convection and strong coupling between velocity and temperature
+  // XD_CONT (Boussinesq value beta high), facsec between 90-100 NL2-Thermohydralic with natural convection, facsec
+  // XD_CONT around 300NL2 -Conduction only, facsec can be set to a very high value (1e8) as if the scheme was
+  // XD_CONT unconditionally stableNL2These values can also be used as rule of thumb for initial facsec with a
+  // XD_CONT facsec_max limit higher.
+  param.ajouter("rapport_residus",&rapport_residus_); // XD_ADD_P floattant
+  // XD_CONT Ratio between the residual at time n and the residual at time n+1 above which the facsec is increased by
+  // XD_CONT multiplying by sqrt(rapport_residus) (1.2 by default).
+  param.ajouter("nb_ite_sans_accel_max",&nb_ite_sans_accel_max_); // XD_ADD_P entier
+  // XD_CONT Maximum number of iterations without facsec increases (20000 by default): if facsec does not increase with
+  // XD_CONT the previous condition (ration between 2 consecutive residuals too high), we increase it by force after
+  // XD_CONT nb_ite_sans_accel_max iterations.
 
   param.lire_avec_accolades(is);
 
@@ -150,13 +169,25 @@ void Schema_Euler_Implicite::lire_facsec_func(Entree& is)
 
 void Schema_Euler_Implicite::set_param(Param& param) const
 {
-  // XD schema_euler_implicite schema_implicite_base schema_euler_implicite INHERITS_BRACE This is the Euler implicit scheme.
+  // XD schema_euler_implicite schema_implicite_base schema_euler_implicite INHERITS_BRACE This is the Euler implicit
+  // XD_CONT scheme.
   param.ajouter("max_iter_implicite",&nb_ite_max);
-  param.ajouter_flag("facsec_cfl",&facsec_cfl_);    // XD_ADD_P rien Flag to compute time step based on CFL: dt=min(facsec,facsec_max)*dt(convection)X/
-  param.ajouter_non_std("facsec_max", (this)); // XD_ADD_P floattant For old syntax, see the complete parameters of facsec for details
-  param.ajouter_non_std("facsec_expert", (this)); // XD_ADD_P facsec_expert Advanced facsec specification
-  param.ajouter_non_std("facsec_func", (this)); // XD_ADD_P chaine Advanced facsec specification as a function
-  param.ajouter_non_std("resolution_monolithique", (this)); // XD_ADD_P bloc_lecture Activate monolithic resolution for coupled problems. Solves together the equations corresponding to the application domains in the given order. All aplication domains of the coupled equations must be given to determine the order of resolution. If the monolithic solving is not wanted for a specific application domain, an underscore can be added as prefix. For example, resolution_monolithique { dom1 { dom2 dom3 } _dom4 } will solve in a single matrix the equations having dom1 as application domain, then the equations having dom2 or dom3 as application domain in a single matrix, then the equations having dom4 as application domain in a sequential way (not in a single matrix).
+  param.ajouter_flag("facsec_cfl",&facsec_cfl_);    // XD_ADD_P rien
+  // XD_CONT Flag to compute time step based on CFL: dt=min(facsec,facsec_max)*dt(convection)X/
+  param.ajouter_non_std("facsec_max", (this)); // XD_ADD_P floattant
+  // XD_CONT For old syntax, see the complete parameters of facsec for details
+  param.ajouter_non_std("facsec_expert", (this)); // XD_ADD_P facsec_expert
+  // XD_CONT Advanced facsec specification
+  param.ajouter_non_std("facsec_func", (this)); // XD_ADD_P chaine
+  // XD_CONT Advanced facsec specification as a function
+  param.ajouter_non_std("resolution_monolithique", (this)); // XD_ADD_P bloc_lecture
+  // XD_CONT Activate monolithic resolution for coupled problems. Solves together the equations corresponding to the
+  // XD_CONT application domains in the given order. All aplication domains of the coupled equations must be given to
+  // XD_CONT determine the order of resolution. If the monolithic solving is not wanted for a specific application
+  // XD_CONT domain, an underscore can be added as prefix. For example, resolution_monolithique { dom1 { dom2 dom3 }
+  // XD_CONT _dom4 } will solve in a single matrix the equations having dom1 as application domain, then the equations
+  // XD_CONT having dom2 or dom3 as application domain in a single matrix, then the equations having dom4 as application
+  // XD_CONT domain in a sequential way (not in a single matrix).
   Schema_Implicite_base::set_param(param);
 }
 

@@ -18,9 +18,13 @@
 #include <Entree_complete.h>
 
 Implemente_instanciable(Champ_Generique_Predefini,"Predefini",Champ_Gen_de_Champs_Gen);
-// XD predefini champ_generique_base predefini INHERITS_BRACE This keyword is used to post process predefined postprocessing fields.
-// XD attr pb_champ deuxmots pb_champ REQ { Pb_champ nom_pb nom_champ } : nom_pb is the problem name and nom_champ is the selected field name. The available keywords for the field name are: energie_cinetique_totale, energie_cinetique_elem,
-// XD_CONT viscosite_turbulente, viscous_force_x, viscous_force_y, viscous_force_z, pressure_force_x, pressure_force_y, pressure_force_z, total_force_x, total_force_y, total_force_z, viscous_force, pressure_force, total_force
+// XD predefini champ_generique_base predefini INHERITS_BRACE This keyword is used to post process predefined
+// XD_CONT postprocessing fields.
+// XD attr pb_champ deuxmots pb_champ REQ { Pb_champ nom_pb nom_champ } : nom_pb is the problem name and nom_champ is
+// XD_CONT the selected field name. The available keywords for the field name are: energie_cinetique_totale,
+// XD_CONT energie_cinetique_elem, viscosite_turbulente, viscous_force_x, viscous_force_y, viscous_force_z,
+// XD_CONT pressure_force_x, pressure_force_y, pressure_force_z, total_force_x, total_force_y, total_force_z,
+// XD_CONT viscous_force, pressure_force, total_force
 
 Sortie& Champ_Generique_Predefini::printOn(Sortie& s ) const
 {

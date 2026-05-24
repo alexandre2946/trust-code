@@ -19,7 +19,8 @@
 #include <Discret_Thyd.h>
 
 Implemente_base(Source_Portance_interfaciale_base, "Source_Portance_interfaciale_base", Sources_Multiphase_base);
-// XD Portance_interfaciale source_base Portance_interfaciale BRACE Base class for source term of lift force in momentum equation.
+// XD Portance_interfaciale source_base Portance_interfaciale BRACE Base class for source term of lift force in momentum
+// XD_CONT equation.
 // XD attr beta floattant beta OPT Multiplying factor for the bubble lift force source term.
 
 Sortie& Source_Portance_interfaciale_base::printOn(Sortie& os) const { return os; }

@@ -18,7 +18,8 @@
 
 Implemente_base(Traitement_particulier_NS_base,"Traitement_particulier_NS_base",Objet_U);
 
-// XD traitement_particulier_base objet_lecture traitement_particulier_base BRACE Basic class to post-process particular values.
+// XD traitement_particulier_base objet_lecture traitement_particulier_base BRACE Basic class to post-process particular
+// XD_CONT values.
 // XD traitement_particulier objet_lecture nul NO_BRACE Auxiliary class to post-process particular values.
 // XD attr aco chaine(into=["{"]) aco REQ Opening curly bracket.
 // XD attr trait_part traitement_particulier_base trait_part REQ Type of traitement_particulier.

@@ -20,8 +20,9 @@
 Implemente_instanciable_sans_constructeur(Espece,"Espece",Fluide_Quasi_Compressible);
 // XD espece milieu_base nul BRACE not_set
 // XD attr gravite suppress_param gravite OPT Gravity field (optional).
-// XD attr porosites_champ suppress_param porosites_champ OPT The porosity is given at each element and the porosity at each face, Psi(face), is calculated by the average of the porosities of the two neighbour elements Psi(elem1), Psi(elem2) :
-// XD_CONT Psi(face)=2/(1/Psi(elem1)+1/Psi(elem2)). This keyword is optional.
+// XD attr porosites_champ suppress_param porosites_champ OPT The porosity is given at each element and the porosity at
+// XD_CONT each face, Psi(face), is calculated by the average of the porosities of the two neighbour elements
+// XD_CONT Psi(elem1), Psi(elem2) : Psi(face)=2/(1/Psi(elem1)+1/Psi(elem2)). This keyword is optional.
 // XD attr diametre_hyd_champ suppress_param diametre_hyd_champ OPT Hydraulic diameter field (optional).
 // XD attr porosites suppress_param porosites OPT Porosities.
 // XD attr rho suppress_param rho OPT Density (kg.m-3).
@@ -38,9 +39,12 @@ Entree& Espece::readOn(Entree& is)
 
 void Espece::set_param(Param& param) const
 {
-  param.ajouter("mu",&ch_mu_,Param::REQUIRED); // XD_ADD_P field_base Species dynamic viscosity value (kg.m-1.s-1).
-  param.ajouter("Cp",&ch_Cp_,Param::REQUIRED); // XD_ADD_P field_base Species specific heat value (J.kg-1.K-1).
-  param.ajouter("Masse_molaire",&Masse_mol_,Param::REQUIRED); // XD_ADD_P double Species molar mass.
+  param.ajouter("mu",&ch_mu_,Param::REQUIRED); // XD_ADD_P field_base
+  // XD_CONT Species dynamic viscosity value (kg.m-1.s-1).
+  param.ajouter("Cp",&ch_Cp_,Param::REQUIRED); // XD_ADD_P field_base
+  // XD_CONT Species specific heat value (J.kg-1.K-1).
+  param.ajouter("Masse_molaire",&Masse_mol_,Param::REQUIRED); // XD_ADD_P double
+  // XD_CONT Species molar mass.
 }
 
 void Espece::verifier_coherence_champs(int& err,Nom& msg)

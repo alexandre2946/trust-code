@@ -30,15 +30,18 @@
 #include <Perf_counters.h>
 
 // XD dt_start class_generic dt_start NO_BRACE not_set
-// XD dt_calc_dt_calc dt_start dt_calc NO_BRACE The time step at first iteration is calculated in agreement with CFL condition.
+// XD dt_calc_dt_calc dt_start dt_calc NO_BRACE The time step at first iteration is calculated in agreement with CFL
+// XD_CONT condition.
 // XD dt_calc_dt_min dt_start dt_min NO_BRACE The first iteration is based on dt_min.
 
-// XD dt_calc_dt_fixe dt_start dt_fixe NO_BRACE The first time step is fixed by the user (recommended when resuming calculation with Crank Nicholson temporal scheme to ensure continuity).
-// XD   attr value floattant value REQ first time step.
+// XD dt_calc_dt_fixe dt_start dt_fixe NO_BRACE The first time step is fixed by the user (recommended when resuming
+// XD_CONT calculation with Crank Nicholson temporal scheme to ensure continuity).
+// XD attr value floattant value REQ first time step.
 
 
 Implemente_base_sans_constructeur(Schema_Temps_base,"Schema_Temps_base",Objet_U);
-// XD schema_temps_base objet_u schema_temps_base INHERITS_BRACE Basic class for time schemes. This scheme will be associated with a problem and the equations of this problem.
+// XD schema_temps_base objet_u schema_temps_base INHERITS_BRACE Basic class for time schemes. This scheme will be
+// XD_CONT associated with a problem and the equations of this problem.
 /* Attributes further down in the cpp: */
 
 /*! @brief Constructeur par defaut d'un schema en temps.
@@ -275,38 +278,93 @@ void Schema_Temps_base::associer_pb(const Probleme_base& un_probleme)
 
 void Schema_Temps_base::set_param(Param& param) const
 {
-  param.ajouter("tinit",&tinit_); // XD_ADD_P double Value of initial calculation time (0 by default).
-  param.ajouter( "tmax",&tmax_); // XD_ADD_P double Time during which the calculation will be stopped (1e30s by default).
-  param.ajouter_non_std( "tcpumax",(this)); // XD_ADD_P double CPU time limit (must be specified in hours) for which the calculation is stopped (1e30s by default).
-  param.ajouter( "dt_min",&dt_min_); // XD_ADD_P double Minimum calculation time step (1e-16s by default).
-  param.ajouter( "dt_max",&dt_max_str_); // XD_ADD_P chaine Maximum calculation time step as function of time (1e30s by default).
-  param.ajouter( "dt_sauv",&dt_sauv_); // XD_ADD_P double Save time step value (1e30s by default). Every dt_sauv, fields are saved in the .sauv file. The file contains all the information saved over time. If this instruction is not entered, results are saved only upon calculation completion. To disable the writing of the .sauv files, you must specify 0. Note that dt_sauv is in terms of physical time (not cpu time).
-  param.ajouter( "nb_sauv_max",&nb_sauv_max_); // XD_ADD_P entier Maximum number of timesteps that will be stored in backup file (10 by default). This value is only useful when doing a complete backup of the calculation with parallel PDI (as it needs to allocate the proper amount of dataspace in advance). If this number is reached (ie we already stored the data of nb_sauv_max timesteps in the file), the next checkpoints will overwrite the first ones
-  param.ajouter( "dt_impr",&dt_impr_); // XD_ADD_P double Scheme parameter printing time step in time (1e30s by default). The time steps and the flux balances are printed (incorporated onto every side of processed domains) into the .out file.
-  param.ajouter_non_std("facsec",(this)); // XD_ADD_P chaine Value assigned to the safety factor for the time step (1. by default). It can also be a function of time. The time step calculated is multiplied by the safety factor. The first thing to try when a calculation does not converge with an explicit time scheme is to reduce the facsec to 0.5. NL2 Warning: Some schemes needs a facsec lower than 1 (0.5 is a good start), for example Schema_Adams_Bashforth_order_3.
-  param.ajouter( "seuil_statio",&seuil_statio_); // XD_ADD_P double Value of the convergence threshold (1e-12 by default). Problems using this type of time scheme converge when the derivatives dGi/dt NL1 of all the unknown transported values Gi have a combined absolute value less than this value. This is the keyword used to set the permanent rating threshold.
-  param.ajouter_non_std("residuals", (this));    // XD_ADD_P residuals To specify how the residuals will be computed (default max norm, possible to choose L2-norm instead).
-  param.ajouter( "diffusion_implicite",&ind_diff_impl_); // XD_ADD_P entier Keyword to make the diffusive term in the Navier-Stokes equations implicit (in this case, it should be set to 1). The stability time step is then only based on the convection time step (dt=facsec*dt_convection). Thus, in some circumstances, an important gain is achieved with respect to the time step (large diffusion with respect to convection on tightened meshes). Caution: It is however recommended that the user avoids exceeding the convection time step by selecting a too large facsec value. Start with a facsec value of 1 and then increase it gradually if you wish to accelerate calculation. In addition, for a natural convection calculation with a zero initial velocity, in the first time step, the convection time is infinite and therefore dt=facsec*dt_max.
-  param.ajouter( "seuil_diffusion_implicite",&seuil_diff_impl_); // XD_ADD_P double This keyword changes the default value (1e-6) of convergency criteria for the resolution by conjugate gradient used for implicit diffusion.
-  param.ajouter( "impr_diffusion_implicite",&impr_diff_impl_); // XD_ADD_P entier Unactivate (default) or not the printing of the convergence during the resolution of the conjugate gradient.
-  param.ajouter( "impr_extremums",&impr_extremums_); // XD_ADD_P entier Print unknowns extremas
-  param.ajouter( "no_error_if_not_converged_diffusion_implicite",&no_error_if_not_converged_diff_impl_); // XD_ADD_P entier not_set
-  param.ajouter( "no_conv_subiteration_diffusion_implicite",&no_conv_subiteration_diff_impl_); // XD_ADD_P entier not_set
-  param.ajouter_non_std( "dt_start",(this)); // XD_ADD_P dt_start dt_start dt_min : the first iteration is based on dt_min. NL2 dt_start dt_calc : the time step at first iteration is calculated in agreement with CFL condition. NL2 dt_start dt_fixe value : the first time step is fixed by the user (recommended when resuming calculation with Crank Nicholson temporal scheme to ensure continuity). NL2 By default, the first iteration is based on dt_calc.
-  param.ajouter_non_std( "nb_pas_dt_max",(this)); // XD_ADD_P entier Maximum number of calculation time steps (1e9 by default).
-  param.ajouter( "niter_max_diffusion_implicite",&niter_max_diff_impl_); // XD_ADD_P entier This keyword changes the default value (number of unknowns) of the maximal iterations number in the conjugate gradient method used for implicit diffusion.
-  param.ajouter( "precision_impr",&precision_impr_); // XD_ADD_P entier Optional keyword to define the digit number for flux values printed into .out files (by default 3).
-  param.ajouter_non_std( "periode_sauvegarde_securite_en_heures",(this)); // XD_ADD_P double To change the default period (23 hours) between the save of the fields in .sauv file.
-  param.ajouter_non_std( "no_check_disk_space",(this)); // XD_ADD_P flag To disable the check of the available amount of disk space during the calculation.
-  param.ajouter_flag( "disable_progress",&disable_progress_); // XD_ADD_P flag To disable the writing of the .progress file.
-  param.ajouter_flag( "disable_dt_ev",&disable_dt_ev_); // XD_ADD_P flag To disable the writing of the .dt_ev file.
-  param.ajouter_flag("adapt_dt_tmax", &adapt_dt_tmax_); // XD_ADD_P flag Use to adapt final dt when approaching tmax.
-  param.ajouter( "gnuplot_header",&gnuplot_header_); // XD_ADD_P entier Optional keyword to modify the header of the .out files. Allows to use the column title instead of columns number.
+  param.ajouter("tinit",&tinit_); // XD_ADD_P double
+  // XD_CONT Value of initial calculation time (0 by default).
+  param.ajouter( "tmax",&tmax_); // XD_ADD_P double
+  // XD_CONT Time during which the calculation will be stopped (1e30s by default).
+  param.ajouter_non_std( "tcpumax",(this)); // XD_ADD_P double
+  // XD_CONT CPU time limit (must be specified in hours) for which the calculation is stopped (1e30s by default).
+  param.ajouter( "dt_min",&dt_min_); // XD_ADD_P double
+  // XD_CONT Minimum calculation time step (1e-16s by default).
+  param.ajouter( "dt_max",&dt_max_str_); // XD_ADD_P chaine
+  // XD_CONT Maximum calculation time step as function of time (1e30s by default).
+  param.ajouter( "dt_sauv",&dt_sauv_); // XD_ADD_P double
+  // XD_CONT Save time step value (1e30s by default). Every dt_sauv, fields are saved in the .sauv file. The file
+  // XD_CONT contains all the information saved over time. If this instruction is not entered, results are saved only
+  // XD_CONT upon calculation completion. To disable the writing of the .sauv files, you must specify 0. Note that
+  // XD_CONT dt_sauv is in terms of physical time (not cpu time).
+  param.ajouter( "nb_sauv_max",&nb_sauv_max_); // XD_ADD_P entier
+  // XD_CONT Maximum number of timesteps that will be stored in backup file (10 by default). This value is only useful
+  // XD_CONT when doing a complete backup of the calculation with parallel PDI (as it needs to allocate the proper
+  // XD_CONT amount of dataspace in advance). If this number is reached (ie we already stored the data of nb_sauv_max
+  // XD_CONT timesteps in the file), the next checkpoints will overwrite the first ones
+  param.ajouter( "dt_impr",&dt_impr_); // XD_ADD_P double
+  // XD_CONT Scheme parameter printing time step in time (1e30s by default). The time steps and the flux balances are
+  // XD_CONT printed (incorporated onto every side of processed domains) into the .out file.
+  param.ajouter_non_std("facsec",(this)); // XD_ADD_P chaine
+  // XD_CONT Value assigned to the safety factor for the time step (1. by default). It can also be a function of time.
+  // XD_CONT The time step calculated is multiplied by the safety factor. The first thing to try when a calculation does
+  // XD_CONT not converge with an explicit time scheme is to reduce the facsec to 0.5. NL2 Warning: Some schemes needs a
+  // XD_CONT facsec lower than 1 (0.5 is a good start), for example Schema_Adams_Bashforth_order_3.
+  param.ajouter( "seuil_statio",&seuil_statio_); // XD_ADD_P double
+  // XD_CONT Value of the convergence threshold (1e-12 by default). Problems using this type of time scheme converge
+  // XD_CONT when the derivatives dGi/dt NL1 of all the unknown transported values Gi have a combined absolute value
+  // XD_CONT less than this value. This is the keyword used to set the permanent rating threshold.
+  param.ajouter_non_std("residuals", (this));    // XD_ADD_P residuals
+  // XD_CONT To specify how the residuals will be computed (default max norm, possible to choose L2-norm instead).
+  param.ajouter( "diffusion_implicite",&ind_diff_impl_); // XD_ADD_P entier
+  // XD_CONT Keyword to make the diffusive term in the Navier-Stokes equations implicit (in this case, it should be set
+  // XD_CONT to 1). The stability time step is then only based on the convection time step (dt=facsec*dt_convection).
+  // XD_CONT Thus, in some circumstances, an important gain is achieved with respect to the time step (large diffusion
+  // XD_CONT with respect to convection on tightened meshes). Caution: It is however recommended that the user avoids
+  // XD_CONT exceeding the convection time step by selecting a too large facsec value. Start with a facsec value of 1
+  // XD_CONT and then increase it gradually if you wish to accelerate calculation. In addition, for a natural convection
+  // XD_CONT calculation with a zero initial velocity, in the first time step, the convection time is infinite and
+  // XD_CONT therefore dt=facsec*dt_max.
+  param.ajouter( "seuil_diffusion_implicite",&seuil_diff_impl_); // XD_ADD_P double
+  // XD_CONT This keyword changes the default value (1e-6) of convergency criteria for the resolution by conjugate
+  // XD_CONT gradient used for implicit diffusion.
+  param.ajouter( "impr_diffusion_implicite",&impr_diff_impl_); // XD_ADD_P entier
+  // XD_CONT Unactivate (default) or not the printing of the convergence during the resolution of the conjugate
+  // XD_CONT gradient.
+  param.ajouter( "impr_extremums",&impr_extremums_); // XD_ADD_P entier
+  // XD_CONT Print unknowns extremas
+  param.ajouter( "no_error_if_not_converged_diffusion_implicite",&no_error_if_not_converged_diff_impl_); // XD_ADD_P entier
+  // XD_CONT not_set
+  param.ajouter( "no_conv_subiteration_diffusion_implicite",&no_conv_subiteration_diff_impl_); // XD_ADD_P entier
+  // XD_CONT not_set
+  param.ajouter_non_std( "dt_start",(this)); // XD_ADD_P dt_start
+  // XD_CONT dt_start dt_min : the first iteration is based on dt_min. NL2 dt_start dt_calc : the time step at first
+  // XD_CONT iteration is calculated in agreement with CFL condition. NL2 dt_start dt_fixe value : the first time step
+  // XD_CONT is fixed by the user (recommended when resuming calculation with Crank Nicholson temporal scheme to ensure
+  // XD_CONT continuity). NL2 By default, the first iteration is based on dt_calc.
+  param.ajouter_non_std( "nb_pas_dt_max",(this)); // XD_ADD_P entier
+  // XD_CONT Maximum number of calculation time steps (1e9 by default).
+  param.ajouter( "niter_max_diffusion_implicite",&niter_max_diff_impl_); // XD_ADD_P entier
+  // XD_CONT This keyword changes the default value (number of unknowns) of the maximal iterations number in the
+  // XD_CONT conjugate gradient method used for implicit diffusion.
+  param.ajouter( "precision_impr",&precision_impr_); // XD_ADD_P entier
+  // XD_CONT Optional keyword to define the digit number for flux values printed into .out files (by default 3).
+  param.ajouter_non_std( "periode_sauvegarde_securite_en_heures",(this)); // XD_ADD_P double
+  // XD_CONT To change the default period (23 hours) between the save of the fields in .sauv file.
+  param.ajouter_non_std( "no_check_disk_space",(this)); // XD_ADD_P flag
+  // XD_CONT To disable the check of the available amount of disk space during the calculation.
+  param.ajouter_flag( "disable_progress",&disable_progress_); // XD_ADD_P flag
+  // XD_CONT To disable the writing of the .progress file.
+  param.ajouter_flag( "disable_dt_ev",&disable_dt_ev_); // XD_ADD_P flag
+  // XD_CONT To disable the writing of the .dt_ev file.
+  param.ajouter_flag("adapt_dt_tmax", &adapt_dt_tmax_); // XD_ADD_P flag
+  // XD_CONT Use to adapt final dt when approaching tmax.
+  param.ajouter( "gnuplot_header",&gnuplot_header_); // XD_ADD_P entier
+  // XD_CONT Optional keyword to modify the header of the .out files. Allows to use the column title instead of columns
+  // XD_CONT number.
 
-  // XD  residuals interprete nul BRACE To specify how the residuals will be computed.
-  // XD attr norm chaine(into=["L2","max"]) norm OPT allows to choose the norm we want to use (max norm by default). Possible to specify L2-norm.
-// XD attr relative chaine(into=["0","1","2"]) relative OPT This is the old keyword seuil_statio_relatif_deconseille. If it is set to 1, it will normalize the residuals with the residuals of the first 5 timesteps (default is 0). if set to 2, residual will be
-// XD_CONT computed as R/(max-min).
+  // XD residuals interprete nul BRACE To specify how the residuals will be computed.
+  // XD attr norm chaine(into=["L2","max"]) norm OPT allows to choose the norm we want to use (max norm by default).
+  // XD_CONT Possible to specify L2-norm.
+// XD attr relative chaine(into=["0","1","2"]) relative OPT This is the old keyword seuil_statio_relatif_deconseille. If
+// XD_CONT it is set to 1, it will normalize the residuals with the residuals of the first 5 timesteps (default is 0).
+// XD_CONT if set to 2, residual will be computed as R/(max-min).
 }
 
 /*! @brief Surcharge Objet_U::printOn(Sortie&) Imprime le schema en temps sur un flot de sortie.

@@ -19,8 +19,10 @@
 #include <Param.h>
 
 Implemente_instanciable(Modele_turbulence_scal_Schmidt, "Modele_turbulence_scal_Schmidt", Modele_turbulence_scal_diffturb_base);
-// XD schmidt modele_turbulence_scal_base schmidt INHERITS_BRACE The Schmidt model. For the scalar equations, only the model based on Reynolds analogy is available. If K_Epsilon was selected in the hydraulic equation, Schmidt must be selected for the
-// XD_CONT convection-diffusion temperature equation coupled to the hydraulic equation and Schmidt for the concentration equations.
+// XD schmidt modele_turbulence_scal_base schmidt INHERITS_BRACE The Schmidt model. For the scalar equations, only the
+// XD_CONT model based on Reynolds analogy is available. If K_Epsilon was selected in the hydraulic equation, Schmidt
+// XD_CONT must be selected for the convection-diffusion temperature equation coupled to the hydraulic equation and
+// XD_CONT Schmidt for the concentration equations.
 
 Sortie& Modele_turbulence_scal_Schmidt::printOn(Sortie& s) const { return Modele_turbulence_scal_diffturb_base::printOn(s); }
 
@@ -33,7 +35,8 @@ Entree& Modele_turbulence_scal_Schmidt::readOn(Entree& is)
 
 void Modele_turbulence_scal_Schmidt::set_param(Param& param) const
 {
-  param.ajouter("ScTurb", &LeScturb_); // XD_ADD_P floattant Keyword to modify the constant (Sct) of Schmlidt model : Dt=Nut/Sct Default value is 0.7.
+  param.ajouter("ScTurb", &LeScturb_); // XD_ADD_P floattant
+  // XD_CONT Keyword to modify the constant (Sct) of Schmlidt model : Dt=Nut/Sct Default value is 0.7.
   Modele_turbulence_scal_base::set_param(param);
 }
 

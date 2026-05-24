@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -23,7 +23,8 @@
 #include <Param.h>
 
 Implemente_instanciable_sans_constructeur(Loi_Etat_Multi_GP_QC,"Loi_Etat_Multi_Gaz_Parfait_QC",Loi_Etat_Multi_GP_base);
-// XD multi_gaz_parfait_QC loi_etat_gaz_parfait_base multi_gaz_parfait_QC INHERITS_BRACE Class for perfect gas multi-species mixtures state law used with a quasi-compressible fluid.
+// XD multi_gaz_parfait_QC loi_etat_gaz_parfait_base multi_gaz_parfait_QC INHERITS_BRACE Class for perfect gas
+// XD_CONT multi-species mixtures state law used with a quasi-compressible fluid.
 
 Loi_Etat_Multi_GP_QC::Loi_Etat_Multi_GP_QC() : Sc_(-1),dtol_fraction_(1.e-6) { }
 
@@ -36,12 +37,18 @@ Sortie& Loi_Etat_Multi_GP_QC::printOn(Sortie& os) const
 Entree& Loi_Etat_Multi_GP_QC::readOn(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter("Sc",&Sc_,Param::REQUIRED); // XD_ADD_P double Schmidt number of the gas Sc=nu/D (D: diffusion coefficient of the mixing).
-  param.ajouter( "Prandtl",&Pr_,Param::REQUIRED); // XD_ADD_P double Prandtl number of the gas Pr=mu*Cp/lambda
-  param.ajouter( "Cp",&Cp_); // XD_ADD_P double Specific heat at constant pressure of the gas Cp.
-  param.ajouter( "dtol_fraction",&dtol_fraction_); // XD_ADD_P double Delta tolerance on mass fractions for check testing (default value 1.e-6).
-  param.ajouter_flag( "correction_fraction",&correction_fraction_); // XD_ADD_P flag To force mass fractions between 0. and 1.
-  param.ajouter_flag( "ignore_check_fraction",&ignore_check_fraction_); // XD_ADD_P flag Not to check if mass fractions between 0. and 1.
+  param.ajouter("Sc",&Sc_,Param::REQUIRED); // XD_ADD_P double
+  // XD_CONT Schmidt number of the gas Sc=nu/D (D: diffusion coefficient of the mixing).
+  param.ajouter( "Prandtl",&Pr_,Param::REQUIRED); // XD_ADD_P double
+  // XD_CONT Prandtl number of the gas Pr=mu*Cp/lambda
+  param.ajouter( "Cp",&Cp_); // XD_ADD_P double
+  // XD_CONT Specific heat at constant pressure of the gas Cp.
+  param.ajouter( "dtol_fraction",&dtol_fraction_); // XD_ADD_P double
+  // XD_CONT Delta tolerance on mass fractions for check testing (default value 1.e-6).
+  param.ajouter_flag( "correction_fraction",&correction_fraction_); // XD_ADD_P flag
+  // XD_CONT To force mass fractions between 0. and 1.
+  param.ajouter_flag( "ignore_check_fraction",&ignore_check_fraction_); // XD_ADD_P flag
+  // XD_CONT Not to check if mass fractions between 0. and 1.
   param.lire_avec_accolades_depuis(is);
   return is;
 }

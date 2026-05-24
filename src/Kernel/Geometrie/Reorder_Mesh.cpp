@@ -26,7 +26,9 @@
 #include <fstream>
 
 Implemente_instanciable(Reorder_Mesh, "Reorder_Mesh", Objet_U);
-// XD reorder_mesh objet_u reorder_mesh BRACE Reordering option to be used in a discretisation : the geometrical entities (nodes, elems, faces) of a mesh can be reordered to follow a Z-curve (Hilbert or Morton) improving data locality in memory.
+// XD reorder_mesh objet_u reorder_mesh BRACE Reordering option to be used in a discretisation : the geometrical
+// XD_CONT entities (nodes, elems, faces) of a mesh can be reordered to follow a Z-curve (Hilbert or Morton) improving
+// XD_CONT data locality in memory.
 
 namespace // Anonymous namespace
 {
@@ -271,16 +273,22 @@ Entree& Reorder_Mesh::readOn(Entree& is)
 
   Param p(que_suis_je());
   algo = 0;
-  p.ajouter("algo", &algo);     // XD_ADD_P dico Z-Curve algorithm to use for geometrical entity renumbering.
+  p.ajouter("algo", &algo);     // XD_ADD_P dico
+  // XD_CONT Z-Curve algorithm to use for geometrical entity renumbering.
   p.dictionnaire("none", 0);    // XD_ADD_DICO No reordering performed (the default).
   p.dictionnaire("morton", 1);  // XD_ADD_DICO Morton scheme for reordering.
   p.dictionnaire("hilbert", 2); // XD_ADD_DICO Hilbert scheme for reordering.
 
-  p.ajouter_flag("dump", &dump_);  // XD_ADD_P flag if set, will dump text files giving the numbering of the various geometrical entities before and after renumbering. Mainly used for debugging.
+  p.ajouter_flag("dump", &dump_);  // XD_ADD_P flag
+  // XD_CONT if set, will dump text files giving the numbering of the various geometrical entities before and after
+  // XD_CONT renumbering. Mainly used for debugging.
   // Values of those flags will be set to false by default:
-  p.ajouter_flag("no_nodes", &no_nodes_);  // XD_ADD_P flag Whether to avoid node reordering.
-  p.ajouter_flag("no_elems", &no_elems_);  // XD_ADD_P flag Whether to avoid element reordering.
-  p.ajouter_flag("no_faces", &no_faces_);  // XD_ADD_P flag Whether to avoid face reordering.
+  p.ajouter_flag("no_nodes", &no_nodes_);  // XD_ADD_P flag
+  // XD_CONT Whether to avoid node reordering.
+  p.ajouter_flag("no_elems", &no_elems_);  // XD_ADD_P flag
+  // XD_CONT Whether to avoid element reordering.
+  p.ajouter_flag("no_faces", &no_faces_);  // XD_ADD_P flag
+  // XD_CONT Whether to avoid face reordering.
 
   p.lire_avec_accolades(is);
 

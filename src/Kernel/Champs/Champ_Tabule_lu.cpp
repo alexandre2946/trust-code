@@ -17,7 +17,8 @@
 #include <EChaine.h>
 
 Implemente_instanciable(Champ_Tabule_lu, "Champ_Tabule_lu", Champ_Tabule_Temps);
-// XD champ_tabule_lu champ_tabule_temps champ_tabule_lu NO_BRACE Uniform field, tabulated from a specified column file. Lines starting with # are ignored.
+// XD champ_tabule_lu champ_tabule_temps champ_tabule_lu NO_BRACE Uniform field, tabulated from a specified column file.
+// XD_CONT Lines starting with # are ignored.
 // XD attr nb_comp entier nb_comp REQ Number of field components.
 // XD attr column_file chaine column_file REQ Name of the column file.
 // XD attr bloc suppress_param bloc REQ del

@@ -34,8 +34,10 @@
 #include <Perf_counters.h>
 
 Implemente_instanciable(MaillerParallel, "MaillerParallel", Interprete);
-// XD maillerparallel interprete maillerparallel BRACE creates a parallel distributed hexaedral mesh of a parallelipipedic box. It is equivalent to creating a mesh with a single Pave, splitting it with Decouper and reloading it in parallel with Scatter. It
-// XD_CONT only works in 3D at this time. It can also be used for a sequential computation (with all NPARTS=1)}
+// XD maillerparallel interprete maillerparallel BRACE creates a parallel distributed hexaedral mesh of a
+// XD_CONT parallelipipedic box. It is equivalent to creating a mesh with a single Pave, splitting it with Decouper and
+// XD_CONT reloading it in parallel with Scatter. It only works in 3D at this time. It can also be used for a sequential
+// XD_CONT computation (with all NPARTS=1)}
 
 Entree& MaillerParallel::readOn(Entree& is)
 {
@@ -555,25 +557,53 @@ Entree& MaillerParallel::interpreter(Entree& is)
   IntTab mapping;
 
   Param param(que_suis_je());
-  param.ajouter("domain", &nom_domaine, Param::REQUIRED); // XD_ADD_P ref_domaine the name of the domain to mesh (it must be an empty domain object).
-  param.ajouter("nb_nodes", &nb_noeuds, Param::REQUIRED); // XD_ADD_P listentier dimension defines the spatial dimension (currently only dimension=3 is supported), and nX, nY and nZ defines the total number of nodes in the mesh in each direction.
-  param.ajouter("splitting", &decoupage, Param::REQUIRED); // XD_ADD_P listentier dimension is the spatial dimension and npartsX, npartsY and npartsZ are the number of parts created. The product of the number of parts must be equal to the number of processors used for the computation.
-  param.ajouter("ghost_thickness", &epaisseur_joint, Param::REQUIRED); // XD_ADD_P entier the number of ghost cells (equivalent to the epaisseur_joint parameter of Decouper.
-  param.ajouter_flag("perio_x", &perio[0]); // XD_ADD_P rien change the splitting method to provide a valid mesh for periodic boundary conditions. Register the corresponding boundary in the list of periodic boundaries for the domain.
-  param.ajouter_flag("perio_y", &perio[1]); // XD_ADD_P rien change the splitting method to provide a valid mesh for periodic boundary conditions. Register the corresponding boundary in the list of periodic boundaries for the domain.
-  param.ajouter_flag("perio_z", &perio[2]); // XD_ADD_P rien change the splitting method to provide a valid mesh for periodic boundary conditions. Register the corresponding boundary in the list of periodic boundaries for the domain.
-  param.ajouter("function_coord_x", &fonctions_coord[0]); // XD_ADD_P chaine By default, the meshing algorithm creates nX nY nZ coordinates ranging between 0 and 1 (eg a unity size box). If function_coord_x} is specified, it is used to transform the [0,1] segment to the coordinates of the nodes. funcX must be a function of the x variable only.
-  param.ajouter("function_coord_y", &fonctions_coord[1]); // XD_ADD_P chaine like function_coord_x for y
-  param.ajouter("function_coord_z", &fonctions_coord[2]); // XD_ADD_P chaine like function_coord_x for z
-  param.ajouter("file_coord_x", &fichier_coord[0]); // XD_ADD_P chaine Keyword to read the Nx floating point values used as nodes coordinates in the file.
-  param.ajouter("file_coord_y", &fichier_coord[1]); // XD_ADD_P chaine idem file_coord_x for y
-  param.ajouter("file_coord_z", &fichier_coord[2]); // XD_ADD_P chaine idem file_coord_x for z
-  param.ajouter("boundary_xmin", &nom_bords_min[0]); // XD_ADD_P chaine the name of the boundary at the minimum X direction. If it not provided, the default boundary names are xmin, xmax, ymin, ymax, zmin and zmax. If the mesh is periodic in a given direction, only the MIN boundary name is used, for both sides of the box.
-  param.ajouter("boundary_xmax", &nom_bords_max[0]); // XD_ADD_P chaine not_set
-  param.ajouter("boundary_ymin", &nom_bords_min[1]); // XD_ADD_P chaine not_set
-  param.ajouter("boundary_ymax", &nom_bords_max[1]); // XD_ADD_P chaine not_set
-  param.ajouter("boundary_zmin", &nom_bords_min[2]); // XD_ADD_P chaine not_set
-  param.ajouter("boundary_zmax", &nom_bords_max[2]); // XD_ADD_P chaine not_set
+  param.ajouter("domain", &nom_domaine, Param::REQUIRED); // XD_ADD_P ref_domaine
+  // XD_CONT the name of the domain to mesh (it must be an empty domain object).
+  param.ajouter("nb_nodes", &nb_noeuds, Param::REQUIRED); // XD_ADD_P listentier
+  // XD_CONT dimension defines the spatial dimension (currently only dimension=3 is supported), and nX, nY and nZ
+  // XD_CONT defines the total number of nodes in the mesh in each direction.
+  param.ajouter("splitting", &decoupage, Param::REQUIRED); // XD_ADD_P listentier
+  // XD_CONT dimension is the spatial dimension and npartsX, npartsY and npartsZ are the number of parts created. The
+  // XD_CONT product of the number of parts must be equal to the number of processors used for the computation.
+  param.ajouter("ghost_thickness", &epaisseur_joint, Param::REQUIRED); // XD_ADD_P entier
+  // XD_CONT the number of ghost cells (equivalent to the epaisseur_joint parameter of Decouper.
+  param.ajouter_flag("perio_x", &perio[0]); // XD_ADD_P rien
+  // XD_CONT change the splitting method to provide a valid mesh for periodic boundary conditions. Register the
+  // XD_CONT corresponding boundary in the list of periodic boundaries for the domain.
+  param.ajouter_flag("perio_y", &perio[1]); // XD_ADD_P rien
+  // XD_CONT change the splitting method to provide a valid mesh for periodic boundary conditions. Register the
+  // XD_CONT corresponding boundary in the list of periodic boundaries for the domain.
+  param.ajouter_flag("perio_z", &perio[2]); // XD_ADD_P rien
+  // XD_CONT change the splitting method to provide a valid mesh for periodic boundary conditions. Register the
+  // XD_CONT corresponding boundary in the list of periodic boundaries for the domain.
+  param.ajouter("function_coord_x", &fonctions_coord[0]); // XD_ADD_P chaine
+  // XD_CONT By default, the meshing algorithm creates nX nY nZ coordinates ranging between 0 and 1 (eg a unity size
+  // XD_CONT box). If function_coord_x} is specified, it is used to transform the [0,1] segment to the coordinates of
+  // XD_CONT the nodes. funcX must be a function of the x variable only.
+  param.ajouter("function_coord_y", &fonctions_coord[1]); // XD_ADD_P chaine
+  // XD_CONT like function_coord_x for y
+  param.ajouter("function_coord_z", &fonctions_coord[2]); // XD_ADD_P chaine
+  // XD_CONT like function_coord_x for z
+  param.ajouter("file_coord_x", &fichier_coord[0]); // XD_ADD_P chaine
+  // XD_CONT Keyword to read the Nx floating point values used as nodes coordinates in the file.
+  param.ajouter("file_coord_y", &fichier_coord[1]); // XD_ADD_P chaine
+  // XD_CONT idem file_coord_x for y
+  param.ajouter("file_coord_z", &fichier_coord[2]); // XD_ADD_P chaine
+  // XD_CONT idem file_coord_x for z
+  param.ajouter("boundary_xmin", &nom_bords_min[0]); // XD_ADD_P chaine
+  // XD_CONT the name of the boundary at the minimum X direction. If it not provided, the default boundary names are
+  // XD_CONT xmin, xmax, ymin, ymax, zmin and zmax. If the mesh is periodic in a given direction, only the MIN boundary
+  // XD_CONT name is used, for both sides of the box.
+  param.ajouter("boundary_xmax", &nom_bords_max[0]); // XD_ADD_P chaine
+  // XD_CONT not_set
+  param.ajouter("boundary_ymin", &nom_bords_min[1]); // XD_ADD_P chaine
+  // XD_CONT not_set
+  param.ajouter("boundary_ymax", &nom_bords_max[1]); // XD_ADD_P chaine
+  // XD_CONT not_set
+  param.ajouter("boundary_zmin", &nom_bords_min[2]); // XD_ADD_P chaine
+  // XD_CONT not_set
+  param.ajouter("boundary_zmax", &nom_bords_max[2]); // XD_ADD_P chaine
+  // XD_CONT not_set
   param.ajouter("mapping", &mapping);
   param.lire_avec_accolades(is);
 

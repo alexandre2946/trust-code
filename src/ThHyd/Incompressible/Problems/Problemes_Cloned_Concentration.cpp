@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -23,15 +23,22 @@ Implemente_instanciable(Pb_Hydraulique_Cloned_Concentration, "Pb_Hydraulique_Clo
 Sortie& Pb_Hydraulique_Cloned_Concentration::printOn(Sortie& os) const { return TRUSTProblem_Cloned_Concentration_Gen<Pb_Hydraulique>::printOn(os); }
 Entree& Pb_Hydraulique_Cloned_Concentration::readOn(Entree& is) { return TRUSTProblem_Cloned_Concentration_Gen<Pb_Hydraulique>::readOn(is); }
 
-// XD Pb_Thermohydraulique_Cloned_Concentration Pb_base Pb_Thermohydraulique_Cloned_Concentration INHERITS_BRACE Resolution of Navier-Stokes/energy/multiple constituent transport equations.
-// XD   attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the problem.
-// XD   attr constituant constituant constituant OPT Constituents.
-// XD   attr navier_stokes_standard navier_stokes_standard navier_stokes_standard OPT Navier-Stokes equations.
-// XD   attr convection_diffusion_concentration convection_diffusion_concentration convection_diffusion_concentration OPT Constituent transport equations (concentration diffusion convection).
-// XD   attr convection_diffusion_temperature convection_diffusion_temperature convection_diffusion_temperature OPT Energy equation (temperature diffusion convection).
+// XD Pb_Thermohydraulique_Cloned_Concentration Pb_base Pb_Thermohydraulique_Cloned_Concentration INHERITS_BRACE
+// XD_CONT Resolution of Navier-Stokes/energy/multiple constituent transport equations.
+// XD attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the
+// XD_CONT problem.
+// XD attr constituant constituant constituant OPT Constituents.
+// XD attr navier_stokes_standard navier_stokes_standard navier_stokes_standard OPT Navier-Stokes equations.
+// XD attr convection_diffusion_concentration convection_diffusion_concentration convection_diffusion_concentration OPT
+// XD_CONT Constituent transport equations (concentration diffusion convection).
+// XD attr convection_diffusion_temperature convection_diffusion_temperature convection_diffusion_temperature OPT Energy
+// XD_CONT equation (temperature diffusion convection).
 
-// XD Pb_Hydraulique_Cloned_Concentration Pb_base Pb_Hydraulique_Cloned_Concentration INHERITS_BRACE Resolution of Navier-Stokes/multiple constituent transport equations.
-// XD   attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the problem.
-// XD   attr constituant constituant constituant OPT Constituents.
-// XD   attr navier_stokes_standard navier_stokes_standard navier_stokes_standard OPT Navier-Stokes equations.
-// XD   attr convection_diffusion_concentration convection_diffusion_concentration convection_diffusion_concentration OPT Constituent transport vectorial equation (concentration diffusion convection).
+// XD Pb_Hydraulique_Cloned_Concentration Pb_base Pb_Hydraulique_Cloned_Concentration INHERITS_BRACE Resolution of
+// XD_CONT Navier-Stokes/multiple constituent transport equations.
+// XD attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the
+// XD_CONT problem.
+// XD attr constituant constituant constituant OPT Constituents.
+// XD attr navier_stokes_standard navier_stokes_standard navier_stokes_standard OPT Navier-Stokes equations.
+// XD attr convection_diffusion_concentration convection_diffusion_concentration convection_diffusion_concentration OPT
+// XD_CONT Constituent transport vectorial equation (concentration diffusion convection).

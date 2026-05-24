@@ -23,9 +23,11 @@
 #include <Param.h>
 
 Implemente_base(Modele_turbulence_scal_base, "Modele_turbulence_scal_base", Objet_U);
-// XD turbulence_paroi_scalaire_base objet_u turbulence_paroi_scalaire_base INHERITS_BRACE Basic class for wall laws for energy equation.
+// XD turbulence_paroi_scalaire_base objet_u turbulence_paroi_scalaire_base INHERITS_BRACE Basic class for wall laws for
+// XD_CONT energy equation.
 
-// XD modele_turbulence_scal_base objet_u modele_turbulence_scal_base INHERITS_BRACE Basic class for turbulence model for energy equation.
+// XD modele_turbulence_scal_base objet_u modele_turbulence_scal_base INHERITS_BRACE Basic class for turbulence model
+// XD_CONT for energy equation.
 
 Sortie& Modele_turbulence_scal_base::printOn(Sortie& s) const
 {
@@ -56,9 +58,17 @@ Entree& Modele_turbulence_scal_base::readOn(Entree& is)
 
 void Modele_turbulence_scal_base::set_param(Param& param) const
 {
-  param.ajouter("dt_impr_nusselt", &dt_impr_nusselt_); // XD_ADD_P floattant Keyword to print local values of Nusselt number and temperature near a wall during a turbulent calculation. The values will be printed in the _Nusselt.face file each dt_impr_nusselt time period. The local Nusselt expression is as follows : Nu = ((lambda+lambda_t)/lambda)*d_wall/d_eq where d_wall is the distance from the first mesh to the wall and d_eq is given by the wall law. This option also gives the value of d_eq and h = (lambda+lambda_t)/d_eq and the fluid temperature of the first mesh near the wall. NL2 For the Neumann boundary conditions (flux_impose), the <<equivalent>> wall temperature given by the wall law is also printed (Tparoi equiv.) preceded for VEF calculation by the edge temperature <<T face de bord>>.
+  param.ajouter("dt_impr_nusselt", &dt_impr_nusselt_); // XD_ADD_P floattant
+  // XD_CONT Keyword to print local values of Nusselt number and temperature near a wall during a turbulent calculation.
+  // XD_CONT The values will be printed in the _Nusselt.face file each dt_impr_nusselt time period. The local Nusselt
+  // XD_CONT expression is as follows : Nu = ((lambda+lambda_t)/lambda)*d_wall/d_eq where d_wall is the distance from
+  // XD_CONT the first mesh to the wall and d_eq is given by the wall law. This option also gives the value of d_eq and
+  // XD_CONT h = (lambda+lambda_t)/d_eq and the fluid temperature of the first mesh near the wall. NL2 For the Neumann
+  // XD_CONT boundary conditions (flux_impose), the <<equivalent>> wall temperature given by the wall law is also
+  // XD_CONT printed (Tparoi equiv.) preceded for VEF calculation by the edge temperature <<T face de bord>>.
   param.ajouter_non_std("dt_impr_nusselt_mean_only", (this)); // XD attr dt_impr_nusselt_mean_only dt_impr_nusselt_mean_only dt_impr_nusselt_mean_only OPT This keyword is used to print the mean values of Nusselt ( obtained with the wall laws) on each boundary, into a file named datafile_ProblemName_nusselt_mean_only.out. periode refers to the printing period, this value is expressed in seconds. If you don\'t use the optional keyword boundaries, all the boundaries will be considered. If you use it, you must specify nb_boundaries which is the number of boundaries on which you want to calculate the mean values, then you have to specify their names.
-  param.ajouter_non_std("turbulence_paroi", this); // XD_ADD_P turbulence_paroi_scalaire_base Keyword to set the wall law.
+  param.ajouter_non_std("turbulence_paroi", this); // XD_ADD_P turbulence_paroi_scalaire_base
+  // XD_CONT Keyword to set the wall law.
 }
 int Modele_turbulence_scal_base::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {

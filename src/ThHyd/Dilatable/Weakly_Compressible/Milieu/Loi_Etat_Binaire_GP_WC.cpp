@@ -18,12 +18,15 @@
 #include <Debog.h>
 
 Implemente_instanciable(Loi_Etat_Binaire_GP_WC,"Loi_Etat_Binaire_Gaz_Parfait_WC",Loi_Etat_Binaire_GP_base);
-// XD binaire_gaz_parfait_WC loi_etat_gaz_parfait_base binaire_gaz_parfait_WC INHERITS_BRACE Class for perfect gas binary mixtures state law used with a weakly-compressible fluid under the iso-thermal and iso-bar assumptions.
+// XD binaire_gaz_parfait_WC loi_etat_gaz_parfait_base binaire_gaz_parfait_WC INHERITS_BRACE Class for perfect gas
+// XD_CONT binary mixtures state law used with a weakly-compressible fluid under the iso-thermal and iso-bar
+// XD_CONT assumptions.
 // XD attr molar_mass1 double molar_mass1 REQ Molar mass of species 1 (in kg/mol).
 // XD attr molar_mass2 double molar_mass2 REQ Molar mass of species 2 (in kg/mol).
 // XD attr mu1 double mu1 REQ Dynamic viscosity of species 1 (in kg/m.s).
 // XD attr mu2 double mu2 REQ Dynamic viscosity of species 2 (in kg/m.s).
-// XD attr temperature double temperature REQ Temperature (in Kelvin) which will be constant during the simulation since this state law only works for iso-thermal conditions.
+// XD attr temperature double temperature REQ Temperature (in Kelvin) which will be constant during the simulation since
+// XD_CONT this state law only works for iso-thermal conditions.
 // XD attr diffusion_coeff double diffusion_coeff REQ Diffusion coefficient assumed the same for both species (in m2/s).
 
 Sortie& Loi_Etat_Binaire_GP_WC::printOn(Sortie& os) const

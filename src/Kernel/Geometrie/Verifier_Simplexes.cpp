@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -19,7 +19,7 @@
 
 Implemente_instanciable_32_64(Verifier_Simplexes_32_64,"Verifier_Simplexes",Interprete_geometrique_base_32_64<_T_>) ;
 // XD verifier_simplexes interprete verifier_simplexes INHERITS_BRACE Keyword to raffine a simplexes
-// XD  attr domain_name ref_domaine domain_name REQ Name of domain.
+// XD attr domain_name ref_domaine domain_name REQ Name of domain.
 
 template <typename _SIZE_>
 Sortie& Verifier_Simplexes_32_64<_SIZE_>::printOn(Sortie& os) const

@@ -18,7 +18,8 @@
 #include <Equation_base.h>
 
 Implemente_instanciable(Echange_externe_impose, "Paroi_echange_externe_impose", Echange_impose_base);
-// XD paroi_echange_externe_impose condlim_base paroi_echange_externe_impose INHERITS_BRACE External type exchange condition with a heat exchange coefficient and an imposed external temperature.
+// XD paroi_echange_externe_impose condlim_base paroi_echange_externe_impose INHERITS_BRACE External type exchange
+// XD_CONT condition with a heat exchange coefficient and an imposed external temperature.
 // XD attr h_or_t chaine(into=["h_imp","t_ext"]) h_imp REQ Heat exchange coefficient value (expressed in W.m-2.K-1).
 // XD attr himpc front_field_base himpc REQ Boundary field type.
 // XD attr t_or_h chaine(into=["t_ext","h_imp"]) text REQ External temperature value (expressed in oC or K).

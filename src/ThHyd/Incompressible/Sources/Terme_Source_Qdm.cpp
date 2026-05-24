@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,7 +17,7 @@
 
 
 // XD source_qdm source_base source_qdm NO_BRACE Momentum source term in the Navier-Stokes equations.
-// XD  attr ch field_base champ REQ Field type.
+// XD attr ch field_base champ REQ Field type.
 
 /*! @brief Renvoie le champ donne representant le terme source
  *

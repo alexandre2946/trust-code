@@ -34,6 +34,8 @@ inline void not_implemented(const Nom& chaine)
   Process::exit();
 }
 
+// XD partitionneur_parmetis partitionneur_deriv parmetis INHERITS_BRACE ParMETIS is the MPI-parallel counterpart of
+// XD_CONT METIS — same general-purpose mesh partitioning, run in parallel.
 Implemente_instanciable_sans_constructeur(Partitionneur_Parmetis,"Partitionneur_Parmetis",Partitionneur_base);
 
 Partitionneur_Parmetis::Partitionneur_Parmetis()
@@ -50,7 +52,9 @@ Sortie& Partitionneur_Parmetis::printOn(Sortie& os) const
 void Partitionneur_Parmetis::set_param(Param& param) const
 {
   param.ajouter("nb_parts",&nb_parties_,Param::REQUIRED);
-  param.ajouter_flag("use_weights",&use_weights_);
+  param.ajouter_flag("use_weights",&use_weights_);  // XD attr use_weights rien use_weights OPT Weight element-element
+  // XD_CONT links in the graph to keep periodic opposite elements on the same processor. Same meaning as in metis;
+  // XD_CONT costs extra memory and time but is otherwise non-mandatory (a correction pass runs unconditionally).
 }
 
 void Partitionneur_Parmetis::validate_params() const

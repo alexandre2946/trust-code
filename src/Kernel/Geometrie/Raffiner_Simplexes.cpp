@@ -28,12 +28,16 @@
 
 Implemente_instanciable_32_64(Raffiner_Simplexes_32_64,"Raffiner_Simplexes",Interprete_geometrique_base_32_64<_T_>) ;
 Add_synonym(Raffiner_Simplexes,"Raffiner_isotrope"); // Raffiner_Simplexes class replaces the obsolete Raffiner_isotrope class
-// XD raffiner_isotrope interprete raffiner_isotrope INHERITS_BRACE For VDF and VEF discretizations, allows to cut triangles/quadrangles or tetrahedral/hexaedras elements respectively in 4 or 8 new ones by defining new summits located at the middle of edges
-// XD_CONT (and center of faces and elements for quadrangles and hexaedra). Such a cut preserves the shape of original elements (isotropic). For 2D elements: \includepng{{raffinerisotrirect.jpeg}}{{6}} NL2 For 3D elements: \includepng{{raffinerisotetra.jpeg}}{{6}} NL2
-// XD_CONT \includepng{{raffinerisohexa.jpeg}}{{5}}.
+// XD raffiner_isotrope interprete raffiner_isotrope INHERITS_BRACE For VDF and VEF discretizations, allows to cut
+// XD_CONT triangles/quadrangles or tetrahedral/hexaedras elements respectively in 4 or 8 new ones by defining new
+// XD_CONT summits located at the middle of edges (and center of faces and elements for quadrangles and hexaedra). Such
+// XD_CONT a cut preserves the shape of original elements (isotropic). For 2D elements:
+// XD_CONT \includeimage{{raffinerisotrirect.jpeg}} NL2 For 3D elements: \includeimage{{raffinerisotetra.jpeg}} NL2
+// XD_CONT \includeimage{{raffinerisohexa.jpeg}}.
 // XD attr domain_name ref_domaine domain_name REQ Name of domain.
 
-// XD Raffiner_Simplexes_64 raffiner_isotrope Raffiner_Simplexes_64 NO_BRACE Same as Raffiner_isotrope and Raffiner_simplexes for big (64b) domain
+// XD Raffiner_Simplexes_64 raffiner_isotrope Raffiner_Simplexes_64 NO_BRACE Same as Raffiner_isotrope and
+// XD_CONT Raffiner_simplexes for big (64b) domain
 template<typename _SIZE_>
 Sortie& Raffiner_Simplexes_32_64<_SIZE_>::printOn(Sortie& os) const
 {

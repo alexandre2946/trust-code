@@ -18,7 +18,9 @@
 #include <Neumann.h>
 
 Implemente_base(Neumann, "Neumann", Cond_lim_base);
-// XD neumann condlim_base neumann INHERITS_BRACE Neumann condition at the boundary called bord (edge) : 1). For Navier-Stokes equations, constraint imposed at the boundary; 2). For scalar transport equation, flux imposed at the boundary.
+// XD neumann condlim_base neumann INHERITS_BRACE Neumann condition at the boundary called bord (edge) : 1). For
+// XD_CONT Navier-Stokes equations, constraint imposed at the boundary; 2). For scalar transport equation, flux imposed
+// XD_CONT at the boundary.
 
 Sortie& Neumann::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
 

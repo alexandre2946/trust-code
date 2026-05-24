@@ -19,7 +19,8 @@
 #include <Motcle.h>
 
 Implemente_base_sans_constructeur(Loi_Etat_GR_base,"Loi_Etat_Gaz_Reel_base",Loi_Etat_base);
-// XD loi_etat_gaz_reel_base loi_etat_base loi_etat_gaz_reel_base INHERITS_BRACE Basic class for real gases state laws used with a dilatable fluid.
+// XD loi_etat_gaz_reel_base loi_etat_base loi_etat_gaz_reel_base INHERITS_BRACE Basic class for real gases state laws
+// XD_CONT used with a dilatable fluid.
 
 Loi_Etat_GR_base::Loi_Etat_GR_base() : MMole_(-1),Cp_(-1),R(-1) { }
 

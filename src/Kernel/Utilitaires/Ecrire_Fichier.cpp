@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -21,9 +21,10 @@
 Implemente_instanciable(Ecrire_Fichier,"Ecrire_Fichier",Interprete);
 Add_synonym(Ecrire_Fichier,"Ecrire_Fichier_Bin");
 
-// XD write_file interprete ecrire_fichier INHERITS_BRACE Keyword to write the object of name name_obj to a file filename. Since the v1.6.3, the default format is now binary format file.
-// XD   attr name_obj chaine name_obj REQ Name of the object to be written.
-// XD   attr filename chaine filename REQ Name of the file.
+// XD write_file interprete ecrire_fichier INHERITS_BRACE Keyword to write the object of name name_obj to a file
+// XD_CONT filename. Since the v1.6.3, the default format is now binary format file.
+// XD attr name_obj chaine name_obj REQ Name of the object to be written.
+// XD attr filename chaine filename REQ Name of the file.
 
 Sortie& Ecrire_Fichier::printOn(Sortie& os) const
 {

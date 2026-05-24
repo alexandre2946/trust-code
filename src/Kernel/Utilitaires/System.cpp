@@ -17,7 +17,8 @@
 #include <Nom.h>
 
 Implemente_instanciable(System,"System",Interprete);
-// XD system interprete system INHERITS_BRACE To run Unix commands from the data file. Example: System \'echo The End | mail trust@cea.fr\'
+// XD system interprete system INHERITS_BRACE To run Unix commands from the data file. Example: System \'echo The End |
+// XD_CONT mail trust@cea.fr\'
 // XD attr cmd chaine cmd REQ command to execute.
 
 

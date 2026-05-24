@@ -25,7 +25,8 @@
 
 Implemente_base_32_64(Partitionneur_base_32_64,"Partitionneur_base",Objet_U_With_Params);
 // XD partitionneur_deriv objet_u partitionneur_deriv INHERITS_BRACE not_set
-// XD  attr nb_parts entier nb_parts OPT The number of non empty parts that must be generated (generally equal to the number of processors in the parallel run).
+// XD attr nb_parts entier nb_parts OPT The number of non empty parts that must be generated (generally equal to the
+// XD_CONT number of processors in the parallel run).
 
 template <typename _SIZE_>
 Sortie& Partitionneur_base_32_64<_SIZE_>::printOn(Sortie& os) const

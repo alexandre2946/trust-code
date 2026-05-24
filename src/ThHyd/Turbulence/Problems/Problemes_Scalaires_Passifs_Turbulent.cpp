@@ -32,37 +32,54 @@ Sortie& Pb_Thermohydraulique_Concentration_Turbulent_Scalaires_Passifs::printOn(
 Entree& Pb_Thermohydraulique_Concentration_Turbulent_Scalaires_Passifs::readOn(Entree& is) { return TRUSTProblem_sup_eqns<Pb_Thermohydraulique_Concentration_Turbulent>::readOn(is); }
 
 // XD pb_thermohydraulique_turbulent_scalaires_passifs Pb_base pb_thermohydraulique_turbulent_scalaires_passifs INHERITS_BRACE Resolution of thermohydraulic problem, with turbulence modelling and with the additional passive scalar equations.
-// XD attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the problem.
+// XD attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the
+// XD_CONT problem.
 // XD attr constituant constituant constituant OPT Constituents.
-// XD attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent OPT Navier-Stokes equations as well as the associated turbulence model equations.
+// XD attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent OPT Navier-Stokes equations as well
+// XD_CONT as the associated turbulence model equations.
 // XD attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent OPT Energy equations (temperature diffusion convection) as well as the associated turbulence model equations.
-// XD attr equations_scalaires_passifs listeqn equations_scalaires_passifs REQ Passive scalar equations. The unknowns of the passive scalar equation number N are named temperatureN or concentrationN or fraction_massiqueN. This keyword is used to define initial
-// XD_CONT conditions and the post processing fields. This kind of problem is very useful to test in only one data file (and then only one calculation) different schemes or different boundary conditions for the scalar transport equation.
+// XD attr equations_scalaires_passifs listeqn equations_scalaires_passifs REQ Passive scalar equations. The unknowns of
+// XD_CONT the passive scalar equation number N are named temperatureN or concentrationN or fraction_massiqueN. This
+// XD_CONT keyword is used to define initial conditions and the post processing fields. This kind of problem is very
+// XD_CONT useful to test in only one data file (and then only one calculation) different schemes or different boundary
+// XD_CONT conditions for the scalar transport equation.
 
-// XD pb_thermohydraulique_especes_turbulent_qc Pb_base pb_thermohydraulique_especes_turbulent_qc INHERITS_BRACE Resolution of turbulent thermohydraulic problem under low Mach number with passive scalar equations.
-// XD attr fluide_quasi_compressible fluide_quasi_compressible fluide_quasi_compressible REQ The fluid medium associated with the problem.
-// XD attr navier_stokes_turbulent_qc navier_stokes_turbulent_qc navier_stokes_turbulent_qc REQ Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
+// XD pb_thermohydraulique_especes_turbulent_qc Pb_base pb_thermohydraulique_especes_turbulent_qc INHERITS_BRACE
+// XD_CONT Resolution of turbulent thermohydraulic problem under low Mach number with passive scalar equations.
+// XD attr fluide_quasi_compressible fluide_quasi_compressible fluide_quasi_compressible REQ The fluid medium associated
+// XD_CONT with the problem.
+// XD attr navier_stokes_turbulent_qc navier_stokes_turbulent_qc navier_stokes_turbulent_qc REQ Navier-Stokes equations
+// XD_CONT under low Mach number as well as the associated turbulence model equations.
 // XD attr convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc REQ Energy equation under low Mach number as well as the associated turbulence model equations.
-// XD attr equations_scalaires_passifs listeqn equations_scalaires_passifs REQ Passive scalar equations. The unknowns of the passive scalar equation number N are named temperatureN or concentrationN or fraction_massiqueN. This keyword is used to define initial
-// XD_CONT conditions and the post processing fields. This kind of problem is very useful to test in only one data file (and then only one calculation) different schemes or different boundary conditions for the scalar transport equation.
+// XD attr equations_scalaires_passifs listeqn equations_scalaires_passifs REQ Passive scalar equations. The unknowns of
+// XD_CONT the passive scalar equation number N are named temperatureN or concentrationN or fraction_massiqueN. This
+// XD_CONT keyword is used to define initial conditions and the post processing fields. This kind of problem is very
+// XD_CONT useful to test in only one data file (and then only one calculation) different schemes or different boundary
+// XD_CONT conditions for the scalar transport equation.
 
-// XD pb_hydraulique_concentration_turbulent_scalaires_passifs Pb_base pb_hydraulique_concentration_turbulent_scalaires_passifs INHERITS_BRACE Resolution of Navier-Stokes/multiple constituent transport equations, with turbulence modelling and with the
-// XD_CONT additional passive scalar equations.
-// XD attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the problem.
+// XD pb_hydraulique_concentration_turbulent_scalaires_passifs Pb_base pb_hydraulique_concentration_turbulent_scalaires_passifs INHERITS_BRACE Resolution of Navier-Stokes/multiple constituent transport equations, with turbulence modelling and with the additional passive scalar equations.
+// XD attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the
+// XD_CONT problem.
 // XD attr constituant constituant constituant OPT Constituents.
-// XD attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent OPT Navier-Stokes equations as well as the associated turbulence model equations.
-// XD attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent OPT Constituent transport equations (concentration diffusion convection) as well as the associated turbulence
-// XD_CONT model equations.
-// XD attr equations_scalaires_passifs listeqn equations_scalaires_passifs REQ Passive scalar equations. The unknowns of the passive scalar equation number N are named temperatureN or concentrationN or fraction_massiqueN. This keyword is used to define initial
-// XD_CONT conditions and the post processing fields. This kind of problem is very useful to test in only one data file (and then only one calculation) different schemes or different boundary conditions for the scalar transport equation.
+// XD attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent OPT Navier-Stokes equations as well
+// XD_CONT as the associated turbulence model equations.
+// XD attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent OPT Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
+// XD attr equations_scalaires_passifs listeqn equations_scalaires_passifs REQ Passive scalar equations. The unknowns of
+// XD_CONT the passive scalar equation number N are named temperatureN or concentrationN or fraction_massiqueN. This
+// XD_CONT keyword is used to define initial conditions and the post processing fields. This kind of problem is very
+// XD_CONT useful to test in only one data file (and then only one calculation) different schemes or different boundary
+// XD_CONT conditions for the scalar transport equation.
 
-// XD pb_thermohydraulique_concentration_turbulent_scalaires_passifs Pb_base pb_thermohydraulique_concentration_turbulent_scalaires_passifs INHERITS_BRACE Resolution of Navier-Stokes/energy/multiple constituent transport equations, with turbulence modelling
-// XD_CONT and with the additional passive scalar equations.
-// XD attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the problem.
+// XD pb_thermohydraulique_concentration_turbulent_scalaires_passifs Pb_base pb_thermohydraulique_concentration_turbulent_scalaires_passifs INHERITS_BRACE Resolution of Navier-Stokes/energy/multiple constituent transport equations, with turbulence modelling and with the additional passive scalar equations.
+// XD attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the
+// XD_CONT problem.
 // XD attr constituant constituant constituant OPT Constituents.
-// XD attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent OPT Navier-Stokes equations as well as the associated turbulence model equations.
-// XD attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent OPT Constituent transport equations (concentration diffusion convection) as well as the associated turbulence
-// XD_CONT model equations.
+// XD attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent OPT Navier-Stokes equations as well
+// XD_CONT as the associated turbulence model equations.
+// XD attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent OPT Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
 // XD attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent OPT Energy equations (temperature diffusion convection) as well as the associated turbulence model equations.
-// XD attr equations_scalaires_passifs listeqn equations_scalaires_passifs REQ Passive scalar equations. The unknowns of the passive scalar equation number N are named temperatureN or concentrationN or fraction_massiqueN. This keyword is used to define initial
-// XD_CONT conditions and the post processing fields. This kind of problem is very useful to test in only one data file (and then only one calculation) different schemes or different boundary conditions for the scalar transport equation.
+// XD attr equations_scalaires_passifs listeqn equations_scalaires_passifs REQ Passive scalar equations. The unknowns of
+// XD_CONT the passive scalar equation number N are named temperatureN or concentrationN or fraction_massiqueN. This
+// XD_CONT keyword is used to define initial conditions and the post processing fields. This kind of problem is very
+// XD_CONT useful to test in only one data file (and then only one calculation) different schemes or different boundary
+// XD_CONT conditions for the scalar transport equation.

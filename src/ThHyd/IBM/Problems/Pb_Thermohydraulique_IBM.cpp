@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,11 +18,14 @@
 #include <Verif_Cl.h>
 
 Implemente_instanciable(Pb_Thermohydraulique_IBM, "Pb_Thermohydraulique_IBM", Pb_Hydraulique_IBM);
-// XD pb_thermohydraulique_ibm Pb_base pb_thermohydraulique_ibm INHERITS_BRACE Resolution of IBM thermohydraulic problem.
-// XD   attr fluide_incompressible fluide_incompressible fluide_incompressible OPT The fluid medium associated with the problem (only one possibility).
-// XD   attr fluide_ostwald fluide_ostwald fluide_ostwald OPT The fluid medium associated with the problem (only one possibility).
-// XD   attr navier_stokes_ibm navier_stokes_ibm navier_stokes_ibm OPT IBM Navier-Stokes equations.
-// XD   attr convection_diffusion_temperature_ibm convection_diffusion_temperature_ibm convection_diffusion_temperature_ibm OPT IBM Energy equation (temperature diffusion convection).
+// XD pb_thermohydraulique_ibm Pb_base pb_thermohydraulique_ibm INHERITS_BRACE Resolution of IBM thermohydraulic
+// XD_CONT problem.
+// XD attr fluide_incompressible fluide_incompressible fluide_incompressible OPT The fluid medium associated with the
+// XD_CONT problem (only one possibility).
+// XD attr fluide_ostwald fluide_ostwald fluide_ostwald OPT The fluid medium associated with the problem (only one
+// XD_CONT possibility).
+// XD attr navier_stokes_ibm navier_stokes_ibm navier_stokes_ibm OPT IBM Navier-Stokes equations.
+// XD attr convection_diffusion_temperature_ibm convection_diffusion_temperature_ibm convection_diffusion_temperature_ibm OPT IBM Energy equation (temperature diffusion convection).
 
 Sortie& Pb_Thermohydraulique_IBM::printOn(Sortie& os) const { return Pb_Hydraulique_IBM::printOn(os); }
 Entree& Pb_Thermohydraulique_IBM::readOn(Entree& is) { return Pb_Hydraulique_IBM::readOn(is); }

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -26,7 +26,8 @@
 #endif
 
 Implemente_instanciable(Champ_Fonc_Interp, "Champ_Fonc_Interp", Champ_Fonc_P0_base);
-// XD Champ_Fonc_Interp champ_don_base Champ_Fonc_Interp BRACE Field that is interpolated from a distant domain via MEDCoupling (remapper).
+// XD Champ_Fonc_Interp champ_don_base Champ_Fonc_Interp BRACE Field that is interpolated from a distant domain via
+// XD_CONT MEDCoupling (remapper).
 
 Sortie& Champ_Fonc_Interp::printOn(Sortie& os) const { return Champ_Fonc_P0_base::printOn(os); }
 
@@ -37,14 +38,22 @@ Entree& Champ_Fonc_Interp::readOn(Entree& is)
 
   Param param(que_suis_je());
   Nom nom_pb_loc, nom_pb_dist, nom_dom_loc, nom_dom_dist, nat;
-  param.ajouter("nom_champ", &nom_, Param::REQUIRED); // XD_ADD_P chaine Name of the field (for example: temperature).
-  param.ajouter("pb_loc", &nom_pb_loc, Param::REQUIRED); // XD_ADD_P chaine Name of the local problem.
-  param.ajouter("pb_dist", &nom_pb_dist, Param::REQUIRED); // XD_ADD_P chaine Name of the distant problem.
-  param.ajouter("dom_loc", &nom_dom_loc); // XD_ADD_P chaine Name of the local domain.
-  param.ajouter("dom_dist", &nom_dom_dist); // XD_ADD_P chaine Name of the distant domain.
-  param.ajouter("default_value", &default_value_); // XD_ADD_P chaine Name of the distant domain.
-  param.ajouter("nature", &nat, Param::REQUIRED); // XD_ADD_P chaine Nature of the field (knowledge from MEDCoupling is required; IntensiveMaximum, IntensiveConservation, ...).
-  param.ajouter("use_overlapdec", &use_dec_); // XD_ADD_P chaine Nature of the field (knowledge from MEDCoupling is required; IntensiveMaximum, IntensiveConservation, ...).
+  param.ajouter("nom_champ", &nom_, Param::REQUIRED); // XD_ADD_P chaine
+  // XD_CONT Name of the field (for example: temperature).
+  param.ajouter("pb_loc", &nom_pb_loc, Param::REQUIRED); // XD_ADD_P chaine
+  // XD_CONT Name of the local problem.
+  param.ajouter("pb_dist", &nom_pb_dist, Param::REQUIRED); // XD_ADD_P chaine
+  // XD_CONT Name of the distant problem.
+  param.ajouter("dom_loc", &nom_dom_loc); // XD_ADD_P chaine
+  // XD_CONT Name of the local domain.
+  param.ajouter("dom_dist", &nom_dom_dist); // XD_ADD_P chaine
+  // XD_CONT Name of the distant domain.
+  param.ajouter("default_value", &default_value_); // XD_ADD_P chaine
+  // XD_CONT Name of the distant domain.
+  param.ajouter("nature", &nat, Param::REQUIRED); // XD_ADD_P chaine
+  // XD_CONT Nature of the field (knowledge from MEDCoupling is required; IntensiveMaximum, IntensiveConservation, ...).
+  param.ajouter("use_overlapdec", &use_dec_); // XD_ADD_P chaine
+  // XD_CONT Nature of the field (knowledge from MEDCoupling is required; IntensiveMaximum, IntensiveConservation, ...).
   param.lire_avec_accolades_depuis(is);
 
   pb_loc_ = ref_cast(Probleme_base, Interprete::objet(nom_pb_loc));

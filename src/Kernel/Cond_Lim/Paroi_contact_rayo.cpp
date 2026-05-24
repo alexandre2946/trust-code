@@ -19,13 +19,21 @@
 #include <Equation_base.h>
 
 Implemente_instanciable(Paroi_contact_rayo, "paroi_contact_rayo", Cond_lim_utilisateur_base);
-// XD paroi_contact_rayo condlim_base paroi_contact_rayo INHERITS_BRACE Radiation Thermal condition between two domains. Important: the name of the boundaries in the two domains should be the same. (Warning: there is also an old limitation not yet fixed on the
-// XD_CONT sequential algorithm in VDF to detect the matching faces on the two boundaries: faces should be ordered in the same way). The kind of condition depends on the discretization. In VDF, it is a heat exchange condition, and in VEF, a temperature condition. NL2
-// XD_CONT Such a coupling requires coincident meshes for the moment. In case of non-coincident meshes, run is stopped and two external files are automatically generated in VEF (connectivity_failed_boundary_name and connectivity_failed_pb_name.med). In 2D, the keyword
-// XD_CONT Decouper_bord_coincident associated to the connectivity_failed_boundary_name file allows to generate a new coincident mesh. NL2 In 3D, for a first preliminary cut domain with HOMARD (fluid for instance), the second problem associated to pb_name (solide in a
-// XD_CONT fluid/solid coupling problem) has to be submitted to HOMARD cutting procedure with connectivity_failed_pb_name.med. NL2 Such a procedure works as while the primary refined mesh (fluid in our example) impacts the fluid/solid interface with a compact shape as
-// XD_CONT described below (values 2 or 4 indicates the number of division from primary faces obtained in fluid domain at the interface after HOMARD cutting): NL2 2-2-2-2-2-2 NL2 2-4-4-4-4-4-2 \\; 2-2-2 NL2 2-4-4-4-4-2 \\; 2-4-2 NL2 2-2-2-2-2 \\; 2-2 NL2 OK NL2 NL2 2-2
-// XD_CONT \\; \\; 2-2-2 NL2 2-4-2 \\; 2-2 NL2 2-2 \\; 2-2 NL2 NOT OK
+// XD paroi_contact_rayo condlim_base paroi_contact_rayo INHERITS_BRACE Radiation Thermal condition between two domains.
+// XD_CONT Important: the name of the boundaries in the two domains should be the same. (Warning: there is also an old
+// XD_CONT limitation not yet fixed on the sequential algorithm in VDF to detect the matching faces on the two
+// XD_CONT boundaries: faces should be ordered in the same way). The kind of condition depends on the discretization. In
+// XD_CONT VDF, it is a heat exchange condition, and in VEF, a temperature condition. NL2 Such a coupling requires
+// XD_CONT coincident meshes for the moment. In case of non-coincident meshes, run is stopped and two external files are
+// XD_CONT automatically generated in VEF (connectivity_failed_boundary_name and connectivity_failed_pb_name.med). In
+// XD_CONT 2D, the keyword Decouper_bord_coincident associated to the connectivity_failed_boundary_name file allows to
+// XD_CONT generate a new coincident mesh. NL2 In 3D, for a first preliminary cut domain with HOMARD (fluid for
+// XD_CONT instance), the second problem associated to pb_name (solide in a fluid/solid coupling problem) has to be
+// XD_CONT submitted to HOMARD cutting procedure with connectivity_failed_pb_name.med. NL2 Such a procedure works as
+// XD_CONT while the primary refined mesh (fluid in our example) impacts the fluid/solid interface with a compact shape
+// XD_CONT as described below (values 2 or 4 indicates the number of division from primary faces obtained in fluid
+// XD_CONT domain at the interface after HOMARD cutting): NL2 2-2-2-2-2-2 NL2 2-4-4-4-4-4-2 \\; 2-2-2 NL2 2-4-4-4-4-2
+// XD_CONT \\; 2-4-2 NL2 2-2-2-2-2 \\; 2-2 NL2 OK NL2 NL2 2-2 \\; \\; 2-2-2 NL2 2-4-2 \\; 2-2 NL2 2-2 \\; 2-2 NL2 NOT OK
 // XD attr autrepb ref_Pb_base autrepb REQ Name of other problem.
 // XD attr nameb chaine nameb REQ boundary name of the remote problem which should be the same than the local name
 // XD attr type_rayo chaine type_rayo REQ Radiation type : transparent or semi-transparent

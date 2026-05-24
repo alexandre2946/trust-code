@@ -37,11 +37,16 @@ Entree& Option_DG::interpreter(Entree& is)
   int vo=-1, po=-1, to=-1; // Default orders for velocity, pressure, and temperature
 
   Param param(que_suis_je());
-  param.ajouter("order",&DEFAULT_ORDER); // XD_ADD_P int global order for the DG unknowns (1 by default)
-  param.ajouter("velocity_order",&vo); // XD_ADD_P int optional order for DG velocity unknown
-  param.ajouter("pressure_order",&po); // XD_ADD_P int optional order for DG pressure unknown
-  param.ajouter("temperature_order",&to); // XD_ADD_P int optional order for DG temperature unknown
-  param.ajouter("gram_schmidt",&GRAM_SCHMIDT); // XD_ADD_P int Gram Schmidt orthogonalization (1 by default)
+  param.ajouter("order",&DEFAULT_ORDER); // XD_ADD_P int
+  // XD_CONT global order for the DG unknowns (1 by default)
+  param.ajouter("velocity_order",&vo); // XD_ADD_P int
+  // XD_CONT optional order for DG velocity unknown
+  param.ajouter("pressure_order",&po); // XD_ADD_P int
+  // XD_CONT optional order for DG pressure unknown
+  param.ajouter("temperature_order",&to); // XD_ADD_P int
+  // XD_CONT optional order for DG temperature unknown
+  param.ajouter("gram_schmidt",&GRAM_SCHMIDT); // XD_ADD_P int
+  // XD_CONT Gram Schmidt orthogonalization (1 by default)
   param.lire_avec_accolades_depuis(is);
 
   if (vo != -1)

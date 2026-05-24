@@ -19,11 +19,12 @@
 #include <Param.h>
 
 Implemente_instanciable(Perte_Charge_Directionnelle_VEF_P1NC,"Perte_Charge_Directionnelle_VEF_P1NC",Perte_Charge_VEF);
-// XD perte_charge_directionnelle source_base perte_charge_directionnelle BRACE Directional pressure loss (available in VEF and PolyMAC_CDO).
-// XD  attr lambda chaine lambda_u REQ Function for loss coefficient which may be Reynolds dependant (Ex: 64/Re).
-// XD  attr diam_hydr champ_don_base diam_hydr REQ Hydraulic diameter value.
-// XD  attr direction champ_don_base direction REQ Field which indicates the direction of the pressure loss.
-// XD  attr sous_zone chaine sous_zone OPT Optional sub-area where pressure loss applies.
+// XD perte_charge_directionnelle source_base perte_charge_directionnelle BRACE Directional pressure loss (available in
+// XD_CONT VEF and PolyMAC_CDO).
+// XD attr lambda chaine lambda_u REQ Function for loss coefficient which may be Reynolds dependant (Ex: 64/Re).
+// XD attr diam_hydr champ_don_base diam_hydr REQ Hydraulic diameter value.
+// XD attr direction champ_don_base direction REQ Field which indicates the direction of the pressure loss.
+// XD attr sous_zone chaine sous_zone OPT Optional sub-area where pressure loss applies.
 
 Sortie& Perte_Charge_Directionnelle_VEF_P1NC::printOn(Sortie& s ) const
 {

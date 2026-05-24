@@ -18,11 +18,17 @@
 #include <Param.h>
 
 Implemente_instanciable(Partitionneur_Fichier_Decoupage,"Partitionneur_Fichier_Decoupage",Partitionneur_base);
-// XD partitionneur_fichier_decoupage partitionneur_deriv fichier_decoupage INHERITS_BRACE This algorithm reads an array of integer values on the disc, one value for each mesh element. Each value is interpreted as the target part number n>=0 for this element.
-// XD_CONT The number of parts created is the highest value in the array plus one. Empty parts can be created if some values are not present in the array. NL2 The file format is ASCII, and contains space, tab or carriage-return separated integer values. The first value
-// XD_CONT is the number nb_elem of elements in the domain, followed by nb_elem integer values (positive or zero). NL2 This algorithm has been designed to work together with the \'ecrire_decoupage\' option. You can generate a partition with any other algorithm, write it
-// XD_CONT to disc, modify it, and read it again to generate the .Zone files. NL2 Contrary to other partitioning algorithms, no correction is applied by default to the partition (eg. element 0 on processor 0 and corrections for periodic boundaries). If
-// XD_CONT \'corriger_partition\' is specified, these corrections are applied.
+// XD partitionneur_fichier_decoupage partitionneur_deriv fichier_decoupage INHERITS_BRACE This algorithm reads an array
+// XD_CONT of integer values on the disc, one value for each mesh element. Each value is interpreted as the target part
+// XD_CONT number n>=0 for this element. The number of parts created is the highest value in the array plus one. Empty
+// XD_CONT parts can be created if some values are not present in the array. NL2 The file format is ASCII, and contains
+// XD_CONT space, tab or carriage-return separated integer values. The first value is the number nb_elem of elements in
+// XD_CONT the domain, followed by nb_elem integer values (positive or zero). NL2 This algorithm has been designed to
+// XD_CONT work together with the \'ecrire_decoupage\' option. You can generate a partition with any other algorithm,
+// XD_CONT write it to disc, modify it, and read it again to generate the .Zone files. NL2 Contrary to other
+// XD_CONT partitioning algorithms, no correction is applied by default to the partition (eg. element 0 on processor 0
+// XD_CONT and corrections for periodic boundaries). If \'corriger_partition\' is specified, these corrections are
+// XD_CONT applied.
 
 
 Sortie& Partitionneur_Fichier_Decoupage::printOn(Sortie& os) const

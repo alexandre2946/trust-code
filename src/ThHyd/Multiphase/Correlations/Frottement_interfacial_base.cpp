@@ -17,9 +17,12 @@
 #include <Pb_Multiphase.h>
 
 Implemente_base(Frottement_interfacial_base, "Frottement_interfacial_base", Correlation_base);
-// XD frottement_interfacial source_base frottement_interfacial BRACE Source term which corresponds to the phases friction at the interface
-// XD attr a_res floattant a_res OPT void fraction at which the  gas velocity is forced to approach liquid velocity (default alpha_evanescence*100)
-// XD attr dv_min floattant dv_min OPT minimal relative velocity used to linearize interfacial friction at low velocities
+// XD frottement_interfacial source_base frottement_interfacial BRACE Source term which corresponds to the phases
+// XD_CONT friction at the interface
+// XD attr a_res floattant a_res OPT void fraction at which the gas velocity is forced to approach liquid velocity
+// XD_CONT (default alpha_evanescence*100)
+// XD attr dv_min floattant dv_min OPT minimal relative velocity used to linearize interfacial friction at low
+// XD_CONT velocities
 // XD attr exp_res entier exp_res OPT exponent that callibrates intensity of velocity convergence (default 2)
 
 Sortie& Frottement_interfacial_base::printOn(Sortie& os) const

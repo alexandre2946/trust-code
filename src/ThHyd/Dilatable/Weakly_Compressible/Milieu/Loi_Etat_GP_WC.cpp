@@ -18,7 +18,8 @@
 #include <Debog.h>
 
 Implemente_instanciable(Loi_Etat_GP_WC,"Loi_Etat_Gaz_Parfait_WC",Loi_Etat_Mono_GP_base);
-// XD perfect_gaz_WC loi_etat_gaz_parfait_base gaz_parfait_WC BRACE Class for perfect gas state law used with a weakly-compressible fluid.
+// XD perfect_gaz_WC loi_etat_gaz_parfait_base gaz_parfait_WC BRACE Class for perfect gas state law used with a
+// XD_CONT weakly-compressible fluid.
 // XD attr Cp double Cp REQ Specific heat at constant pressure (J/kg/K).
 // XD attr Cv double Cv OPT Specific heat at constant volume (J/kg/K).
 // XD attr gamma double gamma OPT Cp/Cv

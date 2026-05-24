@@ -493,32 +493,60 @@ void Postraitement::set_param(Param& param) const
 // XD attr expression_p_ana chaine expression_p_ana OPT not_set (for IJK)
 // XD attr postprocessor_stt rien postprocessor_stt OPT not_set (for STT)
 // XD attr format_trustlata format_trustlata Format_IJKLata OPT not_set (for STT)
-// XD attr interfaces interface_posts interfaces OPT Keyword to read all the caracteristics of the interfaces. Different kind of interfaces exist as well as different interface intitialisations.
-  param.ajouter("Fichier",&nom_fich_); // XD_ADD_P chaine Name of file.
-  param.ajouter("Format",&format_); // XD_ADD_P chaine(into=["lml","lata","single_lata","lata_v2","med","cgns"]) This optional parameter specifies the format of the output file. The basename used for the output file is the basename of the data file. For the fmt parameter, choices are lml or lata. A short description of each format can be found below. The default value is lml.
-  param.ajouter_non_std("dt_post",(this)); // XD_ADD_P chaine Field\'s write frequency (as a time period) - can also be specified after the 'field' keyword.
-  param.ajouter("nb_pas_dt_post",&nb_pas_dt_post_, Param::Nature::OPTIONAL); // XD_ADD_P entier Field\'s write frequency (as a number of time steps) - can also be specified after the 'field' keyword.
-  param.ajouter_non_std("Domaine",(this)); // XD_ADD_P chaine This optional parameter specifies the domain on which the data should be interpolated before it is written in the output file. The default is to write the data on the domain of the current problem (no interpolation).
-  param.ajouter_non_std("Sous_domaine|Sous_zone",(this)); // XD_ADD_P chaine This optional parameter specifies the sub_domaine on which the data should be interpolated before it is written in the output file. It is only available for sequential computation.
-  param.ajouter("Parallele",&option_para_); // XD_ADD_P chaine(into=["simple","multiple","mpi-io"]) Select simple (single file, sequential write), multiple (several files, parallel write), or mpi-io (single file, parallel write) for LATA format
-  param.ajouter_non_std("Definition_champs",(this));// XD_ADD_P definition_champs  Keyword to create new or more complex field for advanced postprocessing.
-  param.ajouter_non_std("Definition_champs_fichier|Definition_champs_file",(this));// XD_ADD_P definition_champs_fichier Definition_champs read from file.
-  param.ajouter_non_std("Sondes|Probes",(this)); // XD_ADD_P sondes Probe.
-  param.ajouter_non_std("Sondes_fichier|Probes_file",(this)); // XD_ADD_P sondes_fichier Probe read from a file.
-  param.ajouter_non_std("Sondes_mobiles|Mobile_probes",(this)); // XD_ADD_P sondes Mobile probes useful for ALE, their positions will be updated in the mesh.
-  param.ajouter_non_std("Sondes_mobiles_fichier|Mobile_probes_file",(this)); // XD_ADD_P sondes_fichier Mobile probes read in a file
-  param.ajouter("DeprecatedKeepDuplicatedProbes",&DeprecatedKeepDuplicatedProbes); // XD_ADD_P entier Flag to not remove duplicated probes in .son files (1: keep duplicate probes, 0: remove duplicate probes)
-  param.ajouter_non_std("champs|fields",(this)); // XD_ADD_P champs_posts Field\'s write mode.
-  param.ajouter_non_std("champs_fichier|fields_file",(this));// XD_ADD_P champs_posts_fichier  Fields read from file.
-  param.ajouter_non_std("Statistiques|statistics",(this));  // XD_ADD_P stats_posts Statistics between two points fixed : start of integration time and end of integration time.
-  param.ajouter_non_std("statistiques_fichier|statistics_file",(this));// XD_ADD_P stats_posts_fichier Statistics read from file.
+// XD attr interfaces interface_posts interfaces OPT Keyword to read all the caracteristics of the interfaces. Different
+// XD_CONT kind of interfaces exist as well as different interface intitialisations.
+  param.ajouter("Fichier",&nom_fich_); // XD_ADD_P chaine
+  // XD_CONT Name of file.
+  param.ajouter("Format",&format_); // XD_ADD_P chaine(into=["lml","lata","single_lata","lata_v2","med","cgns"])
+  // XD_CONT This optional parameter specifies the format of the output file. The basename used for the output file is
+  // XD_CONT the basename of the data file. For the fmt parameter, choices are lml or lata. A short description of each
+  // XD_CONT format can be found below. The default value is lml.
+  param.ajouter_non_std("dt_post",(this)); // XD_ADD_P chaine
+  // XD_CONT Field\'s write frequency (as a time period) - can also be specified after the 'field' keyword.
+  param.ajouter("nb_pas_dt_post",&nb_pas_dt_post_, Param::Nature::OPTIONAL); // XD_ADD_P entier
+  // XD_CONT Field\'s write frequency (as a number of time steps) - can also be specified after the 'field' keyword.
+  param.ajouter_non_std("Domaine",(this)); // XD_ADD_P chaine
+  // XD_CONT This optional parameter specifies the domain on which the data should be interpolated before it is written
+  // XD_CONT in the output file. The default is to write the data on the domain of the current problem (no
+  // XD_CONT interpolation).
+  param.ajouter_non_std("Sous_domaine|Sous_zone",(this)); // XD_ADD_P chaine
+  // XD_CONT This optional parameter specifies the sub_domaine on which the data should be interpolated before it is
+  // XD_CONT written in the output file. It is only available for sequential computation.
+  param.ajouter("Parallele",&option_para_); // XD_ADD_P chaine(into=["simple","multiple","mpi-io"])
+  // XD_CONT Select simple (single file, sequential write), multiple (several files, parallel write), or mpi-io (single
+  // XD_CONT file, parallel write) for LATA format
+  param.ajouter_non_std("Definition_champs",(this));// XD_ADD_P definition_champs
+  // XD_CONT Keyword to create new or more complex field for advanced postprocessing.
+  param.ajouter_non_std("Definition_champs_fichier|Definition_champs_file",(this));// XD_ADD_P definition_champs_fichier
+  // XD_CONT Definition_champs read from file.
+  param.ajouter_non_std("Sondes|Probes",(this)); // XD_ADD_P sondes
+  // XD_CONT Probe.
+  param.ajouter_non_std("Sondes_fichier|Probes_file",(this)); // XD_ADD_P sondes_fichier
+  // XD_CONT Probe read from a file.
+  param.ajouter_non_std("Sondes_mobiles|Mobile_probes",(this)); // XD_ADD_P sondes
+  // XD_CONT Mobile probes useful for ALE, their positions will be updated in the mesh.
+  param.ajouter_non_std("Sondes_mobiles_fichier|Mobile_probes_file",(this)); // XD_ADD_P sondes_fichier
+  // XD_CONT Mobile probes read in a file
+  param.ajouter("DeprecatedKeepDuplicatedProbes",&DeprecatedKeepDuplicatedProbes); // XD_ADD_P entier
+  // XD_CONT Flag to not remove duplicated probes in .son files (1: keep duplicate probes, 0: remove duplicate probes)
+  param.ajouter_non_std("champs|fields",(this)); // XD_ADD_P champs_posts
+  // XD_CONT Field\'s write mode.
+  param.ajouter_non_std("champs_fichier|fields_file",(this));// XD_ADD_P champs_posts_fichier
+  // XD_CONT Fields read from file.
+  param.ajouter_non_std("Statistiques|statistics",(this));  // XD_ADD_P stats_posts
+  // XD_CONT Statistics between two points fixed : start of integration time and end of integration time.
+  param.ajouter_non_std("statistiques_fichier|statistics_file",(this));// XD_ADD_P stats_posts_fichier
+  // XD_CONT Statistics read from file.
   param.ajouter_non_std("Sondes_Int|Int_Probes",(this));
   param.ajouter_non_std("Sondes_Int_fichier|Int_probes_file",(this));
   param.ajouter_non_std("Tableaux_Int|Int_array",(this));
   param.ajouter_non_std("Tableaux_Int_fichier|Int_array_file",(this));
-  param.ajouter_non_std("Statistiques_en_serie|Serial_statistics",(this));// XD_ADD_P stats_serie_posts Statistics between two points not fixed : on period of integration.
-  param.ajouter_non_std("Statistiques_en_serie_fichier|Serial_statistics_file",(this));// XD_ADD_P stats_serie_posts_fichier Serial_statistics read from a file
-  param.ajouter("suffix_for_reset", &suffix_for_reset_); // XD_ADD_P chaine Suffix used to modify the postprocessing file name if the ICoCo resetTime() method is invoked.
+  param.ajouter_non_std("Statistiques_en_serie|Serial_statistics",(this));// XD_ADD_P stats_serie_posts
+  // XD_CONT Statistics between two points not fixed : on period of integration.
+  param.ajouter_non_std("Statistiques_en_serie_fichier|Serial_statistics_file",(this));// XD_ADD_P stats_serie_posts_fichier
+  // XD_CONT Serial_statistics read from a file
+  param.ajouter("suffix_for_reset", &suffix_for_reset_); // XD_ADD_P chaine
+  // XD_CONT Suffix used to modify the postprocessing file name if the ICoCo resetTime() method is invoked.
 
   if ((champs_demande_ || stat_demande_)
       && dt_post_ == DT_NOT_INIT && nb_pas_dt_post_ == NB_NOT_INIT)
@@ -536,55 +564,69 @@ void Postraitement::set_param(Param& param) const
 // XD attr use_XY_Nodes rien use_XY_Nodes OPT not_set
 
 // XD bloc_fichier objet_lecture nul BRACE Block containing the name of the file
-// XD   attr fichier chaine file REQ File name
+// XD attr fichier chaine file REQ File name
 
 // XD sondes_fichier objet_lecture nul BRACE Keyword to read probes from a file
-// XD   attr fichier|file chaine file REQ name of file
+// XD attr fichier|file chaine file REQ name of file
 // XD definition_champs_fichier objet_lecture nul BRACE Keyword to read definition_champs from a file
-// XD   attr fichier|file chaine file REQ name of file
+// XD attr fichier|file chaine file REQ name of file
 
 // XD champ_a_post objet_lecture nul NO_BRACE Field to be post-processed.
-// XD   attr champ chaine champ REQ Name of the post-processed field.
-// XD attr localisation chaine(into=["elem","som","faces","elem_dg"]) localisation OPT Localisation of post-processed field values: The two available values are elem, som, or faces (LATA format only) used respectively to select field values at mesh centres
-// XD_CONT (CHAMPMAILLE type field in the lml file) or at mesh nodes (CHAMPPOINT type field in the lml file). If no selection is made, localisation is set to som by default, elem_dg is specific for dg discretisation to interpolate value on one unique cell center value.
+// XD attr champ chaine champ REQ Name of the post-processed field.
+// XD attr localisation chaine(into=["elem","som","faces","elem_dg"]) localisation OPT Localisation of post-processed
+// XD_CONT field values: The two available values are elem, som, or faces (LATA format only) used respectively to select
+// XD_CONT field values at mesh centres (CHAMPMAILLE type field in the lml file) or at mesh nodes (CHAMPPOINT type field
+// XD_CONT in the lml file). If no selection is made, localisation is set to som by default, elem_dg is specific for dg
+// XD_CONT discretisation to interpolate value on one unique cell center value.
 // XD champs_a_post listobj nul INHERITS_BRACE champ_a_post NO_COMMA Fields to be post-processed.
 
 // XD interface_posts objet_lecture nul NO_BRACE not set
-// XD   attr nom_interf chaine nom_interf OPT name of the interface to post process
-// XD   attr blocs champs_a_post blocs REQ Post-processed fields.
+// XD attr nom_interf chaine nom_interf OPT name of the interface to post process
+// XD attr blocs champs_a_post blocs REQ Post-processed fields.
 
 
 // XD champs_posts objet_lecture nul NO_BRACE Field\'s write mode.
-// XD   attr format chaine(into=["binaire","formatte"]) format OPT Type of file.
-// XD   attr mot chaine(into=["dt_post","nb_pas_dt_post"]) mot OPT Keyword to set the kind of the field\'s write frequency. Either a time period or a time step period. it can be specified either here, or at the begining of the postprocessing bloc.
-// XD   attr period chaine period OPT Value of the period which can be like (2.*t).
-// XD   attr champs|fields champs_a_post champs REQ Post-processed fields.
+// XD attr format chaine(into=["binaire","formatte"]) format OPT Type of file.
+// XD attr mot chaine(into=["dt_post","nb_pas_dt_post"]) mot OPT Keyword to set the kind of the field\'s write
+// XD_CONT frequency. Either a time period or a time step period. it can be specified either here, or at the begining of
+// XD_CONT the postprocessing bloc.
+// XD attr period chaine period OPT Value of the period which can be like (2.*t).
+// XD attr champs|fields champs_a_post champs REQ Post-processed fields.
 
 // XD champs_posts_fichier objet_lecture nul NO_BRACE Fields read from file.
-// XD   attr format chaine(into=["binaire","formatte"]) format OPT Type of file.
-// XD   attr mot chaine(into=["dt_post","nb_pas_dt_post"]) mot OPT Keyword to set the kind of the field\'s write frequency. Either a time period or a time step period.
-// XD   attr period chaine period OPT Value of the period which can be like (2.*t).
-// XD   attr fichier bloc_fichier file REQ name of file
+// XD attr format chaine(into=["binaire","formatte"]) format OPT Type of file.
+// XD attr mot chaine(into=["dt_post","nb_pas_dt_post"]) mot OPT Keyword to set the kind of the field\'s write
+// XD_CONT frequency. Either a time period or a time step period.
+// XD attr period chaine period OPT Value of the period which can be like (2.*t).
+// XD attr fichier bloc_fichier file REQ name of file
 
 // XD stats_posts objet_lecture nul NO_BRACE Post-processing for statistics. \input{{statistiques}}
-// XD   attr mot chaine(into=["dt_post","nb_pas_dt_post"]) mot OPT Keyword to set the kind of the field\'s write frequency. Either a time period or a time step period.
-// XD   attr period chaine period OPT Value of the period which can be like (2.*t).
-// XD   attr champs|fields list_stat_post champs REQ Post-processed fields.
+// XD attr mot chaine(into=["dt_post","nb_pas_dt_post"]) mot OPT Keyword to set the kind of the field\'s write
+// XD_CONT frequency. Either a time period or a time step period.
+// XD attr period chaine period OPT Value of the period which can be like (2.*t).
+// XD attr champs|fields list_stat_post champs REQ Post-processed fields.
 
 // XD stats_posts_fichier objet_lecture nul NO_BRACE Statistics read from file.. \input{{statistiques}}
-// XD   attr mot chaine(into=["dt_post","nb_pas_dt_post"]) mot OPT Keyword to set the kind of the field\'s write frequency. Either a time period or a time step period.
-// XD   attr period chaine period OPT Value of the period which can be like (2.*t).
-// XD   attr fichier bloc_fichier file REQ name of file
+// XD attr mot chaine(into=["dt_post","nb_pas_dt_post"]) mot OPT Keyword to set the kind of the field\'s write
+// XD_CONT frequency. Either a time period or a time step period.
+// XD attr period chaine period OPT Value of the period which can be like (2.*t).
+// XD attr fichier bloc_fichier file REQ name of file
 
-// XD stats_serie_posts objet_lecture nul NO_BRACE This keyword is used to set the statistics. Average on dt_integr time interval is post-processed every dt_integr seconds. \input{{statistiquesseries}}
-// XD   attr mot chaine(into=["dt_integr"]) mot REQ Keyword is used to set the statistics period of integration and write period.
-// XD   attr dt_integr floattant dt_integr REQ Average on dt_integr time interval is post-processed every dt_integr seconds.
-// XD   attr stat list_stat_post stat REQ not_set
+// XD stats_serie_posts objet_lecture nul NO_BRACE This keyword is used to set the statistics. Average on dt_integr time
+// XD_CONT interval is post-processed every dt_integr seconds. \input{{statistiquesseries}}
+// XD attr mot chaine(into=["dt_integr"]) mot REQ Keyword is used to set the statistics period of integration and write
+// XD_CONT period.
+// XD attr dt_integr floattant dt_integr REQ Average on dt_integr time interval is post-processed every dt_integr
+// XD_CONT seconds.
+// XD attr stat list_stat_post stat REQ not_set
 
-// XD stats_serie_posts_fichier objet_lecture nul NO_BRACE This keyword is used to set the statistics read from a file. Average on dt_integr time interval is post-processed every dt_integr seconds. \input{{statistiquesseries}}
-// XD   attr mot chaine(into=["dt_integr"]) mot REQ Keyword is used to set the statistics period of integration and write period.
-// XD   attr dt_integr floattant dt_integr REQ Average on dt_integr time interval is post-processed every dt_integr seconds.
-// XD   attr fichier bloc_fichier file REQ name of file
+// XD stats_serie_posts_fichier objet_lecture nul NO_BRACE This keyword is used to set the statistics read from a file.
+// XD_CONT Average on dt_integr time interval is post-processed every dt_integr seconds. \input{{statistiquesseries}}
+// XD attr mot chaine(into=["dt_integr"]) mot REQ Keyword is used to set the statistics period of integration and write
+// XD_CONT period.
+// XD attr dt_integr floattant dt_integr REQ Average on dt_integr time interval is post-processed every dt_integr
+// XD_CONT seconds.
+// XD attr fichier bloc_fichier file REQ name of file
 
 // XD stat_post_deriv objet_lecture stat_post_deriv NO_BRACE not_set
 // XD list_stat_post listobj nul INHERITS_BRACE stat_post_deriv NO_COMMA Post-processing for statistics
@@ -592,19 +634,25 @@ void Postraitement::set_param(Param& param) const
 
 
 // XD stat_post_t_deb stat_post_deriv t_deb NO_BRACE Start of integration time
-// XD   attr val floattant val REQ not_set
+// XD attr val floattant val REQ not_set
 // XD stat_post_t_fin stat_post_deriv t_fin NO_BRACE End of integration time
-// XD   attr val floattant val REQ not_set
+// XD attr val floattant val REQ not_set
 // XD stat_post_moyenne stat_post_deriv moyenne NO_BRACE to calculate the average of the field over time
-// XD   attr field chaine field REQ name of the field on which statistical analysis will be performed. Possible keywords are Vitesse (velocity), Pression (pressure), Temperature, Concentration, ...
-// XD   attr localisation chaine(into=["elem","elem_dg","som","faces"]) localisation OPT Localisation of post-processed field value
-// XD stat_post_ecart_type stat_post_deriv ecart_type NO_BRACE to calculate the standard deviation (statistic rms) of the field
-// XD   attr field chaine field REQ name of the field on which statistical analysis will be performed. Possible keywords are Vitesse (velocity), Pression (pressure), Temperature, Concentration, ...
-// XD   attr localisation chaine(into=["elem","elem_dg","som","faces"]) localisation OPT Localisation of post-processed field value
+// XD attr field chaine field REQ name of the field on which statistical analysis will be performed. Possible keywords
+// XD_CONT are Vitesse (velocity), Pression (pressure), Temperature, Concentration, ...
+// XD attr localisation chaine(into=["elem","elem_dg","som","faces"]) localisation OPT Localisation of post-processed
+// XD_CONT field value
+// XD stat_post_ecart_type stat_post_deriv ecart_type NO_BRACE to calculate the standard deviation (statistic rms) of
+// XD_CONT the field
+// XD attr field chaine field REQ name of the field on which statistical analysis will be performed. Possible keywords
+// XD_CONT are Vitesse (velocity), Pression (pressure), Temperature, Concentration, ...
+// XD attr localisation chaine(into=["elem","elem_dg","som","faces"]) localisation OPT Localisation of post-processed
+// XD_CONT field value
 // XD stat_post_correlation stat_post_deriv correlation NO_BRACE correlation between the two fields
-// XD   attr first_field chaine first_field REQ first field
-// XD   attr second_field chaine second_field REQ second field
-// XD   attr localisation chaine(into=["elem","elem_dg","som","faces"]) localisation OPT Localisation of post-processed field value
+// XD attr first_field chaine first_field REQ first field
+// XD attr second_field chaine second_field REQ second field
+// XD attr localisation chaine(into=["elem","elem_dg","som","faces"]) localisation OPT Localisation of post-processed
+// XD_CONT field value
 
 int Postraitement::lire_motcle_non_standard(const Motcle& mot, Entree& s)
 {

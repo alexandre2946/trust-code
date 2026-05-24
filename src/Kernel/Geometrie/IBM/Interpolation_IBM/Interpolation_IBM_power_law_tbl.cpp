@@ -16,7 +16,8 @@
 #include <Interpolation_IBM_power_law_tbl.h>
 
 Implemente_instanciable( Interpolation_IBM_power_law_tbl, "Interpolation_IBM_power_law_tbl|IBM_power_law_tbl", Interpolation_IBM_elem_fluid ) ;
-// XD interpolation_ibm_power_law_tbl interpolation_ibm_elem_fluid ibm_power_law_tbl BRACE Immersed Boundary Method (IBM): power law interpolation.
+// XD interpolation_ibm_power_law_tbl interpolation_ibm_elem_fluid ibm_power_law_tbl BRACE Immersed Boundary Method
+// XD_CONT (IBM): power law interpolation.
 
 Sortie& Interpolation_IBM_power_law_tbl::printOn( Sortie& os ) const
 {
@@ -34,6 +35,8 @@ Entree& Interpolation_IBM_power_law_tbl::readOn( Entree& is )
 void Interpolation_IBM_power_law_tbl::set_param(Param& param) const
 {
   Interpolation_IBM_elem_fluid::set_param( param );
-  param.ajouter("formulation_WJSP",&formulation_WJSP_,Param::OPTIONAL); // XD_ADD_P entier Choix formulation WJSP ou non
-  param.ajouter("formulation_linear_pwl",&formulation_linear_pwl_,Param::OPTIONAL);  // XD_ADD_P entier Choix formulation lineaire ou non
+  param.ajouter("formulation_WJSP",&formulation_WJSP_,Param::OPTIONAL); // XD_ADD_P entier
+  // XD_CONT Choix formulation WJSP ou non
+  param.ajouter("formulation_linear_pwl",&formulation_linear_pwl_,Param::OPTIONAL);  // XD_ADD_P entier
+  // XD_CONT Choix formulation lineaire ou non
 }

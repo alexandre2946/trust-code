@@ -23,8 +23,9 @@
 #include <Champ_base.h>
 
 Implemente_instanciable(Ecrire_fichier_xyz_valeur,"Ecrire_fichier_xyz_valeur",Objet_U);
-// XD ecrire_fichier_xyz_valeur interprete nul BRACE This keyword is used to write the values of a field only for some boundaries in a text file with the following format: n_valeur NL2 x_1 y_1 [z_1] val_1 NL2 ... NL2 x_n y_n [z_n] val_n NL2 The created files
-// XD_CONT are named : pbname_fieldname_[boundaryname]_time.dat
+// XD ecrire_fichier_xyz_valeur interprete nul BRACE This keyword is used to write the values of a field only for some
+// XD_CONT boundaries in a text file with the following format: n_valeur NL2 x_1 y_1 [z_1] val_1 NL2 ... NL2 x_n y_n
+// XD_CONT [z_n] val_n NL2 The created files are named : pbname_fieldname_[boundaryname]_time.dat
 
 Sortie& Ecrire_fichier_xyz_valeur::printOn(Sortie& os) const
 {
@@ -47,10 +48,14 @@ Entree& Ecrire_fichier_xyz_valeur::readOn(Entree& is)
 
 void Ecrire_fichier_xyz_valeur::set_param(Param& param) const
 {
-  param.ajouter_flag("binary_file",&binary_file_); // XD_ADD_P flag To write file in binary format
-  param.ajouter("dt", &dt_); // XD_ADD_P floattant File writing frequency
-  param.ajouter("fields", &fields_names_); // XD_ADD_P listchaine Names of the fields we want to write
-  param.ajouter("boundaries", &boundary_names_); // XD_ADD_P listchaine Names of the boundaries on which to write fields
+  param.ajouter_flag("binary_file",&binary_file_); // XD_ADD_P flag
+  // XD_CONT To write file in binary format
+  param.ajouter("dt", &dt_); // XD_ADD_P floattant
+  // XD_CONT File writing frequency
+  param.ajouter("fields", &fields_names_); // XD_ADD_P listchaine
+  // XD_CONT Names of the fields we want to write
+  param.ajouter("boundaries", &boundary_names_); // XD_ADD_P listchaine
+  // XD_CONT Names of the boundaries on which to write fields
 }
 
 

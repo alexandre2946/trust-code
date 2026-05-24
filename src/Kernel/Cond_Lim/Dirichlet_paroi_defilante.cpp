@@ -16,7 +16,9 @@
 #include <Dirichlet_paroi_defilante.h>
 
 Implemente_instanciable(Dirichlet_paroi_defilante, "Paroi_defilante", Dirichlet);
-// XD paroi_defilante dirichlet paroi_defilante INHERITS_BRACE Keyword to designate a condition where tangential velocity is imposed on the wall called bord (edge). If the velocity components set by the user is not tangential, projection is used.
+// XD paroi_defilante dirichlet paroi_defilante INHERITS_BRACE Keyword to designate a condition where tangential
+// XD_CONT velocity is imposed on the wall called bord (edge). If the velocity components set by the user is not
+// XD_CONT tangential, projection is used.
 // XD attr ch front_field_base ch REQ Boundary field type.
 
 

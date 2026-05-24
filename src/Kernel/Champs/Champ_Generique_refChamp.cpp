@@ -50,7 +50,8 @@ Entree& Champ_Generique_refChamp::readOn(Entree& is)
 void Champ_Generique_refChamp::set_param(Param& param) const
 {
   param.ajouter_non_std("nom_source",(this)); // XD attr nom_source chaine nom_source OPT The alias name for the field
-  param.ajouter_non_std("Pb_champ",(this),Param::REQUIRED); // XD attr pb_champ deuxmots pb_champ REQ { Pb_champ nom_pb nom_champ } : nom_pb is the problem name and nom_champ is the selected field name.
+  param.ajouter_non_std("Pb_champ",(this),Param::REQUIRED); // XD attr pb_champ deuxmots pb_champ REQ { Pb_champ nom_pb
+  // XD_CONT nom_champ } : nom_pb is the problem name and nom_champ is the selected field name.
 }
 
 int Champ_Generique_refChamp::lire_motcle_non_standard(const Motcle& mot, Entree& is)

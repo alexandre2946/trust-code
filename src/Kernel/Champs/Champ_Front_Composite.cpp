@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,9 +17,11 @@
 #include <Motcle.h>
 
 Implemente_instanciable(Champ_Front_Composite,"Champ_Front_Composite",Champ_front_base);
-// XD champ_front_composite front_field_base champ_front_composite NO_BRACE Composite front field. Used in multiphase problems to associate data to each phase.
-// XD  attr dim entier dim REQ Number of field components.
-// XD  attr bloc bloc_lecture bloc REQ Values Various pieces of the field, defined per phase. Part 1 goes to phase 1, etc...
+// XD champ_front_composite front_field_base champ_front_composite NO_BRACE Composite front field. Used in multiphase
+// XD_CONT problems to associate data to each phase.
+// XD attr dim entier dim REQ Number of field components.
+// XD attr bloc bloc_lecture bloc REQ Values Various pieces of the field, defined per phase. Part 1 goes to phase 1,
+// XD_CONT etc...
 
 Sortie& Champ_Front_Composite::printOn(Sortie& os) const {  return Champ_front_base::printOn(os); }
 

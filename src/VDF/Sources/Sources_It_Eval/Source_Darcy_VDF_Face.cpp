@@ -21,6 +21,17 @@
 
 Implemente_instanciable_sans_constructeur(Source_Darcy_VDF_Face,"Darcy_VDF_Face",Terme_Source_VDF_base);
 
+// Hand-maintained XD: the dataset keyword 'darcy' diverges from the C++
+// 'Darcy_VDF_Face' name above, and its declared parent 'source_base' diverges
+// from the actual 'Terme_Source_VDF_base' — preserved verbatim from the
+// legacy TRAD_2.org to keep current schema behavior. Body is parsed opaquely
+// via bloc_lecture so the divergence is invisible to the parser.
+// XD darcy source_base darcy NO_BRACE Class for calculation in a porous media with source term of Darcy -nu/K*V. This
+// XD_CONT keyword must be used with a permeability model. For the moment there are two models : permeability constant
+// XD_CONT or Ergun's law. Darcy source term is available for quasi compressible calculation. A new keyword is aded for
+// XD_CONT porosity (porosite).
+// XD attr bloc bloc_lecture bloc REQ Description.
+
 Sortie& Source_Darcy_VDF_Face::printOn(Sortie& s) const { return s << que_suis_je(); }
 
 Entree& Source_Darcy_VDF_Face::readOn(Entree& is )

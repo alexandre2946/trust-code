@@ -22,10 +22,13 @@
 #include <Param.h>
 
 Implemente_instanciable(Champ_Morceaux,"Champ_Morceaux",Champ_Fonc_P0_base);
-// XD champ_morceaux champ_don_base champ_morceaux NO_BRACE Field defined by subfields on a list of subdomains. Each field must be defined on the whole domain.
-// XD   attr problem_name ref_Pb_base problem_name REQ Name of the problem.
-// XD attr data bloc_lecture data REQ { Defaut field_def sous_domaine_1 field_1 ... sous_domaine_i field_i } By default, the field field_def is assigned to the field. It takes the sous_domaine_i identifier Sous_Domaine (sub_area) type object field, field_i.
-// XD_CONT Sous_Domaine (sub_area) type objects must have been previously defined if the operator wishes to use a champ_morceaux type object.
+// XD champ_morceaux champ_don_base champ_morceaux NO_BRACE Field defined by subfields on a list of subdomains. Each
+// XD_CONT field must be defined on the whole domain.
+// XD attr problem_name ref_Pb_base problem_name REQ Name of the problem.
+// XD attr data bloc_lecture data REQ { Defaut field_def sous_domaine_1 field_1 ... sous_domaine_i field_i } By default,
+// XD_CONT the field field_def is assigned to the field. It takes the sous_domaine_i identifier Sous_Domaine (sub_area)
+// XD_CONT type object field, field_i. Sous_Domaine (sub_area) type objects must have been previously defined if the
+// XD_CONT operator wishes to use a champ_morceaux type object.
 
 Sortie& Champ_Morceaux::printOn(Sortie& os) const { return os; }
 

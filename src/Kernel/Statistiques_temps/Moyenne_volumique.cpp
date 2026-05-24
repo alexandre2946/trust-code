@@ -24,7 +24,8 @@
 #include <Param.h>
 
 Implemente_instanciable(Moyenne_volumique,"Moyenne_volumique",Interprete);
-// XD moyenne_volumique interprete moyenne_volumique BRACE This keyword should be used after Resoudre keyword. It computes the convolution product of one or more fields with a given filtering function.
+// XD moyenne_volumique interprete moyenne_volumique BRACE This keyword should be used after Resoudre keyword. It
+// XD_CONT computes the convolution product of one or more fields with a given filtering function.
 
 Sortie& Moyenne_volumique::printOn(Sortie& s ) const
 {
@@ -437,17 +438,41 @@ Entree& Moyenne_volumique::interpreter(Entree& is)
   Motcle format_post("lata_v1");
   Nom nom_fichier_post;
   OWN_PTR(Format_Post_base) fichier_post;
-  param.ajouter("nom_pb", & nom_pb, Param::REQUIRED); // XD_ADD_P ref_Pb_base name of the problem where the source fields will be searched.
-  param.ajouter("nom_domaine", & nom_dom, Param::REQUIRED); // XD_ADD_P ref_domaine name of the destination domain (for example, it can be a coarser mesh, but for optimal performance in parallel, the domain should be split with the same algorithm as the computation mesh, eg, same tranche parameters for example)
-  param.ajouter("noms_champs", & noms_champs, Param::REQUIRED); // XD_ADD_P listchaine name of the source fields (these fields must be accessible from the postraitement) N source_field1 source_field2 ... source_fieldN
+  param.ajouter("nom_pb", & nom_pb, Param::REQUIRED); // XD_ADD_P ref_Pb_base
+  // XD_CONT name of the problem where the source fields will be searched.
+  param.ajouter("nom_domaine", & nom_dom, Param::REQUIRED); // XD_ADD_P ref_domaine
+  // XD_CONT name of the destination domain (for example, it can be a coarser mesh, but for optimal performance in
+  // XD_CONT parallel, the domain should be split with the same algorithm as the computation mesh, eg, same tranche
+  // XD_CONT parameters for example)
+  param.ajouter("noms_champs", & noms_champs, Param::REQUIRED); // XD_ADD_P listchaine
+  // XD_CONT name of the source fields (these fields must be accessible from the postraitement) N source_field1
+  // XD_CONT source_field2 ... source_fieldN
   param.ajouter("fichier_post", & fichier_post);
-  param.ajouter("format_post", & format_post); // XD_ADD_P chaine gives the fileformat for the result (by default : lata)
-  param.ajouter("nom_fichier_post", & nom_fichier_post); // XD_ADD_P chaine indicates the filename where the result is written
+  param.ajouter("format_post", & format_post); // XD_ADD_P chaine
+  // XD_CONT gives the fileformat for the result (by default : lata)
+  param.ajouter("nom_fichier_post", & nom_fichier_post); // XD_ADD_P chaine
+  // XD_CONT indicates the filename where the result is written
   // L'objet Moyenne_volumique est un interprete, mais c'est aussi un objet
   // dont la seule propriete est la fonction filtre a utiliser... astuce:
   // on appelle le readOn de la classe pour lire la fonction filtre.
-  param.ajouter("fonction_filtre", this, Param::REQUIRED); // XD_ADD_P bloc_lecture to specify the given filter NL2 Fonction_filtre {NL2 type filter_typeNL2 demie-largeur lNL2 [ omega w ] NL2 [ expression string ]NL2 } NL2 NL2 type filter_type : This parameter specifies the filtering function. Valid filter_type are:NL2 Boite is a box filter, $f(x,y,z)=(abs(x)<l)*(abs(y) <l)*(abs(z) <l) / (8 l^3)$NL2 Chapeau is a hat filter (product of hat filters in each direction) centered on the origin, the half-width of the filter being l and its integral being 1.NL2 Quadra is a 2nd order filter.NL2 Gaussienne is a normalized gaussian filter of standard deviation sigma in each direction (all field elements outside a cubic box defined by clipping_half_width are ignored, hence, taking clipping_half_width=2.5*sigma yields an integral of 0.99 for a uniform unity field).NL2 Parser allows a user defined function of the x,y,z variables. All elements outside a cubic box defined by clipping_half_width are ignored. The parser is much slower than the equivalent c++ coded function...NL2 NL2 demie-largeur l : This parameter specifies the half width of the filterNL2 [ omega w ] : This parameter must be given for the gaussienne filter. It defines the standard deviation of the gaussian filter.NL2 [ expression string] : This parameter must be given for the parser filter type. This expression will be interpreted by the math parser with the predefined variables x, y and z.
-  param.ajouter("localisation", & localisation); // XD_ADD_P chaine(into=["elem","som"]) indicates where the convolution product should be computed: either on the elements or on the nodes of the destination domain.
+  param.ajouter("fonction_filtre", this, Param::REQUIRED); // XD_ADD_P bloc_lecture
+  // XD_CONT to specify the given filter NL2 Fonction_filtre {NL2 type filter_typeNL2 demie-largeur lNL2 [ omega w ] NL2
+  // XD_CONT [ expression string ]NL2 } NL2 NL2 type filter_type : This parameter specifies the filtering function.
+  // XD_CONT Valid filter_type are:NL2 Boite is a box filter, $f(x,y,z)=(abs(x)<l)*(abs(y) <l)*(abs(z) <l) / (8 l^3)$NL2
+  // XD_CONT Chapeau is a hat filter (product of hat filters in each direction) centered on the origin, the half-width
+  // XD_CONT of the filter being l and its integral being 1.NL2 Quadra is a 2nd order filter.NL2 Gaussienne is a
+  // XD_CONT normalized gaussian filter of standard deviation sigma in each direction (all field elements outside a
+  // XD_CONT cubic box defined by clipping_half_width are ignored, hence, taking clipping_half_width=2.5*sigma yields an
+  // XD_CONT integral of 0.99 for a uniform unity field).NL2 Parser allows a user defined function of the x,y,z
+  // XD_CONT variables. All elements outside a cubic box defined by clipping_half_width are ignored. The parser is much
+  // XD_CONT slower than the equivalent c++ coded function...NL2 NL2 demie-largeur l : This parameter specifies the half
+  // XD_CONT width of the filterNL2 [ omega w ] : This parameter must be given for the gaussienne filter. It defines the
+  // XD_CONT standard deviation of the gaussian filter.NL2 [ expression string] : This parameter must be given for the
+  // XD_CONT parser filter type. This expression will be interpreted by the math parser with the predefined variables x,
+  // XD_CONT y and z.
+  param.ajouter("localisation", & localisation); // XD_ADD_P chaine(into=["elem","som"])
+  // XD_CONT indicates where the convolution product should be computed: either on the elements or on the nodes of the
+  // XD_CONT destination domain.
   param.dictionnaire("ELEM", id_elem);
   param.dictionnaire("SOM", id_som);
   param.lire_avec_accolades_depuis(is);

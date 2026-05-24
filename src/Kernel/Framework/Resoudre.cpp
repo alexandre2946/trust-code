@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -21,7 +21,7 @@
 
 Implemente_instanciable(Resoudre,"Resoudre|Solve",Interprete);
 // XD solve interprete resoudre NO_BRACE Interpretor to start calculation with TRUST.
-// XD  attr pb ref_pb_gen_base pb REQ Name of problem to be solved.
+// XD attr pb ref_pb_gen_base pb REQ Name of problem to be solved.
 
 /*! @brief Simple appel a: Interprete::printOn(Sortie&)
  *

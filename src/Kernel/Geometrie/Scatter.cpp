@@ -41,9 +41,10 @@
 #include <numeric>
 
 Implemente_instanciable(Scatter,"Scatter",Interprete);
-// XD scatter interprete scatter NO_BRACE Class to read a partionned mesh from the files during a parallel calculation. The files are in binary format.
-// XD  attr file chaine file REQ Name of file.
-// XD  attr domaine ref_domaine domaine REQ Name of domain.
+// XD scatter interprete scatter NO_BRACE Class to read a partionned mesh from the files during a parallel calculation.
+// XD_CONT The files are in binary format.
+// XD attr file chaine file REQ Name of file.
+// XD attr domaine ref_domaine domaine REQ Name of domain.
 
 /*! @brief Simple appel a: Interprete::printOn(Sortie&)
  *

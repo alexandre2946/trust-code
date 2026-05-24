@@ -16,11 +16,16 @@
 #include <Pb_Thermohydraulique_WC.h>
 
 Implemente_instanciable(Pb_Thermohydraulique_WC,"Pb_Thermohydraulique_WC",Pb_WC_base);
-// XD pb_thermohydraulique_WC Pb_base pb_thermohydraulique_WC INHERITS_BRACE Resolution of thermo-hydraulic problem for a weakly-compressible fluid. NL2 Keywords for the unknowns other than pressure, velocity, temperature are : NL2 masse_volumique : density
-// XD_CONT NL2 pression : reduced pressure NL2 pression_tot : total pressure NL2 pression_hydro : hydro-static pressure NL2 pression_eos : pressure used in state equation.
-// XD attr fluide_weakly_compressible fluide_weakly_compressible fluide_weakly_compressible REQ The fluid medium associated with the problem.
-// XD attr navier_stokes_WC navier_stokes_WC navier_stokes_WC REQ Navier-Stokes equation for a weakly-compressible fluid.
-// XD attr convection_diffusion_chaleur_WC convection_diffusion_chaleur_WC convection_diffusion_chaleur_WC REQ Temperature equation for a weakly-compressible fluid.
+// XD pb_thermohydraulique_WC Pb_base pb_thermohydraulique_WC INHERITS_BRACE Resolution of thermo-hydraulic problem for
+// XD_CONT a weakly-compressible fluid. NL2 Keywords for the unknowns other than pressure, velocity, temperature are :
+// XD_CONT NL2 masse_volumique : density NL2 pression : reduced pressure NL2 pression_tot : total pressure NL2
+// XD_CONT pression_hydro : hydro-static pressure NL2 pression_eos : pressure used in state equation.
+// XD attr fluide_weakly_compressible fluide_weakly_compressible fluide_weakly_compressible REQ The fluid medium
+// XD_CONT associated with the problem.
+// XD attr navier_stokes_WC navier_stokes_WC navier_stokes_WC REQ Navier-Stokes equation for a weakly-compressible
+// XD_CONT fluid.
+// XD attr convection_diffusion_chaleur_WC convection_diffusion_chaleur_WC convection_diffusion_chaleur_WC REQ
+// XD_CONT Temperature equation for a weakly-compressible fluid.
 
 Sortie& Pb_Thermohydraulique_WC::printOn(Sortie& os) const { return Probleme_base::printOn(os); }
 

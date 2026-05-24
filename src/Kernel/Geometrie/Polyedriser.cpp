@@ -43,8 +43,9 @@ static int faces_sommets_poly[6][4] =
 };
 
 Implemente_instanciable_32_64(Polyedriser_32_64,"Polyedriser",Interprete_geometrique_base_32_64<_T_>);
-// XD polyedriser interprete polyedriser INHERITS_BRACE cast hexahedra into polyhedra so that the indexing of the mesh vertices is compatible with PolyMAC_HFV discretization. Must be used in PolyMAC_HFV discretization if a hexahedral mesh has been produced
-// XD_CONT with TRUST's internal mesh generator.
+// XD polyedriser interprete polyedriser INHERITS_BRACE cast hexahedra into polyhedra so that the indexing of the mesh
+// XD_CONT vertices is compatible with PolyMAC_HFV discretization. Must be used in PolyMAC_HFV discretization if a
+// XD_CONT hexahedral mesh has been produced with TRUST's internal mesh generator.
 // XD attr domain_name ref_domaine domain_name REQ Name of domain.
 
 template <typename _SIZE_>

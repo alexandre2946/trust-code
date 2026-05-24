@@ -21,11 +21,14 @@
 #include <Interprete.h>
 
 Implemente_instanciable(Partitionneur_Union,"Partitionneur_Union",Partitionneur_base);
-// XD partitionneur_union partitionneur_deriv union BRACE Let several local domains be generated from a bigger one using the keyword create_domain_from_sub_domain, and let their partitions be generated in the usual way. Provided the list of partition files for
-// XD_CONT each small domain, the keyword 'union' will partition the global domain in a conform fashion with the smaller domains.
+// XD partitionneur_union partitionneur_deriv union BRACE Let several local domains be generated from a bigger one using
+// XD_CONT the keyword create_domain_from_sub_domain, and let their partitions be generated in the usual way. Provided
+// XD_CONT the list of partition files for each small domain, the keyword 'union' will partition the global domain in a
+// XD_CONT conform fashion with the smaller domains.
 
-// XD attr sous_domaines bloc_lecture sous_domaines REQ List of the partition files with the following syntaxe: {sous_domaine1 decoupage1 ... sous_domaineim decoupageim } where sous_domaine1 ... sous_zomeim are small domains names and decoupage1 ...
-// XD_CONT decoupageim are partition files.
+// XD attr sous_domaines bloc_lecture sous_domaines REQ List of the partition files with the following syntaxe:
+// XD_CONT {sous_domaine1 decoupage1 ... sous_domaineim decoupageim } where sous_domaine1 ... sous_zomeim are small
+// XD_CONT domains names and decoupage1 ... decoupageim are partition files.
 
 
 Sortie& Partitionneur_Union::printOn(Sortie& os) const

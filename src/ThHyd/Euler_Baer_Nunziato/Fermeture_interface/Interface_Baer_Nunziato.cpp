@@ -31,7 +31,9 @@ Entree& Interface_Baer_Nunziato::readOn(Entree& is)
 
 void Interface_Baer_Nunziato::set_param(Param& param) const
 {
-  param.ajouter("velocity_from_phase|phase_vitesse", &nom_phase_vitesse_ , Param::REQUIRED); // XD_ADD_P chaine Name of phase used to take the velocity at the interface. The pressure is automatically taken from the other phase
+  param.ajouter("velocity_from_phase|phase_vitesse", &nom_phase_vitesse_ , Param::REQUIRED); // XD_ADD_P chaine
+  // XD_CONT Name of phase used to take the velocity at the interface. The pressure is automatically taken from the
+  // XD_CONT other phase
 }
 
 void Interface_Baer_Nunziato::completer()

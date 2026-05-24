@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,8 +18,17 @@
 
 Implemente_instanciable(Pb_Hydraulique,"Pb_Hydraulique",Pb_Fluide_base);
 // XD pb_hydraulique Pb_base pb_hydraulique INHERITS_BRACE Resolution of the Navier-Stokes equations.
-// XD   attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the problem.
-// XD   attr navier_stokes_standard navier_stokes_standard navier_stokes_standard REQ Navier-Stokes equations.
+// XD attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the
+// XD_CONT problem.
+// XD attr correlations bloc_lecture correlations OPT List of correlations used in specific source terms (e.g.
+// XD_CONT wall-friction adaptive law).
+// XD attr navier_stokes_standard navier_stokes_standard navier_stokes_standard REQ Navier-Stokes equations.
+// XD attr Energie_cinetique_turbulente Energie_cinetique_turbulente Energie_cinetique_turbulente OPT Turbulent kinetic
+// XD_CONT Energy conservation equation for a turbulent mono-phase problem (available in TrioCFD).
+// XD attr Echelle_temporelle_turbulente Echelle_temporelle_turbulente Echelle_temporelle_turbulente OPT Turbulent
+// XD_CONT Dissipation time scale equation for a turbulent mono-phase problem (available in TrioCFD).
+// XD attr Taux_dissipation_turbulent Taux_dissipation_turbulent Taux_dissipation_turbulent OPT Turbulent Dissipation
+// XD_CONT frequency equation for a turbulent mono-phase problem (available in TrioCFD).
 
 Sortie& Pb_Hydraulique::printOn(Sortie& os) const { return Pb_Fluide_base::printOn(os); }
 Entree& Pb_Hydraulique::readOn(Entree& is) { return Pb_Fluide_base::readOn(is); }

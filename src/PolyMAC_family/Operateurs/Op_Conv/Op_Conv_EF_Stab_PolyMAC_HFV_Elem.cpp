@@ -40,7 +40,8 @@
 Implemente_instanciable(Op_Conv_EF_Stab_PolyMAC_HFV_Elem, "Op_Conv_EF_Stab_PolyMAC_HFV_Elem|Op_Conv_EF_Stab_PolyMAC_MPFA_Elem", Op_Conv_PolyMAC_CDO_base);
 Implemente_instanciable_sans_constructeur(Op_Conv_Amont_PolyMAC_HFV_Elem, "Op_Conv_Amont_PolyMAC_HFV_Elem|Op_Conv_Amont_PolyMAC_MPFA_Elem", Op_Conv_EF_Stab_PolyMAC_HFV_Elem);
 Implemente_instanciable_sans_constructeur(Op_Conv_Centre_PolyMAC_HFV_Elem, "Op_Conv_Centre_PolyMAC_HFV_Elem|Op_Conv_Centre_PolyMAC_MPFA_Elem", Op_Conv_EF_Stab_PolyMAC_HFV_Elem);
-// XD Op_Conv_EF_Stab_PolyMAC_HFV_Elem interprete Op_Conv_EF_Stab_PolyMAC_HFV_Elem BRACE Class Op_Conv_EF_Stab_PolyMAC_HFV_Elem
+// XD Op_Conv_EF_Stab_PolyMAC_HFV_Elem interprete Op_Conv_EF_Stab_PolyMAC_HFV_Elem BRACE Class
+// XD_CONT Op_Conv_EF_Stab_PolyMAC_HFV_Elem
 
 Op_Conv_Amont_PolyMAC_HFV_Elem::Op_Conv_Amont_PolyMAC_HFV_Elem() { alpha_ = 1.0; }
 Op_Conv_Centre_PolyMAC_HFV_Elem::Op_Conv_Centre_PolyMAC_HFV_Elem() { alpha_ = 0.0; }
@@ -58,7 +59,8 @@ Entree& Op_Conv_EF_Stab_PolyMAC_HFV_Elem::readOn(Entree& is)
   if (que_suis_je().debute_par("Op_Conv_EF_Stab") or que_suis_je().debute_par("Op_Conv_ALE")) //on n'est pas dans Op_Conv_Amont/Centre
     {
       Param param(que_suis_je());
-      param.ajouter("alpha", &alpha_);            // XD_ADD_P double parametre ajustant la stabilisation de 0 (schema centre) a 1 (schema amont)
+      param.ajouter("alpha", &alpha_);            // XD_ADD_P double
+      // XD_CONT parametre ajustant la stabilisation de 0 (schema centre) a 1 (schema amont)
       param.lire_avec_accolades_depuis(is);
     }
 

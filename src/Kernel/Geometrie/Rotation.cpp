@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,12 +16,14 @@
 #include <Rotation.h>
 
 Implemente_instanciable(Rotation,"Rotation",Transformer);
-// XD rotation interprete rotation INHERITS_BRACE Keyword to rotate the geometry of an arbitrary angle around an axis aligned with Ox, Oy or Oz axis.
-// XD  attr domain_name ref_domaine domain_name REQ Name of domain to wich the transformation is applied.
-// XD  attr dir chaine(into=["X","Y","Z"]) dir REQ X, Y or Z to indicate the direction of the rotation axis
-// XD  attr coord1 floattant coord1 REQ coordinates of the center of rotation in the plane orthogonal to the rotation axis. These coordinates must be specified in the direct triad sense.
-// XD  attr coord2 floattant coord2 REQ not_set
-// XD  attr angle floattant angle REQ angle of rotation (in degrees)
+// XD rotation interprete rotation INHERITS_BRACE Keyword to rotate the geometry of an arbitrary angle around an axis
+// XD_CONT aligned with Ox, Oy or Oz axis.
+// XD attr domain_name ref_domaine domain_name REQ Name of domain to wich the transformation is applied.
+// XD attr dir chaine(into=["X","Y","Z"]) dir REQ X, Y or Z to indicate the direction of the rotation axis
+// XD attr coord1 floattant coord1 REQ coordinates of the center of rotation in the plane orthogonal to the rotation
+// XD_CONT axis. These coordinates must be specified in the direct triad sense.
+// XD attr coord2 floattant coord2 REQ not_set
+// XD attr angle floattant angle REQ angle of rotation (in degrees)
 
 
 /*! @brief Simple appel a: Transformer::printOn(Sortie&)

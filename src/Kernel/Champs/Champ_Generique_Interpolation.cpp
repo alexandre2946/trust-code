@@ -58,12 +58,17 @@ Sortie& Champ_Generique_Interpolation::printOn(Sortie& os) const
 //  methode          : type de methode de calcul "calculer_champ_post" (optionnel, une seule methode disponible)
 void Champ_Generique_Interpolation::set_param(Param& param) const
 {
-// XD interpolation champ_post_de_champs_post interpolation INHERITS_BRACE To create a field which is an interpolation of the field given by the keyword source.
+// XD interpolation champ_post_de_champs_post interpolation INHERITS_BRACE To create a field which is an interpolation
+// XD_CONT of the field given by the keyword source.
   Champ_Gen_de_Champs_Gen::set_param(param);
-  param.ajouter("localisation",&localisation_,Param::REQUIRED); // XD_ADD_P chaine type_loc indicate where is done the interpolation (elem for element or som for node).
-  param.ajouter("methode",&methode_); //  XD_ADD_P chaine The optional keyword methode is limited to calculer_champ_post for the moment.
-  param.ajouter("domaine",&nom_domaine_lu_);  //  XD_ADD_P chaine  the domain name where the interpolation is done (by default, the calculation domain)
-  param.ajouter("optimisation_sous_maillage",&optimisation_demande_); // XD_ADD_P dico not_set
+  param.ajouter("localisation",&localisation_,Param::REQUIRED); // XD_ADD_P chaine
+  // XD_CONT type_loc indicate where is done the interpolation (elem for element or som for node).
+  param.ajouter("methode",&methode_); // XD_ADD_P chaine
+  // XD_CONT The optional keyword methode is limited to calculer_champ_post for the moment.
+  param.ajouter("domaine",&nom_domaine_lu_);  // XD_ADD_P chaine
+  // XD_CONT the domain name where the interpolation is done (by default, the calculation domain)
+  param.ajouter("optimisation_sous_maillage",&optimisation_demande_); // XD_ADD_P dico
+  // XD_CONT not_set
   param.dictionnaire("default",-1); // XD_ADD_DICO not_set
   param.dictionnaire("yes",1);  // XD_ADD_DICO not_set
   param.dictionnaire("no",0); // XD_ADD_DICO not_set

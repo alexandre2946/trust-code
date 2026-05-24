@@ -16,7 +16,8 @@
 #include <Interpolation_IBM_thermal_wall_law.h>
 
 Implemente_instanciable( Interpolation_IBM_thermal_wall_law, "Interpolation_IBM_thermal_wall_law|IBM_thermal_wall_law", Interpolation_IBM_elem_fluid ) ;
-// XD interpolation_ibm_thermal_wall_law interpolation_ibm_elem_fluid ibm_thermal_wall_law BRACE Immersed Boundary Method (IBM): Interpolation thermal wall law.
+// XD interpolation_ibm_thermal_wall_law interpolation_ibm_elem_fluid ibm_thermal_wall_law BRACE Immersed Boundary
+// XD_CONT Method (IBM): Interpolation thermal wall law.
 
 Sortie& Interpolation_IBM_thermal_wall_law::printOn( Sortie& os ) const
 {
@@ -34,10 +35,14 @@ Entree& Interpolation_IBM_thermal_wall_law::readOn( Entree& is )
 void Interpolation_IBM_thermal_wall_law::set_param(Param& param) const
 {
   Interpolation_IBM_elem_fluid::set_param( param );
-  param.ajouter("formulation_Tplus",&formulation_Tp_,Param::OPTIONAL);  // XD_ADD_P entier Choix formulation calcul T+ (Kader si rien)
-  param.ajouter("boundary_type",&boundary_type_,Param::REQUIRED); // XD_ADD_P entier Choix type de cond limite
-  param.ajouter("T_inlet",&T_inlet_,Param::REQUIRED); // XD_ADD_P double Demande la température d'écoulement d'entrée moyenne
-  param.ajouter("Prandlt_mol",&Prandlt_mol_,Param::REQUIRED); // XD_ADD_P double Demande le Prandlt du fluide
+  param.ajouter("formulation_Tplus",&formulation_Tp_,Param::OPTIONAL);  // XD_ADD_P entier
+  // XD_CONT Choix formulation calcul T+ (Kader si rien)
+  param.ajouter("boundary_type",&boundary_type_,Param::REQUIRED); // XD_ADD_P entier
+  // XD_CONT Choix type de cond limite
+  param.ajouter("T_inlet",&T_inlet_,Param::REQUIRED); // XD_ADD_P double
+  // XD_CONT Demande la température d'écoulement d'entrée moyenne
+  param.ajouter("Prandlt_mol",&Prandlt_mol_,Param::REQUIRED); // XD_ADD_P double
+  // XD_CONT Demande le Prandlt du fluide
 }
 
 double Interpolation_IBM_thermal_wall_law::Kader(double yplus, double Prandlt)

@@ -26,19 +26,28 @@
 #include <Sonde.h>
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Sonde,"Sonde",Objet_U);
-// XD sonde objet_lecture nul NO_BRACE Keyword is used to define the probes. Observations: the probe coordinates should be given in Cartesian coordinates (X, Y, Z), including axisymmetric.
-// XD attr nom_sonde chaine nom_sonde REQ Name of the file in which the values taken over time will be saved. The complete file name is nom_sonde.son.
-// XD attr special chaine(into=["grav","som","nodes","chsom","gravcl"]) special OPT Option to change the positions of the probes. Several options are available: NL2 grav : each probe is moved to the nearest cell center of the mesh; NL2 som : each probe is
-// XD_CONT moved to the nearest vertex of the mesh NL2 nodes : each probe is moved to the nearest face center of the mesh; NL2 chsom : only available for P1NC sampled field. The values of the probes are calculated according to P1-Conform corresponding field. NL2 gravcl :
-// XD_CONT Extend to the domain face boundary a cell-located segment probe in order to have the boundary condition for the field. For this type the extreme probe point has to be on the face center of gravity.
+// XD sonde objet_lecture nul NO_BRACE Keyword is used to define the probes. Observations: the probe coordinates should
+// XD_CONT be given in Cartesian coordinates (X, Y, Z), including axisymmetric.
+// XD attr nom_sonde chaine nom_sonde REQ Name of the file in which the values taken over time will be saved. The
+// XD_CONT complete file name is nom_sonde.son.
+// XD attr special chaine(into=["grav","som","nodes","chsom","gravcl"]) special OPT Option to change the positions of
+// XD_CONT the probes. Several options are available: NL2 grav : each probe is moved to the nearest cell center of the
+// XD_CONT mesh; NL2 som : each probe is moved to the nearest vertex of the mesh NL2 nodes : each probe is moved to the
+// XD_CONT nearest face center of the mesh; NL2 chsom : only available for P1NC sampled field. The values of the probes
+// XD_CONT are calculated according to P1-Conform corresponding field. NL2 gravcl : Extend to the domain face boundary a
+// XD_CONT cell-located segment probe in order to have the boundary condition for the field. For this type the extreme
+// XD_CONT probe point has to be on the face center of gravity.
 // XD attr nom_inco chaine nom_inco REQ Name of the sampled field.
 // XD attr mperiode chaine(into=["periode"]) mperiode REQ Keyword to set the sampled field measurement frequency.
-// XD attr prd floattant prd REQ Period value. Every prd seconds, the field value calculated at the previous time step is written to the nom_sonde.son file.
+// XD attr prd floattant prd REQ Period value. Every prd seconds, the field value calculated at the previous time step
+// XD_CONT is written to the nom_sonde.son file.
 // XD attr type sonde_base type REQ Type of probe.
 
-// XD sonde_base objet_lecture sonde_base NO_BRACE Basic probe. Probes refer to sensors that allow a value or several points of the domain to be monitored over time. The probes may be a set of points defined one by one (keyword Points) or a set of points
-// XD_CONT evenly distributed over a straight segment (keyword Segment) or arranged according to a layout (keyword Plan) or according to a parallelepiped (keyword Volume). The fields allow all the values of a physical value on the domain to be known at several moments in
-// XD_CONT time.
+// XD sonde_base objet_lecture sonde_base NO_BRACE Basic probe. Probes refer to sensors that allow a value or several
+// XD_CONT points of the domain to be monitored over time. The probes may be a set of points defined one by one (keyword
+// XD_CONT Points) or a set of points evenly distributed over a straight segment (keyword Segment) or arranged according
+// XD_CONT to a layout (keyword Plan) or according to a parallelepiped (keyword Volume). The fields allow all the values
+// XD_CONT of a physical value on the domain to be known at several moments in time.
 
 // XD segmentfacesx sonde_base segmentfacesx NO_BRACE Segment probe where points are moved to the nearest x faces
 // XD attr nbr entier nbr REQ Number of probe points of the segment, evenly distributed.
@@ -69,12 +78,15 @@ Implemente_instanciable_sans_constructeur_ni_destructeur(Sonde,"Sonde",Objet_U);
 // XD points sonde_base points NO_BRACE Keyword to define the number of probe points. The file is arranged in columns.
 // XD attr points listpoints points REQ Probe points.
 
-// XD numero_elem_sur_maitre sonde_base numero_elem_sur_maitre NO_BRACE Keyword to define a probe at the special element. Useful for min/max sonde.
+// XD numero_elem_sur_maitre sonde_base numero_elem_sur_maitre NO_BRACE Keyword to define a probe at the special
+// XD_CONT element. Useful for min/max sonde.
 // XD attr numero entier numero REQ element number
 
-// XD segmentpoints points segmentpoints NO_BRACE This keyword is used to define a probe segment from specifics points. The nom_champ field is sampled at ns specifics points.
+// XD segmentpoints points segmentpoints NO_BRACE This keyword is used to define a probe segment from specifics points.
+// XD_CONT The nom_champ field is sampled at ns specifics points.
 
-// XD position_like sonde_base position_like NO_BRACE Keyword to define a probe at the same position of another probe named autre_sonde.
+// XD position_like sonde_base position_like NO_BRACE Keyword to define a probe at the same position of another probe
+// XD_CONT named autre_sonde.
 // XD attr autre_sonde chaine autre_sonde REQ Name of the other probe.
 
 // XD plan sonde_base plan NO_BRACE Keyword to set the number of probe layout points. The file format is type .lml
@@ -84,7 +96,8 @@ Implemente_instanciable_sans_constructeur_ni_destructeur(Sonde,"Sonde",Objet_U);
 // XD attr point_fin un_point point_fin REQ Second point defining the angle. This angle should be positive.
 // XD attr point_fin_2 un_point point_fin_2 REQ Third point defining the angle. This angle should be positive.
 
-// XD volume sonde_base volume NO_BRACE Keyword to define the probe volume in a parallelepiped passing through 4 points and the number of probes in each direction.
+// XD volume sonde_base volume NO_BRACE Keyword to define the probe volume in a parallelepiped passing through 4 points
+// XD_CONT and the number of probes in each direction.
 // XD attr nbr entier nbr REQ Number of probes in the first direction.
 // XD attr nbr2 entier nbr2 REQ Number of probes in the second direction.
 // XD attr nbr3 entier nbr3 REQ Number of probes in the third direction.

@@ -20,7 +20,8 @@
 #include <Param.h>
 
 Implemente_instanciable(Champ_front_MED,"Champ_front_MED",Champ_front_txyz);
-// XD champ_front_MED front_field_base champ_front_MED NO_BRACE Field allowing the loading of a boundary condition from a MED file using Champ_fonc_med
+// XD champ_front_MED front_field_base champ_front_MED NO_BRACE Field allowing the loading of a boundary condition from
+// XD_CONT a MED file using Champ_fonc_med
 
 Sortie& Champ_front_MED::printOn(Sortie& os) const
 {

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -19,11 +19,14 @@
 #include <Verif_Cl.h>
 
 Implemente_instanciable(Pb_Hydraulique_Concentration,"Pb_Hydraulique_Concentration",Pb_Fluide_base);
-// XD pb_hydraulique_concentration Pb_base pb_hydraulique_concentration INHERITS_BRACE Resolution of Navier-Stokes/multiple constituent transport equations.
-// XD   attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the problem.
-// XD   attr constituant constituant constituant OPT Constituents.
-// XD   attr navier_stokes_standard navier_stokes_standard navier_stokes_standard OPT Navier-Stokes equations.
-// XD   attr convection_diffusion_concentration convection_diffusion_concentration convection_diffusion_concentration OPT Constituent transport vectorial equation (concentration diffusion convection).
+// XD pb_hydraulique_concentration Pb_base pb_hydraulique_concentration INHERITS_BRACE Resolution of
+// XD_CONT Navier-Stokes/multiple constituent transport equations.
+// XD attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the
+// XD_CONT problem.
+// XD attr constituant constituant constituant OPT Constituents.
+// XD attr navier_stokes_standard navier_stokes_standard navier_stokes_standard OPT Navier-Stokes equations.
+// XD attr convection_diffusion_concentration convection_diffusion_concentration convection_diffusion_concentration OPT
+// XD_CONT Constituent transport vectorial equation (concentration diffusion convection).
 
 /*! @brief Simple appel a: Pb_Fluide_base::printOn(Sortie&) Ecrit le probleme sur un flot de sortie.
  *

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -19,7 +19,8 @@
 #include <Param.h>
 
 Implemente_instanciable(Viscosite_turbulente_Smagorinsky, "Viscosite_turbulente_Smago", Viscosite_turbulente_LES_base);
-// XD type_diffusion_turbulente_multiphase_smago type_diffusion_turbulente_multiphase_deriv smago BRACE LES Smagorinsky type.
+// XD type_diffusion_turbulente_multiphase_smago type_diffusion_turbulente_multiphase_deriv smago BRACE LES Smagorinsky
+// XD_CONT type.
 
 Sortie& Viscosite_turbulente_Smagorinsky::printOn(Sortie& os) const { return os; }
 
@@ -27,7 +28,8 @@ Entree& Viscosite_turbulente_Smagorinsky::readOn(Entree& is)
 {
   mod_const_ = 0.18; // par default
   Param param(que_suis_je());
-  param.ajouter("cs", &mod_const_); // XD_ADD_P floattant Smagorinsky's model constant. By default it is se to 0.18.
+  param.ajouter("cs", &mod_const_); // XD_ADD_P floattant
+  // XD_CONT Smagorinsky's model constant. By default it is se to 0.18.
   param.lire_avec_accolades_depuis(is);
 
   if (mod_const_ < 0.) Process::exit("The smagorinsky's constant must be positive !");

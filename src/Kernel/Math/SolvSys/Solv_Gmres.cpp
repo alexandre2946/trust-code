@@ -22,12 +22,15 @@
 Implemente_instanciable_sans_constructeur(Solv_Gmres,"Solv_Gmres",solv_iteratif);
 // XD solv_gmres solveur_sys_base gmres BRACE Preconditioned GMRES.
 // XD attr diag rien diag OPT Keyword to precondition with the diagonal
-// XD attr seuil floattant seuil OPT Value of the final residue. The solver ceases iterations when the Euclidean residue standard ||Ax-B|| is less than this value. default value 1e-12.
-// XD attr impr rien impr OPT Keyword which is used to request display of the Euclidean residue standard each time this iterates
-// XD attr save_matrice|save_matrix rien save_matrice OPT To save the matrix in a file.
+// XD attr seuil floattant seuil OPT Value of the final residue. The solver ceases iterations when the Euclidean residue
+// XD_CONT standard ||Ax-B|| is less than this value. default value 1e-12.
+// XD attr impr rien impr OPT Keyword which is used to request display of the Euclidean residue standard each time this
+// XD_CONT iterates
+// XD attr save_matrice|save_matrix entier save_matrice OPT To save the matrix in a file.
 // XD attr quiet rien quiet OPT To not displaying any outputs of the solver.
 // XD attr nb_it_max entier nb_it_max OPT Keyword to set the maximum iterations number for the solver.
-// XD attr controle_residu entier controle_residu OPT Keyword of Boolean type (by default 0). If set to 1, check the convergence after solve
+// XD attr controle_residu entier controle_residu OPT Keyword of Boolean type (by default 0). If set to 1, check the
+// XD_CONT convergence after solve
 
 Solv_Gmres::Solv_Gmres()
 {

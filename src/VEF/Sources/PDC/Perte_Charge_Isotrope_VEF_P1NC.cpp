@@ -18,12 +18,13 @@
 #include <Equation_base.h>
 
 Implemente_instanciable(Perte_Charge_Isotrope_VEF_P1NC,"Perte_Charge_Isotrope_VEF_P1NC",Perte_Charge_VEF);
-// XD perte_charge_isotrope source_base perte_charge_isotrope BRACE Isotropic pressure loss (available in VEF and PolyMAC_CDO).
-// XD  attr lambda chaine lambda_u REQ Function for loss coefficient which may be Reynolds dependant (Ex: 64/Re).
-// XD  attr diam_hydr champ_don_base diam_hydr REQ Hydraulic diameter value.
-// XD  attr sous_zone chaine sous_zone OPT Optional sub-area where pressure loss applies.
-// XD  attr regul bloc_lecture regul OPT Optional parameter for pressure drop coefficient regulation on target flow rate.
-// XD  attr surface bloc_lecture surface OPT Optional parameter for surface used to impose the pressure drop.
+// XD perte_charge_isotrope source_base perte_charge_isotrope BRACE Isotropic pressure loss (available in VEF and
+// XD_CONT PolyMAC_CDO).
+// XD attr lambda chaine lambda_u REQ Function for loss coefficient which may be Reynolds dependant (Ex: 64/Re).
+// XD attr diam_hydr champ_don_base diam_hydr REQ Hydraulic diameter value.
+// XD attr sous_zone chaine sous_zone OPT Optional sub-area where pressure loss applies.
+// XD attr regul bloc_lecture regul OPT Optional parameter for pressure drop coefficient regulation on target flow rate.
+// XD attr surface bloc_lecture surface OPT Optional parameter for surface used to impose the pressure drop.
 
 Sortie& Perte_Charge_Isotrope_VEF_P1NC::printOn(Sortie& s ) const
 {

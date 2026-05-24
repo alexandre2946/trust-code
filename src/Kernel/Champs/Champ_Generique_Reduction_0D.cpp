@@ -25,8 +25,9 @@
 
 Implemente_instanciable(Champ_Generique_Reduction_0D,"Reduction_0D",Champ_Gen_de_Champs_Gen);
 Add_synonym(Champ_Generique_Reduction_0D,"Champ_Post_Reduction_0D");
-// XD reduction_0d champ_post_de_champs_post reduction_0d INHERITS_BRACE To calculate the min, max, sum, average, weighted sum, weighted average, weighted sum by porosity, weighted average by porosity, euclidian norm, normalized euclidian norm, L1 norm, L2
-// XD_CONT norm of a field.
+// XD reduction_0d champ_post_de_champs_post reduction_0d INHERITS_BRACE To calculate the min, max, sum, average,
+// XD_CONT weighted sum, weighted average, weighted sum by porosity, weighted average by porosity, euclidian norm,
+// XD_CONT normalized euclidian norm, L1 norm, L2 norm of a field.
 
 Sortie& Champ_Generique_Reduction_0D::printOn(Sortie& s ) const
 {
@@ -73,7 +74,16 @@ Entree& Champ_Generique_Reduction_0D::readOn(Entree& s )
 void Champ_Generique_Reduction_0D::set_param(Param& param) const
 {
   Champ_Gen_de_Champs_Gen::set_param(param);
-  param.ajouter("methode",&methode_,Param::REQUIRED); // XD_ADD_P chaine(into=["min","max","moyenne","average","moyenne_ponderee","weighted_average","somme","sum","somme_ponderee","weighted_sum","somme_ponderee_porosite","weighted_sum_porosity","euclidian_norm","normalized_euclidian_norm","L1_norm","L2_norm","valeur_a_gauche","left_value"]) name of the reduction method: NL2 - min for the minimum value, NL2 - max for the maximum value, NL2 - average (or moyenne) for a mean, NL2 - weighted_average (or moyenne_ponderee) for a mean ponderated by integration volumes, e.g: cell volumes for temperature and pressure in VDF, volumes around faces for velocity and temperature in VEF, NL2 - sum (or somme) for the sum of all the values of the field, NL2 - weighted_sum (or somme_ponderee) for a weighted sum (integral), NL2 - weighted_average_porosity (or moyenne_ponderee_porosite) and weighted_sum_porosity (or somme_ponderee_porosite) for the mean and sum weighted by the volumes of the elements, only for ELEM localisation, NL2 - euclidian_norm for the euclidian norm, NL2 - normalized_euclidian_norm for the euclidian norm normalized, NL2 - L1_norm for norm L1, NL2 - L2_norm for norm L2
+  param.ajouter("methode",&methode_,Param::REQUIRED); // XD_ADD_P chaine(into=["min","max","moyenne","average","moyenne_ponderee","weighted_average","somme","sum","somme_ponderee","weighted_sum","somme_ponderee_porosite","weighted_sum_porosity","euclidian_norm","normalized_euclidian_norm","L1_norm","L2_norm","valeur_a_gauche","left_value"])
+  // XD_CONT name of the reduction method: NL2 - min for the minimum value, NL2 - max for the maximum value, NL2 -
+  // XD_CONT average (or moyenne) for a mean, NL2 - weighted_average (or moyenne_ponderee) for a mean ponderated by
+  // XD_CONT integration volumes, e.g: cell volumes for temperature and pressure in VDF, volumes around faces for
+  // XD_CONT velocity and temperature in VEF, NL2 - sum (or somme) for the sum of all the values of the field, NL2 -
+  // XD_CONT weighted_sum (or somme_ponderee) for a weighted sum (integral), NL2 - weighted_average_porosity (or
+  // XD_CONT moyenne_ponderee_porosite) and weighted_sum_porosity (or somme_ponderee_porosite) for the mean and sum
+  // XD_CONT weighted by the volumes of the elements, only for ELEM localisation, NL2 - euclidian_norm for the euclidian
+  // XD_CONT norm, NL2 - normalized_euclidian_norm for the euclidian norm normalized, NL2 - L1_norm for norm L1, NL2 -
+  // XD_CONT L2_norm for norm L2
 }
 
 void Champ_Generique_Reduction_0D::completer(const Postraitement_base& post)

@@ -32,7 +32,8 @@ Implemente_instanciable( Op_Conv_EF_Stab_PolyMAC_CDO_Face, "Op_Conv_EF_Stab_Poly
 Implemente_instanciable( Op_Conv_Amont_PolyMAC_CDO_Face, "Op_Conv_Amont_PolyMAC_CDO_Face", Op_Conv_EF_Stab_PolyMAC_CDO_Face );
 Implemente_instanciable( Op_Conv_Centre_PolyMAC_CDO_Face, "Op_Conv_Centre_PolyMAC_CDO_Face", Op_Conv_EF_Stab_PolyMAC_CDO_Face );
 
-// XD Op_Conv_EF_Stab_PolyMAC_CDO_Face interprete Op_Conv_EF_Stab_PolyMAC_CDO_Face BRACE Class Op_Conv_EF_Stab_PolyMAC_CDO_Face_PolyMAC_CDO
+// XD Op_Conv_EF_Stab_PolyMAC_CDO_Face interprete Op_Conv_EF_Stab_PolyMAC_CDO_Face BRACE Class
+// XD_CONT Op_Conv_EF_Stab_PolyMAC_CDO_Face_PolyMAC_CDO
 
 Sortie& Op_Conv_EF_Stab_PolyMAC_CDO_Face::printOn(Sortie& os) const { return Op_Conv_PolyMAC_CDO_base::printOn(os); }
 Sortie& Op_Conv_Amont_PolyMAC_CDO_Face::printOn(Sortie& os) const { return Op_Conv_PolyMAC_CDO_base::printOn(os); }
@@ -42,7 +43,8 @@ Entree& Op_Conv_EF_Stab_PolyMAC_CDO_Face::readOn(Entree& is)
 {
   Op_Conv_PolyMAC_CDO_base::readOn(is);
   Param param(que_suis_je());
-  param.ajouter("alpha", &alpha_);            // XD_ADD_P double parametre ajustant la stabilisation de 0 (schema centre) a 1 (schema amont)
+  param.ajouter("alpha", &alpha_);            // XD_ADD_P double
+  // XD_CONT parametre ajustant la stabilisation de 0 (schema centre) a 1 (schema amont)
   param.lire_avec_accolades_depuis(is);
   return is;
 }

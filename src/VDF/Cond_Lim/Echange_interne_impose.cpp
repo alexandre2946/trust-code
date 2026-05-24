@@ -26,7 +26,8 @@
 #include <EChaine.h>
 
 Implemente_instanciable(Echange_interne_impose,"Paroi_echange_interne_impose",Echange_externe_impose);
-// XD Echange_interne_impose condlim_base Paroi_echange_interne_impose INHERITS_BRACE Internal heat exchange boundary condition with exchange coefficient.
+// XD Echange_interne_impose condlim_base Paroi_echange_interne_impose INHERITS_BRACE Internal heat exchange boundary
+// XD_CONT condition with exchange coefficient.
 // XD attr h_imp chaine h_imp REQ Exchange coefficient value expressed in W.m-2.K-1.
 // XD attr ch front_field_base ch REQ Boundary field type.
 

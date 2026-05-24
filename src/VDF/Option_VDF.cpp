@@ -31,11 +31,20 @@ Entree& Option_VDF::readOn(Entree& is) { return Interprete::readOn(is); }
 Entree& Option_VDF::interpreter(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter_non_std("traitement_coins", (this)); // XD_ADD_P chaine(into=["oui","non"]) Treatment of corners (yes or no). This option modifies slightly the calculations at the outlet of the plane channel. It supposes that the boundary continues after channel outlet (i.e. velocity vector remains parallel to the boundary).
-  param.ajouter_non_std("traitement_gradients", (this)); // XD_ADD_P chaine(into=["oui","non"]) Treatment of gradient calculations (yes or no). This option modifies slightly the gradient calculation at the corners and activates also the corner treatment option.
-  param.ajouter_non_std("P_imposee_aux_faces", (this)); // XD_ADD_P chaine(into=["oui","non"]) Pressure imposed at the faces (yes or no).
-  param.ajouter_non_std("DEACTIVATE_ARETE_MIXTE", (this)); // XD_ADD_P rien Deactivate the arete_mixte contribution in the conv op of the momentum equation.
-  param.ajouter_non_std("all_options|toutes_les_options", (this)); // XD_ADD_P rien Activates all Option_VDF options. If used, must be used alone without specifying the other options, nor combinations.
+  param.ajouter_non_std("traitement_coins", (this)); // XD_ADD_P chaine(into=["oui","non"])
+  // XD_CONT Treatment of corners (yes or no). This option modifies slightly the calculations at the outlet of the plane
+  // XD_CONT channel. It supposes that the boundary continues after channel outlet (i.e. velocity vector remains
+  // XD_CONT parallel to the boundary).
+  param.ajouter_non_std("traitement_gradients", (this)); // XD_ADD_P chaine(into=["oui","non"])
+  // XD_CONT Treatment of gradient calculations (yes or no). This option modifies slightly the gradient calculation at
+  // XD_CONT the corners and activates also the corner treatment option.
+  param.ajouter_non_std("P_imposee_aux_faces", (this)); // XD_ADD_P chaine(into=["oui","non"])
+  // XD_CONT Pressure imposed at the faces (yes or no).
+  param.ajouter_non_std("DEACTIVATE_ARETE_MIXTE", (this)); // XD_ADD_P rien
+  // XD_CONT Deactivate the arete_mixte contribution in the conv op of the momentum equation.
+  param.ajouter_non_std("all_options|toutes_les_options", (this)); // XD_ADD_P rien
+  // XD_CONT Activates all Option_VDF options. If used, must be used alone without specifying the other options, nor
+  // XD_CONT combinations.
   param.lire_avec_accolades_depuis(is);
   return is;
 }

@@ -18,10 +18,12 @@
 #include <Linear_algebra_tools_impl.h>
 
 Implemente_instanciable_32_64(Analyse_Angle_32_64,"Analyse_Angle",Interprete_geometrique_base_32_64<_T_>);
-// XD analyse_angle interprete analyse_angle INHERITS_BRACE Keyword Analyse_angle prints the histogram of the largest angle of each mesh elements of the domain named name_domain. nb_histo is the histogram number of bins. It is called by default during the
-// XD_CONT domain discretization with nb_histo set to 18. Useful to check the number of elements with angles above 90 degrees.
-// XD  attr domain_name ref_domaine domain_name REQ Name of domain to resequence.
-// XD  attr nb_histo entier nb_histo REQ not_set
+// XD analyse_angle interprete analyse_angle INHERITS_BRACE Keyword Analyse_angle prints the histogram of the largest
+// XD_CONT angle of each mesh elements of the domain named name_domain. nb_histo is the histogram number of bins. It is
+// XD_CONT called by default during the domain discretization with nb_histo set to 18. Useful to check the number of
+// XD_CONT elements with angles above 90 degrees.
+// XD attr domain_name ref_domaine domain_name REQ Name of domain to resequence.
+// XD attr nb_histo entier nb_histo REQ not_set
 
 // XD analyse_angle_64 analyse_angle analyse_angle_64 INHERITS_BRACE Analyse_angle for big (64b) domain.
 

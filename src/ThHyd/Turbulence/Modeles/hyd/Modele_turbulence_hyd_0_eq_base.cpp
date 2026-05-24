@@ -26,7 +26,8 @@
 #include <Param.h>
 #include <Perf_counters.h>
 
-// XD Modele_turbulence_hyd_0_eq_base modele_turbulence_hyd_deriv Modele_turbulence_hyd_0_eq_base 1 Turbulence model constructed using several fields.
+// XD Modele_turbulence_hyd_0_eq_base modele_turbulence_hyd_deriv Modele_turbulence_hyd_0_eq_base BRACE Turbulence model
+// XD_CONT constructed using several fields.
 
 Implemente_base(Modele_turbulence_hyd_0_eq_base, "Modele_turbulence_hyd_0_eq_base", Modele_turbulence_hyd_base);
 

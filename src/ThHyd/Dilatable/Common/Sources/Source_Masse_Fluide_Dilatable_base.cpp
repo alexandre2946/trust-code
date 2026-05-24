@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -23,7 +23,8 @@
 #include <Param.h>
 
 Implemente_base(Source_Masse_Fluide_Dilatable_base, "Source_Masse_Fluide_Dilatable_base", Objet_U);
-// XD mass_source interprete nul BRACE Mass source used in a dilatable simulation to add/reduce a mass at the boundary (volumetric source in the first cell of a given boundary).
+// XD mass_source interprete nul BRACE Mass source used in a dilatable simulation to add/reduce a mass at the boundary
+// XD_CONT (volumetric source in the first cell of a given boundary).
 
 Sortie& Source_Masse_Fluide_Dilatable_base::printOn(Sortie& os) const
 {
@@ -33,8 +34,11 @@ Sortie& Source_Masse_Fluide_Dilatable_base::printOn(Sortie& os) const
 Entree& Source_Masse_Fluide_Dilatable_base::readOn(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter("bord", &nom_bord_, Param::REQUIRED); // XD_ADD_P chaine Name of the boundary where the source term is applied
-  param.ajouter("surfacic_flux", &ch_front_source_, Param::REQUIRED); // XD_ADD_P front_field_base The boundary field that the user likes to apply: for example, champ_front_uniforme, ch_front_input_uniform or champ_front_fonc_t
+  param.ajouter("bord", &nom_bord_, Param::REQUIRED); // XD_ADD_P chaine
+  // XD_CONT Name of the boundary where the source term is applied
+  param.ajouter("surfacic_flux", &ch_front_source_, Param::REQUIRED); // XD_ADD_P front_field_base
+  // XD_CONT The boundary field that the user likes to apply: for example, champ_front_uniforme, ch_front_input_uniform
+  // XD_CONT or champ_front_fonc_t
   param.lire_avec_accolades_depuis(is);
 
   if (!sub_type(Champ_front_base, ch_front_source_.valeur()))

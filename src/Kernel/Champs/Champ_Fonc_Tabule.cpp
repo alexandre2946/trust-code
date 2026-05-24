@@ -19,10 +19,13 @@
 #include <string>
 
 Implemente_instanciable(Champ_Fonc_Tabule,"Champ_Fonc_Tabule",Champ_Fonc_base);
-// XD champ_fonc_tabule champ_don_base champ_fonc_tabule NO_BRACE Field that is tabulated as a function of another field.
-// XD  attr pb_field bloc_lecture pb_field REQ block similar to { pb1 field1 } or { pb1 field1 ... pbN fieldN }
-// XD  attr dim entier dim REQ Number of field components.
-// XD  attr bloc bloc_lecture bloc REQ Values (the table (the value of the field at any time is calculated by linear interpolation from this table) or the analytical expression (with keyword expression to use an analytical expression)).
+// XD champ_fonc_tabule champ_don_base champ_fonc_tabule NO_BRACE Field that is tabulated as a function of another
+// XD_CONT field.
+// XD attr pb_field bloc_lecture pb_field REQ block similar to { pb1 field1 } or { pb1 field1 ... pbN fieldN }
+// XD attr dim entier dim REQ Number of field components.
+// XD attr bloc bloc_lecture bloc REQ Values (the table (the value of the field at any time is calculated by linear
+// XD_CONT interpolation from this table) or the analytical expression (with keyword expression to use an analytical
+// XD_CONT expression)).
 
 void Champ_Fonc_Tabule::Warn_old_chp_fonc_syntax_V_184(const char *nom_class, const Nom& val1, const Nom& val2)
 {

@@ -33,10 +33,17 @@ Entree& Option_PolyMAC_family::readOn(Entree& is) { return Interprete::readOn(is
 Entree& Option_PolyMAC_family::interpreter(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter_non_std("use_osqp",(this)); // XD_ADD_P rien Flag to use the old formulation of the M2 matrix provided by the OSQP library. Only useful for PolyMAC_CDO version.
-  param.ajouter_non_std("maillage_vdf|vdf_mesh",(this)); // XD_ADD_P rien Flag used to force the calculation of the equiv tab.
-  param.ajouter_non_std("interp_ve1",(this)); // XD_ADD_P rien Flag to enable a first-order face-to-element velocity interpolation. By default, it is not activated which means a second order interpolation. Only useful for PolyMAC_MPFA version.
-  param.ajouter_non_std("traitement_axi",(this)); // XD_ADD_P rien Flag used to relax the time-step stability criterion in case of a thin slice geometry while modelling an axi-symetrical case. Only useful for PolyMAC_MPFA version.
+  param.ajouter_non_std("use_osqp",(this)); // XD_ADD_P rien
+  // XD_CONT Flag to use the old formulation of the M2 matrix provided by the OSQP library. Only useful for PolyMAC_CDO
+  // XD_CONT version.
+  param.ajouter_non_std("maillage_vdf|vdf_mesh",(this)); // XD_ADD_P rien
+  // XD_CONT Flag used to force the calculation of the equiv tab.
+  param.ajouter_non_std("interp_ve1",(this)); // XD_ADD_P rien
+  // XD_CONT Flag to enable a first-order face-to-element velocity interpolation. By default, it is not activated which
+  // XD_CONT means a second order interpolation. Only useful for PolyMAC_MPFA version.
+  param.ajouter_non_std("traitement_axi",(this)); // XD_ADD_P rien
+  // XD_CONT Flag used to relax the time-step stability criterion in case of a thin slice geometry while modelling an
+  // XD_CONT axi-symetrical case. Only useful for PolyMAC_MPFA version.
   param.lire_avec_accolades_depuis(is);
   return is;
 }

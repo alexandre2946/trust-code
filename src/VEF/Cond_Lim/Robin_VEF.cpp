@@ -32,9 +32,12 @@ Entree& Robin_VEF::readOn( Entree& is )
 {
   Param param(que_suis_je());
 
-  param.ajouter("alpha", 		&alpha_robin_cl_, 		Param::REQUIRED); // XD_ADD_P floattant Robin coefficient for the normal field
-  param.ajouter("beta" , 		&beta_robin_cl_ , 		Param::REQUIRED); // XD_ADD_P floattant Robin coefficient for the tangent field
-  param.ajouter("champ_front_normal_et_tangentiel_robin",&le_champ_front,Param::REQUIRED); // XD_ADD_P front_field_base The boundary field
+  param.ajouter("alpha", 		&alpha_robin_cl_, 		Param::REQUIRED); // XD_ADD_P floattant
+  // XD_CONT Robin coefficient for the normal field
+  param.ajouter("beta" , 		&beta_robin_cl_ , 		Param::REQUIRED); // XD_ADD_P floattant
+  // XD_CONT Robin coefficient for the tangent field
+  param.ajouter("champ_front_normal_et_tangentiel_robin",&le_champ_front,Param::REQUIRED); // XD_ADD_P front_field_base
+  // XD_CONT The boundary field
   param.lire_avec_accolades_depuis(is);
 
 

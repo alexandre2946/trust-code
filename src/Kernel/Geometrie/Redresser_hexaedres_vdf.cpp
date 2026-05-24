@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -22,8 +22,10 @@
 #include <Hexaedre_VEF.h>
 
 Implemente_instanciable(Redresser_hexaedres_vdf,"Redresser_hexaedres_vdf",Interprete_geometrique_base);
-// XD redresser_hexaedres_vdf interprete redresser_hexaedres_vdf INHERITS_BRACE Keyword to convert a domain (named domain_name) with quadrilaterals/VEF hexaedras which looks like rectangles/VDF hexaedras into a domain with real rectangles/VDF hexaedras.
-// XD  attr domain_name ref_domaine domain_name REQ Name of domain to resequence.
+// XD redresser_hexaedres_vdf interprete redresser_hexaedres_vdf INHERITS_BRACE Keyword to convert a domain (named
+// XD_CONT domain_name) with quadrilaterals/VEF hexaedras which looks like rectangles/VDF hexaedras into a domain with
+// XD_CONT real rectangles/VDF hexaedras.
+// XD attr domain_name ref_domaine domain_name REQ Name of domain to resequence.
 
 Sortie& Redresser_hexaedres_vdf::printOn(Sortie& os) const
 {

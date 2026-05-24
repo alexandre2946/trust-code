@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,8 @@ Sortie& Viscosite_turbulente_l_melange::printOn(Sortie& os) const { return os; }
 Entree& Viscosite_turbulente_l_melange::readOn(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter("l_melange", &l_melange_, Param::REQUIRED); // XD_ADD_P floattant not_set
+  param.ajouter("l_melange", &l_melange_, Param::REQUIRED); // XD_ADD_P floattant
+  // XD_CONT not_set
   param.lire_avec_accolades_depuis(is);
   Cerr << "l_melange = " << l_melange_ << finl ;
 

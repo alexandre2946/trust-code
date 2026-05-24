@@ -33,20 +33,33 @@ Entree& PDF_model::readOn(Entree& is)
 {
   // (xdata documentation is in the TRAD_2.org because we need a special bloc_lecture object)
   Param param(que_suis_je());
-  param.ajouter_flag("moving_IB", &PDF_mobile_); // XD_ADD_P rien flag to activate moving_IB
-  param.ajouter_flag("use_pseudo_level_set_moving_PDF", &use_pseudo_level_set_moving_PDF_); // XD_ADD_P rien flag to activate use_pseudo_level_set_moving_PDF
+  param.ajouter_flag("moving_IB", &PDF_mobile_); // XD_ADD_P rien
+  // XD_CONT flag to activate moving_IB
+  param.ajouter_flag("use_pseudo_level_set_moving_PDF", &use_pseudo_level_set_moving_PDF_); // XD_ADD_P rien
+  // XD_CONT flag to activate use_pseudo_level_set_moving_PDF
   param.ajouter_non_std("velocity_shape_IBM_function",(this),Param::OPTIONAL);
-  param.ajouter("IBM_spring_parameter",&raid_, Param::OPTIONAL); // XD_ADD_P floattant spring coefficient for moving IBM
-  param.ajouter("eta",&eta_, Param::REQUIRED); // XD_ADD_P floattant penalization coefficient
-  param.ajouter("bilan_PDF",&pdf_bilan_,Param::OPTIONAL); // XD_ADD_P entier type de bilan du terme PDF (seul/avec temps/avec convection)
-  param.ajouter("temps_relaxation_coefficient_PDF",&temps_relax_,Param::OPTIONAL); // XD_ADD_P floattant time relaxation on the forcing term to help
-  param.ajouter("echelle_relaxation_coefficient_PDF",&echelle_relax_,Param::OPTIONAL); // XD_ADD_P floattant time relaxation on the forcing term to help convergence
-  param.ajouter("regularization_coefficient_PDF",&regul_coeff_PDF_,Param::OPTIONAL); // XD_ADD_P floattant regularization coefficient for the forcing term (dead cell)
-  param.ajouter_flag("local",&local_); // XD_ADD_P rien whether the prescribed velocity is expressed in the global or local basis
-  param.ajouter_non_std("vitesse_imposee_data",(this),Param::OPTIONAL); // XD_ADD_P field_base Prescribed velocity as a field
-  param.ajouter_non_std("vitesse_imposee_fonction",(this),Param::OPTIONAL); // XD_ADD_P listchaine Prescribed velocity as a set of ananlytical component
-  param.ajouter_non_std("variable_imposee_data",(this),Param::OPTIONAL); // XD_ADD_P field_base Prescribed variable as a field
-  param.ajouter_non_std("variable_imposee_fonction",(this),Param::OPTIONAL); // XD_ADD_P listchaine Prescribed variable as a set of ananlytical component
+  param.ajouter("IBM_spring_parameter",&raid_, Param::OPTIONAL); // XD_ADD_P floattant
+  // XD_CONT spring coefficient for moving IBM
+  param.ajouter("eta",&eta_, Param::REQUIRED); // XD_ADD_P floattant
+  // XD_CONT penalization coefficient
+  param.ajouter("bilan_PDF",&pdf_bilan_,Param::OPTIONAL); // XD_ADD_P entier
+  // XD_CONT type de bilan du terme PDF (seul/avec temps/avec convection)
+  param.ajouter("temps_relaxation_coefficient_PDF",&temps_relax_,Param::OPTIONAL); // XD_ADD_P floattant
+  // XD_CONT time relaxation on the forcing term to help
+  param.ajouter("echelle_relaxation_coefficient_PDF",&echelle_relax_,Param::OPTIONAL); // XD_ADD_P floattant
+  // XD_CONT time relaxation on the forcing term to help convergence
+  param.ajouter("regularization_coefficient_PDF",&regul_coeff_PDF_,Param::OPTIONAL); // XD_ADD_P floattant
+  // XD_CONT regularization coefficient for the forcing term (dead cell)
+  param.ajouter_flag("local",&local_); // XD_ADD_P rien
+  // XD_CONT whether the prescribed velocity is expressed in the global or local basis
+  param.ajouter_non_std("vitesse_imposee_data",(this),Param::OPTIONAL); // XD_ADD_P field_base
+  // XD_CONT Prescribed velocity as a field
+  param.ajouter_non_std("vitesse_imposee_fonction",(this),Param::OPTIONAL); // XD_ADD_P listchaine
+  // XD_CONT Prescribed velocity as a set of ananlytical component
+  param.ajouter_non_std("variable_imposee_data",(this),Param::OPTIONAL); // XD_ADD_P field_base
+  // XD_CONT Prescribed variable as a field
+  param.ajouter_non_std("variable_imposee_fonction",(this),Param::OPTIONAL); // XD_ADD_P listchaine
+  // XD_CONT Prescribed variable as a set of ananlytical component
   param.lire_avec_accolades_depuis(is);
   if (type_variable_imposee_ == -1)
     {

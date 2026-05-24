@@ -21,7 +21,8 @@
 #include <Domaine_VF.h>
 
 Implemente_instanciable_sans_constructeur(Sortie_libre_pression_moyenne_imposee, "Frontiere_ouverte_pression_moyenne_imposee", Neumann_sortie_libre);
-// XD frontiere_ouverte_pression_moyenne_imposee neumann frontiere_ouverte_pression_moyenne_imposee NO_BRACE Class for open boundary with pressure mean level imposed.
+// XD frontiere_ouverte_pression_moyenne_imposee neumann frontiere_ouverte_pression_moyenne_imposee NO_BRACE Class for
+// XD_CONT open boundary with pressure mean level imposed.
 // XD attr pext floattant pext REQ Mean pressure.
 
 

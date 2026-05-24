@@ -19,7 +19,8 @@
 #include <Nom.h>
 
 Implemente_instanciable(Lata_2_CGNS, "Lata_To_CGNS|Lata_2_CGNS", Interprete);
-// XD lata_to_CGNS interprete lata_to_CGNS INHERITS_BRACE To convert results file written with LATA format to CGNS file. Warning: Fields located on faces are not supported yet.
+// XD lata_to_CGNS interprete lata_to_CGNS INHERITS_BRACE To convert results file written with LATA format to CGNS file.
+// XD_CONT Warning: Fields located on faces are not supported yet.
 // XD attr file chaine file REQ LATA file to convert to the new format.
 // XD attr file_CGNS chaine file_CGNS REQ Name of the CGNS file.
 

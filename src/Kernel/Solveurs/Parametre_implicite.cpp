@@ -41,13 +41,19 @@ Sortie& Parametre_implicite::printOn(Sortie& os) const
   return os;
 }
 
-// XD parametre_implicite parametre_equation_base parametre_implicite INHERITS_BRACE Keyword to change for this equation only the parameter of the implicit scheme used to solve the problem.
-// XD attr seuil_convergence_implicite floattant seuil_convergence_implicite OPT Keyword to change for this equation only the value of seuil_convergence_implicite used in the implicit scheme.
-// XD attr seuil_convergence_solveur floattant seuil_convergence_solveur OPT Keyword to change for this equation only the value of seuil_convergence_solveur used in the implicit scheme
-// XD attr solveur solveur_sys_base solveur OPT Keyword to change for this equation only the solver used in the implicit scheme
-// XD attr resolution_explicite rien resolution_explicite OPT To solve explicitly the equation whereas the scheme is an implicit scheme.
+// XD parametre_implicite parametre_equation_base parametre_implicite INHERITS_BRACE Keyword to change for this equation
+// XD_CONT only the parameter of the implicit scheme used to solve the problem.
+// XD attr seuil_convergence_implicite floattant seuil_convergence_implicite OPT Keyword to change for this equation
+// XD_CONT only the value of seuil_convergence_implicite used in the implicit scheme.
+// XD attr seuil_convergence_solveur floattant seuil_convergence_solveur OPT Keyword to change for this equation only
+// XD_CONT the value of seuil_convergence_solveur used in the implicit scheme
+// XD attr solveur solveur_sys_base solveur OPT Keyword to change for this equation only the solver used in the implicit
+// XD_CONT scheme
+// XD attr resolution_explicite rien resolution_explicite OPT To solve explicitly the equation whereas the scheme is an
+// XD_CONT implicit scheme.
 // XD attr equation_non_resolue rien equation_non_resolue OPT Keyword to specify that the equation is not solved.
-// XD attr equation_frequence_resolue chaine equation_frequence_resolue OPT Keyword to specify that the equation is solved only every n time steps (n is an integer or given by a time-dependent function f(t)).
+// XD attr equation_frequence_resolue chaine equation_frequence_resolue OPT Keyword to specify that the equation is
+// XD_CONT solved only every n time steps (n is an integer or given by a time-dependent function f(t)).
 Entree& Parametre_implicite::readOn(Entree& is)
 {
   Nom eq_freq_resolue="0";

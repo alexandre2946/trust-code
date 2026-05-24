@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -19,7 +19,7 @@
 Implemente_instanciable(Ecrire,"Ecrire",Interprete);
 
 // XD write interprete ecrire INHERITS_BRACE Keyword to write the object of name name_obj to a standard outlet.
-// XD   attr name_obj chaine name_obj REQ Name of the object to be written.
+// XD attr name_obj chaine name_obj REQ Name of the object to be written.
 
 Sortie& Ecrire::printOn(Sortie& os) const { return Interprete::printOn(os); }
 

@@ -22,13 +22,15 @@
 #include <TRUSTTrav.h>
 
 Implemente_base(Interface_base, "Interface_base", Objet_U);
-// XD Interface_base objet_u Interface_base INHERITS_BRACE Basic class for a liquid-gas interface (used in pb_multiphase)
+// XD Interface_base objet_u Interface_base INHERITS_BRACE Basic class for a liquid-gas interface (used in
+// XD_CONT pb_multiphase)
 
 Sortie& Interface_base::printOn(Sortie& os) const { return os; }
 
 void Interface_base::set_param(Param& param) const
 {
-  param.ajouter("tension_superficielle|surface_tension", &sigma__); // XD_ADD_P floattant surface tension
+  param.ajouter("tension_superficielle|surface_tension", &sigma__); // XD_ADD_P floattant
+  // XD_CONT surface tension
 }
 
 Entree& Interface_base::readOn(Entree& is)

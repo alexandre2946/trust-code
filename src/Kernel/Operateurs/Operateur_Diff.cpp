@@ -21,8 +21,10 @@ Implemente_instanciable(Operateur_Diff,"Operateur_Diff",OWN_PTR(Operateur_Diff_b
 // XD diffusion_deriv objet_lecture diffusion_deriv NO_BRACE not_set
 // XD bloc_diffusion objet_lecture nul NO_BRACE not_set
 // XD attr aco chaine(into=["{"]) aco REQ Opening curly bracket.
-// XD attr operateur diffusion_deriv operateur OPT if none is specified, the diffusive scheme used is a 2nd-order scheme.
-// XD attr op_implicite op_implicite op_implicite OPT To have diffusive implicitation, it use Uzawa algorithm. Very useful when viscosity has large variations.
+// XD attr operateur diffusion_deriv operateur OPT if none is specified, the diffusive scheme used is a 2nd-order
+// XD_CONT scheme.
+// XD attr op_implicite op_implicite op_implicite OPT To have diffusive implicitation, it use Uzawa algorithm. Very
+// XD_CONT useful when viscosity has large variations.
 // XD attr acof chaine(into=["}"]) acof REQ Closing curly bracket.
 
 /* Here we put the doc for all shared (VDF, VEF,...) keywords: */

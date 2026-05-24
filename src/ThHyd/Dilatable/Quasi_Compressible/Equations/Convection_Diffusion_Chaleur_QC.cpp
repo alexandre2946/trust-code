@@ -23,11 +23,12 @@
 #include <Param.h>
 
 Implemente_instanciable_sans_constructeur(Convection_Diffusion_Chaleur_QC,"Convection_Diffusion_Chaleur_QC",Convection_Diffusion_Chaleur_Fluide_Dilatable_base);
-// XD convection_diffusion_chaleur_QC eqn_base convection_diffusion_chaleur_QC INHERITS_BRACE Temperature equation for a quasi-compressible fluid.
-// XD attr mode_calcul_convection chaine(into=["ancien","divuT_moins_Tdivu","divrhouT_moins_Tdivrhou"]) mode_calcul_convection OPT Option to set the form of the convective operatorNL2 divrhouT_moins_Tdivrhou (the default since 1.6.8): rho.u.gradT = div(rho.u.T
-// XD_CONT )- Tdiv(rho.u.1) NL2ancien: u.gradT = div(u.T) - T.div(u) NL2 divuT_moins_Tdivu : u.gradT = div(u.T) - Tdiv(u.1)
-// XD attr T_min double T_min OPT  Specifies T_min (and T_max) to keep temperature within [T_min, T_max] and avoid excessive excursions beyond physical limits in QC simulations. Use with caution.
-// XD attr T_max double T_max OPT  Should be set when T_min set in the datafile.
+// XD convection_diffusion_chaleur_QC eqn_base convection_diffusion_chaleur_QC INHERITS_BRACE Temperature equation for a
+// XD_CONT quasi-compressible fluid.
+// XD attr mode_calcul_convection chaine(into=["ancien","divuT_moins_Tdivu","divrhouT_moins_Tdivrhou"]) mode_calcul_convection OPT Option to set the form of the convective operatorNL2 divrhouT_moins_Tdivrhou (the default since 1.6.8): rho.u.gradT = div(rho.u.T )- Tdiv(rho.u.1) NL2ancien: u.gradT = div(u.T) - T.div(u) NL2 divuT_moins_Tdivu : u.gradT = div(u.T) - Tdiv(u.1)
+// XD attr T_min double T_min OPT Specifies T_min (and T_max) to keep temperature within [T_min, T_max] and avoid
+// XD_CONT excessive excursions beyond physical limits in QC simulations. Use with caution.
+// XD attr T_max double T_max OPT Should be set when T_min set in the datafile.
 
 Convection_Diffusion_Chaleur_QC::Convection_Diffusion_Chaleur_QC():mode_convection_(2) { }
 

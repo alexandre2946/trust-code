@@ -16,11 +16,15 @@
 #include <Pb_Thermohydraulique_QC.h>
 
 Implemente_instanciable(Pb_Thermohydraulique_QC,"Pb_Thermohydraulique_QC",Pb_QC_base);
-// XD pb_thermohydraulique_QC Pb_base pb_thermohydraulique_QC INHERITS_BRACE Resolution of thermo-hydraulic problem for a quasi-compressible fluid. NL2 Keywords for the unknowns other than pressure, velocity, temperature are : NL2 masse_volumique : density NL2
-// XD_CONT enthalpie : enthalpy NL2 pression : reduced pressure NL2 pression_tot : total pressure.
-// XD attr fluide_quasi_compressible fluide_quasi_compressible fluide_quasi_compressible REQ The fluid medium associated with the problem.
+// XD pb_thermohydraulique_QC Pb_base pb_thermohydraulique_QC INHERITS_BRACE Resolution of thermo-hydraulic problem for
+// XD_CONT a quasi-compressible fluid. NL2 Keywords for the unknowns other than pressure, velocity, temperature are :
+// XD_CONT NL2 masse_volumique : density NL2 enthalpie : enthalpy NL2 pression : reduced pressure NL2 pression_tot :
+// XD_CONT total pressure.
+// XD attr fluide_quasi_compressible fluide_quasi_compressible fluide_quasi_compressible REQ The fluid medium associated
+// XD_CONT with the problem.
 // XD attr navier_stokes_QC navier_stokes_QC navier_stokes_QC REQ Navier-Stokes equation for a quasi-compressible fluid.
-// XD attr convection_diffusion_chaleur_QC convection_diffusion_chaleur_QC convection_diffusion_chaleur_QC REQ Temperature equation for a quasi-compressible fluid.
+// XD attr convection_diffusion_chaleur_QC convection_diffusion_chaleur_QC convection_diffusion_chaleur_QC REQ
+// XD_CONT Temperature equation for a quasi-compressible fluid.
 
 Sortie& Pb_Thermohydraulique_QC::printOn(Sortie& os) const { return Probleme_base::printOn(os); }
 

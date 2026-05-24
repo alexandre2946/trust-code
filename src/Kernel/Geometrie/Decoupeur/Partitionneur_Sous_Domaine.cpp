@@ -19,8 +19,10 @@
 #include <Param.h>
 #include <EChaine.h>
 
-// XD partitionneur_sous_dom partitionneur_deriv sous_dom INHERITS_BRACE Given a global partition of a global domain, 'sous-domaine' allows to produce a conform partition of a sub-domain generated from the bigger one using the keyword
-// XD_CONT create_domain_from_sub_domain. The sub-domain will be partitionned in a conform fashion with the global domain.
+// XD partitionneur_sous_dom partitionneur_deriv sous_dom INHERITS_BRACE Given a global partition of a global domain,
+// XD_CONT 'sous-domaine' allows to produce a conform partition of a sub-domain generated from the bigger one using the
+// XD_CONT keyword create_domain_from_sub_domain. The sub-domain will be partitionned in a conform fashion with the
+// XD_CONT global domain.
 Implemente_instanciable(Partitionneur_Sous_Domaine,"Partitionneur_Sous_Dom",Partitionneur_base);
 
 
@@ -47,9 +49,12 @@ void Partitionneur_Sous_Domaine::set_param(Param& param) const
   // TODO (teo boutin) this might be cleaner/easier to understand if a flag/boolean option
   // is used to choose between using a file or a subdomain from runtime instanciation in trust datafile
   // rather than having 2 params and checking only one is used
-  param.ajouter("fichier",&filename_,Param::REQUIRED); // XD_ADD_P chaine fichier
-  param.ajouter("fichier_ssz",&filename_ssz_); // XD_ADD_P chaine fichier sous zone
-  param.ajouter("name_ssz",&name_ssz_); // XD_ADD_P chaine nom sous zone (nom d'un objet Sous_Domaine declare dans le jdd)
+  param.ajouter("fichier",&filename_,Param::REQUIRED); // XD_ADD_P chaine
+  // XD_CONT fichier
+  param.ajouter("fichier_ssz",&filename_ssz_); // XD_ADD_P chaine
+  // XD_CONT fichier sous zone
+  param.ajouter("name_ssz",&name_ssz_); // XD_ADD_P chaine
+  // XD_CONT nom sous zone (nom d'un objet Sous_Domaine declare dans le jdd)
 }
 
 void Partitionneur_Sous_Domaine::validate_params() const

@@ -17,8 +17,10 @@
 
 Implemente_instanciable(Fluide_sodium_gaz, "Fluide_sodium_gaz", Fluide_reel_base);
 // XD fluide_sodium_gaz fluide_base fluide_sodium_gaz INHERITS_BRACE Class for Fluide_sodium_gaz (real fluid)
-// XD attr P_ref floattant P_ref OPT Use to set the pressure value in the closure law. If not specified, the value of the pressure unknown will be used
-// XD attr T_ref floattant T_ref OPT Use to set the temperature value in the closure law. If not specified, the value of the temperature unknown will be used
+// XD attr P_ref floattant P_ref OPT Use to set the pressure value in the closure law. If not specified, the value of
+// XD_CONT the pressure unknown will be used
+// XD attr T_ref floattant T_ref OPT Use to set the temperature value in the closure law. If not specified, the value of
+// XD_CONT the temperature unknown will be used
 
 Sortie& Fluide_sodium_gaz::printOn(Sortie& os) const { return os; }
 Entree& Fluide_sodium_gaz::readOn(Entree& is) { return Fluide_reel_base::readOn(is); }

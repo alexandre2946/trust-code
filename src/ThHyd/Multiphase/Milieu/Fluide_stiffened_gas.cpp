@@ -32,13 +32,20 @@ Entree& Fluide_stiffened_gas::readOn(Entree& is)
 void Fluide_stiffened_gas::set_param(Param& param) const
 {
   Fluide_reel_base::set_param(param);
-  param.ajouter("gamma",&gamma_); // XD_ADD_P floattant Heat capacity ratio (Cp/Cv)
-  param.ajouter("pinf",&pinf_); // XD_ADD_P floattant Stiffened gas pressure constant (if set to zero, the state law becomes identical to that of perfect gases)
-  param.ajouter("mu",&mu__); // XD_ADD_P floattant Dynamic viscosity
-  param.ajouter("lambda",&lambda__); // XD_ADD_P floattant Thermal conductivity
-  param.ajouter("Cv",&Cv_); // XD_ADD_P floattant Thermal capacity at constant volume
-  param.ajouter("q",&q_); // XD_ADD_P floattant Reference energy
-  param.ajouter("q_prim",&q_prim_); // XD_ADD_P floattant Model constant
+  param.ajouter("gamma",&gamma_); // XD_ADD_P floattant
+  // XD_CONT Heat capacity ratio (Cp/Cv)
+  param.ajouter("pinf",&pinf_); // XD_ADD_P floattant
+  // XD_CONT Stiffened gas pressure constant (if set to zero, the state law becomes identical to that of perfect gases)
+  param.ajouter("mu",&mu__); // XD_ADD_P floattant
+  // XD_CONT Dynamic viscosity
+  param.ajouter("lambda",&lambda__); // XD_ADD_P floattant
+  // XD_CONT Thermal conductivity
+  param.ajouter("Cv",&Cv_); // XD_ADD_P floattant
+  // XD_CONT Thermal capacity at constant volume
+  param.ajouter("q",&q_); // XD_ADD_P floattant
+  // XD_CONT Reference energy
+  param.ajouter("q_prim",&q_prim_); // XD_ADD_P floattant
+  // XD_CONT Model constant
 }
 
 #define ind std::distance(res.begin(), &val)

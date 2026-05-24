@@ -51,10 +51,14 @@ Entree&  Raffiner_isotrope_parallele::interpreter(Entree& is)
   Param param(que_suis_je());
 
   // XD Raffiner_isotrope_parallele interprete Raffiner_isotrope_parallele BRACE Refine parallel mesh in parallel
-  param.ajouter("name_of_initial_domaines|name_of_initial_zones",&org,Param::REQUIRED); // XD_ADD_P chaine name of initial Domaines
-  param.ajouter("name_of_new_domaines|name_of_new_zones",&newd,Param::REQUIRED); // XD_ADD_P chaine name of new Domaines
-  param.ajouter("ascii",&form);  // XD_ADD_P flag writing Domaines in ascii format
-  param.ajouter_flag("single_hdf",&format_hdf); // XD_ADD_P rien writing Domaines in hdf format
+  param.ajouter("name_of_initial_domaines|name_of_initial_zones",&org,Param::REQUIRED); // XD_ADD_P chaine
+  // XD_CONT name of initial Domaines
+  param.ajouter("name_of_new_domaines|name_of_new_zones",&newd,Param::REQUIRED); // XD_ADD_P chaine
+  // XD_CONT name of new Domaines
+  param.ajouter("ascii",&form);  // XD_ADD_P flag
+  // XD_CONT writing Domaines in ascii format
+  param.ajouter_flag("single_hdf",&format_hdf); // XD_ADD_P rien
+  // XD_CONT writing Domaines in hdf format
   param.lire_avec_accolades(is);
 
   // Force un fichier unique au dela d'un certain nombre de rangs MPI:

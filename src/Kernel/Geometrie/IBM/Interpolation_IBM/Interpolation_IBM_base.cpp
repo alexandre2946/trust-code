@@ -17,7 +17,8 @@
 #include <Source_PDF_base.h>
 
 Implemente_base(Interpolation_IBM_base, "Interpolation_IBM_base", Objet_U);
-// XD interpolation_ibm_base objet_u interpolation_ibm_base NO_BRACE Base class for all the interpolation methods available in the Immersed Boundary Method (IBM).
+// XD interpolation_ibm_base objet_u interpolation_ibm_base NO_BRACE Base class for all the interpolation methods
+// XD_CONT available in the Immersed Boundary Method (IBM).
 
 void Interpolation_IBM_base::discretise(const Discretisation_base& dis, Domaine_dis_base& le_dom_dis)
 {
@@ -135,12 +136,18 @@ Entree& Interpolation_IBM_base::readOn( Entree& is )
 
 void Interpolation_IBM_base::set_param(Param& param) const
 {
-  param.ajouter_flag("impr",&impr_);  // XD_ADD_P flag To print IBM-related data
-  param.ajouter("nb_histo_boxes_impr",&N_histo_,Param::OPTIONAL);  // XD_ADD_P entier number of histogram boxes for printed data
-  param.ajouter("est_dirichlet",&is_dirichlet_lu_,Param::OPTIONAL);   // XD_ADD_P field_base Node field of booleans indicating whether the node belong to an element where the interface is
-  param.ajouter_flag("get_solid_points_from_prepro", &solid_points_from_prepro_); // XD_ADD_P rien get IBM solid points from prepro.
-  param.ajouter_flag("get_is_dirichlet_from_prepro", &is_dirichlet_from_prepro_); // XD_ADD_P rien get IBM is_dirichlet from prepro.
-  param.ajouter_flag("get_corresp_elems_from_prepro", &corresp_elems_from_prepro_); // XD_ADD_P rien get IBM corresp_elems from prepro.
+  param.ajouter_flag("impr",&impr_);  // XD_ADD_P flag
+  // XD_CONT To print IBM-related data
+  param.ajouter("nb_histo_boxes_impr",&N_histo_,Param::OPTIONAL);  // XD_ADD_P entier
+  // XD_CONT number of histogram boxes for printed data
+  param.ajouter("est_dirichlet",&is_dirichlet_lu_,Param::OPTIONAL);   // XD_ADD_P field_base
+  // XD_CONT Node field of booleans indicating whether the node belong to an element where the interface is
+  param.ajouter_flag("get_solid_points_from_prepro", &solid_points_from_prepro_); // XD_ADD_P rien
+  // XD_CONT get IBM solid points from prepro.
+  param.ajouter_flag("get_is_dirichlet_from_prepro", &is_dirichlet_from_prepro_); // XD_ADD_P rien
+  // XD_CONT get IBM is_dirichlet from prepro.
+  param.ajouter_flag("get_corresp_elems_from_prepro", &corresp_elems_from_prepro_); // XD_ADD_P rien
+  // XD_CONT get IBM corresp_elems from prepro.
 }
 
 void Interpolation_IBM_base::definir_pseudo_level_set()

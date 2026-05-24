@@ -28,8 +28,10 @@
 #include <Param.h>
 
 Implemente_instanciable(Navier_Stokes_Turbulent, "Navier_Stokes_Turbulent", Navier_Stokes_std);
-// XD navier_stokes_turbulent navier_stokes_standard navier_stokes_turbulent INHERITS_BRACE Navier-Stokes equations as well as the associated turbulence model equations.
-// XD attr modele_turbulence modele_turbulence_hyd_deriv modele_turbulence OPT Turbulence model for Navier-Stokes equations.
+// XD navier_stokes_turbulent navier_stokes_standard navier_stokes_turbulent INHERITS_BRACE Navier-Stokes equations as
+// XD_CONT well as the associated turbulence model equations.
+// XD attr modele_turbulence modele_turbulence_hyd_deriv modele_turbulence OPT Turbulence model for Navier-Stokes
+// XD_CONT equations.
 
 Sortie& Navier_Stokes_Turbulent::printOn(Sortie& is) const { return Equation_base::printOn(is); }
 

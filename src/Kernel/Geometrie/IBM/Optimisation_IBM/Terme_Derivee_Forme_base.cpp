@@ -23,7 +23,8 @@
 #include <Milieu_base.h>
 
 Implemente_base(Terme_Derivee_Forme_base,"Terme_Derivee_Forme_base",Source_base);
-// XD  derivee_forme  source_base derivee_forme NO_BRACE Class to define a source term corresponding to the shape derivative in the projection equation.
+// XD derivee_forme source_base derivee_forme NO_BRACE Class to define a source term corresponding to the shape
+// XD_CONT derivative in the projection equation.
 
 Entree& Terme_Derivee_Forme_base::readOn(Entree& s)
 {

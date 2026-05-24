@@ -17,17 +17,29 @@
 #include <Equation_Navier_Cauchy.h>
 
 Implemente_instanciable(Solveur_Newmark, "Newmark", Solveur_non_lineaire);
-// XD newmark solveur_implicite_base newmark BRACE Newmark implicit solver for the resolution of the linear elastodynamic equation.
-// XD attr seuil_convergence_implicite floattant seuil_convergence_implicite REQ Keyword to set the value of the convergence criteria for the resolution of the implicit system build to solve either the Navier_Stokes equation (only for Simple and Simpler
-// XD_CONT algorithms) or a scalar equation. It is adviced to use the default value (1e6) to solve the implicit system only once by time step. This value must be decreased when a coupling between problems is considered.
-// XD attr seuil_convergence_solveur floattant seuil_convergence_solveur OPT value of the convergence criteria for the resolution of the implicit system build by solving several times per time step the Navier_Stokes equation and the scalar equations if any.
-// XD_CONT This value MUST be used when a coupling between problems is considered (should be set to a value typically of 0.1 or 0.01).
-// XD attr seuil_generation_solveur floattant seuil_generation_solveur OPT Option to create a GMRES solver and use vrel as the convergence threshold (implicit linear system Ax=B will be solved if residual error ||Ax-B|| is lesser than vrel).
-// XD attr seuil_verification_solveur floattant seuil_verification_solveur OPT Option to check if residual error ||Ax-B|| is lesser than vrel after the implicit linear system Ax=B has been solved.
-// XD attr seuil_test_preliminaire_solveur floattant seuil_test_preliminaire_solveur OPT Option to decide if the implicit linear system Ax=B should be solved by checking if the residual error ||Ax-B|| is bigger than vrel.
-// XD attr solveur solveur_sys_base solveur OPT Method (different from the default one, Gmres with diagonal preconditioning) to solve the linear system.
+// XD newmark solveur_implicite_base newmark BRACE Newmark implicit solver for the resolution of the linear
+// XD_CONT elastodynamic equation.
+// XD attr seuil_convergence_implicite floattant seuil_convergence_implicite REQ Keyword to set the value of the
+// XD_CONT convergence criteria for the resolution of the implicit system build to solve either the Navier_Stokes
+// XD_CONT equation (only for Simple and Simpler algorithms) or a scalar equation. It is adviced to use the default
+// XD_CONT value (1e6) to solve the implicit system only once by time step. This value must be decreased when a coupling
+// XD_CONT between problems is considered.
+// XD attr seuil_convergence_solveur floattant seuil_convergence_solveur OPT value of the convergence criteria for the
+// XD_CONT resolution of the implicit system build by solving several times per time step the Navier_Stokes equation and
+// XD_CONT the scalar equations if any. This value MUST be used when a coupling between problems is considered (should
+// XD_CONT be set to a value typically of 0.1 or 0.01).
+// XD attr seuil_generation_solveur floattant seuil_generation_solveur OPT Option to create a GMRES solver and use vrel
+// XD_CONT as the convergence threshold (implicit linear system Ax=B will be solved if residual error ||Ax-B|| is lesser
+// XD_CONT than vrel).
+// XD attr seuil_verification_solveur floattant seuil_verification_solveur OPT Option to check if residual error
+// XD_CONT ||Ax-B|| is lesser than vrel after the implicit linear system Ax=B has been solved.
+// XD attr seuil_test_preliminaire_solveur floattant seuil_test_preliminaire_solveur OPT Option to decide if the
+// XD_CONT implicit linear system Ax=B should be solved by checking if the residual error ||Ax-B|| is bigger than vrel.
+// XD attr solveur solveur_sys_base solveur OPT Method (different from the default one, Gmres with diagonal
+// XD_CONT preconditioning) to solve the linear system.
 // XD attr nb_it_max entier nb_it_max OPT Keyword to set the maximum iterations number for the Gmres.
-// XD attr controle_residu rien controle_residu OPT Keyword of Boolean type (by default 0). If set to 1, the convergence occurs if the residu suddenly increases.
+// XD attr controle_residu rien controle_residu OPT Keyword of Boolean type (by default 0). If set to 1, the convergence
+// XD_CONT occurs if the residu suddenly increases.
 // XD attr alpha floattant alpha OPT Damping coefficient for Rayleigh damping: C = alpha * M
 // XD attr beta floattant beta OPT Newmark parameter beta (default value 0.25 for average acceleration method).
 // XD attr gamma floattant gamma OPT Newmark parameter gamma (default value 0.5 for average acceleration method).

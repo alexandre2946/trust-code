@@ -22,8 +22,9 @@
 #include <Domaine_VDF.h>
 
 Implemente_instanciable(Sortie_libre_Gradient_Pression_impose, "Frontiere_ouverte_Gradient_Pression_impose", Neumann_sortie_libre);
-// XD frontiere_ouverte_gradient_pression_impose neumann frontiere_ouverte_gradient_pression_impose INHERITS_BRACE Normal imposed pressure gradient condition on the open boundary called bord (edge). This boundary condition may be only used in VDF
-// XD_CONT discretization. The imposed $\partial P/\partial n$ value is expressed in Pa.m-1.
+// XD frontiere_ouverte_gradient_pression_impose neumann frontiere_ouverte_gradient_pression_impose INHERITS_BRACE
+// XD_CONT Normal imposed pressure gradient condition on the open boundary called bord (edge). This boundary condition
+// XD_CONT may be only used in VDF discretization. The imposed $\partial P/\partial n$ value is expressed in Pa.m-1.
 // XD attr ch front_field_base ch REQ Boundary field type.
 
 Sortie& Sortie_libre_Gradient_Pression_impose::printOn(Sortie& s) const { return s << que_suis_je() << finl; }

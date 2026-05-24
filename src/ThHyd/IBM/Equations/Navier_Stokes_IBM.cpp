@@ -25,11 +25,15 @@
 
 Implemente_instanciable(Navier_Stokes_IBM, "Navier_Stokes_IBM", Navier_Stokes_std);
 // XD navier_stokes_ibm navier_stokes_standard navier_stokes_ibm INHERITS_BRACE IBM Navier-Stokes equations.
-// XD attr correction_matrice_projection_initiale entier correction_matrice_projection_initiale OPT (IBM advanced) fix matrix of initial projection for PDF
-// XD attr correction_calcul_pression_initiale entier correction_calcul_pression_initiale OPT (IBM advanced) fix initial pressure computation for PDF
-// XD attr correction_vitesse_projection_initiale entier correction_vitesse_projection_initiale OPT (IBM advanced) fix initial velocity computation for PDF
+// XD attr correction_matrice_projection_initiale entier correction_matrice_projection_initiale OPT (IBM advanced) fix
+// XD_CONT matrix of initial projection for PDF
+// XD attr correction_calcul_pression_initiale entier correction_calcul_pression_initiale OPT (IBM advanced) fix initial
+// XD_CONT pressure computation for PDF
+// XD attr correction_vitesse_projection_initiale entier correction_vitesse_projection_initiale OPT (IBM advanced) fix
+// XD_CONT initial velocity computation for PDF
 // XD attr correction_matrice_pression entier correction_matrice_pression OPT (IBM advanced) fix pressure matrix for PDF
-// XD attr matrice_pression_penalisee_H1 entier matrice_pression_penalisee_H1 OPT (IBM advanced) fix pressure matrix for PDF
+// XD attr matrice_pression_penalisee_H1 entier matrice_pression_penalisee_H1 OPT (IBM advanced) fix pressure matrix for
+// XD_CONT PDF
 // XD attr correction_vitesse_modifie entier correction_vitesse_modifie OPT (IBM advanced) fix velocity for PDF
 // XD attr correction_pression_modifie entier correction_pression_modifie OPT (IBM advanced) fix pressure for PDF
 // XD attr gradient_pression_qdm_modifie entier gradient_pression_qdm_modifie OPT (IBM advanced) fix pressure gradient

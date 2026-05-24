@@ -23,7 +23,8 @@
 #include <Param.h>
 
 Implemente_instanciable_sans_constructeur(Convection_Diffusion_Concentration,"Convection_Diffusion_Concentration",Convection_Diffusion_std);
-// XD convection_diffusion_concentration eqn_base convection_diffusion_concentration INHERITS_BRACE Constituent transport vectorial equation (concentration diffusion convection).
+// XD convection_diffusion_concentration eqn_base convection_diffusion_concentration INHERITS_BRACE Constituent
+// XD_CONT transport vectorial equation (concentration diffusion convection).
 
 Convection_Diffusion_Concentration::Convection_Diffusion_Concentration():nb_constituants_(-1), masse_molaire_(-1.) { }
 
@@ -75,10 +76,17 @@ const double& Convection_Diffusion_Concentration::masse_molaire() const
 void Convection_Diffusion_Concentration::set_param(Param& param) const
 {
   Convection_Diffusion_std::set_param(param);
-  param.ajouter_non_std("nom_inconnue",(this)); // XD_ADD_P chaine Keyword Nom_inconnue will rename the unknown of this equation with the given name. In the postprocessing part, the concentration field will be accessible with this name. This is usefull if you want to track more than one concentration (otherwise, only the concentration field in the first concentration equation can be accessed).
-  param.ajouter_non_std("alias",(this)); // XD_ADD_P chaine not_set
-  param.ajouter("masse_molaire",&masse_molaire_); // XD_ADD_P floattant not_set
-  param.ajouter_non_std("is_multi_scalar|is_multi_scalar_diffusion", (this)); // XD_ADD_P rien Flag to activate the multi_scalar diffusion operator
+  param.ajouter_non_std("nom_inconnue",(this)); // XD_ADD_P chaine
+  // XD_CONT Keyword Nom_inconnue will rename the unknown of this equation with the given name. In the postprocessing
+  // XD_CONT part, the concentration field will be accessible with this name. This is usefull if you want to track more
+  // XD_CONT than one concentration (otherwise, only the concentration field in the first concentration equation can be
+  // XD_CONT accessed).
+  param.ajouter_non_std("alias",(this)); // XD_ADD_P chaine
+  // XD_CONT not_set
+  param.ajouter("masse_molaire",&masse_molaire_); // XD_ADD_P floattant
+  // XD_CONT not_set
+  param.ajouter_non_std("is_multi_scalar|is_multi_scalar_diffusion", (this)); // XD_ADD_P rien
+  // XD_CONT Flag to activate the multi_scalar diffusion operator
 }
 
 int Convection_Diffusion_Concentration::lire_motcle_non_standard(const Motcle& mot, Entree& is)

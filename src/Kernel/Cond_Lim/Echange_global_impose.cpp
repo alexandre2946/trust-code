@@ -21,8 +21,10 @@
 #include <Equation_base.h>
 
 Implemente_instanciable_sans_constructeur(Echange_global_impose,"Paroi_echange_global_impose",Echange_impose_base);
-// XD paroi_echange_global_impose condlim_base paroi_echange_global_impose INHERITS_BRACE Global type exchange condition (internal) that is to say that diffusion on the first fluid mesh is not taken into consideration.
-// XD attr h_imp chaine h_imp REQ Global exchange coefficient value. The global exchange coefficient value is expressed in W.m-2.K-1.
+// XD paroi_echange_global_impose condlim_base paroi_echange_global_impose INHERITS_BRACE Global type exchange condition
+// XD_CONT (internal) that is to say that diffusion on the first fluid mesh is not taken into consideration.
+// XD attr h_imp chaine h_imp REQ Global exchange coefficient value. The global exchange coefficient value is expressed
+// XD_CONT in W.m-2.K-1.
 // XD attr himpc front_field_base himpc REQ Boundary field type.
 // XD attr text chaine text REQ External temperature value. The external temperature value is expressed in oC or K.
 // XD attr ch front_field_base ch REQ Boundary field type.

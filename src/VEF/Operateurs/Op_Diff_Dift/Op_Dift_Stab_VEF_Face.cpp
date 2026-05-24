@@ -31,13 +31,20 @@
 #include <Debog.h>
 
 Implemente_instanciable(Op_Dift_Stab_VEF_Face, "Op_Dift_VEF_P1NC_stab", Op_Dift_VEF_base);
-// XD diffusion_stab diffusion_deriv stab BRACE keyword allowing consistent and stable calculations even in case of obtuse angle meshes.
-// XD attr standard entier standard OPT to recover the same results as calculations made by standard laminar diffusion operator. However, no stabilization technique is used and calculations may be unstable when working with obtuse angle meshes (by default 0)
+// XD diffusion_stab diffusion_deriv stab BRACE keyword allowing consistent and stable calculations even in case of
+// XD_CONT obtuse angle meshes.
+// XD attr standard entier standard OPT to recover the same results as calculations made by standard laminar diffusion
+// XD_CONT operator. However, no stabilization technique is used and calculations may be unstable when working with
+// XD_CONT obtuse angle meshes (by default 0)
 // XD attr info entier info OPT developer option to get the stabilizing ratio (by default 0)
-// XD attr new_jacobian entier new_jacobian OPT when implicit time schemes are used, this option defines a new jacobian that may be more suitable to get stationary solutions (by default 0)
-// XD attr nu entier nu OPT (respectively nut 1) takes the molecular viscosity (resp. eddy viscosity) into account in the velocity gradient part of the diffusion expression (by default nu=1 and nut=1)
+// XD attr new_jacobian entier new_jacobian OPT when implicit time schemes are used, this option defines a new jacobian
+// XD_CONT that may be more suitable to get stationary solutions (by default 0)
+// XD attr nu entier nu OPT (respectively nut 1) takes the molecular viscosity (resp. eddy viscosity) into account in
+// XD_CONT the velocity gradient part of the diffusion expression (by default nu=1 and nut=1)
 // XD attr nut entier nut OPT not_set
-// XD attr nu_transp entier nu_transp OPT (respectively nut_transp 1) takes the molecular viscosity (resp. eddy viscosity) into account in the transposed velocity gradient part of the diffusion expression (by default nu_transp=0 and nut_transp=1)
+// XD attr nu_transp entier nu_transp OPT (respectively nut_transp 1) takes the molecular viscosity (resp. eddy
+// XD_CONT viscosity) into account in the transposed velocity gradient part of the diffusion expression (by default
+// XD_CONT nu_transp=0 and nut_transp=1)
 // XD attr nut_transp entier nut_transp OPT not_set
 
 double my_minimum(double a, double b, double c)

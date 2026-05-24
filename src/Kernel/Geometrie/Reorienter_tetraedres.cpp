@@ -17,8 +17,10 @@
 #include <Scatter.h>
 
 Implemente_instanciable_32_64(Reorienter_tetraedres_32_64,"Reorienter_tetraedres",Interprete_geometrique_base_32_64<_T_>);
-// XD reorienter_tetraedres interprete reorienter_tetraedres INHERITS_BRACE This keyword is mandatory for front-tracking computations with the VEF discretization. For each tetrahedral element of the domain, it checks if it has a positive volume. If the volume
-// XD_CONT (determinant of the three vectors) is negative, it swaps two nodes to reverse the orientation of this tetrahedron.
+// XD reorienter_tetraedres interprete reorienter_tetraedres INHERITS_BRACE This keyword is mandatory for front-tracking
+// XD_CONT computations with the VEF discretization. For each tetrahedral element of the domain, it checks if it has a
+// XD_CONT positive volume. If the volume (determinant of the three vectors) is negative, it swaps two nodes to reverse
+// XD_CONT the orientation of this tetrahedron.
 // XD attr domain_name ref_domaine domain_name REQ Name of domain.
 
 template <typename _SIZE_>

@@ -28,7 +28,8 @@ Implemente_instanciable(Operateur_Conv,"Operateur_Conv",OWN_PTR(Operateur_Conv_b
 
 /* Here we put the doc for all shared (VDF, VEF,...) keywords: */
 
-// XD convection_negligeable convection_deriv negligeable NO_BRACE For VDF and VEF discretizations. Suppresses the convection operator.
+// XD convection_negligeable convection_deriv negligeable NO_BRACE For VDF and VEF discretizations. Suppresses the
+// XD_CONT convection operator.
 
 // XD convection_amont convection_deriv amont NO_BRACE Keyword for upwind scheme for VDF or VEF discretizations.
 

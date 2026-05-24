@@ -17,7 +17,9 @@
 #include <Domaine.h>
 
 Implemente_instanciable(Trianguler,"Trianguler",Triangulation_base);
-// XD triangulate interprete trianguler INHERITS_BRACE To achieve a triangular mesh from a mesh comprising rectangles (2 triangles per rectangle). Should be used in VEF discretization. Principle: NL2 \includepng{{trianguler.pdf}}{{10}}
+// XD triangulate interprete trianguler INHERITS_BRACE To achieve a triangular mesh from a mesh comprising rectangles (2
+// XD_CONT triangles per rectangle). Should be used in VEF discretization. Principle: NL2
+// XD_CONT \includeimage{{trianguler.jpeg}}
 // XD attr domain_name ref_domaine domain_name REQ Name of domain.
 
 /*! @brief Simple appel a: Interprete::printOn(Sortie&)

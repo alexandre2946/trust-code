@@ -18,7 +18,8 @@
 #include <Process.h>
 
 Implemente_instanciable(Probleme_Elasticite_Lineaire,"Probleme_Elasticite_Lineaire",Probleme_base);
-// XD Probleme_Elasticite_Lineaire Pb_base Probleme_Elasticite_Lineaire INHERITS_BRACE Resolution of Probleme_Elasticite_Lineaire
+// XD Probleme_Elasticite_Lineaire Pb_base Probleme_Elasticite_Lineaire INHERITS_BRACE Resolution of
+// XD_CONT Probleme_Elasticite_Lineaire
 // XD attr Milieu_Elasticite Milieu_Elasticite Milieu_Elasticite OPT Milieu_Elasticite
 // XD attr Equation_Navier_Cauchy Equation_Navier_Cauchy Equation_Navier_Cauchy OPT Equation_Navier_Cauchy
 

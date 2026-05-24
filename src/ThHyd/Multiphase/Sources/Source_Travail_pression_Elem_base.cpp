@@ -23,7 +23,8 @@
 #include <cfloat>
 
 Implemente_base(Source_Travail_pression_Elem_base, "Source_Travail_pression_Elem_base", Sources_Multiphase_base);
-// XD travail_pression source_base travail_pression NO_BRACE Source term which corresponds to the additional pressure work term that appears when dealing with compressible multiphase fluids
+// XD travail_pression source_base travail_pression NO_BRACE Source term which corresponds to the additional pressure
+// XD_CONT work term that appears when dealing with compressible multiphase fluids
 
 Sortie& Source_Travail_pression_Elem_base::printOn(Sortie& os) const { return os; }
 Entree& Source_Travail_pression_Elem_base::readOn(Entree& is) { return is; }

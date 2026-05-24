@@ -33,8 +33,8 @@ extern void TRUST_set_library_mode(bool);
 
 Implemente_instanciable(Pilote_ICoCo,"Pilote_ICoCo",Interprete);
 // XD pilote_icoco interprete pilote_icoco BRACE not_set
-// XD  attr pb_name chaine pb_name REQ not_set
-// XD  attr main chaine main REQ not_set
+// XD attr pb_name chaine pb_name REQ not_set
+// XD attr main chaine main REQ not_set
 
 
 /*! @brief Simple appel a: Interprete::printOn(Sortie&)
@@ -539,9 +539,14 @@ Entree& Pilote_ICoCo::interpreter(Entree& is)
   param.dictionnaire("Pilote_ICoCo_2",2);
   param.dictionnaire("Pilote_ICoCo_3",3);
   param.dictionnaire("Pilote_ICoCo_4",4);
-  param.ajouter("nb_pas_dt_reset",&nb_pas_dt_reset); // XD_ADD_P int number of time steps before a single call to resetTime(0) like the Cathare directive (default value 1000000000)
-  param.ajouter("nstep_stabilized",&nstep_stabilized); // XD_ADD_P int number of first iterations in which resetTime(0) is called as a Cathare stabilized transient (default value 0)
-  param.ajouter("sortie_root_directory",&sortie_root_directory); // XD_ADD_P int if enable, no save post before the resetTime(0) call (default value 0)
+  param.ajouter("nb_pas_dt_reset",&nb_pas_dt_reset); // XD_ADD_P int
+  // XD_CONT number of time steps before a single call to resetTime(0) like the Cathare directive (default value
+  // XD_CONT 1000000000)
+  param.ajouter("nstep_stabilized",&nstep_stabilized); // XD_ADD_P int
+  // XD_CONT number of first iterations in which resetTime(0) is called as a Cathare stabilized transient (default value
+  // XD_CONT 0)
+  param.ajouter("sortie_root_directory",&sortie_root_directory); // XD_ADD_P int
+  // XD_CONT if enable, no save post before the resetTime(0) call (default value 0)
   param.lire_avec_accolades_depuis(is);
   Probleme_U& pb_to_solve=ref_cast(Probleme_U,objet(nom1));
   switch (methode)

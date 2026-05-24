@@ -16,7 +16,8 @@
 #include <Champ_Fonc_Fonction_txyz.h>
 
 Implemente_instanciable(Champ_Fonc_Fonction_txyz,"Champ_Fonc_Fonction_txyz",Champ_Fonc_Fonction);
-// XD champ_fonc_fonction_txyz champ_fonc_fonction champ_fonc_fonction_txyz INHERITS_BRACE this refers to a field that is a function of another field and time and/or space coordinates
+// XD champ_fonc_fonction_txyz champ_fonc_fonction champ_fonc_fonction_txyz INHERITS_BRACE this refers to a field that
+// XD_CONT is a function of another field and time and/or space coordinates
 
 Sortie& Champ_Fonc_Fonction_txyz::printOn(Sortie& os) const { return os; }
 

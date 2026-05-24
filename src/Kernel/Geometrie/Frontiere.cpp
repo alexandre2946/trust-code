@@ -18,7 +18,9 @@
 #include <TRUSTTab.h>
 
 Implemente_base_32_64(Frontiere_32_64,"Frontiere",Objet_U);
-// XD bord_base objet_lecture bord_base INHERITS_BRACE Basic class for block sides. Block sides that are neither edges nor connectors are not specified. The duplicate nodes of two blocks in contact are automatically recognized and deleted.
+// XD bord_base objet_lecture bord_base INHERITS_BRACE Basic class for block sides. Block sides that are neither edges
+// XD_CONT nor connectors are not specified. The duplicate nodes of two blocks in contact are automatically recognized
+// XD_CONT and deleted.
 
 /*! @brief Lit les specification d'une frontiere a partir d'un flot d'entree.
  *

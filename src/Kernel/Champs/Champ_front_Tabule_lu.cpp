@@ -17,7 +17,8 @@
 #include <EChaine.h>
 
 Implemente_instanciable(Champ_front_Tabule_lu, "Champ_front_Tabule_lu", Champ_front_Tabule);
-// XD champ_front_tabule_lu champ_front_tabule champ_front_tabule_lu NO_BRACE Constant field on the boundary, tabulated from a specified column file. Lines starting with # are ignored.
+// XD champ_front_tabule_lu champ_front_tabule champ_front_tabule_lu NO_BRACE Constant field on the boundary, tabulated
+// XD_CONT from a specified column file. Lines starting with # are ignored.
 // XD attr nb_comp entier nb_comp REQ Number of field components.
 // XD attr column_file chaine column_file REQ Name of the column file.
 // XD attr bloc suppress_param bloc REQ del

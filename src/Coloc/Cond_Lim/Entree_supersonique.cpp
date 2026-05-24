@@ -17,7 +17,8 @@
 
 Implemente_instanciable(Entree_supersonique, "Entree_supersonique", Entree_fluide_alpha_impose);
 
-// XD entree_supersonique frontiere_ouverte_alpha_impose entree_supersonique INHERITS_BRACE Supersonic inlet boundary condition.
+// XD entree_supersonique frontiere_ouverte_alpha_impose entree_supersonique INHERITS_BRACE Supersonic inlet boundary
+// XD_CONT condition.
 
 Sortie& Entree_supersonique::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
 Entree& Entree_supersonique::readOn(Entree& s) { return Entree_fluide_alpha_impose::readOn(s); }

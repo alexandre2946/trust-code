@@ -18,7 +18,8 @@
 #include <Frontiere_dis_base.h>
 
 Implemente_instanciable(Champ_front_fonc_pois_ipsn,"Champ_front_fonc_pois_ipsn",Champ_front_fonc);
-// XD champ_front_fonc_pois_ipsn front_field_base champ_front_fonc_pois_ipsn NO_BRACE Boundary field champ_front_fonc_pois_ipsn.
+// XD champ_front_fonc_pois_ipsn front_field_base champ_front_fonc_pois_ipsn NO_BRACE Boundary field
+// XD_CONT champ_front_fonc_pois_ipsn.
 // XD attr r_tube floattant r_tube REQ not_set
 // XD attr umoy list umoy REQ not_set
 // XD attr r_loc listf r_loc REQ not_set

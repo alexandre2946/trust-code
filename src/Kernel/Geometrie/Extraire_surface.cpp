@@ -25,12 +25,19 @@
 #include <Extraire_plan.h>
 
 Implemente_instanciable(Extraire_surface,"Extraire_surface",Interprete_geometrique_base);
-// XD extraire_surface interprete extraire_surface BRACE This keyword extracts a surface mesh named domain_name (this domain should have been declared before) from the mesh of the pb_name problem. The surface mesh is defined by one or two conditions. The first
-// XD_CONT condition is about elements with Condition_elements. For example: Condition_elements x*x+y*y+z*z<1 NL2 Will define a surface mesh with external faces of the mesh elements inside the sphere of radius 1 located at (0,0,0). The second condition Condition_faces is
-// XD_CONT useful to give a restriction.NL2 By default, the faces from the boundaries are not added to the surface mesh excepted if option avec_les_bords is given (all the boundaries are added), or if the option avec_certains_bords is used to add only some boundaries.
-// XD_CONT The first condition is about elements with Condition_elements. For example: Condition_elements x*x+y*y+z*z<1 NL2 Will define a surface mesh with external faces of the mesh elements inside the sphere of radius 1 located at (0,0,0).
-// XD_CONT The second condition Condition_faces is useful to give a restriction.NL2 By default, the faces from the boundaries are not added to the surface mesh excepted if option avec_les_bords is given (all the boundaries are added),
-// XD_CONT or if the option avec_certains_bords is used to add only some boundaries.
+// XD extraire_surface interprete extraire_surface BRACE This keyword extracts a surface mesh named domain_name (this
+// XD_CONT domain should have been declared before) from the mesh of the pb_name problem. The surface mesh is defined by
+// XD_CONT one or two conditions. The first condition is about elements with Condition_elements. For example:
+// XD_CONT Condition_elements x*x+y*y+z*z<1 NL2 Will define a surface mesh with external faces of the mesh elements
+// XD_CONT inside the sphere of radius 1 located at (0,0,0). The second condition Condition_faces is useful to give a
+// XD_CONT restriction.NL2 By default, the faces from the boundaries are not added to the surface mesh excepted if
+// XD_CONT option avec_les_bords is given (all the boundaries are added), or if the option avec_certains_bords is used
+// XD_CONT to add only some boundaries. The first condition is about elements with Condition_elements. For example:
+// XD_CONT Condition_elements x*x+y*y+z*z<1 NL2 Will define a surface mesh with external faces of the mesh elements
+// XD_CONT inside the sphere of radius 1 located at (0,0,0). The second condition Condition_faces is useful to give a
+// XD_CONT restriction.NL2 By default, the faces from the boundaries are not added to the surface mesh excepted if
+// XD_CONT option avec_les_bords is given (all the boundaries are added), or if the option avec_certains_bords is used
+// XD_CONT to add only some boundaries.
 
 Sortie& Extraire_surface::printOn(Sortie& os) const { return Interprete::printOn(os); }
 
@@ -44,12 +51,18 @@ Entree& Extraire_surface::interpreter_(Entree& is)
   bool avec_les_bords = false;
   Noms noms_des_bords;
   Param param(que_suis_je());
-  param.ajouter("domaine",&nom_domaine_surfacique,Param::REQUIRED); // XD_ADD_P ref_domaine Domain in which faces are saved
-  param.ajouter("probleme",&nom_pb,Param::REQUIRED); // XD_ADD_P ref_Pb_base Problem from which faces should be extracted
-  param.ajouter("condition_elements",&expr_elements); // XD_ADD_P chaine condition on center of elements
-  param.ajouter("condition_faces",&expr_faces); // XD_ADD_P chaine not_set
-  param.ajouter_flag("avec_les_bords",&avec_les_bords); // XD_ADD_P rien not_set
-  param.ajouter("avec_certains_bords",&noms_des_bords); // XD_ADD_P listchaine not_set
+  param.ajouter("domaine",&nom_domaine_surfacique,Param::REQUIRED); // XD_ADD_P ref_domaine
+  // XD_CONT Domain in which faces are saved
+  param.ajouter("probleme",&nom_pb,Param::REQUIRED); // XD_ADD_P ref_Pb_base
+  // XD_CONT Problem from which faces should be extracted
+  param.ajouter("condition_elements",&expr_elements); // XD_ADD_P chaine
+  // XD_CONT condition on center of elements
+  param.ajouter("condition_faces",&expr_faces); // XD_ADD_P chaine
+  // XD_CONT not_set
+  param.ajouter_flag("avec_les_bords",&avec_les_bords); // XD_ADD_P rien
+  // XD_CONT not_set
+  param.ajouter("avec_certains_bords",&noms_des_bords); // XD_ADD_P listchaine
+  // XD_CONT not_set
   param.lire_avec_accolades_depuis(is);
 
   associer_domaine(nom_domaine_surfacique);

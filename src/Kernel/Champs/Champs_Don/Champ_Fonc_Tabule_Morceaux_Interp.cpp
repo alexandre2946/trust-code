@@ -21,8 +21,9 @@
 #include <EChaine.h>
 
 Implemente_instanciable(Champ_Fonc_Tabule_Morceaux_Interp, "Champ_Fonc_Tabule_Morceaux_Interp", Champ_Fonc_Tabule_Morceaux);
-// XD Champ_Fonc_Tabule_Morceaux_Interp Champ_Fonc_Tabule_Morceaux Champ_Fonc_Tabule_Morceaux_Interp NO_BRACE Field defined by tabulated data in each sub-domaine. It makes possible the definition of a field which is a function of other fields. Here we use
-// XD_CONT MEDCoupling to interpolate fields between the two domains.
+// XD Champ_Fonc_Tabule_Morceaux_Interp Champ_Fonc_Tabule_Morceaux Champ_Fonc_Tabule_Morceaux_Interp NO_BRACE Field
+// XD_CONT defined by tabulated data in each sub-domaine. It makes possible the definition of a field which is a
+// XD_CONT function of other fields. Here we use MEDCoupling to interpolate fields between the two domains.
 // XD attr domain_name suppress_param domain_name REQ del.
 // XD attr problem_name ref_Pb_base problem_name REQ Name of the problem.
 

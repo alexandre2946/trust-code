@@ -70,8 +70,10 @@ Entree& EcritureLectureSpecial::readOn(Entree& is)
 {
   return is;
 }
-// XD ecriturelecturespecial interprete ecriturelecturespecial INHERITS_BRACE Class to write or not to write a .xyz file on the disk at the end of the calculation.
-// XD attr type chaine type REQ If set to 0 (the default), no xyz file is created. If set to 1, the .xyz file is written at the end of the computation.
+// XD ecriturelecturespecial interprete ecriturelecturespecial INHERITS_BRACE Class to write or not to write a .xyz file
+// XD_CONT on the disk at the end of the calculation.
+// XD attr type chaine type REQ If set to 0 (the default), no xyz file is created. If set to 1, the .xyz file is written
+// XD_CONT at the end of the computation.
 Entree& EcritureLectureSpecial::interpreter(Entree& is)
 {
   Nom option;

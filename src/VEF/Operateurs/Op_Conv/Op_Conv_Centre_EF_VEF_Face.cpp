@@ -19,20 +19,25 @@
 
 Implemente_instanciable(Op_Conv_Centre_EF_VEF_Face,"Op_Conv_Centre_EF_VEF_P1NC",Op_Conv_VEF_base);
 // XD bloc_ef objet_lecture nul NO_BRACE not_set
-// XD   attr mot1 chaine(into=["transportant_bar","transporte_bar","filtrer_resu","antisym"]) mot1 REQ not_set
-// XD   attr val1 entier(into=[0,1]) val1 REQ not_set
-// XD   attr mot2 chaine(into=["transportant_bar","transporte_bar","filtrer_resu","antisym"]) mot2 REQ not_set
-// XD   attr val2 entier(into=[0,1]) val2 REQ not_set
-// XD   attr mot3 chaine(into=["transportant_bar","transporte_bar","filtrer_resu","antisym"]) mot3 REQ not_set
-// XD   attr val3 entier(into=[0,1]) val3 REQ not_set
-// XD   attr mot4 chaine(into=["transportant_bar","transporte_bar","filtrer_resu","antisym"]) mot4 REQ not_set
-// XD   attr val4 entier(into=[0,1]) val4 REQ not_set
-// XD convection_ef convection_deriv ef NO_BRACE For VEF calculations, a centred convective scheme based on Finite Elements formulation can be called through the following data:NL2 NL2 Convection { EF transportant_bar val transporte_bar val antisym val
-// XD_CONT filtrer_resu val }NL2 NL2 This scheme is 2nd order accuracy (and get better the property of kinetic energy conservation). Due to possible problems of instabilities phenomena, this scheme has to be coupled with stabilisation process (see
-// XD_CONT Source_Qdm_lambdaup).These two last data are equivalent from a theoretical point of view in variationnal writing to : div(( u. grad ub , vb) - (u. grad vb, ub)), where vb corresponds to the filtered reference test functions.NL2 NL2 Remark:NL2 This class
+// XD attr mot1 chaine(into=["transportant_bar","transporte_bar","filtrer_resu","antisym"]) mot1 REQ not_set
+// XD attr val1 entier(into=[0,1]) val1 REQ not_set
+// XD attr mot2 chaine(into=["transportant_bar","transporte_bar","filtrer_resu","antisym"]) mot2 REQ not_set
+// XD attr val2 entier(into=[0,1]) val2 REQ not_set
+// XD attr mot3 chaine(into=["transportant_bar","transporte_bar","filtrer_resu","antisym"]) mot3 REQ not_set
+// XD attr val3 entier(into=[0,1]) val3 REQ not_set
+// XD attr mot4 chaine(into=["transportant_bar","transporte_bar","filtrer_resu","antisym"]) mot4 REQ not_set
+// XD attr val4 entier(into=[0,1]) val4 REQ not_set
+// XD convection_ef convection_deriv ef NO_BRACE For VEF calculations, a centred convective scheme based on Finite
+// XD_CONT Elements formulation can be called through the following data:NL2 NL2 Convection { EF transportant_bar val
+// XD_CONT transporte_bar val antisym val filtrer_resu val }NL2 NL2 This scheme is 2nd order accuracy (and get better
+// XD_CONT the property of kinetic energy conservation). Due to possible problems of instabilities phenomena, this
+// XD_CONT scheme has to be coupled with stabilisation process (see Source_Qdm_lambdaup).These two last data are
+// XD_CONT equivalent from a theoretical point of view in variationnal writing to : div(( u. grad ub , vb) - (u. grad
+// XD_CONT vb, ub)), where vb corresponds to the filtered reference test functions.NL2 NL2 Remark:NL2 This class
 // XD_CONT requires to define a filtering operator : see solveur_bar
-// XD   attr mot1 chaine(into=["defaut_bar"]) mot1 OPT equivalent to transportant_bar 0 transporte_bar 1 filtrer_resu 1 antisym 1
-// XD   attr bloc_ef bloc_ef bloc_ef OPT not_set
+// XD attr mot1 chaine(into=["defaut_bar"]) mot1 OPT equivalent to transportant_bar 0 transporte_bar 1 filtrer_resu 1
+// XD_CONT antisym 1
+// XD attr bloc_ef bloc_ef bloc_ef OPT not_set
 
 Sortie& Op_Conv_Centre_EF_VEF_Face::printOn(Sortie& s ) const
 {

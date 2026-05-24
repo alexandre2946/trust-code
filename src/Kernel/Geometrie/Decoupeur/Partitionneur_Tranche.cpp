@@ -20,11 +20,17 @@
 #include <Param.h>
 
 Implemente_instanciable_32_64(Partitionneur_Tranche_32_64, "Partitionneur_Tranche", Partitionneur_base_32_64<_T_>);
-// XD partitionneur_tranche partitionneur_deriv tranche INHERITS_BRACE This algorithm will create a geometrical partitionning by slicing the mesh in the two or three axis directions, based on the geometric center of each mesh element. nz must be given if
-// XD_CONT dimension=3. Each slice contains the same number of elements (slices don\'t have the same geometrical width, and for VDF meshes, slice boundaries are generally not flat except if the number of mesh elements in each direction is an exact multiple of the number
-// XD_CONT of slices). First, nx slices in the X direction are created, then each slice is split in ny slices in the Y direction, and finally, each part is split in nz slices in the Z direction. The resulting number of parts is nx*ny*nz. If one particular direction has
-// XD_CONT been declared periodic, the default slicing (0, 1, 2, ..., n-1)is replaced by (0, 1, 2, ... n-1, 0), each of the two \'0\' slices having twice less elements than the other slices.
-// XD attr tranches listentierf tranches OPT Partitioned by nx in the X direction, ny in the Y direction, nz in the Z direction. Works only for structured meshes. No warranty for unstructured meshes.
+// XD partitionneur_tranche partitionneur_deriv tranche INHERITS_BRACE This algorithm will create a geometrical
+// XD_CONT partitionning by slicing the mesh in the two or three axis directions, based on the geometric center of each
+// XD_CONT mesh element. nz must be given if dimension=3. Each slice contains the same number of elements (slices don\'t
+// XD_CONT have the same geometrical width, and for VDF meshes, slice boundaries are generally not flat except if the
+// XD_CONT number of mesh elements in each direction is an exact multiple of the number of slices). First, nx slices in
+// XD_CONT the X direction are created, then each slice is split in ny slices in the Y direction, and finally, each part
+// XD_CONT is split in nz slices in the Z direction. The resulting number of parts is nx*ny*nz. If one particular
+// XD_CONT direction has been declared periodic, the default slicing (0, 1, 2, ..., n-1)is replaced by (0, 1, 2, ...
+// XD_CONT n-1, 0), each of the two \'0\' slices having twice less elements than the other slices.
+// XD attr tranches listentierf tranches OPT Partitioned by nx in the X direction, ny in the Y direction, nz in the Z
+// XD_CONT direction. Works only for structured meshes. No warranty for unstructured meshes.
 
 
 template <typename _SIZE_>

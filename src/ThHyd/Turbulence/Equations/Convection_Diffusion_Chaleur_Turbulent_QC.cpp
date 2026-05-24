@@ -20,7 +20,8 @@
 
 Implemente_instanciable(Convection_Diffusion_Chaleur_Turbulent_QC, "Convection_Diffusion_Chaleur_Turbulent_QC", Convection_Diffusion_Chaleur_QC);
 // XD convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_QC convection_diffusion_chaleur_turbulent_qc INHERITS_BRACE Temperature equation for a quasi-compressible fluid as well as the associated turbulence model equations.
-// XD attr modele_turbulence modele_turbulence_scal_base modele_turbulence OPT Turbulence model for the temperature (energy) conservation equation.
+// XD attr modele_turbulence modele_turbulence_scal_base modele_turbulence OPT Turbulence model for the temperature
+// XD_CONT (energy) conservation equation.
 
 Sortie& Convection_Diffusion_Chaleur_Turbulent_QC::printOn(Sortie& is) const
 {

@@ -29,10 +29,14 @@ Entree& Interpolation_IBM_power_law_tbl_u_star::readOn( Entree& is )
 {
   Param param(que_suis_je());
   Interpolation_IBM_base::set_param(param);
-  param.ajouter("points_solides",&solid_points_lu_,Param::REQUIRED);  // XD_ADD_P field_base Node field giving the projection of the node on the immersed boundary
-  param.ajouter("est_dirichlet",&is_dirichlet_lu_,Param::REQUIRED);   // XD_ADD_P field_base Node field of booleans indicating whether the node belong to an element where the interface is
-  param.ajouter("correspondance_elements",&corresp_elems_lu_,Param::REQUIRED); // XD_ADD_P field_base Cell field giving the SALOME cell number
-  param.ajouter("elements_solides",&solid_elems_lu_,Param::REQUIRED); // XD_ADD_P field_base Node field giving the element number containing the solid point
+  param.ajouter("points_solides",&solid_points_lu_,Param::REQUIRED);  // XD_ADD_P field_base
+  // XD_CONT Node field giving the projection of the node on the immersed boundary
+  param.ajouter("est_dirichlet",&is_dirichlet_lu_,Param::REQUIRED);   // XD_ADD_P field_base
+  // XD_CONT Node field of booleans indicating whether the node belong to an element where the interface is
+  param.ajouter("correspondance_elements",&corresp_elems_lu_,Param::REQUIRED); // XD_ADD_P field_base
+  // XD_CONT Cell field giving the SALOME cell number
+  param.ajouter("elements_solides",&solid_elems_lu_,Param::REQUIRED); // XD_ADD_P field_base
+  // XD_CONT Node field giving the element number containing the solid point
   param.lire_avec_accolades_depuis(is);
   return is;
 }

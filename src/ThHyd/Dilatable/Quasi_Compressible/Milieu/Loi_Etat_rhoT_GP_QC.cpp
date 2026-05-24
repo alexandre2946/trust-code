@@ -20,7 +20,8 @@
 #include <ParserView.h>
 
 Implemente_instanciable_sans_constructeur( Loi_Etat_rhoT_GP_QC, "Loi_Etat_rhoT_Gaz_Parfait_QC", Loi_Etat_GP_base ) ;
-// XD rhoT_gaz_parfait_QC loi_etat_gaz_parfait_base rhoT_gaz_parfait_QC INHERITS_BRACE Class for perfect gas used with a quasi-compressible fluid where the state equation is defined as rho = f(T).
+// XD rhoT_gaz_parfait_QC loi_etat_gaz_parfait_base rhoT_gaz_parfait_QC INHERITS_BRACE Class for perfect gas used with a
+// XD_CONT quasi-compressible fluid where the state equation is defined as rho = f(T).
 
 Loi_Etat_rhoT_GP_QC::Loi_Etat_rhoT_GP_QC() { }
 
@@ -35,11 +36,16 @@ Entree& Loi_Etat_rhoT_GP_QC::readOn( Entree& is )
   Nom expression_;
 
   Param param(que_suis_je());
-  param.ajouter("Cp",&Cp_,Param::REQUIRED);// XD_ADD_P double Specific heat at constant pressure of the gas Cp.
-  param.ajouter("Prandtl",&Pr_); // XD_ADD_P double Prandtl number of the gas Pr=mu*Cp/lambda
-  param.ajouter("rho_xyz",&rho_xyz_); // XD_ADD_P field_base Defined with a Champ_Fonc_xyz to define a constant rho with time (space dependent)
-  param.ajouter("rho_t",&expression_); // XD_ADD_P chaine Expression of T used to calculate rho. This can lead to a variable rho, both in space and in time.
-  param.ajouter("Tmin_for_exit",&Tmin_for_exit_); // XD_ADD_P double If temperature goes below Tmin_for_exit (default value -1000), computation will stop.
+  param.ajouter("Cp",&Cp_,Param::REQUIRED);// XD_ADD_P double
+  // XD_CONT Specific heat at constant pressure of the gas Cp.
+  param.ajouter("Prandtl",&Pr_); // XD_ADD_P double
+  // XD_CONT Prandtl number of the gas Pr=mu*Cp/lambda
+  param.ajouter("rho_xyz",&rho_xyz_); // XD_ADD_P field_base
+  // XD_CONT Defined with a Champ_Fonc_xyz to define a constant rho with time (space dependent)
+  param.ajouter("rho_t",&expression_); // XD_ADD_P chaine
+  // XD_CONT Expression of T used to calculate rho. This can lead to a variable rho, both in space and in time.
+  param.ajouter("Tmin_for_exit",&Tmin_for_exit_); // XD_ADD_P double
+  // XD_CONT If temperature goes below Tmin_for_exit (default value -1000), computation will stop.
   param.lire_avec_accolades(is);
 
   if (expression_ == "??" && !rho_xyz_)

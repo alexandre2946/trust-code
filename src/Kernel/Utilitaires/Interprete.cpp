@@ -17,9 +17,11 @@
 #include <Interprete.h>
 
 Implemente_base(Interprete, "Interprete", Objet_U);
-// XD interprete objet_u interprete NO_BRACE Basic class for interpreting a data file. Interpretors allow some operations to be carried out on objects.
+// XD interprete objet_u interprete NO_BRACE Basic class for interpreting a data file. Interpretors allow some
+// XD_CONT operations to be carried out on objects.
 
-// XD fin interprete end INHERITS_BRACE Keyword which must complete the data file. The execution of the data file stops when reaching this keyword.
+// XD fin interprete end INHERITS_BRACE Keyword which must complete the data file. The execution of the data file stops
+// XD_CONT when reaching this keyword.
 
 Entree& Interprete::readOn(Entree& is)
 {

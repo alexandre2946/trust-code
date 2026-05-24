@@ -17,7 +17,8 @@
 #include <TRUSTTab.h>
 
 Implemente_instanciable( Interpolation_IBM_hybrid, "Interpolation_IBM_hybride|IBM_hybride", Interpolation_IBM_elem_fluid ) ;
-// XD interpolation_ibm_hybride interpolation_ibm_elem_fluid ibm_hybride BRACE Immersed Boundary Method (IBM): hybrid (fluid/mean gradient) interpolation.
+// XD interpolation_ibm_hybride interpolation_ibm_elem_fluid ibm_hybride BRACE Immersed Boundary Method (IBM): hybrid
+// XD_CONT (fluid/mean gradient) interpolation.
 
 Sortie& Interpolation_IBM_hybrid::printOn( Sortie& os ) const
 {
@@ -29,7 +30,8 @@ Entree& Interpolation_IBM_hybrid::readOn( Entree& is )
   //Interpolation_IBM_elem_fluid::readOn(is);
   Param param(que_suis_je());
   Interpolation_IBM_elem_fluid::set_param(param);
-  param.ajouter("elements_solides",&solid_elems_lu_,Param::REQUIRED); // XD_ADD_P field_base Node field giving the element number containing the solid point
+  param.ajouter("elements_solides",&solid_elems_lu_,Param::REQUIRED); // XD_ADD_P field_base
+  // XD_CONT Node field giving the element number containing the solid point
   param.lire_avec_accolades_depuis(is);
   return is;
 }

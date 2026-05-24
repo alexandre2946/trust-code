@@ -19,7 +19,8 @@
 #include <Nom.h>
 
 Implemente_instanciable(Lata_2_MED, "Lata_To_MED|Lata_2_MED", Interprete);
-// XD lata_to_med interprete lata_to_med INHERITS_BRACE To convert results file written with LATA format to MED file. Warning: Fields located on faces are not supported yet.
+// XD lata_to_med interprete lata_to_med INHERITS_BRACE To convert results file written with LATA format to MED file.
+// XD_CONT Warning: Fields located on faces are not supported yet.
 // XD attr format format_lata_to_med format OPT generated file post_med.data use format (MED or LATA or LML keyword).
 // XD attr file chaine file REQ LATA file to convert to the new format.
 // XD attr file_med chaine file_med REQ Name of the MED file.

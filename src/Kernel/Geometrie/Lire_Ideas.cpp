@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -19,9 +19,10 @@
 #include <Scatter.h>
 
 Implemente_instanciable(Lire_Ideas,"Lire_Ideas",Interprete_geometrique_base);
-// XD lire_ideas interprete lire_ideas INHERITS_BRACE Read a geom in a unv file. 3D tetra mesh elements only may be read by TRUST.
-// XD  attr nom_dom ref_domaine nom_dom REQ Name of domain.
-// XD  attr file chaine file REQ Name of file.
+// XD lire_ideas interprete lire_ideas INHERITS_BRACE Read a geom in a unv file. 3D tetra mesh elements only may be read
+// XD_CONT by TRUST.
+// XD attr nom_dom ref_domaine nom_dom REQ Name of domain.
+// XD attr file chaine file REQ Name of file.
 
 Sortie& Lire_Ideas::printOn(Sortie& s ) const
 {

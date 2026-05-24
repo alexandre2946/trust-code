@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -38,9 +38,10 @@ inline void decompression(Nom& nom_fichier)
     }
 }
 Implemente_instanciable(Lire_Tgrid,"Lire_Tgrid",Interprete_geometrique_base);
-// XD read_tgrid interprete lire_tgrid INHERITS_BRACE Keyword to reaf Tgrid/Gambit mesh files. 2D (triangles or quadrangles) and 3D (tetra or hexa elements) meshes, may be read by TRUST.
-// XD  attr dom ref_domaine dom REQ Name of domaine.
-// XD  attr filename chaine filename REQ Name of file containing the mesh.
+// XD read_tgrid interprete lire_tgrid INHERITS_BRACE Keyword to reaf Tgrid/Gambit mesh files. 2D (triangles or
+// XD_CONT quadrangles) and 3D (tetra or hexa elements) meshes, may be read by TRUST.
+// XD attr dom ref_domaine dom REQ Name of domaine.
+// XD attr filename chaine filename REQ Name of file containing the mesh.
 
 Sortie& Lire_Tgrid::printOn(Sortie& os) const { return Interprete::printOn(os); }
 

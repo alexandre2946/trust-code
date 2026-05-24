@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -37,7 +37,8 @@ Entree& Champ_Parametrique::readOn(Entree& is)
   Champ_Parametrique::enabled=true;
   Nom fichier;
   Param param(que_suis_je());
-  param.ajouter("fichier", &fichier, Param::REQUIRED);  // XD_ADD_P chaine Filename where fields are read
+  param.ajouter("fichier", &fichier, Param::REQUIRED);  // XD_ADD_P chaine
+  // XD_CONT Filename where fields are read
   param.lire_avec_accolades_depuis(is);
   // Lecture de tous les lignes du fichier parametrique:
   EFichier fic(fichier);

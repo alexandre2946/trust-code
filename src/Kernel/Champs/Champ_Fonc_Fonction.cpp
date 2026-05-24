@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,12 +18,13 @@
 
 Implemente_instanciable(Champ_Fonc_Fonction,"Champ_Fonc_Fonction",Champ_Fonc_Tabule);
 // XD champ_fonc_fonction champ_fonc_tabule champ_fonc_fonction NO_BRACE Field that is a function of another field.
-// XD  attr dim suppress_param dim OPT del
-// XD  attr pb_field suppress_param pb_field OPT del
-// XD  attr bloc suppress_param bloc OPT del
-// XD  attr problem_name ref_Pb_base problem_name REQ Name of problem.
-// XD  attr inco chaine inco REQ Name of the field (for example: temperature).
-// XD  attr expression listchaine expression REQ Number of field components followed by the analytical expression for each field component.
+// XD attr dim suppress_param dim OPT del
+// XD attr pb_field suppress_param pb_field OPT del
+// XD attr bloc suppress_param bloc OPT del
+// XD attr problem_name ref_Pb_base problem_name REQ Name of problem.
+// XD attr inco chaine inco REQ Name of the field (for example: temperature).
+// XD attr expression listchaine expression REQ Number of field components followed by the analytical expression for
+// XD_CONT each field component.
 
 Sortie& Champ_Fonc_Fonction::printOn(Sortie& os) const { return os; }
 

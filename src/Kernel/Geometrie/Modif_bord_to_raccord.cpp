@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,10 +17,11 @@
 #include <EFichier.h>
 
 Implemente_instanciable_32_64(Modif_bord_to_raccord_32_64,"Modif_bord_to_raccord",Interprete_geometrique_base_32_64<_T_>);
-// XD modif_bord_to_raccord interprete modif_bord_to_raccord INHERITS_BRACE Keyword to convert a boundary of domain_name domain of kind Bord to a boundary of kind Raccord (named boundary_name). It is useful when using meshes with boundaries of kind Bord
-// XD_CONT defined and to run a coupled calculation.
-// XD  attr domaine ref_domaine domain REQ Name of domain
-// XD  attr nom_bord chaine nom_bord REQ Name of the boundary to transform.
+// XD modif_bord_to_raccord interprete modif_bord_to_raccord INHERITS_BRACE Keyword to convert a boundary of domain_name
+// XD_CONT domain of kind Bord to a boundary of kind Raccord (named boundary_name). It is useful when using meshes with
+// XD_CONT boundaries of kind Bord defined and to run a coupled calculation.
+// XD attr domaine ref_domaine domain REQ Name of domain
+// XD attr nom_bord chaine nom_bord REQ Name of the boundary to transform.
 
 template <typename _SIZE_>
 Sortie& Modif_bord_to_raccord_32_64<_SIZE_>::printOn(Sortie& os) const

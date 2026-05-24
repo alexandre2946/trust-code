@@ -29,7 +29,8 @@ Sortie& Flux_parietal_Nusselt::printOn(Sortie& os) const
 Entree& Flux_parietal_Nusselt::readOn(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter_non_std("formula", this, Param::REQUIRED); // XD_ADD_P chaine Nusselt formula as a function of Re and Pr
+  param.ajouter_non_std("formula", this, Param::REQUIRED); // XD_ADD_P chaine
+  // XD_CONT Nusselt formula as a function of Re and Pr
   param.lire_avec_accolades_depuis(is);
   return is;
 }

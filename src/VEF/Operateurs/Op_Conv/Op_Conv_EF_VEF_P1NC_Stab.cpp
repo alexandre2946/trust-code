@@ -45,16 +45,22 @@ Implemente_instanciable(Op_Conv_EF_VEF_P1NC_Stab,"Op_Conv_EF_Stab_VEF_P1NC",Op_C
 // XD listsous_zone_valeur listobj nul NO_BRACE sous_zone_valeur NO_COMMA List of groups of two words.
 
 // XD convection_ef_stab convection_deriv ef_stab BRACE Keyword for a VEF convective scheme.
-// XD attr alpha floattant alpha OPT To weight the scheme centering with the factor double (between 0 (full centered) and 1 (mix between upwind and centered), by default 1). For scalar equation, it is adviced to use alpha=1 and for the momentum equation,
-// XD_CONT alpha=0.2 is adviced.
+// XD attr alpha floattant alpha OPT To weight the scheme centering with the factor double (between 0 (full centered)
+// XD_CONT and 1 (mix between upwind and centered), by default 1). For scalar equation, it is adviced to use alpha=1 and
+// XD_CONT for the momentum equation, alpha=0.2 is adviced.
 // XD attr test entier test OPT Developer option to compare old and new version of EF_stab
 // XD attr tdivu rien tdivu OPT To have the convective operator calculated as div(TU)-TdivU(=UgradT).
 // XD attr old rien old OPT To use old version of EF_stab scheme (default no).
 // XD attr volumes_etendus rien volumes_etendus OPT Option for the scheme to use the extended volumes (default, yes).
-// XD attr volumes_non_etendus rien volumes_non_etendus OPT Option for the scheme to not use the extended volumes (default, no).
-// XD attr amont_sous_zone ref_sous_zone amont_sous_zone OPT Option to degenerate EF_stab scheme into Amont (upwind) scheme in the sub zone of name sz_name. The sub zone may be located arbitrarily in the domain but the more often this option will be activated
-// XD_CONT in a zone where EF_stab scheme generates instabilities as for free outlet for example.
-// XD attr alpha_sous_zone listsous_zone_valeur alpha_sous_zone OPT Option to change locally the alpha value on N sub-zones named sub_zone_name_I. Generally, it is used to prevent from a local divergence by increasing locally the alpha parameter.
+// XD attr volumes_non_etendus rien volumes_non_etendus OPT Option for the scheme to not use the extended volumes
+// XD_CONT (default, no).
+// XD attr amont_sous_zone ref_sous_zone amont_sous_zone OPT Option to degenerate EF_stab scheme into Amont (upwind)
+// XD_CONT scheme in the sub zone of name sz_name. The sub zone may be located arbitrarily in the domain but the more
+// XD_CONT often this option will be activated in a zone where EF_stab scheme generates instabilities as for free outlet
+// XD_CONT for example.
+// XD attr alpha_sous_zone listsous_zone_valeur alpha_sous_zone OPT Option to change locally the alpha value on N
+// XD_CONT sub-zones named sub_zone_name_I. Generally, it is used to prevent from a local divergence by increasing
+// XD_CONT locally the alpha parameter.
 
 Sortie& Op_Conv_EF_VEF_P1NC_Stab::printOn(Sortie& s ) const
 {

@@ -29,53 +29,67 @@ Implemente_base_sans_destructeur(Probleme_base,"Probleme_base",Probleme_U);
 
 // XD pb_gen_base objet_u pb_gen_base INHERITS_BRACE Basic class for problems.
 
-// XD Pb_base pb_gen_base Pb_base BRACE Resolution of equations on a domain. A problem is defined by creating an object and assigning the problem type that the user wishes to resolve. To enter values for the problem objects created, the Lire (Read) interpretor
-// XD_CONT is used with a data block.
-// XD  attr milieu milieu_base milieu OPT The medium associated with the problem.
-// XD  attr constituant constituant constituant OPT Constituent.
-// XD  attr postraitement|Post_processing corps_postraitement postraitement OPT One post-processing (without name).
-// XD  attr postraitements|Post_processings postraitements postraitements OPT List of Postraitement objects (with name).
-// XD  attr liste_de_postraitements liste_post_ok liste_de_postraitements OPT This
-// XD attr liste_postraitements liste_post liste_postraitements OPT This block defines the output files to be written during the computation. The output format is lata in order to use OpenDX to draw the results. This block can be divided in one or several
-// XD_CONT sub-blocks that can be written at different frequencies and in different directories. Attention. The directory lata used in this example should be created before running the computation or the lata files will be lost.
-// XD attr sauvegarde format_file_base sauvegarde OPT Keyword used when calculation results are to be backed up. When a coupling is performed, the backup-recovery file name must be well specified for each problem. In this case, you must save to different files
-// XD_CONT and correctly specify these files when resuming the calculation.
-// XD  attr sauvegarde_simple format_file_base sauvegarde_simple OPT The same keyword than Sauvegarde except, the last time step only is saved.
-// XD attr reprise format_file_base reprise OPT Keyword to resume a calculation based on the name_file file (see the class format_file). If format_reprise is xyz, the name_file file should be the .xyz file created by the previous calculation. With this file,
-// XD_CONT it is possible to resume a parallel calculation on P processors, whereas the previous calculation has been run on N (N<>P) processors. Should the calculation be resumed, values for the tinit (see schema_temps_base) time fields are taken from the name_file
-// XD_CONT file. If there is no backup corresponding to this time in the name_file, TRUST exits in error.
-// XD  attr resume_last_time format_file_base resume_last_time OPT Keyword to resume a calculation based on the name_file file, resume the calculation at the last time found in the file (tinit is set to last time of saved files).
+// XD Pb_base pb_gen_base Pb_base BRACE Resolution of equations on a domain. A problem is defined by creating an object
+// XD_CONT and assigning the problem type that the user wishes to resolve. To enter values for the problem objects
+// XD_CONT created, the Lire (Read) interpretor is used with a data block.
+// XD attr milieu milieu_base milieu OPT The medium associated with the problem.
+// XD attr constituant constituant constituant OPT Constituent.
+// XD attr postraitement|Post_processing corps_postraitement postraitement OPT One post-processing (without name).
+// XD attr postraitements|Post_processings postraitements postraitements OPT List of Postraitement objects (with name).
+// XD attr liste_de_postraitements liste_post_ok liste_de_postraitements OPT This
+// XD attr liste_postraitements liste_post liste_postraitements OPT This block defines the output files to be written
+// XD_CONT during the computation. The output format is lata in order to use OpenDX to draw the results. This block can
+// XD_CONT be divided in one or several sub-blocks that can be written at different frequencies and in different
+// XD_CONT directories. Attention. The directory lata used in this example should be created before running the
+// XD_CONT computation or the lata files will be lost.
+// XD attr sauvegarde format_file_base sauvegarde OPT Keyword used when calculation results are to be backed up. When a
+// XD_CONT coupling is performed, the backup-recovery file name must be well specified for each problem. In this case,
+// XD_CONT you must save to different files and correctly specify these files when resuming the calculation.
+// XD attr sauvegarde_simple format_file_base sauvegarde_simple OPT The same keyword than Sauvegarde except, the last
+// XD_CONT time step only is saved.
+// XD attr reprise format_file_base reprise OPT Keyword to resume a calculation based on the name_file file (see the
+// XD_CONT class format_file). If format_reprise is xyz, the name_file file should be the .xyz file created by the
+// XD_CONT previous calculation. With this file, it is possible to resume a parallel calculation on P processors,
+// XD_CONT whereas the previous calculation has been run on N (N<>P) processors. Should the calculation be resumed,
+// XD_CONT values for the tinit (see schema_temps_base) time fields are taken from the name_file file. If there is no
+// XD_CONT backup corresponding to this time in the name_file, TRUST exits in error.
+// XD attr resume_last_time format_file_base resume_last_time OPT Keyword to resume a calculation based on the name_file
+// XD_CONT file, resume the calculation at the last time found in the file (tinit is set to last time of saved files).
 // XD attr transparent_medium_radiation_model transparent_medium_radiation_model modele_rayonnement_milieu_transparent OPT Read a transparent medium radiation model associated to a fluid problem
 
-//  XD ref domaine domaine
-//  XD ref scheme schema_temps_base
-//  XD ref loi1 loi_fermeture_base
-//  XD ref loi2 loi_fermeture_base
-//  XD ref loi3 loi_fermeture_base
-//  XD ref loi4 loi_fermeture_base
-//  XD ref loi5 loi_fermeture_base
+// XD ref domaine domaine
+// XD ref scheme schema_temps_base
+// XD ref loi1 loi_fermeture_base
+// XD ref loi2 loi_fermeture_base
+// XD ref loi3 loi_fermeture_base
+// XD ref loi4 loi_fermeture_base
+// XD ref loi5 loi_fermeture_base
 
-// XD problem_read_generic Pb_base problem_read_generic INHERITS_BRACE The probleme_read_generic differs rom the rest of the TRUST code : The problem does not state the number of equations that are enclosed in the problem. As the list of equations to be solved
-// XD_CONT in the generic read problem is declared in the data file and not pre-defined in the structure of the problem, each equation has to be distinctively associated with the problem with the Associate keyword.
-// XD   ref eqn1 eqn_base
-// XD   ref eqn2 eqn_base
-// XD   ref eqn3 eqn_base
-// XD   ref eqn4 eqn_base
-// XD   ref eqn5 eqn_base
-// XD   ref eqn6 eqn_base
-// XD   ref eqn7 eqn_base
-// XD   ref eqn8 eqn_base
-// XD   ref eqn9 eqn_base
-// XD   ref eqn10 eqn_base
+// XD problem_read_generic Pb_base problem_read_generic INHERITS_BRACE The probleme_read_generic differs rom the rest of
+// XD_CONT the TRUST code : The problem does not state the number of equations that are enclosed in the problem. As the
+// XD_CONT list of equations to be solved in the generic read problem is declared in the data file and not pre-defined
+// XD_CONT in the structure of the problem, each equation has to be distinctively associated with the problem with the
+// XD_CONT Associate keyword.
+// XD ref eqn1 eqn_base
+// XD ref eqn2 eqn_base
+// XD ref eqn3 eqn_base
+// XD ref eqn4 eqn_base
+// XD ref eqn5 eqn_base
+// XD ref eqn6 eqn_base
+// XD ref eqn7 eqn_base
+// XD ref eqn8 eqn_base
+// XD ref eqn9 eqn_base
+// XD ref eqn10 eqn_base
 
 
 // XD constituant milieu_base constituant INHERITS_BRACE Constituent.
-// XD attr coefficient_diffusion field_base coefficient_diffusion REQ Constituent diffusion coefficient value (m2.s-1). If a multi-constituent problem is being processed, the diffusivite will be a vectorial and each components will be the diffusion of the
-// XD_CONT constituent.
+// XD attr coefficient_diffusion field_base coefficient_diffusion REQ Constituent diffusion coefficient value (m2.s-1).
+// XD_CONT If a multi-constituent problem is being processed, the diffusivite will be a vectorial and each components
+// XD_CONT will be the diffusion of the constituent.
 // XD attr is_multi_scalar rien is_multi_scalar_diffusion OPT Flag to activate the multi_scalar diffusion operator
 
 // XD format_file_base objet_lecture nul NO_BRACE Format of the file
-// XD   attr checkpoint_fname chaine checkpoint_fname REQ Name of file.
+// XD attr checkpoint_fname chaine checkpoint_fname REQ Name of file.
 
 // XD binaire format_file_base binaire INHERITS_BRACE Format of the file - binary version
 // XD formatte format_file_base formatte INHERITS_BRACE Format of the file - formatte version
@@ -84,7 +98,7 @@ Implemente_base_sans_destructeur(Probleme_base,"Probleme_base",Probleme_U);
 // XD pdi format_file_base pdi INHERITS_BRACE Format of the file - pdi version
 
 // XD pdi_expert format_file_base pdi_expert BRACE Format of the file - PDI expert version
-// XD   attr yaml_fname chaine yaml_fname REQ YAML file name
+// XD attr yaml_fname chaine yaml_fname REQ YAML file name
 
 // Variables globales pour initialiser est_le_premier_postraitement_pour_nom_fic
 // et est_le_dernier_postraitement_pour_nom_fic en une seule passe.

@@ -21,7 +21,8 @@
 #include <TRUSTTrav.h>
 
 Implemente_instanciable(Champ_front_txyz,"Champ_front_fonc_txyz",Ch_front_var_instationnaire_indep);
-// XD champ_front_fonc_txyz front_field_base champ_front_fonc_txyz NO_BRACE Boundary field which is not constant in space and in time.
+// XD champ_front_fonc_txyz front_field_base champ_front_fonc_txyz NO_BRACE Boundary field which is not constant in
+// XD_CONT space and in time.
 // XD attr val listchaine val REQ Values of field components (mathematical expressions).
 
 /*! @brief Imprime le champ sur flot de sortie.

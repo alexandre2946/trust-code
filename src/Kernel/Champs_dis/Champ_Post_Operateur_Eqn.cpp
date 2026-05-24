@@ -39,11 +39,20 @@ Champ_Post_Operateur_Eqn::Champ_Post_Operateur_Eqn()
 void Champ_Post_Operateur_Eqn::set_param(Param& param) const
 {
   Champ_Generique_Operateur_base::set_param(param);
-  param.ajouter("numero_source",&numero_source_); // XD_ADD_P entier the source to be post-processed (its number). If you have only one source term, numero_source will correspond to 0 if you want to post-process that unique source
-  param.ajouter("numero_op",&numero_op_); // XD_ADD_P entier numero_op will be 0 (diffusive operator) or 1 (convective operator) or  2 (gradient operator) or 3 (divergence operator).
-  param.ajouter("numero_masse",&numero_masse_); // XD_ADD_P entier numero_masse will be 0 for the mass equation operator in Pb_multiphase.
-  param.ajouter_flag("sans_solveur_masse",&sans_solveur_masse_); // XD_ADD_P rien not_set
-  param.ajouter("compo",&compo_); // XD_ADD_P entier If you want to post-process only one component of a vector field, you can specify the number of the component after compo keyword. By default, it is set to -1 which means that all the components will be post-processed. This feature is not available in VDF disretization.
+  param.ajouter("numero_source",&numero_source_); // XD_ADD_P entier
+  // XD_CONT the source to be post-processed (its number). If you have only one source term, numero_source will
+  // XD_CONT correspond to 0 if you want to post-process that unique source
+  param.ajouter("numero_op",&numero_op_); // XD_ADD_P entier
+  // XD_CONT numero_op will be 0 (diffusive operator) or 1 (convective operator) or 2 (gradient operator) or 3
+  // XD_CONT (divergence operator).
+  param.ajouter("numero_masse",&numero_masse_); // XD_ADD_P entier
+  // XD_CONT numero_masse will be 0 for the mass equation operator in Pb_multiphase.
+  param.ajouter_flag("sans_solveur_masse",&sans_solveur_masse_); // XD_ADD_P rien
+  // XD_CONT not_set
+  param.ajouter("compo",&compo_); // XD_ADD_P entier
+  // XD_CONT If you want to post-process only one component of a vector field, you can specify the number of the
+  // XD_CONT component after compo keyword. By default, it is set to -1 which means that all the components will be
+  // XD_CONT post-processed. This feature is not available in VDF disretization.
 }
 
 Entree& Champ_Post_Operateur_Eqn::readOn(Entree& s )

@@ -19,9 +19,9 @@
 #include <Param.h>
 
 Implemente_instanciable(Convection_Diffusion_Espece_Binaire_Turbulent_QC, "Convection_Diffusion_Espece_Binaire_Turbulent_QC", Convection_Diffusion_Espece_Binaire_QC);
-// XD Convection_Diffusion_Espece_Binaire_Turbulent_QC convection_diffusion_espece_binaire_QC Convection_Diffusion_Espece_Binaire_Turbulent_QC INHERITS_BRACE Species conservation equation for a binary quasi-compressible fluid as well as the associated
-// XD_CONT turbulence model equations.
-// XD attr modele_turbulence modele_turbulence_scal_base modele_turbulence OPT Turbulence model for the species conservation equation.
+// XD Convection_Diffusion_Espece_Binaire_Turbulent_QC convection_diffusion_espece_binaire_QC Convection_Diffusion_Espece_Binaire_Turbulent_QC INHERITS_BRACE Species conservation equation for a binary quasi-compressible fluid as well as the associated turbulence model equations.
+// XD attr modele_turbulence modele_turbulence_scal_base modele_turbulence OPT Turbulence model for the species
+// XD_CONT conservation equation.
 
 Sortie& Convection_Diffusion_Espece_Binaire_Turbulent_QC::printOn(Sortie& is) const { return Convection_Diffusion_Espece_Binaire_QC::printOn(is); }
 

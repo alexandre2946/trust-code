@@ -32,7 +32,8 @@
 #include <Param.h>
 
 Implemente_instanciable_sans_constructeur(Champ_Generique_Extraction,"Extraction",Champ_Gen_de_Champs_Gen);
-// XD extraction champ_post_de_champs_post extraction INHERITS_BRACE To create a surface field (values at the boundary) of a volume field
+// XD extraction champ_post_de_champs_post extraction INHERITS_BRACE To create a surface field (values at the boundary)
+// XD_CONT of a volume field
 
 Add_synonym(Champ_Generique_Extraction,"Champ_Post_Extraction");
 
@@ -67,8 +68,10 @@ Sortie& Champ_Generique_Extraction::printOn(Sortie& os) const
 void Champ_Generique_Extraction::set_param(Param& param) const
 {
   Champ_Gen_de_Champs_Gen::set_param(param);
-  param.ajouter("domaine",&dom_extrac_,Param::REQUIRED);   // XD attr domaine ref_domaine domaine REQ name of the volume field
-  param.ajouter("nom_frontiere",&nom_fr_,Param::REQUIRED); // XD attr nom_frontiere chaine nom_frontiere REQ boundary name where the values of the volume field will be picked
+  param.ajouter("domaine",&dom_extrac_,Param::REQUIRED);   // XD attr domaine ref_domaine domaine REQ name of the volume
+  // XD_CONT field
+  param.ajouter("nom_frontiere",&nom_fr_,Param::REQUIRED); // XD attr nom_frontiere chaine nom_frontiere REQ boundary
+  // XD_CONT name where the values of the volume field will be picked
   param.ajouter("methode",&methode_);                      // XD attr methode chaine(into=["trace","champ_frontiere"]) methode OPT name of the extraction method (trace by_default or champ_frontiere)
 }
 

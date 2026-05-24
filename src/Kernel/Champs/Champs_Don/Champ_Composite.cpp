@@ -17,9 +17,11 @@
 #include <Motcle.h>
 
 Implemente_instanciable(Champ_Composite,"Champ_Composite",Champ_Don_base);
-// XD champ_composite champ_don_base champ_composite NO_BRACE Composite field. Used in multiphase problems to associate data to each phase.
+// XD champ_composite champ_don_base champ_composite NO_BRACE Composite field. Used in multiphase problems to associate
+// XD_CONT data to each phase.
 // XD attr dim entier dim REQ Number of field components.
-// XD attr bloc bloc_lecture bloc REQ Values Various pieces of the field, defined per phase. Part 1 goes to phase 1, etc...
+// XD attr bloc bloc_lecture bloc REQ Values Various pieces of the field, defined per phase. Part 1 goes to phase 1,
+// XD_CONT etc...
 
 Sortie& Champ_Composite::printOn(Sortie& os) const { return Champ_Don_base::printOn(os); }
 

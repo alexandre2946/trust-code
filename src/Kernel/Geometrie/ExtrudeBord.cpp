@@ -26,10 +26,14 @@
 #include <TRUSTVects.h>
 
 Implemente_instanciable(ExtrudeBord,"ExtrudeBord",Interprete_geometrique_base);
-// XD extrudebord interprete extrudebord BRACE Class to generate an extruded mesh from a boundary of a tetrahedral or an hexahedral mesh. NL2 Warning: If the initial domain is a tetrahedral mesh, the boundary will be moved in the XY plane then extrusion will
-// XD_CONT be applied (you should maybe use the Transformer keyword on the final domain to have the domain you really want). You can use the keyword Postraiter_domaine to generate a lata|med|... file to visualize your initial and final meshes. NL2 This keyword can be
-// XD_CONT used for example to create a periodic box extracted from a boundary of a tetrahedral or a hexaedral mesh. This periodic box may be used then to engender turbulent inlet flow condition for the main domain.NL2 Note that ExtrudeBord in VEF generates 3 or 14
-// XD_CONT tetrahedra from extruded prisms.
+// XD extrudebord interprete extrudebord BRACE Class to generate an extruded mesh from a boundary of a tetrahedral or an
+// XD_CONT hexahedral mesh. NL2 Warning: If the initial domain is a tetrahedral mesh, the boundary will be moved in the
+// XD_CONT XY plane then extrusion will be applied (you should maybe use the Transformer keyword on the final domain to
+// XD_CONT have the domain you really want). You can use the keyword Postraiter_domaine to generate a lata|med|... file
+// XD_CONT to visualize your initial and final meshes. NL2 This keyword can be used for example to create a periodic box
+// XD_CONT extracted from a boundary of a tetrahedral or a hexaedral mesh. This periodic box may be used then to
+// XD_CONT engender turbulent inlet flow condition for the main domain.NL2 Note that ExtrudeBord in VEF generates 3 or
+// XD_CONT 14 tetrahedra from extruded prisms.
 
 Sortie& ExtrudeBord::printOn(Sortie& os) const
 {
@@ -54,15 +58,24 @@ Entree& ExtrudeBord::interpreter_(Entree& is)
       exit();
     }
   Param param(que_suis_je());
-  param.ajouter("domaine_init",&nom_dom_volumique,Param::REQUIRED);// XD_ADD_P ref_domaine Initial domain with hexaedras or tetrahedras.
-  param.ajouter_arr_size_predefinie("direction",&vect_dir,Param::REQUIRED);// XD_ADD_P  listf Directions for the extrusion.
-  param.ajouter("nb_tranches",&nbpas,Param::REQUIRED);// XD_ADD_P  entier Number of elements in the extrusion direction.
-  param.ajouter("domaine_final",&nom_dom_surfacique,Param::REQUIRED);// XD_ADD_P  chaine Extruded domain.
-  param.ajouter("nom_bord",&nom_front,Param::REQUIRED);// XD_ADD_P  chaine Name of the boundary of the initial domain where extrusion will be applied.
-  param.ajouter_flag("hexa_old",&hexa_old);// XD_ADD_P  rien Old algorithm for boundary extrusion from a hexahedral mesh.
-  param.ajouter_flag("Trois_Tetra",&Trois_Tetra);// XD_ADD_P  rien To extrude in 3 tetrahedras instead of 14 tetrahedras.
-  param.ajouter_flag("Vingt_Tetra",&Vingt_Tetra);// XD_ADD_P  rien To extrude in 20 tetrahedras instead of 14 tetrahedras.
-  param.ajouter("sans_passer_par_le2D",&en3D_);// XD_ADD_P  entier Only for non-regression
+  param.ajouter("domaine_init",&nom_dom_volumique,Param::REQUIRED);// XD_ADD_P ref_domaine
+  // XD_CONT Initial domain with hexaedras or tetrahedras.
+  param.ajouter_arr_size_predefinie("direction",&vect_dir,Param::REQUIRED);// XD_ADD_P listf
+  // XD_CONT Directions for the extrusion.
+  param.ajouter("nb_tranches",&nbpas,Param::REQUIRED);// XD_ADD_P entier
+  // XD_CONT Number of elements in the extrusion direction.
+  param.ajouter("domaine_final",&nom_dom_surfacique,Param::REQUIRED);// XD_ADD_P chaine
+  // XD_CONT Extruded domain.
+  param.ajouter("nom_bord",&nom_front,Param::REQUIRED);// XD_ADD_P chaine
+  // XD_CONT Name of the boundary of the initial domain where extrusion will be applied.
+  param.ajouter_flag("hexa_old",&hexa_old);// XD_ADD_P rien
+  // XD_CONT Old algorithm for boundary extrusion from a hexahedral mesh.
+  param.ajouter_flag("Trois_Tetra",&Trois_Tetra);// XD_ADD_P rien
+  // XD_CONT To extrude in 3 tetrahedras instead of 14 tetrahedras.
+  param.ajouter_flag("Vingt_Tetra",&Vingt_Tetra);// XD_ADD_P rien
+  // XD_CONT To extrude in 20 tetrahedras instead of 14 tetrahedras.
+  param.ajouter("sans_passer_par_le2D",&en3D_);// XD_ADD_P entier
+  // XD_CONT Only for non-regression
   param.lire_avec_accolades_depuis(is);
 
   associer_domaine(nom_dom_volumique);

@@ -21,7 +21,8 @@
 #include <Motcle.h>
 
 Implemente_base_sans_constructeur(Loi_Etat_GP_base,"Loi_Etat_Gaz_Parfait_base",Loi_Etat_base);
-// XD loi_etat_gaz_parfait_base loi_etat_base loi_etat_gaz_parfait_base INHERITS_BRACE Basic class for perfect gases state laws used with a dilatable fluid.
+// XD loi_etat_gaz_parfait_base loi_etat_base loi_etat_gaz_parfait_base INHERITS_BRACE Basic class for perfect gases
+// XD_CONT state laws used with a dilatable fluid.
 
 Loi_Etat_GP_base::Loi_Etat_GP_base() : Cp_(-1), R_(-1) { }
 

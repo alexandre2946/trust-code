@@ -21,13 +21,16 @@
 #include <Discretisation_base.h>
 
 Implemente_base(Saturation_base, "Saturation_base", Interface_base);
-// XD saturation_base Interface_base saturation_base INHERITS_BRACE fluide-gas interface with phase change (used in pb_multiphase)
+// XD saturation_base Interface_base saturation_base INHERITS_BRACE fluide-gas interface with phase change (used in
+// XD_CONT pb_multiphase)
 
 void Saturation_base::set_param(Param& param) const
 {
   Interface_base::set_param(param);
-  param.ajouter("P_ref", &P_ref_); // XD_ADD_P floattant not_set
-  param.ajouter("T_ref", &T_ref_); // XD_ADD_P floattant not_set
+  param.ajouter("P_ref", &P_ref_); // XD_ADD_P floattant
+  // XD_CONT not_set
+  param.ajouter("T_ref", &T_ref_); // XD_ADD_P floattant
+  // XD_CONT not_set
 }
 
 Sortie& Saturation_base::printOn(Sortie& os) const { return os; }

@@ -34,18 +34,29 @@ Implemente_base(Source_PDF_base,"Source_PDF_base",Source_dep_inco_base);
 Entree& Source_PDF_base::readOn(Entree& s)
 {
   Param param(que_suis_je());
-  param.ajouter("prepro_ibm", &prepro_lu_,Param::OPTIONAL); // XD_ADD_P Prepro_IBM_base to realise the PDF IBM preprocessing
-  param.ajouter("aire", &champ_aire_lu_,Param::OPTIONAL); // XD_ADD_P field_base volumic field: a boolean for the cell (0 or 1) indicating if the obstacle is in the cell
-  param.ajouter_flag("get_aire_from_prepro", &aire_from_prepro_); // XD_ADD_P rien get aire IBM from prepro.
-  param.ajouter("barycentre", &champ_barycentre_lu_,Param::OPTIONAL); // XD_ADD_P field_base volumic field with 3 components representing the face barycenters
-  param.ajouter_flag("get_barycenter_from_prepro", &barycentre_from_prepro_); // XD_ADD_P rien get aire IBM from prepro.
-  param.ajouter("rotation", &champ_rotation_lu_,Param::OPTIONAL); // XD_ADD_P field_base volumic field with 9 components representing the change of basis on cells (local to global). Used for rotating cases for example.
-  param.ajouter_flag("get_rotation_from_prepro", &rotation_from_prepro_); // XD_ADD_P rien get aire IBM from prepro.
-  param.ajouter_flag("transpose_rotation", &transpose_rotation_); // XD_ADD_P rien  whether to transpose the basis change matrix.
-  param.ajouter("modele",&modele_lu_,Param::REQUIRED);   // XD_ADD_P bloc_pdf_model model used for the Penalized Direct Forcing
+  param.ajouter("prepro_ibm", &prepro_lu_,Param::OPTIONAL); // XD_ADD_P Prepro_IBM_base
+  // XD_CONT to realise the PDF IBM preprocessing
+  param.ajouter("aire", &champ_aire_lu_,Param::OPTIONAL); // XD_ADD_P field_base
+  // XD_CONT volumic field: a boolean for the cell (0 or 1) indicating if the obstacle is in the cell
+  param.ajouter_flag("get_aire_from_prepro", &aire_from_prepro_); // XD_ADD_P rien
+  // XD_CONT get aire IBM from prepro.
+  param.ajouter("barycentre", &champ_barycentre_lu_,Param::OPTIONAL); // XD_ADD_P field_base
+  // XD_CONT volumic field with 3 components representing the face barycenters
+  param.ajouter_flag("get_barycenter_from_prepro", &barycentre_from_prepro_); // XD_ADD_P rien
+  // XD_CONT get aire IBM from prepro.
+  param.ajouter("rotation", &champ_rotation_lu_,Param::OPTIONAL); // XD_ADD_P field_base
+  // XD_CONT volumic field with 9 components representing the change of basis on cells (local to global). Used for
+  // XD_CONT rotating cases for example.
+  param.ajouter_flag("get_rotation_from_prepro", &rotation_from_prepro_); // XD_ADD_P rien
+  // XD_CONT get aire IBM from prepro.
+  param.ajouter_flag("transpose_rotation", &transpose_rotation_); // XD_ADD_P rien
+  // XD_CONT whether to transpose the basis change matrix.
+  param.ajouter("modele",&modele_lu_,Param::REQUIRED);   // XD_ADD_P bloc_pdf_model
+  // XD_CONT model used for the Penalized Direct Forcing
   temps_relax_ = modele_lu_.temps_relax_;
   echelle_relax_ =  modele_lu_.echelle_relax_;
-  param.ajouter("interpolation",&interpolation_lue_,Param::OPTIONAL); // XD_ADD_P interpolation_ibm_base interpolation method
+  param.ajouter("interpolation",&interpolation_lue_,Param::OPTIONAL); // XD_ADD_P interpolation_ibm_base
+  // XD_CONT interpolation method
 
   param.lire_avec_accolades(s);
   if (interpolation_lue_)

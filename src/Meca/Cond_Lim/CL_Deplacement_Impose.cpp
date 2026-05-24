@@ -17,7 +17,8 @@
 #include <Motcle.h>
 
 Implemente_instanciable(CL_Deplacement_Impose, "paroi_deplacement_impose", Scalaire_impose_paroi);
-// XD paroi_deplacement_impose dirichlet paroi_deplacement_impose NO_BRACE CL_Deplacement_Impose/paroi_deplacement_impose
+// XD paroi_deplacement_impose dirichlet paroi_deplacement_impose NO_BRACE
+// XD_CONT CL_Deplacement_Impose/paroi_deplacement_impose
 // XD attr ch front_field_base ch REQ Boundary field type.
 
 Sortie& CL_Deplacement_Impose::printOn(Sortie& s) const { return Scalaire_impose_paroi::printOn(s); }

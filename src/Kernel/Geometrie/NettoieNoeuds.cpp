@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,8 +18,9 @@
 #include <Scatter.h>
 
 Implemente_instanciable_32_64(NettoieNoeuds_32_64, "NettoiePasNoeuds", Interprete_geometrique_base_32_64<_T_>);
-// XD nettoiepasnoeuds interprete nettoiepasnoeuds NO_BRACE Keyword NettoiePasNoeuds does not delete useless nodes (nodes without elements) from a domain.
-// XD  attr domain_name ref_domaine domain_name REQ Name of domain.
+// XD nettoiepasnoeuds interprete nettoiepasnoeuds NO_BRACE Keyword NettoiePasNoeuds does not delete useless nodes
+// XD_CONT (nodes without elements) from a domain.
+// XD attr domain_name ref_domaine domain_name REQ Name of domain.
 
 template <typename _SIZE_>
 Sortie& NettoieNoeuds_32_64<_SIZE_>::printOn(Sortie& os) const { return Interprete::printOn(os); }

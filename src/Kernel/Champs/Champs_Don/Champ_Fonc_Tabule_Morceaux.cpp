@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,11 +20,14 @@
 #include <TRUSTTab_parts.h>
 
 Implemente_instanciable(Champ_Fonc_Tabule_Morceaux, "Champ_Fonc_Tabule_Morceaux|Champ_Tabule_Morceaux", TRUSTChamp_Morceaux_generique<Champ_Morceaux_Type::FONC_TABULE>);
-// XD Champ_Fonc_Tabule_Morceaux champ_don_base Champ_Tabule_Morceaux NO_BRACE Field defined by tabulated data in each sub-domaine. It makes possible the definition of a field which is a function of other fields.
-// XD   attr domain_name ref_domaine domain_name REQ Name of the domain.
-// XD   attr nb_comp entier nb_comp REQ Number of field components.
-// XD attr data bloc_lecture data REQ { Defaut val_def sous_domaine_1 val_1 ... sous_domaine_i val_i } By default, the value val_def is assigned to the field. It takes the sous_domaine_i identifier Sous_Domaine (sub_area) type object function, val_i.
-// XD_CONT Sous_Domaine (sub_area) type objects must have been previously defined if the operator wishes to use a champ_fonc_tabule_morceaux type object.
+// XD Champ_Fonc_Tabule_Morceaux champ_don_base Champ_Tabule_Morceaux NO_BRACE Field defined by tabulated data in each
+// XD_CONT sub-domaine. It makes possible the definition of a field which is a function of other fields.
+// XD attr domain_name ref_domaine domain_name REQ Name of the domain.
+// XD attr nb_comp entier nb_comp REQ Number of field components.
+// XD attr data bloc_lecture data REQ { Defaut val_def sous_domaine_1 val_1 ... sous_domaine_i val_i } By default, the
+// XD_CONT value val_def is assigned to the field. It takes the sous_domaine_i identifier Sous_Domaine (sub_area) type
+// XD_CONT object function, val_i. Sous_Domaine (sub_area) type objects must have been previously defined if the
+// XD_CONT operator wishes to use a champ_fonc_tabule_morceaux type object.
 
 Sortie& Champ_Fonc_Tabule_Morceaux::printOn(Sortie& os) const { return os << valeurs(); }
 

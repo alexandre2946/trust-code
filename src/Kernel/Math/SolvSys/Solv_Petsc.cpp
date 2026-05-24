@@ -49,112 +49,167 @@
 Implemente_instanciable_sans_constructeur_ni_destructeur(Solv_Petsc,"Solv_Petsc",Solv_Externe);
 
 // XD petsc solveur_sys_base petsc NO_BRACE Solver via Petsc API
-// XD   attr solveur solveur_petsc_deriv solveur REQ solver type and options
+// XD attr solveur solveur_petsc_deriv solveur REQ solver type and options
 
-// XD solveur_petsc_deriv objet_u solveur_petsc_deriv INHERITS_BRACE Additional information is available in the PETSC documentation: https://petsc.org/release/manual/
-// XD   attr seuil floattant seuil OPT corresponds to the iterative solver convergence value. The iterative solver converges when the Euclidean residue standard ||Ax-B|| is less than seuil.
-// XD   attr quiet rien quiet OPT is a keyword which is used to not displaying any outputs of the solver.
-// XD   attr impr rien impr OPT used to request display of the Euclidean residue standard each time this iterates through the conjugated gradient (display to the standard outlet).
-// XD   attr rtol floattant rtol OPT not_set
-// XD   attr atol floattant atol OPT not_set
-// XD   attr save_matrix_mtx_format rien save_matrix_mtx_format OPT not_set
+// XD solveur_petsc_deriv objet_u solveur_petsc_deriv INHERITS_BRACE Additional information is available in the PETSC
+// XD_CONT documentation: https://petsc.org/release/manual/
+// XD attr seuil floattant seuil OPT corresponds to the iterative solver convergence value. The iterative solver
+// XD_CONT converges when the Euclidean residue standard ||Ax-B|| is less than seuil.
+// XD attr quiet rien quiet OPT is a keyword which is used to not displaying any outputs of the solver.
+// XD attr impr rien impr OPT used to request display of the Euclidean residue standard each time this iterates through
+// XD_CONT the conjugated gradient (display to the standard outlet).
+// XD attr rtol floattant rtol OPT not_set
+// XD attr atol floattant atol OPT not_set
+// XD attr save_matrix_mtx_format rien save_matrix_mtx_format OPT not_set
 
-// XD solveur_petsc_lu solveur_petsc_deriv lu INHERITS_BRACE Several solvers through PETSc API are available. NL2 TIPS: NL2 NL2 NL2 A) Solver for symmetric linear systems (e.g: Pressure system from Navier-Stokes equations): NL2 -The CHOLESKY parallel solver is
-// XD_CONT from MUMPS library. It offers better performance than all others solvers if you have enough RAM for your calculation. A parallel calculation on a cluster with 4GBytes on each processor, 40000 cells/processor seems the upper limit. Seems to be very slow to
-// XD_CONT initialize above 500 cpus/cores. NL2 -When running a parallel calculation with a high number of cpus/cores (typically more than 500) where preconditioner scalabilty is the key for CPU performance, consider BICGSTAB with BLOCK_JACOBI_ICC(1) as preconditioner or
-// XD_CONT if not converges, GCP with BLOCK_JACOBI_ICC(1) as preconditioner. NL2 -For other situations, the first choice should be GCP/SSOR. In order to fine tune the solver choice, each one of the previous list should be considered. Indeed, the CPU speed of a solver
-// XD_CONT depends of a lot of parameters. You may give a try to the OPTIMAL solver to help you to find the fastest solver on your study. NL2 NL2 B) Solver for non symmetric linear systems (e.g.: Implicit schemes): NL2 The BICGSTAB/DIAG solver seems to offer the best
+// XD solveur_petsc_lu solveur_petsc_deriv lu INHERITS_BRACE Several solvers through PETSc API are available. NL2 TIPS:
+// XD_CONT NL2 NL2 NL2 A) Solver for symmetric linear systems (e.g: Pressure system from Navier-Stokes equations): NL2
+// XD_CONT -The CHOLESKY parallel solver is from MUMPS library. It offers better performance than all others solvers if
+// XD_CONT you have enough RAM for your calculation. A parallel calculation on a cluster with 4GBytes on each processor,
+// XD_CONT 40000 cells/processor seems the upper limit. Seems to be very slow to initialize above 500 cpus/cores. NL2
+// XD_CONT -When running a parallel calculation with a high number of cpus/cores (typically more than 500) where
+// XD_CONT preconditioner scalabilty is the key for CPU performance, consider BICGSTAB with BLOCK_JACOBI_ICC(1) as
+// XD_CONT preconditioner or if not converges, GCP with BLOCK_JACOBI_ICC(1) as preconditioner. NL2 -For other
+// XD_CONT situations, the first choice should be GCP/SSOR. In order to fine tune the solver choice, each one of the
+// XD_CONT previous list should be considered. Indeed, the CPU speed of a solver depends of a lot of parameters. You may
+// XD_CONT give a try to the OPTIMAL solver to help you to find the fastest solver on your study. NL2 NL2 B) Solver for
+// XD_CONT non symmetric linear systems (e.g.: Implicit schemes): NL2 The BICGSTAB/DIAG solver seems to offer the best
 // XD_CONT performances.
 
-// XD solveur_petsc_Cholesky_superlu solveur_petsc_deriv Cholesky_superlu INHERITS_BRACE Parallelized Cholesky from SUPERLU_DIST library (less CPU and RAM, efficient than the previous one)
+// XD solveur_petsc_Cholesky_superlu solveur_petsc_deriv Cholesky_superlu INHERITS_BRACE Parallelized Cholesky from
+// XD_CONT SUPERLU_DIST library (less CPU and RAM, efficient than the previous one)
 
-// XD solveur_petsc_Cholesky_pastix solveur_petsc_deriv Cholesky_pastix INHERITS_BRACE  Parallelized Cholesky from PASTIX library.
+// XD solveur_petsc_Cholesky_pastix solveur_petsc_deriv Cholesky_pastix INHERITS_BRACE Parallelized Cholesky from PASTIX
+// XD_CONT library.
 
-// XD solveur_petsc_Cholesky_umfpack solveur_petsc_deriv Cholesky_umfpack INHERITS_BRACE Sequential Cholesky from UMFPACK library (seems fast).
+// XD solveur_petsc_Cholesky_umfpack solveur_petsc_deriv Cholesky_umfpack INHERITS_BRACE Sequential Cholesky from
+// XD_CONT UMFPACK library (seems fast).
 
-// XD solveur_petsc_Cholesky_out_of_core solveur_petsc_deriv Cholesky_out_of_core INHERITS_BRACE Same as the previous one but with a written LU decomposition of disk (save RAM memory but add an extra CPU cost during Ax=B solve).
+// XD solveur_petsc_Cholesky_out_of_core solveur_petsc_deriv Cholesky_out_of_core INHERITS_BRACE Same as the previous
+// XD_CONT one but with a written LU decomposition of disk (save RAM memory but add an extra CPU cost during Ax=B
+// XD_CONT solve).
 
-// XD solveur_petsc_cholesky solveur_petsc_deriv cholesky INHERITS_BRACE Parallelized version of Cholesky from MUMPS library. This solver accepts an option to select a different ordering than the automatic selected one by MUMPS (and printed by using the impr
-// XD_CONT option). The possible choices are Metis, Scotch, PT-Scotch or Parmetis. The two last options can only be used during a parallel calculation, whereas the two first are available for sequential or parallel calculations. It seems that the CPU cost of A=LU
-// XD_CONT factorization but also of the backward/forward elimination steps may sometimes be reduced by selecting a different ordering (Scotch seems often the best for b/f elimination) than the default one. NL2 Notice that this solver requires a huge amont of memory
-// XD_CONT compared to iterative methods. To know how much RAM you will need by core, then use the impr option to have detailled informations during the analysis phase and before the factorisation phase (in the following output, you will learn that the largest memory is
-// XD_CONT taken by the zeroth CPU with 108MB): NL2 Rank of proc needing largest memory in IC facto : 0 NL2 Estimated corresponding MBYTES for IC facto : 108 NL2 Thanks to the following graph, you read that in order to solve for instance a flow on a mesh with 2.6e6
-// XD_CONT cells, you will need to run a parallel calculation on 32 CPUs if you have cluster nodes with only 4GB/core (6.2GB*0.42~2.6GB) : NL2 \includepng{{petscgraph.jpeg}}{{10}}
-// XD   attr save_matrice|save_matrix rien save_matrix OPT not_set
-// XD   attr save_matrix_petsc_format rien save_matrix_petsc_format OPT not_set
-// XD   attr reduce_ram rien reduce_ram OPT not_set
-// XD   attr cli_quiet solveur_petsc_option_cli cli_quiet OPT not_set
-// XD   attr cli solveur_petsc_option_cli cli OPT not_set
+// XD solveur_petsc_cholesky_lapack solveur_petsc_deriv cholesky_lapack INHERITS_BRACE Sequential Cholesky via LAPACK
+// XD_CONT (cannot be used in parallel). Accepts factored_matrix to save/read/disk-cache the factorisation.
+// XD attr factored_matrix chaine(into=["save","read","disk"]) factored_matrix OPT Cache the LU factorisation: save
+// XD_CONT writes it after computing, read loads a precomputed one, disk reads if present and otherwise
+// XD_CONT computes-then-saves.
+
+// XD solveur_petsc_cholesky solveur_petsc_deriv cholesky INHERITS_BRACE Parallelized version of Cholesky from MUMPS
+// XD_CONT library. This solver accepts an option to select a different ordering than the automatic selected one by
+// XD_CONT MUMPS (and printed by using the impr option). The possible choices are Metis, Scotch, PT-Scotch or Parmetis.
+// XD_CONT The two last options can only be used during a parallel calculation, whereas the two first are available for
+// XD_CONT sequential or parallel calculations. It seems that the CPU cost of A=LU factorization but also of the
+// XD_CONT backward/forward elimination steps may sometimes be reduced by selecting a different ordering (Scotch seems
+// XD_CONT often the best for b/f elimination) than the default one. NL2 Notice that this solver requires a huge amont
+// XD_CONT of memory compared to iterative methods. To know how much RAM you will need by core, then use the impr option
+// XD_CONT to have detailled informations during the analysis phase and before the factorisation phase (in the following
+// XD_CONT output, you will learn that the largest memory is taken by the zeroth CPU with 108MB): NL2 Rank of proc
+// XD_CONT needing largest memory in IC facto : 0 NL2 Estimated corresponding MBYTES for IC facto : 108 NL2 Thanks to
+// XD_CONT the following graph, you read that in order to solve for instance a flow on a mesh with 2.6e6 cells, you will
+// XD_CONT need to run a parallel calculation on 32 CPUs if you have cluster nodes with only 4GB/core (6.2GB*0.42~2.6GB)
+// XD_CONT : NL2 \includeimage{{petscgraph.jpeg}}
+// XD attr save_matrice|save_matrix rien save_matrix OPT not_set
+// XD attr save_matrix_petsc_format rien save_matrix_petsc_format OPT not_set
+// XD attr reduce_ram rien reduce_ram OPT not_set
+// XD attr cli_quiet solveur_petsc_option_cli cli_quiet OPT not_set
+// XD attr cli solveur_petsc_option_cli cli OPT not_set
 
 // XD solveur_petsc_cholesky_mumps_blr solveur_petsc_deriv cholesky_mumps_blr INHERITS_BRACE BLR for (Block Low-Rank)
-// XD   attr reduce_ram rien reduce_ram OPT not_set
-// XD   attr dropping_parameter floattant dropping_parameter OPT not_set
-// XD   attr cli solveur_petsc_option_cli cli OPT not_set
+// XD attr reduce_ram rien reduce_ram OPT not_set
+// XD attr dropping_parameter floattant dropping_parameter OPT not_set
+// XD attr cli solveur_petsc_option_cli cli OPT not_set
 
 // XD solveur_petsc_option_cli bloc_lecture nul INHERITS_BRACE solver
 
-// XD solveur_petsc_cli solveur_petsc_deriv cli NO_BRACE Command Line Interface. Should be used only by advanced users, to access the whole solver/preconditioners from the PETSC API. To find all the available options, run your calculation with the -ksp_view
-// XD_CONT -help options: NL2 trust datafile [N] --ksp_view --help NL2 -pc_type Preconditioner:(one of) none jacobi pbjacobi bjacobi sor lu shell mg eisenstat ilu icc cholesky asm ksp composite redundant nn mat fieldsplit galerkin openmp spai hypre tfs (PCSetType) NL2
-// XD_CONT HYPRE preconditioner options: NL2 -pc_hypre_type pilut (choose one of) pilut parasails boomeramg NL2 HYPRE ParaSails Options NL2 -pc_hypre_parasails_nlevels 1: Number of number of levels (None) NL2 -pc_hypre_parasails_thresh 0.1: Threshold (None) NL2
-// XD_CONT -pc_hypre_parasails_filter 0.1: filter (None) NL2 -pc_hypre_parasails_loadbal 0: Load balance (None) NL2 -pc_hypre_parasails_logging: FALSE Print info to screen (None) NL2 -pc_hypre_parasails_reuse: FALSE Reuse nonzero pattern in preconditioner (None) NL2
-// XD_CONT -pc_hypre_parasails_sym nonsymmetric (choose one of) nonsymmetric SPD nonsymmetric,SPD NL2 NL2 Krylov Method (KSP) Options NL2 -ksp_type Krylov method:(one of) cg cgne stcg gltr richardson chebychev gmres tcqmr bcgs bcgsl cgs tfqmr cr lsqr preonly qcg bicg
-// XD_CONT fgmres minres symmlq lgmres lcd (KSPSetType) NL2 -ksp_max_it 10000: Maximum number of iterations (KSPSetTolerances) NL2 -ksp_rtol 0: Relative decrease in residual norm (KSPSetTolerances) NL2 -ksp_atol 1e-12: Absolute value of residual norm (KSPSetTolerances)
-// XD_CONT NL2 -ksp_divtol 10000: Residual norm increase cause divergence (KSPSetTolerances) NL2 -ksp_converged_use_initial_residual_norm: Use initial residual residual norm for computing relative convergence NL2 -ksp_monitor_singular_value stdout: Monitor singular
-// XD_CONT values (KSPMonitorSet) NL2 -ksp_monitor_short stdout: Monitor preconditioned residual norm with fewer digits (KSPMonitorSet) NL2 -ksp_monitor_draw: Monitor graphically preconditioned residual norm (KSPMonitorSet) NL2 -ksp_monitor_draw_true_residual: Monitor
-// XD_CONT graphically true residual norm (KSPMonitorSet) NL2 NL2 Example to use the multigrid method as a solver, not only as a preconditioner: NL2 Solveur_pression Petsc CLI {-ksp_type richardson -pc_type hypre -pc_hypre_type boomeramg -ksp_atol 1.e-7 }
-// XD   attr seuil suppress_param seuil OPT corresponds to the iterative solver convergence value. The iterative solver converges when the Euclidean residue standard  is less than seuil.
-// XD   attr quiet suppress_param quiet OPT is a keyword which is used to not displaying any outputs of the solver.
-// XD   attr impr suppress_param impr OPT impress or not
-// XD   attr rtol suppress_param rtol OPT not_set
-// XD   attr atol suppress_param atol OPT not_set
-// XD   attr save_matrix_mtx_format suppress_param save_matrix_mtx_format OPT not_set
-// XD   attr cli_bloc bloc_lecture cli_bloc REQ bloc
+// XD solveur_petsc_cli solveur_petsc_deriv cli NO_BRACE Command Line Interface. Should be used only by advanced users,
+// XD_CONT to access the whole solver/preconditioners from the PETSC API. To find all the available options, run your
+// XD_CONT calculation with the -ksp_view -help options: NL2 trust datafile [N] --ksp_view --help NL2 -pc_type
+// XD_CONT Preconditioner:(one of) none jacobi pbjacobi bjacobi sor lu shell mg eisenstat ilu icc cholesky asm ksp
+// XD_CONT composite redundant nn mat fieldsplit galerkin openmp spai hypre tfs (PCSetType) NL2 HYPRE preconditioner
+// XD_CONT options: NL2 -pc_hypre_type pilut (choose one of) pilut parasails boomeramg NL2 HYPRE ParaSails Options NL2
+// XD_CONT -pc_hypre_parasails_nlevels 1: Number of number of levels (None) NL2 -pc_hypre_parasails_thresh 0.1:
+// XD_CONT Threshold (None) NL2 -pc_hypre_parasails_filter 0.1: filter (None) NL2 -pc_hypre_parasails_loadbal 0: Load
+// XD_CONT balance (None) NL2 -pc_hypre_parasails_logging: FALSE Print info to screen (None) NL2
+// XD_CONT -pc_hypre_parasails_reuse: FALSE Reuse nonzero pattern in preconditioner (None) NL2 -pc_hypre_parasails_sym
+// XD_CONT nonsymmetric (choose one of) nonsymmetric SPD nonsymmetric,SPD NL2 NL2 Krylov Method (KSP) Options NL2
+// XD_CONT -ksp_type Krylov method:(one of) cg cgne stcg gltr richardson chebychev gmres tcqmr bcgs bcgsl cgs tfqmr cr
+// XD_CONT lsqr preonly qcg bicg fgmres minres symmlq lgmres lcd (KSPSetType) NL2 -ksp_max_it 10000: Maximum number of
+// XD_CONT iterations (KSPSetTolerances) NL2 -ksp_rtol 0: Relative decrease in residual norm (KSPSetTolerances) NL2
+// XD_CONT -ksp_atol 1e-12: Absolute value of residual norm (KSPSetTolerances) NL2 -ksp_divtol 10000: Residual norm
+// XD_CONT increase cause divergence (KSPSetTolerances) NL2 -ksp_converged_use_initial_residual_norm: Use initial
+// XD_CONT residual residual norm for computing relative convergence NL2 -ksp_monitor_singular_value stdout: Monitor
+// XD_CONT singular values (KSPMonitorSet) NL2 -ksp_monitor_short stdout: Monitor preconditioned residual norm with
+// XD_CONT fewer digits (KSPMonitorSet) NL2 -ksp_monitor_draw: Monitor graphically preconditioned residual norm
+// XD_CONT (KSPMonitorSet) NL2 -ksp_monitor_draw_true_residual: Monitor graphically true residual norm (KSPMonitorSet)
+// XD_CONT NL2 NL2 Example to use the multigrid method as a solver, not only as a preconditioner: NL2 Solveur_pression
+// XD_CONT Petsc CLI {-ksp_type richardson -pc_type hypre -pc_hypre_type boomeramg -ksp_atol 1.e-7 }
+// XD attr seuil suppress_param seuil OPT corresponds to the iterative solver convergence value. The iterative solver
+// XD_CONT converges when the Euclidean residue standard is less than seuil.
+// XD attr quiet suppress_param quiet OPT is a keyword which is used to not displaying any outputs of the solver.
+// XD attr impr suppress_param impr OPT impress or not
+// XD attr rtol suppress_param rtol OPT not_set
+// XD attr atol suppress_param atol OPT not_set
+// XD attr save_matrix_mtx_format suppress_param save_matrix_mtx_format OPT not_set
+// XD attr cli_bloc bloc_lecture cli_bloc REQ bloc
 
 // XD solveur_petsc_cli_quiet solveur_petsc_deriv cli_quiet NO_BRACE solver
-// XD   attr seuil suppress_param seuil OPT corresponds to the iterative solver convergence value. The iterative solver converges when the Euclidean residue standard is less than seuil.
-// XD   attr quiet suppress_param quiet OPT is a keyword which is used to not displaying any outputs of the solver.
-// XD   attr impr suppress_param impr OPT impress or not
-// XD   attr rtol suppress_param rtol OPT not_set
-// XD   attr atol suppress_param atol OPT not_set
-// XD   attr save_matrix_mtx_format suppress_param save_matrix_mtx_format OPT not_set
-// XD   attr cli_quiet_bloc bloc_lecture cli_quiet_bloc REQ bloc
+// XD attr seuil suppress_param seuil OPT corresponds to the iterative solver convergence value. The iterative solver
+// XD_CONT converges when the Euclidean residue standard is less than seuil.
+// XD attr quiet suppress_param quiet OPT is a keyword which is used to not displaying any outputs of the solver.
+// XD attr impr suppress_param impr OPT impress or not
+// XD attr rtol suppress_param rtol OPT not_set
+// XD attr atol suppress_param atol OPT not_set
+// XD attr save_matrix_mtx_format suppress_param save_matrix_mtx_format OPT not_set
+// XD attr cli_quiet_bloc bloc_lecture cli_quiet_bloc REQ bloc
 
-// XD solveur_petsc_IBICGSTAB solveur_petsc_deriv IBICGSTAB INHERITS_BRACE Improved version of previous one for massive parallel computations (only a single global reduction operation instead of the usual 3 or 4).
-// XD   attr precond preconditionneur_petsc_deriv precond OPT not_set
+// XD solveur_petsc_IBICGSTAB solveur_petsc_deriv IBICGSTAB INHERITS_BRACE Improved version of previous one for massive
+// XD_CONT parallel computations (only a single global reduction operation instead of the usual 3 or 4).
+// XD attr precond preconditionneur_petsc_deriv precond OPT not_set
 
 // XD solveur_petsc_BICGSTAB solveur_petsc_deriv BICGSTAB INHERITS_BRACE Stabilized Bi-Conjugate Gradient
-// XD   attr precond preconditionneur_petsc_deriv precond OPT not_set
+// XD attr precond preconditionneur_petsc_deriv precond OPT not_set
 
 // XD solveur_petsc_gmres solveur_petsc_deriv gmres INHERITS_BRACE Generalized Minimal Residual
-// XD   attr precond preconditionneur_petsc_deriv precond OPT not_set
-// XD   attr reuse_preconditioner_nb_it_max entier reuse_preconditioner_nb_it_max OPT not_set
-// XD   attr save_matrix_petsc_format rien save_matrix_petsc_format OPT not_set
-// XD attr nb_it_max entier nb_it_max OPT In order to specify a given number of iterations instead of a condition on the residue with the keyword seuil. May be useful when defining a PETSc solver for the implicit time scheme where convergence is very fast: 5
-// XD_CONT or less iterations seems enough.
+// XD attr precond preconditionneur_petsc_deriv precond OPT not_set
+// XD attr reuse_preconditioner_nb_it_max entier reuse_preconditioner_nb_it_max OPT not_set
+// XD attr save_matrix_petsc_format rien save_matrix_petsc_format OPT not_set
+// XD attr nb_it_max entier nb_it_max OPT In order to specify a given number of iterations instead of a condition on the
+// XD_CONT residue with the keyword seuil. May be useful when defining a PETSc solver for the implicit time scheme where
+// XD_CONT convergence is very fast: 5 or less iterations seems enough.
 
 // XD solveur_petsc_gcp solveur_petsc_deriv gcp INHERITS_BRACE Preconditioned Conjugate Gradient
-// XD   attr precond preconditionneur_petsc_deriv precond OPT preconditioner
-// XD   attr precond_nul rien precond_nul OPT No preconditioner used, equivalent to precond null { }
-// XD   attr rtol floattant rtol OPT not_set
-// XD   attr reuse_preconditioner_nb_it_max entier reuse_preconditioner_nb_it_max OPT not_set
-// XD   attr cli solveur_petsc_option_cli cli OPT not_set
-// XD   attr reorder_matrix entier reorder_matrix OPT not_set
-// XD attr read_matrix rien read_matrix OPT save_matrix|read_matrix are the keywords to save|read into a file the constant matrix A of the linear system Ax=B solved (eg: matrix from the pressure linear system for an incompressible flow). It is useful when you
-// XD_CONT want to minimize the MPI communications on massive parallel calculation. Indeed, in VEF discretization, the overlapping width (generaly 2, specified with the largeur_joint option in the partition keyword partition) can be reduced to 1, once the matrix has been
-// XD_CONT properly assembled and saved. The cost of the MPI communications in TRUST itself (not in PETSc) will be reduced with length messages divided by 2. So the strategy is: NL2 I) Partition your VEF mesh with a largeur_joint value of 2 NL2 II) Run your parallel
-// XD_CONT calculation on 0 time step, to build and save the matrix with the save_matrix option. A file named Matrix_NBROWS_rows_NCPUS_cpus.petsc will be saved to the disk (where NBROWS is the number of rows of the matrix and NCPUS the number of CPUs used). NL2 III)
-// XD_CONT Partition your VEF mesh with a largeur_joint value of 1 NL2 IV) Run your parallel calculation completly now and substitute the save_matrix option by the read_matrix option. Some interesting gains have been noticed when the cost of linear system solve with
-// XD_CONT PETSc is small compared to all the other operations.
-// XD   attr save_matrice|save_matrix rien save_matrix OPT see read_matrix
-// XD   attr petsc_decide entier petsc_decide OPT not_set
-// XD   attr pcshell chaine pcshell OPT not_set
-// XD   attr aij rien aij OPT not_set
+// XD attr precond preconditionneur_petsc_deriv precond OPT preconditioner
+// XD attr precond_nul rien precond_nul OPT No preconditioner used, equivalent to precond null { }
+// XD attr rtol floattant rtol OPT not_set
+// XD attr reuse_preconditioner_nb_it_max entier reuse_preconditioner_nb_it_max OPT not_set
+// XD attr cli solveur_petsc_option_cli cli OPT not_set
+// XD attr reorder_matrix entier reorder_matrix OPT not_set
+// XD attr read_matrix rien read_matrix OPT save_matrix|read_matrix are the keywords to save|read into a file the
+// XD_CONT constant matrix A of the linear system Ax=B solved (eg: matrix from the pressure linear system for an
+// XD_CONT incompressible flow). It is useful when you want to minimize the MPI communications on massive parallel
+// XD_CONT calculation. Indeed, in VEF discretization, the overlapping width (generaly 2, specified with the
+// XD_CONT largeur_joint option in the partition keyword partition) can be reduced to 1, once the matrix has been
+// XD_CONT properly assembled and saved. The cost of the MPI communications in TRUST itself (not in PETSc) will be
+// XD_CONT reduced with length messages divided by 2. So the strategy is: NL2 I) Partition your VEF mesh with a
+// XD_CONT largeur_joint value of 2 NL2 II) Run your parallel calculation on 0 time step, to build and save the matrix
+// XD_CONT with the save_matrix option. A file named Matrix_NBROWS_rows_NCPUS_cpus.petsc will be saved to the disk
+// XD_CONT (where NBROWS is the number of rows of the matrix and NCPUS the number of CPUs used). NL2 III) Partition your
+// XD_CONT VEF mesh with a largeur_joint value of 1 NL2 IV) Run your parallel calculation completly now and substitute
+// XD_CONT the save_matrix option by the read_matrix option. Some interesting gains have been noticed when the cost of
+// XD_CONT linear system solve with PETSc is small compared to all the other operations.
+// XD attr save_matrice|save_matrix rien save_matrix OPT see read_matrix
+// XD attr petsc_decide entier petsc_decide OPT not_set
+// XD attr pcshell chaine pcshell OPT not_set
+// XD attr aij rien aij OPT not_set
 
-// XD solveur_petsc_PIPECG solveur_petsc_deriv PIPECG INHERITS_BRACE Pipelined Conjugate Gradient (possible reduced CPU cost during massive parallel calculation due to a single non-blocking reduction per iteration, if TRUST is built with a MPI-3
-// XD_CONT implementation)... no example in TRUST
+// XD solveur_petsc_PIPECG solveur_petsc_deriv PIPECG INHERITS_BRACE Pipelined Conjugate Gradient (possible reduced CPU
+// XD_CONT cost during massive parallel calculation due to a single non-blocking reduction per iteration, if TRUST is
+// XD_CONT built with a MPI-3 implementation)... no example in TRUST
 
 
-// XD preconditionneur_petsc_deriv objet_u preconditionneur_petsc_deriv INHERITS_BRACE Preconditioners available with petsc solvers
+// XD preconditionneur_petsc_deriv objet_u preconditionneur_petsc_deriv INHERITS_BRACE Preconditioners available with
+// XD_CONT petsc solvers
 
 // XD preconditionneur_petsc_diag preconditionneur_petsc_deriv diag INHERITS_BRACE Diagonal (Jacobi) preconditioner.
 
@@ -162,12 +217,16 @@ Implemente_instanciable_sans_constructeur_ni_destructeur(Solv_Petsc,"Solv_Petsc"
 
 // XD preconditionneur_petsc_sa_amg preconditionneur_petsc_deriv sa-amg INHERITS_BRACE preconditionner
 
-// XD preconditionneur_petsc_BLOCK_JACOBI_ICC preconditionneur_petsc_deriv BLOCK_JACOBI_ICC INHERITS_BRACE Incomplete Cholesky factorization for symmetric matrix with the PETSc implementation.
-// XD   attr level entier level OPT factorization level (default value, 1). In parallel, the factorization is done by block (one per processor by default).
-// XD attr ordering chaine(into=["natural","rcm"]) ordering OPT The ordering of the local matrix is natural by default, but rcm ordering, which reduces the bandwith of the local matrix, may interestingly improves the quality of the decomposition and reduces
-// XD_CONT the number of iterations.
+// XD preconditionneur_petsc_BLOCK_JACOBI_ICC preconditionneur_petsc_deriv BLOCK_JACOBI_ICC INHERITS_BRACE Incomplete
+// XD_CONT Cholesky factorization for symmetric matrix with the PETSc implementation.
+// XD attr level entier level OPT factorization level (default value, 1). In parallel, the factorization is done by
+// XD_CONT block (one per processor by default).
+// XD attr ordering chaine(into=["natural","rcm"]) ordering OPT The ordering of the local matrix is natural by default,
+// XD_CONT but rcm ordering, which reduces the bandwith of the local matrix, may interestingly improves the quality of
+// XD_CONT the decomposition and reduces the number of iterations.
 
-// XD preconditionneur_petsc_boomeramg preconditionneur_petsc_deriv boomeramg INHERITS_BRACE Multigrid preconditioner (no option is available yet, look at CLI command and Petsc documentation to try other options).
+// XD preconditionneur_petsc_boomeramg preconditionneur_petsc_deriv boomeramg INHERITS_BRACE Multigrid preconditioner
+// XD_CONT (no option is available yet, look at CLI command and Petsc documentation to try other options).
 
 // XD preconditionneur_petsc_null preconditionneur_petsc_deriv null INHERITS_BRACE No preconditioner used
 
@@ -175,22 +234,32 @@ Implemente_instanciable_sans_constructeur_ni_destructeur(Solv_Petsc,"Solv_Petsc"
 
 // XD preconditionneur_petsc_jacobi preconditionneur_petsc_deriv jacobi INHERITS_BRACE preconditionner
 
-// XD preconditionneur_petsc_EISENTAT preconditionneur_petsc_deriv EISENTAT INHERITS_BRACE SSOR version with Eisenstat trick which reduces the number of computations and thus CPU cost...
-// XD   attr omega floattant omega OPT relaxation factor
+// XD preconditionneur_petsc_EISENTAT preconditionneur_petsc_deriv EISENTAT INHERITS_BRACE SSOR version with Eisenstat
+// XD_CONT trick which reduces the number of computations and thus CPU cost...
+// XD attr omega floattant omega OPT relaxation factor
 
-// XD preconditionneur_petsc_ssor preconditionneur_petsc_deriv ssor INHERITS_BRACE Symmetric Successive Over Relaxation algorithm.
-// XD   attr omega floattant omega OPT relaxation factor (default value, 1.5)
+// XD preconditionneur_petsc_ssor preconditionneur_petsc_deriv ssor INHERITS_BRACE Symmetric Successive Over Relaxation
+// XD_CONT algorithm.
+// XD attr omega floattant omega OPT relaxation factor (default value, 1.5)
 
-// XD preconditionneur_petsc_block_jacobi_ilu preconditionneur_petsc_deriv block_jacobi_ilu INHERITS_BRACE preconditionner
-// XD   attr level entier level OPT not_set
+// XD preconditionneur_petsc_block_jacobi_ilu preconditionneur_petsc_deriv block_jacobi_ilu INHERITS_BRACE
+// XD_CONT preconditionner
+// XD attr level entier level OPT not_set
 
-// XD preconditionneur_petsc_spai preconditionneur_petsc_deriv spai INHERITS_BRACE  Spai Approximate Inverse algorithm from Parasails Hypre library.
-// XD   attr level entier level OPT first parameter
-// XD   attr epsilon floattant epsilon OPT second parameter
+// XD preconditionneur_petsc_spai preconditionneur_petsc_deriv spai INHERITS_BRACE Spai Approximate Inverse algorithm
+// XD_CONT from Parasails Hypre library.
+// XD attr level entier level OPT first parameter
+// XD attr epsilon floattant epsilon OPT second parameter
 
-// XD preconditionneur_petsc_pilut preconditionneur_petsc_deriv pilut INHERITS_BRACE Dual Threashold Incomplete LU factorization.
-// XD   attr level entier level OPT factorization level
-// XD   attr epsilon floattant epsilon OPT drop tolerance
+// XD preconditionneur_petsc_pilut preconditionneur_petsc_deriv pilut INHERITS_BRACE Dual Threashold Incomplete LU
+// XD_CONT factorization.
+// XD attr level entier level OPT factorization level
+// XD attr epsilon floattant epsilon OPT drop tolerance
+
+// XD preconditionneur_petsc_ilu_mumps preconditionneur_petsc_deriv ilu_mumps INHERITS_BRACE Incomplete LU factorization
+// XD_CONT with Block Low Ranking from the MUMPS library. Mapped at runtime onto Petsc's cholesky pc with
+// XD_CONT mat_mumps_icntl_35=1 (BLR enabled).
+// XD attr epsilon floattant epsilon OPT BLR dropping parameter (passed through as mat_mumps_cntl_7).
 
 
 

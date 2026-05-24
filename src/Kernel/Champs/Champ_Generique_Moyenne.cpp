@@ -40,7 +40,11 @@ Entree& Champ_Generique_Moyenne::readOn(Entree& s )
 void Champ_Generique_Moyenne::set_param(Param& param) const
 {
   Champ_Generique_Statistiques_base::set_param(param);
-  param.ajouter_non_std("moyenne_convergee",(this)); // XD attr moyenne_convergee field_base moyenne_convergee OPT This option allows to read a converged time averaged field in a .xyz file in order to calculate, when resuming the calculation, the statistics fields (rms, correlation) which depend on this average. In that case, the time averaged field is not updated during the resume of calculation. In this case, the time averaged field must be fully converged to avoid errors when calculating high order statistics.
+  param.ajouter_non_std("moyenne_convergee",(this)); // XD attr moyenne_convergee field_base moyenne_convergee OPT This
+  // XD_CONT option allows to read a converged time averaged field in a .xyz file in order to calculate, when resuming
+  // XD_CONT the calculation, the statistics fields (rms, correlation) which depend on this average. In that case, the
+  // XD_CONT time averaged field is not updated during the resume of calculation. In this case, the time averaged field
+  // XD_CONT must be fully converged to avoid errors when calculating high order statistics.
 }
 
 int Champ_Generique_Moyenne::lire_motcle_non_standard(const Motcle& mot, Entree& is)

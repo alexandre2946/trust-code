@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -32,10 +32,14 @@ Entree& Transport_turbulent_SGDH::readOn(Entree& is)
 {
   Param param(que_suis_je());
   double Pr_t = -1;
-  param.ajouter("Pr_t|Prandtl_turbulent|Schmitt_turbulent", &Pr_t); // XD attr Pr_t floattant Prandtl_turbulent OPT not_set
-  param.ajouter("sigma|sigma_turbulent", &sigma_); // XD_ADD_P floattant not_set
-  param.ajouter("no_alpha", &no_alpha_); // XD_ADD_P flag not_set
-  param.ajouter("gas_turb", &gas_turb_); // XD_ADD_P flag not_set
+  param.ajouter("Pr_t|Prandtl_turbulent|Schmitt_turbulent", &Pr_t); // XD attr Pr_t floattant Prandtl_turbulent OPT
+  // XD_CONT not_set
+  param.ajouter("sigma|sigma_turbulent", &sigma_); // XD_ADD_P floattant
+  // XD_CONT not_set
+  param.ajouter("no_alpha", &no_alpha_); // XD_ADD_P flag
+  // XD_CONT not_set
+  param.ajouter("gas_turb", &gas_turb_); // XD_ADD_P flag
+  // XD_CONT not_set
   param.lire_avec_accolades_depuis(is);
   if (Pr_t > 0 && sigma_ != 1) Process::exit(que_suis_je() + ": cannot specify both Pr_t and sigma!");
   if (Pr_t > 0) sigma_ = 1. / Pr_t;

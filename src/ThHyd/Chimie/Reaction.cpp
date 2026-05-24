@@ -21,8 +21,9 @@
 #include <Discretisation_base.h>
 
 Implemente_instanciable(Reaction,"Reaction",Objet_U_With_Params);
-// XD reaction objet_lecture nul BRACE Keyword to describe reaction: NL2 w =K pow(T,beta) exp(-Ea/( R T)) $\Pi$ pow(Reactif_i,activitivity_i). NL2 If K_inv >0, NL2 w= K pow(T,beta) exp(-Ea/( R T)) ( $\Pi$ pow(Reactif_i,activitivity_i) - Kinv/exp(-c_r_Ea/(R T))
-// XD_CONT $\Pi$ pow(Produit_i,activitivity_i ))
+// XD reaction objet_lecture nul BRACE Keyword to describe reaction: NL2 w =K pow(T,beta) exp(-Ea/( R T)) $\Pi$
+// XD_CONT pow(Reactif_i,activitivity_i). NL2 If K_inv >0, NL2 w= K pow(T,beta) exp(-Ea/( R T)) ( $\Pi$
+// XD_CONT pow(Reactif_i,activitivity_i) - Kinv/exp(-c_r_Ea/(R T)) $\Pi$ pow(Produit_i,activitivity_i ))
 
 Sortie& Reaction::printOn(Sortie& os) const
 {
@@ -115,8 +116,10 @@ void Reaction::completer(const Motcles& list_var,const ArrOfDouble& masse_molair
 
 void Reaction::set_param(Param& param) const
 {
-  param.ajouter( "reactifs",&reactifs_,Param::REQUIRED);  // XD attr reactifs chaine reactifs REQ LHS of equation (ex CH4+2*O2)
-  param.ajouter( "produits",&produits_,Param::REQUIRED);  // XD attr produits chaine produits REQ RHS of equation (ex CO2+2*H20)
+  param.ajouter( "reactifs",&reactifs_,Param::REQUIRED);  // XD attr reactifs chaine reactifs REQ LHS of equation (ex
+  // XD_CONT CH4+2*O2)
+  param.ajouter( "produits",&produits_,Param::REQUIRED);  // XD attr produits chaine produits REQ RHS of equation (ex
+  // XD_CONT CO2+2*H20)
   param.ajouter( "constante_taux_reaction",&constante_taux_reaction_);       // XD attr constante_taux_reaction floattant constante_taux_reaction OPT constante of cinetic K
   param.ajouter( "enthalpie_reaction",&enthalpie_reaction_,Param::REQUIRED); // XD attr enthalpie_reaction floattant enthalpie_reaction REQ DH
   param.ajouter( "energie_activation",&Ea_);               // XD attr energie_activation floattant energie_activation REQ Ea

@@ -23,11 +23,13 @@
 #include <memory>
 
 Implemente_instanciable_32_64(Mailler_32_64,"Mailler",Interprete_geometrique_base_32_64<_T_>);
-// XD mailler interprete mailler INHERITS_BRACE The Mailler (Mesh) interpretor allows a Domain type object domaine to be meshed with objects objet_1, objet_2, etc...
+// XD mailler interprete mailler INHERITS_BRACE The Mailler (Mesh) interpretor allows a Domain type object domaine to be
+// XD_CONT meshed with objects objet_1, objet_2, etc...
 // XD attr domaine ref_domaine domaine REQ Name of domain.
 // XD attr bloc list_bloc_mailler bloc REQ Instructions to mesh.
 
-// XD mailler_64 mailler mailler_64 INHERITS_BRACE The Mailler (Mesh) interpretor allows a big (64b) domain type object domaine to be meshed with objects objet_1, objet_2, etc...
+// XD mailler_64 mailler mailler_64 INHERITS_BRACE The Mailler (Mesh) interpretor allows a big (64b) domain type object
+// XD_CONT domaine to be meshed with objects objet_1, objet_2, etc...
 
 template <typename _SIZE_>
 Sortie& Mailler_32_64<_SIZE_>::printOn(Sortie& os) const

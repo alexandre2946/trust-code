@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,8 +18,8 @@
 
 Implemente_instanciable(Dilate,"Dilate",Interprete_geometrique_base);
 // XD dilate interprete dilate INHERITS_BRACE Keyword to multiply the whole coordinates of the geometry.
-// XD  attr domain_name ref_domaine domain_name REQ Name of domain.
-// XD  attr alpha floattant alpha REQ Value of dilatation coefficient.
+// XD attr domain_name ref_domaine domain_name REQ Name of domain.
+// XD attr alpha floattant alpha REQ Value of dilatation coefficient.
 
 
 /*! @brief Simple appel a: Interprete::printOn(Sortie&)

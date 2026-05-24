@@ -17,13 +17,16 @@
 
 Implemente_instanciable(Echange_externe_radiatif, "Echange_externe_radiatif|Paroi_echange_externe_radiatif", Echange_externe_impose);
 
-// XD echange_externe_radiatif condlim_base echange_externe_radiatif INHERITS_BRACE Combines radiative $(sigma * eps * (T^4 - T_ext^4))$ and convective $(h * (T - T_ext))$ heat transfer boundary conditions, where sigma is the Stefan-Boltzmann constant, eps is
-// XD_CONT the emi
-// XD attr h_imp chaine(into=["h_imp","t_ext","emissivite"]) h_imp REQ Heat exchange coefficient value (expressed in W.m-2.K-1).
+// XD echange_externe_radiatif condlim_base echange_externe_radiatif INHERITS_BRACE Combines radiative $(sigma * eps *
+// XD_CONT (T^4 - T_ext^4))$ and convective $(h * (T - T_ext))$ heat transfer boundary conditions, where sigma is the
+// XD_CONT Stefan-Boltzmann constant, eps is the emi
+// XD attr h_imp chaine(into=["h_imp","t_ext","emissivite"]) h_imp REQ Heat exchange coefficient value (expressed in
+// XD_CONT W.m-2.K-1).
 // XD attr himpc front_field_base himpc REQ Boundary field type.
 // XD attr emissivite chaine(into=["emissivite","h_imp","t_ext"]) emissivite REQ Emissivity coefficient value.
 // XD attr emissivitebc front_field_base emissivitebc REQ Boundary field type.
-// XD attr t_ext chaine(into=["t_ext","h_imp","emissivite"]) t_ext REQ External temperature value (expressed in oC or K).
+// XD attr t_ext chaine(into=["t_ext","h_imp","emissivite"]) t_ext REQ External temperature value (expressed in oC or
+// XD_CONT K).
 // XD attr ch front_field_base ch REQ Boundary field type.
 // XD attr temp_unit chaine(into=["temperature_unit"]) temp_unit REQ Temperature unit
 // XD attr temp_unit_val chaine(into=["kelvin","celsius"]) temp_unit_val REQ Temperature unit

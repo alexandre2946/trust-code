@@ -22,7 +22,8 @@
 #include <Champ_Uniforme.h>
 
 Implemente_instanciable(Champ_front_pression_from_u,"Champ_front_pression_from_u",Ch_front_var_instationnaire_dep);
-// XD champ_front_pression_from_u front_field_base champ_front_pression_from_u NO_BRACE this field is used to define a pressure field depending of a velocity field.
+// XD champ_front_pression_from_u front_field_base champ_front_pression_from_u NO_BRACE this field is used to define a
+// XD_CONT pressure field depending of a velocity field.
 // XD attr expression chaine expression REQ value depending of a velocity (like $2*u_moy^2$).
 
 

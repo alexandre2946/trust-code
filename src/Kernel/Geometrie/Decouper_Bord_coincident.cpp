@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -19,10 +19,13 @@
 #include <Scatter.h>
 
 Implemente_instanciable(Decouper_Bord_coincident,"Decouper_Bord_coincident",Interprete_geometrique_base);
-// XD decouper_bord_coincident interprete decouper_bord_coincident INHERITS_BRACE In case of non-coincident meshes and a paroi_contact condition, run is stopped and two external files are automatically generated in VEF (connectivity_failed_boundary_name and
-// XD_CONT connectivity_failed_pb_name.med). In 2D, the keyword Decouper_bord_coincident associated to the connectivity_failed_boundary_name file allows to generate a new coincident mesh.
-// XD  attr domain_name ref_domaine domain_name REQ Name of domain.
-// XD  attr bord chaine bord REQ connectivity_failed_boundary_name
+// XD decouper_bord_coincident interprete decouper_bord_coincident INHERITS_BRACE In case of non-coincident meshes and a
+// XD_CONT paroi_contact condition, run is stopped and two external files are automatically generated in VEF
+// XD_CONT (connectivity_failed_boundary_name and connectivity_failed_pb_name.med). In 2D, the keyword
+// XD_CONT Decouper_bord_coincident associated to the connectivity_failed_boundary_name file allows to generate a new
+// XD_CONT coincident mesh.
+// XD attr domain_name ref_domaine domain_name REQ Name of domain.
+// XD attr bord chaine bord REQ connectivity_failed_boundary_name
 
 
 Sortie& Decouper_Bord_coincident::printOn(Sortie& os) const { return Interprete::printOn(os); }

@@ -22,7 +22,8 @@
 
 Implemente_base(Discret_Thyd, "Discret_Thyd", Discret_Thermique);
 
-// XD discretisation_base objet_u discretisation_base INHERITS_BRACE Basic class for space discretization of thermohydraulic turbulent problems.
+// XD discretisation_base objet_u discretisation_base INHERITS_BRACE Basic class for space discretization of
+// XD_CONT thermohydraulic turbulent problems.
 
 Sortie& Discret_Thyd::printOn(Sortie& s) const { return s; }
 
@@ -37,7 +38,8 @@ Entree& Discret_Thyd::readOn(Entree& is)
 
 void Discret_Thyd::set_param(Param& p) const
 {
-  p.ajouter("reorder", &reorder_); // XD_ADD_P reorder_mesh Reordering directive.
+  p.ajouter("reorder", &reorder_); // XD_ADD_P reorder_mesh
+  // XD_CONT Reordering directive.
 }
 
 /**! Override to make sure reordering options are passed to Domaine_dis_base

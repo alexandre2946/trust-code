@@ -15,22 +15,26 @@
 
 #include <Schema_RK_Classique.h>
 
-// XD runge_kutta_ordre_2_classique schema_temps_base runge_kutta_ordre_2_classique INHERITS_BRACE This is a classical Runge-Kutta scheme of second order that uses 2 integration points.
+// XD runge_kutta_ordre_2_classique schema_temps_base runge_kutta_ordre_2_classique INHERITS_BRACE This is a classical
+// XD_CONT Runge-Kutta scheme of second order that uses 2 integration points.
 Implemente_instanciable(RK2_Classique,"Runge_Kutta_ordre_2_classique",TRUSTSchema_RK<Ordre_RK::DEUX_CLASSIQUE>);
 Sortie& RK2_Classique::printOn(Sortie& s) const { return  TRUSTSchema_RK<Ordre_RK::DEUX_CLASSIQUE>::printOn(s); }
 Entree& RK2_Classique::readOn(Entree& s) { return TRUSTSchema_RK<Ordre_RK::DEUX_CLASSIQUE>::readOn(s) ; }
 
-// XD runge_kutta_ordre_3_classique schema_temps_base runge_kutta_ordre_3_classique INHERITS_BRACE This is a classical Runge-Kutta scheme of third order that uses 3 integration points.
+// XD runge_kutta_ordre_3_classique schema_temps_base runge_kutta_ordre_3_classique INHERITS_BRACE This is a classical
+// XD_CONT Runge-Kutta scheme of third order that uses 3 integration points.
 Implemente_instanciable(RK3_Classique,"Runge_Kutta_ordre_3_classique",TRUSTSchema_RK<Ordre_RK::TROIS_CLASSIQUE>);
 Sortie& RK3_Classique::printOn(Sortie& s) const { return  TRUSTSchema_RK<Ordre_RK::TROIS_CLASSIQUE>::printOn(s); }
 Entree& RK3_Classique::readOn(Entree& s) { return TRUSTSchema_RK<Ordre_RK::TROIS_CLASSIQUE>::readOn(s) ; }
 
-// XD runge_kutta_ordre_4_classique schema_temps_base runge_kutta_ordre_4_classique INHERITS_BRACE This is a classical Runge-Kutta scheme of fourth order that uses 4 integration points.
+// XD runge_kutta_ordre_4_classique schema_temps_base runge_kutta_ordre_4_classique INHERITS_BRACE This is a classical
+// XD_CONT Runge-Kutta scheme of fourth order that uses 4 integration points.
 Implemente_instanciable(RK4_Classique, "Runge_Kutta_ordre_4_classique", TRUSTSchema_RK<Ordre_RK::QUATRE_CLASSIQUE>);
 Sortie& RK4_Classique::printOn(Sortie& s) const { return TRUSTSchema_RK<Ordre_RK::QUATRE_CLASSIQUE>::printOn(s); }
 Entree& RK4_Classique::readOn(Entree& s) { return TRUSTSchema_RK<Ordre_RK::QUATRE_CLASSIQUE>::readOn(s); }
 
-// XD runge_kutta_ordre_4_classique_3_8 schema_temps_base runge_kutta_ordre_4_classique_3_8 INHERITS_BRACE This is a classical Runge-Kutta scheme of fourth order that uses 4 integration points and the 3/8 rule.
+// XD runge_kutta_ordre_4_classique_3_8 schema_temps_base runge_kutta_ordre_4_classique_3_8 INHERITS_BRACE This is a
+// XD_CONT classical Runge-Kutta scheme of fourth order that uses 4 integration points and the 3/8 rule.
 Implemente_instanciable(RK4_Classique_3_8, "Runge_Kutta_ordre_4_classique_3_8", TRUSTSchema_RK<Ordre_RK::QUATRE_CLASSIQUE_3_8>);
 Sortie& RK4_Classique_3_8::printOn(Sortie& s) const { return TRUSTSchema_RK<Ordre_RK::QUATRE_CLASSIQUE_3_8>::printOn(s); }
 Entree& RK4_Classique_3_8::readOn(Entree& s) { return TRUSTSchema_RK<Ordre_RK::QUATRE_CLASSIQUE_3_8>::readOn(s); }

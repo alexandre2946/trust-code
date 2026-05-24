@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -21,11 +21,11 @@
 
 Implemente_base(Champ_Fonc_P0_base, "Champ_Fonc_P0_base", Champ_Fonc_base);
 // XD champ_input_base field_base champ_input_base BRACE not_set
-// XD   attr nb_comp entier nb_comp REQ not_set
-// XD   attr nom chaine nom REQ not_set
-// XD   attr initial_value list initial_value OPT not_set
-// XD   attr probleme chaine probleme REQ not_set
-// XD   attr sous_zone ref_sous_zone sous_zone OPT not_set
+// XD attr nb_comp entier nb_comp REQ not_set
+// XD attr nom chaine nom REQ not_set
+// XD attr initial_value list initial_value OPT not_set
+// XD attr probleme chaine probleme REQ not_set
+// XD attr sous_zone ref_sous_zone sous_zone OPT not_set
 
 Sortie& Champ_Fonc_P0_base::printOn(Sortie& os) const { return os << que_suis_je() << " " << le_nom(); }
 

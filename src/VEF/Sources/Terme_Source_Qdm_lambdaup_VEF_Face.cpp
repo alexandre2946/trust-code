@@ -22,9 +22,11 @@
 #include <SFichier.h>
 
 Implemente_instanciable(Terme_Source_Qdm_lambdaup_VEF_Face,"Source_Qdm_lambdaup_VEF_P1NC",Source_base);
-// XD source_qdm_lambdaup source_base source_qdm_lambdaup BRACE This source term is a dissipative term which is intended to minimise the energy associated to non-conformscales u\' (responsible for spurious oscillations in some cases). The equation for these
-// XD_CONT scales can be seen as: du\'/dt= -lambda. u\' + grad P\' where -lambda. u\' represents the dissipative term, with lambda = a/Delta t For Crank-Nicholson temporal scheme, recommended value for a is 2. NL2 Remark : This method requires to define a filtering
-// XD_CONT operator.
+// XD source_qdm_lambdaup source_base source_qdm_lambdaup BRACE This source term is a dissipative term which is intended
+// XD_CONT to minimise the energy associated to non-conformscales u\' (responsible for spurious oscillations in some
+// XD_CONT cases). The equation for these scales can be seen as: du\'/dt= -lambda. u\' + grad P\' where -lambda. u\'
+// XD_CONT represents the dissipative term, with lambda = a/Delta t For Crank-Nicholson temporal scheme, recommended
+// XD_CONT value for a is 2. NL2 Remark : This method requires to define a filtering operator.
 
 Sortie& Terme_Source_Qdm_lambdaup_VEF_Face::printOn(Sortie& s ) const
 {
@@ -53,7 +55,8 @@ Entree& Terme_Source_Qdm_lambdaup_VEF_Face::readOn(Entree& is )
     les_mots[0] = "lambda";             // XD attr lambda floattant lambda_u REQ value of lambda
     les_mots[1] = "lambda_min";         // XD attr lambda_min floattant lambda_min OPT value of lambda_min
     les_mots[2] = "lambda_max";         // XD attr lambda_max floattant lambda_max OPT value of lambda_max
-    les_mots[3] = "ubar_umprim_cible";  // XD attr ubar_umprim_cible floattant ubar_umprim_cible OPT value of ubar_umprim_cible
+    les_mots[3] = "ubar_umprim_cible";  // XD attr ubar_umprim_cible floattant ubar_umprim_cible OPT value of
+    // XD_CONT ubar_umprim_cible
   }
   lambda=-1;
   while(motlu!=accfermee)

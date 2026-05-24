@@ -26,11 +26,18 @@
 
 Implemente_instanciable(Probleme_Couple,"Probleme_Couple",Couplage_U);
 Implemente_instanciable(Probleme_Couple_Point_Fixe,"Probleme_Couple_Point_Fixe",Probleme_Couple);
-// XD coupled_problem pb_gen_base probleme_couple INHERITS_BRACE This instruction causes a probleme_couple type object to be created. This type of object has an associated problem list, that is, the coupling of n problems among them may be processed. Coupling
-// XD_CONT between these problems is carried out explicitly via conditions at particular contact limits. Each problem may be associated either with the Associate keyword or with the Read/groupes keywords. The difference is that in the first case, the four problems
-// XD_CONT exchange values then calculate their timestep, rather in the second case, the same strategy is used for all the problems listed inside one group, but the second group of problem exchange values with the first group of problems after the first group did its
-// XD_CONT timestep. So, the first case may then also be written like this: NL2 Probleme_Couple pbc NL2 Read pbc { groupes { { pb1 , pb2 , pb3 , pb4 } } } NL2 There is a physical environment per problem (however, the same physical environment could be common to several
-// XD_CONT problems). NL2 Each problem is resolved in a domain. NL2 Warning : Presently, coupling requires coincident meshes. In case of non-coincident meshes, boundary condition \'paroi_contact\' in VEF returns error message (see paroi_contact for correcting procedure).
+// XD coupled_problem pb_gen_base probleme_couple INHERITS_BRACE This instruction causes a probleme_couple type object
+// XD_CONT to be created. This type of object has an associated problem list, that is, the coupling of n problems among
+// XD_CONT them may be processed. Coupling between these problems is carried out explicitly via conditions at particular
+// XD_CONT contact limits. Each problem may be associated either with the Associate keyword or with the Read/groupes
+// XD_CONT keywords. The difference is that in the first case, the four problems exchange values then calculate their
+// XD_CONT timestep, rather in the second case, the same strategy is used for all the problems listed inside one group,
+// XD_CONT but the second group of problem exchange values with the first group of problems after the first group did
+// XD_CONT its timestep. So, the first case may then also be written like this: NL2 Probleme_Couple pbc NL2 Read pbc {
+// XD_CONT groupes { { pb1 , pb2 , pb3 , pb4 } } } NL2 There is a physical environment per problem (however, the same
+// XD_CONT physical environment could be common to several problems). NL2 Each problem is resolved in a domain. NL2
+// XD_CONT Warning : Presently, coupling requires coincident meshes. In case of non-coincident meshes, boundary
+// XD_CONT condition \'paroi_contact\' in VEF returns error message (see paroi_contact for correcting procedure).
 // XD attr groupes list_list_nom groupes OPT { groupes { { pb1 , pb2 } , { pb3 , pb4 } } }
 // XD ref domaine_2 domaine
 // XD ref pb_1 Pb_base

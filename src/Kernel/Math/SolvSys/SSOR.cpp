@@ -36,7 +36,8 @@ Sortie& SSOR::printOn(Sortie& s ) const
 Entree& SSOR::readOn(Entree& is )
 {
   Param param(que_suis_je());
-  param.ajouter("omega", &omega_);  // XD attr omega floattant omega OPT Over-relaxation facteur (between 1 and 2, default value 1.6).
+  param.ajouter("omega", &omega_);  // XD attr omega floattant omega OPT Over-relaxation facteur (between 1 and 2,
+  // XD_CONT default value 1.6).
   param.lire_avec_accolades(is);
 
   if (omega_ <= 0. || omega_ >= 2.)

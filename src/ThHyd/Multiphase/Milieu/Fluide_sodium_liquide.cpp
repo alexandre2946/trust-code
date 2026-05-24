@@ -16,9 +16,12 @@
 #include <Fluide_sodium_liquide.h>
 
 Implemente_instanciable(Fluide_sodium_liquide, "Fluide_sodium_liquide", Fluide_reel_base);
-// XD fluide_sodium_liquide fluide_base fluide_sodium_liquide INHERITS_BRACE Class for Fluide_sodium_liquide (real fluid)
-// XD attr P_ref floattant P_ref OPT Use to set the pressure value in the closure law. If not specified, the value of the pressure unknown will be used
-// XD attr T_ref floattant T_ref OPT Use to set the temperature value in the closure law. If not specified, the value of the temperature unknown will be used
+// XD fluide_sodium_liquide fluide_base fluide_sodium_liquide INHERITS_BRACE Class for Fluide_sodium_liquide (real
+// XD_CONT fluid)
+// XD attr P_ref floattant P_ref OPT Use to set the pressure value in the closure law. If not specified, the value of
+// XD_CONT the pressure unknown will be used
+// XD attr T_ref floattant T_ref OPT Use to set the temperature value in the closure law. If not specified, the value of
+// XD_CONT the temperature unknown will be used
 
 Sortie& Fluide_sodium_liquide::printOn(Sortie& os) const { return os; }
 Entree& Fluide_sodium_liquide::readOn(Entree& is) { return Fluide_reel_base::readOn(is); }

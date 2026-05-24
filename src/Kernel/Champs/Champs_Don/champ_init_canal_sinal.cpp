@@ -17,23 +17,31 @@
 #include <Motcle.h>
 
 Implemente_instanciable(champ_init_canal_sinal,"champ_init_canal_sinal",TRUSTChamp_Divers_generique<Champ_Divers_Type::CANAL>);
-// XD champ_init_canal_sinal champ_don_base champ_init_canal_sinal NO_BRACE For a parabolic profile on U velocity with an unpredictable disturbance on V and W and a sinusoidal disturbance on V velocity.
+// XD champ_init_canal_sinal champ_don_base champ_init_canal_sinal NO_BRACE For a parabolic profile on U velocity with
+// XD_CONT an unpredictable disturbance on V and W and a sinusoidal disturbance on V velocity.
 // XD attr dim entier dim REQ Number of field components.
 // XD attr bloc bloc_lec_champ_init_canal_sinal bloc REQ Parameters for the class champ_init_canal_sinal.
 
-// XD bloc_lec_champ_init_canal_sinal objet_lecture nul BRACE Parameters for the class champ_init_canal_sinal. NL2 in 2D: NL2 U=ucent*y(2h-y)/h/h NL2 V=ampli_bruit*rand+ampli_sin*sin(omega*x) NL2 rand: unpredictable value between -1 and 1. NL2 in 3D: NL2
-// XD_CONT U=ucent*y(2h-y)/h/h NL2 V=ampli_bruit*rand1+ampli_sin*sin(omega*x) NL2 W=ampli_bruit*rand2 NL2 rand1 and rand2: unpredictables values between -1 and 1.
+// XD bloc_lec_champ_init_canal_sinal objet_lecture nul BRACE Parameters for the class champ_init_canal_sinal. NL2 in
+// XD_CONT 2D: NL2 U=ucent*y(2h-y)/h/h NL2 V=ampli_bruit*rand+ampli_sin*sin(omega*x) NL2 rand: unpredictable value
+// XD_CONT between -1 and 1. NL2 in 3D: NL2 U=ucent*y(2h-y)/h/h NL2 V=ampli_bruit*rand1+ampli_sin*sin(omega*x) NL2
+// XD_CONT W=ampli_bruit*rand2 NL2 rand1 and rand2: unpredictables values between -1 and 1.
 // XD attr ucent floattant ucent REQ Velocity value at the center of the channel.
 // XD attr h floattant h REQ Half hength of the channel.
 // XD attr ampli_bruit floattant ampli_bruit REQ Amplitude for the disturbance.
 // XD attr ampli_sin floattant ampli_sin OPT Amplitude for the sinusoidal disturbance (by default equals to ucent/10).
 // XD attr omega floattant omega REQ Value of pulsation for the of the sinusoidal disturbance.
-// XD attr dir_flow entier(into=[0,1,2]) dir_flow OPT Flow direction for the initialization of the flow in a channel. NL2 - if dir_flow=0, the flow direction is X NL2 - if dir_flow=1, the flow direction is Y NL2 - if dir_flow=2, the flow direction is Z NL2
-// XD_CONT Default value for dir_flow is 0
-// XD attr dir_wall entier(into=[0,1,2]) dir_wall OPT Wall direction for the initialization of the flow in a channel. NL2 - if dir_wall=0, the normal to the wall is in X direction NL2 - if dir_wall=1, the normal to the wall is in Y direction NL2 - if
-// XD_CONT dir_wall=2, the normal to the wall is in Z direction NL2 Default value for dir_flow is 1
-// XD attr min_dir_flow floattant min_dir_flow OPT Value of the minimum coordinate in the flow direction for the initialization of the flow in a channel. Default value for dir_flow is 0.
-// XD attr min_dir_wall floattant min_dir_wall OPT Value of the minimum coordinate in the wall direction for the initialization of the flow in a channel. Default value for dir_flow is 0.
+// XD attr dir_flow entier(into=[0,1,2]) dir_flow OPT Flow direction for the initialization of the flow in a channel.
+// XD_CONT NL2 - if dir_flow=0, the flow direction is X NL2 - if dir_flow=1, the flow direction is Y NL2 - if
+// XD_CONT dir_flow=2, the flow direction is Z NL2 Default value for dir_flow is 0
+// XD attr dir_wall entier(into=[0,1,2]) dir_wall OPT Wall direction for the initialization of the flow in a channel.
+// XD_CONT NL2 - if dir_wall=0, the normal to the wall is in X direction NL2 - if dir_wall=1, the normal to the wall is
+// XD_CONT in Y direction NL2 - if dir_wall=2, the normal to the wall is in Z direction NL2 Default value for dir_flow
+// XD_CONT is 1
+// XD attr min_dir_flow floattant min_dir_flow OPT Value of the minimum coordinate in the flow direction for the
+// XD_CONT initialization of the flow in a channel. Default value for dir_flow is 0.
+// XD attr min_dir_wall floattant min_dir_wall OPT Value of the minimum coordinate in the wall direction for the
+// XD_CONT initialization of the flow in a channel. Default value for dir_flow is 0.
 
 Sortie& champ_init_canal_sinal::printOn(Sortie& os) const { return os; }
 

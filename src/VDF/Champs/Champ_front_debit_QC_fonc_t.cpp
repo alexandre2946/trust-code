@@ -22,9 +22,12 @@
 #include <Interprete.h>
 
 Implemente_instanciable(Champ_front_debit_QC_fonc_t,"Champ_front_debit_QC_VDF_fonc_t",Ch_front_var_instationnaire_indep);
-// XD Champ_front_debit_QC_VDF_fonc_t front_field_base Champ_front_debit_QC_VDF_fonc_t NO_BRACE This keyword is used to define a flow rate field for quasi-compressible fluids in VDF discretization. The flow rate could be constant or time-dependent.
+// XD Champ_front_debit_QC_VDF_fonc_t front_field_base Champ_front_debit_QC_VDF_fonc_t NO_BRACE This keyword is used to
+// XD_CONT define a flow rate field for quasi-compressible fluids in VDF discretization. The flow rate could be constant
+// XD_CONT or time-dependent.
 // XD attr dimension entier dim REQ Problem dimension
-// XD attr liste bloc_lecture liste REQ List of the mass flow rate values [kg/s/m2] with the following syntaxe: { val1 ... valdim } where val1 ... valdim are constant or function of time.
+// XD attr liste bloc_lecture liste REQ List of the mass flow rate values [kg/s/m2] with the following syntaxe: { val1
+// XD_CONT ... valdim } where val1 ... valdim are constant or function of time.
 // XD attr moyen chaine moyen OPT Option to use rho mean value
 // XD attr pb_name chaine pb_name REQ Problem name
 

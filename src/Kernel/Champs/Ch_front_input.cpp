@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -24,11 +24,11 @@
 
 Implemente_instanciable(Ch_front_input,"Ch_front_input",Ch_front_var_instationnaire_dep);
 // XD ch_front_input front_field_base ch_front_input BRACE not_set
-// XD  attr nb_comp entier nb_comp REQ not_set
-// XD  attr nom chaine nom REQ not_set
-// XD  attr initial_value list initial_value OPT not_set
-// XD  attr probleme chaine probleme REQ not_set
-// XD  attr sous_zone ref_sous_zone sous_zone OPT not_set
+// XD attr nb_comp entier nb_comp REQ not_set
+// XD attr nom chaine nom REQ not_set
+// XD attr initial_value list initial_value OPT not_set
+// XD attr probleme chaine probleme REQ not_set
+// XD attr sous_zone ref_sous_zone sous_zone OPT not_set
 
 
 Entree& Ch_front_input::readOn(Entree& is)

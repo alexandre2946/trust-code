@@ -16,12 +16,17 @@
 #include <Pb_Multiphase_Enthalpie.h>
 
 Implemente_instanciable(Pb_Multiphase_Enthalpie, "Pb_Multiphase_Enthalpie|Pb_Multiphase_h", Pb_Multiphase);
-// XD Pb_Multiphase_Enthalpie Pb_Multiphase Pb_Multiphase_h INHERITS_BRACE A problem that allows the resolution of N-phases with 3*N equations
+// XD Pb_Multiphase_Enthalpie Pb_Multiphase Pb_Multiphase_h INHERITS_BRACE A problem that allows the resolution of
+// XD_CONT N-phases with 3*N equations
 // XD attr milieu_composite bloc_lecture milieu_composite OPT The composite medium associated with the problem.
-// XD attr correlations bloc_lecture correlations OPT List of correlations used in specific source terms (i.e. interfacial flux,  interfacial friction, ...)
-// XD attr QDM_Multiphase QDM_Multiphase QDM_Multiphase REQ Momentum conservation equation for a multi-phase problem where the unknown is the velocity
-// XD attr Masse_Multiphase Masse_Multiphase Masse_Multiphase REQ Mass consevation equation for a multi-phase problem where the unknown is the alpha (void fraction)
-// XD attr Energie_Multiphase_h Energie_Multiphase_Enthalpie Energie_Multiphase_Enthalpie REQ Internal energy conservation equation for a multi-phase problem where the unknown is the enthalpy
+// XD attr correlations bloc_lecture correlations OPT List of correlations used in specific source terms (i.e.
+// XD_CONT interfacial flux, interfacial friction, ...)
+// XD attr QDM_Multiphase QDM_Multiphase QDM_Multiphase REQ Momentum conservation equation for a multi-phase problem
+// XD_CONT where the unknown is the velocity
+// XD attr Masse_Multiphase Masse_Multiphase Masse_Multiphase REQ Mass consevation equation for a multi-phase problem
+// XD_CONT where the unknown is the alpha (void fraction)
+// XD attr Energie_Multiphase_h Energie_Multiphase_Enthalpie Energie_Multiphase_Enthalpie REQ Internal energy
+// XD_CONT conservation equation for a multi-phase problem where the unknown is the enthalpy
 // XD attr Energie_Multiphase suppress_param Energie_Multiphase OPT del
 
 Sortie& Pb_Multiphase_Enthalpie::printOn(Sortie& os) const { return Pb_Multiphase::printOn(os); }

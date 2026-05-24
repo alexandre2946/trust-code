@@ -24,11 +24,13 @@
 
 Implemente_base(Terme_Puissance_Thermique_Echange_Impose_Elem_base, "Terme_Puissance_Thermique_Echange_Impose_Elem_base", Source_base);
 
-// XD terme_puissance_thermique_echange_impose source_base terme_puissance_thermique_echange_impose BRACE Source term to impose thermal power according to formula : P = himp * (T - Text). Where T is the Trust temperature, Text is the outside temperature with
-// XD_CONT which energy is exchanged via an exchange coefficient himp
+// XD terme_puissance_thermique_echange_impose source_base terme_puissance_thermique_echange_impose BRACE Source term to
+// XD_CONT impose thermal power according to formula : P = himp * (T - Text). Where T is the Trust temperature, Text is
+// XD_CONT the outside temperature with which energy is exchanged via an exchange coefficient himp
 // XD attr himp field_base himp REQ the exchange coefficient
 // XD attr Text field_base Text REQ the outside temperature
-// XD attr PID_controler_on_targer_power bloc_lecture PID_controler_on_targer_power OPT PID_controler_on_targer_power bloc with parameters target_power (required), Kp, Ki and Kd (at least one of them should be provided)
+// XD attr PID_controler_on_targer_power bloc_lecture PID_controler_on_targer_power OPT PID_controler_on_targer_power
+// XD_CONT bloc with parameters target_power (required), Kp, Ki and Kd (at least one of them should be provided)
 
 Sortie& Terme_Puissance_Thermique_Echange_Impose_Elem_base::printOn(Sortie& s) const { return s << que_suis_je(); }
 

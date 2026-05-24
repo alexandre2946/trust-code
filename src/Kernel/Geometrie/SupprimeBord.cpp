@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,9 +16,10 @@
 #include <SupprimeBord.h>
 #include <EFichier.h>
 Implemente_instanciable_32_64(SupprimeBord_32_64,"Supprime_Bord",Interprete_geometrique_base_32_64<_T_>);
-// XD supprime_bord interprete supprime_bord INHERITS_BRACE Keyword to remove boundaries (named Boundary_name1 Boundary_name2 ) of the domain named domain_name.
-// XD   attr domaine ref_domaine domain REQ Name of domain
-// XD   attr bords list_nom bords REQ { Boundary_name1 Boundaray_name2 }
+// XD supprime_bord interprete supprime_bord INHERITS_BRACE Keyword to remove boundaries (named Boundary_name1
+// XD_CONT Boundary_name2 ) of the domain named domain_name.
+// XD attr domaine ref_domaine domain REQ Name of domain
+// XD attr bords list_nom bords REQ { Boundary_name1 Boundaray_name2 }
 
 template <typename _SIZE_>
 Sortie& SupprimeBord_32_64<_SIZE_>::printOn(Sortie& os) const

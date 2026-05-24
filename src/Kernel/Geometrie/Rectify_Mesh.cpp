@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -22,7 +22,7 @@
 Implemente_instanciable(Rectify_Mesh,"Rectify_Mesh",Interprete_geometrique_base) ;
 Add_synonym(Rectify_Mesh,"Orienter_Simplexes");
 // XD rectify_mesh interprete rectify_mesh INHERITS_BRACE Keyword to raffine a mesh
-// XD  attr domain_name ref_domaine domain_name REQ Name of domain.
+// XD attr domain_name ref_domaine domain_name REQ Name of domain.
 
 Sortie& Rectify_Mesh::printOn(Sortie& os) const
 {

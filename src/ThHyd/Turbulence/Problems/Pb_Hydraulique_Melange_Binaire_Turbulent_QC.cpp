@@ -16,11 +16,14 @@
 #include <Pb_Hydraulique_Melange_Binaire_Turbulent_QC.h>
 
 Implemente_instanciable(Pb_Hydraulique_Melange_Binaire_Turbulent_QC, "Pb_Hydraulique_Melange_Binaire_Turbulent_QC", Pb_QC_base);
-// XD pb_hydraulique_melange_binaire_turbulent_qc Pb_base pb_hydraulique_melange_binaire_turbulent_qc INHERITS_BRACE Resolution of a turbulent binary mixture problem for a quasi-compressible fluid with an iso-thermal condition.
-// XD attr fluide_quasi_compressible fluide_quasi_compressible fluide_quasi_compressible REQ The fluid medium associated with the problem.
-// XD attr navier_stokes_turbulent_qc navier_stokes_turbulent_qc navier_stokes_turbulent_qc REQ Navier-Stokes equation for a quasi-compressible fluid as well as the associated turbulence model equations.
-// XD attr Convection_Diffusion_Espece_Binaire_Turbulent_QC Convection_Diffusion_Espece_Binaire_Turbulent_QC Convection_Diffusion_Espece_Binaire_Turbulent_QC REQ Species conservation equation for a quasi-compressible fluid as well as the associated turbulence
-// XD_CONT model equations.
+// XD pb_hydraulique_melange_binaire_turbulent_qc Pb_base pb_hydraulique_melange_binaire_turbulent_qc INHERITS_BRACE
+// XD_CONT Resolution of a turbulent binary mixture problem for a quasi-compressible fluid with an iso-thermal
+// XD_CONT condition.
+// XD attr fluide_quasi_compressible fluide_quasi_compressible fluide_quasi_compressible REQ The fluid medium associated
+// XD_CONT with the problem.
+// XD attr navier_stokes_turbulent_qc navier_stokes_turbulent_qc navier_stokes_turbulent_qc REQ Navier-Stokes equation
+// XD_CONT for a quasi-compressible fluid as well as the associated turbulence model equations.
+// XD attr Convection_Diffusion_Espece_Binaire_Turbulent_QC Convection_Diffusion_Espece_Binaire_Turbulent_QC Convection_Diffusion_Espece_Binaire_Turbulent_QC REQ Species conservation equation for a quasi-compressible fluid as well as the associated turbulence model equations.
 
 Sortie& Pb_Hydraulique_Melange_Binaire_Turbulent_QC::printOn(Sortie& os) const { return Probleme_base::printOn(os); }
 

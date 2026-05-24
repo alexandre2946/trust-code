@@ -21,7 +21,8 @@
 
 Implemente_instanciable(CL_Contrainte_Imposee, "paroi_pression_imposee", Neumann);
 
-// XD paroi_pression_imposee condlim_base paroi_pression_imposee INHERITS_BRACE CL_Contrainte_Imposee/paroi_pression_imposee
+// XD paroi_pression_imposee condlim_base paroi_pression_imposee INHERITS_BRACE
+// XD_CONT CL_Contrainte_Imposee/paroi_pression_imposee
 // XD attr ch front_field_base ch REQ Boundary field type.
 
 Sortie& CL_Contrainte_Imposee::printOn(Sortie& os) const { return Neumann::printOn(os); }

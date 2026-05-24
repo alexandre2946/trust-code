@@ -28,10 +28,13 @@
 Implemente_instanciable(Lata_2_Other, "lata_to_other|lata_2_other", Interprete);
 // XD format_lata_to_med objet_lecture nul NO_BRACE not_set
 // XD attr mot chaine(into=["format_post_sup"]) mot REQ not_set
-// XD attr format chaine(into=["lml","lata","lata_v2","med"]) format OPT generated file post_med.data use format (MED or LATA or LML keyword).
+// XD attr format chaine(into=["lml","lata","lata_v2","med"]) format OPT generated file post_med.data use format (MED or
+// XD_CONT LATA or LML keyword).
 
-// XD lata_to_other interprete lata_to_other INHERITS_BRACE To convert results file written with LATA format to CGNS, MED or LML format. Warning: Fields located at faces are not supported yet.
-// XD attr format chaine(into=["lml","lata","lata_v2","med","cgns"]) format OPT Results format (CGNS, MED or LATA or LML keyword).
+// XD lata_to_other interprete lata_to_other INHERITS_BRACE To convert results file written with LATA format to CGNS,
+// XD_CONT MED or LML format. Warning: Fields located at faces are not supported yet.
+// XD attr format chaine(into=["lml","lata","lata_v2","med","cgns"]) format OPT Results format (CGNS, MED or LATA or LML
+// XD_CONT keyword).
 // XD attr file chaine file REQ LATA file to convert to the new format.
 // XD attr file_post chaine file_post REQ Name of file post.
 

@@ -259,10 +259,15 @@ void Equation_base::set_param(Param& param) const
 {
   param.ajouter_non_std("conditions_limites|boundary_conditions",(this),Param::REQUIRED);  // XD attr conditions_limites|boundary_conditions condlims conditions_limites OPT Boundary conditions.
   param.ajouter_non_std("conditions_initiales|initial_conditions",(this),Param::REQUIRED); // XD attr conditions_initiales|initial_conditions condinits conditions_initiales OPT Initial conditions.
-  param.ajouter_non_std("sources",(this)); // XD attr sources sources sources OPT To introduce a source term into an equation (in case of several source terms into the same equation, the blocks corresponding to the various terms need to be separated by a comma)
+  param.ajouter_non_std("sources",(this)); // XD attr sources sources sources OPT To introduce a source term into an
+  // XD_CONT equation (in case of several source terms into the same equation, the blocks corresponding to the various
+  // XD_CONT terms need to be separated by a comma)
   param.ajouter_non_std("ecrire_fichier_xyz_valeur",(this)); // XD attr ecrire_fichier_xyz_valeur ecrire_fichier_xyz_valeur ecrire_fichier_xyz_valeur OPT This keyword is used to write the values of a field only for some boundaries in a text file
   param.ajouter("parametre_equation",&parametre_equation_); // XD attr parametre_equation parametre_equation_base parametre_equation OPT Keyword used to specify additional parameters for the equation
-  param.ajouter_non_std("equation_non_resolue",(this)); // XD attr equation_non_resolue chaine equation_non_resolue OPT The equation will not be solved while condition(t) is verified if equation_non_resolue keyword is used. Exemple: The Navier-Stokes equations are not solved between time t0 and t1. NL2 Navier_Sokes_Standard NL2 { equation_non_resolue (t>t0)*(t<t1) }
+  param.ajouter_non_std("equation_non_resolue",(this)); // XD attr equation_non_resolue chaine equation_non_resolue OPT
+  // XD_CONT The equation will not be solved while condition(t) is verified if equation_non_resolue keyword is used.
+  // XD_CONT Exemple: The Navier-Stokes equations are not solved between time t0 and t1. NL2 Navier_Sokes_Standard NL2 {
+  // XD_CONT equation_non_resolue (t>t0)*(t<t1) }
   param.ajouter_non_std("rename_equation|renommer_equation",(this)); // XD attr renommer_equation chaine rename_equation OPT Rename the equation with a specific name.
 }
 
@@ -321,6 +326,16 @@ int Equation_base::lire_motcle_non_standard(const Motcle& mot, Entree& is)
  */
 Entree& Equation_base::lire_sources(Entree& is)
 {
+  static bool already_read=false;
+  if (already_read)
+    {
+      Cerr << "Error: the 'sources' keyword should only appear once per equation." << finl;
+      Cerr << "To declare several source terms, list them inside a single block separated by commas:" << finl;
+      Cerr << "    sources { TermA { ... } , TermB { ... } }" << finl;
+      // Process::exit(); // comment that out since it appears pb_multiphase is doing shadowy stuff...
+    }
+
+  already_read=true;
   Cerr << "Reading of source terms" << finl ;
   is >> les_sources;
   return is;

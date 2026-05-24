@@ -19,7 +19,8 @@
 #include <SFichier.h>
 
 Implemente_instanciable_32_64(OrienteFacesBord_32_64,"OrienteFacesBord",Interprete_geometrique_base_32_64<_T_>);
-// XD orientefacesbord interprete orientefacesbord INHERITS_BRACE Keyword to modify the order of the boundary vertices included in a domain, such that the surface normals are outer pointing.
+// XD orientefacesbord interprete orientefacesbord INHERITS_BRACE Keyword to modify the order of the boundary vertices
+// XD_CONT included in a domain, such that the surface normals are outer pointing.
 // XD attr domain_name ref_domaine domain_name REQ Name of domain.
 
 

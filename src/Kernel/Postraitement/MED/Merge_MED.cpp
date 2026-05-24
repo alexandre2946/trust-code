@@ -28,10 +28,13 @@ using namespace MEDCoupling;
 #endif
 
 Implemente_instanciable(Merge_MED,"Merge_MED",Interprete);
-// XD Merge_MED interprete Merge_MED NO_BRACE This keyword allows to merge multiple MED files produced during a parallel computation into a single MED file.
-// XD attr med_files_base_name chaine med_files_base_name REQ Base name of multiple med files that should appear as base_name_xxxxx.med, where xxxxx denotes the MPI rank number. If you specify NOM_DU_CAS, it will automatically take the basename from your
-// XD_CONT datafile's name.
-// XD attr time_iterations chaine(into=["all_times","last_time"]) time_iterations REQ Identifies whether to merge all time iterations present in the MED files or only the last one.
+// XD Merge_MED interprete Merge_MED NO_BRACE This keyword allows to merge multiple MED files produced during a parallel
+// XD_CONT computation into a single MED file.
+// XD attr med_files_base_name chaine med_files_base_name REQ Base name of multiple med files that should appear as
+// XD_CONT base_name_xxxxx.med, where xxxxx denotes the MPI rank number. If you specify NOM_DU_CAS, it will
+// XD_CONT automatically take the basename from your datafile's name.
+// XD attr time_iterations chaine(into=["all_times","last_time"]) time_iterations REQ Identifies whether to merge all
+// XD_CONT time iterations present in the MED files or only the last one.
 
 Sortie& Merge_MED::printOn(Sortie& os) const { return Interprete::printOn(os); }
 Entree& Merge_MED::readOn(Entree& is) { return Interprete::readOn(is); }

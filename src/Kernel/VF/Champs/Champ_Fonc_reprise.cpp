@@ -28,18 +28,26 @@
 
 extern void convert_to(const char *s, double& ob);
 Implemente_instanciable(Champ_Fonc_reprise,"Champ_Fonc_reprise",Champ_Fonc_base);
-// XD champ_fonc_reprise champ_don_base champ_fonc_reprise NO_BRACE This field is used to read a data field in a save file (.xyz or .sauv) at a specified time. It is very useful, for example, to run a thermohydraulic calculation with velocity initial condition
-// XD_CONT read into a save file from a previous hydraulic calculation.
-// XD attr format chaine(into=["binaire","formatte","xyz","single_hdf","pdi"]) format OPT Type of file (the file format). If xyz format is activated, the .xyz file from the previous calculation will be given for filename, and if formatte or binaire is choosen,
-// XD_CONT the .sauv file of the previous calculation will be specified for filename. In the case of a parallel calculation, if the mesh partition does not changed between the previous calculation and the next one, the binaire format should be preferred, because is
-// XD_CONT faster than the xyz format. If pdi is used, the same constraints/advantages as binaire apply, but it produces one (HDF5) file per node on the filesystem instead of having one file per processor. The single_hdf format is still supported but is obsolete, the PDI
-// XD_CONT format is recommended.
+// XD champ_fonc_reprise champ_don_base champ_fonc_reprise NO_BRACE This field is used to read a data field in a save
+// XD_CONT file (.xyz or .sauv) at a specified time. It is very useful, for example, to run a thermohydraulic
+// XD_CONT calculation with velocity initial condition read into a save file from a previous hydraulic calculation.
+// XD attr format chaine(into=["binaire","formatte","xyz","single_hdf","pdi"]) format OPT Type of file (the file
+// XD_CONT format). If xyz format is activated, the .xyz file from the previous calculation will be given for filename,
+// XD_CONT and if formatte or binaire is choosen, the .sauv file of the previous calculation will be specified for
+// XD_CONT filename. In the case of a parallel calculation, if the mesh partition does not changed between the previous
+// XD_CONT calculation and the next one, the binaire format should be preferred, because is faster than the xyz format.
+// XD_CONT If pdi is used, the same constraints/advantages as binaire apply, but it produces one (HDF5) file per node on
+// XD_CONT the filesystem instead of having one file per processor. The single_hdf format is still supported but is
+// XD_CONT obsolete, the PDI format is recommended.
 // XD attr filename chaine filename REQ Name of the save file.
 // XD attr pb_name ref_Pb_base pb_name REQ Name of the problem.
-// XD attr champ chaine champ REQ Name of the problem unknown. It may also be the temporal average of a problem unknown (like moyenne_vitesse, moyenne_temperature,...)
-// XD attr fonction fonction_champ_reprise fonction OPT Optional keyword to apply a function on the field being read in the save file (e.g. to read a temperature field in Celsius units and convert it for the calculation on Kelvin units, you will use: fonction
-// XD_CONT 1 273.+val )
-// XD attr temps chaine time REQ Time of the saved field in the save file or last_time. If you give the keyword last_time instead, the last time saved in the save file will be used.
+// XD attr champ chaine champ REQ Name of the problem unknown. It may also be the temporal average of a problem unknown
+// XD_CONT (like moyenne_vitesse, moyenne_temperature,...)
+// XD attr fonction fonction_champ_reprise fonction OPT Optional keyword to apply a function on the field being read in
+// XD_CONT the save file (e.g. to read a temperature field in Celsius units and convert it for the calculation on Kelvin
+// XD_CONT units, you will use: fonction 1 273.+val )
+// XD attr temps chaine time REQ Time of the saved field in the save file or last_time. If you give the keyword
+// XD_CONT last_time instead, the last time saved in the save file will be used.
 
 // XD fonction_champ_reprise objet_lecture nul NO_BRACE not_set
 // XD attr mot chaine(into=["fonction"]) mot REQ not_set

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -25,7 +25,8 @@
 #include <Param.h>
 
 Implemente_instanciable_sans_constructeur(ExtrudeParoi,"ExtrudeParoi",Interprete_geometrique_base);
-// XD extrudeparoi interprete extrudeparoi BRACE Keyword dedicated in 3D (VEF) to create prismatic layer at wall. Each prism is cut into 3 tetraedra.
+// XD extrudeparoi interprete extrudeparoi BRACE Keyword dedicated in 3D (VEF) to create prismatic layer at wall. Each
+// XD_CONT prism is cut into 3 tetraedra.
 
 ExtrudeParoi::ExtrudeParoi()
 {
@@ -96,11 +97,17 @@ Entree& ExtrudeParoi::interpreter_(Entree& is)
 {
   Nom nom_dom;
   Param param(que_suis_je());
-  param.ajouter("domaine",&nom_dom,Param::REQUIRED); // XD_ADD_P ref_domaine Name of the domain.
-  param.ajouter("nom_bord",&nom_front,Param::REQUIRED); // XD_ADD_P chaine Name of the (no-slip) boundary for creation of prismatic layers.
-  param.ajouter("epaisseur",&epaisseur); // XD_ADD_P list n r1 r2 .... rn : (relative or absolute) width for each layer.
-  param.ajouter_flag("critere_absolu",&type); // XD_ADD_P rien use absolute width for each layer instead of relative.
-  param.ajouter("projection_normale_bord",&projection_normale_bord); // XD_ADD_P rien keyword to project layers on the same plane that contiguous boundaries. defaut values are : epaisseur_relative 1 0.5 projection_normale_bord 1
+  param.ajouter("domaine",&nom_dom,Param::REQUIRED); // XD_ADD_P ref_domaine
+  // XD_CONT Name of the domain.
+  param.ajouter("nom_bord",&nom_front,Param::REQUIRED); // XD_ADD_P chaine
+  // XD_CONT Name of the (no-slip) boundary for creation of prismatic layers.
+  param.ajouter("epaisseur",&epaisseur); // XD_ADD_P list
+  // XD_CONT n r1 r2 .... rn : (relative or absolute) width for each layer.
+  param.ajouter_flag("critere_absolu",&type); // XD_ADD_P rien
+  // XD_CONT use absolute width for each layer instead of relative.
+  param.ajouter("projection_normale_bord",&projection_normale_bord); // XD_ADD_P rien
+  // XD_CONT keyword to project layers on the same plane that contiguous boundaries. defaut values are :
+  // XD_CONT epaisseur_relative 1 0.5 projection_normale_bord 1
   param.lire_avec_accolades_depuis(is);
   array_trier_retirer_doublons(epaisseur);
   nb_couche=epaisseur.size_array();

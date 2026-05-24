@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -25,7 +25,8 @@
 
 
 Implemente_instanciable(Champ_front_xyz_debit,"Champ_front_xyz_debit",Champ_front_normal);
-// XD champ_front_xyz_debit front_field_base champ_front_xyz_debit BRACE This field is used to define a flow rate field with a velocity profil which will be normalized to match the flow rate chosen.
+// XD champ_front_xyz_debit front_field_base champ_front_xyz_debit BRACE This field is used to define a flow rate field
+// XD_CONT with a velocity profil which will be normalized to match the flow rate chosen.
 
 Sortie& Champ_front_xyz_debit::printOn(Sortie& os) const
 {
@@ -36,8 +37,11 @@ Sortie& Champ_front_xyz_debit::printOn(Sortie& os) const
 Entree& Champ_front_xyz_debit::readOn(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter("velocity_profil", &velocity_profil_, Param::OPTIONAL); // XD_ADD_P front_field_base velocity_profil 0 velocity field to define the profil of velocity.
-  param.ajouter("flow_rate", &flow_rate_, Param::REQUIRED); //  XD_ADD_P front_field_base flow_rate 1 uniform field in space to define the flow rate. It could be, for example, champ_front_uniforme, ch_front_input_uniform or champ_front_fonc_t
+  param.ajouter("velocity_profil", &velocity_profil_, Param::OPTIONAL); // XD_ADD_P front_field_base
+  // XD_CONT velocity_profil 0 velocity field to define the profil of velocity.
+  param.ajouter("flow_rate", &flow_rate_, Param::REQUIRED); // XD_ADD_P front_field_base
+  // XD_CONT flow_rate 1 uniform field in space to define the flow rate. It could be, for example, champ_front_uniforme,
+  // XD_CONT ch_front_input_uniform or champ_front_fonc_t
   param.lire_avec_accolades_depuis(is);
   fixer_nb_comp(dimension * flow_rate_->nb_comp());
   return is;

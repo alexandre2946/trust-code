@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,8 @@ Entree& Op_Conv_SUPG_EF::readOn( Entree& is )
 {
   btd_=3; // utilise dans calculer_pas_de_temps
   Param param(que_suis_je()); // XD convection_supg convection_deriv supg BRACE Only for EF discretization.
-  param.ajouter("facteur",&ksupg_,Param::REQUIRED); // XD_ADD_P double not_set
+  param.ajouter("facteur",&ksupg_,Param::REQUIRED); // XD_ADD_P double
+  // XD_CONT not_set
 
   param.lire_avec_accolades(is);
   return is;

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,7 +20,8 @@
 #include <Param.h>
 
 Implemente_instanciable(Test_SSE_Kernels, "Test_SSE_Kernels", Interprete);
-// XD Test_SSE_Kernels interprete Test_SSE_Kernels BRACE Object to test the different kernel methods used in the multigrid solver in IJK discretization
+// XD Test_SSE_Kernels interprete Test_SSE_Kernels BRACE Object to test the different kernel methods used in the
+// XD_CONT multigrid solver in IJK discretization
 
 Sortie& Test_SSE_Kernels::printOn(Sortie& s ) const
 {
@@ -36,7 +37,8 @@ Entree& Test_SSE_Kernels::interpreter(Entree& is)
 {
   int nmax=1000;
   Param param(que_suis_je());
-  param.ajouter("nmax", &nmax); // XD_ADD_P entier Number of tests we want to perform
+  param.ajouter("nmax", &nmax); // XD_ADD_P entier
+  // XD_CONT Number of tests we want to perform
   param.lire_avec_accolades(is);
 
   /*

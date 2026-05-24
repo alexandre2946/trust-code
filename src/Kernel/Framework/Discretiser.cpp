@@ -19,8 +19,10 @@
 #include <Discretiser.h>
 
 Implemente_instanciable(Discretiser,"Discretiser|Discretize",Interprete);
-// XD discretize interprete discretiser INHERITS_BRACE Keyword to discretise a problem problem_name according to the discretization dis. NL2 IMPORTANT: A number of objects must be already associated (a domain, time scheme, central object) prior to invoking the
-// XD_CONT Discretize (Discretiser) keyword. The physical properties of this central object must also have been read.
+// XD discretize interprete discretiser INHERITS_BRACE Keyword to discretise a problem problem_name according to the
+// XD_CONT discretization dis. NL2 IMPORTANT: A number of objects must be already associated (a domain, time scheme,
+// XD_CONT central object) prior to invoking the Discretize (Discretiser) keyword. The physical properties of this
+// XD_CONT central object must also have been read.
 // XD attr problem_name ref_pb_gen_base problem_name REQ Name of problem.
 // XD attr dis ref_discretisation_base dis REQ Name of the discretization object.
 

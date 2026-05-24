@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -22,7 +22,8 @@
 #include <Param.h>
 
 Implemente_instanciable(Postraiter_domaine, "Postraiter_domaine", Interprete_geometrique_base);
-// XD postraiter_domaine interprete postraiter_domaine BRACE To write one or more domains in a file with a specified format (MED,LML,LATA,SINGLE_LATA,CGNS).
+// XD postraiter_domaine interprete postraiter_domaine BRACE To write one or more domains in a file with a specified
+// XD_CONT format (MED,LML,LATA,SINGLE_LATA,CGNS).
 
 Sortie& Postraiter_domaine::printOn(Sortie& os) const { return Interprete::printOn(os); }
 
@@ -180,19 +181,30 @@ Entree& Postraiter_domaine::interpreter_(Entree& is)
   Nom nom_pdb;
   Nom un_dom;
   Param param(que_suis_je());
-  param.ajouter("format", &format_post_, Param::REQUIRED); // XD_ADD_P chaine(into=["lml","lata","single_lata","lata_v2","med","cgns"]) File format.
+  param.ajouter("format", &format_post_, Param::REQUIRED); // XD_ADD_P chaine(into=["lml","lata","single_lata","lata_v2","med","cgns"])
+  // XD_CONT File format.
   format_binaire_ = 1;
-  param.ajouter("binaire", &format_binaire_); // XD_ADD_P entier(into=[0,1]) Binary (binaire 1) or ASCII (binaire 0) may be used. By default, it is 0 for LATA and only ASCII is available for LML and only binary is available for MED.
+  param.ajouter("binaire", &format_binaire_); // XD_ADD_P entier(into=[0,1])
+  // XD_CONT Binary (binaire 1) or ASCII (binaire 0) may be used. By default, it is 0 for LATA and only ASCII is
+  // XD_CONT available for LML and only binary is available for MED.
   ecrire_frontiere_ = 1;
-  param.ajouter("ecrire_frontiere", &ecrire_frontiere_); // XD_ADD_P entier(into=[0,1]) This option will write (if set to 1, the default) or not (if set to 0) the boundaries as fields into the file (it is useful to not add the boundaries when writing a domain extracted from another domain)
-  param.ajouter("dual", &dual_); // XD_ADD_P entier(into=[0,1]) This option indicates whether the original mesh (default) or the dual one (the one used for postprocessing of field faces) is to be written.
+  param.ajouter("ecrire_frontiere", &ecrire_frontiere_); // XD_ADD_P entier(into=[0,1])
+  // XD_CONT This option will write (if set to 1, the default) or not (if set to 0) the boundaries as fields into the
+  // XD_CONT file (it is useful to not add the boundaries when writing a domain extracted from another domain)
+  param.ajouter("dual", &dual_); // XD_ADD_P entier(into=[0,1])
+  // XD_CONT This option indicates whether the original mesh (default) or the dual one (the one used for postprocessing
+  // XD_CONT of field faces) is to be written.
   nom_pdb = "NOM_DU_CAS";
-  param.ajouter("fichier|file", &nom_pdb); // XD_ADD_P chaine The file name can be changed with the fichier option.
+  param.ajouter("fichier|file", &nom_pdb); // XD_ADD_P chaine
+  // XD_CONT The file name can be changed with the fichier option.
   // desactive l'ecriture des joints pratique pour comparer parallele et sequentielle
   joint_non_ecrit_ = 1;
-  param.ajouter("joints_non_postraites", &joint_non_ecrit_); // XD_ADD_P entier(into=[0,1]) The joints_non_postraites (1 by default) will not write the boundaries between the partitioned mesh.
-  param.ajouter("domaine|domain", &un_dom); // XD_ADD_P ref_domaine Name of domain
-  param.ajouter_non_std("domaines", (this)); // XD_ADD_P bloc_lecture Names of domains : { name1 name2 }
+  param.ajouter("joints_non_postraites", &joint_non_ecrit_); // XD_ADD_P entier(into=[0,1])
+  // XD_CONT The joints_non_postraites (1 by default) will not write the boundaries between the partitioned mesh.
+  param.ajouter("domaine|domain", &un_dom); // XD_ADD_P ref_domaine
+  // XD_CONT Name of domain
+  param.ajouter_non_std("domaines", (this)); // XD_ADD_P bloc_lecture
+  // XD_CONT Names of domains : { name1 name2 }
   param.ajouter_condition("is_read_domaine_or_is_read_domaines", "Vous devez preciser domaine ou domaines dans Postraiter_domaine");
   param.ajouter_condition("is_read_domaine_or_is_read_domaines", "Interpreter Postraiter_domaine : one of the keywords domaine or domaines must be specified.");
   param.lire_avec_accolades_depuis(is);

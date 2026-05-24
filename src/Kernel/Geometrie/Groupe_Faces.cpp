@@ -16,6 +16,10 @@
 #include <Groupe_Faces.h>
 
 Implemente_instanciable_32_64(Groupe_Faces_32_64, "Groupe_Faces", Frontiere_32_64<_T_>);
+// XD groupe_faces bord_base groupe_faces NO_BRACE A named selection of mesh faces, defined by a plane equation. Same
+// XD_CONT readOn shape as Bord (name + plane), used to expose internal face sets for post-processing or coupling.
+// XD attr nom chaine nom REQ Name of the face group.
+// XD attr defbord defbord defbord REQ Definition of the plane selecting the faces.
 
 template <typename _SIZE_>
 Sortie& Groupe_Faces_32_64<_SIZE_>::printOn(Sortie& s) const { return Frontiere_32_64<_SIZE_>::printOn(s); }

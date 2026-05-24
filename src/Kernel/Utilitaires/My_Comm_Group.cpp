@@ -22,7 +22,8 @@
 //#include <Probleme_base.h>
 
 Implemente_instanciable(My_Comm_Group, "My_Comm_Group", Interprete);
-// XD My_Comm_Group interprete My_Comm_Group BRACE This keyword allows to create a user MPI Comm Group of size N using the processors allocated to TRUST. The set of processors is split in N subsets.
+// XD My_Comm_Group interprete My_Comm_Group BRACE This keyword allows to create a user MPI Comm Group of size N using
+// XD_CONT the processors allocated to TRUST. The set of processors is split in N subsets.
 
 static OWN_PTR(Comm_Group) my_comm_group;
 
@@ -96,7 +97,8 @@ Entree& My_Comm_Group::interpreter(Entree& is)
 {
   int nb_groups = -123;
   Param param(que_suis_je());
-  param.ajouter("Group_nb", &nb_groups, Param::REQUIRED); // XD_ADD_P entier Number of groups to define in your Comm Group.
+  param.ajouter("Group_nb", &nb_groups, Param::REQUIRED); // XD_ADD_P entier
+  // XD_CONT Number of groups to define in your Comm Group.
   param.lire_avec_accolades_depuis(is);
 
   if (Process::is_sequential())

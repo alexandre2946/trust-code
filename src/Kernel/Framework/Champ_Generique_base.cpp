@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -22,10 +22,11 @@
 
 Implemente_base(Champ_Generique_base,"Champ_Generique_base",Objet_U);
 // XD champ_generique_base objet_u champ_generique_base BRACE not_set
+// XD listchamp_generique listobj nul BRACE champ_generique_base COMMA XXX
 
 // XD definition_champ objet_lecture nul NO_BRACE Keyword to create new complex field for advanced postprocessing.
-// XD   attr name chaine name REQ The name of the new created field.
-// XD   attr champ_generique champ_generique_base champ_generique REQ not_set
+// XD attr name chaine name REQ The name of the new created field.
+// XD attr champ_generique champ_generique_base champ_generique REQ not_set
 
 // XD definition_champs listobj nul BRACE definition_champ NO_COMMA List of definition champ
 

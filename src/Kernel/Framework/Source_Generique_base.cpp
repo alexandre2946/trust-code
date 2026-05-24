@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -19,8 +19,10 @@
 #include <Postraitement.h>
 
 Implemente_base(Source_Generique_base,"Source_Generique_base",Source_base);
-// XD source_generique source_base source_generique NO_BRACE to define a source term depending on some discrete fields of the problem and (or) analytic expression. It is expressed by the way of a generic field usually used for post-processing.
-// XD  attr champ champ_generique_base champ REQ the source field
+// XD source_generique source_base source_generique NO_BRACE to define a source term depending on some discrete fields
+// XD_CONT of the problem and (or) analytic expression. It is expressed by the way of a generic field usually used for
+// XD_CONT post-processing.
+// XD attr champ champ_generique_base champ REQ the source field
 
 /*! @brief DOES NOTHING - to override in derived classes.
  *

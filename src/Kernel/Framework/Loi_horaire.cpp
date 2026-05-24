@@ -40,8 +40,10 @@ Entree& Loi_horaire::readOn(Entree& is)
 
   // Lecture de jeu de donnees
   Param param(que_suis_je());
-  param.ajouter("position",&position_);    // XD attr position listchaine position REQ Vecteur position
-  param.ajouter("vitesse",&vitesse_);      // XD attr vitesse listchaine vitesse REQ Vecteur vitesse
+  param.ajouter("position",&position_);    // XD attr position listchaine position OPT Vecteur position (default: zero
+  // XD_CONT vector of length `dimension`)
+  param.ajouter("vitesse",&vitesse_);      // XD attr vitesse listchaine vitesse OPT Vecteur vitesse (default: zero
+  // XD_CONT vector of length `dimension`)
   param.ajouter("rotation",&rotation_);    // XD attr rotation listchaine rotation OPT Matrice de passage
   param.ajouter("derivee_rotation",&derivee_rotation_);          // XD attr derivee_rotation listchaine derivee_rotation OPT Derivee matrice de passage
   param.ajouter("verification_derivee",&verification_derivee_);  // XD attr verification_derivee entier verification_derivee OPT not_set

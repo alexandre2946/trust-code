@@ -25,12 +25,17 @@ Implemente_instanciable_32_64(Declarer_bord_perio_32_64,"Declarer_bord_perio",In
 Add_synonym(Declarer_bord_perio,"Corriger_frontiere_periodique");
 Add_synonym(Declarer_bord_perio_64,"Corriger_frontiere_periodique_64");
 
-// XD declarer_bord_perio interprete corriger_frontiere_periodique BRACE The Declarer_bord_perio keyword is mandatory to first define the periodic boundaries, to reorder the faces and eventually fix unaligned nodes of these boundaries. Faces on one side of the
-// XD_CONT periodic domain are put first, then the faces on the opposite side, in the same order. It must be run in sequential before mesh splitting.
-//  XD attr domaine chaine domaine REQ Name of domain.
-//  XD attr bord chaine bord REQ the name of the boundary (which must contain two opposite sides of the domain)
-//  XD attr direction list direction OPT defines the periodicity direction vector (a vector that points from one node on one side to the opposite node on the other side). This vector must be given if the automatic algorithm fails, that is:NL2 - when the node coordinates are not perfectly periodic NL2 - when the periodic direction is not aligned with the normal vector of the boundary faces
-//  XD attr fichier_post chaine fichier_post OPT .
+// XD declarer_bord_perio interprete corriger_frontiere_periodique BRACE The Declarer_bord_perio keyword is mandatory to
+// XD_CONT first define the periodic boundaries, to reorder the faces and eventually fix unaligned nodes of these
+// XD_CONT boundaries. Faces on one side of the periodic domain are put first, then the faces on the opposite side, in
+// XD_CONT the same order. It must be run in sequential before mesh splitting.
+// XD attr domaine chaine domaine REQ Name of domain.
+// XD attr bord chaine bord REQ the name of the boundary (which must contain two opposite sides of the domain)
+// XD attr direction list direction OPT defines the periodicity direction vector (a vector that points from one node on
+// XD_CONT one side to the opposite node on the other side). This vector must be given if the automatic algorithm fails,
+// XD_CONT that is:NL2 - when the node coordinates are not perfectly periodic NL2 - when the periodic direction is not
+// XD_CONT aligned with the normal vector of the boundary faces
+// XD attr fichier_post chaine fichier_post OPT .
 
 template <typename _SIZE_>
 Entree& Declarer_bord_perio_32_64<_SIZE_>::readOn(Entree& is)

@@ -34,7 +34,8 @@ Entree& Loi_Fermeture_Test::readOn( Entree& is )
 
 void Loi_Fermeture_Test::set_param(Param& param) const
 {
-  param.ajouter("coef",&coef_); // XD_ADD_P floattant coefficient
+  param.ajouter("coef",&coef_); // XD_ADD_P floattant
+  // XD_CONT coefficient
 }
 void Loi_Fermeture_Test::mettre_a_jour(double temps)
 {

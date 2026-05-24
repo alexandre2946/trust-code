@@ -28,21 +28,25 @@
 
 // XD type_perte_charge_deriv objet_lecture type_perte_charge_deriv INHERITS_BRACE not_set
 
-// XD type_perte_charge_dp type_perte_charge_deriv dp NO_BRACE  DP field should have 3 components defining dp, dDP/dQ, Q0
-// XD attr dp_field field_base dp_field REQ the parameters of the previous formula (DP = dp + dDP/dQ * (Q - Q0)): uniform_field 3 dp dDP/dQ Q0 where Q0 is a mass flow rate (kg/s).
+// XD type_perte_charge_dp type_perte_charge_deriv dp NO_BRACE DP field should have 3 components defining dp, dDP/dQ, Q0
+// XD attr dp_field field_base dp_field REQ the parameters of the previous formula (DP = dp + dDP/dQ * (Q - Q0)):
+// XD_CONT uniform_field 3 dp dDP/dQ Q0 where Q0 is a mass flow rate (kg/s).
 
-// XD type_perte_charge_dp_regul type_perte_charge_deriv dp_regul BRACE Keyword used to regulate the DP value in order to match a target flow rate. Syntax  : dp_regul { DP0 d deb d eps e }
+// XD type_perte_charge_dp_regul type_perte_charge_deriv dp_regul BRACE Keyword used to regulate the DP value in order
+// XD_CONT to match a target flow rate. Syntax : dp_regul { DP0 d deb d eps e }
 // XD attr DP0 chaine DP0 REQ Reference pressure drop value (possibly time‑dependent)
 // XD attr deb chaine deb REQ target flow rate in kg/s
 // XD attr alpha chaine alpha REQ alpha string
 
 
-// XD DP_Impose source_base DP_Impose NO_BRACE Source term to impose a pressure difference according to the formula : DP = dp + dDP/dQ * (Q - Q0)
+// XD DP_Impose source_base DP_Impose NO_BRACE Source term to impose a pressure difference according to the formula : DP
+// XD_CONT = dp + dDP/dQ * (Q - Q0)
 // XD attr aco chaine(into=["{"]) aco REQ Opening curly bracket.
 // XD attr dp_type type_perte_charge_deriv dp_type REQ mass flow rate (kg/s).
 // XD attr surface chaine(into=["surface"]) surface REQ not_set
-// XD attr bloc_surface bloc_lecture bloc_surface REQ Three syntaxes are possible for the surface definition block: NL2 For VDF and VEF: { X|Y|Z = location subzone_name } NL2 Only for VEF: { Surface surface_name }. NL2 For PolyMAC_CDO { Surface surface_name
-// XD_CONT Orientation champ_uniforme }.
+// XD attr bloc_surface bloc_lecture bloc_surface REQ Three syntaxes are possible for the surface definition block: NL2
+// XD_CONT For VDF and VEF: { X|Y|Z = location subzone_name } NL2 Only for VEF: { Surface surface_name }. NL2 For
+// XD_CONT PolyMAC_CDO { Surface surface_name Orientation champ_uniforme }.
 // XD attr acof chaine(into=["}"]) acof REQ Closing curly bracket.
 Entree& DP_Impose::lire_donnees(Entree& is)
 {

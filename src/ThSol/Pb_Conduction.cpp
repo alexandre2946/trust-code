@@ -17,8 +17,8 @@
 
 Implemente_instanciable(Pb_Conduction,"Pb_Conduction",Probleme_base);
 // XD Pb_Conduction Pb_base Pb_Conduction INHERITS_BRACE Resolution of the heat equation.
-// XD  attr solide solide solide OPT The medium associated with the problem.
-// XD  attr Conduction Conduction Conduction OPT Heat equation.
+// XD attr solide solide solide OPT The medium associated with the problem.
+// XD attr Conduction Conduction Conduction OPT Heat equation.
 
 /*! @brief NE FAIT RIEN
  *

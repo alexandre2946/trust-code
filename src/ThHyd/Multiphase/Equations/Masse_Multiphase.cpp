@@ -27,7 +27,8 @@
 #include <Param.h>
 
 Implemente_instanciable(Masse_Multiphase, "Masse_Multiphase", Convection_Diffusion_std);
-// XD Masse_Multiphase eqn_base Masse_Multiphase INHERITS_BRACE Mass consevation equation for a multi-phase problem where the unknown is the alpha (void fraction)
+// XD Masse_Multiphase eqn_base Masse_Multiphase INHERITS_BRACE Mass consevation equation for a multi-phase problem
+// XD_CONT where the unknown is the alpha (void fraction)
 
 Sortie& Masse_Multiphase::printOn(Sortie& is) const { return Equation_base::printOn(is); }
 

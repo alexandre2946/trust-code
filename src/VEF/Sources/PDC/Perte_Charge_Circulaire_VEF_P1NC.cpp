@@ -29,9 +29,10 @@
 
 Implemente_instanciable(Perte_Charge_Circulaire_VEF_P1NC,"Perte_Charge_Circulaire_VEF_P1NC",Perte_Charge_VEF);
 // XD perte_charge_circulaire source_base perte_charge_circulaire BRACE New pressure loss.
-// XD   attr lambda chaine lambda_u REQ Function f(Re_tot, Re_long, t, x, y, z) for loss coefficient in the longitudinal direction
-// XD   attr diam_hydr champ_don_base diam_hydr REQ Hydraulic diameter value.
-// XD   attr sous_zone chaine sous_zone OPT Optional sub-area where pressure loss applies.
+// XD attr lambda chaine lambda_u REQ Function f(Re_tot, Re_long, t, x, y, z) for loss coefficient in the longitudinal
+// XD_CONT direction
+// XD attr diam_hydr champ_don_base diam_hydr REQ Hydraulic diameter value.
+// XD attr sous_zone chaine sous_zone OPT Optional sub-area where pressure loss applies.
 
 Sortie& Perte_Charge_Circulaire_VEF_P1NC::printOn(Sortie& s ) const
 {
@@ -52,9 +53,12 @@ Entree& Perte_Charge_Circulaire_VEF_P1NC::readOn(Entree& s )
 void Perte_Charge_Circulaire_VEF_P1NC::set_param(Param& param) const
 {
   Perte_Charge_VEF::set_param(param);
-  param.ajouter_non_std("lambda_ortho",(this),Param::REQUIRED); // XD_ADD_P chaine function: Function f(Re_tot, Re_ortho, t, x, y, z) for loss coefficient in transverse direction
-  param.ajouter("diam_hydr_ortho",&diam_hydr_ortho,Param::REQUIRED); // XD_ADD_P champ_don_base Transverse hydraulic diameter value.
-  param.ajouter("direction",&v,Param::REQUIRED); // XD_ADD_P champ_don_base Field which indicates the direction of the pressure loss.
+  param.ajouter_non_std("lambda_ortho",(this),Param::REQUIRED); // XD_ADD_P chaine
+  // XD_CONT function: Function f(Re_tot, Re_ortho, t, x, y, z) for loss coefficient in transverse direction
+  param.ajouter("diam_hydr_ortho",&diam_hydr_ortho,Param::REQUIRED); // XD_ADD_P champ_don_base
+  // XD_CONT Transverse hydraulic diameter value.
+  param.ajouter("direction",&v,Param::REQUIRED); // XD_ADD_P champ_don_base
+  // XD_CONT Field which indicates the direction of the pressure loss.
 }
 
 int Perte_Charge_Circulaire_VEF_P1NC::lire_motcle_non_standard(const Motcle& mot, Entree& is)

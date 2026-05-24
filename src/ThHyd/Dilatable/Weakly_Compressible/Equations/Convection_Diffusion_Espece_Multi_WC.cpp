@@ -25,7 +25,8 @@
 #include <Perf_counters.h>
 
 Implemente_instanciable(Convection_Diffusion_Espece_Multi_WC,"Convection_Diffusion_Espece_Multi_WC",Convection_Diffusion_Espece_Multi_base);
-// XD convection_diffusion_espece_multi_WC eqn_base convection_diffusion_espece_multi_WC INHERITS_BRACE Species conservation equation for a multi-species weakly-compressible fluid.
+// XD convection_diffusion_espece_multi_WC eqn_base convection_diffusion_espece_multi_WC INHERITS_BRACE Species
+// XD_CONT conservation equation for a multi-species weakly-compressible fluid.
 
 Sortie& Convection_Diffusion_Espece_Multi_WC::printOn(Sortie& is) const
 {

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -32,8 +32,10 @@ Sortie& Transport_turbulent_aire_interfaciale::printOn(Sortie& os) const
 Entree& Transport_turbulent_aire_interfaciale::readOn(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter("CstDiff", &cst_diff);// XD_ADD_P floattant Kataoka diffusion model constant. By default it is se to 0.236.
-  param.ajouter("ng2", &n_g2); // XD_ADD_P floattant not_set
+  param.ajouter("CstDiff", &cst_diff);// XD_ADD_P floattant
+  // XD_CONT Kataoka diffusion model constant. By default it is se to 0.236.
+  param.ajouter("ng2", &n_g2); // XD_ADD_P floattant
+  // XD_CONT not_set
   param.lire_avec_accolades_depuis(is);
   return is;
 }

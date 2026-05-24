@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,9 +16,10 @@
 #include <PrecisionGeom.h>
 
 Implemente_instanciable(PrecisionGeom,"PrecisionGeom",Interprete);
-// XD precisiongeom interprete precisiongeom NO_BRACE Class to change the way floating-point number comparison is done. By default, two numbers are equal if their absolute difference is smaller than 1e-10. The keyword is useful to modify this value. Moreover,
-// XD_CONT nodes coordinates will be written in .geom files with this same precision.
-// XD  attr precision floattant precision REQ New value of precision.
+// XD precisiongeom interprete precisiongeom NO_BRACE Class to change the way floating-point number comparison is done.
+// XD_CONT By default, two numbers are equal if their absolute difference is smaller than 1e-10. The keyword is useful
+// XD_CONT to modify this value. Moreover, nodes coordinates will be written in .geom files with this same precision.
+// XD attr precision floattant precision REQ New value of precision.
 
 
 /*! @brief Simple appel a: Interprete::printOn(Sortie&)

@@ -39,8 +39,11 @@
 #include <Tri_VEF.h>
 
 Implemente_instanciable(VEF_discretisation, "VEFPreP1B|VEF", Discret_Thyd);
-// XD vef discretisation_base vefprep1b INHERITS_BRACE Finite element volume discretization (P1NC/P1-bubble element). Since the 1.5.5 version, several new discretizations are available thanks to the optional keyword Read. By default, the VEFPreP1B keyword is
-// XD_CONT equivalent to the former VEFPreP1B formulation (v1.5.4 and sooner). P0P1 (if used with the strong formulation for imposed pressure boundary) is equivalent to VEFPreP1B but the convergence is slower. VEFPreP1B dis is equivalent to VEFPreP1B dis Read dis { P0 P1
+// XD vef discretisation_base vefprep1b INHERITS_BRACE Finite element volume discretization (P1NC/P1-bubble element).
+// XD_CONT Since the 1.5.5 version, several new discretizations are available thanks to the optional keyword Read. By
+// XD_CONT default, the VEFPreP1B keyword is equivalent to the former VEFPreP1B formulation (v1.5.4 and sooner). P0P1
+// XD_CONT (if used with the strong formulation for imposed pressure boundary) is equivalent to VEFPreP1B but the
+// XD_CONT convergence is slower. VEFPreP1B dis is equivalent to VEFPreP1B dis Read dis { P0 P1
 // XD_CONT Changement_de_base_P1Bulle 1 Cl_pression_sommet_faible 0 }
 
 // By default, P0+P1 and changing basis to do P0+P1->P1Bulle
@@ -63,13 +66,24 @@ void VEF_discretisation::set_param(Param& param) const
 {
   Discret_Thyd::set_param(param);
 
-  param.ajouter("changement_de_base_P1bulle", &P1Bulle_); // XD_ADD_P entier(into=[0,1]) changement_de_base_p1bulle 1 This option may be used to have the P1NC/P0P1 formulation (value set to 0) or the P1NC/P1Bulle formulation (value set to 1, the default).
-  param.ajouter_flag("P0", &alphaE_); // XD_ADD_P rien Pressure nodes are added on element centres
-  param.ajouter_flag("P1", &alphaS_); // XD_ADD_P rien Pressure nodes are added on vertices
-  param.ajouter_flag("Pa", &alphaA_); // XD_ADD_P rien Only available in 3D, pressure nodes are added on bones
-  param.ajouter_flag("RT", &alphaRT_); // XD_ADD_P rien For P1NCP1B (in TrioCFD)
-  param.ajouter("modif_div_face_dirichlet", &modif_div_face_dirichlet_); // XD_ADD_P entier(into=[0,1]) This option (by default 0) is used to extend control volumes for the momentum equation.
-  param.ajouter("CL_pression_sommet_faible", &cl_pression_sommet_faible_); // XD_ADD_P entier(into=[0,1]) This option is used to specify a strong formulation (value set to 0, the default) or a weak formulation (value set to 1) for an imposed pressure boundary condition. The first formulation converges quicker and is stable in general cases. The second formulation should be used if there are several outlet boundaries with Neumann condition (see Ecoulement_Neumann test case for example).
+  param.ajouter("changement_de_base_P1bulle", &P1Bulle_); // XD_ADD_P entier(into=[0,1])
+  // XD_CONT changement_de_base_p1bulle 1 This option may be used to have the P1NC/P0P1 formulation (value set to 0) or
+  // XD_CONT the P1NC/P1Bulle formulation (value set to 1, the default).
+  param.ajouter_flag("P0", &alphaE_); // XD_ADD_P rien
+  // XD_CONT Pressure nodes are added on element centres
+  param.ajouter_flag("P1", &alphaS_); // XD_ADD_P rien
+  // XD_CONT Pressure nodes are added on vertices
+  param.ajouter_flag("Pa", &alphaA_); // XD_ADD_P rien
+  // XD_CONT Only available in 3D, pressure nodes are added on bones
+  param.ajouter_flag("RT", &alphaRT_); // XD_ADD_P rien
+  // XD_CONT For P1NCP1B (in TrioCFD)
+  param.ajouter("modif_div_face_dirichlet", &modif_div_face_dirichlet_); // XD_ADD_P entier(into=[0,1])
+  // XD_CONT This option (by default 0) is used to extend control volumes for the momentum equation.
+  param.ajouter("CL_pression_sommet_faible", &cl_pression_sommet_faible_); // XD_ADD_P entier(into=[0,1])
+  // XD_CONT This option is used to specify a strong formulation (value set to 0, the default) or a weak formulation
+  // XD_CONT (value set to 1) for an imposed pressure boundary condition. The first formulation converges quicker and is
+  // XD_CONT stable in general cases. The second formulation should be used if there are several outlet boundaries with
+  // XD_CONT Neumann condition (see Ecoulement_Neumann test case for example).
 }
 
 void VEF_discretisation::check_param()

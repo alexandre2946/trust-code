@@ -36,14 +36,19 @@ extern void convert_to(const char *s, double& ob);
  * @return (Entree&) le flot d'entree modifie
  * @throws mot cle inattendu, on attendait "KX","KY", "KZ" ou "K"
  */
-// XD perte_charge_singuliere source_base perte_charge_singuliere BRACE Source term that is used to model a pressure loss over a surface area (transition through a grid, sudden enlargement) defined by the faces of elements located on the intersection of a
-// XD_CONT subzone named subzone_name and a X,Y, or Z plane located at X,Y or Z = location.
-// XD attr dir chaine(into=["kx","ky","kz","K"]) dir REQ KX, KY or KZ designate directional pressure loss coefficients for respectively X, Y or Z direction. Or in the case where you chose a target flow rate with regul. Use K for isotropic pressure loss
-// XD_CONT coefficient
-// XD  attr coeff floattant coeff OPT Value (float) of friction coefficient (KX, KY, KZ).
-// XD  attr regul bloc_lecture regul OPT option to have adjustable K with flowrate target  NL2 { K0 valeur_initiale_de_k deb debit_cible eps intervalle_variation_mutiplicatif}.
-// XD attr surface bloc_lecture surface REQ Three syntaxes are possible for the surface definition block: NL2 For VDF and VEF: { X|Y|Z = location subzone_name } NL2 Only for VEF: { Surface surface_name }. NL2 For PolyMAC_CDO { Surface surface_name Orientation
-// XD_CONT champ_uniforme }
+// XD perte_charge_singuliere source_base perte_charge_singuliere BRACE Source term that is used to model a pressure
+// XD_CONT loss over a surface area (transition through a grid, sudden enlargement) defined by the faces of elements
+// XD_CONT located on the intersection of a subzone named subzone_name and a X,Y, or Z plane located at X,Y or Z =
+// XD_CONT location.
+// XD attr dir chaine(into=["kx","ky","kz","K"]) dir REQ KX, KY or KZ designate directional pressure loss coefficients
+// XD_CONT for respectively X, Y or Z direction. Or in the case where you chose a target flow rate with regul. Use K for
+// XD_CONT isotropic pressure loss coefficient
+// XD attr coeff floattant coeff OPT Value (float) of friction coefficient (KX, KY, KZ).
+// XD attr regul bloc_lecture regul OPT option to have adjustable K with flowrate target NL2 { K0 valeur_initiale_de_k
+// XD_CONT deb debit_cible eps intervalle_variation_mutiplicatif}.
+// XD attr surface bloc_lecture surface REQ Three syntaxes are possible for the surface definition block: NL2 For VDF
+// XD_CONT and VEF: { X|Y|Z = location subzone_name } NL2 Only for VEF: { Surface surface_name }. NL2 For PolyMAC_CDO {
+// XD_CONT Surface surface_name Orientation champ_uniforme }
 
 Entree& Perte_Charge_Singuliere::lire_regul(Entree& is)
 {

@@ -25,7 +25,8 @@
 #include <Domaine_VF.h>
 
 Implemente_instanciable(Milieu_composite, "Milieu_composite", Fluide_base);
-// XD Milieu_composite listobj Milieu_composite INHERITS_BRACE milieu_base NO_COMMA Composite medium made of several sub mediums.
+// XD Milieu_composite listobj Milieu_composite INHERITS_BRACE milieu_base NO_COMMA Composite medium made of several sub
+// XD_CONT mediums.
 
 Sortie& Milieu_composite::printOn(Sortie& os) const { return os; }
 

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -46,8 +46,10 @@ Sortie& Op_Conv_BTD_EF::printOn(Sortie& s ) const
 Entree& Op_Conv_BTD_EF::readOn(Entree& s )
 {
   Param param(que_suis_je()); // XD convection_btd convection_deriv btd BRACE Only for EF discretization.
-  param.ajouter("btd",&btd_,Param::REQUIRED); // XD_ADD_P double not_set
-  param.ajouter("facteur",&facteur_,Param::REQUIRED);  // XD_ADD_P double not_set
+  param.ajouter("btd",&btd_,Param::REQUIRED); // XD_ADD_P double
+  // XD_CONT not_set
+  param.ajouter("facteur",&facteur_,Param::REQUIRED);  // XD_ADD_P double
+  // XD_CONT not_set
 
   param.lire_avec_accolades(s);
   return s;

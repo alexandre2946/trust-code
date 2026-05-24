@@ -16,7 +16,8 @@
 #include <Neumann_paroi_flux_nul.h>
 
 Implemente_instanciable(Neumann_paroi_flux_nul, "Paroi", Neumann_paroi_adiabatique);
-// XD Paroi condlim_base Paroi NO_BRACE Impermeability condition at a wall called bord (edge) (standard flux zero). This condition must be associated with a wall type hydraulic condition.
+// XD Paroi condlim_base Paroi NO_BRACE Impermeability condition at a wall called bord (edge) (standard flux zero). This
+// XD_CONT condition must be associated with a wall type hydraulic condition.
 
 
 Sortie& Neumann_paroi_flux_nul::printOn(Sortie& s) const { return s << que_suis_je() << finl; }

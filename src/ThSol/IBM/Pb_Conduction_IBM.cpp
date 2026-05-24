@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,8 +17,8 @@
 
 Implemente_instanciable(Pb_Conduction_IBM, "Pb_Conduction_IBM", Pb_Conduction);
 // XD Pb_Conduction_ibm Pb_base Pb_Conduction_ibm INHERITS_BRACE Resolution of the IBM heat equation.
-// XD  attr solide solide solide OPT The medium associated with the problem.
-// XD   attr Conduction_ibm Conduction_ibm Conduction_ibm OPT IBM Heat equation.
+// XD attr solide solide solide OPT The medium associated with the problem.
+// XD attr Conduction_ibm Conduction_ibm Conduction_ibm OPT IBM Heat equation.
 
 Sortie& Pb_Conduction_IBM::printOn(Sortie& s) const { return s; }
 

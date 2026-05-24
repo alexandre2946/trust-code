@@ -24,12 +24,21 @@
 Implemente_instanciable_32_64(DecoupeBord_32_64,"DecoupeBord",Interprete_geometrique_base_32_64<_T_>);
 Add_synonym(DecoupeBord,"DecoupeBord_pour_rayonnement");
 
-// XD decoupebord interprete decoupebord_pour_rayonnement BRACE To subdivide the external boundary of a domain into several parts (may be useful for better accuracy when using radiation model in transparent medium). To specify the boundaries of the
-// XD_CONT fine_domain_name domain to be splitted. These boundaries will be cut according the coarse mesh defined by either the keyword domaine_grossier (each boundary face of the coarse mesh coarse_domain_name will be used to group boundary faces of the fine mesh to
-// XD_CONT define a new boundary), either by the keyword nb_parts_naif (each boundary of the fine mesh is splitted into a partition with nx*ny*nz elements), either by a geometric condition given by a formulae with the keyword condition_geometrique. If used, the
-// XD_CONT coarse_domain_name domain should have the same boundaries name of the fine_domain_name domain. NL2 A mesh file (ASCII format, except if binaire option is specified) named by default newgeom (or specified by the nom_fichier_sortie keyword) will be created and
-// XD_CONT will contain the fine_domain_name domain with the splitted boundaries named boundary_name%I (where I is between from 0 and n-1). Furthermore, several files named boundary_name%I and boundary_name_xv will be created, containing the definition of the subdived
-// XD_CONT boundaries. newgeom will be used to calculate view factors with geom2ansys script whereas only the boundary_name_xv files will be necessary for the radiation calculation. The file listb will contain the list of the boundaries boundary_name%I.
+// XD decoupebord interprete decoupebord_pour_rayonnement BRACE To subdivide the external boundary of a domain into
+// XD_CONT several parts (may be useful for better accuracy when using radiation model in transparent medium). To
+// XD_CONT specify the boundaries of the fine_domain_name domain to be splitted. These boundaries will be cut according
+// XD_CONT the coarse mesh defined by either the keyword domaine_grossier (each boundary face of the coarse mesh
+// XD_CONT coarse_domain_name will be used to group boundary faces of the fine mesh to define a new boundary), either by
+// XD_CONT the keyword nb_parts_naif (each boundary of the fine mesh is splitted into a partition with nx*ny*nz
+// XD_CONT elements), either by a geometric condition given by a formulae with the keyword condition_geometrique. If
+// XD_CONT used, the coarse_domain_name domain should have the same boundaries name of the fine_domain_name domain. NL2
+// XD_CONT A mesh file (ASCII format, except if binaire option is specified) named by default newgeom (or specified by
+// XD_CONT the nom_fichier_sortie keyword) will be created and will contain the fine_domain_name domain with the
+// XD_CONT splitted boundaries named boundary_name%I (where I is between from 0 and n-1). Furthermore, several files
+// XD_CONT named boundary_name%I and boundary_name_xv will be created, containing the definition of the subdived
+// XD_CONT boundaries. newgeom will be used to calculate view factors with geom2ansys script whereas only the
+// XD_CONT boundary_name_xv files will be necessary for the radiation calculation. The file listb will contain the list
+// XD_CONT of the boundaries boundary_name%I.
 
 template <typename _SIZE_>
 Sortie& DecoupeBord_32_64<_SIZE_>::printOn(Sortie& os) const
@@ -475,14 +484,22 @@ Entree& DecoupeBord_32_64<_SIZE_>::interpreter_(Entree& is)
   Param param(this->que_suis_je());
   int binaire=0;
   Noms expr;
-  param.ajouter("domaine",&nom_dom1,Param::REQUIRED); // XD_ADD_P ref_domaine not_set
-  param.ajouter("domaine_grossier",&nom_dom2); // XD_ADD_P ref_domaine not_set
-  param.ajouter("nb_parts_naif",&nb_parts); // XD_ADD_P listentier not_set
-  param.ajouter("nb_parts_geom",&nb_parts_geom); // XD_ADD_P listentier not_set
-  param.ajouter("condition_geometrique",&expr); // XD_ADD_P listchaine not_set
-  param.ajouter("bords_a_decouper",&nomdec,Param::REQUIRED); // XD_ADD_P listchaine not_set
-  param.ajouter("nom_fichier_sortie",&nom_fichier_sortie); // XD_ADD_P chaine not_set
-  param.ajouter("binaire",&binaire); // XD_ADD_P entier not_set
+  param.ajouter("domaine",&nom_dom1,Param::REQUIRED); // XD_ADD_P ref_domaine
+  // XD_CONT not_set
+  param.ajouter("domaine_grossier",&nom_dom2); // XD_ADD_P ref_domaine
+  // XD_CONT not_set
+  param.ajouter("nb_parts_naif",&nb_parts); // XD_ADD_P listentier
+  // XD_CONT not_set
+  param.ajouter("nb_parts_geom",&nb_parts_geom); // XD_ADD_P listentier
+  // XD_CONT not_set
+  param.ajouter("condition_geometrique",&expr); // XD_ADD_P listchaine
+  // XD_CONT not_set
+  param.ajouter("bords_a_decouper",&nomdec,Param::REQUIRED); // XD_ADD_P listchaine
+  // XD_CONT not_set
+  param.ajouter("nom_fichier_sortie",&nom_fichier_sortie); // XD_ADD_P chaine
+  // XD_CONT not_set
+  param.ajouter("binaire",&binaire); // XD_ADD_P entier
+  // XD_CONT not_set
   param.lire_avec_accolades_depuis(is);
   // on fait une copie de dom1 pour le modifier
   this->associer_domaine(nom_dom1);

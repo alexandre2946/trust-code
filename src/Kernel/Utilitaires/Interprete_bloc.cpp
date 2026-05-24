@@ -16,6 +16,16 @@
 #include <Interprete_bloc.h>
 #include <Type_Verifie.h>
 
+// `export <Type> <name>` is a TRUST-specific prefix on forward
+// declarations — it tells Interprete_bloc::lire to add the resulting
+// object to the parent Interprete_bloc's scope instead of the local
+// one, so the name survives Read_file's sub-block destruction. There
+// is no dedicated C++ class for it; the parsing is inlined below.
+// trustify recognises the `export` keyword directly in
+// Dataset_Parser.ReadFromTokens — it treats `export <Type> <name>`
+// as a regular forward declaration and stashes the `export` token on
+// the resulting Declaration_Parser for round-trip emission.
+
 Implemente_instanciable_sans_constructeur_ni_destructeur(Interprete_bloc,"Interprete_bloc",Liste_bloc);
 
 // Voir Interprete_bloc::interprete_courant()

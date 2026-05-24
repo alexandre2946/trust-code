@@ -17,9 +17,11 @@
 #include <Pb_Multiphase.h>
 
 Implemente_base(Viscosite_turbulente_base, "Viscosite_turbulente_base", Correlation_base);
-// XD type_diffusion_turbulente_multiphase_deriv objet_lecture type_diffusion_turbulente_multiphase_deriv INHERITS_BRACE not_set
+// XD type_diffusion_turbulente_multiphase_deriv objet_lecture type_diffusion_turbulente_multiphase_deriv INHERITS_BRACE
+// XD_CONT not_set
 
-// XD diffusion_turbulente_multiphase diffusion_deriv turbulente NO_BRACE Turbulent diffusion operator for multiphase problem
+// XD diffusion_turbulente_multiphase diffusion_deriv turbulente NO_BRACE Turbulent diffusion operator for multiphase
+// XD_CONT problem
 // XD attr type type_diffusion_turbulente_multiphase_deriv type OPT Turbulence model for multiphase problem
 
 Sortie& Viscosite_turbulente_base::printOn(Sortie& os) const {return os;}

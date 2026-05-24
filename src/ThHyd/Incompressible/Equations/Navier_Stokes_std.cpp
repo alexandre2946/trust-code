@@ -102,13 +102,28 @@ void Navier_Stokes_std::set_param(Param& param) const
   param.ajouter_condition("is_read_diffusion","The diffusion operator must be read, select negligeable type if you want to neglect it.");
   param.ajouter_condition("is_read_convection","The convection operator must be read, select negligeable type if you want to neglect it.");
   param.ajouter_non_std("solveur_pression",(this),Param::REQUIRED); // XD attr solveur_pression solveur_sys_base solveur_pression OPT Linear pressure system resolution method.
-  param.ajouter_non_std("dt_projection",(this));  // XD attr dt_projection deuxmots dt_projection OPT nb value : This keyword checks every nb time-steps the equality of velocity divergence to zero. value is the criteria convergency for the solver used.
+  param.ajouter_non_std("dt_projection",(this));  // XD attr dt_projection deuxmots dt_projection OPT nb value : This
+  // XD_CONT keyword checks every nb time-steps the equality of velocity divergence to zero. value is the criteria
+  // XD_CONT convergency for the solver used.
   param.ajouter_non_std("Traitement_particulier",(this)); // XD attr traitement_particulier traitement_particulier traitement_particulier OPT Keyword to post-process particular values.
   param.ajouter_non_std("Erreur_max_DivU",(this));
   param.ajouter("uzawa",&seuil_uzawa);
   //param.ajouter_non_std("vitesse_transportante",(this));
-  param.ajouter_non_std("seuil_divU",(this));  // XD attr seuil_divU floatfloat seuil_divU OPT value factor : this keyword is intended to minimise the number of iterations during the pressure system resolution. The convergence criteria during this step (\'seuil\' in solveur_pression) is dynamically adapted according to the mass conservation. At tn , the linear system Ax=B is considered as solved if the residual ||Ax-B||<seuil(tn). For tn+1, the threshold value seuil(tn+1) will be evualated as: NL2 If ( |max(DivU)*dt|<value ) NL2 Seuil(tn+1)= Seuil(tn)*factor NL2 Else NL2 Seuil(tn+1)= Seuil(tn)*factor NL2 Endif NL2 The first parameter (value) is the mass evolution the user is ready to accept per timestep, and the second one (factor) is the factor of evolution for \'seuil\' (for example 1.1, so 10% per timestep). Investigations has to be lead to know more about the effects of these two last parameters on the behaviour of the simulations.
-  param.ajouter_non_std("solveur_bar",(this)); // XD attr solveur_bar solveur_sys_base solveur_bar OPT This keyword is used to define when filtering operation is called (typically for EF convective scheme, standard diffusion operator and Source_Qdm_lambdaup ). A file (solveur.bar) is then created and used for inversion procedure. Syntax is the same then for pressure solver (GCP is required for multi-processor calculations and, in a general way, for big meshes).
+  param.ajouter_non_std("seuil_divU",(this));  // XD attr seuil_divU floatfloat seuil_divU OPT value factor : this
+  // XD_CONT keyword is intended to minimise the number of iterations during the pressure system resolution. The
+  // XD_CONT convergence criteria during this step (\'seuil\' in solveur_pression) is dynamically adapted according to
+  // XD_CONT the mass conservation. At tn , the linear system Ax=B is considered as solved if the residual
+  // XD_CONT ||Ax-B||<seuil(tn). For tn+1, the threshold value seuil(tn+1) will be evualated as: NL2 If (
+  // XD_CONT |max(DivU)*dt|<value ) NL2 Seuil(tn+1)= Seuil(tn)*factor NL2 Else NL2 Seuil(tn+1)= Seuil(tn)*factor NL2
+  // XD_CONT Endif NL2 The first parameter (value) is the mass evolution the user is ready to accept per timestep, and
+  // XD_CONT the second one (factor) is the factor of evolution for \'seuil\' (for example 1.1, so 10% per timestep).
+  // XD_CONT Investigations has to be lead to know more about the effects of these two last parameters on the behaviour
+  // XD_CONT of the simulations.
+  param.ajouter_non_std("solveur_bar",(this)); // XD attr solveur_bar solveur_sys_base solveur_bar OPT This keyword is
+  // XD_CONT used to define when filtering operation is called (typically for EF convective scheme, standard diffusion
+  // XD_CONT operator and Source_Qdm_lambdaup ). A file (solveur.bar) is then created and used for inversion procedure.
+  // XD_CONT Syntax is the same then for pressure solver (GCP is required for multi-processor calculations and, in a
+  // XD_CONT general way, for big meshes).
   param.ajouter("projection_initiale",&projection_initiale); // XD attr projection_initiale entier projection_initiale OPT Keyword to suppress, if boolean equals 0, the initial projection which checks DivU=0. By default, boolean equals 1.
   param.ajouter_flag("postraiter_gradient_pression_sans_masse", &postraiter_gradient_pression_sans_masse_); // XD attr postraiter_gradient_pression_sans_masse rien postraiter_gradient_pression_sans_masse OPT Avoid mass matrix multiplication for the gradient postprocessing
   param.ajouter_non_std("methode_calcul_pression_initiale",(this));  // XD attr methode_calcul_pression_initiale chaine(into=["avec_les_cl","avec_sources","avec_sources_et_operateurs","sans_rien"]) methode_calcul_pression_initiale OPT Keyword to select an option for the pressure calculation before the fist time step. Options are : avec_les_cl (default option lapP=0 is solved with Neuman boundary conditions on pressure if any), avec_sources (lapP=f is solved with Neuman boundaries conditions and f integrating the source terms of the Navier-Stokes equations) and avec_sources_et_operateurs (lapP=f is solved as with the previous option avec_sources but f integrating also some operators of the Navier-Stokes equations). The two last options are useful and sometime necessary when source terms are implicited when using an implicit time scheme to solve the Navier-Stokes equations.

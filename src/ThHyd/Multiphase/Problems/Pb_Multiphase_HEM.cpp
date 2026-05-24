@@ -17,7 +17,8 @@
 #include <EChaine.h>
 
 Implemente_instanciable(Pb_Multiphase_HEM, "Pb_HEM|Pb_Multiphase_HEM", Pb_Multiphase);
-// XD Pb_Multiphase_HEM Pb_Multiphase Pb_HEM INHERITS_BRACE A problem that allows the resolution of 2-phases mechanicaly and thermally coupled with 3 equations
+// XD Pb_Multiphase_HEM Pb_Multiphase Pb_HEM INHERITS_BRACE A problem that allows the resolution of 2-phases mechanicaly
+// XD_CONT and thermally coupled with 3 equations
 
 Sortie& Pb_Multiphase_HEM::printOn(Sortie& os) const { return Pb_Multiphase::printOn(os); }
 Entree& Pb_Multiphase_HEM::readOn(Entree& is) { return Pb_Multiphase::readOn(is); }

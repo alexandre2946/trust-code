@@ -23,8 +23,10 @@
 
 
 Implemente_instanciable(Echange_interne_global_impose,"Paroi_echange_interne_global_impose",Echange_global_impose);
-// XD Echange_interne_global_impose condlim_base Paroi_echange_interne_global_impose INHERITS_BRACE Internal heat exchange boundary condition with global exchange coefficient.
-// XD attr h_imp chaine h_imp REQ Global exchange coefficient value. The global exchange coefficient value is expressed in W.m-2.K-1.
+// XD Echange_interne_global_impose condlim_base Paroi_echange_interne_global_impose INHERITS_BRACE Internal heat
+// XD_CONT exchange boundary condition with global exchange coefficient.
+// XD attr h_imp chaine h_imp REQ Global exchange coefficient value. The global exchange coefficient value is expressed
+// XD_CONT in W.m-2.K-1.
 // XD attr ch front_field_base ch REQ Boundary field type.
 
 /*! @brief Ecrit le type de l'objet sur un flot de sortie

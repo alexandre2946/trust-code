@@ -21,7 +21,8 @@
 #include <Param.h>
 
 Implemente_instanciable(Fraction_Euler, "Fraction_Euler", Conservation_Euler_base);
-// XD fraction_euler cons_euler fraction_euler INHERITS_BRACE Void fraction conservation equation for a multi-phase Euler problem where the unknown is the temperature
+// XD fraction_euler cons_euler fraction_euler INHERITS_BRACE Void fraction conservation equation for a multi-phase
+// XD_CONT Euler problem where the unknown is the temperature
 
 Sortie& Fraction_Euler::printOn(Sortie& is) const { return Equation_base::printOn(is); }
 

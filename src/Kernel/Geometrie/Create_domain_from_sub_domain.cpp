@@ -23,8 +23,11 @@
 #include <Synonyme_info.h>
 
 Implemente_instanciable(Create_domain_from_sub_domain,"Create_domain_from_sub_domain|Create_domain_from_sub_domains",Interprete_geometrique_base);
-// XD Create_domain_from_sub_domain interprete_geometrique_base Create_domain_from_sub_domain BRACE This keyword fills the domain domaine_final with the subdomaine par_sous_zone from the domain domaine_init. It is very useful when meshing several mediums with
-// XD_CONT Gmsh. Each medium will be defined as a subdomaine into Gmsh. A MED mesh file will be saved from Gmsh and read with Lire_Med keyword by the TRUST data file. And with this keyword, a domain will be created for each medium in the TRUST data file.
+// XD Create_domain_from_sub_domain interprete_geometrique_base Create_domain_from_sub_domain BRACE This keyword fills
+// XD_CONT the domain domaine_final with the subdomaine par_sous_zone from the domain domaine_init. It is very useful
+// XD_CONT when meshing several mediums with Gmsh. Each medium will be defined as a subdomaine into Gmsh. A MED mesh
+// XD_CONT file will be saved from Gmsh and read with Lire_Med keyword by the TRUST data file. And with this keyword, a
+// XD_CONT domain will be created for each medium in the TRUST data file.
 
 Add_synonym(Create_domain_from_sub_domain, "Create_domain_from_sous_zone");
 
@@ -57,9 +60,12 @@ Entree& Create_domain_from_sub_domain::interpreter_(Entree& is)
   Nom nom_dom_org;
   noms_sous_domaines.dimensionner(1), noms_doms.dimensionner(1);
   Param param(que_suis_je());
-  param.ajouter("domaine_final",&noms_doms[0]); // XD_ADD_P ref_domaine new domain in which faces are stored
-  param.ajouter("par_sous_zone|par_sous_dom",&noms_sous_domaines[0]); // XD_ADD_P chaine a sub-area (a group in a MED file) allowing to choose the elements
-  param.ajouter("domaine_init",&nom_dom_org,Param::REQUIRED); // XD_ADD_P ref_domaine initial domain
+  param.ajouter("domaine_final",&noms_doms[0]); // XD_ADD_P ref_domaine
+  // XD_CONT new domain in which faces are stored
+  param.ajouter("par_sous_zone|par_sous_dom",&noms_sous_domaines[0]); // XD_ADD_P chaine
+  // XD_CONT a sub-area (a group in a MED file) allowing to choose the elements
+  param.ajouter("domaine_init",&nom_dom_org,Param::REQUIRED); // XD_ADD_P ref_domaine
+  // XD_CONT initial domain
   param.ajouter_non_std("domaines|zones", this);
   param.lire_avec_accolades_depuis(is);
 

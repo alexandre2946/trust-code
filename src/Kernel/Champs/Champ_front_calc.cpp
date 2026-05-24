@@ -24,11 +24,16 @@
 #include <Domaine_VF.h>
 
 Implemente_instanciable_sans_constructeur(Champ_front_calc,"Champ_front_calc",Ch_front_var_instationnaire_dep);
-// XD champ_front_calc front_field_base champ_front_calc NO_BRACE This keyword is used on a boundary to get a field from another boundary. The local and remote boundaries should have the same mesh. If not, the Champ_front_recyclage keyword could be used
-// XD_CONT instead. It is used in the condition block at the limits of equation which itself refers to a problem called pb1. We are working under the supposition that pb1 is coupled to another problem.
+// XD champ_front_calc front_field_base champ_front_calc NO_BRACE This keyword is used on a boundary to get a field from
+// XD_CONT another boundary. The local and remote boundaries should have the same mesh. If not, the
+// XD_CONT Champ_front_recyclage keyword could be used instead. It is used in the condition block at the limits of
+// XD_CONT equation which itself refers to a problem called pb1. We are working under the supposition that pb1 is
+// XD_CONT coupled to another problem.
 // XD attr problem_name ref_Pb_base problem_name REQ Name of the other problem to which pb1 is coupled.
-// XD attr bord chaine bord REQ Name of the side which is the boundary between the 2 domains in the domain object description associated with the problem_name object.
-// XD attr field_name chaine field_name REQ Name of the field containing the value that the user wishes to use at the boundary. The field_name object must be recognized by the problem_name object.
+// XD attr bord chaine bord REQ Name of the side which is the boundary between the 2 domains in the domain object
+// XD_CONT description associated with the problem_name object.
+// XD attr field_name chaine field_name REQ Name of the field containing the value that the user wishes to use at the
+// XD_CONT boundary. The field_name object must be recognized by the problem_name object.
 
 
 Champ_front_calc::Champ_front_calc() { set_distant(1); }

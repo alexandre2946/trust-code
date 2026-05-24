@@ -19,7 +19,8 @@
 
 Implemente_base(Conservation_Euler_base, "Conservation_Euler_base", Convection_Diffusion_std);
 // XD cons_euler eqn_base cons_euler INHERITS_BRACE Base class equation for a multi-phase Euler conservation equations
-// XD attr termes_non_conservatifs bloc_op_non_conservativtifs non_conservative_terms OPT Keyword to alter the non-conservative scheme.
+// XD attr termes_non_conservatifs bloc_op_non_conservativtifs non_conservative_terms OPT Keyword to alter the
+// XD_CONT non-conservative scheme.
 
 // XD bloc_op_non_conservativtifs objet_lecture nul NO_BRACE not_set
 // XD attr aco chaine(into=["{"]) aco REQ Opening curly bracket.

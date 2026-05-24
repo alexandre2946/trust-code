@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,8 +18,9 @@
 
 Implemente_instanciable(Pb_Hydraulique_IBM,"Pb_Hydraulique_IBM",Pb_Fluide_base);
 // XD pb_hydraulique_ibm Pb_base pb_hydraulique_ibm INHERITS_BRACE Resolution of the IBM Navier-Stokes equations.
-// XD   attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the problem.
-// XD   attr navier_stokes_ibm navier_stokes_ibm navier_stokes_ibm REQ IBM Navier-Stokes equations.
+// XD attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the
+// XD_CONT problem.
+// XD attr navier_stokes_ibm navier_stokes_ibm navier_stokes_ibm REQ IBM Navier-Stokes equations.
 
 Sortie& Pb_Hydraulique_IBM::printOn(Sortie& os) const { return Pb_Fluide_base::printOn(os); }
 Entree& Pb_Hydraulique_IBM::readOn(Entree& is) { return Pb_Fluide_base::readOn(is); }

@@ -23,17 +23,30 @@ Implemente_instanciable(Pb_Thermohydraulique_Especes_WC,"Pb_Thermohydraulique_Es
 Sortie& Pb_Thermohydraulique_Especes_WC::printOn(Sortie& os) const { return TRUSTProblem_sup_eqns<Pb_Thermohydraulique_WC>::printOn(os); }
 Entree& Pb_Thermohydraulique_Especes_WC::readOn(Entree& is) { return TRUSTProblem_sup_eqns<Pb_Thermohydraulique_WC>::readOn(is); }
 
-// XD pb_thermohydraulique_especes_QC Pb_base pb_thermohydraulique_especes_QC INHERITS_BRACE Resolution of thermo-hydraulic problem for a multi-species quasi-compressible fluid.
-// XD attr fluide_quasi_compressible fluide_quasi_compressible fluide_quasi_compressible REQ The fluid medium associated with the problem.
+// XD pb_thermohydraulique_especes_QC Pb_base pb_thermohydraulique_especes_QC INHERITS_BRACE Resolution of
+// XD_CONT thermo-hydraulic problem for a multi-species quasi-compressible fluid.
+// XD attr fluide_quasi_compressible fluide_quasi_compressible fluide_quasi_compressible REQ The fluid medium associated
+// XD_CONT with the problem.
 // XD attr navier_stokes_QC navier_stokes_QC navier_stokes_QC REQ Navier-Stokes equation for a quasi-compressible fluid.
-// XD attr convection_diffusion_chaleur_QC convection_diffusion_chaleur_QC convection_diffusion_chaleur_QC REQ Temperature equation for a quasi-compressible fluid.
-// XD attr equations_scalaires_passifs listeqn equations_scalaires_passifs REQ Passive scalar equations. The unknowns of the passive scalar equation number N are named temperatureN or concentrationN or fraction_massiqueN. This keyword is used to define initial
-// XD_CONT conditions and the post processing fields. This kind of problem is very useful to test in only one data file (and then only one calculation) different schemes or different boundary conditions for the scalar transport equation.
+// XD attr convection_diffusion_chaleur_QC convection_diffusion_chaleur_QC convection_diffusion_chaleur_QC REQ
+// XD_CONT Temperature equation for a quasi-compressible fluid.
+// XD attr equations_scalaires_passifs listeqn equations_scalaires_passifs REQ Passive scalar equations. The unknowns of
+// XD_CONT the passive scalar equation number N are named temperatureN or concentrationN or fraction_massiqueN. This
+// XD_CONT keyword is used to define initial conditions and the post processing fields. This kind of problem is very
+// XD_CONT useful to test in only one data file (and then only one calculation) different schemes or different boundary
+// XD_CONT conditions for the scalar transport equation.
 
-// XD pb_thermohydraulique_especes_WC Pb_base pb_thermohydraulique_especes_WC INHERITS_BRACE Resolution of thermo-hydraulic problem for a multi-species weakly-compressible fluid.
-// XD attr fluide_weakly_compressible fluide_weakly_compressible fluide_weakly_compressible REQ The fluid medium associated with the problem.
-// XD attr navier_stokes_WC navier_stokes_WC navier_stokes_WC REQ Navier-Stokes equation for a weakly-compressible fluid.
-// XD attr convection_diffusion_chaleur_WC convection_diffusion_chaleur_WC convection_diffusion_chaleur_WC REQ Temperature equation for a weakly-compressible fluid.
-// XD attr equations_scalaires_passifs listeqn equations_scalaires_passifs REQ Passive scalar equations. The unknowns of the passive scalar equation number N are named temperatureN or concentrationN or fraction_massiqueN. This keyword is used to define initial
-// XD_CONT conditions and the post processing fields. This kind of problem is very useful to test in only one data file (and then only one calculation) different schemes or different boundary conditions for the scalar transport equation.
+// XD pb_thermohydraulique_especes_WC Pb_base pb_thermohydraulique_especes_WC INHERITS_BRACE Resolution of
+// XD_CONT thermo-hydraulic problem for a multi-species weakly-compressible fluid.
+// XD attr fluide_weakly_compressible fluide_weakly_compressible fluide_weakly_compressible REQ The fluid medium
+// XD_CONT associated with the problem.
+// XD attr navier_stokes_WC navier_stokes_WC navier_stokes_WC REQ Navier-Stokes equation for a weakly-compressible
+// XD_CONT fluid.
+// XD attr convection_diffusion_chaleur_WC convection_diffusion_chaleur_WC convection_diffusion_chaleur_WC REQ
+// XD_CONT Temperature equation for a weakly-compressible fluid.
+// XD attr equations_scalaires_passifs listeqn equations_scalaires_passifs REQ Passive scalar equations. The unknowns of
+// XD_CONT the passive scalar equation number N are named temperatureN or concentrationN or fraction_massiqueN. This
+// XD_CONT keyword is used to define initial conditions and the post processing fields. This kind of problem is very
+// XD_CONT useful to test in only one data file (and then only one calculation) different schemes or different boundary
+// XD_CONT conditions for the scalar transport equation.
 

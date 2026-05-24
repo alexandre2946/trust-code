@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,29 +16,38 @@
 #include <Perte_Charge_Reguliere.h>
 #include <Motcle.h>
 
-// XD perte_charge_reguliere source_base perte_charge_reguliere NO_BRACE Source term modelling the presence of a bundle of tubes in a flow.
+// XD perte_charge_reguliere source_base perte_charge_reguliere NO_BRACE Source term modelling the presence of a bundle
+// XD_CONT of tubes in a flow.
 // XD attr spec spec_pdcr_base spec REQ Description of longitudinale or transversale type.
-// XD attr zone_name chaine name_of_zone REQ Name of the sub-area occupied by the tube bundle. A Sous_Zone (Sub-area) type object called zone_name should have been previously created.
+// XD attr zone_name chaine name_of_zone REQ Name of the sub-area occupied by the tube bundle. A Sous_Zone (Sub-area)
+// XD_CONT type object called zone_name should have been previously created.
 
-// XD spec_pdcr_base objet_lecture spec_pdcr_base NO_BRACE Class to read the source term modelling the presence of a bundle of tubes in a flow. Cf=A Re-B.
+// XD spec_pdcr_base objet_lecture spec_pdcr_base NO_BRACE Class to read the source term modelling the presence of a
+// XD_CONT bundle of tubes in a flow. Cf=A Re-B.
 
-// XD longitudinale spec_pdcr_base longitudinale NO_BRACE Class to define the pressure loss in the direction of the tube bundle.
-// XD   attr dir chaine(into=["x","y","z"]) dir REQ Direction.
-// XD   attr dd floattant dd REQ Tube bundle hydraulic diameter value. This value is expressed in m.
-// XD   attr ch_a chaine(into=["a","cf"]) ch_a REQ Keyword to be used to set law coefficient values for the coefficient of regular pressure losses.
-// XD   attr a floattant a REQ Value of a law coefficient for regular pressure losses.
-// XD   attr ch_b chaine(into=["b"]) ch_b OPT Keyword to be used to set law coefficient values for regular pressure losses.
-// XD   attr b floattant b OPT Value of a law coefficient for regular pressure losses.
+// XD longitudinale spec_pdcr_base longitudinale NO_BRACE Class to define the pressure loss in the direction of the tube
+// XD_CONT bundle.
+// XD attr dir chaine(into=["x","y","z"]) dir REQ Direction.
+// XD attr dd floattant dd REQ Tube bundle hydraulic diameter value. This value is expressed in m.
+// XD attr ch_a chaine(into=["a","cf"]) ch_a REQ Keyword to be used to set law coefficient values for the coefficient of
+// XD_CONT regular pressure losses.
+// XD attr a floattant a REQ Value of a law coefficient for regular pressure losses.
+// XD attr ch_b chaine(into=["b"]) ch_b OPT Keyword to be used to set law coefficient values for regular pressure
+// XD_CONT losses.
+// XD attr b floattant b OPT Value of a law coefficient for regular pressure losses.
 
-// XD transversale spec_pdcr_base transversale NO_BRACE Class to define the pressure loss in the direction perpendicular to the tube bundle.
-// XD   attr dir chaine(into=["x","y","z"]) dir REQ Direction.
-// XD   attr dd floattant dd REQ Value of the tube bundle step.
-// XD   attr chaine_d chaine(into=["d"]) chaine_d REQ Keyword to be used to set the value of the tube external diameter.
-// XD   attr d floattant d REQ Value of the tube external diameter.
-// XD   attr ch_a chaine(into=["a","cf"]) ch_a REQ Keyword to be used to set law coefficient values for the coefficient of regular pressure losses.
-// XD   attr a floattant a REQ Value of a law coefficient for regular pressure losses.
-// XD   attr ch_b chaine(into=["b"]) ch_b OPT Keyword to be used to set law coefficient values for regular pressure losses.
-// XD   attr b floattant b OPT Value of a law coefficient for regular pressure losses.
+// XD transversale spec_pdcr_base transversale NO_BRACE Class to define the pressure loss in the direction perpendicular
+// XD_CONT to the tube bundle.
+// XD attr dir chaine(into=["x","y","z"]) dir REQ Direction.
+// XD attr dd floattant dd REQ Value of the tube bundle step.
+// XD attr chaine_d chaine(into=["d"]) chaine_d REQ Keyword to be used to set the value of the tube external diameter.
+// XD attr d floattant d REQ Value of the tube external diameter.
+// XD attr ch_a chaine(into=["a","cf"]) ch_a REQ Keyword to be used to set law coefficient values for the coefficient of
+// XD_CONT regular pressure losses.
+// XD attr a floattant a REQ Value of a law coefficient for regular pressure losses.
+// XD attr ch_b chaine(into=["b"]) ch_b OPT Keyword to be used to set law coefficient values for regular pressure
+// XD_CONT losses.
+// XD attr b floattant b OPT Value of a law coefficient for regular pressure losses.
 
 
 //Add a constructor for initialization

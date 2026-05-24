@@ -26,27 +26,32 @@
 
 Implemente_instanciable(Test_solveur,"Test_solveur",Interprete);
 // XD test_solveur interprete test_solveur BRACE To test several solvers
-// XD   attr fichier_secmem chaine fichier_secmem OPT Filename containing the second member B
-// XD   attr fichier_matrice chaine fichier_matrice OPT Filename containing the matrix A
-// XD   attr fichier_solution chaine fichier_solution OPT Filename containing the solution x
-// XD   attr nb_test entier nb_test OPT Number of tests to measure the time resolution (one preconditionnement)
-// XD   attr impr rien impr OPT To print the convergence solver
-// XD   attr solveur solveur_sys_base solveur OPT To specify a solver
-// XD   attr fichier_solveur chaine fichier_solveur OPT To specify a file containing a list of solvers
-// XD   attr genere_fichier_solveur floattant genere_fichier_solveur OPT To create a file of the solver with a threshold convergence
-// XD   attr seuil_verification floattant seuil_verification OPT Check if the solution satisfy ||Ax-B||<precision
-// XD   attr pas_de_solution_initiale rien pas_de_solution_initiale OPT Resolution isn\'t initialized with the solution x
-// XD   attr ascii rien ascii OPT Ascii files
+// XD attr fichier_secmem chaine fichier_secmem OPT Filename containing the second member B
+// XD attr fichier_matrice chaine fichier_matrice OPT Filename containing the matrix A
+// XD attr fichier_solution chaine fichier_solution OPT Filename containing the solution x
+// XD attr nb_test entier nb_test OPT Number of tests to measure the time resolution (one preconditionnement)
+// XD attr impr rien impr OPT To print the convergence solver
+// XD attr solveur solveur_sys_base solveur OPT To specify a solver
+// XD attr fichier_solveur chaine fichier_solveur OPT To specify a file containing a list of solvers
+// XD attr genere_fichier_solveur floattant genere_fichier_solveur OPT To create a file of the solver with a threshold
+// XD_CONT convergence
+// XD attr seuil_verification floattant seuil_verification OPT Check if the solution satisfy ||Ax-B||<precision
+// XD attr pas_de_solution_initiale rien pas_de_solution_initiale OPT Resolution isn\'t initialized with the solution x
+// XD attr ascii rien ascii OPT Ascii files
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Solv_Optimal,"Solv_Optimal",solv_iteratif);
-// XD optimal solveur_sys_base optimal BRACE Optimal is a solver which tests several solvers of the previous list to choose the fastest one for the considered linear system.
-// XD   attr seuil floattant seuil REQ Convergence threshold
-// XD   attr impr rien impr OPT To print the convergency of the fastest solver
-// XD   attr quiet rien quiet OPT To disable printing of information
-// XD   attr save_matrice|save_matrix rien save_matrice OPT To save the linear system (A, x, B) into a file
-// XD   attr frequence_recalc entier frequence_recalc OPT To set a time step period (by default, 100) for re-checking the fatest solver
-// XD   attr nom_fichier_solveur chaine nom_fichier_solveur OPT To specify the file containing the list of the tested solvers
-// XD   attr fichier_solveur_non_recree rien fichier_solveur_non_recree OPT To avoid the creation of the file containing the list
+// XD optimal solveur_sys_base optimal BRACE Optimal is a solver which tests several solvers of the previous list to
+// XD_CONT choose the fastest one for the considered linear system.
+// XD attr seuil floattant seuil REQ Convergence threshold
+// XD attr impr rien impr OPT To print the convergency of the fastest solver
+// XD attr quiet rien quiet OPT To disable printing of information
+// XD attr save_matrice|save_matrix rien save_matrice OPT To save the linear system (A, x, B) into a file
+// XD attr frequence_recalc entier frequence_recalc OPT To set a time step period (by default, 100) for re-checking the
+// XD_CONT fatest solver
+// XD attr nom_fichier_solveur chaine nom_fichier_solveur OPT To specify the file containing the list of the tested
+// XD_CONT solvers
+// XD attr fichier_solveur_non_recree rien fichier_solveur_non_recree OPT To avoid the creation of the file containing
+// XD_CONT the list
 
 Sortie& Test_solveur::printOn(Sortie& s ) const
 {

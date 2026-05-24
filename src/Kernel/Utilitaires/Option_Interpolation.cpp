@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -31,8 +31,10 @@ Entree& Option_Interpolation::interpreter(Entree& is)
   bool no_dec = false;
 
   Param param(que_suis_je());
-  param.ajouter_flag("sans_dec|without_dec", &no_dec); // XD_ADD_P rien Use remapper even for a parallel calculation
-  param.ajouter("sharing_algo", &SHARING_ALGO); // XD_ADD_P entier Setting the DEC sharing algo : 0,1,2
+  param.ajouter_flag("sans_dec|without_dec", &no_dec); // XD_ADD_P rien
+  // XD_CONT Use remapper even for a parallel calculation
+  param.ajouter("sharing_algo", &SHARING_ALGO); // XD_ADD_P entier
+  // XD_CONT Setting the DEC sharing algo : 0,1,2
   param.lire_avec_accolades_depuis(is);
 
   if(SHARING_ALGO < 0 || SHARING_ALGO > 2)

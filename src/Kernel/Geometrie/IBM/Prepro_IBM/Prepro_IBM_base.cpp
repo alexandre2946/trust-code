@@ -24,7 +24,8 @@
 #include <MEDCouplingFieldDouble.hxx>
 
 Implemente_base(Prepro_IBM_base, "Prepro_IBM_base", Objet_U);
-// XD Prepro_IBM_base objet_u Prepro_IBM_base INHERITS_BRACE To perform the intersection of an IB (Lagrange mesh) in a MED-format file .med with the Euler computional mesh.
+// XD Prepro_IBM_base objet_u Prepro_IBM_base INHERITS_BRACE To perform the intersection of an IB (Lagrange mesh) in a
+// XD_CONT MED-format file .med with the Euler computional mesh.
 
 Entree& Prepro_IBM_base::readOn(Entree& s)
 {
@@ -37,20 +38,29 @@ Entree& Prepro_IBM_base::readOn(Entree& s)
 
 void Prepro_IBM_base::set_param(Param& param) const
 {
-  param.ajouter("epsilon_prepro_IBM",&eps_,Param::OPTIONAL); // XD_ADD_P double geometric precision (<<1)
-  param.ajouter("constant_c_IBM",&c_prepro_,Param::OPTIONAL);  // XD_ADD_P double additive coefficient to search the purely fluid point (cf. publications G Billo)
-  param.ajouter_non_std("directions_pt_fluid",(this),Param::OPTIONAL); // XD_ADD_P listentier corresponding to each direction to search the purely fluid point
+  param.ajouter("epsilon_prepro_IBM",&eps_,Param::OPTIONAL); // XD_ADD_P double
+  // XD_CONT geometric precision (<<1)
+  param.ajouter("constant_c_IBM",&c_prepro_,Param::OPTIONAL);  // XD_ADD_P double
+  // XD_CONT additive coefficient to search the purely fluid point (cf. publications G Billo)
+  param.ajouter_non_std("directions_pt_fluid",(this),Param::OPTIONAL); // XD_ADD_P listentier
+  // XD_CONT corresponding to each direction to search the purely fluid point
   // Exemples :
   //  *  [True, True, False] if the case is 2D in plane XY
   //  *  [False, True, True] if the case is 2D in plane YZ
   //  *  [True, True, True] if the case is 3D
-  param.ajouter_non_std("MESH_Lagrange_file",(this), Param::OPTIONAL); // XD_ADD_P chaine Name of the .med file including the IB surfacic mesh.
-  param.ajouter("MESH_Lagrange_name",&nom_maillage_IB_, Param::OPTIONAL); // XD_ADD_P chaine Name of the IB surfacic mesh.
-  param.ajouter_flag("write_results_prepro",&save_prepro_); // XD_ADD_P flag to save output from prepro IBM
-  param.ajouter("Out_MED_file_name",&nom_fichier_med_Out_, Param::OPTIONAL); // XD_ADD_P chaine Name of the .med file to save output from prepro IBM
+  param.ajouter_non_std("MESH_Lagrange_file",(this), Param::OPTIONAL); // XD_ADD_P chaine
+  // XD_CONT Name of the .med file including the IB surfacic mesh.
+  param.ajouter("MESH_Lagrange_name",&nom_maillage_IB_, Param::OPTIONAL); // XD_ADD_P chaine
+  // XD_CONT Name of the IB surfacic mesh.
+  param.ajouter_flag("write_results_prepro",&save_prepro_); // XD_ADD_P flag
+  // XD_CONT to save output from prepro IBM
+  param.ajouter("Out_MED_file_name",&nom_fichier_med_Out_, Param::OPTIONAL); // XD_ADD_P chaine
+  // XD_CONT Name of the .med file to save output from prepro IBM
 
-  param.ajouter("prepro_IBM_verbose",&verbose_,Param::OPTIONAL); // XD_ADD_P entier to get verbose version
-  param.ajouter_flag("verify_results_prepro",&verify_results_prepro_); // XD_ADD_P flag to save output from prepro IBM
+  param.ajouter("prepro_IBM_verbose",&verbose_,Param::OPTIONAL); // XD_ADD_P entier
+  // XD_CONT to get verbose version
+  param.ajouter_flag("verify_results_prepro",&verify_results_prepro_); // XD_ADD_P flag
+  // XD_CONT to save output from prepro IBM
 }
 
 int Prepro_IBM_base::lire_motcle_non_standard(const Motcle& un_mot, Entree& is)

@@ -17,9 +17,12 @@
 #include <Fluide_Incompressible.h>
 
 Implemente_instanciable(Pb_Thermohydraulique_Turbulent, "Pb_Thermohydraulique_Turbulent", Pb_Fluide_base);
-// XD pb_thermohydraulique_turbulent Pb_base pb_thermohydraulique_turbulent INHERITS_BRACE Resolution of thermohydraulic problem, with turbulence modelling.
-// XD attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the problem.
-// XD attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent REQ Navier-Stokes equations as well as the associated turbulence model equations.
+// XD pb_thermohydraulique_turbulent Pb_base pb_thermohydraulique_turbulent INHERITS_BRACE Resolution of thermohydraulic
+// XD_CONT problem, with turbulence modelling.
+// XD attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the
+// XD_CONT problem.
+// XD attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent REQ Navier-Stokes equations as well
+// XD_CONT as the associated turbulence model equations.
 // XD attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent REQ Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
 
 Sortie& Pb_Thermohydraulique_Turbulent::printOn(Sortie& os) const { return Pb_Fluide_base::printOn(os); }

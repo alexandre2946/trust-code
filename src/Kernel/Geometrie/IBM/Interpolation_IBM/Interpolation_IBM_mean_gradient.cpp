@@ -21,7 +21,8 @@
 #include <Source_PDF_base.h>
 
 Implemente_instanciable( Interpolation_IBM_mean_gradient, "Interpolation_IBM_gradient_moyen|IBM_gradient_moyen", Interpolation_IBM_base ) ;
-// XD interpolation_ibm_mean_gradient interpolation_ibm_base ibm_gradient_moyen BRACE Immersed Boundary Method (IBM): mean gradient interpolation.
+// XD interpolation_ibm_mean_gradient interpolation_ibm_base ibm_gradient_moyen BRACE Immersed Boundary Method (IBM):
+// XD_CONT mean gradient interpolation.
 
 Sortie& Interpolation_IBM_mean_gradient::printOn( Sortie& os ) const
 {
@@ -31,14 +32,22 @@ Sortie& Interpolation_IBM_mean_gradient::printOn( Sortie& os ) const
 Entree& Interpolation_IBM_mean_gradient::readOn( Entree& is )
 {
   Param param(que_suis_je());
-  param.ajouter("points_solides",&solid_points_lu_,Param::OPTIONAL);  // XD_ADD_P field_base Node field giving the projection of the node on the immersed boundary
-  param.ajouter("est_dirichlet",&is_dirichlet_lu_,Param::OPTIONAL);   // XD_ADD_P field_base Node field of booleans indicating whether the node belong to an element where the interface is
-  param.ajouter("correspondance_elements",&corresp_elems_lu_,Param::OPTIONAL); // XD_ADD_P field_base Cell field giving the SALOME cell number
-  param.ajouter("elements_solides",&solid_elems_lu_,Param::OPTIONAL); // XD_ADD_P field_base Node field giving the element number containing the solid point
-  param.ajouter_flag("get_solid_points_from_prepro", &solid_points_from_prepro_); // XD_ADD_P rien get IBM solid points from prepro.
-  param.ajouter_flag("get_solid_elems_from_prepro", &solid_elems_from_prepro_); // XD_ADD_P rien get IBM solid elems from prepro.
-  param.ajouter_flag("get_is_dirichlet_from_prepro", &is_dirichlet_from_prepro_); // XD_ADD_P rien get IBM is_dirichlet from prepro.
-  param.ajouter_flag("get_corresp_elems_from_prepro", &corresp_elems_from_prepro_); // XD_ADD_P rien get IBM corresp_elems from prepro.
+  param.ajouter("points_solides",&solid_points_lu_,Param::OPTIONAL);  // XD_ADD_P field_base
+  // XD_CONT Node field giving the projection of the node on the immersed boundary
+  param.ajouter("est_dirichlet",&is_dirichlet_lu_,Param::OPTIONAL);   // XD_ADD_P field_base
+  // XD_CONT Node field of booleans indicating whether the node belong to an element where the interface is
+  param.ajouter("correspondance_elements",&corresp_elems_lu_,Param::OPTIONAL); // XD_ADD_P field_base
+  // XD_CONT Cell field giving the SALOME cell number
+  param.ajouter("elements_solides",&solid_elems_lu_,Param::OPTIONAL); // XD_ADD_P field_base
+  // XD_CONT Node field giving the element number containing the solid point
+  param.ajouter_flag("get_solid_points_from_prepro", &solid_points_from_prepro_); // XD_ADD_P rien
+  // XD_CONT get IBM solid points from prepro.
+  param.ajouter_flag("get_solid_elems_from_prepro", &solid_elems_from_prepro_); // XD_ADD_P rien
+  // XD_CONT get IBM solid elems from prepro.
+  param.ajouter_flag("get_is_dirichlet_from_prepro", &is_dirichlet_from_prepro_); // XD_ADD_P rien
+  // XD_CONT get IBM is_dirichlet from prepro.
+  param.ajouter_flag("get_corresp_elems_from_prepro", &corresp_elems_from_prepro_); // XD_ADD_P rien
+  // XD_CONT get IBM corresp_elems from prepro.
   param.lire_avec_accolades_depuis(is);
   return is;
 }

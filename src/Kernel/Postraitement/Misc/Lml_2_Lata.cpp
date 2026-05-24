@@ -19,7 +19,8 @@
 #include <Motcle.h>
 
 Implemente_instanciable(Lml_2_Lata, "Lml_to_lata|Lml_2_Lata", Interprete);
-// XD lml_to_lata interprete lml_to_lata INHERITS_BRACE To convert results file written with LML format to a single LATA file.
+// XD lml_to_lata interprete lml_to_lata INHERITS_BRACE To convert results file written with LML format to a single LATA
+// XD_CONT file.
 // XD attr file_lml chaine file_lml REQ LML file to convert to the new format.
 // XD attr file_lata chaine file_lata REQ Name of the single LATA file.
 

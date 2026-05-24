@@ -22,9 +22,11 @@
 #include <Param.h>
 
 Implemente_instanciable_sans_constructeur(Extruder_en3,"Extruder_en3",Interprete_geometrique_base);
-// XD extruder_en3 extruder extruder_en3 BRACE Class to create a 3D tetrahedral/hexahedral mesh (a prism is cut in 3) from a 2D triangular/quadrangular mesh. The names of the boundaries (by default, devant (front) and derriere (back)) may be edited by the
-// XD_CONT keyword nom_cl_devant and nom_cl_derriere. If 'null' is written for nom_cl, then no boundary condition is generated at this place. NL2 Recommendation : to ensure conformity between meshes (in case of fluid/solid coupling) it is recommended to extrude all the
-// XD_CONT domains at the same time.
+// XD extruder_en3 extruder extruder_en3 BRACE Class to create a 3D tetrahedral/hexahedral mesh (a prism is cut in 3)
+// XD_CONT from a 2D triangular/quadrangular mesh. The names of the boundaries (by default, devant (front) and derriere
+// XD_CONT (back)) may be edited by the keyword nom_cl_devant and nom_cl_derriere. If 'null' is written for nom_cl, then
+// XD_CONT no boundary condition is generated at this place. NL2 Recommendation : to ensure conformity between meshes
+// XD_CONT (in case of fluid/solid coupling) it is recommended to extrude all the domains at the same time.
 
 Extruder_en3::Extruder_en3():
   NZ_(-1),
@@ -64,8 +66,10 @@ Entree& Extruder_en3::interpreter_(Entree& is)
   param.ajouter("domaine",&noms_dom,Param::REQUIRED);  // XD attr domaine listchaine domain_name REQ List of the domains
   param.ajouter("nb_tranches",&NZ_,Param::REQUIRED);
   param.ajouter_arr_size_predefinie("direction",&direction_,Param::REQUIRED);
-  param.ajouter("nom_cl_devant",&nom_dvt_);         // XD attr nom_cl_devant chaine nom_cl_devant OPT New name of the first boundary.
-  param.ajouter("nom_cl_derriere",&nom_derriere_);  // XD attr nom_cl_derriere chaine nom_cl_derriere OPT New name of the second boundary.
+  param.ajouter("nom_cl_devant",&nom_dvt_);         // XD attr nom_cl_devant chaine nom_cl_devant OPT New name of the
+  // XD_CONT first boundary.
+  param.ajouter("nom_cl_derriere",&nom_derriere_);  // XD attr nom_cl_derriere chaine nom_cl_derriere OPT New name of
+  // XD_CONT the second boundary.
   param.lire_avec_accolades_depuis(is);
   nb_dom=noms_dom.size();
 

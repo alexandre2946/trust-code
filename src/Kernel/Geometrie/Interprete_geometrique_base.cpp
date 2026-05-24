@@ -19,7 +19,8 @@
 #include <EChaine.h>
 
 Implemente_base_32_64(Interprete_geometrique_base_32_64, "Interprete_geometrique_base", Interprete);
-// XD interprete_geometrique_base interprete interprete_geometrique_base INHERITS_BRACE Class for interpreting a data file
+// XD interprete_geometrique_base interprete interprete_geometrique_base INHERITS_BRACE Class for interpreting a data
+// XD_CONT file
 
 template <typename _SIZE_>
 Sortie& Interprete_geometrique_base_32_64<_SIZE_>::printOn(Sortie& os) const { return os; }

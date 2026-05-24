@@ -25,14 +25,18 @@
 
 Implemente_base_sans_constructeur(Modele_turbulence_hyd_LES_base, "Modele_turbulence_hyd_LES_base", Modele_turbulence_hyd_0_eq_base);
 
-// XD form_a_nb_points objet_lecture nul NO_BRACE The structure fonction is calculated on nb points and we should add the 2 directions (0:OX, 1:OY, 2:OZ) constituting the homegeneity planes. Example for channel flows, planes parallel to the walls.
-// XD  attr nb entier(into=[4]) nb REQ Number of points.
-// XD  attr dir1 entier(max=2) dir1 REQ First direction.
-// XD  attr dir2 entier(max=2) dir2 REQ Second direction.
-
-// XD mod_turb_hyd_ss_maille modele_turbulence_hyd_deriv mod_turb_hyd_ss_maille INHERITS_BRACE Class for sub-grid turbulence model for Navier-Stokes equations.
-// XD attr formulation_a_nb_points form_a_nb_points formulation_a_nb_points OPT The structure fonction is calculated on nb points and we should add the 2 directions (0:OX, 1:OY, 2:OZ) constituting the homegeneity planes. Example for channel flows, planes
+// XD form_a_nb_points objet_lecture nul NO_BRACE The structure fonction is calculated on nb points and we should add
+// XD_CONT the 2 directions (0:OX, 1:OY, 2:OZ) constituting the homegeneity planes. Example for channel flows, planes
 // XD_CONT parallel to the walls.
+// XD attr nb entier(into=[4]) nb REQ Number of points.
+// XD attr dir1 entier(max=2) dir1 REQ First direction.
+// XD attr dir2 entier(max=2) dir2 REQ Second direction.
+
+// XD mod_turb_hyd_ss_maille modele_turbulence_hyd_deriv mod_turb_hyd_ss_maille INHERITS_BRACE Class for sub-grid
+// XD_CONT turbulence model for Navier-Stokes equations.
+// XD attr formulation_a_nb_points form_a_nb_points formulation_a_nb_points OPT The structure fonction is calculated on
+// XD_CONT nb points and we should add the 2 directions (0:OX, 1:OY, 2:OZ) constituting the homegeneity planes. Example
+// XD_CONT for channel flows, planes parallel to the walls.
 
 Modele_turbulence_hyd_LES_base::Modele_turbulence_hyd_LES_base()
 {
@@ -52,7 +56,15 @@ Entree& Modele_turbulence_hyd_LES_base::readOn(Entree& is)
 void Modele_turbulence_hyd_LES_base::set_param(Param& param) const
 {
   Modele_turbulence_hyd_base::set_param(param);
-  param.ajouter("longueur_maille", &methode_); // XD_ADD_P chaine(into=["volume","volume_sans_lissage","scotti","arrete"]) Different ways to calculate the characteristic length may be specified : NL2 volume : It is the default option. Characteristic length is based on the cubic root of the volume cells. A smoothing procedure is applied to avoid discontinuities of this quantity in VEF from a cell to another. NL2 volume_sans_lissage : For VEF only. Characteristic length is based on the cubic root of the volume cells (without smoothing procedure).NL2 scotti : Characteristic length is based on the cubic root of the volume cells and the Scotti correction is applied to take into account the stretching of the cell in the case of anisotropic meshes. NL2 arete : For VEF only. Characteristic length relies on the max edge (+ smoothing procedure) is taken into account.
+  param.ajouter("longueur_maille", &methode_); // XD_ADD_P chaine(into=["volume","volume_sans_lissage","scotti","arrete"])
+  // XD_CONT Different ways to calculate the characteristic length may be specified : NL2 volume : It is the default
+  // XD_CONT option. Characteristic length is based on the cubic root of the volume cells. A smoothing procedure is
+  // XD_CONT applied to avoid discontinuities of this quantity in VEF from a cell to another. NL2 volume_sans_lissage :
+  // XD_CONT For VEF only. Characteristic length is based on the cubic root of the volume cells (without smoothing
+  // XD_CONT procedure).NL2 scotti : Characteristic length is based on the cubic root of the volume cells and the Scotti
+  // XD_CONT correction is applied to take into account the stretching of the cell in the case of anisotropic meshes.
+  // XD_CONT NL2 arete : For VEF only. Characteristic length relies on the max edge (+ smoothing procedure) is taken
+  // XD_CONT into account.
 
 }
 

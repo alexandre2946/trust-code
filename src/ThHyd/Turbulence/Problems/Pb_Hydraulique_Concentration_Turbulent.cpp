@@ -18,12 +18,14 @@
 #include <Constituant.h>
 
 Implemente_instanciable(Pb_Hydraulique_Concentration_Turbulent, "Pb_Hydraulique_Concentration_Turbulent", Pb_Fluide_base);
-// XD pb_hydraulique_concentration_turbulent Pb_base pb_hydraulique_concentration_turbulent INHERITS_BRACE Resolution of Navier-Stokes/multiple constituent transport equations, with turbulence modelling.
-// XD attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the problem.
+// XD pb_hydraulique_concentration_turbulent Pb_base pb_hydraulique_concentration_turbulent INHERITS_BRACE Resolution of
+// XD_CONT Navier-Stokes/multiple constituent transport equations, with turbulence modelling.
+// XD attr fluide_incompressible fluide_incompressible fluide_incompressible REQ The fluid medium associated with the
+// XD_CONT problem.
 // XD attr constituant constituant constituant OPT Constituents.
-// XD attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent OPT Navier-Stokes equations as well as the associated turbulence model equations.
-// XD attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent OPT Constituent transport equations (concentration diffusion convection) as well as the associated turbulence
-// XD_CONT model equations.
+// XD attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent OPT Navier-Stokes equations as well
+// XD_CONT as the associated turbulence model equations.
+// XD attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent OPT Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
 
 Sortie& Pb_Hydraulique_Concentration_Turbulent::printOn(Sortie& os) const { return Pb_Fluide_base::printOn(os); }
 

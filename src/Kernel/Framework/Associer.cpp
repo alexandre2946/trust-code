@@ -17,9 +17,13 @@
 #include <Nom.h>
 
 Implemente_instanciable(Associer,"Associer|Associate",Interprete);
-// XD associate interprete associer INHERITS_BRACE This interpretor allows one object to be associated with another. The order of the two objects in this instruction is not important. The object objet_2 is associated to objet_1 if this makes sense; if not
-// XD_CONT either objet_1 is associated to objet_2 or the program exits with error because it cannot execute the Associate (Associer) instruction. For example, to calculate water flow in a pipe, a Pb_Hydraulique type object needs to be defined. But also a Domaine type
-// XD_CONT object to represent the pipe, a time discretization object (Scheme_euler_explicit for ex.). These two objects must then be associated with the problem.
+// XD associate interprete associer INHERITS_BRACE This interpretor allows one object to be associated with another. The
+// XD_CONT order of the two objects in this instruction is not important. The object objet_2 is associated to objet_1 if
+// XD_CONT this makes sense; if not either objet_1 is associated to objet_2 or the program exits with error because it
+// XD_CONT cannot execute the Associate (Associer) instruction. For example, to calculate water flow in a pipe, a
+// XD_CONT Pb_Hydraulique type object needs to be defined. But also a Domaine type object to represent the pipe, a time
+// XD_CONT discretization object (Scheme_euler_explicit for ex.). These two objects must then be associated with the
+// XD_CONT problem.
 // XD attr objet_1 chaine objet_1 REQ Objet_1
 // XD attr objet_2 chaine objet_2 REQ Objet_2
 

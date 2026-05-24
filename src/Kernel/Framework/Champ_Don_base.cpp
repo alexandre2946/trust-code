@@ -17,7 +17,8 @@
 #include <Check_espace_virtuel.h>
 
 Implemente_base(Champ_Don_base,"Champ_Don_base",Champ_base);
-// XD champ_don_base field_base champ_don_base INHERITS_BRACE Basic class for data fields (not calculated), p.e. physics properties.
+// XD champ_don_base field_base champ_don_base INHERITS_BRACE Basic class for data fields (not calculated), p.e. physics
+// XD_CONT properties.
 
 
 Sortie& Champ_Don_base::printOn(Sortie& os) const { return Champ_base::printOn(os); }

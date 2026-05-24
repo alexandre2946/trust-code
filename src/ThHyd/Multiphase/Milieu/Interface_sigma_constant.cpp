@@ -16,7 +16,8 @@
 #include <Interface_sigma_constant.h>
 
 Implemente_instanciable(Interface_sigma_constant, "Interface_sigma_constant", Interface_base);
-// XD Interface_sigma_constant Interface_base Interface_sigma_constant INHERITS_BRACE Liquid-gas interface with a constant surface tension sigma
+// XD Interface_sigma_constant Interface_base Interface_sigma_constant INHERITS_BRACE Liquid-gas interface with a
+// XD_CONT constant surface tension sigma
 
 Sortie& Interface_sigma_constant::printOn(Sortie& os) const { return os; }
 Entree& Interface_sigma_constant::readOn(Entree& is) { return Interface_base::readOn(is); }

@@ -24,8 +24,10 @@
 #include <Param.h>
 
 Implemente_instanciable(Modele_turbulence_scal_Prandtl, "Modele_turbulence_scal_Prandtl", Modele_turbulence_scal_diffturb_base);
-// XD prandtl modele_turbulence_scal_base prandtl INHERITS_BRACE The Prandtl model. For the scalar equations, only the model based on Reynolds analogy is available. If K_Epsilon was selected in the hydraulic equation, Prandtl must be selected for the
-// XD_CONT convection-diffusion temperature equation coupled to the hydraulic equation and Schmidt for the concentration equations.
+// XD prandtl modele_turbulence_scal_base prandtl INHERITS_BRACE The Prandtl model. For the scalar equations, only the
+// XD_CONT model based on Reynolds analogy is available. If K_Epsilon was selected in the hydraulic equation, Prandtl
+// XD_CONT must be selected for the convection-diffusion temperature equation coupled to the hydraulic equation and
+// XD_CONT Schmidt for the concentration equations.
 
 Sortie& Modele_turbulence_scal_Prandtl::printOn(Sortie& s) const { return Modele_turbulence_scal_diffturb_base::printOn(s); }
 
@@ -60,8 +62,12 @@ Entree& Modele_turbulence_scal_Prandtl::readOn(Entree& is)
 
 void Modele_turbulence_scal_Prandtl::set_param(Param& param) const
 {
-  param.ajouter("Prdt", &LePrdt_fct_); // XD_ADD_P chaine Keyword to modify the constant (Prdt) of Prandtl model : Alphat=Nut/Prdt Default value is 0.9
-  param.ajouter("Prandt_turbulent_fonction_nu_t_alpha", &definition_fonction_); // XD_ADD_P chaine Optional keyword to specify turbulent diffusivity (by default, alpha_t=nu_t/Prt) with another formulae, for example: alpha_t=nu_t2/(0,7*alpha+0,85*nu_tt) with the string nu_t*nu_t/(0,7*alpha+0,85*nu_t) where alpha is the thermal diffusivity.
+  param.ajouter("Prdt", &LePrdt_fct_); // XD_ADD_P chaine
+  // XD_CONT Keyword to modify the constant (Prdt) of Prandtl model : Alphat=Nut/Prdt Default value is 0.9
+  param.ajouter("Prandt_turbulent_fonction_nu_t_alpha", &definition_fonction_); // XD_ADD_P chaine
+  // XD_CONT Optional keyword to specify turbulent diffusivity (by default, alpha_t=nu_t/Prt) with another formulae, for
+  // XD_CONT example: alpha_t=nu_t2/(0,7*alpha+0,85*nu_tt) with the string nu_t*nu_t/(0,7*alpha+0,85*nu_t) where alpha
+  // XD_CONT is the thermal diffusivity.
   Modele_turbulence_scal_base::set_param(param);
 }
 

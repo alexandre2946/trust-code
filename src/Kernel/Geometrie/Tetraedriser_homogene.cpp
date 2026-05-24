@@ -16,9 +16,13 @@
 #include <Tetraedriser_homogene.h>
 
 Implemente_instanciable(Tetraedriser_homogene, "Tetraedriser_homogene", Triangulation_base);
-// XD tetraedriser_homogene tetraedriser tetraedriser_homogene INHERITS_BRACE Use the Tetraedriser_homogene (Homogeneous_Tetrahedralisation) interpretor in VEF discretization to mesh a block in tetrahedrals. Each block hexahedral is no longer divided into 6
-// XD_CONT tetrahedrals (keyword Tetraedriser (Tetrahedralise)), it is now broken down into 40 tetrahedrals. Thus a block defined with 11 nodes in each X, Y, Z direction will contain 10*10*10*40=40,000 tetrahedrals. This also allows problems in the mesh corners with the
-// XD_CONT P1NC/P1iso/P1bulle or P1/P1 discretization items to be avoided. Initial block is divided in 40 tetrahedra: \includepng{{tetraedriserhomogene.jpeg}}{{5}}
+// XD tetraedriser_homogene tetraedriser tetraedriser_homogene INHERITS_BRACE Use the Tetraedriser_homogene
+// XD_CONT (Homogeneous_Tetrahedralisation) interpretor in VEF discretization to mesh a block in tetrahedrals. Each
+// XD_CONT block hexahedral is no longer divided into 6 tetrahedrals (keyword Tetraedriser (Tetrahedralise)), it is now
+// XD_CONT broken down into 40 tetrahedrals. Thus a block defined with 11 nodes in each X, Y, Z direction will contain
+// XD_CONT 10*10*10*40=40,000 tetrahedrals. This also allows problems in the mesh corners with the P1NC/P1iso/P1bulle or
+// XD_CONT P1/P1 discretization items to be avoided. Initial block is divided in 40 tetrahedra:
+// XD_CONT \includeimage{{tetraedriserhomogene.jpeg}}
 
 
 Sortie& Tetraedriser_homogene::printOn(Sortie& os) const { return Interprete::printOn(os); }

@@ -89,12 +89,14 @@ void VerifierCoin::cut_elem(int elem, const DoubleTab& xp)
  */
 Entree& VerifierCoin::interpreter_(Entree& is)
 {
-// XD verifiercoin interprete verifiercoin INHERITS_BRACE This keyword subdivides inconsistent 2D/3D cells used with VEFPreP1B discretization. Must be used before the mesh is discretized. NL1 The Read_file option can be used only if the file.decoupage_som was
-// XD_CONT previously created by TRUST. This option, only in 2D, reverses the common face at two cells (at least one is inconsistent), through the nodes opposed. In 3D, the option has no effect.
-// XD  attr domain_name  ref_domaine dom REQ Name of the domaine
-// XD  attr bloc verifiercoin_bloc bloc REQ not_set
-// XD  verifiercoin_bloc objet_lecture nul BRACE not_set
-// XD  attr Read_file|Lire_fichier chaine filename OPT name of the *.decoupage_som file
+// XD verifiercoin interprete verifiercoin INHERITS_BRACE This keyword subdivides inconsistent 2D/3D cells used with
+// XD_CONT VEFPreP1B discretization. Must be used before the mesh is discretized. NL1 The Read_file option can be used
+// XD_CONT only if the file.decoupage_som was previously created by TRUST. This option, only in 2D, reverses the common
+// XD_CONT face at two cells (at least one is inconsistent), through the nodes opposed. In 3D, the option has no effect.
+// XD attr domain_name ref_domaine dom REQ Name of the domaine
+// XD attr bloc verifiercoin_bloc bloc REQ not_set
+// XD verifiercoin_bloc objet_lecture nul BRACE not_set
+// XD attr Read_file|Lire_fichier chaine filename OPT name of the *.decoupage_som file
 
 
   associer_domaine(is);
