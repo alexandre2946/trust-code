@@ -1,0 +1,77 @@
+#---------------------------------------------------------------------------
+# TRUST documentation
+#
+# This file carries only what is specific to the TRUST docs build —
+# project identity, paths, the bibliography.  Every other setting
+# (theme, MathJax, output options, extraction, graphs, ...) is shared
+# with every baltik and lives in docs/doxyfile_common, included below.
+#
+# Why this split?  Audit M4: keeping the shared parts in one place means
+# theme/format/output changes propagate to every baltik on next `make`
+# without per-baltik regeneration.  Baltik users get TRUST-side
+# improvements (e.g. the MathJax 3 offline bundle) automatically.
+#---------------------------------------------------------------------------
+
+PROJECT_NAME           = "TRUST"
+PROJECT_NUMBER         = $(TRUST_VERSION)
+PROJECT_BRIEF          = "HPC thermohydraulic platform"
+PROJECT_LOGO           = theme/favicon.ico
+
+#---------------------------------------------------------------------------
+# Input (TRUST-specific sources)
+#---------------------------------------------------------------------------
+INPUT                 += content \
+                         $(TRUST_ROOT)/src \
+                         $(TRUST_ROOT)/Outils/trustify/README.md \
+                         $(TRUST_ROOT)/Outils/trustify/docs \
+                         $(TRUST_ROOT)/Outils/trustify/pdf/README.md
+
+#---------------------------------------------------------------------------
+# HTML header — TRUST's own (includes the GitHub corner pointing at the
+# trust-code repo and the ISAS sidebar logo).  Baltiks ship their own
+# docs/theme/header.html so they can customise their own corner.
+#---------------------------------------------------------------------------
+HTML_HEADER            = theme/header.html
+
+#---------------------------------------------------------------------------
+# Bibliography (TRUST-only today)
+#---------------------------------------------------------------------------
+CITE_BIB_FILES         = content/references.bib
+
+#---------------------------------------------------------------------------
+# Shared defaults: theme, MathJax, extraction, output formats, graphs,
+# search engine, ... See docs/doxyfile_common.  Any setting from that
+# file can be overridden in the "TRUST-side overrides" block below.
+#---------------------------------------------------------------------------
+@INCLUDE_PATH          = .
+@INCLUDE               = doxyfile_common
+
+#---------------------------------------------------------------------------
+# TRUST-side overrides / additions (re-declare any setting from
+# doxyfile_common here to override).
+#---------------------------------------------------------------------------
+# TRUST narrative content (tutorials, developer guide) references figures
+# from content/figures.  IMAGE_PATH lets Doxygen resolve those \image and
+# markdown image references; Doxygen then auto-copies every *referenced*
+# image into the HTML output root, so they need no explicit listing here.
+# These figures are TRUST-only (baltiks get their keyword-reference figures
+# through trustify), which is why this lives here, not in the shared
+# doxyfile_common.
+IMAGE_PATH            += content/figures
+#
+# The sidebar ISAS logo is the one exception: theme/header.html references
+# it via raw HTML (`$relpath^ISAS_logo.png`), which Doxygen does NOT scan
+# for image dependencies — so it is never auto-copied and must be listed
+# explicitly.  It lives in theme/ (page chrome, like header.html/favicon),
+# not content/figures.  HTML_EXTRA_FILES copies each listed FILE to the
+# output root by basename, so `$relpath^ISAS_logo.png` then resolves.
+# NB: HTML_EXTRA_FILES takes individual files only — passing a directory
+# makes Doxygen 1.16.1 error ("...is a directory, it has to be a file!")
+# and copy nothing (that was the previous `+= content/figures` bug).
+HTML_EXTRA_FILES      += theme/ISAS_logo.png
+#
+# Favicon (browser-tab icon).  doxyfile_common no longer ships one — each
+# project declares its own here.  theme/header.html references it by the
+# bare name "favicon.ico" (and PROJECT_LOGO above points at the same file),
+# so the listed file must be named favicon.ico.
+HTML_EXTRA_FILES      += theme/favicon.ico

@@ -1,0 +1,149 @@
+/* ============================================================
+   TRUST platform — Doxygen custom stylesheet
+   ============================================================ */
+
+/* --- Font -------------------------------------------------- */
+html {
+  --font-family: 'Inter', sans-serif;
+}
+
+/* --- Project name / logo links in the header --------------- */
+/* doxygen-awesome.css forces `color: var(--primary-color)
+   !important` on every <a> — override it with !important so
+   the title-bar link inherits the surrounding text colour and
+   font weight, leaving only a subtle hover underline as the
+   click affordance.                                          */
+#projectname a:link,
+#projectname a:visited,
+#projectname a:hover,
+#projectname a:focus,
+#projectname a:active {
+  color: inherit !important;
+  font-weight: inherit;
+  text-decoration: none;
+}
+#projectname a:hover {
+  text-decoration: underline;
+}
+#projectlogo a {
+  display: inline-block;
+}
+
+/* --- GitHub corner octocat --------------------------------- */
+.github-corner:hover .octo-arm {
+  animation: octocat-wave 560ms ease-in-out;
+}
+
+@keyframes octocat-wave {
+  0%, 100% { transform: rotate(0); }
+  20%, 60% { transform: rotate(-25deg); }
+  40%, 80% { transform: rotate(10deg); }
+}
+
+/* On small screens, always wave and hide on very small screens */
+@media (max-width: 500px) {
+  .github-corner:hover .octo-arm { animation: none; }
+  .github-corner .octo-arm       { animation: octocat-wave 560ms ease-in-out; }
+}
+
+/* --- Figures ----------------------------------------------- */
+.contents img {
+  max-width: 80%;
+  height: auto;
+  display: block;
+  margin: 1em auto;
+}
+
+/* --- Bottom-left sidebar logo ------------------------------ */
+#sidebar-logo {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: var(--side-nav-fixed-width);
+  padding: 12px 16px;
+  box-sizing: border-box;
+  background: var(--side-nav-background);
+  z-index: 999;
+
+  /* hide automatically when nav-tree content is too tall */
+  overflow: hidden;
+  transition: opacity 0.2s;
+}
+
+#sidebar-logo img {
+  width: 100%;
+  max-width: 160px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  opacity: 0.85;
+}
+
+/* collapse logo when sidebar content is too tall to fit */
+@media screen and (max-height: 500px) {
+  #sidebar-logo {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+/* --- Hardcoded colours in navtree.css / doxygen.css -----------
+   doxygen-awesome.css does not override every element that uses
+   hardcoded hex colours in Doxygen's own stylesheets.  custom.css
+   loads last, so same-specificity rules here win by cascade order.
+   All colours use doxygen-awesome CSS variables so they follow the
+   theme in both light and dark mode automatically.               */
+
+/* In-page navigation panel (Doxygen 1.16+) */
+#page-nav {
+  background: var(--side-nav-background);
+  border-left: 1px solid var(--separator-color);
+}
+#page-nav-resize-handle {
+  background-color: var(--separator-color);
+}
+#page-nav-resize-handle::after {
+  border-left-color: var(--page-secondary-foreground-color);
+  border-right-color: var(--page-secondary-foreground-color);
+}
+
+/* Highlighted (currently-visible) section row in the in-page TOC */
+ul.page-outline li.vis {
+  background-color: var(--menu-selected-background);
+}
+
+/* Breadcrumb footer chevron arrows */
+#nav-path li.navelem:after {
+  background: var(--page-background-color);
+}
+#nav-path li.navelem:hover,
+#nav-path li.navelem:hover:after {
+  background-color: var(--menu-selected-background);
+}
+
+/* Navtree sync-to-page button */
+div.nav-sync-icon {
+  background-color: var(--side-nav-background);
+  border-color: var(--separator-color);
+}
+div.nav-sync-icon:hover {
+  background-color: var(--menu-selected-background);
+}
+div.nav-sync-icon.active:after {
+  background-color: var(--side-nav-background);
+  border-top-color: var(--separator-color);
+}
+
+/* --- Inline code in dark mode --------------------------------
+   doxygen.css hard-codes a near-white background on span.tt;
+   override it so inline code stays readable in dark mode.      */
+@media (prefers-color-scheme: dark) {
+  span.tt {
+    background-color: var(--code-background);
+    color: var(--code-foreground);
+  }
+}
+html.dark-mode span.tt {
+  background-color: var(--code-background);
+  color: var(--code-foreground);
+}

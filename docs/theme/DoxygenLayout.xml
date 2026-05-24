@@ -1,0 +1,193 @@
+<doxygenlayout version="1.0">
+  <!-- Navigation tabs
+       Top-level tabs are arranged so that each major documentation domain
+       (narrative docs, keyword reference, trustutils API, C++ API) has its
+       own landing point in the sidebar.  Direct @ref links to page/group
+       anchors are used instead of Doxygen's auto-generated <pages>/<modules>
+       index tabs, because the latter are silently dropped when every page
+       is @subpage'd from the mainpage and when the modules index file is
+       not generated (Doxygen 1.16 quirk). -->
+  <navindex>
+    <tab type="mainpage" visible="yes" title="Home"/>
+
+    <!-- All narrative sections (Quick Start, User Guide, Keyword Reference,
+         User Tutorials, Developer Corner, Bibliography) are subpages of the
+         mainpage and are promoted to the top level by flatten_navtree.py.
+         No explicit tabs are needed here — adding them would duplicate the
+         navtree entries. -->
+
+    <!-- C++ API: groups all code-generated content -->
+    <tab type="usergroup" url="" title="C++ API">
+      <tab type="namespaces" visible="yes" title="Namespaces">
+        <tab type="namespacelist"    visible="yes" title="" intro=""/>
+        <tab type="namespacemembers" visible="yes" title="" intro=""/>
+      </tab>
+      <tab type="classes" visible="yes" title="Classes">
+        <tab type="classlist"    visible="yes" title="" intro=""/>
+        <tab type="classindex"   visible="$ALPHABETICAL_INDEX" title=""/>
+        <tab type="hierarchy"    visible="yes" title="" intro=""/>
+        <tab type="classmembers" visible="yes" title="" intro=""/>
+      </tab>
+      <!-- Structs are merged into annotated.html alongside classes in Doxygen 1.9+;
+           structlist.html is no longer generated, so this tab would point to a
+           non-existent page.  Structs remain accessible via Classes → Class List. -->
+      <tab type="structs" visible="no" title="Structs">
+        <tab type="structlist"  visible="no" title="" intro=""/>
+        <tab type="structindex" visible="no" title=""/>
+      </tab>
+      <tab type="files" visible="no" title="Files">
+        <tab type="filelist" visible="no" title="" intro=""/>
+        <tab type="globals"  visible="no" title="" intro=""/>
+      </tab>
+    </tab>
+
+    <!-- Bibliography is a @subpage of mainpage; no tab needed. -->
+
+    <tab type="examples" visible="yes" title="" intro=""/>
+  </navindex>
+
+  <!-- Class page layout -->
+  <class>
+    <briefdescription visible="yes"/>
+    <includes visible="$SHOW_INCLUDE_FILES"/>
+    <inheritancegraph visible="$CLASS_GRAPH"/>
+    <collaborationgraph visible="$COLLABORATION_GRAPH"/>
+    <memberdecl>
+      <nestedclasses visible="yes" title=""/>
+      <publictypes title=""/>
+      <publicslots title=""/>
+      <signals title=""/>
+      <publicmethods title=""/>
+      <publicstaticmethods title=""/>
+      <publicattributes title=""/>
+      <publicstaticattributes title=""/>
+      <protectedtypes title=""/>
+      <protectedslots title=""/>
+      <protectedmethods title=""/>
+      <protectedstaticmethods title=""/>
+      <protectedattributes title=""/>
+      <protectedstaticattributes title=""/>
+      <privatetypes title=""/>
+      <privateslots title=""/>
+      <privatemethods title=""/>
+      <privatestaticmethods title=""/>
+      <privateattributes title=""/>
+      <privatestaticattributes title=""/>
+      <friends title=""/>
+      <related title="" subtitle=""/>
+      <membergroups visible="yes"/>
+    </memberdecl>
+    <detaileddescription title=""/>
+    <memberdef>
+      <inlineclasses title=""/>
+      <typedefs title=""/>
+      <enums title=""/>
+      <constructors title=""/>
+      <functions title=""/>
+      <related title=""/>
+      <variables title=""/>
+    </memberdef>
+    <allmemberslink visible="yes"/>
+    <usedfiles visible="$SHOW_USED_FILES"/>
+    <authorsection visible="yes"/>
+  </class>
+
+  <!-- Namespace page layout -->
+  <namespace>
+    <briefdescription visible="yes"/>
+    <memberdecl>
+      <nestednamespaces visible="yes" title=""/>
+      <constantgroups visible="yes" title=""/>
+      <classes visible="yes" title=""/>
+      <structs visible="yes" title=""/>
+      <typedefs title=""/>
+      <enums title=""/>
+      <functions title=""/>
+      <variables title=""/>
+      <membergroups visible="yes"/>
+    </memberdecl>
+    <detaileddescription title=""/>
+    <memberdef>
+      <inlineclasses title=""/>
+      <typedefs title=""/>
+      <enums title=""/>
+      <functions title=""/>
+      <variables title=""/>
+    </memberdef>
+    <authorsection visible="yes"/>
+  </namespace>
+
+  <!-- File page layout -->
+  <file>
+    <briefdescription visible="yes"/>
+    <includes visible="$SHOW_INCLUDE_FILES"/>
+    <includegraph visible="$INCLUDE_GRAPH"/>
+    <includedbygraph visible="$INCLUDED_BY_GRAPH"/>
+    <sourcelink visible="yes"/>
+    <memberdecl>
+      <classes visible="yes" title=""/>
+      <structs visible="yes" title=""/>
+      <namespaces visible="yes" title=""/>
+      <constantgroups visible="yes" title=""/>
+      <defines title=""/>
+      <typedefs title=""/>
+      <enums title=""/>
+      <functions title=""/>
+      <variables title=""/>
+      <membergroups visible="yes"/>
+    </memberdecl>
+    <detaileddescription title=""/>
+    <memberdef>
+      <inlineclasses title=""/>
+      <defines title=""/>
+      <typedefs title=""/>
+      <enums title=""/>
+      <functions title=""/>
+      <variables title=""/>
+    </memberdef>
+    <authorsection/>
+  </file>
+
+  <!-- Group page layout -->
+  <group>
+    <briefdescription visible="yes"/>
+    <groupgraph visible="$GROUP_GRAPHS"/>
+    <memberdecl>
+      <nestedgroups visible="yes" title=""/>
+      <dirs visible="yes" title=""/>
+      <files visible="yes" title=""/>
+      <namespaces visible="yes" title=""/>
+      <classes visible="yes" title=""/>
+      <defines title=""/>
+      <typedefs title=""/>
+      <enums title=""/>
+      <enumvalues title=""/>
+      <functions title=""/>
+      <variables title=""/>
+      <membergroups visible="yes"/>
+    </memberdecl>
+    <detaileddescription title=""/>
+    <memberdef>
+      <pagedocs/>
+      <inlineclasses title=""/>
+      <defines title=""/>
+      <typedefs title=""/>
+      <enums title=""/>
+      <enumvalues title=""/>
+      <functions title=""/>
+      <variables title=""/>
+    </memberdef>
+    <authorsection visible="yes"/>
+  </group>
+
+  <!-- Directory page layout -->
+  <directory>
+    <briefdescription visible="yes"/>
+    <directorygraph visible="yes"/>
+    <memberdecl>
+      <dirs visible="yes"/>
+      <files visible="yes"/>
+    </memberdecl>
+    <detaileddescription title=""/>
+  </directory>
+</doxygenlayout>

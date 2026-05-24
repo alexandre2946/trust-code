@@ -1,0 +1,170 @@
+#---------------------------------------------------------------------------
+# Shared Doxygen base configuration for TRUST and baltik documentation
+#
+# @INCLUDE'd by:
+#   - $TRUST_ROOT/docs/Doxyfile           (TRUST documentation itself)
+#   - <baltik>/docs/Doxyfile              (every baltik created from
+#                                          bin/baltik/templates/basic)
+#
+# Contract — the includer must set BEFORE @INCLUDEing this file:
+#     PROJECT_NAME, PROJECT_NUMBER, PROJECT_BRIEF   project identity
+#     OUTPUT_DIRECTORY                              where doxygen writes
+#     INPUT                                         sources to scan
+#     HTML_HEADER                                   per-project header
+#                                                   (lets each baltik
+#                                                   customise its own
+#                                                   GitHub corner etc.)
+#
+# Optional includer-set knobs (override what is set below):
+#     PROJECT_LOGO, CITE_BIB_FILES, USE_MDFILE_AS_MAINPAGE,
+#     IMAGE_PATH (extend via `+=`).
+#
+# Any setting in this file can be overridden by re-declaring it in the
+# includer AFTER `@INCLUDE`-ing — Doxygen's @INCLUDE semantics: later
+# assignments win.
+#
+# Why a shared base?  Audit M4: TRUST-side improvements (theme updates,
+# MathJax version bumps, new output options, search post-processing
+# changes) take effect for every baltik on the next `make` without any
+# per-baltik Doxyfile regeneration.  The baltik's local Doxyfile only
+# carries that project's identity + overrides, so it stays small and
+# stable across TRUST versions.
+#---------------------------------------------------------------------------
+
+DOXYFILE_ENCODING      = UTF-8
+CREATE_SUBDIRS         = NO
+
+#---------------------------------------------------------------------------
+# Input
+#---------------------------------------------------------------------------
+RECURSIVE              = YES
+FILE_PATTERNS          = *.c \
+                         *.cpp \
+                         *.h \
+                         *.tpp \
+                         *.md
+EXCLUDE_PATTERNS       = *_Prototype*.* \
+                         instancie_*.cpp
+EXTENSION_MAPPING      = tpp=C++
+INPUT_ENCODING         = UTF-8
+GENERATE_TODOLIST      = NO
+# USE_MDFILE_AS_MAINPAGE intentionally empty: TRUST's content/main_page.md
+# and the baltik template's main_page.md both contain an @mainpage
+# directive; assigning a file here would conflict with that.
+USE_MDFILE_AS_MAINPAGE =
+SHOW_FILES             = NO
+INPUT += $(BUILD_DIR)/generated_content
+
+#---------------------------------------------------------------------------
+# Output
+#
+# Output goes to BUILD_DIR, set in the project side Makefile, and exported to env by common.mk
+#
+# Warnings go to WARN_LOGFILE rather than stderr so the terminal stays readable.  docs/common.mk's
+# run_doxygen recipe additionally tees stdout to <BUILD_DIR>/doxygen.log
+# and filters the per-file "Patching output file N/M" spam from the
+# terminal via scripts/filter_doxygen.awk.
+#---------------------------------------------------------------------------
+OUTPUT_DIRECTORY       = $(BUILD_DIR)
+WARN_LOGFILE           = $(BUILD_DIR)/doxygen_warnings.log
+#---------------------------------------------------------------------------
+# Extraction
+#---------------------------------------------------------------------------
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+EXTRACT_ANON_NSPACES   = NO
+HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_CLASSES     = NO
+SHOW_INCLUDE_FILES     = YES
+SORT_MEMBERS_CTORS_1ST = YES
+ALPHABETICAL_INDEX     = YES
+LOOKUP_CACHE_SIZE      = 2
+
+#---------------------------------------------------------------------------
+# Source browsing
+#---------------------------------------------------------------------------
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = NO
+STRIP_CODE_COMMENTS    = NO
+REFERENCES_LINK_SOURCE = YES
+
+#---------------------------------------------------------------------------
+# HTML output (theme assets sourced from TRUST)
+#---------------------------------------------------------------------------
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+LAYOUT_FILE            = $(TRUST_ROOT)/docs/theme/DoxygenLayout.xml
+HTML_EXTRA_STYLESHEET  = $(TRUST_ROOT)/docs/theme/doxygen-awesome.css \
+                         $(TRUST_ROOT)/docs/theme/doxygen-awesome-sidebar-only.css \
+                         $(TRUST_ROOT)/docs/theme/doxygen-awesome-sidebar-only-darkmode-toggle.css \
+                         $(TRUST_ROOT)/docs/theme/custom.css
+# Only genuinely shared assets here.  The favicon is intentionally NOT
+# included: it is page chrome each project ships and declares in its own
+# Doxyfile (`HTML_EXTRA_FILES += <path>/favicon.ico`), so there is no
+# Makefile override point to maintain.  theme/header.html references it by
+# the bare name "favicon.ico", so whatever file a project lists must be
+# named that.
+HTML_EXTRA_FILES       = $(TRUST_ROOT)/docs/theme/doxygen-awesome-darkmode-toggle.js
+HTML_FOOTER            =
+# HTML_COLORSTYLE requires Doxygen >= 1.9.5.  AUTO_LIGHT / AUTO_DARK follow
+# OS preference; LIGHT / DARK pin a single theme.  Older Doxygen versions
+# fall back to the HUE/SAT/GAMMA tuning below.
+HTML_COLORSTYLE        = LIGHT
+HTML_COLORSTYLE_HUE    = 220
+HTML_COLORSTYLE_SAT    = 100
+HTML_COLORSTYLE_GAMMA  = 80
+GENERATE_TREEVIEW      = YES
+DISABLE_INDEX          = NO
+FULL_SIDEBAR           = NO
+SEARCHENGINE           = YES
+SERVER_BASED_SEARCH    = NO
+
+#---------------------------------------------------------------------------
+# Math (MathJax 3, bundled locally for offline rendering)
+#
+# docs/common.mk's run_doxygen recipe extracts the bundle into
+# $(HTML_OUTPUT)/mathjax/ so the generated tree is self-contained.  See
+# the install_mathjax target.  Doxygen appends `/es5/tex-chtml.js` to
+# MATHJAX_RELPATH; the relative path resolves against $relpath^ at every
+# page, so subdir pages still find the bundle.
+#---------------------------------------------------------------------------
+USE_MATHJAX            = YES
+MATHJAX_VERSION        = MathJax_3
+MATHJAX_FORMAT         = HTML-CSS
+MATHJAX_RELPATH        = mathjax
+
+#---------------------------------------------------------------------------
+# Images: no shared default.  Each project points IMAGE_PATH at its own
+# figure directory in its Doxyfile.  trustify-generated keyword-reference
+# figures are handled separately by common.mk's run_doxygen recipe (it
+# copies $(KW_DST_DIR)/figures into the HTML output), so baltiks do not
+# need TRUST's content/figures.
+#---------------------------------------------------------------------------
+IMAGE_PATH             =
+
+#---------------------------------------------------------------------------
+# Other output formats (disabled)
+#---------------------------------------------------------------------------
+GENERATE_LATEX         = NO
+GENERATE_RTF           = NO
+GENERATE_MAN           = NO
+GENERATE_XML           = NO
+
+#---------------------------------------------------------------------------
+# Graphs (Graphviz)
+#---------------------------------------------------------------------------
+HAVE_DOT               = YES
+DOT_NUM_THREADS        = 0
+CLASS_GRAPH            = YES
+COLLABORATION_GRAPH    = YES
+GROUP_GRAPHS           = YES
+INCLUDE_GRAPH          = YES
+INCLUDED_BY_GRAPH      = YES
+CALL_GRAPH             = NO
+CALLER_GRAPH           = NO
+GRAPHICAL_HIERARCHY    = YES
+DIRECTORY_GRAPH        = YES
+DOT_IMAGE_FORMAT       = svg
+INTERACTIVE_SVG        = YES
+DOT_CLEANUP            = YES
