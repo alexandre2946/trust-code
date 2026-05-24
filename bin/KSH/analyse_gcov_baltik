@@ -95,7 +95,7 @@ do
   then
        $TRUST_ROOT/bin/KSH/tggcov_ -html | sed "s/TRUST/$cas/"
       (cd ..;tar zcf $DEST.tgz *.html cpp.gcov)
-      (cd ../..; echo "To update coverage :" ;echo "cp $PWD/TRUST_cpp.gcov.tgz \$TRUST_ROOT/doc/Coverage/cpp.gcov.tar.gz")
+      (cd ../..; echo "To update coverage :" ;echo "cp $PWD/TRUST_cpp.gcov.tgz \$TRUST_ROOT/share/coverage/cpp.gcov.tar.gz")
   fi
   
   cd ..
@@ -109,8 +109,8 @@ done
 [ ! -f $TRUST_ROOT/exec/python/bin/gcovr ] && cd $TRUST_ROOT/exec/python/bin && pip install gcovr
 
 cd $project_directory
-xml=$project_directory/doc/Coverage/gcovr.xml
-html=$project_directory/doc/Coverage/html/index.html
+xml=$project_directory/share/coverage/gcovr.xml
+html=$project_directory/share/coverage/html/index.html
 mkdir -p `dirname $html`
 filter="-e Trust_Fixes/ -e src/Ref/" # On ne mesure pas la couverture des Trust_fixes
 threshold="" && [ ! "$COVERAGE_THRESHOLD" = "" ] && threshold="--fail-under-line $COVERAGE_THRESHOLD" # Erreur si moins de $COVERAGE_THRESHOLD %

@@ -901,18 +901,6 @@ do
             cat Test_baltik.log
          fi
          cd - 1>/dev/null 2>&1
-         ######################################
-         # Verifie la non regression de XData #
-         ######################################
-         if [ $NUIT = 1 ]
-         then
-            if [ "`$TRUST_ROOT/bin/admin/liste_machines "\-xdata" | grep ^$HOST_BUILD"\."`" != "" ]
-            then
-               echo "--------------------------------------------------------"
-               echo "Test the no-regression of XData at "`date '+%H:%M:%S'`
-               cd $TRUST_ROOT/Outils/TRIOXDATA;rm -f *.log;make 1>make.log 2>&1;make check 1>check_xdata.log 2>&1;cat check_xdata.log;cp check_xdata.log $TRUST_TMP/.;cd - 1>/dev/null 2>&1
-            fi
-         fi
          ###############################################
          # Verifie la non regression sur n processeurs #
          ###############################################
@@ -1135,7 +1123,7 @@ do
             Build=$TRUST_ROOT/build/doc/TRUST/exercices
             [ ! -d ${Build} ] && echo Creating ${Build} directory && mkdir -p ${Build}
             rm -rf $Build/validation_form_exercise
-            cp -r $TRUST_ROOT/doc/TRUST/exercices/validation_form_exercise $Build/.
+            cp -r $TRUST_ROOT/Validation/Rapports_automatiques/Verification/Echange_impose/ $Build/validation_form_exercise
             cd $Build/validation_form_exercise
             log=`pwd`/Run_fiche.log
             rm -f $log
@@ -1178,39 +1166,6 @@ do
             else
                echo "Script Run_fiche=KO `[ $Run_fiche_KO_jupyter = 0 ] && echo 'prm -> See '$log ` `[ $Run_fiche_KO_prm = 0 ] && echo 'jupyter -> See '$log2`"
             fi
-         fi
-         ###################################
-         # Lance la verification des modules
-         ###################################
-         if [ $NUIT = 1 ] && [ "`grep activation_verification_modules=1 $TRUST_ROOT/bin/admin/lance_test_nuit`" != "" ]
-         then
-            echo "--------------------------------------------------------"
-            modules=`cd $TRUST_ROOT/Validation/Modules;ls */cree_liste_cas | $TRUST_Awk -F/ '{print $1}'`
-            for module in $modules
-            do
-               if [ "`$TRUST_ROOT/bin/admin/liste_machines "\-verification_module_$module" | grep ^$HOST_BUILD"\."`" != "" ]
-               then
-                  cd $TRUST_ROOT/Validation/Modules
-                  (
-                  # Compilation d'une version semi-optimisee pour aller plus vite
-                  exec=${exec%_opt}_semi_opt
-                  (cd $TRUST_ROOT; make semi_opt)
-                  OPT="_semi_opt"
-                  echo "Lancement de la verification du module $module sur $HOST_BUILD avec $exec..."
-                  # On efface les rapports precedants
-                  rm -f $module/.tests_TRUST_*
-                  ./lance_valid_module $module 1>$module/$module.log 2>&1
-                  if [ $? = 0 ]
-                  then
-                     echo "$module=OK" >> $module/$module.log
-                     echo "Succes de la verification du module $module sur $HOST_BUILD."
-                  else
-                     echo "$module=KO" >> $module/$module.log
-                     echo "Echec de la verification du module $module sur $HOST_BUILD. Voir `pwd`/$module/$module.log"
-                  fi
-                  )
-               fi
-            done
          fi
       else
          echo "Error: $MODULE case not provided" && exit_

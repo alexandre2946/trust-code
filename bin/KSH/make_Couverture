@@ -20,7 +20,7 @@ update_version()
    echo " "
 }
 export PYTHONPATH=$TRUST_ROOT/bin/KSH:$PYTHONPATH
-rep=$TRUST_ROOT/doc/Coverage
+rep=$TRUST_ROOT/share/coverage
 rm -f dico.pkl
 echo "fin" > nul.data
 exec=$TRUST_ROOT/exec/TRUST$COMM"_opt_pg"

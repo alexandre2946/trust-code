@@ -15,10 +15,6 @@ check_components()
          then
             ln -sf ../TRUST/bin/baltik/templates/$Composant .
          fi
-         if [ -d ../TRUST/doc/TRUST/exercices/$Composant ]   # baltik equation_convection_diffusion
-         then
-            ln -sf ../TRUST/doc/TRUST/exercices/$Composant .
-         fi
          if [ -d ../TRUST/Outils/$Composant/$Composant_src ] # baltik ICoCo
          then
             ln -sf ../TRUST/Outils/$Composant/$Composant"_src" $Composant
@@ -116,22 +112,21 @@ check_components()
             fi
             #[ $MODIF_TRUST_OK = 0 ] && COMPOSANT_OK=0
             # Verification independance des sous BALTIKs de TrioCFD n'est plus necessaire suite a la fusion des sous-baltiks de triocfd
-            DOC_PDF_OK=0
+            TRUSIFY_CHECK_OK=0
             if [ $* != tuleap/Kernel ] && [ "$COMPOSANT_BUILD_OK" = 1 ] 
             then
                echo " "
                # Use make's exit code, not text-grep for "Error" in the
                # log. trustify batch-check emits structured FAILED/PASSED
-               # lines, not "Error" — the old grep would miss real
+               # lines, not "Error" - the old grep would miss real
                # regressions and false-positive on harmless stderr that
                # happens to mention "Error". make's exit code reflects
                # both `trustify batch-check`'s exit (non-zero on any
                # failed dataset) AND the audit-3.10 check_trustify_install
                # probe (non-zero when the binary is missing). Audit 3.9.
                make trustify_check 1>>$Gui_log 2>&1
-               trustify_exit=$?
-               [ "$trustify_exit" != "0" ] && DOC_PDF_OK=0 \
-                   && echo "DOC_PDF_OK=0 (make trustify_check failed with exit $trustify_exit — last 20 lines of $Gui_log:)" \
+               TRUSIFY_CHECK_OK=$?
+               [ "$trustify_exit" != "0" ] && echo "make trustify_check failed with exit $trustify_exit - last 20 lines of $Gui_log:)" \
                    && tail -n 20 "$Gui_log"
                if [[ "$ComposantsOfficial" = *"$Composant"* ]] || [[ "$ComposantsLns" = *"$Composant"* ]] # Test si Composant n est pas dans la liste des composants Beta
                then
@@ -156,8 +151,8 @@ check_components()
             fi
             if [ $* != tuleap/Kernel ]
             then
-               echo $ECHO_OPTS "Reference Manual $Composant built on $HOST with $TRUST_VERSION ...\c"
-               if [ $DOC_PDF_OK = 0 ]
+               echo $ECHO_OPTS "trustify check $Composant run on $HOST with $TRUST_VERSION ...\c"
+               if [ $TRUSIFY_CHECK_OK != 0 ]
                then
                   echo $ECHO_OPTS "KO."
                   [ "$COMPOSANT_BUILD_OK" = 1 ] && cat $Gui_log | mail_ -s\"[lance_test_nuit] reference manual $Composant $TRUST_VERSION KO\" ${!BALTIK_PROJECT_LEADER} $TMA_PROJECT_LEADER $TRUST_MAIL
@@ -229,9 +224,6 @@ check_components()
                   #do
                   #   [[ "$wompi_machines" != *"$machine"* ]] && machines=$machines" $machine"
                   #done
-                  machines=`liste_machines "\-ICoCo"`
-               elif [ "$Composant" = equation_convection_diffusion ]
-               then
                   machines=`liste_machines "\-ICoCo"`
                elif [ "$Composant" = TrioCFD ] || [ "$Composant" = triocfd ]
                then
@@ -564,9 +556,9 @@ VOBS="TRUST Composants"
 # List of components tested with TRUST:
 # TrioCFD est ajoute a la liste car est devenu un Baltik de TRUST suite au decoupage de Trio_U.
 # ICoCo est devenu un Outil de TRUST.
-# equation_convection_diffusion est un projet Baltik qui sert de tutorial a la formation developpeur.
+# equation_convection_diffusion est un projet Baltik qui sert de tutorial a la formation developpeur, il a ete retire dans v1.9.8
 # MPCube est un Baltik qui peut etre teste sur TRUST et sur le kernel.
-ComposantsLns="Test_Baltik equation_convection_diffusion ICoCo"
+ComposantsLns="Test_Baltik ICoCo"
 ComposantsOfficial="triocfd mpcube genepi3 flica5 TRUST_NK sides scorpio sympy_to_TRUST pemfc module3D triomc mathys"
 export ComposantsBeta="flica5 module3D triomc"
 #ComposantsGit=$ComposantsOfficial" "$ComposantsBeta
@@ -738,7 +730,7 @@ fi
 #fi
 cd $TRUST_ROOT
 
-# Marque la version dans MAIN.cpp et mon_main.cpp
+# Marque la version dans TRUST_Version.h 
 echo " "
 echo "Mark new version in following files:"
 MAIN=$TRUST_ROOT/src/Kernel/Utilitaires/TRUST_Version.h
@@ -747,75 +739,10 @@ version=`$TRUST_Awk '/TRUST_VERSION/ {print $3}' $MAIN`
 echo "  "$version"=>"$new": "$MAIN
 echo $ECHO_OPTS "1,$ s?TRUST_VERSION $version?TRUST_VERSION \"$new\"?g\nw" | ed $MAIN 1>/dev/null 2>&1
 CHECKIN $MAIN 1>/dev/null 2>&1
-
-index=$TRUST_ROOT/index.html
-version=`$TRUST_Awk '/ Version / {print $4}' $index`
-echo $ECHO_OPTS "1,$ s?$version?$new?g\nw $index.new" | ed $index 1>/dev/null 2>&1
-if [ "`diff $index $index.new`" != "" ]
-then
-   echo "Mark new version in "$index
-   CHECKOUT $index
-   cat $index.new > $index
-fi
-rm -f $index.new
-ref_manual=Outils/TRIOXDATA/XTriou/objet_u.py
-version=`$TRUST_Awk '/ Manual V/ {print $5}' $ref_manual`
-echo $ECHO_OPTS "1,$ s?$version?V${new/"_"/}}?g\nw $ref_manual.new" | ed $ref_manual 1>/dev/null 2>&1
-if [ "`diff $ref_manual $ref_manual.new`" != "" ]
-then
-   echo "Mark new version in "$ref_manual
-   CHECKOUT $ref_manual
-   cat $ref_manual.new > $ref_manual
-fi
-rm -f $ref_manual.new
-tuto=doc/TRUST/Tutorial/TRUST_tutorial.tex
-version=`$TRUST_Awk '/ Tutorial V/ {print $3}' $tuto`
-echo $ECHO_OPTS "1,$ s?$version?V${new/"_"/}]{TRUST?g\nw $tuto.new" | ed $tuto 1>/dev/null 2>&1
-version=`$TRUST_Awk '/ Tutorial V/ {print $5}' $tuto.new`
-echo $ECHO_OPTS "1,$ s?$version?V${new/"_"/}}?g\nw $tuto.new" | ed $tuto.new 1>/dev/null 2>&1
-if [ "`diff $tuto $tuto.new`" != "" ]
-then
-   echo "Mark new version in "$tuto
-   CHECKOUT $tuto
-   cat $tuto.new > $tuto
-fi
-rm -f $tuto.new
-tuto=doc/TRUST/exercices/Tutorial_solutions/Tutorial_solutions.tex
-version=`$TRUST_Awk '/ Tutorial V/ {print $3}' $tuto`
-echo $ECHO_OPTS "1,$ s?$version?V${new/"_"/}?g\nw $tuto.new" | ed $tuto 1>/dev/null 2>&1
-if [ "`diff $tuto $tuto.new`" != "" ]
-then
-   echo "Mark new version in "$tuto
-   CHECKOUT $tuto
-   cat $tuto.new > $tuto
-fi
-rm -f $tuto.new
-tuto=doc/TRUST/Tutorial/Baltik_tutorial.tex
-version=`$TRUST_Awk '/ Tutorial V/ {print $5}' $tuto`
-echo $ECHO_OPTS "1,$ s?$version?V${new/"_"/}]{TRUST?g\nw $tuto.new" | ed $tuto 1>/dev/null 2>&1
-version=`$TRUST_Awk '/ Tutorial V/ {print $9}' $tuto.new`
-echo $ECHO_OPTS "1,$ s?$version?V${new/"_"/}}?g\nw $tuto.new" | ed $tuto.new 1>/dev/null 2>&1
-if [ "`diff $tuto $tuto.new`" != "" ]
-then
-   echo "Mark new version in "$tuto
-   CHECKOUT $tuto
-   cat $tuto.new > $tuto
-fi
-rm -f $tuto.new
-tuto=doc/TRUST/Tutorial/ICoCo_tutorial.tex
-version=`$TRUST_Awk '/ Tutorial V/ {print $4}' $tuto`
-echo $ECHO_OPTS "1,$ s?$version?V${new/"_"/}]{TRUST?g\nw $tuto.new" | ed $tuto 1>/dev/null 2>&1
-version=`$TRUST_Awk '/ Tutorial V/ {print $7}' $tuto.new`
-echo $ECHO_OPTS "1,$ s?$version?V${new/"_"/}}?g\nw $tuto.new" | ed $tuto.new 1>/dev/null 2>&1
-if [ "`diff $tuto $tuto.new`" != "" ]
-then
-   echo "Mark new version in "$tuto
-   CHECKOUT $tuto
-   cat $tuto.new > $tuto
-fi
-rm -f $tuto.new
 echo " "
 
+echo "$new" > VERSION
+CHECKIN $MAIN 1>/dev/null 2>&1
 
 [ ! -d $TRUST_ROOT/.git ] && echo "Error: You must have $TRUST_ROOT/.git directory to do this action" && exit
 
@@ -824,9 +751,9 @@ echo " "
 # Must be done BEFORE envoie_TRUST_arch (git_cron or git_ssh process)
 (
    # Assume unchanged some files (big one with a lot of changes):
-   cd $TRUST_ROOT/doc
+   cd $TRUST_ROOT
    echo "Update Git repos "`pwd`
-   for assume_inchanged in TRUST/TRUST_Reference_Manual.pdf TRUST/Keywords.txt Coverage/cpp.gcov.tar.gz Coverage/list_methodes.gz Coverage/dico.pkl.gz Coverage/list_methodes_non_appelees.gz
+   for assume_inchanged in share/coverage/cpp.gcov.tar.gz share/coverage/list_methodes.gz share/coverage/dico.pkl.gz share/coverage/list_methodes_non_appelees.gz
    do
       if [ ! -f $assume_inchanged ]
       then
@@ -1059,7 +986,7 @@ echo "###############################################"
               fi
            done
            cd $TRUST_ROOT
-           git commit doc/.dico -m"Commit in Kernel before git rebase TMA" --u=no 1>>$rebase_log 2>&1
+           #git commit doc/.dico -m"Commit in Kernel before git rebase TMA" --u=no 1>>$rebase_log 2>&1
            git rebase Livraison 1>>$rebase_log 2>&1
            rebase_error=$?
            if [ $rebase_error != 0 ]
@@ -1286,7 +1213,7 @@ echo "###############################################"
                        echo "TRUST script on $HOST the `date` ...">$install_patch_log
                        echo>>$install_patch_log
                        $TRUST_ROOT/bin/admin/Installer_TRUST.ssh $machine $patch_version -patch -compile 1>>$install_patch_log 2>&1
-                       if [ $? != 0 ] || [ "`grep :error $install_patch_log | grep -iv warning | grep -v TRIOXDATA | grep -v Gmsh`" != "" ]
+                       if [ $? != 0 ] || [ "`grep :error $install_patch_log | grep -iv warning | grep -v Gmsh`" != "" ]
                        then
                           cat $install_patch_log | mail_ -s\"[lance_test_nuit] Failed to install patch version on $machine\" $TRUST_MAIL
                        fi
@@ -1316,7 +1243,7 @@ echo "###############################################"
             cat tmp_.log | mail_ -s\"[lance_test_nuit] git grep python3.X failed in $vue\" $TRUST_MAIL
         fi
 
-        if [ "`find . -type l -lname '/*' | grep -v '/build/' | grep -v '/bin/baltik/templates/Test_Baltik/' | grep -v equation_convection_diffusion`" != "" ]  && [ $vue = tuleap/Livraison ]
+        if [ "`find . -type l -lname '/*' | grep -v '/build/' | grep -v '/bin/baltik/templates/Test_Baltik/'`" != "" ]  && [ $vue = tuleap/Livraison ]
         then
            echo "You should not create absolute links. Use relative links instead to be able to relocate TRUST install" | mail_ -s\"[lance_test_nuit] Forbiden absolute links created in $vue\" $TRUST_MAIL
         fi
@@ -1381,27 +1308,28 @@ source env_TRUST.sh 1>/dev/null 2>&1
 
 # Verifie la validite de la classe mere dans les instanciations
 # Verification du nom de la classe pere dans les macros implemente_...
-verif_log=$REP_NUIT/Verifie_pere_$HOST.log
-echo " "
+#verif_log=$REP_NUIT/Verifie_pere_$HOST.log
+#echo " "
 echo "Call to "$TRUST_ROOT"/bin/KSH/Verifie_pere"
-echo "  See $verif_log"
-echo "TRUST father class check on $HOST the `date` ...">$verif_log
-echo>>$verif_log
-Verifie_pere 1>>$verif_log 2>&1
-verif_error=$?
-tail -n1 $verif_log
-if [ $verif_error != 0 ]
-then
-   echo>>$verif_log
-   cat $TRUST_TMP/Verifie_pere/LOG>>$verif_log
-   cat $verif_log | mail_ -s\"[lance_test_nuit] Verifie_pere KO on $HOST:$TRUST_ROOT\" $TMA_PROJECT_LEADER $TRUST_MAIL
-fi
-echo>>$verif_log
-cat $TRUST_TMP/Verifie_pere/LOG>>$verif_log
-if [ $verif_error = 0 ]
-then
-   rm -rf $TRUST_TMP/Verifie_pere
-fi
+echo "Disabled in 1.9.8, will be replaced by another tool"
+#echo "  See $verif_log"
+#echo "TRUST father class check on $HOST the `date` ...">$verif_log
+#echo>>$verif_log
+#Verifie_pere 1>>$verif_log 2>&1
+#verif_error=$?
+#tail -n1 $verif_log
+#if [ $verif_error != 0 ]
+#then
+#   echo>>$verif_log
+#   cat $TRUST_TMP/Verifie_pere/LOG>>$verif_log
+#   cat $verif_log | mail_ -s\"[lance_test_nuit] Verifie_pere KO on $HOST:$TRUST_ROOT\" $TMA_PROJECT_LEADER $TRUST_MAIL
+#fi
+#echo>>$verif_log
+#cat $TRUST_TMP/Verifie_pere/LOG>>$verif_log
+#if [ $verif_error = 0 ]
+#then
+#   rm -rf $TRUST_TMP/Verifie_pere
+#fi
 
 echo " "
 echo "------------------------------------------------------"
@@ -1700,10 +1628,10 @@ echo $ECHO_OPTS "TRUST Post Processing    mailing list http://saxifrage:3500/wws
 echo $ECHO_OPTS "TrioCFD Front Tracking   mailing list http://saxifrage:3500/wws/info/trio_u_front_tracking" >> $MESSAGES_NUIT
 echo $ECHO_OPTS "---------------------------------------------------------------------------------" >> $MESSAGES_NUIT
 #echo $ECHO_OPTS "TRUST ftp site:          ftp://$TRUST_FTP/$PUBLIC/index.html" >> $MESSAGES_NUIT
-echo $ECHO_OPTS "TRUST documentation:     ftp://$TRUST_FTP/$SECRET/doc" >> $MESSAGES_NUIT
-echo $ECHO_OPTS "Latest Generic Guide:    ftp://$TRUST_FTP/$SECRET/doc/TRUST_Generic_documentation.pdf" >> $MESSAGES_NUIT
-echo $ECHO_OPTS "Latest Reference Manual: ftp://$TRUST_FTP/$SECRET/doc/TRUST_Reference_Manual.pdf" >> $MESSAGES_NUIT
-echo $ECHO_OPTS "Latest Tutorial:         ftp://$TRUST_FTP/$SECRET/doc/TRUST_tutorial.pdf" >> $MESSAGES_NUIT
+echo $ECHO_OPTS "TRUST documentation:     https://cea-trust-platform.readthedocs.io/en/next/" >> $MESSAGES_NUIT
+echo $ECHO_OPTS "Latest General Guide:    https://cea-trust-platform.readthedocs.io/en/next/user_guide/physics_data/index.html" >> $MESSAGES_NUIT
+echo $ECHO_OPTS "Latest Keywords Reference Manual: https://cea-trust-platform.readthedocs.io/en/next/user_guide/reference/index.html" >> $MESSAGES_NUIT
+echo $ECHO_OPTS "Latest Tutorial:         https://cea-trust-platform.readthedocs.io/en/next/user_tutorials/index.html" >> $MESSAGES_NUIT
 echo $ECHO_OPTS "Latest list of builds:   ftp://$TRUST_FTP/$SECRET/NUIT/NUIT.html" >> $MESSAGES_NUIT
 echo $ECHO_OPTS "Latest TRUST binary:     ftp://$TRUST_FTP/$SECRET/exec/linux/TRUST_mpi_opt"_"$new"_build_"$DATE.gz" >> $MESSAGES_NUIT
 echo $ECHO_OPTS "---------------------------------------------------------------------------------" >> $MESSAGES_NUIT
@@ -2331,76 +2259,76 @@ echo "<--- End at "`date '+%H:%M:%S %d/%m'`
 ############
 # Test XData
 ############
-echo " "
-echo "##################################"
-echo "# Verify the validation of XData #"
-echo "##################################"
-echo "---> Begin at "`date '+%H:%M:%S %d/%m'`
-validation_xdata=""
-machines_=`liste_machines "\-xdata"`
-machines=`liste_machines "\-xdata" | $TRUST_Awk -F. '{print $1}' | $TRUST_Awk -F"-gw" '{print $1}'`
-echo "Validation by -xdata on $machines"
+#echo " "
+#echo "##################################"
+#echo "# Verify the validation of XData #"
+#echo "##################################"
+#echo "---> Begin at "`date '+%H:%M:%S %d/%m'`
+#validation_xdata=""
+#machines_=`liste_machines "\-xdata"`
+#machines=`liste_machines "\-xdata" | $TRUST_Awk -F. '{print $1}' | $TRUST_Awk -F"-gw" '{print $1}'`
+#echo "Validation by -xdata on $machines"
 # Si une machine a XData qui fonctionne c'est OK
-for machine_ in $machines_
-do
-   machine=`echo $machine_ | $TRUST_Awk -F. '{print $1}' | $TRUST_Awk -F"-gw" '{print $1}'`
-   check_xdata_log=$REP_NUIT"/check_xdata_"$machine".log"
-   rm -f $check_xdata_log
-   log=`awk -v adr=$machine_ '($2==adr) {print $4}' ~/.netrc | head -1`
-   BATCHMODE=" -o BatchMode=yes "
-   SSHP=""
-   if [ "`liste_machines ssh_pass | grep $machine`" != "" ]
-   then
-      SSHPASS=`awk -v adr=$machine_ '($2==adr) {print $6}' ~/.netrc | head -1`
-      SSHP="sshpass -p $SSHPASS "
-      BATCHMODE=""
-   fi
-   if  [ "`$SSHP ssh_ -o ConnectTimeout=30 $BATCHMODE $log@$machine -n pwd 1>/dev/null 2>&1;echo $?`" != 0 ]
-   then
-      echo "  KO $machine machine not accessible via ssh."
-      echo "  No $check_xdata_log"
-      validation_xdata=0
-      echo | mail_ -s\"[lance_test_nuit] Error when receiving XData log from $machine not accessible via ssh.\" $TRUST_MAIL
-   else
-      echo "  See $check_xdata_log"
-
-      workdir=`$SSHP ssh $log@$machine -n 'echo $WORKDIR'`
-      if  [ "${machine:0:2}" = "is" ]
-      then
-         $SSHP scp $log@$machine:$workdir/.tmp_TRUST_$machine/check_xdata.log $check_xdata_log 1>/dev/null 2>&1
-         scp_error=$?
-      else
-         $SSHP scp $log@$machine:~/.tmp_TRUST_$machine/check_xdata.log $check_xdata_log
-         scp_error=$?
-      fi
-      if [ $scp_error != 0 ]
-      then
-         echo | mail_ -s\"[lance_test_nuit] Error when receiving XData log from $machine. Check if not finished.\" $TRUST_MAIL
-      else
-         grep 'XDATA=' $check_xdata_log
-      fi
-      rm -f $scp_error
-      if [ "`grep 'XDATA=OK' $check_xdata_log 2>/dev/null`" != "" ]
-      then
-         validation_xdata=1
-      else
-         [ "$validation_xdata" = "" ] && validation_xdata=0
-         [ -f $check_xdata_log ] && cat $check_xdata_log | mail_ -s\"[lance_test_nuit] Check XData on $machine KO\" $TRUST_MAIL
-      fi
-   fi
-done
-echo " "
-if [ $validation_xdata = 1 ]
-then
-   echo "Release criterion: XData OK"
-else
-   echo "Release criterion: XData KO"
-fi
-force_validation_xdata=~/force_validation_xdata && [ -f $force_validation_xdata ] && validation_xdata=1 && rm -f $force_validation_xdata
-echo "$validation_xdata  XData $validation_xdata (=1)" >> $MESSAGES_NUIT
-let total_criteres=$total_criteres+1
-let criteres_remplis=$criteres_remplis+$validation_xdata
-echo "<--- End at "`date '+%H:%M:%S %d/%m'`
+#for machine_ in $machines_
+#do
+#   machine=`echo $machine_ | $TRUST_Awk -F. '{print $1}' | $TRUST_Awk -F"-gw" '{print $1}'`
+#   check_xdata_log=$REP_NUIT"/check_xdata_"$machine".log"
+#   rm -f $check_xdata_log
+#   log=`awk -v adr=$machine_ '($2==adr) {print $4}' ~/.netrc | head -1`
+#   BATCHMODE=" -o BatchMode=yes "
+#   SSHP=""
+#   if [ "`liste_machines ssh_pass | grep $machine`" != "" ]
+#   then
+#      SSHPASS=`awk -v adr=$machine_ '($2==adr) {print $6}' ~/.netrc | head -1`
+#      SSHP="sshpass -p $SSHPASS "
+#      BATCHMODE=""
+#   fi
+#   if  [ "`$SSHP ssh_ -o ConnectTimeout=30 $BATCHMODE $log@$machine -n pwd 1>/dev/null 2>&1;echo $?`" != 0 ]
+#   then
+#      echo "  KO $machine machine not accessible via ssh."
+#      echo "  No $check_xdata_log"
+#      validation_xdata=0
+#      echo | mail_ -s\"[lance_test_nuit] Error when receiving XData log from $machine not accessible via ssh.\" $TRUST_MAIL
+#   else
+#      echo "  See $check_xdata_log"
+#
+#      workdir=`$SSHP ssh $log@$machine -n 'echo $WORKDIR'`
+#      if  [ "${machine:0:2}" = "is" ]
+#      then
+#         $SSHP scp $log@$machine:$workdir/.tmp_TRUST_$machine/check_xdata.log $check_xdata_log 1>/dev/null 2>&1
+#         scp_error=$?
+#      else
+#         $SSHP scp $log@$machine:~/.tmp_TRUST_$machine/check_xdata.log $check_xdata_log
+#         scp_error=$?
+#      fi
+#      if [ $scp_error != 0 ]
+#      then
+#         echo | mail_ -s\"[lance_test_nuit] Error when receiving XData log from $machine. Check if not finished.\" $TRUST_MAIL
+#      else
+#         grep 'XDATA=' $check_xdata_log
+#      fi
+#      rm -f $scp_error
+#      if [ "`grep 'XDATA=OK' $check_xdata_log 2>/dev/null`" != "" ]
+#      then
+#         validation_xdata=1
+#      else
+#         [ "$validation_xdata" = "" ] && validation_xdata=0
+#         [ -f $check_xdata_log ] && cat $check_xdata_log | mail_ -s\"[lance_test_nuit] Check XData on $machine KO\" $TRUST_MAIL
+#      fi
+#   fi
+#done
+#echo " "
+#if [ $validation_xdata = 1 ]
+#then
+#   echo "Release criterion: XData OK"
+#else
+#   echo "Release criterion: XData KO"
+#fi
+#force_validation_xdata=~/force_validation_xdata && [ -f $force_validation_xdata ] && validation_xdata=1 && rm -f $force_validation_xdata
+#echo "$validation_xdata  XData $validation_xdata (=1)" >> $MESSAGES_NUIT
+#let total_criteres=$total_criteres+1
+#let criteres_remplis=$criteres_remplis+$validation_xdata
+#echo "<--- End at "`date '+%H:%M:%S %d/%m'`
 
 ##########################
 # Verification des modules
@@ -2729,7 +2657,6 @@ do
       fi
       # Copie cpp.gcov.tar.gz
       file=cpp.gcov.tar.gz
-      #echo "    Copy $file to $TRUST_ROOT/doc/Coverage/" # Recuperer fichier depuis TRUST + all baltik (ici TRUST seul)
       echo "    Copy $file to $TRUST_TMP/"
       rm -f $TRUST_TMP/$file
       if  [ "${hostname:0:2}" = "is" ]
@@ -2738,11 +2665,9 @@ do
       else
          $SSHP scp $log@$machine_gcov:~/.tmp_TRUST_$hostname/$file $TRUST_TMP/$file
       fi
-      if [ "`diff $TRUST_TMP/$file $TRUST_ROOT/doc/Coverage/$file`" != "" ]
+      if [ "`diff $TRUST_TMP/$file $TRUST_ROOT/share/coverage/$file`" != "" ]
       then
          echo "    => updated"
-         #CHECKOUT $TRUST_ROOT/doc/Coverage/$file 1>/dev/null 2>&1 # Recuperer fichier depuis TRUST + all baltik (ici TRUST seul)
-         #mv -f $TRUST_TMP/$file $TRUST_ROOT/doc/Coverage/$file    # Recuperer fichier depuis TRUST + all baltik (ici TRUST seul)
       else
          echo "    => NOT updated"
       fi
@@ -2762,7 +2687,7 @@ then
 fi
 for machine in $machines # Compilation avec -prof et passage de tous les cas tests
 do
-   cd $TRUST_ROOT/doc/Coverage
+   cd $TRUST_ROOT/share/coverage
    hostname=`echo $machine | $TRUST_Awk -F. '{print $1}' | $TRUST_Awk -F"-gw" '{print $1}'`
    log=`awk -v adr=$machine '($2==adr) {print $4}' ~/.netrc | head -1`
    BATCHMODE=" -o BatchMode=yes "
@@ -2792,7 +2717,6 @@ do
       # Copie file
       for file in list_methodes.gz list_methodes_non_appelees.gz dico.pkl.gz
       do
-         #echo "    Copy $file to $TRUST_ROOT/doc/Coverage/" # Recuperer fichier depuis TRUST + all baltik (ici TRUST seul)
          echo "    Copy $file to $TRUST_TMP/"
          rm -f $TRUST_TMP/$file
          if [ "${hostname:0:2}" = "is" ]
@@ -2801,21 +2725,17 @@ do
          else
             $SSHP scp $log@$machine:~/.tmp_TRUST_$hostname/$file $TRUST_TMP/$file
          fi
-         if [ -f $TRUST_TMP/$file ] && [ "`diff $TRUST_TMP/$file $TRUST_ROOT/doc/Coverage/$file`" != "" ]
+         if [ -f $TRUST_TMP/$file ] && [ "`diff $TRUST_TMP/$file $TRUST_ROOT/share/coverage/$file`" != "" ]
          then
             echo "    => updated"
-            #CHECKOUT $TRUST_ROOT/doc/Coverage/$file 1>/dev/null 2>&1 # Recuperer fichier depuis TRUST + all baltik (ici TRUST seul)
-            #mv -f $TRUST_TMP/$file $TRUST_ROOT/doc/Coverage/$file    # Recuperer fichier depuis TRUST + all baltik (ici TRUST seul)
          else
             echo "    => NOT updated"
          fi
-         #rm -f $TRUST_TMP/$file                  # Recuperer fichier depuis TRUST + all baltik (ici TRUST seul)
-         #ls -la $TRUST_ROOT"/doc/Coverage/"$file # Recuperer fichier depuis TRUST + all baltik (ici TRUST seul)
          # Recuperation du rapport gprof de l'ensemble des cas tests de non regression si cree
          if [ "`grep 'GMON_DIR=""' $TRUST_ROOT/bin/lance_test`" = "" ]
          then
             cpu=all_tests.cpu
-            echo "    Copy $cpu to $TRUST_ROOT/doc/Coverage/"
+            echo "    Copy $cpu to $TRUST_ROOT/share/coverage/"
             #CHECKOUT $cpu
             if [ "${hostname:0:2}" = "is" ]
             then
@@ -2824,7 +2744,7 @@ do
                $SSHP scp $log@$machine:~/.tmp_TRUST_$hostname/tests/$cpu . #1>/dev/null 2>&1
             fi
             #CHECKIN $cpu
-            ls -la $TRUST_ROOT"/doc/Coverage/"$cpu
+            ls -la $TRUST_ROOT"/share/coverage/"$cpu
          fi
       done
    fi
@@ -2833,15 +2753,15 @@ done
 ##########
 # TGGCOV #
 ##########
-# Mise a jour du repertoire doc/Coverage et verification que la couverture est a jour
-cd $TRUST_ROOT/doc/Coverage
-Build=$TRUST_ROOT/build/doc/Coverage
+# Mise a jour du repertoire coverage et verification que la couverture est a jour
+cd $TRUST_ROOT/share/coverage
+Build=$TRUST_ROOT/build/coverage
 [ ! -d ${Build} ] && echo Creating ${Build} directory && mkdir -p ${Build}
 echo " "
 echo "Verification of the coverage in `pwd`:"
 # Creation des classes appellees ou non
 (
-cd $TRUST_ROOT/doc/Coverage
+cd $TRUST_ROOT/share/coverage
 echo "  Call to $TRUST_ROOT/bin/KSH/tggcov_ -file"
 listing=`mktemp_`
 export PYTHONPATH=$PYTHONPATH:$TRUST_ROOT/bin/KSH
@@ -2923,15 +2843,14 @@ else
 fi
 (
 # Creation du rapport html
-cd $TRUST_ROOT/doc/Coverage
+cd $TRUST_ROOT/share/coverage
 cd html
 echo "  Call to $TRUST_ROOT/bin/KSH/tggcov_ -html"
 echo "from `pwd`"
 echo "    See $REP_NUIT/tggcov_html.log"
 $TRUST_ROOT/bin/KSH/tggcov_ -html 1>$REP_NUIT/tggcov_html.log 2>&1
 tail -n1 $REP_NUIT/tggcov_html.log
-#echo "    Update html.tgz on $TRUST_ROOT/doc/Coverage" # Recuperer fichier depuis TRUST + all baltik (ici TRUST seul)
-echo "    Update html.tgz on $TRUST_ROOT/doc/Coverage/html"
+echo "    Update html.tgz on $TRUST_ROOT/share/coverage/html"
 tar cfz html.tgz *.html
 # Mise a jour si different
 if [ "`diff -a html.tgz ../html.tgz 2>/dev/null;echo $?`" != 0 ]
@@ -2945,20 +2864,12 @@ else
 fi
 #ls -la ../html.tgz  # Recuperer fichier depuis TRUST + all baltik (ici TRUST seul)
 )
-cd $TRUST_ROOT/doc/Coverage
-echo "  Call to make in $TRUST_ROOT/doc/Coverage"
-make clean # dossier Coverage/html supprime et Coverage/html/index.html vide car non mis a jour dans l'archive TRUST + all baltik
+cd $TRUST_ROOT/share/coverage
+echo "  Call to make in $TRUST_ROOT/share/coverage"
+make clean # dossier coverage/html supprime et coverage/html/index.html vide car non mis a jour dans l'archive TRUST + all baltik
 make
-CPP_GCOV=$TRUST_ROOT/doc/Coverage/html/cpp.gcov
+CPP_GCOV=$TRUST_ROOT/share/coverage/html/cpp.gcov
 echo "  Verification of $CPP_GCOV"
-#grep $DATE $CPP_GCOV/MAIN.cpp.gcov # Build a ete retire des fichiers MAIN.cpp
-#if [ "`grep $DATE $CPP_GCOV/MAIN.cpp.gcov 2>/dev/null`" = "" ]
-#then
-#   echo "    KO"
-#   echo "$CPP_GCOV KO. See on $machine_gcov host with the gcov TRUST binairy: `grep build $CPP_GCOV/MAIN.cpp.gcov`" | mail_ -s\"[lance_test_nuit] Coverage KO on $hostname host\" $TRUST_MAIL
-#else
-#   echo "    OK"
-#fi
 ls -la $CPP_GCOV/MAIN.cpp.gcov
 for file in list_methodes list_methodes_non_appelees
 do
@@ -2966,18 +2877,18 @@ do
 done
 # Nouveau pour 1.6.3: Comparaison de la couverture de code fichier par fichier par rapport a la version precedante (sous $WORKDIR/tuleap/Maintenance)
 (
-cd $TRUST_ROOT/doc/Coverage/html/cpp.gcov
+cd $TRUST_ROOT/share/coverage/html/cpp.gcov
 MAINTENANCE=$WORKDIR/tuleap/Maintenance/TRUST
 echo " "
 echo "Comparison of code coverage between new and old versions"
 echo "from `pwd`"
-echo " and $MAINTENANCE/doc/Coverage/html/cpp.gcov"
+echo " and $MAINTENANCE/share/coverage/html/cpp.gcov"
 echo "Call to bin/KSH/tggcov_ -short -file *.gcov"
 [ ! -d $MAINTENANCE ] && echo "  Verification of test coverage impossible because $MAINTENANCE not exist." #&& coverage=0
 log=`mktemp_`
 for gcov in *.gcov
 do
-   if [ -f $MAINTENANCE/doc/Coverage/html/cpp.gcov/$gcov ]
+   if [ -f $MAINTENANCE/share/coverage/html/cpp.gcov/$gcov ]
    then
       file=${gcov%.gcov}
       new_coverage=`tggcov_ -short -file $file`
@@ -2988,7 +2899,6 @@ do
       if [ $lignes_non_testees_en_plus -gt 0 ] && [ $couverture != 0.00 ]
       then
          echo $ECHO_OPTS "$lignes_non_testees_en_plus lines not tested more in $file"
-         # echo "  "sdiff $TRUST_ROOT/doc/Coverage/html/cpp.gcov/$gcov $MAINTENANCE/doc/Coverage/html/cpp.gcov/$gcov
          # Mise en echec du critere de livraison:
          #coverage=0
       fi
@@ -3014,66 +2924,56 @@ echo "<--- End at "`date '+%H:%M:%S %d/%m'`
 #
 #
 #
-echo " "
-echo "################################"
-echo "# Verify the keywords coverage #"
-echo "################################"
-echo "---> Begin at "`date '+%H:%M:%S %d/%m'`
-echo "  Analysis of $credoc_log"
-grep OK $credoc_log
-grep KO $credoc_log
-error_log=`grep 'error Doxygen' $credoc_log`
-[ ${#error_log} != 0 ] && echo | mail_ -s\"[credoc] Doxygen: Study of TRUST includes under `pwd`\" $TRUST_MAIL
-#echo "    See $TRUST_ROOT/build/doc/TRUST/list_keywords_covered file"
-#OK=`wc -l $TRUST_ROOT/build/doc/TRUST/list_keywords_covered | awk '{ print $1 }'`
-#echo "    $OK keywords covered by test cases"
-#echo "    See $TRUST_ROOT/build/doc/TRUST/list_keywords_NOT_covered file"
-#KO=`wc -l $TRUST_ROOT/build/doc/TRUST/list_keywords_NOT_covered | awk '{ print $1 }'`
-#echo "    $KO keywords NOT covered by test cases"
-#let NB=$OK+$KO
-# Mail de verification uniquement le week-end
-#[ "`date '+%u'`" = 1 ] && [ `date '+%H'` -lt 8 ] && [ -f $TRUST_ROOT/build/doc/TRUST/list_keywords_NOT_covered ] && cat $TRUST_ROOT/build/doc/TRUST/list_keywords_NOT_covered | mail_ -s\"[lance_test_nuit] Tests coverage credoc: list of keywords NOT covered by test cases\" $TMA_PROJECT_LEADER $TRUST_MAIL
-#keywords_minimal=77.37 #v1.7.5
+#echo " "
+#echo "################################"
+#echo "# Verify the keywords coverage #"
+#echo "################################"
+#echo "---> Begin at "`date '+%H:%M:%S %d/%m'`
+#echo "  Analysis of $credoc_log"
+#grep OK $credoc_log
+#grep KO $credoc_log
+#error_log=`grep 'error Doxygen' $credoc_log`
+#[ ${#error_log} != 0 ] && echo | mail_ -s\"[credoc] Doxygen: Study of TRUST includes under `pwd`\" $TRUST_MAIL
 #
-echo "    See $TRUST_ROOT/build/Outils/TRIOXDATA/XTriou/list_keywords_xdata* files"
-NB=0
-OK=0
-KO=0
-[ -f  $TRUST_ROOT/build/Outils/TRIOXDATA/XTriou/list_keywords_xdata ] && NB=`wc -l $TRUST_ROOT/build/Outils/TRIOXDATA/XTriou/list_keywords_xdata | awk '{ print $1 }'`
-[ -f $TRUST_ROOT/build/Outils/TRIOXDATA/XTriou/list_keywords_xdata_tested ] && OK=`wc -l $TRUST_ROOT/build/Outils/TRIOXDATA/XTriou/list_keywords_xdata_tested | awk '{ print $1 }'`
-let KO=$NB-$OK
-echo "    $OK keywords covered by test cases"
-echo "    $KO keywords NOT covered by test cases"
-keywords_minimal=76.15 #77.35 v1.9.4 #77.87 v1.9.3 #78.47 v1.9.2 #80.02 v1.9.1 #81.40 v1.8.4 #80.03 v1.8.3 #78.89 v1.8.2 #78.70 v1.8.1 #78.60 v1.8.0 deplacement de la turbulence de TRUST a TrioCFD;  83.10 v1.7.8 suppression du mot-cle "espece lambda" ; 83.11 v1.7.7 classe de base avec ajout de commentaires XD ; 83.00 v1.7.6 ; 82.89 v1.7.5
+#echo "    See $TRUST_ROOT/build/Outils/TRIOXDATA/XTriou/list_keywords_xdata* files"
+#NB=0
+#OK=0
+#KO=0
+#[ -f  $TRUST_ROOT/build/Outils/TRIOXDATA/XTriou/list_keywords_xdata ] && NB=`wc -l $TRUST_ROOT/build/Outils/TRIOXDATA/XTriou/list_keywords_xdata | awk '{ print $1 }'`
+#[ -f $TRUST_ROOT/build/Outils/TRIOXDATA/XTriou/list_keywords_xdata_tested ] && OK=`wc -l $TRUST_ROOT/build/Outils/TRIOXDATA/XTriou/list_keywords_xdata_tested | awk '{ print $1 }'`
+#let KO=$NB-$OK
+#echo "    $OK keywords covered by test cases"
+#echo "    $KO keywords NOT covered by test cases"
+#keywords_minimal=76.15 #77.35 v1.9.4 #77.87 v1.9.3 #78.47 v1.9.2 #80.02 v1.9.1 #81.40 v1.8.4 #80.03 v1.8.3 #78.89 v1.8.2 #78.70 v1.8.1 #78.60 v1.8.0 deplacement de la turbulence de TRUST a TrioCFD;  83.10 v1.7.8 suppression du mot-cle "espece lambda" ; 83.11 v1.7.7 classe de base avec ajout de commentaires XD ; 83.00 v1.7.6 ; 82.89 v1.7.5
 
-echo " "
-keywords=0
-couverture_de_motcle=0
-[ $NB != 0 ] && couverture_de_motcle=`echo $ECHO_OPTS "scale=2;100*$OK/$NB" | bc -l`
-keywords=`echo $couverture_de_motcle | $TRUST_Awk -v m=$keywords_minimal '{if ($1>=m) print 1;else print 0}'`
-if [ $keywords = 1 ]
-then
-   echo "    Keywords coverage $couverture_de_motcle% >= $keywords_minimal% tested "
-else
-   echo "    Keywords coverage $couverture_de_motcle% < $keywords_minimal% tested"
-   if [ -f $TRUST_ROOT/build/Outils/TRIOXDATA/XTriou/list_keywords_xdata_tested ]
-   then
-      cat $TRUST_ROOT/build/Outils/TRIOXDATA/XTriou/list_keywords_xdata_tested | mail_ -s\"[lance_test_nuit] Keywords coverage KO with $couverture_de_motcle% \< $keywords_minimal% tested\" $TMA_PROJECT_LEADER $TRUST_MAIL
-   else
-      echo "No list_keywords_xdata_tested file" | mail_ -s\"[lance_test_nuit] Keywords coverage KO with $couverture_de_motcle% \< $keywords_minimal% tested\" $TMA_PROJECT_LEADER $TRUST_MAIL
-   fi
-fi
-echo " "
-if [ $keywords = 1 ]
-then
-   echo "Release criterion: Keywords coverage OK"
-else
-   echo "Release criterion: Keywords coverage KO"
-fi
-echo "$keywords  Keywords coverage $OK/$NB=$couverture_de_motcle% (>=$keywords_minimal% tested)" >> $MESSAGES_NUIT
-let total_criteres=$total_criteres+1
-let criteres_remplis=$criteres_remplis+$coverage
-echo "<--- End at "`date '+%H:%M:%S %d/%m'`
+#echo " "
+#keywords=0
+#couverture_de_motcle=0
+#[ $NB != 0 ] && couverture_de_motcle=`echo $ECHO_OPTS "scale=2;100*$OK/$NB" | bc -l`
+#keywords=`echo $couverture_de_motcle | $TRUST_Awk -v m=$keywords_minimal '{if ($1>=m) print 1;else print 0}'`
+#if [ $keywords = 1 ]
+#then
+#   echo "    Keywords coverage $couverture_de_motcle% >= $keywords_minimal% tested "
+#else
+#   echo "    Keywords coverage $couverture_de_motcle% < $keywords_minimal% tested"
+#   if [ -f $TRUST_ROOT/build/Outils/TRIOXDATA/XTriou/list_keywords_xdata_tested ]
+#   then
+#      cat $TRUST_ROOT/build/Outils/TRIOXDATA/XTriou/list_keywords_xdata_tested | mail_ -s\"[lance_test_nuit] Keywords coverage KO with $couverture_de_motcle% \< $keywords_minimal% tested\" $TMA_PROJECT_LEADER $TRUST_MAIL
+#   else
+#      echo "No list_keywords_xdata_tested file" | mail_ -s\"[lance_test_nuit] Keywords coverage KO with $couverture_de_motcle% \< $keywords_minimal% tested\" $TMA_PROJECT_LEADER $TRUST_MAIL
+#   fi
+#fi
+#echo " "
+#if [ $keywords = 1 ]
+#then
+#   echo "Release criterion: Keywords coverage OK"
+#else
+#   echo "Release criterion: Keywords coverage KO"
+#fi
+#echo "$keywords  Keywords coverage $OK/$NB=$couverture_de_motcle% (>=$keywords_minimal% tested)" >> $MESSAGES_NUIT
+#let total_criteres=$total_criteres+1
+#let criteres_remplis=$criteres_remplis+$coverage
+#echo "<--- End at "`date '+%H:%M:%S %d/%m'`
 #
 #
 #
@@ -3624,56 +3524,56 @@ echo "<--- End at "`date '+%H:%M:%S %d/%m'`
 #########
 # Doxygen
 #########
-echo " "
-echo "####################################"
-echo "# Verify the Doxygen documentation #"
-echo "####################################"
-echo "---> Begin at "`date '+%H:%M:%S %d/%m'`
-echo "Search of $TRUST_ROOT/build/doc/doxygen*.err file"
-validation_doxygen=1
-if [ -f $TRUST_ROOT/build/doc/doxygen*.err ]
-then
-   ls -la $TRUST_ROOT/build/doc/doxygen*.*
-   head -n1 $TRUST_ROOT/build/doc/doxygen*.out
-   tail -n1 $TRUST_ROOT/build/doc/doxygen*.out
-elif [ ! -f $TRUST_ROOT/build/doc/doxygen*.out ]
-then
-   validation_doxygen=0 && echo "TRUST Doxygen KO" && echo `ls -la $TRUST_ROOT/build/doc/doxygen*.*` | mail_ -s\"[lance_test_nuit] Validation of Doxygen documentation NOT\" $TRUST_MAIL
-fi
-[ "`grep 'Doxygen documentation failed' $TRUST_ROOT/build/doc/doxygen*.err 2>/dev/null`" != "" ] && validation_doxygen=0 && echo "TRUST Doxygen KO" && cat $TRUST_ROOT/build/doc/doxygen*.err | mail_ -s\"[lance_test_nuit] Validation of TRUST Doxygen documentation KO\" $TRUST_MAIL $TMA_PROJECT_LEADER
-for Composant in $Composants
-do
-   if [[ "$ComposantsOfficial" = *"$Composant"* ]] || [[ "$ComposantsLns" = *"$Composant"* ]] # Test si Composant n est pas dans la liste des composants Beta
-   then
-      if [ "$Composant" != Test_Baltik ] # on retire Test_Baltik du critere de livraison TRUST/TrioCFD. ND 26/09/2022 : on remet ijk
-      then
-         echo " "
-         echo "Search of $TRUST_ROOT/../Composants/$Composant/build/doxygen*.err file"
-         if [ -f $TRUST_ROOT/../Composants/$Composant/build/doxygen*.err ]
-         then
-            ls -la $TRUST_ROOT/../Composants/$Composant/build/doxygen*.*
-            head -n1 $TRUST_ROOT/../Composants/$Composant/build/doxygen*.out
-            tail -n1 $TRUST_ROOT/../Composants/$Composant/build/doxygen*.out
-         elif [ ! -f $TRUST_ROOT/../Composants/$Composant/build/doxygen*.out ]
-         then
-            validation_doxygen=0 && echo "$Composant Doxygen KO" && echo `ls -la $TRUST_ROOT/../Composants/$Composant/build/doxygen*.*` | mail_ -s\"[lance_test_nuit] Validation of $Composant Doxygen documentation NOT\" $TRUST_MAIL
-         fi
-         BALTIK_PROJECT_LEADER=$Composant"_PROJECT_LEADER"
-         [ "`grep 'Doxygen documentation failed' $TRUST_ROOT/../Composants/$Composant/build/doxygen*.err 2>/dev/null`" != "" ] && validation_doxygen=0 && echo "$Composant Doxygen KO" && cat $TRUST_ROOT/../Composants/$Composant/build/doxygen*.err | mail_ -s\"[lance_test_nuit] Validation of $Composant Doxygen documentation KO\" $TRUST_MAIL $TMA_PROJECT_LEADER ${!BALTIK_PROJECT_LEADER}
-      fi
-   fi
-done
-force_validation_doxygen=~/force_validation_doxygen && [ -f $force_validation_doxygen ] && validation_doxygen=1 && rm -f $force_validation_doxygen
-echo " "
-if [ $validation_doxygen = 1 ]
-then
-   echo "Release criterion: Doxygen OK"
-else
-   echo "Release criterion: Doxygen KO"
-fi
-echo "$validation_doxygen  Doxygen $validation_doxygen (=1)" >> $MESSAGES_NUIT
-let total_criteres=$total_criteres+1
-let criteres_remplis=$criteres_remplis+$validation_doxygen
+#echo " "
+#echo "####################################"
+#echo "# Verify the Doxygen documentation #"
+#echo "####################################"
+#echo "---> Begin at "`date '+%H:%M:%S %d/%m'`
+#echo "Search of $TRUST_ROOT/build/doc/doxygen*.err file"
+#validation_doxygen=1
+#if [ -f $TRUST_ROOT/build/doc/doxygen*.err ]
+#then
+#   ls -la $TRUST_ROOT/build/doc/doxygen*.*
+#   head -n1 $TRUST_ROOT/build/doc/doxygen*.out
+#   tail -n1 $TRUST_ROOT/build/doc/doxygen*.out
+#elif [ ! -f $TRUST_ROOT/build/doc/doxygen*.out ]
+#then
+#   validation_doxygen=0 && echo "TRUST Doxygen KO" && echo `ls -la $TRUST_ROOT/build/doc/doxygen*.*` | mail_ -s\"[lance_test_nuit] Validation of Doxygen documentation NOT\" $TRUST_MAIL
+#fi
+#[ "`grep 'Doxygen documentation failed' $TRUST_ROOT/build/doc/doxygen*.err 2>/dev/null`" != "" ] && validation_doxygen=0 && echo "TRUST Doxygen KO" && cat $TRUST_ROOT/build/doc/doxygen*.err | mail_ -s\"[lance_test_nuit] Validation of TRUST Doxygen documentation KO\" $TRUST_MAIL $TMA_PROJECT_LEADER
+#for Composant in $Composants
+#do
+#   if [[ "$ComposantsOfficial" = *"$Composant"* ]] || [[ "$ComposantsLns" = *"$Composant"* ]] # Test si Composant n est pas dans la liste des composants Beta
+#   then
+#      if [ "$Composant" != Test_Baltik ] # on retire Test_Baltik du critere de livraison TRUST/TrioCFD. ND 26/09/2022 : on remet ijk
+#      then
+#         echo " "
+#         echo "Search of $TRUST_ROOT/../Composants/$Composant/build/doxygen*.err file"
+#         if [ -f $TRUST_ROOT/../Composants/$Composant/build/doxygen*.err ]
+#         then
+#            ls -la $TRUST_ROOT/../Composants/$Composant/build/doxygen*.*
+#            head -n1 $TRUST_ROOT/../Composants/$Composant/build/doxygen*.out
+#            tail -n1 $TRUST_ROOT/../Composants/$Composant/build/doxygen*.out
+#         elif [ ! -f $TRUST_ROOT/../Composants/$Composant/build/doxygen*.out ]
+#         then
+#            validation_doxygen=0 && echo "$Composant Doxygen KO" && echo `ls -la $TRUST_ROOT/../Composants/$Composant/build/doxygen*.*` | mail_ -s\"[lance_test_nuit] Validation of $Composant Doxygen documentation NOT\" $TRUST_MAIL
+#         fi
+#         BALTIK_PROJECT_LEADER=$Composant"_PROJECT_LEADER"
+#         [ "`grep 'Doxygen documentation failed' $TRUST_ROOT/../Composants/$Composant/build/doxygen*.err 2>/dev/null`" != "" ] && validation_doxygen=0 && echo "$Composant Doxygen KO" && cat $TRUST_ROOT/../Composants/$Composant/build/doxygen*.err | mail_ -s\"[lance_test_nuit] Validation of $Composant Doxygen documentation KO\" $TRUST_MAIL $TMA_PROJECT_LEADER ${!BALTIK_PROJECT_LEADER}
+#      fi
+#   fi
+#done
+#force_validation_doxygen=~/force_validation_doxygen && [ -f $force_validation_doxygen ] && validation_doxygen=1 && rm -f $force_validation_doxygen
+#echo " "
+#if [ $validation_doxygen = 1 ]
+#then
+#   echo "Release criterion: Doxygen OK"
+#else
+#   echo "Release criterion: Doxygen KO"
+#fi
+#echo "$validation_doxygen  Doxygen $validation_doxygen (=1)" >> $MESSAGES_NUIT
+#let total_criteres=$total_criteres+1
+#let criteres_remplis=$criteres_remplis+$validation_doxygen
 min_criteres=`echo $ECHO_OPTS "scale=0\n$total_criteres*75/100" | bc -l` # 75% du nombre total de criteres pour release beta #
 echo "<--- End at "`date '+%H:%M:%S %d/%m'`
 
@@ -3706,11 +3606,6 @@ deja_livre=0
 if [ $accord_admin = 1 ]
 then
    echo ${new%_beta}" == "$new" => agreement_administrator = "$accord_admin
-   # Add latest version of TRUST tutorials to git
-   cp $TRUST_ROOT/doc/TRUST/Tutorial/TRUST_tutorial.pdf $TRUST_ROOT/doc/TRUST/
-   cp $TRUST_ROOT/doc/TRUST/Tutorial/ICoCo_tutorial.pdf $TRUST_ROOT/doc/TRUST/
-   cp $TRUST_ROOT/doc/TRUST/Tutorial/Baltik_tutorial.pdf $TRUST_ROOT/doc/TRUST/
-   cp $TRUST_ROOT/doc/TRUST/exercices/Tutorial_solutions/Tutorial_solutions.pdf $TRUST_ROOT/doc/TRUST/exercices/
    # Update the version in README.md file (displayed on github)
    sed -i "s/$old/$new/g" $TRUST_ROOT/README.md
    # Commit

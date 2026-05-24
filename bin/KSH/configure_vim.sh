@@ -7,7 +7,7 @@ VERSION=`echo $TRUST_VERSION | awk '{gsub("\\\.","",$0);print $0}'`
 file=~/.vim/syntax/TRUST.vim
 ftdetect=~/.vim/ftdetect/TRUST.vim
 
-file_syntax=$TRUST_ROOT/doc/TRUST/Keywords.Vim
+file_syntax=$TRUST_ROOT/share/Keywords.Vim
 
 if [ "$1" = "build_syntax" ]
 then
@@ -15,7 +15,7 @@ then
    mkdir -p `dirname $file`
 
    # Grab the TRUST keywords
-   KeywordsTRUST=`$TRUST_Awk '!/\|/ {k=k" "$1} /\|/ {gsub("\\\|"," ",$0);k=k" "$0} END {print k}' $TRUST_ROOT/doc/TRUST/Keywords.txt`
+   KeywordsTRUST=`$TRUST_Awk '!/\|/ {k=k" "$1} /\|/ {gsub("\\\|"," ",$0);k=k" "$0} END {print k}' $TRUST_ROOT/share/Keywords.txt`
 
    # Count the keywords
    nbKeywordsTRUST=`echo $KeywordsTRUST | wc -w`
@@ -56,9 +56,9 @@ syntax region TRUSTComments start=/\/\* / end=/ \*\// contains=TRUSTComments
 " > $file.tmp
 #   echo "syntax keyword TRUSTLanguageKeywordsKeywordsTRUST" >> $file.tmp
 
-echo "let titi = \$TRUST_ROOT.\"/doc/TRUST/Keywords.Vim\"
+echo "let titi = \$TRUST_ROOT.\"/share/Keywords.Vim\"
 if filereadable(titi)
-source \$TRUST_ROOT/doc/TRUST/Keywords.Vim
+source \$TRUST_ROOT/share/Keywords.Vim
 endif" >> $file.tmp
 echo "let titi = \$project_directory.\"/share/doc_src/Keywords.Vim\"
 if filereadable(titi)

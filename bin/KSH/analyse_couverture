@@ -58,7 +58,7 @@ done
 
 
 last=`ls -rt *.gcda | tail -1`
-file=$TRUST_ROOT/doc/Coverage/cpp.gcov.tar.gz
+file=$TRUST_ROOT/share/coverage/cpp.gcov.tar.gz
 if [ ! -f $file ] || [ $last -nt $file ]
 then
    echo "Analysis by gcov..."

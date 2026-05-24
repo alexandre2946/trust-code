@@ -36,8 +36,7 @@ then
    rm -r -f src
    
    # On efface la documentation qui est relative a TRUST
-   rm -f doc/html.tar.gz doc/doxygen*
-   rm -f -r doc/html doc/Coverage
+   rm -f -r docs/html share/coverage
    
 ####################################
 # version avec le Noyau uniquement #
@@ -74,7 +73,7 @@ then
    # On efface la documentation qui est relative a TRUST
    rm -f doc/html.tar.gz doc/doxygen*
    rm -f -r doc/html doc/Validation
-   cd doc/Coverage
+   cd share/coverage
    tar xfz cpp.gcov.tar.gz
    find . -name '*'.gcov -exec grep -L TRUST_ROOT/src/Kernel {} \; | xargs rm -f
    rm -f cpp.gcov.tar.gz
@@ -83,13 +82,6 @@ then
    cd -
    # On garde doc/TRUST/Keywords.txt utilise dans les scripts
    # Language_mode_TRUST.sh, configure_vim.sh et configure_emacs.sh
-   # On garde fieldnames.tex pour TRIOXDATA
-   cd doc/TRUST
-   
-   ls | grep -v Keywords.txt | grep -v Generic_Guide | xargs rm -f -r
-   cd Generic_Guide
-   ls | grep -v fieldnames.tex | xargs rm -f
-   cd ../../../
   
    # On efface les binaires de TRUST
    # Plus d executable dans archive depuis v1.7.3

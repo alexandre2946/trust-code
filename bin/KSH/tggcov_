@@ -2,7 +2,8 @@
 # Simule "tggcov -R summary_all file"
 # Ameliorer se baser sur tggcov --annotate pour generer
 # des rapports plus fiables...
-[ "$HTML_ROOT" = "" ] && HTML_ROOT=$TRUST_ROOT/doc/Coverage/html
+[ "$HTML_ROOT" = "" ] && HTML_ROOT=$TRUST_ROOT/share/coverage/html
+cd $TRUST_ROOT/share/coverage/ ; make ; cd -
 cd $HTML_ROOT
 if [ "$1" != -short ]
 then

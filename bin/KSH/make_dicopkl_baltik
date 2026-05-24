@@ -82,6 +82,6 @@ do
   echo $ECHO_OPTS "Creation d'un fichier contenant les methodes non appelees par les cas tests: \c"
   update_version list_methodes_non_appelees
 
- [ "$titi" = "trust" ] && echo && echo && echo  "to update Trust dico.Pkl" && echo  $ECHO_OPTS "cp $rep/* \$TRUST_ROOT/doc/Coverage" && echo
+ [ "$titi" = "trust" ] && echo && echo && echo  "to update Trust dico.Pkl" && echo  $ECHO_OPTS "cp $rep/* \$TRUST_ROOT/share/coverage" && echo
 done
 rm -f $listfichier_a_retirer

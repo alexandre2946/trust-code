@@ -35,7 +35,7 @@ echo "Suppression objets inutiles..."
 # src n'est pas si inutile que cela : le test fftw lors du configure de TrioCFD plante si pas de src dans TRUST.
 #rm -r -f src
 rm -r -f externalpackages
-rm -r -f MonoDir_mpi* doc/html doc/Coverage
+rm -r -f MonoDir_mpi* doc/html docs coverage
 rm -r -f exec/valgrind
 rm -r -f lib/TRUST_mpi*semi_opt*.a lib/TRUST_mpi_opt_pg.a lib/TRUST_mpi_opt_gcov.a lib/TRUST_mpi*kernel*.a
 # menage sur ICoCo pour empecher utilisation sans recompilation

@@ -504,8 +504,6 @@ then
    rm -rf $(find $TRUST_ROOT/Validation -name build)
    rm -rf $(find $TRUST_ROOT/Validation -name Run.log)
    rm -f $(find $TRUST_ROOT/Outils/VisIt/ -name visit-install"*" | grep -v 3_3_3)
-   rm -f $TRUST_ROOT/doc/TRUST/exercices/Tutorial_solutions/Tutorial_solutions.pdf
-   rm -f $TRUST_ROOT/doc/TRUST/Tutorial/*_tutorial.pdf
 
    exit 0
 else

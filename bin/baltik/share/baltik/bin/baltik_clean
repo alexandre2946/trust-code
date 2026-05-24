@@ -134,8 +134,6 @@ if [ $ALL -eq 1 ]
     env_file_full=$project_directory/full_env_${project_name}.sh
     rm -f  $env_file $env_file_full
     rm -rf ${project_directory}/share/doc_auto
-    #rm -f ${project_directory}/share/doc_src/Keywords.Vim ${project_directory}/share/doc_src/Keywords.txt.n
-    #rm -rf ${project_directory}/archives_dependencies
 fi
 
 # Suppression du repertoire d'installation swig si disponible

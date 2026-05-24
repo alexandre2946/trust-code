@@ -34,17 +34,6 @@ mkdir_ftp $SECRET/doc
 # On envoie la RELEASE_NOTES pour futures updates :
 [ "$livraison" = 1 ] && cp_ftp $TRUST_ROOT/RELEASE_NOTES $PUBLIC/exec/.
 
-# On envoie la couverture de tests:
-#echo " "
-#echo "Send tests coverage at `date` ..."
-#mkdir_ftp $SECRET/doc/Coverage
-#cd $TRUST_ROOT/doc/Coverage
-#cp_ftp *.html $SECRET/doc/Coverage/.
-#mkdir_ftp $SECRET/doc/Coverage/html
-#cp_ftp html/*.html $SECRET/doc/Coverage/html/.
-#mkdir_ftp $SECRET/doc/Coverage/html/cpp.gcov
-#cp_ftp html/cpp.gcov/*.gcov $SECRET/doc/Coverage/html/cpp.gcov
-
 # On envoie les pdfs
 echo " "
 echo "Send documentation at `date` ..."

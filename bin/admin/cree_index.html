@@ -74,11 +74,6 @@ echo "<BR><SMALL>Page updated at `date`" >> $html
 echo "
 </BODY>
 </HTML>" >> $html
-cp_ftp $TRUST_ROOT/doc/TRUST/TRUST_Generic_documentation.pdf $PUBLIC/documentation/Notes
-cp_ftp $TRUST_ROOT/doc/TRUST/TRUST_tutorial.pdf $PUBLIC/documentation/Notes
-cp_ftp $TRUST_ROOT/doc/TRUST/Baltik_tutorial.pdf $PUBLIC/documentation/Notes
-cp_ftp $TRUST_ROOT/doc/TRUST/TRUST_Reference_Manual.pdf $PUBLIC/documentation/Notes
-cp_ftp $TRUST_ROOT/doc/TRUST/TrioCFD_Reference_Manual.pdf $PUBLIC/documentation/Notes
 cp_ftp $TRUST_ROOT/bin/HTML/animation.gif $PUBLIC
 cp_ftp $TRUST_ROOT/bin/HTML/animation.gif $SECRET
 cp_ftp $html $PUBLIC

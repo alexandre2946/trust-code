@@ -12,21 +12,27 @@ rep_init=`pwd`
 if [ ! -f $list_methodes ]
 then
    # Deux cas possibles Baltik ou Trust
-   if [ ${exec#$project_directory} != $exec ] && [ -d $project_directory/doc/Coverage ]
+   if [ ${exec#$project_directory} != $exec ] && [ -d $project_directory/share/coverage ]
    then
-      if [ ! -d $project_directory/doc/Coverage ]
+      if [ ! -d $project_directory/share/coverage ]
       then
          echo "No Coverage for this Baltik. Contact the project leader of this Baltik to add test coverage."
          exit -1
       else
-         cd $project_directory/doc/Coverage
+         cd $project_directory/share/coverage
          for gz in `ls *.gz 2>/dev/null`
          do
             [ $gz -nt ${gz%.gz} ] && gunzip -c $gz > ${gz%.gz} 
          done
       fi
    else
-      cd $TRUST_ROOT/doc/Coverage && [ ! -s list_methodes ] && echo "Fichier `pwd`/list_methodes vide ou non existant. Contacter le support TRUST" && exit -1
+      cd $TRUST_ROOT/share/coverage
+      # Extract the committed archives if not already done (fresh checkout)
+      for gz in list_methodes.gz list_methodes_non_appelees.gz dico.pkl.gz
+      do
+         [ -f $gz ] && [ $gz -nt ${gz%.gz} ] && gunzip -c $gz > ${gz%.gz}
+      done
+      [ ! -s list_methodes ] && echo "Fichier `pwd`/list_methodes vide ou non existant. Contacter le support TRUST" && exit -1
    fi
 fi
 warning=0 && [ $exec -nt $list_methodes ] && warning=1  

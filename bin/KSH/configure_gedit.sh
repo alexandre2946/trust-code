@@ -6,13 +6,13 @@
 lang_file=TRUST.lang
 style_file=TRUST.xml
 
-keywords=$TRUST_ROOT/doc/TRUST/Keywords.txt
+keywords=$TRUST_ROOT/share/Keywords.txt
 
 # prise en compte des keywords des baltiks
 if [ -f $project_directory/share/doc_src/Keywords.txt.n ]
 then
     keywords=$TRUST_TMP/Keywords.Gedit
-    cat $TRUST_ROOT/doc/TRUST/Keywords.txt              >   $keywords
+    cat $TRUST_ROOT/share/Keywords.txt              >   $keywords
     cat $project_directory/share/doc_src/Keywords.txt.n >>  $keywords
     # pour supprimer les lignes contenant "|\hyperpage{99}," et "|{" -> sinon probleme avec nedit
     # pour supprimer les lignes contenant "|/*" et "|\#" -> sinon probleme avec gedit

@@ -417,7 +417,7 @@ class TRUSTCase(object):
         ]
 
         ### Import and change de layout of TRUST Keyword ###
-        keywords = os.path.join(os.getenv("TRUST_ROOT"), "doc", "TRUST", "Keywords.txt")
+        keywords = os.path.join(os.getenv("TRUST_ROOT"), "share", "Keywords.txt")
         f = open(keywords, "r")
         tmp = []
         for i in f.readlines():
