@@ -1,6 +1,11 @@
 -------------------------------------------------------------------------------------------------
 Release notes version 1.9.8_beta : Enhancements, modifications and corrected bugs since version 1.9.7 :
 --------------------------------------------------------------------------------------------------
+22/05/26 (TRUST) Docs         : New Doxygen+Doxygen-awesome documentation pipeline for TRUST (C++ API, generic/tutos, and auto-generated keyword reference). See docs/README.md
+22/05/26 (TRUST) Docs         : Baltiks can now build their own Doxygen documentation, with the keyword reference split per origin (TRUST + each dependency). See bin/baltik/README_INSTALL.md
+22/05/26 (TRUST) Tools        : trustify Python package refactored - new CLI (check, format, modernize, generate_markdown, ...), pydantic-based dataset model, and per-workspace .trustify.json config. See Outils/trustify/README.md
+22/05/26 (TRUST) Cleaning     : Old ./doc directory removed - content migrated to ./docs in Markdown format
+22/05/26 (TRUST) Cleaning     : 'trust -trustify' command removed - replaced by 'trustify check'
 20/05/26 (TRUST) Portability  : TRUST compilation now requires at least C++17
 12/05/26 (TRUST) Change       : TRIOXDATA is now removed from TRUST. Dataset check and keyword documentation now only relies on 'trustify'. See documentation in Outils/trustify/README.md
 06/05/26 (TRUST) New feature  : DG discretisation can now tackle 2D Stokes problem. Possible to choose different order for pressure and velocity. See validation form Stokes_DG.

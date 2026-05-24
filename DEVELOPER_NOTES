@@ -1,6 +1,9 @@
 -------------------------------------------------------------
 Developer notes version 1.9.8_beta : Changes since version 1.9.7 :
 -------------------------------------------------------------
+22/05/26 (TRUST) Cleaning     : Refactoring doxygen comments to follow a standard (see TRUST documentation), translation of each and every comments in English.
+23/05/26 (TRUST) Minor change : Code coverage report moved from $TRUST_ROOT/doc/Coverage/html/index.html to $TRUST_ROOT/share/coverage
+22/05/26 (TRUST) Tools        : trustify Python package refactored - new CLI (check, format, modernize, generate_markdown, ...), pydantic-based dataset model, and per-workspace .trustify.json config. See Outils/trustify/README.md
 18/05/26 (TRUST) Minor change : gui and check_gui targets in baltiks Makefile are removed. Use make trustify and make trustify_check instead.
 27/04/26 (TRUST) New feature  : XD comments in the C++ code can now be written on several lines: use the tag 'XD_CONT' at the begining of the line for this.
 27/04/26 (TRUST) trustify     : trustify unit tests are now passed everytime the tool trustify is built.
