@@ -1,9 +1,0 @@
-#!/bin/bash
-
-cas=`basename $1`
-nb=`grep "Total number of elements" $cas.err | awk '{print $NF}'`
-tp=`grep "Backup of the field"      $cas.err | awk '{print $NF}' | head -n 1`
-
-echo -n $nb" " >> nbcells.dat
-echo -n $tp" " >> lastime.dat
-
