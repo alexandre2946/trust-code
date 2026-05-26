@@ -308,7 +308,6 @@ echo " "
 echo "   -enable-petsc-debug               Enable PETSc library debug only with \$exec_debug of TRUST."
 echo "   -enable-mc-debug                  Enable MEDCoupling library debug only with \$exec_debug of TRUST."
 echo "   -enable-kokkos-debug              Enable Kokkos library debug only with \$exec_debug of TRUST."
-echo "   -with-doxygen-doc                 Enable the build of HTML documentation of TRUST sources."
 echo " "
 echo "   -disable-petsc-optionals          Disable some PETSc optionals for Cathare (visualization features, HDF5 support,...)"
 echo "   -disable-petsc                    Disable PETSc library installation."
@@ -326,9 +325,8 @@ echo "   -disable-metis                    Disable metis library installation."
 echo "   -disable-jupyter                  Disable jupyter installation."
 echo "   -disable-valgrind                 Disable valgrind installation and build."
 echo "   -disable-gnuplot                  Disable gnuplot installation and build."
-echo "   -disable-doxygen                  Disable doxygen installation and build. HTML documentation cannot be build if doxygen disabled."
 echo "   -disable-gmsh                     Disable Gmsh installation and build."
-echo "   -disable-trustify                 Do not build the trustify documentation tool."
+echo "   -disable-trustify                 Disable trustify installation."
 echo "   -disable-plot2d                   Disable PLOT2D installation and build."
 echo "   -disable-pdi                      Disable the build/link of the PDI library."
 echo "   -disable-checks                   Disable checks for external packages, sources, disk space and speed."
@@ -357,7 +355,7 @@ cc=""
 F77=""
 clean=""
 
-LIST_THIRD_PARTY="PETSC MED MPI GTEST METIS MEDCOUPLING VC CCACHE GMSH VALGRIND GNUPLOT PLOT2D DOXYGEN TRUSTIFY"
+LIST_THIRD_PARTY="PETSC MED MPI GTEST METIS MEDCOUPLING VC CCACHE GMSH VALGRIND GNUPLOT PLOT2D TRUSTIFY"
 
 #[ -f configure.log ] && sed "s/^/# /" -i  configure.log
 [ -f configure.log ] && sed "s/# //" -i  configure.log && sed "s/^/# /" -i  configure.log
@@ -375,14 +373,14 @@ if [ "$1" = "-disable-optionals" ]
 then
   shift
   export TRUST_ROOT=$TRUST_ROOT_SA
-  $0 -disable-ccache -disable-openblas -disable-petsc -disable-petsc-optionals -disable-hwloc -disable-gnuplot -disable-valgrind -disable-mpi -disable-cgns -disable-metis -disable-pdi -without-visit -disable-gmsh -disable-plot2d -without-pdflatex -without-doc -disable-jupyter -disable-doxygen -disable-checks -disable-check_sources -disable-trustify -disable-gtest $*
+  $0 -disable-ccache -disable-openblas -disable-petsc -disable-petsc-optionals -disable-hwloc -disable-gnuplot -disable-valgrind -disable-mpi -disable-cgns -disable-metis -disable-pdi -without-visit -disable-gmsh -disable-plot2d -without-pdflatex -without-doc -disable-jupyter -disable-checks -disable-check_sources -disable-trustify -disable-gtest $*
   exit $?
 fi
 if [ "$1" = "-disable-tools" ]
 then
   shift
   export TRUST_ROOT=$TRUST_ROOT_SA
-  $0 -disable-ccache -disable-openblas -disable-hwloc -disable-gnuplot -disable-valgrind -disable-metis -without-visit -disable-gmsh -disable-plot2d -without-doc -without-pdflatex -disable-checks -disable-check_sources -disable-trustify $*
+  $0 -disable-ccache -disable-openblas -disable-hwloc -disable-gnuplot -disable-valgrind -disable-metis -without-visit -disable-gmsh -disable-plot2d -without-doc -without-pdflatex -disable-checks -disable-check_sources $*
   exit $?
 fi
 
@@ -423,13 +421,13 @@ export TRUST_USE_KOKKOS_SIMD=1
 export TRUST_USE_AVX=1
 export TRUST_DISABLE_MPI4PY=0
 export TRUST_DISABLE_JUPYTER=0
+export TRUST_DISABLE_TRUSTIFY=0
 export TRUST_WITHOUT_DOC=0
 export TRUST_WITHOUT_PDFLATEX=0
 export TRUST_WITHOUT_VISIT=0
 export TRUST_WITHOUT_CONDA=0
 export TRUST_DOWNLOAD_VISIT=0
 export TRUST_WITHOUT_HOST=0
-export TRUST_ENABLE_DOC_DOXYGEN=0
 unset CUDA_NVCC
 unset TRUST_CUDA_CC
 unset ROCM_ARCH
@@ -663,17 +661,12 @@ do
       THIRD_PARTY="DOC"
       REP_THIRD_PARTY=$TRUST_ROOT/doc
       ([ -d $REP_THIRD_PARTY ] && [ $first -eq 0 ] && cd $REP_THIRD_PARTY && echo "Disabling $THIRD_PARTY, so make clean:" && make clean)
-      export TRUST_DISABLE_DOXYGEN=1
       # disable pdf doc build
       export TRUST_WITHOUT_PDFLATEX=1
 
    elif [ "${1#-without-pdflatex}" != "$1" ]
    then
       export TRUST_WITHOUT_PDFLATEX=1
-
-   elif [ "${1#-with-doxygen-doc}" != "$1" ]
-   then
-      export TRUST_ENABLE_DOC_DOXYGEN=1
 
    elif [ "${1#-without-visit}" != "$1" ]
    then
@@ -704,6 +697,30 @@ do
       export TRUST_DISABLE_CHECKS=1
       export TRUST_DISABLE_CHECK_SRC=1
 
+   elif [ "$1" = "-disable-trustify" ]
+   then
+      export TRUST_DISABLE_TRUSTIFY=1
+
+   elif [ "$1" = "-disable-doxygen" ] || [ "$1" = "-with-doxygen-doc" ]
+   then
+      # Deprecated: doxygen is no longer an externalpackage managed by
+      # configure, and the HTML doc is now built by the docs/ tree
+      # (`make docs`), which downloads the pinned doxygen release on
+      # demand. Both flags are accepted as no-ops for backward compat with
+      # CI / wrapper scripts that still pass them; they will be deleted in
+      # a future release. Caught here, before the generic -disable-*
+      # handler, so -disable-doxygen does not abort configure with
+      # "DOXYGEN is not in list" (and -with-doxygen-doc does not fall
+      # through to "Unknown option").
+      echo ""
+      echo "WARNING: $1 is deprecated and has no effect."
+      echo "         doxygen is no longer managed by configure; HTML docs"
+      echo "         are built via 'make docs' (the docs/ tree fetches the"
+      echo "         pinned doxygen release on demand). Please remove the"
+      echo "         flag from your build pipeline — it will be deleted in"
+      echo "         a future release."
+      echo ""
+
    elif [ "${1#-disable-}" != "$1" ]
    then
       THIRD_PARTY=`echo ${1#-disable-} | awk '{print toupper($1)}'`
@@ -714,8 +731,6 @@ do
       [ "$THIRD_PARTY" = "VALGRIND" ] && REP_THIRD_PARTY=$TRUST_ROOT/Outils/valgrind
       [ "$THIRD_PARTY" = "HWLOC" ] && REP_THIRD_PARTY=$TRUST_ROOT/Outils/hwloc
       [ "$THIRD_PARTY" = "GNUPLOT" ] && REP_THIRD_PARTY=$TRUST_ROOT/Outils/gnuplot
-      [ "$THIRD_PARTY" = "TRUSTIFY" ] && REP_THIRD_PARTY=$TRUST_ROOT/Outils/trustify
-      [ "$THIRD_PARTY" = "DOXYGEN" ] && REP_THIRD_PARTY=$TRUST_ROOT/Outils/doxygen
       [ "$THIRD_PARTY" = "PLOT2D" ] && REP_THIRD_PARTY=$TRUST_ROOT/Outils/IHM
       if [ ! -d $REP_THIRD_PARTY ]
       then
@@ -831,7 +846,6 @@ echo "TRUST_INT64_NEW=$TRUST_INT64_NEW && export TRUST_INT64_NEW  # Build in 64 
 echo "TRUST_DISABLE_MPI4PY=$TRUST_DISABLE_MPI4PY && export TRUST_DISABLE_MPI4PY  # disable mpi4py build." >> $var
 echo "TRUST_WITHOUT_DOC=$TRUST_WITHOUT_DOC && export TRUST_WITHOUT_DOC		# Disable/enable Documentation"	>> $var
 echo "TRUST_WITHOUT_PDFLATEX=$TRUST_WITHOUT_PDFLATEX && export TRUST_WITHOUT_PDFLATEX		# Disable/enable pdf Documentation build only"	>> $var
-echo "TRUST_ENABLE_DOC_DOXYGEN=$TRUST_ENABLE_DOC_DOXYGEN && export TRUST_ENABLE_DOC_DOXYGEN      # Disable/enable the build of HTML doc" >> $var
 echo "TRUST_WITHOUT_VISIT=$TRUST_WITHOUT_VISIT && export TRUST_WITHOUT_VISIT	# Disable/enable VisIt" 	>> $var
 echo "TRUST_DOWNLOAD_VISIT=$TRUST_DOWNLOAD_VISIT && export TRUST_DOWNLOAD_VISIT 	# Download or build VisIt" >> $var
 echo "TRUST_WITHOUT_CONDA=$TRUST_WITHOUT_CONDA && export TRUST_WITHOUT_CONDA    	# `[ $TRUST_WITHOUT_CONDA = 1 ] && echo 'Installing without conda - The auto-detected Python will be used and is sym-linked in exec/python/bin' || echo 'conda enabled by default'`" >> $var
@@ -1046,7 +1060,7 @@ then
    fi
 fi
 
-if [ "`dot -V 1>/dev/null 2>&1;echo $?`" != 0 ] && [ $TRUST_DISABLE_DOXYGEN != 1 ]
+if [ "`dot -V 1>/dev/null 2>&1;echo $?`" != 0 ]
 then
    echo "graphviz package needed to build html diagrams via doxygen" >> NON_INSTALLED
 fi
@@ -1079,48 +1093,11 @@ then
    fi
 fi
 
-##########################################
-# Creation d'un Makefile sous $TRUST_ROOT
-##########################################
 cd $TRUST_ROOT
 if [ "$clean" = "" ]
 then
    Build=$TRUST_ROOT/build
    [ ! -d ${Build} ] && echo Creating ${Build} directory && mkdir -p ${Build}
-   # echo $ECHO_OPTS "all:\n\tcompile" 				> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "SHELL=/bin/bash" > $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "all:\n\t(source ./env_TRUST.sh && env cibles=\"micro_kernel_opt numeric_kernel_opt standard_kernel_opt opt micro_kernel_debug numeric_kernel_debug standard_kernel_debug debug\" monodir)"  >> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "tools:\n\t(source ./env_TRUST.sh && compile tools)" >> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "optim:\t opt" 	>> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "semi_optim:\t semi_opt" 	>> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "profiling:\t profiling" 	>> $TRUST_ROOT/Makefile
-   for cible in opt debug prof gcov semi_opt profiling custom
-   do
-     echo $ECHO_OPTS "${cible}:\n\t(source ./env_TRUST.sh && env cibles=\"micro_kernel_${cible} numeric_kernel_${cible} standard_kernel_${cible} ${cible}\" monodir)" >> $TRUST_ROOT/Makefile
-   done
-   echo $ECHO_OPTS "unit:\n\t(source ./env_TRUST.sh && env cibles=\"numeric_kernel_debug\" monodir)" >> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "opt_avx:\n\t@echo opt_avx target not available since TRUST v1.9.2" >> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "clean:\n\t(source ./env_TRUST.sh && compile clean)" >> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "doxygen:\n\t(source ./env_TRUST.sh && env TRUST_ENABLE_DOC_DOXYGEN=1 make_Doxyfile)" 			>> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "validation:\n\t(source ./env_TRUST.sh && cd Validation/Rapports_automatiques && ./lance_tout)" >> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "check:\n\t(source ./env_TRUST.sh && echo 0 | lance_test \${exec_opt} \${TRUST_ROOT}/build )" >> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "check_optim:\tcheck" >> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "check_semi_opt:\n\t(source ./env_TRUST.sh && echo 0 | lance_test \${exec_semi_opt} \${TRUST_ROOT}/build )" >> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "check_debug:\n\t(source ./env_TRUST.sh && echo 0 | lance_test \${exec_debug} \${TRUST_ROOT}/build )" >> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "ctest_debug:\n\t(source ./env_TRUST.sh && lance_test -ctest \${exec_debug})" >> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "ctest_optim:\n\t(source ./env_TRUST.sh && lance_test -ctest \${exec_opt})" >> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "ctest_semi_opt:\n\t(source ./env_TRUST.sh && lance_test -ctest \${exec_semi_opt})" >> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "ctest_semi_optim:\t ctest_semi_opt" 	>> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "ctest_rerun_failed_debug:\n\t(source ./env_TRUST.sh && env CTEST_OPTS=\"--rerun-failed\" lance_test -ctest \${exec_debug})" >> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "ctest_rerun_failed_optim:\n\t(source ./env_TRUST.sh && env CTEST_OPTS=\"--rerun-failed\" lance_test -ctest \${exec_opt})" >> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "ctest_rerun_failed_semi_opt:\n\t(source ./env_TRUST.sh && env CTEST_OPTS=\"--rerun-failed\" lance_test -ctest \${exec_semi_opt})" >> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "ctest_rerun_failed_semi_optim:\t ctest_rerun_failed_semi_opt"  >> $TRUST_ROOT/Makefile
-   echo $ECHO_OPTS "check_perf:\n\t(source ./env_TRUST.sh && compare_TU)" >> $TRUST_ROOT/Makefile
-   [ "${#ECHO_OPTS}" = 0 ] && echo "Error: Check "$TRUST_ROOT"/Makefile !!! (ECHO_OPTS="$ECHO_OPTS")" && exit -1
-   ##################################
-   # Desormais on recree les makefile
-   ##################################
-   echo $ECHO_OPTS "File Makefile created."
    echo $ECHO_OPTS "File configure.log created."
    echo
    echo $ECHO_OPTS "=========================================="

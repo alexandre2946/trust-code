@@ -88,6 +88,20 @@ else
    }
    complete -F _trust trust
 
+   # trustify completion (via argcomplete). Guarded: if argcomplete isn't
+   # installed alongside trustify, register-python-argcomplete is absent
+   # and we skip silently instead of injecting a broken complete spec.
+   # stderr from BOTH the inner command and the outer eval is swallowed
+   # so a future argcomplete-vs-trustify-CLI mismatch cannot inject
+   # parse errors into every login shell that sources env_TRUST.sh
+   # (audit 3.4). Cost: silent failure of completion install — debug
+   # with `register-python-argcomplete trustify` directly or
+   # `trustify install-completion --print`.
+   if command -v register-python-argcomplete >/dev/null 2>&1 && command -v trustify >/dev/null 2>&1
+   then
+      eval "$(register-python-argcomplete trustify 2>/dev/null)" 2>/dev/null || true
+   fi
+
    ##########
    # Finalize
    ##########

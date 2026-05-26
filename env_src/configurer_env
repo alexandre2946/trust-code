@@ -486,7 +486,7 @@ then
       done
    fi
    cd $TRUST_ROOT
-   rm -r -f $TRUST_ROOT/env_TRUST.sh $TRUST_ROOT/env/ $TRUST_ROOT/lib $TRUST_ROOT/exec $TRUST_ROOT/include $TRUST_ROOT/Makefile $TRUST_ROOT/MonoDir* $TRUST_ROOT/build
+   rm -r -f $TRUST_ROOT/env_TRUST.sh $TRUST_ROOT/env/ $TRUST_ROOT/lib $TRUST_ROOT/exec $TRUST_ROOT/include $TRUST_ROOT/MonoDir* $TRUST_ROOT/build
    rm -f $TRUST_ROOT/configure.log
    rm -f  $TRUST_ROOT/tags $TRUST_ROOT/TAGS  $TRUST_ROOT/compile*log
    rm -f $TRUST_ROOT/.toto
@@ -855,7 +855,7 @@ then
        INSTALL_OK=1
 
        # list of packages already-installed/to-install in conda, we ignore mpi4py since installed with pip
-       $TRUST_ROOT/exec/python/bin/conda list | grep -v mpi4py | grep -v ^coolprop > conda_list.check
+       $TRUST_ROOT/exec/python/bin/conda list | grep -v mpi4py | grep -v trustify | grep -v ^coolprop > conda_list.check
        if [ "$system" = "Linux" ] && [ $model = "x86_64" ] #&& [ -f $TRUST_ROOT/exec/conda_list.ref ]
        then
           # Strict check of conda packages
@@ -1837,6 +1837,116 @@ fi
 
 # If a package has not been correctly installed, we exit with an error
 [ -f $TRUST_ROOT/NON_INSTALLED ] && [ "`grep ' pip' $TRUST_ROOT/NON_INSTALLED`" != "" ] &&  Display_Missing_packages && exit -1
+
+
+############################################################
+# Installation of trustify into the bundled Python
+############################################################
+# Wired here so that, by default, every configure-time setup (developer
+# ./configure runs AND the binary Installer_TRUST flow) ships a working
+# `trustify` CLI in the conda env right after Python is provisioned. Only
+# pydantic is a runtime dep and it's already provided by conda, so this adds
+# no new packages. Skipped when TRUST_WITHOUT_CONDA=1 (no bundled pip) or when
+# the user passes -disable-trustify (TRUST_DISABLE_TRUSTIFY=1); both print a
+# notice pointing at the manual `pip install` path.
+# `--force-reinstall --no-deps` mirrors `Outils/trustify/Makefile`: ensures
+# every file trustify owns is rewritten without re-resolving (or clobbering)
+# transitive deps.
+# `--no-build-isolation --no-cache-dir` makes this work on OFFLINE build hosts
+# (HPC, restricted networks): pip neither provisions a build env from PyPI nor
+# touches the wheel cache. The catch is that --no-build-isolation runs the
+# build backend in the bundled conda Python as-is, so the package must NOT
+# need any build-time dependency that isn't already there. trustify's
+# pyproject.toml is set up for exactly this: stock setuptools reads the version
+# straight from the VERSION file (`[tool.setuptools.dynamic]`), with no
+# dynamic-versioning plugin to fetch. Without that, the wheel would carry the
+# 0.0.0 fallback version and trustify would refuse the shared schema cache
+# (see api.generate_schema, audit 6.11).
+if [ "$TRUST_WITHOUT_CONDA" = "1" ]
+then
+   # No bundled pip in TRUST_WITHOUT_CONDA mode (only `python` is symlinked
+   # at exec/python/bin/, not `pip`).
+   echo "----------------------------------------------------------"
+   echo "trustify install: skipped (TRUST_WITHOUT_CONDA=1, no bundled pip)."
+   echo "To install trustify into your active Python (requires"
+   echo "Python >= 3.10 and pydantic >= 2 <3):"
+   echo "    pip install $TRUST_ROOT/Outils/trustify/"
+   echo "(add --user if your Python is system-managed and read-only;"
+   echo " omit --user when an active venv/conda env is on PATH"
+   echo " pip refuses --user inside a virtualenv)"
+   echo "----------------------------------------------------------"
+elif [ "$TRUST_DISABLE_TRUSTIFY" = "1" ]
+then
+   echo "----------------------------------------------------------"
+   echo "trustify install: skipped (TRUST_DISABLE_TRUSTIFY=1)."
+   echo "To install trustify into your active Python (requires"
+   echo "Python >= 3.10 and pydantic >= 2 <3):"
+   echo "    pip install $TRUST_ROOT/Outils/trustify/"
+   echo "(add --user if your Python is system-managed and read-only;"
+   echo " omit --user when an active venv/conda env is on PATH"
+   echo " pip refuses --user inside a virtualenv)"
+   echo "----------------------------------------------------------"
+elif [ -x $TRUST_ROOT/exec/python/bin/pip ]
+then
+   echo "Installing trustify Python package..."
+   $TRUST_ROOT/exec/python/bin/pip install --force-reinstall --no-deps --no-build-isolation --no-cache-dir \
+       $TRUST_ROOT/Outils/trustify/ 1>>$TRUST_ROOT/exec/conda_python.log 2>&1
+   trustify_install_status=$?
+   trustify_failure=""
+   if [ $trustify_install_status != 0 ]
+   then
+      trustify_failure="pip install failed"
+   else
+      # Smoke-test the resulting binary: pip succeeding only proves the
+      # wheel installed, NOT that the CLI imports cleanly. With --no-deps
+      # a missing or version-incompatible pydantic surfaces only here.
+      # Without this, the cheerful "trustify installed" message below lies
+      # and every downstream consumer (`make trustify_check`, docs build,
+      # baltik trustify_* recipes, nightly) blows up later with cryptic
+      # ImportErrors. Audit finding 3.1.
+      $TRUST_ROOT/exec/python/bin/trustify --help 1>>$TRUST_ROOT/exec/conda_python.log 2>&1
+      if [ $? != 0 ]
+      then
+         trustify_failure="installed binary fails --help smoke test (likely missing or version-incompatible pydantic — pip install ran with --no-deps)"
+      fi
+   fi
+   if [ -n "$trustify_failure" ]
+   then
+      echo "Error while installing trustify: $trustify_failure. See $TRUST_ROOT/exec/conda_python.log" >> $TRUST_ROOT/NON_INSTALLED
+      # Loud banner so the warning isn't lost in the configure scrollback.
+      # Configure stays non-fatal — trustify is optional for the C++ build
+      # but several downstream pipelines (make trustify_check, docs build,
+      # baltik trustify_* targets) depend on it.
+      echo "**********************************************************"
+      echo "WARNING: trustify install failed ($trustify_failure)."
+      echo "Downstream targets that need it (make trustify_check, docs,"
+      echo "baltik trustify_* recipes) will fail until this is resolved."
+      echo "See $TRUST_ROOT/NON_INSTALLED and $TRUST_ROOT/exec/conda_python.log"
+      echo "**********************************************************"
+   else
+      echo "trustify installed. CLI: $TRUST_ROOT/exec/python/bin/trustify"
+      # Optional dependency: argcomplete powers the `trustify
+      # install-completion` shell completion. TRUST does NOT bundle it
+      # (only pydantic is the required dep and is conda-managed).
+      # Pip-install it here as a courtesy, but warn-don't-fail — many
+      # configure sites have no internet at this point (HPC, restricted
+      # networks) and argcomplete is not worth aborting for. The
+      # `[optional]` extra in pyproject.toml mirrors this dep for
+      # `pip install -e .[dev]` developer setups. Audit finding 3.3.
+
+      ## Skipped in 1.9.8 release. will fall back to a simpler method
+    #   $TRUST_ROOT/exec/python/bin/pip install argcomplete \
+    #       1>>$TRUST_ROOT/exec/conda_python.log 2>&1
+    #   if [ $? != 0 ]
+    #   then
+    #      echo "Notice: argcomplete install failed (no internet at configure?"
+    #      echo "        offline mirror?). It is OPTIONAL — trustify itself is"
+    #      echo "        fully functional without it; only tab completion is"
+    #      echo "        affected. Install later with:"
+    #      echo "            $TRUST_ROOT/exec/python/bin/pip install argcomplete"
+    #   fi
+   fi
+fi
 
 
 ########################

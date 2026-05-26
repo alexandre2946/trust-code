@@ -45,8 +45,10 @@ make_tools()
    reps=$reps" Outils/lata_tools"
    [ "$TRUST_DISABLE_MPI" = 0 ] && reps=$reps" Outils/ICoCo"
    [ "$TRUST_DISABLE_VALGRIND" != 1 ] && reps=$reps" Outils/valgrind"
-   [ "$TRUST_DISABLE_TRUSTIFY" != 1 ] && reps=$reps" Outils/trustify"
-   [ "$TRUST_DISABLE_DOXYGEN" != 1 ] && reps=$reps" Outils/doxygen"
+   # trustify is installed at configure time (env_src/configurer_env) — it
+   # is a pure-Python package with no C++ build artefact, so make_tools has
+   # nothing to do here. Use `make install_trustify` from TRUST_ROOT to
+   # refresh it without re-running configure.
    [ "$TRUST_WITHOUT_DOC" != 1 ] && reps=$reps" doc"
    [ "$TRUST_DISABLE_GNUPLOT" != 1 ] && reps=$reps" Outils/gnuplot"
    [ "$TRUST_DISABLE_GMSH" != 1 ] && reps=$reps" Outils/Gmsh"

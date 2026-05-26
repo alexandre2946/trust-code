@@ -42,13 +42,6 @@ then
   source $TRUST_ROOT/Outils/lata_tools/src/tools/env.sh
 fi
 
-# Chargement de trustify
-if [ "`echo $PYTHONPATH | grep -i trustify`" = "" ]
-then
-  source $TRUST_ROOT/Outils/trustify/env.sh
-fi
-
-
 if [ $ok = 1 ]; then 
    echo "env_for_python.sh successfully loaded."
 else
