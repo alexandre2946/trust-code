@@ -1,0 +1,5 @@
+{
+  "lsp": {
+    "enum_dedup_threshold": 4
+  }
+}

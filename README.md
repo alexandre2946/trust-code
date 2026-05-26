@@ -141,7 +141,7 @@ You are also invited to visit the TRUST **Doxygen** documentation which is avail
 
 - **TRUST scripts** => bin/
 
-- **Documentation files** => doc/
+- **Documentation files** => docs/
 
 - **Environment files** => env_src/ & env/
 
@@ -172,15 +172,15 @@ You are also invited to visit the TRUST **Doxygen** documentation which is avail
 
 - **DEVELOPER_NOTES**		=> Developer notes (manually and regulary updated by support)
 
-- **Makefile**			=>	List of targets to build the code
+- **Makefile**			=> List of targets to build the code
 
-- **ToDo**				=> List of tasks to do
+- **ToDo**			=> List of tasks to do
 
 - **configure**			=> configure script
 
-- **index.html**			=> Index description (gives access to documentation, tutorials, ...)
+- **index.html**		=> Index description (gives access to documentation, tutorials, ...)
 
-- **license**				=> TRUST and third party licences
+- **license**			=> TRUST and third party licences
 
 
 # **Thermo-Physical Properties interface**

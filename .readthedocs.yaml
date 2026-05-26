@@ -1,0 +1,49 @@
+version: 2
+
+build:
+  os: ubuntu-24.04
+  tools:
+    python: "3.12"
+  apt_packages:
+    - graphviz   # optional doxygen dep for class/call graphs
+    - rsync      # streams progress while copying the large HTML tree (see below)
+  jobs:
+    build:
+      html:
+        # docs/common.mk installs trustify with --no-deps into the Python
+        # it resolves, so we must supply its only runtime dependency
+        # ourselves.  This is done HERE rather than in a `pre_install` job
+        # because, with no `sphinx`/`mkdocs` key, RTD skips
+        # create_environment/install entirely (no virtualenv) and the
+        # firing of install-phase hooks is not guaranteed.  The
+        # `build.html` commands always run, so this is the safe place.
+        # Version matches trustify's pyproject.toml pin.
+        - pip install "pydantic>=2,<3"
+        #
+        # Doxygen is NOT in apt_packages: docs/common.mk downloads the
+        # official 1.16.1 release from doxygen.nl (and MathJax 3.2.2 from
+        # npm) via curl when externalpackages/ is absent (which is the
+        # case on RTD, where externalpackages/ is not cloned).  This pins
+        # doxygen to the exact version TRUST is tested against.
+        #
+        # `make clean` is explicit because readthedocs may reuse the
+        # workspace/image across builds, which would otherwise leave
+        # stale HTML files in docs/build/ (orphans of removed classes,
+        # keywords, or pages).  Locally `make all` reuses the existing
+        # tree for speed; on RTD we always start clean.
+        #
+        # TRUSTIFY_USER_INSTALL=1: RTD has neither a TRUST conda env nor an
+        # active virtualenv, so docs/common.mk classifies its interpreter
+        # as a bare system Python and (by design) refuses to install into
+        # it unless this opt-in is set, in which case it uses `pip --user`.
+        - TRUSTIFY_USER_INSTALL=1 make -C docs clean all
+        #
+        # The doxygen tree is large (~850 MB, ~33k files: ~10k SVG class /
+        # collaboration graphs plus their .md5/.map sidecars).  A plain
+        # `cp -r` of it runs silently for minutes, which trips RTD's
+        # "Build terminated due to inactivity" killer.  rsync with
+        # --info=progress2 streams progress to stdout continuously, so RTD
+        # keeps seeing output; its exit code is the command's exit code.
+        # (Trailing slash on the source copies the *contents* of html/.)
+        - mkdir -p "$READTHEDOCS_OUTPUT/html"
+        - rsync -a --info=progress2 docs/build/html/ "$READTHEDOCS_OUTPUT/html/"
