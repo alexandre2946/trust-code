@@ -1,5 +1,5 @@
 # Verification que le raffinement en sequentiel (raffiner_isotrope) est identique au raffinement en parallele (raffiner_isotrope_parallele) #
-# PARALLEL OK 9 #
+# PARALLEL OK 7 #
 
 dimension 3
 Pb_Thermohydraulique pb

@@ -31,7 +31,7 @@ Entree& SolveurSys::readOn(Entree& is)
   Nom solver_name;
   param.ajouter("solveur_pression", &solver_name, Param::REQUIRED);
   param.lire_sans_accolade(is);
-  if (solver_name == "GEN")
+  if (solver_name.majuscule() == "GEN")
     {
       Cerr << "Error: Sparskit based solver 'solveur gen { solv_elem bicgstab|gmres ... }' removed in v1.9.8" << finl;
       Cerr << "       It can be replaced by more efficient PETSc equivalent solvers." << finl;

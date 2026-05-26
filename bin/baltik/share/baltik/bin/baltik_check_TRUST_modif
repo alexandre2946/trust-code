@@ -6,7 +6,7 @@ org=`mktemp_ -d `
 list_patch=""
 list_useless_patch=""
 rm -rf org
-for f in `ls build/src/*.{cpp,h,f} 2>/dev/null | grep -v info_atelier`
+for f in `ls build/src/*.{cpp,h,f,tpp} 2>/dev/null | grep -v info_atelier`
 do
   f2=`Find.sh $(basename $f)`
  [ "$f2" != "" ] && f3=`find -name $(basename $f) | grep -v build | grep -v kernel_official_sources` &&  cp $f2 $org && [ "$f3" != "" ] && list_patch=$f3" "$list_patch && [ "`diff $f3 $f2 &>/dev/null ; echo $?`" = "0" ] && list_useless_patch=$f3" "$list_useless_patch; 
