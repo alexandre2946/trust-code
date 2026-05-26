@@ -2,10 +2,9 @@
 build/
 *env_*
 *.log
-Makefile
+/Makefile
 configure
 README.BALTIK
 .tests_*
-.gitignore
 src/**/CMakeLists.txt
 instancie_src_*.cpp

@@ -457,10 +457,17 @@ fi
 swig=0 && [ -f $project_directory/share/swig/CMakeLists.txt ] && swig=1
 
 
+printf "SHELL := /bin/bash\n\n" >> $project_makefile
 printf "# helplist of target\n"  >> $project_makefile
 printf "\n" >> $project_makefile
 printf "# Parameter initialization\n" >> $project_makefile
 printf "TESTLIST ?= \"\"\n" >> $project_makefile
+# Cap at 16 (audit 6.7): `nproc` reports the full physical node on HPC
+# login machines (often 128+ cores), but a user allocation typically
+# gets only a handful — the implicit fan-out DoS'd the login node.
+# Single quotes around the printf so `$$` survives to the Makefile,
+# where it tells Make to pass `$` through to /bin/sh literally.
+printf 'TRUSTIFY_CHECK_JOBS ?= $(shell n=$$(nproc 2>/dev/null || echo 1); [ "$$n" -gt 16 ] && n=16; echo "$$n")\n' >> $project_makefile
 printf "\n" >> $project_makefile
 printf "default: help\n" >> $project_makefile
 printf "\t@exit 1 \n" >> $project_makefile
@@ -686,49 +693,35 @@ printf "check_perf : optim\n"                                              >> $p
 printf "\t@echo \"########################\"\n"                 >> $project_makefile
 printf "\t@echo \"# Checking perf        #\"\n"                 >> $project_makefile
 printf "\t@echo \"########################\"\n"                 >> $project_makefile
-printf "\t@source $env_file; compare_TU \n"                       >> $project_makefile
+printf "\t@. $env_file; compare_TU \n"                       >> $project_makefile
 printf "\n"                                                     >> $project_makefile
 
-printf "# help trustify \t: Build trustify Python module for the baltik\n" >> $project_makefile
-printf "trustify :\n"                                              >> $project_makefile
-printf "\t@echo \"############################\"\n"                 >> $project_makefile
-printf "\t@echo \"# Building trustify module #\"\n"                 >> $project_makefile
-printf "\t@echo \"############################\"\n"                 >> $project_makefile
-printf "\t@source $env_file; $TRUST_ROOT/Outils/trustify/install.sh \n"  >> $project_makefile
-printf "\n"                                                     >> $project_makefile
-
-printf "# help trustify_check \t: Check dataset validity using trustify generated module\n" >> $project_makefile
-printf "trustify_check : trustify\n"                               >> $project_makefile
-printf "\t@echo \"##########################################\"\n"  >> $project_makefile
-printf "\t@echo \"# Checking datasets with trustify module #\"\n"  >> $project_makefile
-printf "\t@echo \"##########################################\"\n"  >> $project_makefile
-printf "\t@source $env_file; $TRUST_ROOT/Outils/trustify/tools/check_all.sh \n" >> $project_makefile
-printf "\n"                                                     >> $project_makefile
-
-printf "# help trustify_doc \t: Build baltik keyword documentation using trustify\n" >> $project_makefile
-printf "trustify_doc : trustify\n"                               >> $project_makefile
-printf "\t@echo \"######################################\"\n"  >> $project_makefile
-printf "\t@echo \"# Building keyword doc with trustify #\"\n"  >> $project_makefile
-printf "\t@echo \"######################################\"\n"  >> $project_makefile
-printf "\t@source $env_file; $TRUST_ROOT/Outils/trustify/tools/gen_doc.sh \n" >> $project_makefile
-printf "\n"                                                     >> $project_makefile
+# Trustify recipes — defined in a Makefile-syntax template (no
+# printf-escape hell) and expanded via
+# $TRUST_ROOT/scripts/expand_env.py. Configure-time substitutions:
+# @@env_file@@         absolute path to this baltik's env shell
+# @@trustify_version@@ output of `trustify --version` at configure
+#                      time, or "unknown" if trustify isn't on PATH
+#                      (configurer_env install failed, etc.)
+# @@configure_date@@   ISO date for human reference
+# Audit 3.5 + 3.10 + 3.6.
+# Subshell scope keeps the temporary exports from leaking into the
+# rest of baltik_configure.
+trustify_version=$( (command -v trustify >/dev/null 2>&1 && trustify --version 2>/dev/null) || echo "unknown" )
+configure_date=$(date '+%Y-%m-%d')
+( export env_file trustify_version configure_date; \
+  "$TRUST_ROOT/scripts/expand_env.py" \
+      "${BALTIK_ROOT}/templates/trustify_recipes.mk.in" \
+      >> $project_makefile )
 
 
-printf "# help doxygen \t: Building doxygen documentation \n" >> $project_makefile
-printf "doxygen :\n"                                              >> $project_makefile
+printf "# help docs \t: Building doxygen documentation \n" >> $project_makefile
+printf "docs :\n"                                              >> $project_makefile
 printf "\t@echo \"###################################\"\n"                 >> $project_makefile
 printf "\t@echo \"# building doxygen documentation  #\"\n"                 >> $project_makefile
 printf "\t@echo \"###################################\"\n"                 >> $project_makefile
-printf "\t@env project_directory=${project_directory} $BALTIK_ROOT/bin/baltik_make_Doxyfile\n"                >> $project_makefile
+printf "\t@\$(MAKE) -C ${project_directory}/docs\n"                >> $project_makefile
 printf "\n"                                                     >> $project_makefile
-
-#printf "# help check_project_modularity \t: Check project modularity \n"                           >> $project_makefile
-#printf "check_project_modularity :\n"                           >> $project_makefile
-#printf "\t@echo \"########################\"\n"                 >> $project_makefile
-#printf "\t@echo \"# Project modularity   #\"\n"                 >> $project_makefile
-#printf "\t@echo \"########################\"\n"                 >> $project_makefile
-#printf "\t@env TRUST_ROOT_ORG=$TRUST_ROOT $BALTIK_ROOT/bin/baltik_check_project_modularity \n"                     >> $project_makefile
-#printf "\n"    
 
 if [ "$swig" = "1" ]
 then
@@ -737,28 +730,28 @@ printf "swig_optim : optim module_optim\n"                           >> $project
 printf "\t@echo \"###################\"\n"                 >> $project_makefile
 printf "\t@echo \"# SWIG generation #\"\n"                 >> $project_makefile
 printf "\t@echo \"###################\"\n"                 >> $project_makefile
-printf "\t@source $env_file; cd ${project_directory}/share/swig; make swig_optim\n"                     >> $project_makefile
+printf "\t@. $env_file; cd ${project_directory}/share/swig; make swig_optim\n"                     >> $project_makefile
 printf "\n"                                                     >> $project_makefile
 printf "# help swig_debug \t\t: build icoco_python through swig in debug mode\n"                           >> $project_makefile
 printf "swig_debug : debug module_debug\n"                           >> $project_makefile
 printf "\t@echo \"###################\"\n"                 >> $project_makefile
 printf "\t@echo \"# SWIG generation #\"\n"                 >> $project_makefile
 printf "\t@echo \"###################\"\n"                 >> $project_makefile
-printf "\t@source $env_file; cd ${project_directory}/share/swig; make swig_debug \n"                     >> $project_makefile
+printf "\t@. $env_file; cd ${project_directory}/share/swig; make swig_debug \n"                     >> $project_makefile
 printf "\n"                                                     >> $project_makefile
 printf "# help swig_semi_optim \t\t: build icoco_python through swig in semi_optim mode\n"                           >> $project_makefile
 printf "swig_semi_optim : semi_optim module_semi_optim\n"                           >> $project_makefile
 printf "\t@echo \"###################\"\n"                 >> $project_makefile
 printf "\t@echo \"# SWIG generation #\"\n"                 >> $project_makefile
 printf "\t@echo \"###################\"\n"                 >> $project_makefile
-printf "\t@source $env_file; cd ${project_directory}/share/swig; make swig_semi_optim \n"                     >> $project_makefile
+printf "\t@. $env_file; cd ${project_directory}/share/swig; make swig_semi_optim \n"                     >> $project_makefile
 printf "\n"                                                     >> $project_makefile
 printf "# help swig_ctest \t\t: run ctest on icoco_python tests (mode is the one used to build swig_mode)\n"                           >> $project_makefile
 printf "swig_ctest : \n"                           >> $project_makefile
 printf "\t@echo \"################\"\n"                 >> $project_makefile
 printf "\t@echo \"# SWIG testing #\"\n"                 >> $project_makefile
 printf "\t@echo \"################\"\n"                 >> $project_makefile
-printf "\t@source $env_file; cd ${project_directory}/share/swig; make swig_ctest \n"                     >> $project_makefile
+printf "\t@. $env_file; cd ${project_directory}/share/swig; make swig_ctest \n"                     >> $project_makefile
 printf "\n"                                                     >> $project_makefile
 fi
  
@@ -772,7 +765,7 @@ printf "\n"
 #printf "# help terminal \t: Open a xterm with TRUST_TESTS... \n" >> $project_makefile
 printf "# help terminal \t: Open a xterm... \n" >> $project_makefile
 printf "terminal :\n" >> $project_makefile
-printf "\t source $env_file; env MAKELEVEL=0 xterm\n" >> $project_makefile
+printf "\t . $env_file; env MAKELEVEL=0 xterm\n" >> $project_makefile
 
 phony=""
 for type in $list_cible
@@ -780,7 +773,7 @@ do
  phony="$phony check_$type $type"
 done
 [  "$swig" = "1" ] && phony="$phony swig_optim swig_debug swig_semi_optim swig_ctest"
-printf ".PHONY : $phony validation clean distrib install terminal\n"   >> $project_makefile
+printf ".PHONY : $phony validation clean distrib install terminal docs\n"   >> $project_makefile
 
 echo "Done."
 echo ""

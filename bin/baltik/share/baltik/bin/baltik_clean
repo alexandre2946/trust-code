@@ -69,6 +69,8 @@ project_makefile="${project_directory}/Makefile"
 project_build_directory="${project_directory}/build"
 project_test_directory="${project_directory}/build/tests"
 
+# make clean in the new docs directory (if it exists)
+[ -d "${project_directory}/docs" ] && make -C ${project_directory}/docs clean
 
 # suppression du repertoire de compilation
 rm -rf $project_build_directory

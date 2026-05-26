@@ -12,19 +12,11 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-/////////////////////////////////////////////////////////////////////////////
-//
-// File      : Hello.cpp
-// Directory : $TRUST_ROOT/bin/baltik/templates/basic/src
-//
-/////////////////////////////////////////////////////////////////////////////
 
 #include <Hello.h>
 
 Implemente_instanciable(Hello,"Hello",Interprete);
 // XD hello interprete hello 0 Hello class
-
-// printOn et readOn
 
 Sortie& Hello::printOn(Sortie& s ) const
 {
