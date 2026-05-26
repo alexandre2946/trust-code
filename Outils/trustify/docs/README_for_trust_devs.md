@@ -1,4 +1,4 @@
-@page Trustify_ForTrustDevs trustify — guide for TRUST/baltik developers
+@page Trustify_ForTrustDevs trustify - guide for TRUST/baltik developers
 
 ## Documenting your keywords with `// XD` tags
 

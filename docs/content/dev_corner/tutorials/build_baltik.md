@@ -394,40 +394,29 @@ We want now to add XD tags to create the automated documentation of your new cod
 First, we have to create this documentation for the first time.
 ```
 cd $project_directory
-make gui
+make docs
 ```
 
-Open the documentation file:
+Open the documentation:
 ```
-evince $project_directory/build/xdata/XTriou/doc.pdf &
+google-chrome $project_directory/docs/build/html/index.html &
 ```
 
-Now will add XD tags (keyword documentation) in cpp files. For this open:
-```
-gedit $TRUST_ROOT/Outils/trustify/docs/README_for_trust_devs.md &
-```
+Now will add XD tags (keyword documentation) in cpp files. For this open @ref Trustify_ForTrustDevs
+
 Add a first tag (in comments) into your cpp file just after the openning brace of the 'interpreter\_()' method:
 `// XD english_class_name base_class_name TRUST_class_name mode description`
 
-where `english_class_name` and `TRUST_class_name` can be `my_first_class`. The `base_class_name` is the name of the section in which will appear the information of your new class in the 'doc.pdf' file.
-The `mode` is to choose with the help of the doc\_TRAD\_2 file. Here set it to `-3`.
+Follow the instructions on @ref Trustify_ForTrustDevs to document your developments.
 
-You can then add at the end of the lines of type `param.ajouter\...`, an XD comment like:
-    `param.ajouter(...); // XD_ADD_P type description`
-where `type` can be (cf 'doc\_TRAD\_2' file): 'int', 'floattant','chaine', 'rien'...
-
-You can no rebuild the documentation:
+You can now rebuild the documentation:
 ```
-make gui
+make docs
 ```
 
-And check that the documentation of your new class is in the new doc:
+You can also use the following to check that the documentation is validated:
 ```
-evince $project_directory/build/xdata/XTriou/doc.pdf &
-```
-You can also use the following to check that the GUI is validated:
-```
-make check_gui
+make trustify_check
 ```
 Notice that you must have XD commands in all your cpp classes.
 
