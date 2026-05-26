@@ -112,11 +112,8 @@ help()
    echo "-help|-h                      : List options."
    echo "-baltik [baltik_name]         : Instanciate an empty Baltik project."
    echo "-index                        : Access to the TRUST ressource index."
-   echo "-doc                          : Access to the TRUST manual (Generic Guide)."
-   echo "-html                         : Access to the doxygen documentation."
    echo "-config nedit|vim|emacs|gedit : Configure nedit or vim or emacs or gedit with TRUST keywords."
    echo "-edit                         : Edit datafile."
-   echo "-trustify                     : Check the datafile's keywords with trustify."
    echo "-partition                    : Partition the mesh to prepare a parallel calculation (Creation of the .Zones files)."
    echo "-mesh                         : Visualize the mesh(es) contained in the data file."
    echo "-eclipse-trust                : Generate Eclipse configuration files to import TRUST sources."
@@ -163,8 +160,6 @@ binary=$exec
 ici=`pwd`
 me=`whoami`
 edit=""
-xedit=""
-trustify=""
 partition=""
 mesh=""
 monitor=""
@@ -216,62 +211,95 @@ do
       else
          help
       fi
-   elif [ "$1" = "-doc" ]
-   then
-      doc=$TRUST_ROOT/doc/TRUST/TRUST_Generic_documentation.pdf
-      if [ -f $doc ]
-      then
-         for app in xpdf evince kpdf okular
-         do
-            $app $doc 1>/dev/null 2>&1 && exit 0
-         done
-         echo "No PDF reader found!"
-         exit -1
-      else
-         echo "$doc not found!"
-         exit -1
-      fi
-   elif [ "$1" = "-html" ]
-   then
-      if [ "$project_directory" != "" ]
-      then
-         doc=$project_directory/build/html/index.html
-         [ ! -f $doc ] && doc=$TRUST_ROOT/doc/html/index.html
-      else
-         doc=$TRUST_ROOT/doc/html/index.html
-      fi
-      if [ -f $doc ]
-      then
-         ($TRUST_WEBBROWSER $doc &) && exit 0
-      else
-        echo "$doc not found!"
-        exit -1
-      fi
    elif [ "$1" = "-baltik" ]
    then
       [ -f bin/trust ] && echo "Can't be run at $TRUST_ROOT" && exit -1
       shift
       if [ "$1" != "" ]
       then
-         baltik_name=$1
-         mkdir -p $baltik_name
-         cd $baltik_name
+         PROJECT_NAME=$1
+         mkdir -p $PROJECT_NAME
+         cd $PROJECT_NAME
+      else
+         PROJECT_NAME=$(basename $PWD)
       fi
-      echo "Creating an empty Baltik project under `pwd` ..."
+      export PROJECT_NAME
+      script=$TRUST_ROOT/scripts/expand_env.py
+
+      # If the user is inside another baltik (i.e. they sourced env_<parent>.sh
+      # before running us), the inherited $project_directory points at that
+      # parent.  Capture its name+path BEFORE we overwrite $project_directory
+      # so we can pre-populate the new project.cfg's [dependencies] section.
+      parent_baltik_dir=""
+      parent_baltik_name=""
+      if [ -n "$project_directory" ] && [ -f "$project_directory/project.cfg" ] \
+         && [ "$project_directory" != "$PWD" ]; then
+         parent_baltik_dir="$project_directory"
+         parent_baltik_name=$(awk -F: '/^[[:space:]]*name[[:space:]]*:/{gsub(/[[:space:]]/,"",$2); print $2; exit}' "$project_directory/project.cfg")
+      fi
+
+      project_directory=$PWD
+
+      echo "Creating an empty Baltik project under $project_directory ..."
       echo "Copying a template from \$TRUST_ROOT/bin/baltik/templates/basic ..."
       cp -r $TRUST_ROOT/bin/baltik/templates/basic/* .
       echo "Changing the project configuration file project.cfg ..."
-      sed -i "1,$ s?TRUST?`whoami 2>/dev/null`?g" project.cfg
-      project=`pwd` && project=`basename $project`
-      sed -i "1,$ s?basic?$project?g" project.cfg
+      $script $TRUST_ROOT/bin/baltik/templates/basic/project.cfg -o project.cfg
+      if [ -n "$parent_baltik_name" ]; then
+         echo "Detected parent baltik '$parent_baltik_name' at $parent_baltik_dir — adding it as a build dependency."
+         echo "$parent_baltik_name : $parent_baltik_dir" >> project.cfg
+         echo "  The parent baltik's keywords and C++ classes will appear"
+         echo "  automatically in this baltik's HTML docs — both the keyword"
+         echo "  reference (via 'trustify generate_markdown') and the C++ API"
+         echo "  (via Doxyfile.chain) read project.cfg's [dependencies] on"
+         echo "  every 'make docs', so no further setup is needed."
+      fi
       # Update src/Version_kernel
       echo $TRUST_VERSION > src/Version_kernel
       echo "Suppressing Hello World examples from the project ..."
       rm -r -f src/Hello.* tests/Reference/New/Hello tests/Reference/New/new tests/Reference/Validation/Hello_world_jdd1 share/Validation/Rapports_automatiques/Hello_world
+      echo "Preparing documentation skeleton ..."
+      rm docs/Doxyfile # It will be generated when calling 'make' in the sub-directory 'docs'
+      $script $TRUST_ROOT/bin/baltik/templates/basic/docs/Makefile -o docs/Makefile
+      # Hand-written narrative pages live under docs/content/ (the doc
+      # pipeline scans that dir recursively), mirroring TRUST's docs/content/
+      # layout: main_page.md is the @mainpage home, demo.md a starter page.
+      $script $TRUST_ROOT/bin/baltik/templates/basic/docs/content/main_page.md -o docs/content/main_page.md
+      $script $TRUST_ROOT/bin/baltik/templates/basic/docs/content/demo.md -o docs/content/demo.md
       echo "Running baltik_build_configure..."
       baltik_build_configure
       echo "Read the README.BALTIK file to know more about Baltik projects."
-      #./configure && make check_optim
+      exit 0
+   elif [ "$1" = "-baltik_docs_scaffold" ]
+   then
+      [ -f bin/trust ] && echo "Can't be run at $TRUST_ROOT" && exit -1
+      shift
+      if [ "$1" != "" ]
+      then
+         [ ! -d "$1" ] && echo "Error: directory '$1' not found." && exit -1
+         cd "$1" || exit -1
+      fi
+      if [ ! -f project.cfg ]
+      then
+         echo "Error: no project.cfg in $PWD - this does not look like a baltik directory."
+         echo "cd into an existing baltik, or pass its directory name as argument."
+         exit -1
+      fi
+      [ -e docs ] && echo "Error: $PWD/docs already exists. Remove it (or back it up) before re-running." && exit -1
+      PROJECT_NAME=$(awk -F: '/^[[:space:]]*name[[:space:]]*:/{gsub(/[[:space:]]/,"",$2); print $2; exit}' project.cfg)
+      [ -z "$PROJECT_NAME" ] && echo "Error: could not extract 'name' from $PWD/project.cfg." && exit -1
+      export PROJECT_NAME
+      script=$TRUST_ROOT/scripts/expand_env.py
+      echo "Scaffolding docs/ for baltik '$PROJECT_NAME' under $PWD ..."
+      cp -r $TRUST_ROOT/bin/baltik/templates/basic/docs .
+      rm docs/Doxyfile # It will be generated when calling 'make' in the sub-directory 'docs'
+      $script $TRUST_ROOT/bin/baltik/templates/basic/docs/Makefile -o docs/Makefile
+      # Hand-written narrative pages live under docs/content/ (the doc
+      # pipeline scans that dir recursively), mirroring TRUST's docs/content/
+      # layout: main_page.md is the @mainpage home, demo.md a starter page.
+      $script $TRUST_ROOT/bin/baltik/templates/basic/docs/content/main_page.md -o docs/content/main_page.md
+      $script $TRUST_ROOT/bin/baltik/templates/basic/docs/content/demo.md -o docs/content/demo.md
+      echo "docs/ scaffold complete. Run 'cd docs && make' to build the documentation."
       exit 0
    elif [ "$1" = "-index" ]
    then
@@ -286,12 +314,12 @@ do
    elif [ "$1" = "-edit" ]
    then
       edit=1
-   elif [ "$1" = "-xedit" ]
-   then
-      xedit=1
    elif [ "$1" = "-trustify" ]
    then
-      trustify=1
+      echo "[DEPRECATED] trust -trustify removed in version 1.9.8"
+      echo "             use 'trustify check path/to/jdd.data' instead"
+      echo "             see 'trustify --help' for additional options"
+      exit 1
    elif [ "$1" = "-partition" ]
    then
       partition=1
@@ -691,17 +719,6 @@ then
    [ "$editor" = "" ] && editor="xemacs"
    $editor $NOM".data" &
    exit $?
-fi
-
-############################
-# Verify data with trustify #
-############################
-if [ "$trustify" = 1 ]
-then
-   $TRUST_ROOT/Outils/trustify/tools/check_single.sh $NOM".data"
-   ret=$?
-   [ $ret != 0 ] && echo "Error!"
-   exit $ret
 fi
 
 ##################

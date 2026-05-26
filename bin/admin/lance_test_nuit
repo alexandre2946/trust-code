@@ -120,14 +120,26 @@ check_components()
             if [ $* != tuleap/Kernel ] && [ "$COMPOSANT_BUILD_OK" = 1 ] 
             then
                echo " "
+               # Use make's exit code, not text-grep for "Error" in the
+               # log. trustify batch-check emits structured FAILED/PASSED
+               # lines, not "Error" — the old grep would miss real
+               # regressions and false-positive on harmless stderr that
+               # happens to mention "Error". make's exit code reflects
+               # both `trustify batch-check`'s exit (non-zero on any
+               # failed dataset) AND the audit-3.10 check_trustify_install
+               # probe (non-zero when the binary is missing). Audit 3.9.
                make trustify_check 1>>$Gui_log 2>&1
-               grep "Error" $Gui_log
-               [ "`grep "Error" $Gui_log`" != "" ] && DOC_PDF_OK=0 && echo DOC_PDF_OK=0
+               trustify_exit=$?
+               [ "$trustify_exit" != "0" ] && DOC_PDF_OK=0 \
+                   && echo "DOC_PDF_OK=0 (make trustify_check failed with exit $trustify_exit — last 20 lines of $Gui_log:)" \
+                   && tail -n 20 "$Gui_log"
                if [[ "$ComposantsOfficial" = *"$Composant"* ]] || [[ "$ComposantsLns" = *"$Composant"* ]] # Test si Composant n est pas dans la liste des composants Beta
                then
                   if [ "$Composant" != "triomc" ] && [ "$Composant" != "mathys" ]
                   then
-                     make doxygen 1>$Doc_log 2>&1
+                     # 'doxygen' target was renamed to 'docs' (baltik_configure
+                     # now emits 'docs:', which delegates to the docs/ tree).
+                     make docs 1>$Doc_log 2>&1
                   fi
                fi
             fi

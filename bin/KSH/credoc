@@ -1,12 +1,16 @@
 #!/bin/bash
 ##################################################################
-# Creation des sources html par Doxygen sous $TRUST_ROOT/doc/html
+# Creation des sources html par Doxygen sous $TRUST_ROOT/docs/build/html
 ##################################################################
 doxygen()
 {
-   echo "See $TRUST_ROOT/build/doc/doxygen*.* files"
-   rm -r -f $TRUST_ROOT/build/doc/doxygen*.*
-   make_Doxyfile
+   # 'make_Doxyfile' was removed; HTML docs are now produced by the docs/
+   # build system (make -C docs ...). Output lives in docs/build/html.
+   # Clean first so removed classes/keywords/pages don't leave orphaned
+   # HTML behind (same rationale as .readthedocs.yaml's 'make clean all').
+   echo "Building HTML documentation via the docs/ tree"
+   echo "See $TRUST_ROOT/docs/build/html"
+   make -C $TRUST_ROOT/docs clean all
    echo "End doxygen at `date '+%H:%M:%S %d/%m'`";
    # Verification des includes avec Doxygen (fait uniquement le vendredi soir)
    #if [ "`date '+%u'`" = 5 ]
