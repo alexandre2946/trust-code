@@ -94,12 +94,15 @@ void Declarer_bord_perio_32_64<_SIZE_>::adapt_som_and_faces()
 template <typename _SIZE_>
 Entree& Declarer_bord_perio_32_64<_SIZE_>::interpreter_(Entree& is)
 {
+  bool declare_only = false;
+
   Nom nom_dom;
   Param param(this->que_suis_je());
   param.ajouter("domaine", &nom_dom, Param::REQUIRED);
   param.ajouter("bord", &nom_bord_, Param::REQUIRED);
   param.ajouter("direction", &direction_perio_);
   param.ajouter("fichier_post", &nom_fichier_post_);
+  param.ajouter_flag("declare_only", &declare_only);
   param.lire_avec_accolades_depuis(is);
 
   if (this->nproc() > 1)
@@ -112,7 +115,8 @@ Entree& Declarer_bord_perio_32_64<_SIZE_>::interpreter_(Entree& is)
 
   this->associer_domaine(nom_dom);
 
-  adapt_som_and_faces();
+  if(!declare_only)
+    adapt_som_and_faces();
 
   // Register 'bord' in the list of periodic boundary of the domain:
   Domaine_t& dom = this->domaine();
