@@ -83,7 +83,7 @@ versions usually work too but may produce slightly different HTML
 chrome.
 
 ```bash
-# Requires cmake >= 3.16, a C++17 compiler, flex, bison, python3.
+# Requires cmake >= 3.16, a C++17 compiler, flex, bison, python3
 git clone --branch Release_1_16_1 --depth 1 https://github.com/doxygen/doxygen.git
 cmake -S doxygen -B doxygen/build -G "Unix Makefiles"
 cmake --build doxygen/build -j

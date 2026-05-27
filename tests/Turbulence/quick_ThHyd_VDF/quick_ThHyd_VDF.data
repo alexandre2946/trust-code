@@ -25,8 +25,8 @@ Mailler dom
 
     }
 }
-declarer_bord_perio { domaine dom bord periox }
-declarer_bord_perio { domaine dom bord perioz }
+declarer_bord_perio { domaine dom bord periox declare_only }
+declarer_bord_perio { domaine dom bord perioz declare_only }
 # END MESH #
 # BEGIN PARTITION
 Partition dom
