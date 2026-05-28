@@ -40,7 +40,7 @@ def compute_substitutions(raw_version: str) -> dict[str, str]:
     is_beta = core.endswith("_beta")
     return {
         "VERSION": core,
-        "READTHEDOCS_LABEL": "latest" if is_beta else f"v{core}",
+        "READTHEDOCS_LABEL": "next" if is_beta else f"v{core}",
     }
 
 

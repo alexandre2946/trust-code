@@ -6,23 +6,23 @@ This software is **OpenSource ([BSD license](https://github.com/cea-trust-platfo
 
 You can visit **[TRUST website](https://cea-trust-platform.github.io/)**
 
-# **How to install TRUST-1.9.7 version ?**
+# **How to install TRUST-1.9.8 version ?**
 
 ### **First method (git configuration)**
 
 ```bash
 # Check out the sources for TRUST
-git clone https://github.com/cea-trust-platform/trust-code.git TRUST-1.9.7
+git clone https://github.com/cea-trust-platform/trust-code.git TRUST-1.9.8
 # Move to the cloned TRUST folder
-cd TRUST-1.9.7
+cd TRUST-1.9.8
 # Download the required external packages
-wget ftp://ftp.cea.fr/pub/TRUST/externalpackages/externalpackages-1.9.7.tar
+wget ftp://ftp.cea.fr/pub/TRUST/externalpackages/externalpackages-1.9.8.tar
 # or:
-# curl ftp://ftp.cea.fr/pub/TRUST/externalpackages/externalpackages-1.9.7.tar > externalpackages-1.9.7.tar
+# curl ftp://ftp.cea.fr/pub/TRUST/externalpackages/externalpackages-1.9.8.tar > externalpackages-1.9.8.tar
 # or:
-# wget "https://drive.usercontent.google.com/download?id=1PsGqQTlWg_5p4d7xQP-L4lVoBCwepur2&export=download&authuser=4&confirm=t" -O externalpackages-1.9.7.tar
+# wget https://github.com/cea-trust-platform/trust-code/releases/download/v1.9.8/externalpackages-1.9.8.tar 
 # Unzip the downloaded external packages folder
-tar xf externalpackages-1.9.7.tar
+tar xf externalpackages-1.9.8.tar
 # Have a look at the available configuration options
 ./configure -help
 # Execute the configure script with your selected options
@@ -43,13 +43,13 @@ type mpicxx
 
 ```bash
 # Download the sources for TRUST
-wget ftp://ftp.cea.fr/pub/TRUST/TRUST/Version1.9.7/TRUST-1.9.7.tar.gz
+wget ftp://ftp.cea.fr/pub/TRUST/TRUST/Version1.9.8/TRUST-1.9.8.tar.gz
 # or:
-# curl ftp://ftp.cea.fr/pub/TRUST/TRUST/Version1.9.7/TRUST-1.9.7.tar.gz > TRUST-1.9.7.tar.gz
+# curl ftp://ftp.cea.fr/pub/TRUST/TRUST/Version1.9.8/TRUST-1.9.8.tar.gz > TRUST-1.9.8.tar.gz
 # Unzip the downloaded folder
-tar xzf TRUST-1.9.7.tar.gz
+tar xzf TRUST-1.9.8.tar.gz
 # Move to the unziped TRUST folder
-cd TRUST-1.9.7
+cd TRUST-1.9.8
 # Execute the configure script with your selected options
 ./configure $OPTIONS
 ```
@@ -135,11 +135,11 @@ make clean
 trust -index
 ```
 
-You are also invited to visit the TRUST **Doxygen** documentation which is available **[here](https://cea-trust-platform.github.io/TRUST_Doxygen.github.io/html/index.html)**.
+You are also invited to visit the TRUST **Doxygen** documentation which is available **[here](https://cea-trust-platform.readthedocs.io/en/v1.9.8/index.html)**.
 
 # **Quick directories description**
 
-- **TRUST scripts** => bin/
+- **TRUST scripts** => bin/ and scripts/
 
 - **Documentation files** => docs/
 
@@ -158,6 +158,8 @@ You are also invited to visit the TRUST **Doxygen** documentation which is avail
 - **Tools to build TRUST** => Outils/
 
 - **Location of Validation forms** => Validation/
+
+- **Miscellaneous** => share/
 
 
 # **Quick files description**
