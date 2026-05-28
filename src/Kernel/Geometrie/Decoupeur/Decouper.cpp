@@ -307,7 +307,7 @@ Entree& Decouper_32_64<_SIZE_>::lire(Entree& is)
   if (liste_bords_perio.size() > 0)
     {
       Cerr << finl << "ERROR: Option 'periodique' in Decouper/Partition keyword is now obsolete! It must be removed." << finl;
-      Cerr << "Your periodic boundaries in the domain now only needs to be declared once using the 'Declarer_bord_perio' keyword." << finl << finl;
+      Cerr << "Your periodic boundaries in the domain now only needs to be declared once using the 'Declarer_bord_perio|Corriger_frontiere_periodique' keyword." << finl << finl;
       Process::exit();
     }
 

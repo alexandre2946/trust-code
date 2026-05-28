@@ -36,6 +36,8 @@ Add_synonym(Declarer_bord_perio_64,"Corriger_frontiere_periodique_64");
 // XD_CONT that is:NL2 - when the node coordinates are not perfectly periodic NL2 - when the periodic direction is not
 // XD_CONT aligned with the normal vector of the boundary faces
 // XD attr fichier_post chaine fichier_post OPT .
+// XD attr declare_only rien declare_only OPT flag if added will only add the periodic boundary without calling
+// XD_CONT corriger_frontiere_periodique
 
 template <typename _SIZE_>
 Entree& Declarer_bord_perio_32_64<_SIZE_>::readOn(Entree& is)

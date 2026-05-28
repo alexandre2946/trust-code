@@ -2221,7 +2221,8 @@ void Domaine_32_64<int>::construire_renum_som_perio(const Conds_lim& les_cl, con
           if(bords_per.rang(nom_b) < 0)
             {
               Cerr << "ERROR: you have put a periodic boundary condition on a boundary ('" << nom_b << "') which is not periodic." << finl;
-              Cerr << "Use the keyword 'declarer_bord_perio' after the loading of the domain to declare this boundary as being periodic." << finl;
+              Cerr << "Use the keyword: declarer_bord_perio { domaine " << le_nom() << " bord " << nom_b << " }" << finl;
+              Cerr << "after the loading of the domain to declare this boundary as being periodic." << finl;
               Process::exit();
             }
         }

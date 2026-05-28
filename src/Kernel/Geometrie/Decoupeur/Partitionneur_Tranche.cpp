@@ -146,17 +146,18 @@ void Partitionneur_Tranche_32_64<_SIZE_>::chercher_direction_perio(const Domaine
         }
       if (count != 1)
         {
-          Cerr << "Error in Partitionneur_Tranche_32_64<_SIZE_>::chercher_direction_perio\n"
-               << " periodic direction not found for the boundary " << nom_bord
-               << "\n Vector delta found between faces twin : " << delta
-               << "\n with a maximum error : " << erreur << finl;
+          Cerr << "Error in Partitionneur_Tranche_32_64<_SIZE_>::chercher_direction_perio" << finl;
+          Cerr << " periodic direction not found for the boundary " << nom_bord << finl;
+          Cerr << " Vector delta found between faces twin : " << delta << finl;
+          Cerr << " with a maximum error : " << erreur << finl;
+          Cerr << "TIP: Try to add 'declare_only' flag into declare_bord_perio block or switch to metis tool" << finl;
           Process::exit();
         }
     }
   if (max_array(directions_perio) > 1)
     {
-      Cerr << "Error in Partitionneur_Tranche_32_64<_SIZE_>::chercher_direction_perio\n"
-           << " several boundaries have the same periodic direction" << finl;
+      Cerr << "Error in Partitionneur_Tranche_32_64<_SIZE_>::chercher_direction_perio" << finl;
+      Cerr << " several boundaries have the same periodic direction" << finl;
       Process::exit();
     }
 }
