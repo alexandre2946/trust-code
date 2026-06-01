@@ -225,7 +225,7 @@ void Terme_Source_Coriolis_VDF_Face::calculer_force_de_Coriolis() const
       }
     default:
       {
-        Cerr << "Pour pouvoir utiliser la force de Coriolis, il faut etre en 2D ou 3D" << finl;
+        Cerr << "To use the Coriolis force, the simulation must be 2D or 3D" << finl;
         exit();
       }
     }

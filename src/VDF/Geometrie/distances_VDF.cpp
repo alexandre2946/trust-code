@@ -30,7 +30,7 @@ void moy_2D_vit(const DoubleVect& vit, int elem, int iori, const Domaine_VDF& do
     }
   else
     {
-      Cerr << "valeur de iori " << iori << " impossible en 2D" << finl;
+      Cerr << "value of iori " << iori << " not possible in 2D" << finl;
       Process::exit();
       num1 = num2 = -1;
     }
@@ -58,7 +58,7 @@ double norm_2D_vit(const DoubleVect& vit, int elem, int iori, const Domaine_VDF&
     vit_paroi = u_paroi;
   else
     {
-      Cerr << "valeur de iori " << iori << " impossible en 2D" << finl;
+      Cerr << "value of iori " << iori << " not possible in 2D" << finl;
       Process::exit();
       vit_paroi = 0;
     }
@@ -109,7 +109,7 @@ void moy_3D_vit(const DoubleVect& vit, int elem, int iori, const Domaine_VDF& do
     }
   else
     {
-      Cerr << "valeur de iori " << iori << " impossible en 3D" << finl;
+      Cerr << "value of iori " << iori << " not possible in 3D" << finl;
       Process::exit();
       num1 = num2 = num3 = num4 = -1;
     }
@@ -147,11 +147,11 @@ double norm_3D_vit(const DoubleVect& vit, int elem, int iori, const Domaine_VDF&
       v1 = val1 - u_paroi;
       v2 = val2 - v_paroi;
     }
-  //Fin modif YB
+  //End modif YB
 
   else
     {
-      Cerr << "valeur de iori " << iori << " impossible en 3D" << finl;
+      Cerr << "value of iori " << iori << " not possible in 3D" << finl;
       Process::exit();
       v1 = v2 = 0;
     }

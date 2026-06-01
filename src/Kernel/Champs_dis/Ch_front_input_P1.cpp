@@ -111,7 +111,7 @@ double Ch_front_input_P1::valeur_au_temps_et_au_point(double temps,int som,doubl
 
     }
 
-  Cerr<<" point non trouve "<<finl;
+  Cerr<<" point not found "<<finl;
   exit();
   return -1.;
 }

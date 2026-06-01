@@ -66,17 +66,17 @@ void Sortie_libre_Gradient_Pression_impose_VEFPreP1B::mettre_a_jour(double temps
   Cond_lim_base::mettre_a_jour(temps);
   if (!calculer_trace_pression())
     {
-      Cerr << "Erreur dans Sortie_libre_Gradient_Pression_impose_VEFPreP1B::mettre_a_jour" << finl;
+      Cerr << "Error in Sortie_libre_Gradient_Pression_impose_VEFPreP1B::mettre_a_jour" << finl;
       exit();
     }
 }
 
-// Retourne 1 si OK, 0 sinon.
+// Returns 1 if OK, 0 otherwise.
 int Sortie_libre_Gradient_Pression_impose_VEFPreP1B::calculer_trace_pression()
 {
   if (!pression_interne)
     {
-      Cerr << "Sortie_libre_Gradient_Pression_impose_VEFPreP1B::calculer_trace_pression() : la pression n'est pas definie!" << finl;
+      Cerr << "Sortie_libre_Gradient_Pression_impose_VEFPreP1B::calculer_trace_pression() : pressure is not defined!" << finl;
       return 0;
     }
   Debog::verifier("pression_interne:", pression_interne);

@@ -48,27 +48,27 @@ Entree& Traitement_particulier_NS_Profils_thermo_VDF::lire(Entree& is)
 
 Entree& Traitement_particulier_NS_Profils_thermo_VDF::lire(const Motcle& motlu, Entree& is)
 {
-  // Par defaut on ne fait pas de statistiques sur la temperature.
+  // By default, no statistics are computed on the temperature.
 
   if (motlu=="stats_thermo")
     {
-      //Statistiques sur le champ de temperature
+      //Statistics on the temperature field
       oui_stats_thermo = 1;
     }
   else
     {
       if(motlu=="reprise_thermo")
         {
-          // Reprise des statistiques pour le champs de temperature
-          oui_repr_stats_thermo = 1; // On veut reprendre les statistiques sur la temperature
-          is  >> fich_repr_stats_thermo ;  // Indication du nom du fichier de reprise des stats pour le champs de temperature
-          Cerr << "On reprend les statistiques sur le champs thermique" << finl;
+          // Restart of statistics for the temperature field
+          oui_repr_stats_thermo = 1; // We want to restart the statistics on temperature
+          is  >> fich_repr_stats_thermo ;  // Name of the restart file for the temperature field statistics
+          Cerr << "Restarting statistics on the thermal field" << finl;
         }
       else
         {
           if(motlu=="tmin_tmax")
             {
-              // On demande les max et min de temperature dans un fichier
+              // The user requests max and min temperature values in a file
               tmin_tmax = 1;
               Cerr << "User asked to monitor min and max of temperature" << finl;
               Cerr << "in channel flow computation." << finl;
@@ -673,16 +673,16 @@ void Traitement_particulier_NS_Profils_thermo_VDF::reprendre_stat()
             {
               if (ti > temps_deb)
                 {
-                  Cerr << "Pb de reprise des stats du champ thermique :" << finl;
-                  Cerr << "Le temps de debut des stats demande " << temps_deb  << finl;
-                  Cerr << "est inferieur a celui de debut des stats sauvees !" << ti << finl;
+                  Cerr << "Problem restarting thermal field statistics:" << finl;
+                  Cerr << "The requested start time for stats " << temps_deb  << finl;
+                  Cerr << "is less than the start time of the saved stats!" << ti << finl;
                   exit();
                 }
               else
                 {
                   if (temps_deb>=tps)
                     {
-                      Cerr << "On recommence le calcul des stats thermiques a partir de t=" << temps_deb << "s." << finl;
+                      Cerr << "Restarting thermal statistics computation from t=" << temps_deb << "s." << finl;
                       Tmoy_temp = 0.;
                       Trms_temp = 0.;
                       upTp_temp = 0.;
@@ -692,14 +692,14 @@ void Traitement_particulier_NS_Profils_thermo_VDF::reprendre_stat()
                     }
                   else
                     {
-                      Cerr << "On a deja depasse le temps auquel vous voulez commencer les stats thermiques !" << finl;
+                      Cerr << "The time at which you want to start thermal statistics has already been passed!" << finl;
                       exit();
                     }
                 }
             }
           else
             {
-              Cerr << "On continue le calcul des stats thermiques, debute a t=" <<  ti << "s." << finl;
+              Cerr << "Continuing thermal statistics computation, started at t=" <<  ti << "s." << finl;
               temps_deb = ti;
             }
         }
@@ -707,12 +707,12 @@ void Traitement_particulier_NS_Profils_thermo_VDF::reprendre_stat()
         {
           if (tps<=temps_deb)
             {
-              Cerr << "On n a pas encore debute le calcul des stats thermiques." << finl;
+              Cerr << "Thermal statistics computation has not started yet." << finl;
               oui_repr_stats_thermo = 0;
             }
           else
             {
-              Cerr << "Il faut donner le fichier pour reprendre les stats thermiques !" << finl;
+              Cerr << "A file must be provided to restart thermal statistics!" << finl;
               exit();
             }
         }

@@ -52,7 +52,7 @@ Entree& Modele_rayo_transp::readOn(Entree& is)
   // XD_CONT Flag to dump matrix in a binary file. By default it it ASCII
   param.lire_avec_accolades_depuis(is);
 
-  Cerr << "Modele_rayo_transp::lire_fichiers" << finl;
+  Cerr << "Modele_rayo_transp::reading files" << finl;
   if (fic_mat_ray_inv_bin_)
     lire_fichiers(fichier_face_rayo, fichier_fij, nom_fic_mat_ray_inv_);
   else
@@ -63,11 +63,11 @@ Entree& Modele_rayo_transp::readOn(Entree& is)
 
 void Modele_rayo_transp::lire_fichiers(Nom& fich_faces_rayo, Nom& fich_fij, Nom& fich_mat)
 {
-  Cerr << "fichier_matrice = " << fich_mat << finl;
+  Cerr << "matrix_file = " << fich_mat << finl;
 
   struct stat f, e, m;
 
-  // 3 fichiers a tester :
+  // 3 files to check:
   const char *facteur_file = fich_fij;
   const char *emissivite_file = fich_faces_rayo;
   const char *matrice_inverse_file = fich_mat;
@@ -89,28 +89,28 @@ void Modele_rayo_transp::lire_fichiers(Nom& fich_faces_rayo, Nom& fich_fij, Nom&
   else
     lire_matrice_inv_ = true;
 
-  // Teste si facteur_file ou emissivite_file plus recent que matrice_inverse_file
+  // Test whether facteur_file or emissivite_file is more recent than matrice_inverse_file
   if (lire_matrice_inv_ && (f.st_mtime > m.st_mtime || e.st_mtime > m.st_mtime))
     lire_matrice_inv_ = false;
 
-  // Pour l'instant, on se contente de relire les deux premiers fichiers. Le dernier nom (nom3)
-  // sert de test pour indiquer qu'il faut inverser la matrice
+  // For now, just re-read the first two files. The last name (nom3)
+  // serves as a flag indicating that the matrix must be inverted
   lire_fichiers(fich_faces_rayo, fich_fij);
 }
 
 void Modele_rayo_transp::lire_fichiers(Nom& fich_faces_rayo, Nom& fich_fij)
 {
-  Cerr << "fichier_face_rayo = " << fich_faces_rayo << finl;
-  Cerr << "fichier_fij = " << fich_fij << finl;
+  Cerr << "radiation_face_file = " << fich_faces_rayo << finl;
+  Cerr << "fij_file = " << fich_fij << finl;
 
   LecFicDiffuse fic1(fich_faces_rayo);
   LecFicDiffuse fic2(fich_fij);
 
-  // lecture du nombre de face rayonnante et des faces rayonnantes dans fic1
-  Cerr << "Lecture du fichier : " << fich_faces_rayo << finl;
+  // read the number of radiation faces and the radiation faces from fic1
+  Cerr << "Reading file: " << fich_faces_rayo << finl;
 
   fic1 >> nb_faces_totales_ >> nb_faces_rayonnantes_;
-  Cerr << "Vous avez defini " << nb_faces_rayonnantes_ << " faces rayonnantes sur " << nb_faces_totales_ << " faces en tout" << finl;
+  Cerr << "You have defined " << nb_faces_rayonnantes_ << " radiation faces out of " << nb_faces_totales_ << " faces in total" << finl;
   les_faces_rayonnantes_.dimensionner(nb_faces_totales_);
   les_flux_radiatifs_.resize(nb_faces_rayonnantes());
 
@@ -122,17 +122,17 @@ void Modele_rayo_transp::lire_fichiers(Nom& fich_faces_rayo, Nom& fich_fij)
         {
           if (les_faces_rayonnantes_[i].emissivite() < 0.)
             {
-              Cerr << "Erreur dans " << fich_faces_rayo << " !!! emissivite <0 et != -1 : " << les_faces_rayonnantes_[i].emissivite() << finl;
+              Cerr << "Error in " << fich_faces_rayo << " !!! emissivity <0 and != -1: " << les_faces_rayonnantes_[i].emissivite() << finl;
               Process::exit();
             }
           if (irayo >= nb_faces_rayonnantes_)
             {
-              Cerr << "Erreur dans " << fich_faces_rayo << finl;
-              Cerr << "   nb_faces_rayonnantes utilisateur " << nb_faces_rayonnantes_ << finl;
-              Cerr << "   nb_faces_rayonnantes deduites des emissivites " << irayo + 1 << finl;
+              Cerr << "Error in " << fich_faces_rayo << finl;
+              Cerr << "   nb_faces_rayonnantes user " << nb_faces_rayonnantes_ << finl;
+              Cerr << "   nb_faces_rayonnantes deduced from emissivities " << irayo + 1 << finl;
               // G.F.
-              Cerr << "On a corrige emissivite = 0 ne veut pas dire pas de rayonnement ... " << finl;
-              Cerr << "Il faut mettre maintenant l'emissivite a -1 pour ne pas tenir compte de certains bords " << finl;
+              Cerr << "Note: emissivity = 0 does not mean no radiation ... " << finl;
+              Cerr << "You must now set emissivity to -1 to ignore certain boundaries " << finl;
               Process::exit();
             }
           irayo++;
@@ -144,26 +144,26 @@ void Modele_rayo_transp::lire_fichiers(Nom& fich_faces_rayo, Nom& fich_fij)
 
   if (irayo != nb_faces_rayonnantes_)
     {
-      Cerr << "Erreur dans " << fich_faces_rayo << finl;
-      Cerr << "   nb_faces_rayonnantes utilisateur " << nb_faces_rayonnantes_ << finl;
-      Cerr << "   nb_faces_rayonnantes deduites des emissivites " << irayo << finl;
+      Cerr << "Error in " << fich_faces_rayo << finl;
+      Cerr << "   nb_faces_rayonnantes user " << nb_faces_rayonnantes_ << finl;
+      Cerr << "   nb_faces_rayonnantes deduced from emissivities " << irayo << finl;
       Process::exit();
     }
 
-  if (!lire_matrice_inv_) // lecture fichier fij dans ce cas !!
+  if (!lire_matrice_inv_) // read fij file in this case !!
     {
-      Cerr << "Lecture du fichier : " << fich_fij << finl;
+      Cerr << "Reading file: " << fich_fij << finl;
 
       fic2 >> ordre_mat_forme_;
       if (ordre_mat_forme_ != nb_faces_totales_)
         {
-          Cerr << "Le nombre de faces dans la matrice des facteurs de formes est different de celui du fichier des faces rayonnantes" << finl;
-          Cerr << "Verifier votre fichier " << fich_fij << finl;
+          Cerr << "The number of faces in the view factor matrix differs from that of the radiation faces file" << finl;
+          Cerr << "Check your file " << fich_fij << finl;
           Process::exit();
         }
 
-      Cerr << "l'ordre de la matrice est " << ordre_mat_forme_ << finl;
-      // Dimensionnement de la "matrice" des facteurs de formes.
+      Cerr << "the matrix order is " << ordre_mat_forme_ << finl;
+      // Sizing the view factor "matrix".
       les_facteurs_de_forme_.resize(nb_faces_rayonnantes(), nb_faces_rayonnantes());
       irayo = 0;
       jrayo = 0;
@@ -192,10 +192,10 @@ void Modele_rayo_transp::lire_fichiers(Nom& fich_faces_rayo, Nom& fich_fij)
     }
   else
     {
-      Cerr << "On ne lit pas la matrice des facteurs de forme puisque l'on va " << finl;
-      Cerr << "lire directement la matrice inverse qui a deja ete calculee lors d'un calcul precedent." << finl;
+      Cerr << "The view factor matrix is not read since " << finl;
+      Cerr << "the inverse matrix already computed in a previous calculation will be read directly." << finl;
     }
-  Cerr << "La lecture des fichiers du prepro est terminee. Fichiers corrects." << finl;
+  Cerr << "Reading of the preprocessor files is complete. Files are correct." << finl;
 }
 
 void Modele_rayo_transp::associer_pb_fluide_rayo(const Pb_Fluide_base& pb)
@@ -263,11 +263,11 @@ void Modele_rayo_transp::calculer_flux_radiatifs()
 
 int Modele_rayo_transp::postraiter()
 {
-  // Impression en plus du modele de rayonnement
+  // Print the radiation model
   if (processeur_rayonnant() != -1)
     if (pb_fluide_rayo_->schema_temps().limpr())
       {
-        Cout << "Impression des flux radiatifs sur les bords de rayonnement" << finl;
+        Cout << "Printing radiative fluxes on radiation boundaries" << finl;
         Cout << "----------------------------------------------------------------" << finl;
         imprimer_flux_radiatifs(Cout);
       }
@@ -365,7 +365,7 @@ double Modele_rayo_transp::flux_radiatif(int num_face) const
                         int nglob = ndeb + face;
                         if (corres_[nglob] != -1)
                           {
-                            Cerr << me() << "la face " << nglob << " semble etre contenu par les faces_rayonnantes " << i << " et " << corres_[nglob] << finl;
+                            Cerr << me() << "face " << nglob << " seems to be contained by radiation faces " << i << " and " << corres_[nglob] << finl;
                             Cerr << me() << les_faces_rayonnantes_[i].nom_bord_rayo_lu() << " " << les_faces_rayonnantes_[corres_[nglob]].nom_bord_rayo_lu() << finl;
                             Cerr << ensemble.nb_faces_bord() << finl;
                             Process::exit();
@@ -425,8 +425,8 @@ void Modele_rayo_transp::completer()
                 }
               if (ok == 0)
                 {
-                  Cerr << "La condition limite de nom " << la_cl.frontiere_dis().le_nom() << " est definie comme rayonnante" << finl;
-                  Cerr<< "mais n'est pas dans la liste des faces rayonnantes ou son emissivite vaut -1" << finl;
+                  Cerr << "The boundary condition named " << la_cl.frontiere_dis().le_nom() << " is defined as radiating" << finl;
+                  Cerr<< "but is not in the list of radiation faces or its emissivity is -1" << finl;
                   Process::exit();
                 }
             }
@@ -461,15 +461,15 @@ void Modele_rayo_transp::completer()
 
           Cerr << me() << collectnoms << finl;
 
-          // on verifie que l'on a bien tous les noms
+          // verify that all names are present
           if (me() == 0)
             associer_processeur_rayonnant(me());
           else
             associer_processeur_rayonnant(-1);
         }
-      else //tout est ok
+      else //everything is ok
         {
-          Cerr << "On redimenssionne le tableau de faces de bord" << finl;
+          Cerr << "Resizing the boundary face array" << finl;
           Cerr << "   compte_nb_bords_rayo = " << compte_nb_bords_rayo << finl;
           Cerr << "   mod_rayo.nb_faces_rayonnantes() = " << nb_faces_rayonnantes() << finl;
           associer_processeur_rayonnant(-1);
@@ -522,16 +522,16 @@ void Modele_rayo_transp::init_matrice_rayo()
         }
       else
         {
-          // Puisque l'on va lire la matrice de rayonnement inverse dans un fichier, il n'est pas necessaire de remplire matrice_rayo
+          // Since the inverse radiation matrix will be read from a file, there is no need to fill matrice_rayo
         }
 
       Nom version("version_2beta3");
 
-      // INVERSION DE LA MATRICE UNE FOIS POUR TOUT
+      // INVERT THE MATRIX ONCE AND FOR ALL
       if (!lire_matrice_inv_)
         {
-          Cerr << "Inversion de la matrice de rayonnement au debut du calcul" << finl;
-          // On commence par decomposer la matrice de rayonnement en une decomposition LU.
+          Cerr << "Inverting the radiation matrix at the start of the computation" << finl;
+          // First perform an LU decomposition of the radiation matrix.
           DoubleVect sol_tmp(nb_faces_rayonnantes());
           {
             IntVect index(nb_faces_rayonnantes());
@@ -625,26 +625,26 @@ void Modele_rayo_transp::init_matrice_rayo()
         {
           if (!fic_mat_ray_inv_bin_)
             {
-              Cerr << "Lecture du fichier ASCI " << nom_fic_mat_ray_inv_ << finl;
+              Cerr << "Reading ASCII file " << nom_fic_mat_ray_inv_ << finl;
               EFichier fic(nom_fic_mat_ray_inv_);
 
               int i, j;
-              Cerr << "Lecture du fichier : " << nom_fic_mat_ray_inv_ << finl;
+              Cerr << "Reading file: " << nom_fic_mat_ray_inv_ << finl;
               Nom toto;
               fic >> toto;
               if (toto != version)
                 {
-                  Cerr << "Il faut detruire votre fichier " << nom_fic_mat_ray_inv_ << " la matrice stockee a changee." << finl;
+                  Cerr << "You must delete your file " << nom_fic_mat_ray_inv_ << " because the stored matrix has changed." << finl;
                   Process::exit();
                 }
               fic >> ordre_mat_forme_;
               if (ordre_mat_forme_ != nb_faces_rayonnantes())
                 {
-                  Cerr << "L'ordre de la matrice inverse de rayonnement est different du nombre de faces rayonnantes" << finl;
-                  Cerr << "Verifiez votre fichier " << nom_fic_mat_ray_inv_ << finl;
+                  Cerr << "The order of the inverse radiation matrix differs from the number of radiation faces" << finl;
+                  Cerr << "Check your file " << nom_fic_mat_ray_inv_ << finl;
                   Process::exit();
                 }
-              Cerr << "l'ordre de la matrice est " << ordre_mat_forme_ << finl;
+              Cerr << "the matrix order is " << ordre_mat_forme_ << finl;
 
               for (i = 0; i < ordre_mat_forme_; i++)
                 for (j = 0; j < ordre_mat_forme_; j++)
@@ -652,29 +652,29 @@ void Modele_rayo_transp::init_matrice_rayo()
             }
           else
             {
-              Cerr << "Lecture du fichier BINAIRE " << nom_fic_mat_ray_inv_ << finl;
+              Cerr << "Reading BINARY file " << nom_fic_mat_ray_inv_ << finl;
               EFichierBin fic_bin(nom_fic_mat_ray_inv_);
 
-              Cerr << "Lecture du fichier : " << nom_fic_mat_ray_inv_ << finl;
+              Cerr << "Reading file: " << nom_fic_mat_ray_inv_ << finl;
               Nom toto;
               fic_bin >> toto;
               if (toto != version)
                 {
-                  Cerr << "Il faut detruire votre fichier " << nom_fic_mat_ray_inv_ << " la matrice stockee a changee." << finl;
+                  Cerr << "You must delete your file " << nom_fic_mat_ray_inv_ << " because the stored matrix has changed." << finl;
                   Process::exit();
                 }
               fic_bin >> matrice_rayo_;
               ordre_mat_forme_ = matrice_rayo_.dimension(0);
               if (ordre_mat_forme_ != nb_faces_rayonnantes())
                 {
-                  Cerr << "L'ordre de la matrice inverse de rayonnement est different du nombre de faces rayonnantes" << finl;
-                  Cerr << "Verifiez votre fichier " << nom_fic_mat_ray_inv_ << finl;
+                  Cerr << "The order of the inverse radiation matrix differs from the number of radiation faces" << finl;
+                  Cerr << "Check your file " << nom_fic_mat_ray_inv_ << finl;
                   Process::exit();
                 }
-              Cerr << "l'ordre de la matrice est " << ordre_mat_forme_ << finl;
+              Cerr << "the matrix order is " << ordre_mat_forme_ << finl;
             }
-          Cerr << "La lecture de la matrice de rayonnement inverse dans le fichier " << finl;
-          Cerr << nom_fic_mat_ray_inv_ << " est terminee. Fichier correct " << finl;
+          Cerr << "Reading of the inverse radiation matrix from file " << finl;
+          Cerr << nom_fic_mat_ray_inv_ << " is complete. File correct." << finl;
         }
     }
 }

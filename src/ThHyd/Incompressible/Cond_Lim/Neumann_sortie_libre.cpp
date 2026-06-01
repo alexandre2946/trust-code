@@ -76,9 +76,9 @@ Entree& Neumann_sortie_libre::readOn(Entree& s)
     s >> le_champ_ext;
   else
     {
-      Cerr << "Erreur a la lecture de la condition aux limites de type: " << finl;
+      Cerr << "Error reading boundary condition of type: " << finl;
       Cerr << que_suis_je() << finl;
-      Cerr << "On attendait " << les_motcles << " a la place de " << motlu << finl;
+      Cerr << "Expected " << les_motcles << " instead of " << motlu << finl;
       exit();
     }
 

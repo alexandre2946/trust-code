@@ -37,7 +37,7 @@ Sortie& Loi_Etat_Binaire_GP_WC::printOn(Sortie& os) const
 
 Entree& Loi_Etat_Binaire_GP_WC::readOn(Entree& is)
 {
-  Cerr<<"Lecture de la loi d'etat Melange Binaire WC ... "<<finl;
+  Cerr<<"Reading the binary mixture equation of state WC ... "<<finl;
   return Loi_Etat_Binaire_GP_base::readOn(is);
 }
 

@@ -1297,7 +1297,7 @@ export FI_CXI_DEFAULT_CQ_SIZE=393216" >> $GPU_DIRECT
    [ -f $OUTPUT.out ] && cat $OUTPUT.out >> "/proc/self/fd/1" #cat $OUTPUT.out > "/dev/stdout"
    [ -f $OUTPUT.err ] && cat $OUTPUT.err >> "/proc/self/fd/2" #cat $OUTPUT.err > "/dev/stderr"
    # Check for TRUST calculation only (cause coupled MC2 calculation DO NOT produce this message for example):
-   if [ "`grep 'Executable: ' $OUTPUT.err 2>/dev/null`" != "" ] && [ "`grep 'Arret des processes.' $OUTPUT.err`" = "" ]
+   if [ "`grep 'Executable: ' $OUTPUT.err 2>/dev/null`" != "" ] && [ "`grep 'Stopping processes.' $OUTPUT.err`" = "" ]
    then
       err=1
    fi

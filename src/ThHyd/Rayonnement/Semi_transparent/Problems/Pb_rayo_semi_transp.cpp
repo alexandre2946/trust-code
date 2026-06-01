@@ -78,36 +78,36 @@ void Pb_rayo_semi_transp::discretise_longueur_rayo()
 
           if (sub_type(Champ_Uniforme, coeff_abs))
             {
-              // Typage du OWN_PTR(Champ_Don_base) longueur_rayo_ comme un champ_uniforme
+              // Type the OWN_PTR(Champ_Don_base) longueur_rayo_ as a Champ_Uniforme
               fluide.typer_longeur_rayo("Champ_Uniforme");
               Champ_Don_base& l_rayo = fluide.longueur_rayo();
               Champ_Uniforme& ch_l_rayo = ref_cast(Champ_Uniforme, l_rayo);
               ch_l_rayo.nommer("longueur_de_rayonnement");
               ch_l_rayo.fixer_nb_comp(1);
-              // Le nombre de valeurs nodales est fixe a 1 ici car il s'agit d'un
-              // Champ_Uniforme, dans les autres cas, il faut le fixer egale au nombre d'elements ou de faces en fonctions de la localisation du champ
+              // The number of nodal values is fixed to 1 here because this is a
+              // Champ_Uniforme; in other cases it must be set equal to the number of elements or faces depending on the field location
               ch_l_rayo.fixer_nb_valeurs_nodales(1);
               ch_l_rayo.fixer_unite("m");
               ch_l_rayo.changer_temps(0);
             }
           else
             {
-              Cerr << "Le coefficient d'absorption n'est pas un OWN_PTR(Champ_base) Uniforme mais un " << coeff_abs.que_suis_je() << ". modifier la methode " << finl;
-              Cerr << "Pb_Couple_rayo_semi_transp::discretiser pour pouvoir prendre en compte ce type de Champ_Don" << finl;
+              Cerr << "The absorption coefficient is not a uniform OWN_PTR(Champ_base) but a " << coeff_abs.que_suis_je() << ". modify the method " << finl;
+              Cerr << "Pb_Couple_rayo_semi_transp::discretiser to be able to handle this type of Champ_Don" << finl;
             }
           fluide.initialiser(pb_fluide_->schema_temps().temps_courant());
         }
       else
         {
-          Cerr << "Erreur 0 dans Pb_Couple_rayo_semi_transp::discretiser vous n'avez probablement pas renseigne tous les" << finl;
-          Cerr << "parametres physique de votre fluide incompressible pour pouvoir traiter un probleme de rayonnement semi transparent" << finl;
+          Cerr << "Error 0 in Pb_Couple_rayo_semi_transp::discretiser you have probably not specified all the" << finl;
+          Cerr << "physical parameters of your incompressible fluid to handle a semi-transparent radiation problem" << finl;
           Process::exit();
         }
     }
   else
     {
-      Cerr << "Erreur dans Pb_rayo_semi_transp::readOn Le probleme de rayonnement semi transparent ne peut etre utilise" << finl;
-      Cerr << "qu'avec un Fluide_base et non " << pb_fluide_->milieu().que_suis_je() << finl;
+      Cerr << "Error in Pb_rayo_semi_transp::readOn: the semi-transparent radiation problem can only be used" << finl;
+      Cerr << "with a Fluide_base and not " << pb_fluide_->milieu().que_suis_je() << finl;
       Process::exit();
     }
 }
@@ -145,9 +145,9 @@ void Pb_rayo_semi_transp::preparer_calcul()
 
   if (contient_source_rayo_semi_transp == 0)
     {
-      Cerr << "Attention, vous n'avez pas defini de terme source de rayonnement semi transparent" << finl;
-      Cerr << "pensez a ajourter le terme source Source_rayo_semi_transp dans la liste des termes " << finl;
-      Cerr << "sources de l'equation de l'energie" << finl;
+      Cerr << "Warning, you have not defined a semi-transparent radiation source term" << finl;
+      Cerr << "remember to add the source term Source_rayo_semi_transp in the list of source terms " << finl;
+      Cerr << "of the energy equation" << finl;
       Process::exit();
     }
   eq_rayo().completer();
@@ -179,8 +179,8 @@ void Pb_rayo_semi_transp::calculer_flux_radiatif()
         }
       else
         {
-          Cerr << "Erreur : les conditions aux limites de l'equation de rayonnement" << finl;
-          Cerr << "doivent forcement etre du type rayonnantes" << finl;
+          Cerr << "Error: the boundary conditions of the radiation equation" << finl;
+          Cerr << "must necessarily be of radiation type" << finl;
           Process::exit();
         }
     }
@@ -204,17 +204,17 @@ const Champ_front_base& Pb_rayo_semi_transp::flux_radiatif(const Nom& nom_bord) 
             }
           else
             {
-              Cerr << "Erreur : les conditions aux limites de l'equation de rayonnement" << finl;
-              Cerr << "doivent forcement etre du type rayonnantes" << finl;
+              Cerr << "Error: the boundary conditions of the radiation equation" << finl;
+              Cerr << "must necessarily be of radiation type" << finl;
               Process::exit();
 
             }
         }
     }
-  Cerr << "Erreur : Pb_rayo_semi_transp::flux_radiatif" << finl;
-  Cerr << "il n'y a pas de condition a la limite portant le nom " << nom_bord << finl;
+  Cerr << "Error: Pb_rayo_semi_transp::flux_radiatif" << finl;
+  Cerr << "there is no boundary condition named " << nom_bord << finl;
   Process::exit();
-  //pour les compilos
+  //for the compilers
   const Cond_lim& la_cl_rayo = eq_rayo().domaine_Cl_dis().les_conditions_limites(0);
   Flux_radiatif_base& la_cl_rayon = ref_cast_non_const(Flux_radiatif_base, la_cl_rayo.valeur());
   return la_cl_rayon.flux_radiatif();

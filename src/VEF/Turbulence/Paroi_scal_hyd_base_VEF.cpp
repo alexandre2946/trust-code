@@ -80,7 +80,7 @@ int Paroi_scal_hyd_base_VEF::init_lois_paroi()
 
   if (axi)
     {
-      Cerr << "Attention, rien n'est fait en Axi pour le VEF" << finl;
+      Cerr << "Warning, nothing is implemented for Axi in VEF" << finl;
       exit();
     }
   else

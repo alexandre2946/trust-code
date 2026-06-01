@@ -202,7 +202,7 @@ double Loi_Etat_GR_base::inverser_Pth(double H, double rho)
     }
   if (std::fabs(acc)>1e-8)
     {
-      Cerr<<"Probleme dans l'inversion de la pression : nb_iter="<<i<<finl;
+      Cerr<<"Problem in the pressure inversion: nb_iter="<<i<<finl;
       Cerr<<" Pth="<<P<<" H="<<H<<" rho="<<rho<<finl;
       abort();
     }

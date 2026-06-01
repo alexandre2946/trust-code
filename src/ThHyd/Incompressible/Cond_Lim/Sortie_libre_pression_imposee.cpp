@@ -108,7 +108,7 @@ double Sortie_libre_pression_imposee::flux_impose(int i, int j) const
   else if (j < le_champ_front->valeurs().dimension(1))
     return le_champ_front->valeurs()(i, j) / rho_;
   else
-    Cerr << "Sortie_libre_pression_imposee::flux_impose erreur" << finl;
+    Cerr << "Sortie_libre_pression_imposee::flux_impose error" << finl;
   Process::exit();
   return 0.;
 }

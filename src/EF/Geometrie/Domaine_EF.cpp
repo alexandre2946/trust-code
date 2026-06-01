@@ -94,7 +94,7 @@ Entree& Domaine_EF::readOn(Entree& is)
       type_elem_ = Hexa_EF();
     else
       {
-        Cerr << type << " n'est pas un Elem_EF !" << finl;
+        Cerr << type << " is not an Elem_EF !" << finl;
         Process::exit();
       }
   }
@@ -252,7 +252,7 @@ void Domaine_EF::typer_elem(Domaine& domaine_geom)
     type = "Point_EF";
   else
     {
-      Cerr << "probleme de typage dans Domaine_EF::typer_elem => type geometrique : " << type_elem_geom << finl;
+      Cerr << "typing problem in Domaine_EF::typer_elem => geometric type : " << type_elem_geom << finl;
       Process::exit();
     }
   type_elem_.typer(type);
@@ -303,15 +303,15 @@ void Domaine_EF::discretiser()
       }
   }
 
-  // Verification de la coherence entre l'element geometrique et
-  //l'elemnt de discretisation
+  // Verification of coherence between the geometric element and
+  // the discretisation element
 
 
   if (sub_type(Segment_EF,type_elem_.valeur()))
     {
       if (!sub_type(Segment,elem_geom))
         {
-          Cerr << " Le type de l'element geometrique " << elem_geom.que_suis_je() << " est incorrect" << finl;
+          Cerr << " The type of geometric element " << elem_geom.que_suis_je() << " is incorrect" << finl;
           exit();
         }
     }
@@ -319,11 +319,11 @@ void Domaine_EF::discretiser()
     {
       if (!sub_type(Triangle,elem_geom))
         {
-          Cerr << " Le type de l'element geometrique " <<
-               elem_geom.que_suis_je() << " est incorrect" << finl;
-          Cerr << " Seul le type Triangle est compatible avec la discretisation EF en dimension 2" << finl;
-          Cerr << " Il faut trianguler le domaine lorsqu'on utilise le mailleur interne" ;
-          Cerr << " en utilisant l'instruction: Trianguler nom_dom" << finl;
+          Cerr << " The type of geometric element " <<
+               elem_geom.que_suis_je() << " is incorrect" << finl;
+          Cerr << " Only the Triangle type is compatible with the EF discretisation in dimension 2" << finl;
+          Cerr << " You must triangulate the domain when using the internal mesher" ;
+          Cerr << " using the instruction: Trianguler nom_dom" << finl;
           exit();
         }
     }
@@ -331,11 +331,11 @@ void Domaine_EF::discretiser()
     {
       if (!sub_type(Tetraedre,elem_geom))
         {
-          Cerr << " Le type de l'element geometrique " <<
-               elem_geom.que_suis_je() << " est incorrect" << finl;
-          Cerr << " Seul le type Tetraedre est compatible avec la discretisation EF en dimension 3" << finl;
-          Cerr << " Il faut tetraedriser le domaine lorsqu'on utilise le mailleur interne";
-          Cerr << " en utilisant l'instruction: Tetraedriser nom_dom" << finl;
+          Cerr << " The type of geometric element " <<
+               elem_geom.que_suis_je() << " is incorrect" << finl;
+          Cerr << " Only the Tetraedre type is compatible with the EF discretisation in dimension 3" << finl;
+          Cerr << " You must tetrahedralise the domain when using the internal mesher";
+          Cerr << " using the instruction: Tetraedriser nom_dom" << finl;
           exit();
         }
     }
@@ -345,7 +345,7 @@ void Domaine_EF::discretiser()
 
       if (!sub_type(Quadrangle_VEF,elem_geom))
         {
-          Cerr << " Le type de l'element geometrique " << elem_geom.que_suis_je() << " est incorrect" << finl;
+          Cerr << " The type of geometric element " << elem_geom.que_suis_je() << " is incorrect" << finl;
           exit();
         }
     }
@@ -354,7 +354,7 @@ void Domaine_EF::discretiser()
 
       if (!sub_type(Hexaedre_VEF,elem_geom))
         {
-          Cerr << " Le type de l'element geometrique " << elem_geom.que_suis_je() << " est incorrect" << finl;
+          Cerr << " The type of geometric element " << elem_geom.que_suis_je() << " is incorrect" << finl;
           exit();
         }
     }
@@ -521,7 +521,7 @@ void Domaine_EF::calculer_Bij(DoubleTab& bij)
                             poigau,detj, ajm1, aj, df,vol,volumes_sommets_,iphi);
           if (!est_egal(volumes_(elem),vol,1e-5))
             {
-              Cerr<<"Erreur volume "<<elem<< " vol: "<<volumes_(elem)<<" new "<<vol<<" delta "<<volumes_(elem)-vol;
+              Cerr<<"Error volume "<<elem<< " vol: "<<volumes_(elem)<<" new "<<vol<<" delta "<<volumes_(elem)-vol;
               exit();
             }
           for (int i=0; i<nbnn; i++)

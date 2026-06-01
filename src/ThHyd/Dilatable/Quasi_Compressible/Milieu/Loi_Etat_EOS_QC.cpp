@@ -26,7 +26,7 @@ Sortie& Loi_Etat_EOS_QC::printOn(Sortie& os) const { return os << que_suis_je() 
 
 Entree& Loi_Etat_EOS_QC::readOn(Entree& is)
 {
-  Cerr << "Lecture de la loi d'etat EOS_QC ... " << finl;
+  Cerr << "Reading the equation of state EOS_QC ... " << finl;
   Loi_Etat_TPPI_QC_base::readOn(is);
 
   TPPI_ = std::make_shared<EOS_to_TRUST_generique>();

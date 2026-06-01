@@ -241,7 +241,7 @@ double Sortie_libre_Gradient_Pression_libre_VEFPreP1B::Grad_P_lib_VEFPreP1B(int 
   else if (le_champ_front->valeurs().dimension(1) == 1)
     return le_champ_front->valeurs()(face, 0) / d_rho;
   else
-    Cerr << "Sortie_libre_Gradient_Pression_libre_VEFPreP1B::Grad_P_lib_VEFPreP1B() erreur" << finl;
+    Cerr << "Sortie_libre_Gradient_Pression_libre_VEFPreP1B::Grad_P_lib_VEFPreP1B() error" << finl;
   exit();
   return 0.;
 }

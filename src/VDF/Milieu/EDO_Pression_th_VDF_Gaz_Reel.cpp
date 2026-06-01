@@ -123,7 +123,7 @@ double EDO_Pression_th_VDF_Gaz_Reel::resoudre(double Pth_n)
             }
         }
       Pth = Pth_n + dt / V * (S - .5 * (Fn + Fnp1));
-      Cerr << "Pression thermo recalculee (impl" << k << ") = " << Pth << finl;
+      Cerr << "Recomputed thermodynamic pressure (iter " << k << ") = " << Pth << finl;
     }
   return Pth;
 }

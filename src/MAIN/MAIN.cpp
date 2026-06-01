@@ -70,12 +70,12 @@ int main_TRUST(int argc, char** argv,mon_main*& main_process,bool with_mpi, bool
 #ifdef VTRACE
   //VT_USER_END("Initialization");
 #endif
-  // Attention: on n'a pas le droit d'utiliser les communications paralleles au debut.
-  // Cerr et Cout sont OK (variables statiques dans Journal_log_files.cpp)
-  // Le journal peut etre utilise mais ecrit dans Sortie_Nulle jusqu'a ce qu'on ouvre
-  // les fichiers (voir Journal_log_files.cpp)
+  // Warning: parallel communications must not be used at this early stage.
+  // Cerr and Cout are OK (static variables in Journal_log_files.cpp)
+  // The journal can be used but writes to Sortie_Nulle until the log files are opened
+  // (see Journal_log_files.cpp)
   //
-  // Voir <PARALLEL_OK>
+  // See <PARALLEL_OK>
 
   // *************** Process command-line arguments ********************
   int check_enabled = DEFAULT_CHECK_ENABLED;
@@ -244,9 +244,9 @@ int main_TRUST(int argc, char** argv,mon_main*& main_process,bool with_mpi, bool
         {
           //error = 1;
         }
-      //if (i==1) Cerr << "Arguments lus: " << argv[0];
+      //if (i==1) Cerr << "Arguments read: " << argv[0];
       //Cerr << " " << argv[i];
-      /* PL: Je desactive car MPICH rajoute des arguments derriere le nombre de processeurs:
+      /* PL: Disabled because MPICH appends arguments after the number of processors:
          ... TRUST_mpich_opt jdd 2 -p4pg .../PINNNN -p4wd pathname
          if (error) {
          Cerr << "TRUST error processing command line, argument " << i << " : \n "
@@ -365,8 +365,8 @@ int main_TRUST(int argc, char** argv,mon_main*& main_process,bool with_mpi, bool
 
         if (master)
           {
-            Cerr<<"Localisation etude: " << ::pwd() << finl;
-            Cerr<<"Nom du cas " << data_file << finl;
+            Cerr<<"Study location: " << ::pwd() << finl;
+            Cerr<<"Case name: " << data_file << finl;
             Cerr<<" code : "<< argv[0] << finl;
             Cerr<<" version : " << TRUST_VERSION << " " << finl;
           }
@@ -377,7 +377,7 @@ int main_TRUST(int argc, char** argv,mon_main*& main_process,bool with_mpi, bool
 
     if (master)
       {
-        Cerr << "Arret des processes." << finl;
+        Cerr << "Stopping processes." << finl;
 #ifndef NDEBUG
         Cerr << finl;
         Cerr << "DEBUG: Statistics for Trav arrays (int): " << finl;

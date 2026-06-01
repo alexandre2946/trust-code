@@ -844,7 +844,7 @@ void Navier_Stokes_std::projeter()
       double bilan=mp_norme_vect(secmem); // TODO DG surcharger cette fonction pour avoir \sum \int_T || \sum_{nfunc_p} secmem*fbase_p ||
       Cout << "-------------  Projection  -----------------" << finl;
       Cout << "--------------------------------------------" << finl;
-      Cout << "Bilan de masse avant projection : " << bilan << finl;
+      Cout << "Mass balance before projection : " << bilan << finl;
 
       if( sub_type(solv_iteratif,solveur_pression_.valeur()) )
         {
@@ -882,12 +882,12 @@ void Navier_Stokes_std::projeter()
 
       Debog::verifier("Navier_Stokes_std::projeter, vitesse", tab_vitesse);
 
-      // Verif ...
+      // Verification...
       divergence.calculer(tab_vitesse, secmem);
       secmem.echange_espace_virtuel();
 
       bilan=mp_norme_vect(secmem);
-      Cout << "Bilan de masse apres projection : " << bilan << finl;
+      Cout << "Mass balance after projection : " << bilan << finl;
       Cout << "-------------  Projection  OK---------------" << finl;
       Cout << "--------------------------------------------" << finl;
 
@@ -942,24 +942,23 @@ int Navier_Stokes_std::preparer_calcul()
       assembleur_pression_->assembler_QC(fluide().masse_volumique().valeurs(), matrice_pression_);
     }
 
-  // GF en cas de reprise on conserve la valeur de la pression
-  // avant elle ne servait qu' a initialiser le lagrange pour la projection
-  // C'est important pour le Simpler/Piso de bien repartir de la pression
-  // sauvegardee...
+  // GF: on restart, we preserve the pressure value.
+  // Previously it was only used to initialize the lagrange for the projection.
+  // It is important for Simpler/Piso to restart from the saved pressure.
   //la_pression->valeurs()=0.;
   Debog::verifier("Navier_Stokes_std::preparer_calcul, la_pression av projeter", la_pression->valeurs());
   if (projection_a_faire())
     projeter();
 
-  // Au cas ou une cl de pression depend de u que l'on vient de modifier
+  // In case a pressure boundary condition depends on u that was just modified
   le_dom_Cl_dis->mettre_a_jour(temps);
   Debog::verifier("Navier_Stokes_std::preparer_calcul, la_pression ap projeter", la_pression->valeurs());
 
-  // Initialisation du champ de pression (resolution de Laplacien(P)=0 avec les conditions limites en pression)
-  // Permet de demarrer la resolution avec une bonne approximation de la pression (important pour le Piso ou P!=0)
+  // Initialization of the pressure field (solving Laplacian(P)=0 with pressure boundary conditions)
+  // Allows starting the resolution with a good pressure approximation (important for Piso or P!=0)
   if (!probleme().reprise_effectuee() && methode_calcul_pression_initiale_ != 3)
     {
-      Cout << "Estimation du champ de pression au demarrage:" << finl;
+      Cout << "Estimation of the pressure field at startup:" << finl;
       DoubleTrav secmem(la_pression->valeurs());
       DoubleTrav vpoint(gradient_P->valeurs());
       gradient.calculer(la_pression->valeurs(), gradient_P->valeurs());

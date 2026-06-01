@@ -212,14 +212,14 @@ void VEF_discretisation::discretiser_champ_(const Motcle& directive, const Domai
     type_champ_vitesse = "Champ_Q1NC";
   else
     {
-      Cerr << "VEF_discretisation::discretiser_champ :\n L'element geometrique ";
+      Cerr << "VEF_discretisation::discretiser_champ :\n The geometric element ";
       Cerr << domaine_vef.type_elem().que_suis_je();
-      Cerr << " n'est pas supporte." << finl;
+      Cerr << " is not supported." << finl;
       exit();
     }
 
   Nom type;
-  int default_nb_comp = 0; // Valeur par defaut du nombre de composantes
+  int default_nb_comp = 0; // Default number of components
   int rang = motcles.search(directive);
   switch(rang)
     {
@@ -411,15 +411,15 @@ void VEF_discretisation::discretiser_champ_fonc_don_(const Motcle& directive, co
         }
       else
         {
-          Cerr << "VEF_discretisation::discretiser_champ :\n L'element geometrique ";
+          Cerr << "VEF_discretisation::discretiser_champ :\n The geometric element ";
           Cerr << elem_vef.que_suis_je();
-          Cerr << " n'est pas supporte." << finl;
+          Cerr << " is not supported." << finl;
           exit();
         }
     }
 
   Nom type;
-  int default_nb_comp = 0; // Valeur par defaut du nombre de composantes
+  int default_nb_comp = 0; // Default number of components
   int rang = motcles.search(directive);
   switch(rang)
     {
@@ -509,7 +509,7 @@ void VEF_discretisation::discretiser_champ_fonc_don_(const Motcle& directive, co
 
 void VEF_discretisation::distance_paroi(const Schema_Temps_base& sch, Domaine_dis_base& z, OWN_PTR(Champ_Fonc_base)& ch) const
 {
-  Cerr << "Discretisation de la distance paroi" << finl;
+  Cerr << "Discretization of the wall distance" << finl;
   Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, z);
   ch.typer("Champ_Fonc_P0_VEF");
   Champ_Fonc_P0_VEF& ch_dist_paroi = ref_cast(Champ_Fonc_P0_VEF, ch.valeur());
@@ -523,7 +523,7 @@ void VEF_discretisation::distance_paroi(const Schema_Temps_base& sch, Domaine_di
 
 void VEF_discretisation::distance_paroi_globale(const Schema_Temps_base& sch, Domaine_dis_base& z, OWN_PTR(Champ_Fonc_base)& ch) const
 {
-  Cerr << "Discretisation de distance paroi globale" << finl;
+  Cerr << "Discretization of global wall distance" << finl;
   Noms noms(1), unites(1);
   noms[0] = Nom("distance_paroi_globale");
   unites[0] = Nom("m");
@@ -532,7 +532,7 @@ void VEF_discretisation::distance_paroi_globale(const Schema_Temps_base& sch, Do
 
 void VEF_discretisation::vorticite(Domaine_dis_base& z, const Champ_Inc_base& ch_vitesse, OWN_PTR(Champ_Fonc_base)& ch) const
 {
-  Cerr << "Discretisation de la vorticite " << finl;
+  Cerr << "Discretization of vorticity " << finl;
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, z);
 
   if (sub_type(Tri_VEF,domaine_VEF.type_elem()) || sub_type(Tetra_VEF, domaine_VEF.type_elem()))
@@ -579,7 +579,7 @@ void VEF_discretisation::vorticite(Domaine_dis_base& z, const Champ_Inc_base& ch
     }
   else
     {
-      Cerr << "Pb dans le typage des elements dans VEF_discretisation::vorticite" << finl;
+      Cerr << "Problem in element typing in VEF_discretisation::vorticite" << finl;
       exit();
     }
 }
@@ -632,50 +632,50 @@ void VEF_discretisation::creer_champ_vorticite(const Schema_Temps_base& sch, con
     }
   else
     {
-      Cerr << "Pb dans le typage des elements dans VEF_discretisation::creer_champ_vorticite" << finl;
+      Cerr << "Problem in element typing in VEF_discretisation::creer_champ_vorticite" << finl;
       exit();
     }
 }
 
-/*! @brief discretise en VEF le fluide incompressible, donc  K e N
+/*! @brief Discretizes the incompressible fluid in VEF, specifically K and N.
  *
- * @param (Domaine_dis_base&) domaine a discretiser
- * @param (Fluide_Ostwald&) fluide a discretiser
- * @param (Champ_Inc_base&) vitesse
+ * @param (Domaine_dis_base&) domain to discretize
+ * @param (Fluide_Ostwald&) fluid to discretize
+ * @param (Champ_Inc_base&) velocity
  * @param (Champ_Inc_base&) temperature
  */
 void VEF_discretisation::proprietes_physiques_fluide_Ostwald(const Domaine_dis_base& z, Fluide_Ostwald& le_fluide, const Navier_Stokes_std& eqn_hydr, const Champ_Inc_base& ch_temper) const
 {
-  Cerr << "Discretisation VEF du fluide_Ostwald" << finl;
+  Cerr << "VEF discretization of the Ostwald fluid" << finl;
   const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, z);
   const Champ_Inc_base& ch_vitesse = eqn_hydr.inconnue();
   const Champ_P1NC& vit = ref_cast(Champ_P1NC, ch_vitesse);
 
   Champ_Don_base& mu = le_fluide.viscosite_dynamique();
-  //  mu est toujours un champ_Ostwald_VEF , il faut toujours faire ce qui suit
+  //  mu is always a champ_Ostwald_VEF, the following must always be done
   Champ_Ostwald_VEF& ch_mu = ref_cast(Champ_Ostwald_VEF, mu);
-  Cerr << "associe domainedisbase VEF" << finl;
+  Cerr << "associate domainedisbase VEF" << finl;
   ch_mu.associer_domaine_dis_base(domaine_vef);
   ch_mu.associer_fluide(le_fluide);
   ch_mu.associer_champ(vit);
   ch_mu.associer_eqn(eqn_hydr);
-  Cerr << "associations finies domaine dis base, fluide, champ VEF" << finl;
+  Cerr << "associations completed: domain dis base, fluid, field VEF" << finl;
   ch_mu.fixer_nb_comp(1);
 
-  Cerr << "fait fixer_nb_valeurs_nodales" << finl;
+  Cerr << "done fixer_nb_valeurs_nodales" << finl;
   Cerr << "nb_valeurs_nodales VEF = " << domaine_vef.nb_elem() << finl;
   ch_mu.fixer_nb_valeurs_nodales(domaine_vef.nb_elem());
 
-  Cerr << "fait changer_temps" << finl;
+  Cerr << "done changer_temps" << finl;
   ch_mu.changer_temps(vit.temps());
-  Cerr << "mu VEF est discretise " << finl;
+  Cerr << "mu VEF is discretized " << finl;
 }
 
 void VEF_discretisation::critere_Q(const Domaine_dis_base& z, const Domaine_Cl_dis_base& zcl, const Champ_Inc_base& ch_vitesse, OWN_PTR(Champ_Fonc_base)& ch) const
 {
-  // On passe la zcl, pour qu'il n y ait qu une methode qqsoit la dsicretisation
-  // mais on ne s'en sert pas!!!
-  Cerr << "Discretisation du critere Q " << finl;
+  // We pass zcl so there is only one method regardless of the discretization,
+  // but it is not used here!!!
+  Cerr << "Discretization of Q criterion " << finl;
   const Champ_P1NC& vit = ref_cast(Champ_P1NC, ch_vitesse);
   const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, z);
   ch.typer("Critere_Q_Champ_P1NC");
@@ -691,7 +691,7 @@ void VEF_discretisation::critere_Q(const Domaine_dis_base& z, const Domaine_Cl_d
 
 void VEF_discretisation::y_plus(const Domaine_dis_base& z, const Domaine_Cl_dis_base& zcl, const Champ_Inc_base& ch_vitesse, OWN_PTR(Champ_Fonc_base)& ch) const
 {
-  Cerr << "Discretisation de y_plus" << finl;
+  Cerr << "Discretization of y_plus" << finl;
   const Champ_P1NC& vit = ref_cast(Champ_P1NC, ch_vitesse);
   const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, z);
   const Domaine_Cl_VEF& domaine_cl_vef = ref_cast(Domaine_Cl_VEF, zcl);
@@ -709,7 +709,7 @@ void VEF_discretisation::y_plus(const Domaine_dis_base& z, const Domaine_Cl_dis_
 
 void VEF_discretisation::t_paroi(const Domaine_dis_base& z,const Domaine_Cl_dis_base& zcl, const Champ_Inc_base& ch_temp, OWN_PTR(Champ_Fonc_base)& ch) const
 {
-  Cerr << "Discretisation de temperature_paroi" << finl;
+  Cerr << "Discretization of temperature_paroi" << finl;
   const Champ_P1NC& temp = ref_cast(Champ_P1NC, ch_temp);
   const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, z);
   const Domaine_Cl_VEF& domaine_cl_vef = ref_cast(Domaine_Cl_VEF, zcl);
@@ -769,7 +769,7 @@ void VEF_discretisation::grad_u(const Domaine_dis_base& z, const Domaine_Cl_dis_
 
 void VEF_discretisation::grad_T(const Domaine_dis_base& z, const Domaine_Cl_dis_base& zcl, const Champ_Inc_base& ch_temperature, OWN_PTR(Champ_Fonc_base)& ch) const
 {
-  Cerr << "Discretisation de gradient_temperature" << finl;
+  Cerr << "Discretization of gradient_temperature" << finl;
 
   const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, z);
   creer_champ(ch, domaine_vef, "gradient_temperature_Champ_P1NC", "gradient_temperature", "K/m", dimension, domaine_vef.nb_elem(), ch_temperature.temps());
@@ -783,7 +783,7 @@ void VEF_discretisation::grad_T(const Domaine_dis_base& z, const Domaine_Cl_dis_
 
 void VEF_discretisation::h_conv(const Domaine_dis_base& z, const Domaine_Cl_dis_base& zcl, const Champ_Inc_base& ch_temperature, OWN_PTR(Champ_Fonc_base)& ch, Motcle& nom, int temp_ref) const
 {
-  Cerr << "Discretisation de h_conv" << finl;
+  Cerr << "Discretization of h_conv" << finl;
   const Champ_P1NC& temp = ref_cast(Champ_P1NC, ch_temperature);
   const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, z);
   const Domaine_Cl_VEF& domaine_cl_vef = ref_cast(Domaine_Cl_VEF, zcl);

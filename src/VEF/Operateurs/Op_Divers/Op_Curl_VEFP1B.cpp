@@ -53,7 +53,7 @@ DoubleTab& Op_Curl_VEFP1B::ajouter(const DoubleTab& vitesse, DoubleTab& curl) co
   //int prems=domaine_VEF.premiere_face_int();
   if (dimension != 2)
     {
-      Cerr << "Pour l'instant seule la 2D est etudiee. " << finl;
+      Cerr << "Only 2D is supported at the moment. " << finl;
       Process::exit();
     }
 
@@ -158,21 +158,21 @@ DoubleTab& Op_Curl_VEFP1B::ajouter(const DoubleTab& vitesse, DoubleTab& curl) co
                     curl(domaine.nb_elem() + numero_som) += pow(-1., modulo) * 1. / (dimension * (dimension + 1)) * vitesse(face_globale, composante) * vecteur_normal1(modulo);
                   }
 
-              } // fin du if
+              } // end if
 
-            } // fin du for num_loc_face
+            } // end for num_loc_face
 
-          /* Pour le moment, on ne travaille que sur des vitesse H10 */
-          /* C'est le travail de these */
-          /* Par consequent, inutile de traiter les faces du bord */
+          /* For now, we only work with H10 velocities */
+          /* This is the subject of the thesis */
+          /* Consequently, no need to treat boundary faces */
 
-        } // fin du for num_loc_elem
+        } // end for num_loc_elem
 
-      Cerr << "Sommet curl(" << numero_som << ") " << curl(domaine.nb_elem() + numero_som) << finl;
+      Cerr << "Vertex curl(" << numero_som << ") " << curl(domaine.nb_elem() + numero_som) << finl;
 
-    } // fin du for sur les sommets
+    } // end for over vertices
 
-  Cerr << "je sors de OpCurl" << finl;
+  Cerr << "exiting OpCurl" << finl;
 
   return curl;
 }

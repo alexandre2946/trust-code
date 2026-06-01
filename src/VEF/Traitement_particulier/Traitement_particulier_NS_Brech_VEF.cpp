@@ -89,7 +89,7 @@ Entree& Traitement_particulier_NS_Brech_VEF::lire(Entree& is)
                 is >> motbidon ;
                 if (motbidon != accouverte)
                   {
-                    Cerr << " on attent { et pas " << motbidon << finl ;
+                    Cerr << " expected { instead of " << motbidon << finl ;
                   }
 
                 is >> nb ;
@@ -104,7 +104,7 @@ Entree& Traitement_particulier_NS_Brech_VEF::lire(Entree& is)
                 for (int i=0; i<nb; i++)
                   {
 
-                    Cerr << " Lire plan de coupe en x " << finl;
+                    Cerr << " Reading cross-section plane in x " << finl;
 
                     is >> R_loc(i,0) ;
 
@@ -132,14 +132,14 @@ Entree& Traitement_particulier_NS_Brech_VEF::lire(Entree& is)
                 is >> motbidon ;
                 if (motbidon != accfermee)
                   {
-                    Cerr << " on attent } et pas " << motbidon << finl ;
+                    Cerr << " expected } instead of " << motbidon << finl ;
                   }
                 break ;
 
               }
             case 1 :
               {
-                Cerr << " Lire Richardson " << finl;
+                Cerr << " Reading Richardson " << finl;
                 const Domaine_dis_base& zdis=mon_equation->inconnue().domaine_dis_base();
                 const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdis);
                 //                  const Probleme_base& pb = mon_equation->probleme();
@@ -157,7 +157,7 @@ Entree& Traitement_particulier_NS_Brech_VEF::lire(Entree& is)
               }
             case 2 :
               {
-                Cerr << " Lire Pression_porosite " << finl;
+                Cerr << " Reading Pression_porosite " << finl;
                 const Domaine_dis_base& zdis=mon_equation->inconnue().domaine_dis_base();
                 const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdis);
                 //                  const Probleme_base& pb = mon_equation->probleme();
@@ -180,9 +180,9 @@ Entree& Traitement_particulier_NS_Brech_VEF::lire(Entree& is)
                   }
                 else
                   {
-                    Cerr << "Erreur dans la lecture de Traitement_particulier_Brech_VEF" << finl;
-                    Cerr << "Les mots cles possibles sont : calcul_flux ou Richardson " << finl;
-                    Cerr << "Vous avez lu :" << motlu << finl;
+                    Cerr << "Error in reading Traitement_particulier_Brech_VEF" << finl;
+                    Cerr << "Possible keywords are: calcul_flux or Richardson " << finl;
+                    Cerr << "Read keyword: " << motlu << finl;
                     exit();
                     break;
                   }
@@ -192,22 +192,22 @@ Entree& Traitement_particulier_NS_Brech_VEF::lire(Entree& is)
       is >> motlu;
       if (motlu != accfermee)
         {
-          Cerr << "Erreur dans la lecture de Traitement_particulier_NS_Brech_VEF 1 ";
-          Cerr << "On attendait une } et pas " << motlu << finl;
+          Cerr << "Error reading Traitement_particulier_NS_Brech_VEF 1 ";
+          Cerr << "Expected a } but got " << motlu << finl;
           exit();
         }
       //         is >> motlu;
       //         if (motlu != accfermee)
       //           {
-      //             Cerr << "Erreur dans la lecture de Traitement_particulier_NS_Brech_VEF 2 ";
-      //             Cerr << "On attendait une } et pas " << motlu << finl;
+      //             Cerr << "Error reading Traitement_particulier_NS_Brech_VEF 2 ";
+      //             Cerr << "Expected a } but got " << motlu << finl;
       //             exit();
       //           }
       //         is >> motlu;
       //         if (motlu != accfermee)
       //           {
-      //             Cerr << "Erreur dans la lecture de Traitement_particulier_NS_Brech_VEF 3 ";
-      //             Cerr << "On attendait une } et pas " << motlu << finl;
+      //             Cerr << "Error reading Traitement_particulier_NS_Brech_VEF 3 ";
+      //             Cerr << "Expected a } but got " << motlu << finl;
       //             exit();
       //           }
     }
@@ -360,16 +360,16 @@ void Traitement_particulier_NS_Brech_VEF::post_traitement_particulier_calcul_flu
         {
           Cout << finl ;
           Cout << " ----------------------- " << finl ;
-          Cout << " Traitement_particulier flux en x (Plan Oyz) a: "<<  R_loc(ii,0) << " "
+          Cout << " Traitement_particulier flux in x (Plane Oyz) at: "<<  R_loc(ii,0) << " "
                <<  R_loc(ii,1) << " "
                <<  R_loc(ii,2) << finl ;
-          Cout << " angle de la normale du plan par rapport a x = " << anglex/3.1415*180. << " (deg) " << finl ;
+          Cout << " angle of the plane normal with respect to x = " << anglex/3.1415*180. << " (deg) " << finl ;
           Cout << " flux_pos = " << flux_pos << " flux_neg = " << flux_neg << " (kg/s) " << finl ;
           Cout << " fluxEnthalpique_pos = " << fluxE_pos << " fluxEnthalpique_neg = " << fluxE_neg << " (Watts) " << finl ;
-          Cout << " masse volumique moyenne sur le plan de coupe : " << massvol << finl ;
-          Cout << " temperature moyenne     sur le plan de coupe : " << tempmoy << finl ;
+          Cout << " average mass density on the cross-section plane: " << massvol << finl ;
+          Cout << " average temperature    on the cross-section plane: " << tempmoy << finl ;
         }
-      // Fin Modifs VB
+      // End VB modifications
     }
 }
 
@@ -463,19 +463,19 @@ void Traitement_particulier_NS_Brech_VEF::post_traitement_particulier_calcul_pre
     }
 
   divergence.calculer(grad_temp, secmem);
-  secmem *= -1; // car div =-B
+  secmem *= -1; // because div = -B
   solveur_pression_.resoudre_systeme(mon_equation->matrice_pression().valeur(),secmem, inc_pre);
 
   DoubleVect& la_pression_porosite = ch_p.valeurs();
   la_pression_porosite = inc_pre ;
-  Cerr << "la_pression " << mon_equation->pression().valeurs() << finl;
+  Cerr << "pressure " << mon_equation->pression().valeurs() << finl;
   Cerr << "ch_p.valeurs() " << ch_p.valeurs() << finl;
 }
 
 
 ////////////////////////////////////////////////////////////////////////////
 //
-//    Implementation des fonctions de la classe Calcul_Production_K_VEF
+//    Implementation of member functions of class Calcul_Production_K_VEF
 //
 /////////////////////////////////////////////////////////////////////////////
 

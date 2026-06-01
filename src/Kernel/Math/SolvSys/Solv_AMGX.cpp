@@ -82,7 +82,7 @@ void Solv_AMGX::Create_objects(const Matrice_Morse& mat_morse, int blocksize)
   //SolveurAmgX_.setA(nRowsGlobal, nRowsLocal, nNz, rowOffsets, colIndices, values, nullptr);
   SolveurAmgX_.setA(nRowsGlobal, nRowsLocal, nNz, rowOffsets, colIndices, values_device, nullptr);
   //cudaFree(values_device);delete[] hostArray;
-  Cout << "[AmgX] Time to set matrix (copy+setup) on GPU: " << statistics().get_time_since_last_open(STD_COUNTERS::gpu_copytodevice) << finl;// Attention balise lue par fiche de validation
+  Cout << "[AmgX] Time to set matrix (copy+setup) on GPU: " << statistics().get_time_since_last_open(STD_COUNTERS::gpu_copytodevice) << finl;// Note: this tag is read by the validation sheet
   statistics().end_count(STD_COUNTERS::gpu_copytodevice, 1, static_cast<int>(sizeof(int) * (nRowsLocal + nNz) + sizeof(double) * nNz));
 }
 
@@ -158,10 +158,10 @@ PetscErrorCode Solv_AMGX::petscToCSR(Mat& A, Vec& lhs_petsc, Vec& rhs_petsc)
 
 void Solv_AMGX::Update_matrix(Mat& MatricePetsc, const Matrice_Morse& mat_morse)
 {
-  // La matrice CSR de PETSc a ete mise a jour dans check_stencil
+  // The PETSc CSR matrix has been updated in check_stencil
   statistics().begin_count(STD_COUNTERS::gpu_copytodevice,statistics().get_last_opened_counter_level()+1);
-  SolveurAmgX_.updateA(nRowsLocal, nNz, values);  // ToDo erreur valgrind au premier appel de updateA...
-  Cout << "[AmgX] Time to update matrix (copy+resetup) on GPU: " << statistics().get_time_since_last_open(STD_COUNTERS::gpu_copytodevice) << finl; // Attention balise lue par fiche de validation
+  SolveurAmgX_.updateA(nRowsLocal, nNz, values);  // ToDo valgrind error on first call to updateA...
+  Cout << "[AmgX] Time to update matrix (copy+resetup) on GPU: " << statistics().get_time_since_last_open(STD_COUNTERS::gpu_copytodevice) << finl; // Note: this tag is read by the validation sheet
   statistics().end_count(STD_COUNTERS::gpu_copytodevice, 1, sizeof(double)*nNz);
 }
 

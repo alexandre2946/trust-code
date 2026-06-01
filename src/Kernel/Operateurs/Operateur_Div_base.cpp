@@ -42,7 +42,7 @@ Entree& Operateur_Div_base::readOn(Entree& is)
 
 DoubleVect& Operateur_Div_base::multvect(const DoubleTab& x, DoubleTab& b) const
 {
-  //Cerr << que_suis_je()<<"::multvect n'est surcharge!!" << finl;
+  //Cerr << que_suis_je()<<"::multvect is not overridden!!" << finl;
   DoubleTrav x0(x);
   DoubleTrav b0(b);
   calculer(x0, b0);

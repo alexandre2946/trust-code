@@ -247,10 +247,10 @@ void Impl_32_64<_SIZE_>::create_listb_from_xyz(const Domaine_t& dom, const Noms&
               //faces_associees.dimensionner_force(nb+1);
 
               faces_associees[face_min].append_array(face1);
-              //Cerr << face1 << " associee a " << face_min << finl;
+              //Cerr << face1 << " associated with " << face_min << finl;
             }
 
-          for (int face2=0; face2<nb+1; face2++) // Ecriture des fichiers de sortie
+          for (int face2=0; face2<nb+1; face2++) // Write output files
             {
               Nom nomfic(nomfr1);
               nomfic+="%";
@@ -301,7 +301,7 @@ void Impl_32_64<_SIZE_>::create_listb_naif(const Domaine_t& dom, const Noms& nom
               if ((nb*nc)<nbfaces) nc++;
               //Cerr<<"nc "<<nc<<finl;
               Cerr<<nomfr<<" splitting in "<<nb<<" parts, average number of faces "<<nbfaces/(1.*nb)<<finl;
-              //  Cerr<<"nombre moyen de faces  "<<nc<<" bord decoupe "<<nomfr<<" en "<<nbfaces/nc<<" parties"<<finl;
+              //  Cerr<<"average number of faces  "<<nc<<" boundary split "<<nomfr<<" into "<<nbfaces/nc<<" parts"<<finl;
               for (int i=0; i<nb; i++)
                 {
                   if (i==nb-1) nc=nbfaces-compt;

@@ -132,8 +132,8 @@ void Rayo_semi_transp_solver_VDF::modifier_matrice()
             }
           else
             {
-              Cerr << "Erreur dans Rayo_semi_transp_solver_VDF::modifier_matrice()" << finl;
-              Cerr << "la frontiere associee a la_cl ne derive pas de Front_VF" << finl;
+              Cerr << "Error in Rayo_semi_transp_solver_VDF::modifier_matrice()" << finl;
+              Cerr << "the boundary associated with la_cl does not derive from Front_VF" << finl;
               Process::exit();
             }
         }
@@ -160,17 +160,17 @@ void Rayo_semi_transp_solver_VDF::assembler_matrice()
 
   matrice.clean();
 
-  // Prise en compte de la partie div((1/3K)grad(irradiance)) dans la matrice de discretisation.
+  // Account for the div((1/3K)grad(irradiance)) part in the discretization matrix.
   terme_diffusif->contribuer_a_avec(irradi, matrice);
 
-  // Modification de la matrice pour prendre en compte le second membre en K*irradiance
+  // Modify the matrix to account for the right-hand side term K*irradiance
   const DoubleTab& kappa = fluide.kappa().valeurs();
 
-  // on verifie
+  // verify
   if (matrice.ordre() != nb_elem_tot)
     Process::exit();
 
-  Cerr << "Ordre de la matrice OK" << finl;
+  Cerr << "Matrix order OK" << finl;
   assert(fluide.kappa().nb_comp() == 1);
 
   double k = -123.;
@@ -254,8 +254,8 @@ void Rayo_semi_transp_solver_VDF::resoudre(double temps)
       }
     else
       {
-        Cerr << "Erreur dans Rayo_semi_transp_solver_VDF::resoudre() ! On ne peut pas resoudre l'equation" << finl;
-        Cerr << "de rayonnement semi transparent avec le solveur : " << solveur->que_suis_je() << "car kappa n'est pas constant, donc, la_matrice n'est pas symetrique" << finl;
+        Cerr << "Error in Rayo_semi_transp_solver_VDF::resoudre()! Cannot solve the equation" << finl;
+        Cerr << "of semi-transparent radiation with the solver: " << solveur->que_suis_je() << " because kappa is not constant, therefore the matrix is not symmetric" << finl;
         Process::exit();
       }
   else if (solveur->que_suis_je() == "Solv_Gmres")
@@ -263,15 +263,15 @@ void Rayo_semi_transp_solver_VDF::resoudre(double temps)
       solveur.resoudre_systeme(matrice, secmem, eq_rayo.inconnue().valeurs());
     else
       {
-        Cerr << "Erreur dans Rayo_semi_transp_solver_VDF::resoudre() ! On ne peut pas resoudre un probleme" << finl;
-        Cerr << "de rayonnement semi transparent en parallele en utilisant le solveur Solv_Gmres. Si vous traitez" << finl;
-        Cerr << "un probleme avec kappa constant, vous contournerez cette limitation en utilisant le solveur GCP avec un preconditionnement GCP" << finl;
+        Cerr << "Error in Rayo_semi_transp_solver_VDF::resoudre()! Cannot solve a problem" << finl;
+        Cerr << "of semi-transparent radiation in parallel using the Solv_Gmres solver. If you treat" << finl;
+        Cerr << "a problem with constant kappa, you can bypass this limitation by using the GCP solver with GCP preconditioning" << finl;
         Process::exit();
       }
   else
     {
-      Cerr << "Erreur dans Rayo_semi_transp_solver_VDF::resoudre() ! On ne peut pas utiliser le solveur : " << solveur->que_suis_je() << finl;
-      Cerr << "pour resoudre l'equation de rayonnement dans un probleme de rayonnement semi transparent" << finl;
+      Cerr << "Error in Rayo_semi_transp_solver_VDF::resoudre()! Cannot use the solver: " << solveur->que_suis_je() << finl;
+      Cerr << "to solve the radiation equation in a semi-transparent radiation problem" << finl;
       Process::exit();
     }
 
@@ -351,15 +351,15 @@ void Rayo_semi_transp_solver_VDF::evaluer_cl_rayonnement(double temps)
                     }
                   else
                     {
-                      Cerr << "Erreur dans Rayo_semi_transp_solver_VDF::evaluer_cl_rayonnement ! Le cas d'une CL thermique " << la_cl_temp->que_suis_je() << " n'est pas code" << finl;
+                      Cerr << "Error in Rayo_semi_transp_solver_VDF::evaluer_cl_rayonnement! The case of a thermal BC " << la_cl_temp->que_suis_je() << " is not implemented" << finl;
                       Process::exit();
                     }
                 }
             }
 
-          // On n'a pas remplie le tableau des temperatures de bord !!!!
+          // The boundary temperature array was not filled!!!!
           if (test_remplissage_Tb == 0)
-            Cerr << "Rayo_semi_transp_solver_VDF::evaluer_cl_rayonnement -- On n'a pas remplie le tableau des temperatures de bord !!!!" << finl;
+            Cerr << "Rayo_semi_transp_solver_VDF::evaluer_cl_rayonnement -- The boundary temperature array was not filled!!!!" << finl;
 
           const Domaine_VF& zvf = ref_cast(Domaine_VF, eq_rayo.domaine_dis());
           la_cl_rayon.evaluer_cl_rayonnement(Tb.valeur(), fluide.kappa(), fluide.longueur_rayo(), fluide.indice(), zvf, eq_rayo.pb_rayo_semi_transp().valeur_sigma(), temps);
@@ -370,7 +370,7 @@ void Rayo_semi_transp_solver_VDF::evaluer_cl_rayonnement(double temps)
         }
       else
         {
-          Cerr << "La condition a la limite " << la_cl_rayo->que_suis_je() << " n'est pas connue pour l'equation de rayonnement !" << finl;
+          Cerr << "The boundary condition " << la_cl_rayo->que_suis_je() << " is not recognized for the radiation equation!" << finl;
           Process::exit();
         }
     }

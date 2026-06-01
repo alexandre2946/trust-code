@@ -81,8 +81,8 @@ Postraitement::Postraitement():
 
 Postraitement::~Postraitement()
 {
-  //Cerr<<"remise a zero des noms des sondes" <<finl;
-  // quand on detruit un postraitement on detruit la liste des noms des sondes pour pouvoir refaire initialize
+  //Cerr<<"reset probe file names" <<finl;
+  // when a post-processing object is destroyed, the probe file name list is cleared so that initialize can be called again
   Postraitement::noms_fichiers_sondes_=LIST(Nom)();
 }
 

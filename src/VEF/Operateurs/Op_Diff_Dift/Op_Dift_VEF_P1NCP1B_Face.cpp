@@ -96,7 +96,7 @@ DoubleTab& Op_Dift_VEF_P1NCP1B_Face::calculer_gradient_som(const DoubleTab& vit,
 
   if (masse.nb_lignes() < 2)
     {
-      Cerr << "On remplit la matrice de masse" << finl;
+      Cerr << "Fill the mass matrix" << finl;
       (ref_cast_non_const(DoubleTab, savgrad)).resize(nb_som, dimension, dimension);
       Matrice_Morse_Sym& mat = ref_cast_non_const(Matrice_Morse_Sym, masse);
       int rang;
@@ -178,7 +178,7 @@ DoubleTab& Op_Dift_VEF_P1NCP1B_Face::calculer_gradient_som(const DoubleTab& vit,
               secmem(som, compi, compj) += coeff_som * signe * sigma[compi] * face_normales(face, compj);
         }
     }
-  //Cerr << "Avant CL secmem = " << secmem << finl;
+  //Cerr << "Before BC secmem = " << secmem << finl;
   const Domaine_Cl_VEF& domaine_Cl_VEF = domaine_cl_vef();
   const Conds_lim& les_cl = domaine_Cl_VEF.les_conditions_limites();
   const IntTab& face_sommets = domaine_VEF.face_sommets();
@@ -205,7 +205,7 @@ DoubleTab& Op_Dift_VEF_P1NCP1B_Face::calculer_gradient_som(const DoubleTab& vit,
           }
       }
     }
-  //Cerr << "Apres CL secmem = " << secmem << finl;
+  //Cerr << "After BC secmem = " << secmem << finl;
   double coeff = 1. / (dimension + 1.);
   {
     DoubleVect secmemij;

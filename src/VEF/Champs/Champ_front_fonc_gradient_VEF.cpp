@@ -33,14 +33,14 @@ Entree& Champ_front_fonc_gradient_VEF::readOn(Entree& s)
   return s;
 }
 
-/*! @brief Mise a jour du temps
+/*! @brief @brief Update the field at the given time.
  *
  */
 
 void Champ_front_fonc_gradient_VEF::mettre_a_jour(double temps)
 {
   Cerr << "Champ_front_fonc_gradient_VEF::mettre_a_jour" << finl;
-  Cerr << "Non encore code..." << finl;
+  Cerr << "Not yet implemented..." << finl;
   exit();
 
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF,domaine_dis());

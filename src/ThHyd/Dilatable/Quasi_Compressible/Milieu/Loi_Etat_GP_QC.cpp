@@ -34,7 +34,7 @@ Sortie& Loi_Etat_GP_QC::printOn(Sortie& os) const
 
 Entree& Loi_Etat_GP_QC::readOn(Entree& is)
 {
-  Cerr << "Lecture de la loi d'etat gaz parfait pour le QC ... " << finl;
+  Cerr << "Reading the perfect gas equation of state for QC ... " << finl;
   return Loi_Etat_Mono_GP_base::readOn(is);
 }
 

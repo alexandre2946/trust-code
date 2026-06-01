@@ -122,21 +122,20 @@ void Pb_Hydraulique_Concentration::associer_milieu_base(const Milieu_base& mil)
     eq_concentration.associer_milieu_base(mil);
   else
     {
-      Cerr << "Un milieu de type " << mil.que_suis_je() << " ne peut etre associe a " << finl;
-      Cerr << "un probleme de type Pb_Hydraulique_Concentration " << finl;
+      Cerr << "A medium of type " << mil.que_suis_je() << " cannot be associated with " << finl;
+      Cerr << "a problem of type Pb_Hydraulique_Concentration " << finl;
       exit();
     }
 }
 
 
-/*! @brief Teste la compatibilite des equations de convection-diffusion et de l'hydraulique.
+/*! @brief Tests the compatibility of the convection-diffusion and hydraulic equations.
  *
- * Le test se fait sur les conditions
- *     aux limites discretisees de chaque equation.
- *     Appel la fonction de librairie hors classe:
+ * The test is performed on the discretized boundary conditions of each equation.
+ *     Calls the library function:
  *       tester_compatibilite_hydr_concentration(const Domaine_Cl_dis_base&,const Domaine_Cl_dis_base&)
  *
- * @return (int) code de retour propage
+ * @return propagated return code
  */
 int Pb_Hydraulique_Concentration::verifier()
 {

@@ -34,7 +34,7 @@ Entree& Assembleur_P_VDF_Q4::readOn(Entree& s )
 int Assembleur_P_VDF_Q4::assembler(Matrice& la_matrice)
 {
   Cerr << "Assembleur_P_VDF_Q4::assembler " << finl;
-  Cerr << "Assemblage de la matrice Q4 en cours..." << finl;
+  Cerr << "Assembling Q4 matrix in progress..." << finl;
   const IntTab& FaceSoms = le_dom_VDF->face_sommets();
   const IntTab& FaceVois = le_dom_VDF->face_voisins();
   const IntVect& Orientation = le_dom_VDF->orientation();
@@ -131,7 +131,7 @@ int Assembleur_P_VDF_Q4::assembler(Matrice& la_matrice)
       rang_voisins(som1)++;
       //}
     }
-  Cerr << "Fin de l'assemblage de la matrice Q4" << finl;
+  Cerr << "End of Q4 matrix assembly" << finl;
   return 1;
 }
 

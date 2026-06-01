@@ -213,18 +213,18 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
               if (num_int == num10)
                 {
                   nu1=i;
-                  //                Cerr << "nu1 (dans les boucles)=" << nu1 << finl;
+                  //                Cerr << "nu1 (in loops)=" << nu1 << finl;
                 }
               else if (num_int == num20)
                 {
                   nu2=i;
-                  //                  Cerr << "nu2 (dans les boucles)=" << nu2 << finl;
+                  //                  Cerr << "nu2 (in loops)=" << nu2 << finl;
                 }
               else
                 {
                   autre_num_face_loc(j)=i;
                   autre_num_face(j)=num_int;
-                  //                  Cerr << "autre_num_face (dans les boucles)=" << autre_num_face(j) << finl;
+                  //                  Cerr << "autre_num_face (in loops)=" << autre_num_face(j) << finl;
                   j++;
                   //                          k++;
                 }
@@ -319,14 +319,14 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
                           default :
                             {
                               numfa7=-1;
-                              Cerr << "C est pas possible!!!" << finl;
+                              Cerr << "This should not be possible!!!" << finl;
                               exit();
                               break;
                             }
                           }
 
                         //                    if (fa7 == itypcl)
-                        if (fa7 == numfa7)  // On est sur la fa7 non confondu avec la face de Dirichlet
+                        if (fa7 == numfa7)  // We are on the fa7 not coinciding with the Dirichlet face
                           {
                             coef1  = 2.*( psc[nu1]+psc[nu2] ) ;
                             coef1 -= psc[numfa7];
@@ -428,8 +428,8 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
                             {
                               nu1=-1;
                               nu2=-1;
-                              Cerr << "On arrete tout, c est pas possible!!!!" << finl;
-                              Cerr << "sinon c est que je n ai rien compris!!!" << finl;
+                              Cerr << "Stopping everything, this should not be possible!!!!" << finl;
+                              Cerr << "otherwise it means I have misunderstood something!!!" << finl;
                               exit();
                             }
                           }
@@ -640,7 +640,7 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
                   fluent_[num_face] -= pscav;
                 }
             }
-          //        Cerr << "Pour l instant Neumann_sortie_libre pas possible!!!" << finl;
+          //        Cerr << "For now Neumann_sortie_libre not supported!!!" << finl;
         }
       else if (sub_type(Periodique,la_cl.valeur()))
         {

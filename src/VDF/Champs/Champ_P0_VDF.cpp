@@ -217,18 +217,16 @@ int Champ_P0_VDF::imprime(Sortie& os, int ncomp) const
     }
   else
     {
-      Cerr << "Champ_P0_VDF::imprime_P0_VDF avec nb_compo_>1 non code." << finl;
+      Cerr << "Champ_P0_VDF::imprime_P0_VDF with nb_compo_>1 not implemented." << finl;
       exit();
     }
   return 1;
 }
 
-/*! @brief Appel a l'objet sous-jacent calcule l'integrale de l'une des composantes
+/*! @brief Computes the spatial integral of one component of the field over the corresponding domain.
  *
- *     du champ sur le domaine qui lui correspond
- *
- * @param (int ncomp) le numero de la composante integree en espace
- * @return (double) valeur de l'integrale
+ * @param ncomp Index of the component to integrate in space.
+ * @return Value of the integral.
  */
 double Champ_P0_VDF::integrale_espace(int ncomp) const
 {

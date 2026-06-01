@@ -351,7 +351,7 @@ void Echange_contact_Correlation_VEF::calculer_CL()
         T(N-1) = T_CL1 = 0.5 * (Tmin_voisin + Tmax);
       else
         {
-          Cerr << "Erreur dans Echange_contact_Correlation_VEF::calculer_CL() (decoupage incompatible ?)";
+          Cerr << "Error in Echange_contact_Correlation_VEF::calculer_CL() (incompatible partitioning?)";
           exit();
         }
     }
@@ -502,9 +502,9 @@ void Echange_contact_Correlation_VEF::init()
               traite(i)=1;
               if (compteur_patches==nb_patches)
                 {
-                  Cerr << "Erreur dans Echange_contact_Correlation_VEF::initialiser" << finl;
-                  Cerr << "Le nombre de patches est depasse." << finl;
-                  Cerr << "Contacter le support TRUST." << finl;
+                  Cerr << "Error in Echange_contact_Correlation_VEF::initialiser" << finl;
+                  Cerr << "The number of patches has been exceeded." << finl;
+                  Cerr << "Please contact TRUST support." << finl;
                   exit();
                 }
               patches_rayo(compteur_patches,0) = i;
@@ -544,9 +544,9 @@ void Echange_contact_Correlation_VEF::init()
                           traite(j) = 1;
                           if (compteur_face==MAX_FACES_PATCH)
                             {
-                              Cerr << "Erreur dans Echange_contact_Correlation_VEF::initialiser" << finl;
-                              Cerr << "Le nombre maximal de faces de patches est depasse." << finl;
-                              Cerr << "Contacter le support TRUST." << finl;
+                              Cerr << "Error in Echange_contact_Correlation_VEF::initialiser" << finl;
+                              Cerr << "The maximum number of patch faces has been exceeded." << finl;
+                              Cerr << "Please contact TRUST support." << finl;
                               exit();
                             }
                           patches_rayo(compteur_patches,compteur_face++) = j;
@@ -675,65 +675,65 @@ void Echange_contact_Correlation_VEF_reprendre(const Nom& filename, const double
   const int nproc = Process::nproc();
   if (Process::je_suis_maitre())
     {
-      Cerr << "Echange_contact_Correlation_VEF::mettre_a_jour: reprise dans le fichier "
+      Cerr << "Echange_contact_Correlation_VEF::mettre_a_jour: resuming from file "
            << filename << finl;
       EFichier file(filename);
-      file.set_error_action(Entree::ERROR_EXIT); // Exit en cas d'erreur de lecture
-      file.set_check_types(1); // Verifie que c'est bien des double
+      file.set_error_action(Entree::ERROR_EXIT); // Exit on read error
+      file.set_check_types(1); // Verify that values are indeed doubles
       Nom bidon1, bidon2, temps_lu;
-      // Le format attendu en entete est "Temps = valeur"
+      // The expected header format is "Temps = valeur"
       file >> bidon1 >> bidon2 >> temps_lu;
       if (bidon1 != "Temps" || bidon2 != "=" || temps_lu != temps)
         {
-          Cerr << "Erreur dans Echange_contact_Correlation_VEF::mettre_a_jour() :\n"
-               << " On attendait l'entet suivante dans le fichier " << filename
+          Cerr << "Error in Echange_contact_Correlation_VEF::mettre_a_jour() :\n"
+               << " The following header was expected in file " << filename
                << "\n Temps = " << temps << finl;
           if (temps_lu != temps)
             {
-              Cerr << "Le temps indique dans le fichierest different du temps de reprise du calcul " << temps
-                   << "Vous ne pouvez pas faire de reprise pour la correlation.\n"
-                   << "Supprimez dans la correlation le mot clef \"Reprise\".\n"
-                   << "La phase transitoire du calcul sera fausse, mais l'etat stationnaire sera juste." << finl;
+              Cerr << "The time indicated in the file differs from the restart time " << temps
+                   << "You cannot restart using this correlation.\n"
+                   << "Remove the keyword \"Reprise\" from the correlation.\n"
+                   << "The transient phase will be incorrect, but the steady state will be correct." << finl;
             }
           Process::exit();
         }
-      DoubleVect tmp(T); // copie de T
+      DoubleVect tmp(T); // copy of T
       double valeur;
       for (int pe = 0; pe < nproc; pe++)
         {
-          recevoir(tmp, pe, canal); // ne fait rien si pe==0
+          recevoir(tmp, pe, canal); // no-op if pe==0
           const int sz = tmp.size();
           for (int i = 0; i < sz; i++)
             {
-              // Le format attendu est "T(i) = valeur"
+              // The expected format is "T(i) = valeur"
               file >> bidon1 >> bidon2 >> valeur;
               tmp[i] = valeur;
             }
-          envoyer(tmp, pe, canal); // ne fait rien si pe==0
+          envoyer(tmp, pe, canal); // no-op if pe==0
           if (pe == 0)
             T = tmp;
         }
     }
   else
     {
-      envoyer(T, 0, canal); // j'envoie un tableau de la bonne taille au proc 0
-      recevoir(T, 0, canal);// je recois le tableau rempli
+      envoyer(T, 0, canal); // send an array of the correct size to proc 0
+      recevoir(T, 0, canal);// receive the filled array back
     }
 }
 
 /**
- * Mise a jour de la vitesse, temperature fluide et coeff d'echange
+ * @brief Updates the velocity, fluid temperature, and heat exchange coefficient.
  */
 void Echange_contact_Correlation_VEF::mettre_a_jour(double temps)
 {
 
-  // Nom des fichiers de sauvegarde
+  // Name of the save files
   Nom Fichier_sauv_nom = domaine_Cl_dis().equation().probleme().le_nom();
   Fichier_sauv_nom+="_";
   Fichier_sauv_nom+=frontiere_dis().frontiere().le_nom();
   Fichier_sauv_nom+=".sauv";
 
-  // Operation de reprise du champ de temperature dans le fluide
+  // Restart operation for the fluid temperature field
   if (Reprise_temperature)
     {
       Echange_contact_Correlation_VEF_reprendre(Fichier_sauv_nom, temps, T);
@@ -833,9 +833,9 @@ void Echange_contact_Correlation_VEF::mettre_a_jour(double temps)
               if (limpr(temps,mon_eqn.schema_temps().pas_de_temps()))
                 {
                   //Cout << ii << " " << patch_courant << finl;
-                  if (Process::is_parallel()) Cout << "Processeur " << Process::me() << " ";
+                  if (Process::is_parallel()) Cout << "Processor " << Process::me() << " ";
                   Cout << ma_front_vf.le_nom() << " patch " << patch_courant;
-                  Cout << " : flux radiatif=sigma*eps/(2-eps)*(TP2^4-TP1^4)= " << flux_radiatif(patch_courant) << " W/m2";
+                  Cout << " : radiative_flux=sigma*eps/(2-eps)*(TP2^4-TP1^4)= " << flux_radiatif(patch_courant) << " W/m2";
                   Cout << " TP2= " << pow(Tp24,0.25) << " K";
                   Cout << " TP1= " << pow(Tp14,0.25) << " K" << finl;
                 }

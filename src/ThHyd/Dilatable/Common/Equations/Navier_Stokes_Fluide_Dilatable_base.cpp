@@ -54,9 +54,9 @@ int Navier_Stokes_Fluide_Dilatable_base::lire_motcle_non_standard(const Motcle& 
       if (typ == "VEFPreP1B") typ = "VEF";
 
       typ = Nom("Source_Masse_Fluide_Dilatable_") + typ;
-      Cerr << "Typage de la source de masse : " << typ << finl;
+      Cerr << "Typing the mass source: " << typ << finl;
       source_masse_.typer(typ);
-      Cerr << "Lecture de la source de masse ... " << finl;
+      Cerr << "Reading the mass source ... " << finl;
       is >> source_masse_.valeur();
       source_masse_->associer_domaine_cl(domaine_Cl_dis());
     }

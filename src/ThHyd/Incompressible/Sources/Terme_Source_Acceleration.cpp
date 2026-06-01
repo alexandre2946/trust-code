@@ -54,36 +54,36 @@ Terme_Source_Acceleration::Terme_Source_Acceleration()
 
 Sortie& Terme_Source_Acceleration::printOn(Sortie& s ) const
 {
-  Cerr << "Terme_Source_Acceleration::printOn : appel invalide" << finl;
+  Cerr << "Terme_Source_Acceleration::printOn : invalid call" << finl;
   assert(0);
   exit();
   return s;
 }
 
-/*! @brief Appel a Terme_Source_Acceleration::lire_data
+/*! @brief Call to Terme_Source_Acceleration::lire_data
  *
  */
 Entree& Terme_Source_Acceleration::readOn(Entree& s )
 {
-  Cerr << "Terme_Source_Acceleration::readOn : appel invalide" << finl;
+  Cerr << "Terme_Source_Acceleration::readOn : invalid call" << finl;
   assert(0);
   exit();
   return s;
 }
 
-/*! @brief Methode appelee par readOn des classes derivees Terme_Source_Acceleration_VDF_Face, .
+/*! @brief Method called by readOn of derived classes Terme_Source_Acceleration_VDF_Face, .
  *
  * ..
  *
- *  Le format attendu est le suivant
+ *  Expected format:
  *   {
- *     [ omega           Un_Champ_uniforme
- *       domegadt        Un_Champ_uniforme
- *       centre_rotation Un_Champ_uniforme
+ *     [ omega           A_Uniform_Field
+ *       domegadt        A_Uniform_Field
+ *       centre_rotation A_Uniform_Field
  *       option          TERME_COMPLET | CORIOLIS_SEUL | ENTRAINEMENT_SEUL ]
- *     [ acceleration    Un_Champ_uniforme ]
+ *     [ acceleration    A_Uniform_Field ]
  *   }
- *  Un_Champ_uniforme est typiquement:
+ *  A_Uniform_Field is typically:
  *       Champ_Uniforme 3 x y z
  *     ou
  *       Champ_Fonc_t DOM 3 fx(t) fy(t) fz(t)
@@ -108,8 +108,8 @@ void Terme_Source_Acceleration::lire_data(Entree& s)
   s >> motlu;
   if (motlu != "{")
     {
-      Cerr << "Erreur dans Terme_Source_Acceleration::lire_data" << finl;
-      Cerr << " On attendait {" << finl;
+      Cerr << "Error in Terme_Source_Acceleration::lire_data" << finl;
+      Cerr << " Expected {" << finl;
       assert(0);
       exit();
     }
@@ -119,7 +119,7 @@ void Terme_Source_Acceleration::lire_data(Entree& s)
       s >> motlu;
       const int i_mot = les_mots.search(motlu);
       if (je_suis_maitre() && i_mot < 5)
-        Cerr << "Lecture de " << motlu << " : ";
+        Cerr << "Reading " << motlu << " : ";
       switch(i_mot)
         {
         case 0:
@@ -157,7 +157,7 @@ void Terme_Source_Acceleration::lire_data(Entree& s)
                 option_ = ENTRAINEMENT_SEUL;
                 break;
               default:
-                Cerr << "Erreur, les options valides sont : " << finl;
+                Cerr << "Error, valid options are: " << finl;
                 Cerr << les_options << finl;
                 assert(0);
                 exit();
@@ -180,24 +180,24 @@ void Terme_Source_Acceleration::lire_data(Entree& s)
             Cerr << champ_vitesse_.que_suis_je() << finl;
           break;
         default:
-          Cerr << "Erreur dans Terme_Source_Acceleration::lire_data" << finl;
-          Cerr << " On ne comprend pas le mot " << motlu << finl;
-          Cerr << " Les mots compris sont : " << les_mots << finl;
+          Cerr << "Error in Terme_Source_Acceleration::lire_data" << finl;
+          Cerr << " Keyword not recognized: " << motlu << finl;
+          Cerr << " Recognized keywords are: " << les_mots << finl;
           assert(0);
           exit();
         }
     }
 
-  // On verifie que c'est coherent:
+  // Check consistency:
   int n = 0;
   if (omega_) n++;
   if (domegadt_) n++;
   if (centre_rotation_) n++;
   if (n != 0 && n != 3)
     {
-      Cerr << "Erreur dans Terme_Source_Acceleration::lire_data" << finl;
-      Cerr << " Si OMEGA ou DOMEGADT ou CENTRE_GRAVITE est donne" << finl;
-      Cerr << " alors les trois doivent etre donnes" << finl;
+      Cerr << "Error in Terme_Source_Acceleration::lire_data" << finl;
+      Cerr << " If OMEGA or DOMEGADT or CENTRE_GRAVITE is given" << finl;
+      Cerr << " then all three must be given" << finl;
       assert(0);
       exit();
     }
@@ -208,9 +208,9 @@ void Terme_Source_Acceleration::lire_data(Entree& s)
           || omega_->valeurs().dimension(1) != 3
           || domegadt_->valeurs().dimension(1) != 3)
         {
-          Cerr << "Erreur dans Terme_Source_Acceleration::lire_data" << finl;
-          Cerr << " les champs OMEGA et DOMEGADT doivent etre des champs" << finl;
-          Cerr << " uniformes a trois composantes (vecteur aligne sur Z en 2D)" << finl;
+          Cerr << "Error in Terme_Source_Acceleration::lire_data" << finl;
+          Cerr << " the OMEGA and DOMEGADT fields must be uniform fields" << finl;
+          Cerr << " with three components (vector aligned on Z in 2D)" << finl;
           assert(0);
           exit();
         }
@@ -219,23 +219,23 @@ void Terme_Source_Acceleration::lire_data(Entree& s)
     {
       if (champ_acceleration_->valeurs().dimension(0) != 1)
         {
-          Cerr << "Erreur dans Terme_Source_Acceleration::lire_data" << finl;
-          Cerr << " Le champ ACCELERATION doit etre un champ uniforme" << finl;
+          Cerr << "Error in Terme_Source_Acceleration::lire_data" << finl;
+          Cerr << " The ACCELERATION field must be a uniform field" << finl;
           assert(0);
           exit();
         }
     }
 
-  // Discretisation de la_source et terme_source_post
-  // Il faut absolument le faire ici pour disposer des champs au moment de
-  // la lecture des postraitements (appel a a_pour_Champ_Fonc)
+  // Discretization of la_source and terme_source_post
+  // This must be done here so that the fields are available at the time
+  // post-processing is read (call to a_pour_Champ_Fonc)
   {
     const Equation_base& eqn = equation();
     if (!sub_type(Navier_Stokes_std, eqn))
       {
-        Cerr << "Erreur dans Terme_Source_Acceleration::lire_data\n"
-             << " Ce terme source ne peut etre insere que dans une equation\n"
-             << " derivee de Navier_Stokes_std" << finl;
+        Cerr << "Error in Terme_Source_Acceleration::lire_data\n"
+             << " This source term can only be inserted into an equation\n"
+             << " derived from Navier_Stokes_std" << finl;
         assert(0);
         exit();
       }

@@ -208,16 +208,16 @@ void Op_PolyMAC_CDO_Elem::dimensionner_bloc_vitesse(const Domaine_PolyMAC_CDO& l
 
 void Op_PolyMAC_CDO_Elem::modifier_pour_Cl(const Domaine_PolyMAC_CDO& le_domaine, const Domaine_Cl_PolyMAC_family& le_domaine_cl, Matrice_Morse& la_matrice, DoubleTab& secmem) const
 {
-  // Dimensionnement de la matrice qui devra recevoir les coefficients provenant de
-  // la convection, de la diffusion pour le cas des faces.
-  // Cette matrice a une structure de matrice morse.
-  // Nous commencons par calculer les tailles des tableaux tab1 et tab2.
+  // Sizing the matrix that will receive coefficients from
+  // convection and diffusion in the face case.
+  // This matrix has a Morse matrix structure.
+  // We start by computing the sizes of arrays tab1 and tab2.
 
   //  int nfin = le_domaine.nb_faces();
   //  const Conds_lim& les_cl = le_domaine_cl.les_conditions_limites();
   //  const IntVect& orientation=le_domaine.orientation();
 
-  // Prise en compte des conditions de type periodicite
-  //Cerr << "dans Op_PolyMAC_CDO_Elem:: modifier_pour_Cl" << finl;
+  // Account for periodic boundary conditions
+  //Cerr << "in Op_PolyMAC_CDO_Elem:: modifier_pour_Cl" << finl;
 
 }

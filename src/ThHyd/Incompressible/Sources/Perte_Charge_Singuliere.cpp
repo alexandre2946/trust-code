@@ -62,17 +62,17 @@ Entree& Perte_Charge_Singuliere::lire_regul(Entree& is)
   param.lire_avec_accolades(is);
   if (obsolete != "")
     {
-      Cerr << "Erreur syntaxe!" << finl;
-      Cerr << "La formule de regulation de debit passant de:" << finl;
+      Cerr << "Syntax error!" << finl;
+      Cerr << "The flow rate regulation formula has changed from:" << finl;
       Cerr << "K_ *= min(max(|debit|/deb_cible)^2,(1-eps)^dt),(1+eps)^dt);" << finl;
-      Cerr << "a:" << finl;
+      Cerr << "to:" << finl;
       Cerr << "K_ += dt*alpha*(debit-debit_cible);" << finl;
-      Cerr << "Le mot cle eps (valeur comprise entre 0 et 1) n'est plus valide." << finl;
-      Cerr << "L'amplitude de la regulation du debit doit etre specifiee par le mot cle alpha. Si vous aviez une valeur non nulle pour eps, par ex 0.5, remplacer par alpha 10" << finl;
-      Cerr << "et eps 0 doit etre remplace par alpha 0" << finl;
+      Cerr << "The keyword eps (value between 0 and 1) is no longer valid." << finl;
+      Cerr << "The amplitude of the flow rate regulation must be specified by the keyword alpha. If you had a non-zero value for eps, e.g. 0.5, replace with alpha 10" << finl;
+      Cerr << "and eps 0 must be replaced by alpha 0" << finl;
       Process::exit();
     }
-  if (alpha_str=="") Process::exit("alpha doit etre specifie pour la regulation.");
+  if (alpha_str=="") Process::exit("alpha must be specified for the regulation.");
   deb_cible_.setNbVar(1), alpha_.setNbVar(1);
   deb_cible_.setString(deb_str), alpha_.setString(alpha_str);
   deb_cible_.addVar("t"), alpha_.addVar("t");
@@ -93,13 +93,13 @@ Entree& Perte_Charge_Singuliere::lire_donnees(Entree& is)
   is >> motlu;
   if (motlu != acc_ouverte)
     {
-      Cerr << "On attendait le mot cle" << acc_ouverte << " a la place de " << motlu << finl;
+      Cerr << "We expected the keyword" << acc_ouverte << " instead of " << motlu << finl;
       Process::exit();
     }
   is >> motlu;
   if (motlu != "dir")
     {
-      Cerr << "On attendait le mot cle dir a la place de " << motlu << finl;
+      Cerr << "We expected the keyword dir instead of " << motlu << finl;
       Process::exit();
     }
   else
@@ -108,9 +108,9 @@ Entree& Perte_Charge_Singuliere::lire_donnees(Entree& is)
       int rang = les_motcles.search(motlu);
       if (rang == -1)
         {
-          Cerr << "Erreur a la lecture des donnees de Perte_Charge_Singuliere" << finl;
-          Cerr << "On attendait l'un des mots cles " << les_motcles << finl;
-          Cerr << "a la place de " << motlu << finl;
+          Cerr << "Error while reading the data of Perte_Charge_Singuliere" << finl;
+          Cerr << "We expected one of the keywords " << les_motcles << finl;
+          Cerr << "instead of " << motlu << finl;
           Process::exit();
         }
       direction_perte_charge_ = rang == 3 ? -1 : rang;
@@ -126,12 +126,12 @@ Entree& Perte_Charge_Singuliere::lire_donnees(Entree& is)
     }
   else
     {
-      Cerr << "On attendait le mot cle coeff ou regul a la place de " << motlu << finl;
+      Cerr << "We expected the keyword coeff or regul instead of " << motlu << finl;
       Process::exit();
     }
 
   Cerr << " direction_perte_charge_ " << direction_perte_charge_ << finl;
-  Cerr << " perte de charge K_ " << K_ << finl;
+  Cerr << " pressure drop K_ " << K_ << finl;
 
   return is;
 }
@@ -161,13 +161,13 @@ void Perte_Charge_Singuliere::lire_surfaces(Entree& is, const Domaine& le_domain
   is >> motlu;
   if (motlu != "surface")
     {
-      Cerr << "On attendait le mot cle surface a la place de " << motlu << finl;
+      Cerr << "We expected the keyword surface instead of " << motlu << finl;
       Process::exit();
     }
   is >> motlu;
   if (motlu != acc_ouverte)
     {
-      Cerr << "On attendait le mot cle" << acc_ouverte << " a la place de " << motlu << finl;
+      Cerr << "We expected the keyword" << acc_ouverte << " instead of " << motlu << finl;
       Process::exit();
     }
   is >> method;
@@ -245,11 +245,11 @@ void Perte_Charge_Singuliere::lire_surfaces(Entree& is, const Domaine& le_domain
       Process::exit();
     }
   is >> motlu;
-  if (motlu == "orientation") is >> orientation, is >> motlu; //on lit un champ pour orienter la surface
+  if (motlu == "orientation") is >> orientation, is >> motlu; //read a field to orient the surface
 
   if (motlu != acc_fermee)
     {
-      Cerr << "On attendait le mot cle" << acc_fermee << " a la place de " << motlu << finl;
+      Cerr << "We expected the keyword" << acc_fermee << " instead of " << motlu << finl;
       Process::exit();
     }
   if (lire_derniere_accolade)
@@ -257,7 +257,7 @@ void Perte_Charge_Singuliere::lire_surfaces(Entree& is, const Domaine& le_domain
       is >> motlu;
       if (motlu != acc_fermee)
         {
-          Cerr << "On attendait le mot cle" << acc_fermee << " a la place de " << motlu << finl;
+          Cerr << "We expected the keyword" << acc_fermee << " instead of " << motlu << finl;
           Process::exit();
         }
     }

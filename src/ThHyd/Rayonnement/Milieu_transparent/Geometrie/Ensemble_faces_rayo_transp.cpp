@@ -110,13 +110,13 @@ void Ensemble_faces_rayo_transp::associer_les_cl(Cond_lim_base& la_cl)
           marq = (int) mp_sum((double) marq);
           if (marq == 0)
             {
-              Cerr << "Face " << fac << " du fichier " << la_cl.frontiere_dis().frontiere().le_nom() << "_xv non trouvee !!! positions ";
+              Cerr << "Face " << fac << " from file " << la_cl.frontiere_dis().frontiere().le_nom() << "_xv not found !!! positions ";
               for (int dir = 0; dir < dimension; dir++)
                 Cerr << positions_(fac, dir) << " ";
               Cerr << finl;
               for (int f2 = 0; f2 < nb_faces_bord_; f2++)
                 {
-                  Cerr << " face " << f2 << " du bord ";
+                  Cerr << " face " << f2 << " of boundary ";
                   for (int dir = 0; dir < dimension; dir++)
                     Cerr << pos(f2, dir) << " ";
                   Cerr << finl;

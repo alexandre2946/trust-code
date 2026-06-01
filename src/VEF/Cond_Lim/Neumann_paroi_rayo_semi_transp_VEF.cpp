@@ -46,7 +46,7 @@ double Neumann_paroi_rayo_semi_transp_VEF::flux_impose(int i) const
   else if (le_champ_front->valeurs().dimension(1) == 1)
     return le_champ_front->valeurs()(i, 0) - flux_radiatif(i, 0);
   else
-    Cerr << "Neumann_paroi_rayo_semi_transp_VEF::flux_impose erreur" << finl;
+    Cerr << "Neumann_paroi_rayo_semi_transp_VEF::flux_impose error" << finl;
 
   return 0;
 }

@@ -989,7 +989,7 @@ void Op_Diff_VEF_Anisotrope_Face::verifier() const
   if(dimension==2)
     {
       const int nbf = vit.dimension(0);
-      Cerr << " Verification de delta(x,0) " << finl;
+      Cerr << " Verification of delta(x,0) " << finl;
       for(i=0; i<nbf; i++)
         {
           vit(i,0)=xv(i,0);
@@ -1008,7 +1008,7 @@ void Op_Diff_VEF_Anisotrope_Face::verifier() const
               Cerr << finl;
             }
         }
-      Cerr << " Verification de delta(y(1-y),0) " << finl;
+      Cerr << " Verification of delta(y(1-y),0) " << finl;
       for(i=0; i<nbf; i++)
         {
           vit(i,0)=xv(i,1)*(1-xv(i,1));

@@ -1244,14 +1244,14 @@ void Couplage_Parietal_PolyMAC_MPFA_helper::ajouter_blocs(matrices_t matrices, D
                 }
 
               if (!cv && essai < 2)
-                continue; //T_efs pas converge avec flux non coercif -> on essaie de stabiliser
+                continue; //T_efs not converged with non-coercive flux -> try stabilization
               else if (!cv)
                 {
-                  Cerr << "non-convergence des T_efs!" << finl;
+                  Cerr << "non-convergence of T_efs!" << finl;
                   Process::exit();
                 }
 
-              /* subbstitution dans des u_efs^n dans Fec et Qec */
+              /* substitute u_efs^n into Fec and Qec */
               for (int n = 0; n < Nm; n++)
                 for (int i = 0; i < t_eq; i++)
                   for (int j = 0; j < t_ec; j++)

@@ -46,7 +46,7 @@ Entree& Prepro_IBM_Ponderation::readOn(Entree& is)
     Cout<<"Weighting method = area and inverse distance weight"<<finl;
   else
     {
-      Cerr<<"Prepro_IBM_ponderation : Type_de_ponderation : invalide argument = "<<pond_<<finl;
+      Cerr<<"Prepro_IBM_ponderation : Type_de_ponderation : invalid argument = "<<pond_<<finl;
       Process::exit();
     }
   return is;
@@ -277,9 +277,9 @@ void Prepro_IBM_Ponderation::projectSolidPoints()
           else
             solid_elemsArray(sommet) = float(interSoElem);
 
-          // Cerr<<"projection point solide sommet : "<<sommet<<" : ";
+          // Cerr<<"solid point projection vertex: "<<sommet<<" : ";
           // for (int d=0; d<dim_esp; d++) Cerr<<solideArray(sommet,d)<<" ";
-          // Cerr<<";element solide = "<<solid_elemsArray(sommet)<<" ";
+          // Cerr<<";solid element = "<<solid_elemsArray(sommet)<<" ";
           // Cerr<<finl;
         }
     }

@@ -34,12 +34,12 @@ Entree& Perte_Charge_Gen::readOn(Entree& is)
   regul_ = 0;
   set_param(param);
   param.lire_avec_accolades_depuis(is);
-  Cerr << "Interpretation de la fonction " << lambda.getString() << " ... ";
+  Cerr << "Interpreting the function " << lambda.getString() << " ... ";
   lambda.parseString();
   Cerr << " Ok" << finl;
   if (diam_hydr->nb_comp() != 1)
     {
-      Cerr << "Il faut definir le champ diam_hydr a une composante" << finl;
+      Cerr << "The diam_hydr field must be defined with one component" << finl;
       exit();
     }
   return is;
@@ -111,7 +111,7 @@ int Perte_Charge_Gen::lire_motcle_non_standard(const Motcle& mot, Entree& is)
     }
   else // non compris
     {
-      Cerr << "Mot cle \"" << mot << "\" non compris lors de la lecture d'un " << que_suis_je() << finl;
+      Cerr << "Keyword \"" << mot << "\" not understood while reading a " << que_suis_je() << finl;
       Process::exit();
     }
   return -1;

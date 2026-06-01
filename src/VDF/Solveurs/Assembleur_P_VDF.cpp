@@ -499,24 +499,24 @@ int Assembleur_P_VDF::modifier_secmem(DoubleTab& secmem)
         }
       else if (sub_type(Dirichlet_paroi_defilante, la_cl_base))
         {
-          // Pour une paroi defilante, rien a faire.
+          // For a sliding wall, nothing to do.
         }
       else if (sub_type(Dirichlet_paroi_fixe, la_cl_base))
         {
-          // Rien a faire non plus.
+          // Nothing to do either.
         }
       else if (sub_type(Symetrie, la_cl_base))
         {
-          // Encore rien a faire
+          // Still nothing to do
         }
       else if (sub_type(Periodique, la_cl_base))
         {
-          // Rien a faire
+          // Nothing to do
         }
       else
         {
-          Cerr << "Erreur dans Assembleur_P_VDF::modifier_secmem\n la condition aux limites ";
-          Cerr << la_cl_base.que_suis_je() << " n'est pas prise en charge." << finl;
+          Cerr << "Error in Assembleur_P_VDF::modifier_secmem\n the boundary condition ";
+          Cerr << la_cl_base.que_suis_je() << " is not supported." << finl;
           assert(0);
           exit();
         }
@@ -650,8 +650,8 @@ int Assembleur_P_VDF::assembler_mat(Matrice& matrice,const DoubleVect& volumes_e
   if (!matrice)
     {
       if (je_suis_maitre())
-        Cerr << "Assemblage de la matrice pression : Assembleur_P_VDF::assembler" << finl;
-      // Par defaut, resolution en increment de pression
+        Cerr << "Assembling the pressure matrix: Assembleur_P_VDF::assembler" << finl;
+      // By default, solve in pressure increment
       construire(matrice);
     }
   set_resoudre_increment_pression(incr_pression);
@@ -661,16 +661,16 @@ int Assembleur_P_VDF::assembler_mat(Matrice& matrice,const DoubleVect& volumes_e
   return 1;
 }
 
-/*! @brief Assemblage de la matrice de pression M telle que M*P = div(porosite * grad (P))
+/*! @brief Assembles the pressure matrix M such that M*P = div(porosity * grad(P))
  *
- *   et calcul des coefficients pour modifier_secmem.
+ *  @brief and computes the coefficients for modifier_secmem.
  *
  */
 int Assembleur_P_VDF::assembler(Matrice& matrice)
 {
   if (je_suis_maitre())
-    Cerr << "Assemblage de la matrice pression : Assembleur_P_VDF::assembler" << finl;
-  // Par defaut, resolution en increment de pression
+    Cerr << "Assembling the pressure matrix: Assembleur_P_VDF::assembler" << finl;
+  // By default, solve in pressure increment
   set_resoudre_increment_pression(1);
   set_resoudre_en_u(1);
   construire(matrice);
@@ -681,27 +681,27 @@ int Assembleur_P_VDF::assembler(Matrice& matrice)
   return 1;
 }
 
-/*! @brief Assemblage de la matrice de pression M telle que M*P = div(porosite/rho * grad (P))
+/*! @brief Assembles the pressure matrix M such that M*P = div(porosity/rho * grad(P))
  *
- *   et calcul des coefficients pour modifier_secmem.
+ *  @brief and computes the coefficients for modifier_secmem.
  *
- * @param (matrice) La matrice a assembler. Contrainte:    Soit la matrice n'est pas encore typee (alors on la "construit"), soit c'est la meme que lors de l'appel precedent.
- * @param (rho)
+ * @param matrice The matrix to assemble. Constraint: either the matrix has not yet been typed (in which case it is "constructed"), or it is the same as from the previous call.
+ * @param rho Density field.
  */
 int Assembleur_P_VDF::assembler_rho_variable(Matrice& matrice,
                                              const Champ_Don_base& rho)
 {
-  // assembler_rho_variable a ete introduit pour le front-tracking:
-  // il faut dire explicitement si on resout en increment de pression
+  // assembler_rho_variable was introduced for front-tracking:
+  // must explicitly specify whether we solve in pressure increment
   assert(get_resoudre_increment_pression() >= 0);
-  // idem pour resoudre en u
+  // same for solving in u
   assert(get_resoudre_en_u() >= 0);
-  // Si la matrice n'a pas encore ete typee, il faut la construire :
+  // If the matrix has not yet been typed, it must be constructed:
   if (!matrice)
     {
       if (je_suis_maitre())
         {
-          Cerr << "Assemblage de la matrice pression : ";
+          Cerr << "Assembling the pressure matrix: ";
           Cerr << "Assembleur_P_VDF::assembler_rho_variable" << finl;
         }
       construire(matrice);
@@ -733,7 +733,7 @@ int Assembleur_P_VDF::assembler_QC(const DoubleTab& tab_rho, Matrice& matrice)
     {
       if (je_suis_maitre())
         {
-          Cerr << "Assemblage de la matrice pression : ";
+          Cerr << "Assembling the pressure matrix: ";
           Cerr << "Assembleur_P_VDF::assembler_QC" << finl;
         }
       construire(matrice);
@@ -755,7 +755,7 @@ int Assembleur_P_VDF::assembler_QC(const DoubleTab& tab_rho, Matrice& matrice)
           if ((la_matrice.nb_lignes()>0) && (la_matrice.nb_colonnes()>0))
             {
               Cerr<<"la_matrice(0,0)"<<la_matrice(0,0)<<finl;
-              Cerr<<"Pas de pression imposee  --> P(0)=0"<<finl;
+              Cerr<<"No imposed pressure --> P(0)=0"<<finl;
               if (je_suis_maitre())    la_matrice(0,0) *= 2;
             }
           la_matrice.set_est_definie(1);

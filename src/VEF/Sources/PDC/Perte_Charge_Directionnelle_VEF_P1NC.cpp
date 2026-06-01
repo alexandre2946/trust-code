@@ -36,7 +36,7 @@ Entree& Perte_Charge_Directionnelle_VEF_P1NC::readOn(Entree& s )
   Perte_Charge_VEF::readOn(s);
   if (v->nb_comp()!=dimension)
     {
-      Cerr << "Il faut definir le champ direction a " << dimension << " composantes" << finl;
+      Cerr << "The direction field must be defined with " << dimension << " components" << finl;
       exit();
     }
   return s;

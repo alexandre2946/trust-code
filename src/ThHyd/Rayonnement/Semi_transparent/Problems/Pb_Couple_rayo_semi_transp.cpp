@@ -95,7 +95,7 @@ int Pb_Couple_rayo_semi_transp::associer_(Objet_U& ob)
 {
   if (sub_type(Pb_rayo_semi_transp, ob))
     {
-      Cerr << "association du pb rayo semi transp au pb couple" << finl;
+      Cerr << "associating the semi-transparent radiation problem with the coupled problem" << finl;
       if (pb_rayo_semi_transp_)
         Process::exit("Attention : on ne peut associer qu'un pb de rayonnement a un Pb_Couple_rayo_semi_transp !!! \n");
 

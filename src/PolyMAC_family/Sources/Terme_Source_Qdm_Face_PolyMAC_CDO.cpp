@@ -33,8 +33,8 @@ Entree& Terme_Source_Qdm_Face_PolyMAC_CDO::readOn(Entree& s)
   s >> la_source;
   if (la_source->nb_comp() != equation().inconnue().nb_comp())
     {
-      Cerr << "Erreur a la lecture du terme source de type " << que_suis_je() << finl;
-      Cerr << "le champ source doit avoir " << dimension << " composantes" << finl;
+      Cerr << "Error reading the source term of type " << que_suis_je() << finl;
+      Cerr << "the source field must have " << dimension << " components" << finl;
       Process::exit();
     }
   return s ;

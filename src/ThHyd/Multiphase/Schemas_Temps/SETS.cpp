@@ -522,39 +522,39 @@ void SETS::iterer_NS(Equation_base& eqn, DoubleTab& current,
   cv = 0;
   for (it = 0; it < iter_min_ || (!cv && it < iter_max_); it++)
     {
-      /* remplissage par assembler_blocs */
-      //equation d'energie en premier pour pouvoir utiliser q_pi dans d'autres equations
+      /* fill via assembler_blocs */
+      // energy equation first, so that q_pi can be used in other equations
       res_en_T ?
       eqs["temperature"]->assembler_blocs_avec_inertie(mats_["temperature"], *sec["temperature"], semi_impl) :
       eqs["enthalpie"]->assembler_blocs_avec_inertie(mats_["enthalpie"], *sec["enthalpie"], semi_impl);
-      //les autres
+      // the others
       for (auto &n_e : eqs)
         if (n_e.first != "temperature" && n_e.first != "enthalpie")
           n_e.second->assembler_blocs_avec_inertie(mats_[n_e.first], *sec[n_e.first], semi_impl);
 
-      //equation de continuite sum_k alpha_k = 1
+      // continuity equation sum_k alpha_k = 1
       eq_qdm.assembleur_pression()->assembler_continuite(mats_["pression"], *sec["pression"]);
 
-      SolveurSys& solv_p = eq_qdm.solveur_pression(); /* on utilise le "solveur_pression" de la QDM */
-      if (pressure_reduction_) /* reduction en pression */
+      SolveurSys& solv_p = eq_qdm.solveur_pression(); /* use the "solveur_pression" of the QDM equation */
+      if (pressure_reduction_) /* pressure reduction */
         {
-          /* expression des autres inconnues (x) en fonction de p : vitesse, puis temperature / pression */
+          /* express the other unknowns (x) as functions of p: velocity, then temperature / pressure */
           tabs_t b_p;
           std::vector<std::set<std::pair<std::string, int>>> ordre;
           if (eq_qdm.domaine_dis().le_nom() == "PolyMAC_MPFA")
-            ordre.push_back( { { "vitesse", 1 } }); //si PolyMAC_MPFA: on commence par ve
-          ordre.push_back( { { "vitesse", 0 } }), ordre.push_back( { }); //puis vf, puis toutes les autres inconnues simultanement
+            ordre.push_back( { { "vitesse", 1 } }); //if PolyMAC_MPFA: start with ve
+          ordre.push_back( { { "vitesse", 0 } }), ordre.push_back( { }); //then vf, then all other unknowns simultaneously
           for (auto &&nom : noms)
             if (nom != "vitesse" && nom != "pression")
               ordre.back().insert( { { nom, 0 } });
           ok = mp_min(eliminer(ordre, "pression", mats_, sec, A_p_, b_p));
           if (!ok)
             {
-              Cerr << "Echec de l'elimination!";
-              break; //si l'elimination echoue, on sort
+              Cerr << "Elimination failed!";
+              break; //if the elimination fails, we exit
             }
 
-          /* assemblage du systeme en pression */
+          /* assembly of the pressure system */
           assembler("pression", A_p_, b_p, mats_, sec, matrice_pression_, *sec["pression"], p_degen_);
 #ifdef PETSCKSP_H
           if (!cv_ctx && sub_type(Solv_Petsc, solv_p.valeur()))
@@ -564,16 +564,16 @@ void SETS::iterer_NS(Equation_base& eqn, DoubleTab& current,
             }
 #endif
 
-          /* resolution : seulement si l'erreur en alpha (dans secmem_pression) depasse un seuil */
+          /* solve: only if the error on alpha (in secmem_pression) exceeds a threshold */
           if (mp_max_abs_vect(*sec["pression"]) > 1e-16)
             {
-              matrice_pression_.ajouter_multvect(inco["pression"]->valeurs(), *sec["pression"]); //passage increment -> variable pour faire plaisir aux solveurs iteratifs
-              solv_p->reinit(), solv_p->set_return_on_error(1); /* pour eviter un exit() en cas d'echec */
+              matrice_pression_.ajouter_multvect(inco["pression"]->valeurs(), *sec["pression"]); //convert increment -> variable to satisfy iterative solvers
+              solv_p->reinit(), solv_p->set_return_on_error(1); /* to avoid an exit() on failure */
               ok = (solv_p.resoudre_systeme(matrice_pression_, *sec["pression"], *incr["pression"]) >= 0);
               if (!ok)
                 {
-                  Cerr << "Echec du solveur!";
-                  break; //le solveur a echoue -> on sort
+                  Cerr << "Solver failed!";
+                  break; //solver failed -> exit
                 }
               incr["pression"]->echange_espace_virtuel();
               *incr["pression"] -= inco["pression"]->valeurs();
@@ -581,28 +581,28 @@ void SETS::iterer_NS(Equation_base& eqn, DoubleTab& current,
           else
             *incr["pression"] = 0;
 
-          //increments des autres variables
+          // increments of the other variables
           for (auto &&n_v : b_p)
             {
-              *incr[n_v.first] = n_v.second; //partie constante
-              A_p_[n_v.first].ajouter_multvect(*incr["pression"], *incr[n_v.first]); //dependance en les increments de pression
+              *incr[n_v.first] = n_v.second; //constant part
+              A_p_[n_v.first].ajouter_multvect(*incr["pression"], *incr[n_v.first]); //dependence on pressure increments
               incr[n_v.first]->echange_espace_virtuel();
             }
         }
-      else /* pas de reduction en pression : on passe directement par mat_semi_impl */
+      else /* no pressure reduction: go directly through mat_semi_impl */
         {
-          mat_semi_impl_.ajouter_multvect(v_inco, v_sec); //passage increment -> variable pour faire plaisir aux solveurs iteratifs
-          solv_p->reinit(), solv_p->set_return_on_error(1); /* pour eviter un exit() en cas d'echec */
+          mat_semi_impl_.ajouter_multvect(v_inco, v_sec); //convert increment -> variable to satisfy iterative solvers
+          solv_p->reinit(), solv_p->set_return_on_error(1); /* to avoid an exit() on failure */
           ok = (solv_p.resoudre_systeme(mat_semi_impl_, v_sec, v_incr) >= 0);
           if (!ok)
             {
-              Cerr << "Echec du solveur!";
-              break; //le solveur a echoue -> on sort
+              Cerr << "Solver failed!";
+              break; //solver failed -> exit
             }
-          v_incr -= v_inco; //retour en increments
+          v_incr -= v_inco; //back to increments
         }
 
-      eqn.solv_masse().corriger_solution(*incr["vitesse"], *incr["vitesse"], 1); //pour PolyMAC_MPFA : sert a corriger ve
+      eqn.solv_masse().corriger_solution(*incr["vitesse"], *incr["vitesse"], 1); //for PolyMAC_MPFA: used to correct ve
 
       if (!Process::me())
         tp << it + 1;
@@ -619,28 +619,28 @@ void SETS::iterer_NS(Equation_base& eqn, DoubleTab& current,
             }
         }
 
-      /* convergence? */
+      /* convergence check */
       cv = corriger_incr_alpha(inco["alpha"]->valeurs(), *incr["alpha"], err_a_sum) < crit_conv_["alpha"];
       for (auto &&n_v : incr)
         if (crit_conv_.count(n_v.first))
           cv &= mp_max_abs_vect(*n_v.second) < crit_conv_.at(n_v.first);
 
-      /* mises a jour : inconnues -> milieu -> champs/conserves -> sources */
+      /* updates: unknowns -> medium -> conserved fields -> sources */
       for (auto &&n_i : inco)
         n_i.second->valeurs() += *incr[n_i.first];
       if (p_degen_)
-        inco["pression"]->valeurs() -= mp_min_vect(inco["pression"]->valeurs()); // On prend la pression minimale comme pression de reference afin d'avoir la meme pression de reference en sequentiel et parallele
+        inco["pression"]->valeurs() -= mp_min_vect(inco["pression"]->valeurs()); // Use the minimum pressure as reference so that the same reference is used in sequential and parallel
       if (!(ok = err_a_sum < crit_conv_["alpha"]))
         {
-          Cerr << "Erreur en alpha!";
-          break; //si on a depasse les bornes du milieu sur (p, T) ou si on manque de precision, on doit sortir
+          Cerr << "Error in alpha!";
+          break; //if we have exceeded the medium bounds on (p, T) or lack precision, we must exit
         }
       if (!(ok = eq_qdm.milieu().check_unknown_range()))
         {
-          Cerr << "Sortie des bornes!";
-          break; //si on a depasse les bornes du milieu sur (p, T) ou si on manque de precision, on doit sortir
+          Cerr << "Out of bounds!";
+          break; //if we have exceeded the medium bounds on (p, T) or lack precision, we must exit
         }
-      pb.mettre_a_jour(t); //inconnues -> milieu -> champs conserves
+      pb.mettre_a_jour(t); //unknowns -> medium -> conserved fields
     }
 
   if (!Process::me())
@@ -732,41 +732,41 @@ int SETS::eliminer(const std::vector<std::set<std::pair<std::string, int>>> ordr
           if (v_m.second->nb_colonnes() && v_m.first != inco_p && e_i.count(v_m.first) && !i_bloc.count(v_m.first))
             dep.insert(v_m.first);
 
-      /* lignes du bloc a traiter */
-      std::pair<std::string, int> i_b0 = *bloc.begin(); //premiere inconnue du bloc
-      IntTrav calc(dims[i_b0][0]); //calc[i] = 1 si on doit traiter l'item i
+      /* rows of the block to process */
+      std::pair<std::string, int> i_b0 = *bloc.begin(); //first unknown of the block
+      IntTrav calc(dims[i_b0][0]); //calc[i] = 1 if item i must be processed
       A = mats.at(i_b0.first).at(i_b0.first);
       oMg = offs[i_b0];
       M = dims[i_b0][1];
       for (int i = 0; i < calc.size_array(); i++)
         if (A->get_tab1()(oMg + M * i + 1) > A->get_tab1()(oMg + M * i))
-          calc(i) = 1; //on traite toutes les lignes dont la matrice est remplie
+          calc(i) = 1; //process all rows whose matrix is filled
 
-      if (prems) //premier passage -> dimensionnement des A_p
+      if (prems) //first pass -> sizing of A_p
         {
           /* verification de la compatibilite des inconnues du bloc -> avec les MD_Vector renseignes dans sec */
           for (auto &&i_b : bloc)
             if (dims[i_b0][0] != dims[i_b][0])
               {
-                Cerr << "SETS::eliminer() : discretisation des inconnues" << i_b0.first << "/" << i_b0.second << " et " << i_b.first << "/" << i_b.second << " incompatibles!" << finl;
+                Cerr << "SETS::eliminer() : discretization of unknowns" << i_b0.first << "/" << i_b0.second << " and " << i_b.first << "/" << i_b.second << " incompatible!" << finl;
                 Process::exit();
               }
 
-          std::vector<std::set<int>> stencil(calc.size_array()); //stencil[i] -> stencil de l'item i (a demultiplier par le line_size() de chaque variable)
+          std::vector<std::set<int>> stencil(calc.size_array()); //stencil[i] -> stencil of item i (to be multiplied by line_size() of each variable)
           for (auto &&i_b : bloc)
             for (auto &&v_m : mats.at(i_b.first))
               if (v_m.second->nb_coeff())
                 {
                   oMg = offs[i_b];
                   M = dims[i_b][1];
-                  if (v_m.first == inco_p) //dependance directe en inco_p
+                  if (v_m.first == inco_p) //direct dependence on inco_p
                     {
                       for (int i = 0; i < calc.size_array(); i++)
                         if (calc[i])
-                          for (auto j = v_m.second->get_tab1()(oMg + M * i) - 1; j < v_m.second->get_tab1()(oMg + M * (i + 1)) - 1; j++) //dependances de toutes les lignes
+                          for (auto j = v_m.second->get_tab1()(oMg + M * i) - 1; j < v_m.second->get_tab1()(oMg + M * (i + 1)) - 1; j++) //dependences of all rows
                             stencil[i].insert(v_m.second->get_tab2()(j) - 1);
                     }
-                  else if (e_i.count(v_m.first) || i_bloc.count(v_m.first)) //dependance en une variable partiellement / totalement eliminee
+                  else if (e_i.count(v_m.first) || i_bloc.count(v_m.first)) //dependence on a partially / fully eliminated variable
                     {
                       A = A_p.count(v_m.first) ? &A_p.at(v_m.first) : nullptr;
                       for (int i = 0; i < calc.size_array(); i++)

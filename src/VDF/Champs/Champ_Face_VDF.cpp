@@ -159,22 +159,22 @@ const Champ_Proto& Champ_Face_VDF::affecter(const DoubleTab& v)
               val(num_face) = v(num_face, orientation(num_face));
           else
             {
-              Cerr << "Erreur TRUST dans Champ_Face_VDF::affecter(const DoubleTab& )" << finl;
-              Cerr << "Les dimensions du DoubleTab passe en parametre sont incompatibles avec celles du Champ_Face_VDF " << finl;
+              Cerr << "TRUST error in Champ_Face_VDF::affecter(const DoubleTab& )" << finl;
+              Cerr << "The dimensions of the DoubleTab passed as parameter are incompatible with those of Champ_Face_VDF " << finl;
               Process::exit();
             }
         }
       else
         {
-          Cerr << "Erreur TRUST dans Champ_Face_VDF::affecter(const DoubleTab& )" << finl;
-          Cerr << "Les dimensions du DoubleTab passe en parametre sont incompatibles avec celles du Champ_Face_VDF " << finl;
+          Cerr << "TRUST error in Champ_Face_VDF::affecter(const DoubleTab& )" << finl;
+          Cerr << "The dimensions of the DoubleTab passed as parameter are incompatible with those of Champ_Face_VDF " << finl;
           Process::exit();
         }
     }
   return *this;
 }
 
-// Cas CL periodique : assure que les valeurs sur des faces periodiques en vis a vis sont identiques. Pour cela on prend la demi somme des deux valeurs.
+// Periodic BC case: ensures that values on periodic faces facing each other are identical. For this we take the half-sum of the two values.
 void Champ_Face_VDF::verifie_valeurs_cl()
 {
   const Domaine_Cl_dis_base& zcl = domaine_Cl_dis();
@@ -1309,14 +1309,14 @@ void Champ_Face_VDF::calculer_dercov_axi(const Domaine_Cl_VDF& domaine_Cl_VDF)
           }
         case 3:
           {
-            // symetrie-symetrie
-            // pas de flux diffusif calcule
+            // symmetry-symmetry
+            // no diffusive flux computed
             break;
           }
         default:
           {
-            Cerr << "On a rencontre un type d'arete non prevu\n";
-            Cerr << "num arete : " << n_arete;
+            Cerr << "An unexpected edge type was encountered\n";
+            Cerr << "edge number: " << n_arete;
             Cerr << " type : " << n_type;
             exit();
             break;

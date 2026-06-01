@@ -817,7 +817,7 @@ do
             exec=$dev_dir/basic_opt
             OK="KO" && rm -f err && [ -f $exec ] && trust exec_opt 1>atelier.log 2>&1 && OK=`$TRUST_Awk 'BEGIN {mes="KO"} /TEST_ATELIER_OK/ { mes="OK" } END {print mes}' atelier.log`
             # On verifie qu'il est alle jusqu'a la fin aussi...
-            [ "`grep 'Arret des processes.' atelier.log`" = "" ] && OK=KO
+            [ "`grep 'Stopping processes.' atelier.log`" = "" ] && OK=KO
             # Construction d'un module
             if [ $OK = OK ]
             then

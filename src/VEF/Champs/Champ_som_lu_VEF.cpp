@@ -43,7 +43,7 @@ DoubleVect& Champ_som_lu_VEF::valeur_a_compo(const DoubleVect& positions, Double
     {
     case 1:
       {
-        Cerr << "Il y a un pbl !! Il faut etre en 2D ou 3D !!" << finl;
+        Cerr << "There is a problem!! Must be in 2D or 3D !!" << finl;
         break;
       }
     case 2:
@@ -85,8 +85,8 @@ DoubleTab& Champ_som_lu_VEF::valeur_aux_elems(const DoubleTab& positions, const 
 
   if (dimension == 2)
     {
-      Cerr << "ATTENTION : Cela n a pas encore ete teste en 2D!!!" << finl;
-      Cerr << "Il manque les fonctions de forme en 2D!! A vous de jouer!!" << finl;
+      Cerr << "WARNING: This has not yet been tested in 2D!!!" << finl;
+      Cerr << "The shape functions in 2D are missing!! Feel free to implement them!!" << finl;
     }
 
   const DoubleTab& ch = valeurs();
@@ -125,8 +125,8 @@ DoubleVect& Champ_som_lu_VEF::valeur_aux_elems_compo(const DoubleTab& positions,
 
   if (dimension == 2)
     {
-      Cerr << "ATTENTION : Cela n a pas encore ete teste en 2D!!!" << finl;
-      Cerr << "Il manque les fonctions de forme en 2D!! A vous de jouer!!" << finl;
+      Cerr << "WARNING: This has not yet been tested in 2D!!!" << finl;
+      Cerr << "The shape functions in 2D are missing!! Feel free to implement them!!" << finl;
       Process::exit();
     }
 

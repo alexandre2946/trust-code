@@ -30,8 +30,8 @@ void EDO_Pression_th_VEF::completer()
 {
   if (!ref_cast(Domaine_VEF,le_dom.valeur()).get_alphaE())
     {
-      Cerr << "Le modele quasi compressible ne fonctionne pas encore avec cette discretisation." << finl;
-      Cerr << "En VEF, la discretisation doit avoir le support P0. Donc utiliser P1Bulle ou P0P1." << finl;
+      Cerr << "The quasi-compressible model does not yet work with this discretization." << finl;
+      Cerr << "In VEF, the discretization must have P0 support. Use P1Bulle or P0P1." << finl;
       Process::exit();
     }
 
@@ -89,8 +89,8 @@ void EDO_Pression_th_VEF::calculer_grad(const DoubleTab& inco, DoubleTab& grad)
             }
         }
 
-      // On traite les faces internes
-      //    Cerr << "Faces internes." << finl;
+      // Process internal faces
+      //    Cerr << "Internal faces." << finl;
       for (face = dom.premiere_face_int(); face < dom.nb_faces(); face++)
         {
           elem1 = face_voisins(face, 0);
@@ -196,7 +196,7 @@ void EDO_Pression_th_VEF::calculer_grad(const DoubleTab& inco, DoubleTab& grad)
             }
         }
       else
-        Cerr << "ATTENTION : gradient de l'inco mal calcule en 3D" << finl;
+        Cerr << "WARNING: gradient of inco incorrectly computed in 3D" << finl;
     }
 }
 

@@ -135,7 +135,7 @@ void Interpolation_IBM_elem_fluid::computeFluidElems(Domaine_dis_base& le_dom_di
             }
           else
             {
-              Cerr<<"erreur in computeFluidElems : elem corresp_elems_ref(elem) = "<<i<<" "<<corresp_elems_ref(i)<<" ; indextag = "<<indextag<<" < 0 ou >= "<<dimtag<<finl;
+              Cerr<<"error in computeFluidElems : elem corresp_elems_ref(elem) = "<<i<<" "<<corresp_elems_ref(i)<<" ; indextag = "<<indextag<<" < 0 or >= "<<dimtag<<finl;
               exit();
             }
         }
@@ -186,7 +186,7 @@ void Interpolation_IBM_elem_fluid::computeFluidElems(Domaine_dis_base& le_dom_di
                 {
                   Cerr << __FILE__ << (int)__LINE__ << "Interpolation_IBM_elem_fluid::computeFluidElems : ERROR : joint width too low?" << finl;
                   Cerr<<"node elems_fluid_ref(node) = "<<i<<" "<<elems_fluid_ref(i)<<finl;
-                  Cerr<<"index = "<<indexr<<" < 0 ou >= "<<dimtag<<finl;
+                  Cerr<<"index = "<<indexr<<" < 0 or >= "<<dimtag<<finl;
                   exit();
                 }
             }

@@ -75,7 +75,7 @@ Entree& Op_Dift_standard_VEF_Face::readOn(Entree& is)
       else if (motlu == "filtrer_resu") is >> filtrer_resu;
       else
         {
-          Cerr << motlu << " n'est pas compris par " << que_suis_je() << finl;
+          Cerr << motlu << " is not understood by " << que_suis_je() << finl;
           Process::exit();
         }
       is >> motlu;

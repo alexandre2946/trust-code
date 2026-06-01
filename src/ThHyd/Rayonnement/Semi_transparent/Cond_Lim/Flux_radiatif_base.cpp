@@ -53,9 +53,9 @@ Entree& Flux_radiatif_base::readOn(Entree& is)
           }
         default:
           {
-            Cerr << "Erreur a la lecture de la condition aux limites de type " << finl;
+            Cerr << "Error reading the boundary condition of type " << finl;
             Cerr << "Flux_radiatif_base " << finl;
-            Cerr << "On attendait " << les_motcles << "a la place de " << motlu << finl;
+            Cerr << "Expected " << les_motcles << "instead of " << motlu << finl;
             Process::exit();
           }
         }
@@ -98,12 +98,12 @@ double Flux_radiatif_base::flux_impose(int i) const
   else if (le_champ_front->valeurs().dimension(1) == 1)
     return le_champ_front->valeurs()(i, 0);
   else
-    Cerr << "Flux_radiatif_base::flux_impose erreur" << finl;
+    Cerr << "Flux_radiatif_base::flux_impose error" << finl;
   Process::exit();
   return 0.;
 }
 
-/*! @brief Renvoie la valeur de flux imposes a la paroi radiative
+/*! @brief Returns the imposed flux value at the radiative wall.
  *
  */
 double Flux_radiatif_base::flux_impose(int i, int j) const

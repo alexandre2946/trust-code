@@ -65,13 +65,13 @@ DoubleTab& Masse_VEF_P1NC::appliquer_impl(DoubleTab& tab_sm) const
 
   if (nfa != tab_sm.dimension(0))
     {
-      Cerr << "erreur dans Masse_VEF_P1NC : ";
-      Cerr << "nombre de faces :  " << nfa
-           << " taille du second membre : " << tab_sm.dimension(0) << finl;
+      Cerr << "Error in Masse_VEF_P1NC: ";
+      Cerr << "number of faces: " << nfa
+           << " size of right-hand side: " << tab_sm.dimension(0) << finl;
       exit();
     }
 
-  // On traite les faces standard qui ne portent pas de conditions aux limites
+  // Process standard faces that carry no boundary conditions
   CDoubleArrView porosite_face = equation().milieu().porosite_face().view_ro();
   CDoubleArrView volumes_entrelaces = tab_volumes_entrelaces.view_ro();
   DoubleTabView sm = tab_sm.view_rw();

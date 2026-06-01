@@ -67,15 +67,15 @@ int Paroi_scal_hyd_base_EF::init_lois_paroi()
   tab_d_reel_.resize(nb_faces_bord_reelles);
   tab_.resize(nb_faces_bord_reelles, nb_fields_);
 
-  // Initialisations de equivalent_distance_, tab_d_reel, positions_Pf, elems_plus
-  // On initialise les distances equivalentes avec les distances geometriques
+  // Initialize equivalent_distance_, tab_d_reel, positions_Pf, elems_plus
+  // Initialize equivalent distances with geometric distances
   const IntTab& face_voisins = le_dom_dis_->face_voisins();
   const DoubleVect& volumes_maille = le_dom_dis_->volumes();
   const DoubleVect& surfaces_face = le_dom_dis_->face_surfaces();
 
   if (axi)
     {
-      Cerr << "Attention, rien n'est fait en Axi pour le EF" << finl;
+      Cerr << "Warning, nothing is done in Axi for EF" << finl;
       exit();
     }
   else

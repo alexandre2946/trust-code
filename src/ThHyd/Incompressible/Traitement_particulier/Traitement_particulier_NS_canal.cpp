@@ -188,8 +188,8 @@ Entree& Traitement_particulier_NS_canal::lire(Entree& is)
 
 void Traitement_particulier_NS_canal::remplir_Tab_recap(IntTab& Tab_rec) const
 {
-// surchargeee dans VDF
-  Cerr << "Traitement_particulier_NS_canal::remplir_Tab_recap ne marche pas pour le VEF" << finl;
+// overridden in VDF
+  Cerr << "Traitement_particulier_NS_canal::remplir_Tab_recap does not work for VEF" << finl;
 //  Process::exit();
 }
 
@@ -270,12 +270,12 @@ void Traitement_particulier_NS_canal::remplir_reordonne_Y_tot(const DoubleVect& 
 
       if(est_egal(tab_Y_tot(0),1.e12))
         {
-          Cerr << "Probleme a la construction de Y_tot" << finl;
+          Cerr << "Problem while building Y_tot" << finl;
           exit();
         }
 
       tab_Y_tot.ordonne_array();
-      // Envoi de Y_tot aux autres processeurs
+      // Send Y_tot to other processors
       for(int p=1; p<Process::nproc(); p++)
         envoyer(tab_Y_tot, 0, p, 0);
     }
@@ -320,7 +320,7 @@ void Traitement_particulier_NS_canal::reprendre_stat_canal(DoubleTab& val, const
 
   if(fic.fail())
     {
-      Cerr << "Impossible d'ouvrir le fichier " << fichier << finl;
+      Cerr << "Cannot open the file " << fichier << finl;
       exit();
     }
 
@@ -345,8 +345,8 @@ void Traitement_particulier_NS_canal::reprendre_stat_canal(DoubleTab& val, const
 
   if(!est_egal(tps_deb_moy,temps_deb,0.1))
     {
-      Cerr << "ERREUR : le temps de debut des stats figurant dans le jeu de donnees differe de beaucoup" << finl;
-      Cerr << "du temps defini dans le fichier de reprise : " << fichier << finl;
+      Cerr << "ERROR : the start time of the stats in the data file differs greatly" << finl;
+      Cerr << "from the time defined in the restart file : " << fichier << finl;
       exit();
     }
 

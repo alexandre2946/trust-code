@@ -30,18 +30,18 @@ Sortie& EDO_Pression_th_VDF_Gaz_Parfait::printOn(Sortie& os) const { return os <
 
 Entree& EDO_Pression_th_VDF_Gaz_Parfait::readOn(Entree& is) { return is; }
 
-/*! @brief Resoud l'EDO
+/*! @brief Solves the ODE for the thermodynamic pressure.
  *
- * @param (double Pth_n) La pression a l'etape precedente
- * @return (double) La nouvelle valeur de la pression
+ * @param Pth_n pressure at the previous time step
+ * @return new value of the thermodynamic pressure
  */
 double EDO_Pression_th_VDF_Gaz_Parfait::resoudre(double Pth_n)
 {
   int traitPth = le_fluide_->getTraitementPth();
-  const DoubleTab& tempnp1 = le_fluide_->inco_chaleur().valeurs();       //actuel
+  const DoubleTab& tempnp1 = le_fluide_->inco_chaleur().valeurs();       //current
   if (traitPth == 0)
     {
-      Cerr << "on choisit le traitement " << finl;
+      Cerr << "Selecting thermodynamic pressure treatment " << finl;
       int n_bord;
       traitPth = 1;
       for (n_bord = 0; n_bord < le_dom->nb_front_Cl(); n_bord++)
@@ -56,7 +56,7 @@ double EDO_Pression_th_VDF_Gaz_Parfait::resoudre(double Pth_n)
     }
 
   double dt = le_fluide_->vitesse().equation().schema_temps().pas_de_temps();
-  if (traitPth == 2)   //Cerr << "trait cst" << finl;
+  if (traitPth == 2)   //Cerr << "constant treatment" << finl;
     {
       return Pth_n;
     }
@@ -102,7 +102,7 @@ double EDO_Pression_th_VDF_Gaz_Parfait::resoudre(double Pth_n)
 
           else if (sub_type(Neumann_sortie_libre, la_cl))
             {
-              Cerr << la_cl.que_suis_je() << " est incompatible avec le traitement conservation_masse pour l'instant" << finl;
+              Cerr << la_cl.que_suis_je() << " is incompatible with the conservation_masse treatment for now" << finl;
               abort();
             }
         }
@@ -124,13 +124,13 @@ double EDO_Pression_th_VDF_Gaz_Parfait::resoudre(double Pth_n)
         return Pth_n;
 
     }
-  Cerr << " Le codage ici est faux !!!!" << finl;
-  Cerr << " Pour l'instant on bloque" << finl;
+  Cerr << " The code here is incorrect !!!!" << finl;
+  Cerr << " Blocking for now" << finl;
   assert(0);
   exit();
   const DoubleTab& tab_vit = ref_cast(Navier_Stokes_std,le_fluide_->vitesse().equation()).vitesse().valeurs();
-  const DoubleTab& tempn = le_fluide_->inco_chaleur().passe();        //passe
-  const DoubleTab& tab_rho = le_fluide_->masse_volumique().valeurs();    //actuel
+  const DoubleTab& tempn = le_fluide_->inco_chaleur().passe();        //previous
+  const DoubleTab& tab_rho = le_fluide_->masse_volumique().valeurs();    //current
 
   Cerr << "---EDO : Tnp1=" << tempnp1(0) << " Tn=" << tempn(0) << finl;
 
@@ -205,7 +205,7 @@ double EDO_Pression_th_VDF_Gaz_Parfait::resoudre(double Pth_n)
 
   double Pth = (1. / (V / dt + F / 2.)) * ((V / dt - F / 2.) * Pth_n + S);
 
-  Cerr << "Pression thermo recalculee = " << Pth << finl;
+  Cerr << "Recomputed thermodynamic pressure = " << Pth << finl;
 
   //return Pth1;
   return Pth;
@@ -272,7 +272,7 @@ void EDO_Pression_th_VDF_Gaz_Parfait::resoudre(DoubleTab& Pth_n)
 
           else if (sub_type(Neumann_sortie_libre, la_cl))
             {
-              Cerr << la_cl.que_suis_je() << " est incompatible avec le traitement conservation_masse pour l'instant" << finl;
+              Cerr << la_cl.que_suis_je() << " is incompatible with the conservation_masse treatment for now" << finl;
               Process::exit();
             }
         }

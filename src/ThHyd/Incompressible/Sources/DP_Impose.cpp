@@ -55,7 +55,7 @@ Entree& DP_Impose::lire_donnees(Entree& is)
   is >> motlu;
   if (motlu != acc_ouverte)
     {
-      Cerr << "On attendait le mot cle" << acc_ouverte << " a la place de " << motlu << finl;
+      Cerr << "We expected the keyword" << acc_ouverte << " instead of " << motlu << finl;
       Process::exit();
     }
   is >> motlu;
@@ -78,7 +78,7 @@ Entree& DP_Impose::lire_donnees(Entree& is)
     }
   else
     {
-      Cerr << "On attendait le mot cle dp ou dp_regul a la place de " << motlu << finl;
+      Cerr << "We expected the keyword dp or dp_regul instead of " << motlu << finl;
       Process::exit();
     }
   return is;

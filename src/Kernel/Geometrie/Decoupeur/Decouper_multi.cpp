@@ -140,25 +140,25 @@ Entree& Decouper_multi::interpreter(Entree& is)
         for (u_procs.clear(), k = 0; k < ns; k++)
           for (auto &&pr : procs[k])
             u_procs.insert(pr); //union
-        for (k = 0; k < ns; k++)  /* on ajoute a chaque sommet les procs auxquels il n'est pas deja connecte */
+        for (k = 0; k < ns; k++)  /* add to each vertex the procs to which it is not yet connected */
           if (procs[k].size() < u_procs.size())
             {
-              std::set<int>& dest = v_sp[v_ds[k][0]][v_ds[k][1]]; //ou on doit inserer
+              std::set<int>& dest = v_sp[v_ds[k][0]][v_ds[k][1]]; //where we must insert
               std::set_difference(u_procs.begin(), u_procs.end(), procs[k].begin(), procs[k].end(), std::inserter(dest, dest.end()));
             }
       }
   S_i->decrRef(), S->decrRef();
-  Cerr << count << " sommets trouves!" << finl;
+  Cerr << count << " vertices found!" << finl;
 
 #else
   Process::exit("Decouper_multi requires MEDCoupling!");
 #endif
 
-  /* ecriture des domaines avec les sommets raccord qu'on a trouves */
+  /* write the domains with the connector vertices that were found */
   for (d = 0; d < (int) v_dec.size(); d++)
     {
       Static_Int_Lists som_raccord;
-      ArrOfInt sizes(v_dom[d]->nb_som()); //tailles des listes par sommet
+      ArrOfInt sizes(v_dom[d]->nb_som()); //list sizes per vertex
       sizes = 0;
       for (auto && s_p : v_sp[d]) sizes[s_p.first] = (int)s_p.second.size();
       som_raccord.set_list_sizes(sizes);

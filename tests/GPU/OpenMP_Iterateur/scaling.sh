@@ -101,7 +101,7 @@ do
             [ $run = 1 ] && [ $mpi != 1 ] && (make_PAR.data $jdd $mpi 1>/dev/null 2>&1;cp PAR_$jdd.data $jdd.data)
             # Calcul
             [ $run = 1 ] && (trust $jdd $mpi -ksp_view -journal=0 1>$jdd.out_err 2>&1 || (rm -f *.TU;echo "Error:See "`pwd`/$jdd.out_err))
-            [ "`grep 'Arret des process' $jdd.out_err`" = "" ] && break
+            [ "`grep 'Stopping processes.' $jdd.out_err`" = "" ] && break
             # Analyse
 	    i=0 && [ "$HOST" = adastra ] && i=1
 	    hram=`awk -v i=$i '/RAM taken/ {if ($(13+i)>RAM) RAM=$(13+i)} END {print 0.1*int(0.01*RAM)}' $jdd.out_err`

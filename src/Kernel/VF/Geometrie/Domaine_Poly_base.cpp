@@ -545,53 +545,53 @@ void Domaine_Poly_base::orthocentrer()
             std::array<double, 3> vec = cross(3, 3, &xv_(f, 0), &ta_(a, 0), &xs(s, 0));
             r2min = std::min(r2min, dot(&vec[0], &vec[0]));
           }
-        if (dot(&X(0, 0), &X(0, 0)) > 0.25 * r2min) continue; //on s'eloigne trop du CG
+        if (dot(&X(0, 0), &X(0, 0)) > 0.25 * r2min) continue; //moving too far from the CG
 
         for (i = 0, b_f_ortho(f) = 1; i < dimension; i++)
           if (std::fabs(X(i, 0)) > 1e-8) xv_(f, i) += X(i, 0);
       }
   Cerr << 100. * (double)(mp_somme_vect(b_f_ortho) / Process::mp_sum(nb_faces())) << "% orthocentered faces " << finl;
 
-  /* 2. orthocentrage des elements */
+  /* 2. orthocentering of elements */
   Cerr << domaine().le_nom() << " : ";
   for (e = 0; e < nb_elem_tot(); e++)
     {
-      //l'element est-il deja orthocentre?
+      //is the element already orthocentered?
       double d2min = DBL_MAX, d2max = 0, d2;
       for (i = 0, np = 0; i < e_s.dimension(1) && (s = e_s(e, i)) >= 0; i++, np++)
         d2min = std::min(d2min, d2 = dot(&xs(s, 0), &xs(s, 0), &xp_(e, 0), &xp_(e, 0))), d2max = std::max(d2max, d2);
       if ((b_e_ortho(e) = (d2max / d2min - 1 < 1e-8))) continue;
 
-      //pour qu'on puisse l'orthocentrer, il faut que ses faces le soient
+      //for orthocentering to be possible, all faces of the element must be orthocentered
       for (i = 0, j = 1; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++) j = j && b_f_ortho(f);
       if (!j) continue;
 
-      //existe-il un orthocentre?
+      //does an orthocentre exist?
       M.resize(np, dimension + 1), S.resize(np, 1);
       for (i = 0; i < np; i++)
         for (j = 0, S(i, 0) = 0, M(i, dimension) = 1; j < dimension; j++)
           S(i, 0) += 0.5 * std::pow(M(i, j) = xs(e_s(e, i), j) - xp_(e, j), 2);
-      if (kersol(M, S, 1e-12, nullptr, X, vp) > 1e-8) continue; //l'element n'a pas d'orthocentre
+      if (kersol(M, S, 1e-12, nullptr, X, vp) > 1e-8) continue; //the element has no orthocentre
 
-      //contrainte : ne pas diminuer la distance entre xp et chaque face de plus de 50%
+      //constraint: do not reduce the distance between xp and each face by more than 50%
       double rmin = DBL_MAX;
       for (i = 0; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++)
         rmin = std::min(rmin, std::fabs(dot(&xp_(e, 0), &nf(f, 0), &xv_(f, 0)) / fs(f)));
-      if (dot(&X(0, 0), &X(0, 0)) > 0.25 * rmin * rmin) continue; //on s'eloigne trop du CG
+      if (dot(&X(0, 0), &X(0, 0)) > 0.25 * rmin * rmin) continue; //moving too far from the CG
 
       for (i = 0, b_e_ortho(e) = 1; i < dimension; i++)
         if (std::fabs(X(i, 0)) > 1e-8) xp_(e, i) += X(i, 0);
     }
-  Cerr << 100. * (double)(mp_somme_vect(b_e_ortho) / Process::mp_sum(nb_elem())) << "% d'elements orthocentres" << finl;
+  Cerr << 100. * (double)(mp_somme_vect(b_e_ortho) / Process::mp_sum(nb_elem())) << "% orthocentered elements" << finl;
 }
 
 void Domaine_Poly_base::calculer_h_carre()
 {
-  // Calcul de h_carre
+  // Computation of h_carre
   h_carre = 1.e30;
-  if (h_carre_.size()) return; // deja fait
+  if (h_carre_.size()) return; // already done
   h_carre_.resize(nb_elem_tot());
-  // Calcul des surfaces
+  // Computation of the surfaces
   const DoubleVect& surfaces=face_surfaces();
   const int nb_faces_elem=domaine().nb_faces_elem();
   const int nbe=nb_elem_tot();

@@ -222,35 +222,35 @@ DoubleTab& Terme_Source_Acceleration_VEF_Face::ajouter(DoubleTab& resu) const
   return resu;
 }
 
-/*! @brief Calcul du champ de vitesse trois composantes aux faces a partir du champ de vitesse aux faces de eq_hydraulique_.
+/*! @brief Computes the three-component velocity field at faces from the velocity field at faces of eq_hydraulique_.
  *
  * inconnue().
- *   En VEF: rien a faire. On ne se sert pas du stockage fourni en
- *   parametre, on renvoie N.S.inconnue()
+ *   In VEF: nothing to do. The provided storage is not used; N.S.inconnue() is returned directly.
  *
- * @param (v_faces_stockage) tableau ou stocker le resultat s'il y a des calculs a faire. En vef, on ne s'en sert pas
+ * @param v_faces_stockage array to store the result if computations are needed. Not used in VEF.
+ * @return reference to the velocity values.
  */
 const DoubleTab& Terme_Source_Acceleration_VEF_Face::calculer_vitesse_faces(DoubleTab& v_faces_stockage) const
 {
   return get_eq_hydraulique().inconnue().valeurs();
 }
 
-/*! @brief Associe le champ de masse volumique=> Le terme source calcule sera alors homogene a d/dt(integrale(rho*v)).
+/*! @brief Associates the density field. The computed source term will then be homogeneous to d/dt(integral(rho*v)).
  *
- * @param (champ_rho) un champ de type Champ_Fonc_P0_VEF qui sera utilise lors des appels a "ajouter()" pour evaluer la masse volumique.
+ * @param champ_rho a field of type Champ_Fonc_P0_VEF that will be used in calls to "ajouter()" to evaluate the density.
  */
 
 void Terme_Source_Acceleration_VEF_Face::associer_champ_rho(const Champ_base& champ_rho)
 {
-  // Il faut que le champ soit discretise aux elements: possibilite
-  // d'autoriser d'autres types si besoin (Champ_Don, Champ_Inc, etc.)
-  // du moment que c'est des champs P0.
+  // The field must be discretized at elements: possibility
+  // to allow other types if needed (Champ_Don, Champ_Inc, etc.)
+  // as long as they are P0 fields.
   if (!sub_type(Champ_Fonc_P0_VEF, champ_rho))
     {
-      Cerr << "Erreur dans Terme_Source_Acceleration_VEF_Face::associer_champ_rho" << finl;
-      Cerr << " Le champ de masse volumique doit etre de type Champ_Fonc_P0_VEF" << finl;
-      Cerr << " Type du champ associe : " << champ_rho.que_suis_je() << finl;
-      Cerr << " Nom du champ associe :  " << champ_rho.le_nom() << finl;
+      Cerr << "Error in Terme_Source_Acceleration_VEF_Face::associer_champ_rho" << finl;
+      Cerr << " The density field must be of type Champ_Fonc_P0_VEF" << finl;
+      Cerr << " Type of the associated field: " << champ_rho.que_suis_je() << finl;
+      Cerr << " Name of the associated field: " << champ_rho.le_nom() << finl;
       assert(0);
       exit();
     }

@@ -30,16 +30,16 @@
 // XD_CONT expressed in W.m-3 in 3D (in W.m-2 in 2D). It is a power per volume unit (in a porous media, it is a power
 // XD_CONT per fluid volume unit).
 
-/*! @brief Lit le terme de puissance thermique a partir d'un flot d'entree et d une equation pour eventuellement
+/*! @brief Reads the thermal power term from an input stream and an equation, possibly using the discretisation to type la_puissance.
  *
- *     acceder a la discretisation afin de typer la_puissance.
- *     Lit uniquement un champ donne representant la_puissance.
+ *     Reads only the prescribed field representing la_puissance.
  *
- * @param (Entree& is) un flot d'entree
+ * @param is An input stream.
+ * @param eqn The equation owning this source term.
  */
 void Terme_Puissance_Thermique::lire_donnees(Entree& is,const Equation_base& eqn)
 {
-  Cerr << "Lecture du Champ Puissance" << finl;
+  Cerr << "Reading Power Field" << finl;
 
   Motcle type;
   is >> type;

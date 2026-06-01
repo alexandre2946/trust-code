@@ -45,7 +45,7 @@ double Eval_Dift_VDF_Face::tau_tan_impl(int face, int k) const
   int f = (face >= tau_tan_.dimension(0)) ? ind_faces_virt_bord[face-nb_faces] : face;
   if(f >= tau_tan_.dimension_tot(0))
     {
-      Cerr << "Erreur dans tau_tan " << finl;
+      Cerr << "Error in tau_tan " << finl;
       Cerr << "dimension : " << tau_tan_.dimension(0) << finl;
       Cerr << "dimension_tot : " << tau_tan_.dimension_tot(0) << finl;
       Cerr << "face : " << face << finl;

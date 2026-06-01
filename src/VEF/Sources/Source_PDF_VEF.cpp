@@ -91,7 +91,7 @@ void Source_PDF_VEF::multiply_coeff_volume(DoubleTab& coeff) const
   int nc = coeff.dimension_tot(0) ;
   if (n != nc)
     {
-      Cerr<<" dimensions differentes n nc = "<<n<<" "<<nc<<finl;
+      Cerr<<" different dimensions n nc = "<<n<<" "<<nc<<finl;
       exit();
     }
   int ndim = coeff.dimension(1) ;
@@ -125,10 +125,10 @@ DoubleTab& Source_PDF_VEF::ajouter_(const DoubleTab& variable, DoubleTab& resu, 
   const DoubleVect& volume=domaine_VEF.volumes_entrelaces();
   int dim_esp = Objet_U::dimension ;
   int dim_var = variable.dimension(1);
-  // Cerr << "erreur ici" << finl;
+  // Cerr << "error here" << finl;
   if (dim_var != 1 && dim_var != dim_esp)
     {
-      Cerr<<"ajouter_: dimension variable differente 1 ou "<<dim_esp<<"! "<<finl;
+      Cerr<<"ajouter_: variable dimension differs from 1 or "<<dim_esp<<"! "<<finl;
       exit();
     }
   ArrOfDouble tuvw(dim_var);
@@ -193,11 +193,11 @@ DoubleTab& Source_PDF_VEF::ajouter_(const DoubleTab& variable, DoubleTab& resu, 
                     }
                 }
               // Cerr<< "Source_PDF_VEF::ajouter_ tijvj=" <<tijvj<<" pond("<<num_elem<<") = "<<pond(num_elem)<< finl;
-              // cas generique : 1/eta rho/dt * coeff_relax * volume * variable
+              // generic case: 1/eta rho/dt * coeff_relax * volume * variable
               for (int i=0; i<nb_face_elem; i++)
                 {
                   resu(elems(num_elem,i),comp)-=pond(num_elem)*coef1*tijvj*variable(elems(num_elem,i),comp);
-                  // Cerr<< "Source_PDF_VEF::ajouter_ noeud: "<<i <<" "<<pond(num_elem)*coef1*tijvj*variable(elems(num_elem,i),comp)<<" variable = "<<variable(elems(num_elem,i),comp)<< finl;
+                  // Cerr<< "Source_PDF_VEF::ajouter_ node: "<<i <<" "<<pond(num_elem)*coef1*tijvj*variable(elems(num_elem,i),comp)<<" variable = "<<variable(elems(num_elem,i),comp)<< finl;
                 }
             }
         }
@@ -235,7 +235,7 @@ void  Source_PDF_VEF::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& ma
   int dim_esp = Objet_U::dimension ;
   if (dim_var != 1 && dim_var != dim_esp)
     {
-      Cerr<<"contribuer_a_avec: dimension variable differente 1 ou "<<dim_esp<<"! "<<finl;
+      Cerr<<"contribuer_a_avec: variable dimension differs from 1 or "<<dim_esp<<"! "<<finl;
       exit();
     }
   ArrOfDouble tuvw(dim_var);
@@ -329,7 +329,7 @@ void  Source_PDF_VEF::verif_ajouter_contrib(const DoubleTab& variable, Matrice_M
     }
   if (difmax > 0.)
     {
-      Cerr<< "Source_PDF_VEF: Max norme caree diff. force absolue = "<<difmax<<finl;
+      Cerr<< "Source_PDF_VEF: Max squared norm of absolute force diff. = "<<difmax<<finl;
     }
 }
 
@@ -536,7 +536,7 @@ void Source_PDF_VEF::calculer_variable_imposee_mean_grad()
 
 void Source_PDF_VEF::calculer_variable_imposee_hybrid()
 {
-  Cerr << "on passe ici" << finl;
+  Cerr << "entering here" << finl;
   const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   int nb_faces=domaine_VEF.nb_faces();
   int dim_esp = Objet_U::dimension;
@@ -562,10 +562,10 @@ void Source_PDF_VEF::calculer_variable_imposee_hybrid()
   variable_imposee_calculee = 0.0;
   variable_imposee_sommet = 0.0;
   sommet_interp = 0;
-  Cerr << "on passe ici" << finl;
+  Cerr << "entering here" << finl;
   for (int i = 0; i < nb_som; i++)
     {
-      Cerr << "on passe la" << finl;
+      Cerr << "passing here" << finl;
       if (fluid_elems(i) >= 0.0)
         {
           sommet_interp(0, i) = 1;
@@ -834,31 +834,31 @@ void Source_PDF_VEF::calculer_vitesse_imposee_power_law_tbl()
               if (norme_v_ref_t < 1.0e-6) norme_v_ref_t = 1.e-6;
 
               double nu = (flag ? opdiffu.diffusivite().valeurs()(cells) : opdiffu.diffusivite().valeurs()(0,0));
-              // On calcule U_tau_ref pour pouvoir calculer les quantites adimensionees ( y+ ...)
-              // Hypothese : sous-couche puissance
+              // Compute U_tau_ref to evaluate dimensionless quantities (y+ ...)
+              // Assumption: power-law sublayer
               double u_tau_ref = pow ( norme_v_ref_t , (1/(1+B_pwl)) ) * pow ( A_pwl, (-1/(1+B_pwl)) )  * pow ( y_ref , (-B_pwl/(1+B_pwl)) ) * pow ( nu,(B_pwl/(1+B_pwl)) ) ;
               // Cerr<<"u_tau_ref y_ref   nu ="<<u_tau_ref<<" "<<y_ref<<" "<<nu<<finl;;
-              double y_ref_p = y_ref * u_tau_ref  / nu;  //la on a enfin tout ce qu'il faut pour etablir la loi polynomiale pour y r+
+              double y_ref_p = y_ref * u_tau_ref  / nu;  // now we have everything needed to establish the polynomial wall law for y r+
               double test_ref;
 
               if (!form_WJSP)
                 {
-                  if ( y_ref_p > y_c_p_pwl)  // a partir de la commence l'expression de la loi de paroi polynomiale turbulente
+                  if ( y_ref_p > y_c_p_pwl)  // from here begins the expression of the turbulent polynomial wall law
                     {
                       if (!form_lin_pwl)
                         {
                           for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) =  v_ref_t(0,j) * pow ( d1 / y_ref , B_pwl )  ;
                         }
-                      else // Formulation lineaire de la loi polynomilale ------------------------------
+                      else // Linear formulation of the polynomial wall law ------------------------------
                         {
                           for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) =  v_ref_t(0,j) *(1. - B_pwl*(1-d1/y_ref)) ;
                         }
                       test_ref = 1.;
-                      // Cerr << "zone log/sous-couche inertielle en coherence avec le calcul de u tau" << finl;
+                      // Cerr << "log zone/inertial sublayer consistent with the u tau computation" << finl;
                     }
                   else
                     {
-                      // En fait, on est en sous-couche visqueuse
+                      // Actually, we are in the viscous sublayer
                       if (!form_lin_pwl)
                         {
                           for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) =  v_ref_t(0,j) * ( d1 / y_ref )   ;
@@ -868,21 +868,21 @@ void Source_PDF_VEF::calculer_vitesse_imposee_power_law_tbl()
                           for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) = v_ref_t(0,j) * (1. - pow(u_tau_ref, 2.)*(y_ref-d1)/(nu *norme_v_ref_t));
                         }
                       test_ref = -1. ;
-                      u_tau_ref = pow ( (nu * norme_v_ref_t / y_ref) , 0.5 ) ; // on recalcule u_tau et y_plus en lineaire au pt reference
+                      u_tau_ref = pow ( (nu * norme_v_ref_t / y_ref) , 0.5 ) ; // recompute u_tau and y_plus linearly at the reference point
                       y_ref_p = y_ref * u_tau_ref / nu;
                       if ( y_ref_p > y_c_p_pwl )
                         {
-                          // Incoherence : on n utilise pas de lois de paroi
+                          // Inconsistency: wall laws are not applied
                           itisok = 0;
                         }
-                      // Cerr << "zone lineaire/sous-couche visqueuse" << finl;
-                    }                   // Fin LdPturb
+                      // Cerr << "linear zone/viscous sublayer" << finl;
+                    }                   // End LdPturb
 
                   double norme_v_imp_c = 0;
                   for(int j=0 ; j < nb_comp; j++) norme_v_imp_c += vitesse_imposee_sommet(i ,j) * vitesse_imposee_sommet(i ,j);
                   norme_v_imp_c = sqrt( norme_v_imp_c );
 
-                  double u_tau = pow ( norme_v_imp_c , (1/(1+B_pwl)) ) * pow ( A_pwl, (-1/(1+B_pwl)) )  * pow ( d1 , (-B_pwl/(1+B_pwl)) ) * pow ( nu,(B_pwl/(1+B_pwl)) ) ; // Hypothese : sous-couche puissance
+                  double u_tau = pow ( norme_v_imp_c , (1/(1+B_pwl)) ) * pow ( A_pwl, (-1/(1+B_pwl)) )  * pow ( d1 , (-B_pwl/(1+B_pwl)) ) * pow ( nu,(B_pwl/(1+B_pwl)) ) ; // Assumption: power-law sublayer
                   y_plus = u_tau * d1 / nu;
                   double test_;
                   if (y_plus >y_c_p_pwl)
@@ -893,21 +893,21 @@ void Source_PDF_VEF::calculer_vitesse_imposee_power_law_tbl()
                   else
                     {
                       test_ = -1.;
-                      u_tau = pow ( (nu * norme_v_imp_c/ d1) , 0.5 ) ; // on recalcule u_tau et y_plus en lineaire au pt force
+                      u_tau = pow ( (nu * norme_v_imp_c/ d1) , 0.5 ) ; // recompute u_tau and y_plus linearly at the forcing point
                       y_plus = u_tau * d1 / nu;
                       if ( y_plus > y_c_p_pwl )
                         {
-                          // Incoherence : on n utilise pas de lois de paroi
-                          Cerr<<"INCOHERENCE: u_tau ="<<u_tau<<" y+ = "<<y_plus<<" y+ref = "<<y_ref_p<<finl;
+                          // Inconsistency: wall laws are not applied
+                          Cerr<<"INCONSISTENCY: u_tau ="<<u_tau<<" y+ = "<<y_plus<<" y+ref = "<<y_ref_p<<finl;
                           itisok = 0;
                         }
                     }
                   // Cerr<<"u_tau d1   nu ="<<u_tau<<" "<<d1<<" "<<nu<<finl;;
 
-                  // ici on effectue le test pour savoir si le noeud de frontiere et le point fluide se trouvent dans la meme zone: si oui ok, si non on impose la vitesse
+                  // here we test whether the boundary node and the fluid point are in the same zone: if yes ok, otherwise impose velocity
 
-                  // Traitement des exceptions
-                  if ( (test_ * test_ref < 0) || (itisok == 0) )  //si non on affecte la vitesse paroi
+                  // Handling of exceptions
+                  if ( (test_ * test_ref < 0) || (itisok == 0) )  //otherwise impose wall velocity
                     {
                       for(int j = 0; j < nb_comp; j++)  vitesse_imposee_sommet(i,j) = vitesse_imposee_mod(i,j);
 
@@ -978,14 +978,14 @@ void Source_PDF_VEF::calculer_vitesse_imposee_power_law_tbl()
                             {
                               for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) =  y_plus * u_tau_ref * v_ref_t(0,j)/norme_v_ref_t;
                             }
-                          else // Formulation lineaire de la loi polynomilale ------------------------------
+                          else // Linear formulation of the polynomial wall law ------------------------------
                             {
                               for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) =  v_ref_t(0,j) * (1. - B_pwl*(1-d1/y_ref)) ;
                             }
                         }
-                      // Cerr << "zone log/sous-couche inertielle en coherence avec le calcul de u tau" << finl;
+                      // Cerr << "log zone/inertial sublayer consistent with the u tau computation" << finl;
                     }
-                  else // hypothèse buffer layer
+                  else // buffer layer hypothesis
                     {
                       u_tau_ref = (nu/y_ref) * pow(-(D_pwl_WJSP/(2*C_pwl_WJSP)) * (1 + pow(1 + 4 * C_pwl_WJSP/pow(D_pwl_WJSP,2) * norme_v_ref_t * y_ref /nu ,1/2)),1/p_pwl_WJSP) ;
                       y_ref_p = y_ref * u_tau_ref  / nu;
@@ -1028,22 +1028,22 @@ void Source_PDF_VEF::calculer_vitesse_imposee_power_law_tbl()
                             {
                               for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) = v_ref_t(0,j) * (1. - pow(u_tau_ref, 2.)*(y_ref-d1)/(nu *norme_v_ref_t));
                             }
-                          u_tau_ref = pow ( (nu * norme_v_ref_t / y_ref) , 0.5 ) ; // on recalcule u_tau et y_plus en lineaire au pt reference
+                          u_tau_ref = pow ( (nu * norme_v_ref_t / y_ref) , 0.5 ) ; // recompute u_tau and y_plus linearly at the reference point
                           y_ref_p = y_ref * u_tau_ref / nu;
                           if ( y_ref_p > y_c1_p_pwl_WJSP)
                             {
-                              // Incoherence : on n utilise pas de lois de paroi
+                              // Inconsistency: wall laws are not used
                               itisok = 0;
-                              Cerr << "Incoherence" << finl;
+                              Cerr << "Inconsistency" << finl;
                             }
                         }
                     }
                   // Cerr<<"u_tau d1   nu ="<<u_tau<<" "<<d1<<" "<<nu<<finl;;
 
-                  // ici on effectue le test pour savoir si le noeud de frontiere et le point fluide se trouvent dans la meme zone: si oui ok, si non on impose la vitesse
+                  // here we test whether the boundary node and the fluid point are in the same zone: if yes ok, otherwise impose velocity
 
-                  // Traitement des exceptions
-                  if (itisok == 0)  //si non on affecte la vitesse paroi
+                  // Handling of exceptions
+                  if (itisok == 0)  //otherwise impose wall velocity
                     {
                       for(int j = 0; j < nb_comp; j++)  vitesse_imposee_sommet(i,j) = vitesse_imposee_mod(i,j);
 
@@ -1130,15 +1130,15 @@ void Source_PDF_VEF::calculer_vitesse_imposee_power_law_tbl()
               if ( abs_h(0,j) < tab_h(0,i) &&  tab_h(0,i) <= abs_h(0,j+1) ) compteur_h(0,j) +=1;
             }
         }
-      Cerr<<"histogramme y+ compteur =";
+      Cerr<<"y+ histogram count =";
       for (int j = 0; j < N; j++) Cerr<<" "<<compteur_h(0,j)<<" ";
       Cerr<<finl;
-      Cerr<<"histogramme y+ abscisse =";
+      Cerr<<"y+ histogram abscissa =";
       for (int j = 0; j < N+1; j++) Cerr<<" "<<abs_h(0,j)<<" ";
       Cerr<<finl;
-      Cerr<<"histogramme y+ : min = "<<h_yplus_min<<" - mean = "<<h_yplus_mean<<" - max =  "<<h_yplus_max<<finl;
+      Cerr<<"y+ histogram: min = "<<h_yplus_min<<" - mean = "<<h_yplus_mean<<" - max =  "<<h_yplus_max<<finl;
 
-      Cerr<<"Moyenne sur "<<yplus_count<<" points"<<finl;
+      Cerr<<"Average over "<<yplus_count<<" points"<<finl;
     }
 }
 
@@ -1462,15 +1462,15 @@ void Source_PDF_VEF::calculer_vitesse_imposee_power_law_tbl_u_star()
               if ( abs_h(0,j) < tab_h(0,i) &&  tab_h(0,i) <= abs_h(0,j+1) ) compteur_h(0,j) +=1;
             }
         }
-      Cerr<<"histogramme y+ compteur =";
+      Cerr<<"y+ histogram count =";
       for (int j = 0; j < N; j++) Cerr<<" "<<compteur_h(0,j)<<" ";
       Cerr<<finl;
-      Cerr<<"histogramme y+ abscisse =";
+      Cerr<<"y+ histogram abscissa =";
       for (int j = 0; j < N+1; j++) Cerr<<" "<<abs_h(0,j)<<" ";
       Cerr<<finl;
-      Cerr<<"histogramme y+ : min = "<<h_yplus_min<<" - mean = "<<h_yplus_mean<<" - max =  "<<h_yplus_max<<finl;
+      Cerr<<"y+ histogram: min = "<<h_yplus_min<<" - mean = "<<h_yplus_mean<<" - max =  "<<h_yplus_max<<finl;
 
-      Cerr<<"Moyenne sur "<<yplus_count<<" points forces et "<<yplus_ref_count<<" points references"<<finl;
+      Cerr<<"Average over "<<yplus_count<<" forced points and "<<yplus_ref_count<<" reference points"<<finl;
     }
 
 }
@@ -1565,30 +1565,30 @@ void Source_PDF_VEF::calculer_temperature_imposee_wall_law()
               d1 = sqrt(d1);
               d2 = sqrt(d2);
               double y_ref= d1+d2;
-              // traitement des exceptions
-              if (d1 < eps) itisok = 0; // le point P est sur la frontiere immergee : affectation
+              // exception handling
+              if (d1 < eps) itisok = 0; // point P is on the immersed boundary: assignment
               else
                 {
                   norme_de_la_normale = sqrt(norme_de_la_normale);
                   for(int j = 0; j < nb_comp; j++) normale(0,j) /= norme_de_la_normale;
                 }
-              // Obtention des caractéristiques du fluide utiles au calcul
+              // Retrieve fluid properties needed for the computation
               double nu = d1 * utau / yplus;
               double rho = equation().milieu().masse_volumique().valeurs()(0,0);
               double Cp = equation().milieu().capacite_calorifique().valeurs()(0, 0);
               //double alpha = equation().milieu().diffusivite().valeurs()(0, 0);
               // -------
-              cells[0] = int(fluid_elems(i)); // N° élément fluide
-              champ_variable_inconnue.valeur_a_elem(xf, Tref, cells[0]); // Détermination de la température au point fluide de référence
+              cells[0] = int(fluid_elems(i)); // Fluid element index
+              champ_variable_inconnue.valeur_a_elem(xf, Tref, cells[0]); // Determine temperature at the reference fluid point
               double yplusref = y_ref * utau / nu;
-              if (!form_Tp) //Loi de paroi de Kader
+              if (!form_Tp) //Kader wall law
                 {
-                  thetap = interp.Kader(yplus,Pr); // Calcul du theta plus avec Kader pour le point forcé (connaissance de y+)
-                  thetapref = interp.Kader(yplusref,Pr); // Calcul du theta plus avec Kader pour le point fluide
+                  thetap = interp.Kader(yplus,Pr); // Compute theta plus with Kader for the forced point (known y+)
+                  thetapref = interp.Kader(yplusref,Pr); // Compute theta plus with Kader for the fluid point
                 }
               else
                 {
-                  Cerr << "Loi non implementee, choix d'une autre loi obligatoire" << finl;
+                  Cerr << "Law not implemented, another law must be chosen" << finl;
                   exit();
                 }
               if ((itisok == 1) and (!boundary_type))
@@ -1611,19 +1611,19 @@ void Source_PDF_VEF::calculer_temperature_imposee_wall_law()
                 }
               else
                 {
-                  Cerr << "Erreur dans le choix du type de condition aux limites" << finl;
+                  Cerr << "Error in the choice of boundary condition type" << finl;
                   exit();
                 }
             }
         }
     }
 
-// Calcul de la température pour les faces forcées
+// Compute temperature for forced faces
   for (int f = 0; f < nb_faces; f++)
     {
       int compteur = 0;
       int som_f = 0;
-      while ((som_f < nb_som_face) and (sommet_interp(faces_sommets(f,som_f))==1))  //On récupère les faces dont l'ensemble des noeuds sont forcées
+      while ((som_f < nb_som_face) and (sommet_interp(faces_sommets(f,som_f))==1))  //Retrieve faces whose all nodes are forced
         {
           compteur++;
           som_f++;
@@ -1722,31 +1722,31 @@ void Source_PDF_VEF::calculer_temperature_imposee_wall_law()
               d1 = sqrt(d1);
               d2 = sqrt(d2);
               double y_ref= d1+d2;
-              // traitement des exceptions
-              if (d1 < eps) itisok = 0; // le point P est sur la frontiere immergee : affectation
+              // exception handling
+              if (d1 < eps) itisok = 0; // point P is on the immersed boundary: assignment
               else
                 {
                   norme_de_la_normale = sqrt(norme_de_la_normale);
                   for(int j = 0; j < nb_comp; j++) normale(0,j) /= norme_de_la_normale;
                 }
-              // Obtention des caractéristiques du fluide utiles au calcul
+              // Retrieve fluid properties needed for the computation
               double nu = d1 * utau / yplus;
               double rho = equation().milieu().masse_volumique().valeurs()(0,0);
               double Cp = equation().milieu().capacite_calorifique().valeurs()(0, 0);
               //double alpha = equation().milieu().diffusivite().valeurs()(0, 0);
               double Pr = 1; //nu/alpha;
               // -------
-              cells[0] = int(fluid_elems(i)); // N° élément fluide
-              champ_variable_inconnue.valeur_a_elem(xf, Tref, cells[0]); // Détermination de la température au point fluide de référence
+              cells[0] = int(fluid_elems(i)); // Fluid element index
+              champ_variable_inconnue.valeur_a_elem(xf, Tref, cells[0]); // Determine temperature at the reference fluid point
               double yplusref = y_ref * utau / nu;
-              if (!form_Tp) //Loi de paroi de Kader
+              if (!form_Tp) //Kader wall law
                 {
-                  thetap = interp.Kader(yplus,Pr); // Calcul du theta plus avec Kader pour le point forcé (connaissance de y+)
-                  thetapref = interp.Kader(yplusref,Pr); // Calcul du theta plus avec Kader pour le point fluide
+                  thetap = interp.Kader(yplus,Pr); // Compute theta plus with Kader for the forced point (known y+)
+                  thetapref = interp.Kader(yplusref,Pr); // Compute theta plus with Kader for the fluid point
                 }
               else
                 {
-                  Cerr << "Loi non implementee, choix d'une autre loi obligatoire" << finl;
+                  Cerr << "Law not implemented, another law must be chosen" << finl;
                   exit();
                 }
               if ((itisok == 1) and (!boundary_type))
@@ -1769,19 +1769,19 @@ void Source_PDF_VEF::calculer_temperature_imposee_wall_law()
                 }
               else
                 {
-                  Cerr << "Erreur dans le choix du type de condition aux limites" << finl;
+                  Cerr << "Error in the choice of boundary condition type" << finl;
                   exit();
                 }
             }
         }
     }
 
-// Calcul de la température pour les faces forcées
+// Compute temperature for forced faces
   for (int f = 0; f < nb_faces; f++)
     {
       int compteur = 0;
       int som_f = 0;
-      while ((som_f < nb_som_face) and (sommet_interp(faces_sommets(f,som_f))==1))  //On récupère les faces dont l'ensemble des noeuds sont forcées
+      while ((som_f < nb_som_face) and (sommet_interp(faces_sommets(f,som_f))==1))  //Retrieve faces whose all nodes are forced
         {
           compteur++;
           som_f++;

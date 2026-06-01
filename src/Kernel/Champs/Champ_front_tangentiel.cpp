@@ -50,12 +50,12 @@ Entree& Champ_front_tangentiel::readOn(Entree& is)
 }
 
 
-/*! @brief Pas code !!
+/*! @brief Not implemented !!
  *
  */
 
 Champ_front_base& Champ_front_tangentiel::affecter_(const Champ_front_base& ch)
 {
-  // Cerr<<"avant de retourner"<<finl;
+  // Cerr<<"before returning"<<finl;
   return *this;
 }

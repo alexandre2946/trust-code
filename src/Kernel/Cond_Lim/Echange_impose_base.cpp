@@ -81,14 +81,14 @@ double Echange_impose_base::T_ext(int i) const
     return T_ext().valeurs()(i, 0);
   else
     {
-      Cerr << "Echange_impose_base::T_ext erreur" << finl;
+      Cerr << "Echange_impose_base::T_ext error" << finl;
       assert(0);
     }
   exit();
   return 0.;
 }
 
-/*! @brief Renvoie la valeur de la temperature imposee sur la (i,j)-eme composante du champ de frontiere.
+/*! @brief Returns the value of the imposed temperature on the (i,j)-th component of the boundary field.
  *
  * @param (int i)
  * @param (int j)
@@ -117,15 +117,15 @@ double Echange_impose_base::h_imp(int i) const
   else if (h_imp_->valeurs().dimension(1) == 1)
     return h_imp_->valeurs()(i, 0);
   else
-    Cerr << "Echange_impose_base::h_imp erreur" << finl;
+    Cerr << "Echange_impose_base::h_imp error" << finl;
 
   exit();
   return 0.;
 }
 
-/*! @brief Renvoie la valeur du coefficient d'echange de chaleur impose sur la i-eme composante
+/*! @brief Returns the value of the imposed heat exchange coefficient on the i-th component
  *
- *     du champ de frontiere.
+ *     of the boundary field.
  *
  * @param (int i)
  * @param (int j)
@@ -155,15 +155,15 @@ double Echange_impose_base::emissivite(int i) const
   else if (emissivite_->valeurs().dimension(1) == 1)
     return emissivite_->valeurs()(i, 0);
   else
-    Cerr << "Echange_impose_base::emissivite erreur" << finl;
+    Cerr << "Echange_impose_base::emissivite error" << finl;
 
   exit();
   return 0.;
 }
 
-/*! @brief Renvoie la valeur de l'emissivite impose sur la i-eme composante
+/*! @brief Returns the value of the imposed emissivity on the i-th component
  *
- *     du champ de frontiere.
+ *     of the boundary field.
  *
  * @param (int i)
  * @param (int j)

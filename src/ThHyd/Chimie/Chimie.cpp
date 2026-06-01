@@ -134,7 +134,7 @@ void  Chimie::completer(const Probleme_base& pb)
     {
       if (marqueur_espece_en_competition_micro_melange_==-1)
         {
-          Cerr<<" espece_en_competition_micro_melange non trouve: "<< espece_en_competition_micro_melange_<<finl;
+          Cerr<<" espece_en_competition_micro_melange not found: "<< espece_en_competition_micro_melange_<<finl;
           exit();
         }
       else
@@ -142,12 +142,12 @@ void  Chimie::completer(const Probleme_base& pb)
     }
   if(min_array(masses_molaires)<0)
     {
-      Cerr<< "pb avec les masses_molaires "<<masses_molaires<<finl;
+      Cerr<< "problem with masses_molaires "<<masses_molaires<<finl;
       exit();
     }
   if (liste_Y_.size()>0)
     {
-      Puissance_volumique_=(liste_Y_[0]->valeurs()); // dimensionnement du tableau...
+      Puissance_volumique_=(liste_Y_[0]->valeurs()); // array sizing...
       Puissance_volumique_=0.;
     }
   else
@@ -225,7 +225,7 @@ void  Chimie::mettre_a_jour(double temps)
 
               if ((reaction.beta_!=0)||(reaction.Ea_!=0)||((reaction.c_r_Ea_!=0)&&(reaction.contre_reaction_>0)))
                 {
-                  Cerr<<"Reaction :  Donnees incompatibles avec le fait que l on n a pas de temperature"<<finl;
+                  Cerr<<"Reaction:  Data incompatible with the fact that there is no temperature"<<finl;
                   Cerr<<reaction<<finl;
                   exit();
                 }
@@ -297,7 +297,7 @@ void  Chimie::mettre_a_jour(double temps)
                 D_mol = D_moleculaire(0, 0);
               else
                 {
-                  Cerr << "D_mol pas code pour champ non uniforme" << finl;
+                  Cerr << "D_mol not implemented for non-uniform field" << finl;
                   exit();
                 }
               double invsct=1./0.9;
@@ -341,7 +341,7 @@ void  Chimie::mettre_a_jour(double temps)
                     {
                       if (C[i]<-1e-5)
                         {
-                          Cerr<<" on rabote C_"<<i<<" dans la maille "<<elem<<" dans la chimie !!!!!! "<<C[i]<<finl;
+                          Cerr<<" clipping C_"<<i<<" in cell "<<elem<<" in the chemistry !!!!!! "<<C[i]<<finl;
                           exit();
                         }
                       C[i]=0;
@@ -381,7 +381,7 @@ void  Chimie::mettre_a_jour(double temps)
 
           if ((reaction.beta_!=0)||(reaction.Ea_!=0)||((reaction.c_r_Ea_!=0)&&(reaction.contre_reaction_>0)))
             {
-              Cerr<<"Reaction :  Donnees incompatibles avec le fait que l on n a pas de temperature"<<finl;
+              Cerr<<"Reaction:  Data incompatible with the fact that there is no temperature"<<finl;
               Cerr<<reaction<<finl;
               exit();
             }
@@ -400,25 +400,25 @@ void  Chimie::mettre_a_jour(double temps)
         {
 
 
-          // recuperation des valeurs initiales
+          // retrieval of initial values
           for (int i=0; i<nbc; i++)
             {
               C[i]=liste_C_[i]->valeurs()(elem);
             }
           for (int n=0; n<nb_sous_pas_de_temps_reaction_max; n++)
             {
-              // rabotage eventuel
+              // clamp negative values if any
               for (int i=0; i<nbc; i++)
                 if (C[i]<0)
                   {
                     if (C[i]<-1e-5)
                       {
-                        Cerr<<" on rabote C_"<<i<<" dans la maille "<<elem<<" dans la chimie !!!!!! "<<C[i]<<finl;
+                        Cerr<<" clipping C_"<<i<<" in cell "<<elem<<" in the chemistry !!!!!! "<<C[i]<<finl;
                         exit();
                       }
                     C[i]=0;
                   }
-              // calcul des proportions initiales des reactions non equilibre
+              // compute initial proportions for non-equilibrium reactions
 
               for (int i=0; i<nbr_directe; i++)
                 {
@@ -523,7 +523,7 @@ void  Chimie::mettre_a_jour(double temps)
 
       return;
     }
-  Cerr<<"Chimie dispo qu'avec des concentrations"<<finl;
+  Cerr<<"Chimie available only with concentrations"<<finl;
   exit();
 
 }

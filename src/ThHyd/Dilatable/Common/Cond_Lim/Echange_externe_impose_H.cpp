@@ -63,17 +63,17 @@ double Echange_externe_impose_H::T_ext(int i) const
         return le_champ_front->valeurs()(i, 0);
     }
   else
-    Cerr << "Echange_impose_base::T_ext erreur" << finl;
+    Cerr << "Echange_impose_base::T_ext error" << finl;
 
   abort();
   return 0.;
 }
 
-/*! @brief Renvoie la valeur de la temperature imposee sur la (i,j)-eme composante du champ de frontiere.
+/*! @brief Returns the imposed temperature value for the (i,j)-th component of the boundary field.
  *
- * @param (int i)
- * @param (int j)
- * @return (double)
+ * @param i Row index of the boundary field component.
+ * @param j Column index of the boundary field component.
+ * @return Imposed temperature value.
  */
 double Echange_externe_impose_H::T_ext(int i, int j) const
 {

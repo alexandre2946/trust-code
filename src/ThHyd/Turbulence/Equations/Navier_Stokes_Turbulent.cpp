@@ -73,19 +73,19 @@ int Navier_Stokes_Turbulent::typer_lire_mod_turb_hyd(Entree& s)
     {
       if (dimension == 2 && discr != "VDF_Hyper")
         {
-          Cerr << "Vous traitez un cas turbulent en dimension 2 avec un modele sous maille" << finl;
-          Cerr << "Attention a l'interpretation des resultats !!" << finl;
+          Cerr << "You are solving a turbulent case in 2D with a subgrid-scale model" << finl;
+          Cerr << "Be careful with the interpretation of the results !!" << finl;
         }
 
       nom1 += "_";
-      // les operateurs de diffusion sont communs aux discretisations VEF et VEFP1B
+      // diffusion operators are common to VEF and VEFP1B discretizations
       if (discr == "VEFPreP1B") discr = "VEF";
       nom1 += discr;
     }
   if (nom1 == "MODELE_TURBULENCE_HYD_SOUS_MAILLE_LM_VEF")
     {
-      Cerr << "Le mot cle Sous_maille_LM s'appelle desormais Longueur_Melange pour etre coherent en VDF et VEF." << finl;
-      Cerr << "Changer votre jeu de donnees." << finl;
+      Cerr << "The keyword Sous_maille_LM is now called Longueur_Melange for consistency between VDF and VEF." << finl;
+      Cerr << "Please update your data file." << finl;
       Process::exit();
     }
 
@@ -155,9 +155,9 @@ Entree& Navier_Stokes_Turbulent::lire_op_diff_turbulent(Entree& is)
       terme_diffusif.l_op_base().associer_eqn(*this);
       terme_diffusif->associer_diffusivite(terme_diffusif.diffusivite());
       is >> motbidon;
-      //on lit la fin de diffusion { }
+      //read the end of diffusion { }
       if (motbidon != accfermee)
-        Cerr << " On ne peut plus entrer d option apres negligeable " << finl;
+        Cerr << " No options can be entered after negligeable " << finl;
     }
   else if (motbidon == "tenseur_Reynolds_externe")
     {
@@ -166,9 +166,9 @@ Entree& Navier_Stokes_Turbulent::lire_op_diff_turbulent(Entree& is)
       Cerr << terme_diffusif->que_suis_je() << finl;
       terme_diffusif->associer_diffusivite(terme_diffusif.diffusivite());
       is >> motbidon;
-      //on lit la fin de diffusion { }
+      //read the end of diffusion { }
       if (motbidon != accfermee)
-        Cerr << " On ne peut plus entrer d option apres tenseur_Reynolds_externe " << finl;
+        Cerr << " No options can be entered after tenseur_Reynolds_externe " << finl;
     }
   else if (motbidon == "standard")
     {
@@ -206,7 +206,7 @@ Entree& Navier_Stokes_Turbulent::lire_op_diff_turbulent(Entree& is)
       is >> motbidon;
       //on lit la fin de diffusion { }
       if (motbidon != accfermee)
-        Cerr << " On ne peut plus entrer d option apres option " << finl;
+        Cerr << " No options can be entered after option " << finl;
     }
   else
     {

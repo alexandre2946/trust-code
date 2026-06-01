@@ -27,7 +27,7 @@ void Pb_QC_base::associer_milieu_base(const Milieu_base& mil)
   if (sub_type(Fluide_Quasi_Compressible,mil)) Pb_Dilatable_base::associer_milieu_base(mil);
   else
     {
-      Cerr << "Un milieu de type " << mil.que_suis_je() << " ne peut etre associe a un probleme Quasi Compressible !" << finl;
+      Cerr << "A medium of type " << mil.que_suis_je() << " cannot be associated with a Quasi Compressible problem!" << finl;
       Process::exit();
     }
 }

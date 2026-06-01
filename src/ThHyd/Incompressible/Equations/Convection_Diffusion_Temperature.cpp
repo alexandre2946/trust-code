@@ -95,7 +95,7 @@ int Convection_Diffusion_Temperature::lire_motcle_non_standard(const Motcle& un_
               for ( int i = 0 ; i<dim ; i++)
                 {
                   is >> tab(i);
-                  Cerr << "Lecture de la valeur de la penalisation suivant la direction " << i+1 <<" :" << tab(i) << finl;
+                  Cerr << "Reading the penalization value along direction " << i+1 <<" :" << tab(i) << finl;
                 }
               tab_penalisation_L2_FTD.add(tab);
               is >> mot ;
@@ -103,8 +103,8 @@ int Convection_Diffusion_Temperature::lire_motcle_non_standard(const Motcle& un_
         }
       else
         {
-          Cerr << "Erreur a la lecture des parametres de la penalisation L2 " << finl;
-          Cerr << "On attendait : " << accolade_ouverte << finl;
+          Cerr << "Error while reading the parameters of the L2 penalization " << finl;
+          Cerr << "We expected: " << accolade_ouverte << finl;
           exit();
         }
       const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis());
@@ -386,12 +386,12 @@ void Convection_Diffusion_Temperature::assembler(Matrice_Morse& matrice, const D
         }
       else
         {
-          Cerr << "VIA_CONTRIBUER_AU_SECOND_MEMBRE pas code pour " << que_suis_je() << ":assembler" << finl;
-          Cerr << "avec discretisation " <<  probleme().discretisation().que_suis_je() << "" << finl;
+          Cerr << "VIA_CONTRIBUER_AU_SECOND_MEMBRE not implemented for " << que_suis_je() << ":assembler" << finl;
+          Cerr << "with discretization " <<  probleme().discretisation().que_suis_je() << "" << finl;
           Process::exit();
         }
-      // // On calcule somme(residu) par contribuer_au_second_membre (typiquement CL non implicitees)
-      // // Cette approche necessite de coder 3 methodes (contribuer_a_avec, contribuer_au_second_membre et ajouter pour l'explicite)
+      // // Compute sum(residual) via contribuer_au_second_membre (typically for non-implicitized BCs)
+      // // This approach requires coding 3 methods (contribuer_a_avec, contribuer_au_second_membre, and ajouter for the explicit scheme)
       // sources().contribuer_a_avec(inco,matrice);
       // sources().ajouter(resu);
       // matrice.ajouter_multvect(inco, resu); // Add source residual first
@@ -627,60 +627,60 @@ void Convection_Diffusion_Temperature::mise_en_place_domaine_fantome(DoubleTab& 
   int maj = verifier_tag_indicatrice_pena_glob();
   if (maj == 1) return;
 
-  // garde-fou
+  // safety check
   if (schema_temps().facteur_securite_pas() > 1.0)
     {
-      Cerr << "Convection_Diffusion_Temperature::mise_en_place_domaine_fantome Facteur securite doit etre <= 1"<<finl;
+      Cerr << "Convection_Diffusion_Temperature::mise_en_place_domaine_fantome safety factor must be <= 1"<<finl;
       Process::exit();
     }
 
-  // fonction characteristique globale ibc penalisees actuelle
+  // current global penalized IBC characteristic function
   IntTrav indicatrice_totale;
   IntTrav indicatrice_face_totale ;
   calcul_indic_pena_global(indicatrice_totale,indicatrice_face_totale);
-  // etat des lieux actuel
+  // current state
   const int nb_elem  = indicatrice_totale.dimension(0);
   int x=0;
   int j=0;
   for (int k_elem =0 ; k_elem <nb_elem; ++k_elem)  ((indicatrice_totale(k_elem)!=0) ? ++x : ++j);
 
-  //traitement cellules fantomes (if any)
+  //ghost cell treatment (if any)
   const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis());
   const IntTab& elem_faces = domaine_vf.elem_faces();
   const IntTab& faces_elem = domaine_vf.face_voisins();
   const int nb_faces_elem = elem_faces.dimension(1);
-  int k=0; //nb cellules fantomes ibc -> fluide
-  int k_cor=0; //nb cellules fantomes (ibc -> fluide) corrigees
-  int k_cor2=0; //nb cellules fantomes (fluide -> ibc) corrigees
-  int u=0; //nb cellules fluide -> ibc
+  int k=0; //number of ghost cells ibc -> fluid
+  int k_cor=0; //number of ghost cells (ibc -> fluid) corrected
+  int k_cor2=0; //number of ghost cells (fluid -> ibc) corrected
+  int u=0; //number of fluid -> ibc cells
   for (int i_elem = 0; i_elem < nb_elem; i_elem++)
     {
-      //cellules fantomes (actuellement fluide et precedement ibc) => on modifie solution
+      //ghost cells (currently fluid, previously ibc) => modify solution
       double somme_inc = 0.;
       double coeff = 0.;
       if (indic_pena_global(i_elem) != 0 && indicatrice_totale(i_elem) == 0)
         {
           ++k;
-          // boucle sur les faces pour determiner la valeur de la variable pour les cellules voisines strictement fluide
+          // loop over faces to determine the variable value for strictly fluid neighbouring cells
           IntTrav stok_vois(nb_faces_elem);
           for (int i_face = 0; i_face < nb_faces_elem; i_face++)
             {
               const int face = elem_faces(i_elem, i_face);
               const int voisin = faces_elem(face, 0) + faces_elem(face, 1) - i_elem;
-              if (voisin >= 0) // le voisin existe
+              if (voisin >= 0) // the neighbour exists
                 {
-                  if ((indic_pena_global(voisin) == indicatrice_totale(voisin)) &&  (indic_pena_global(voisin) == indicatrice_totale(i_elem))) // strictement fluide aux deux pas de temps
+                  if ((indic_pena_global(voisin) == indicatrice_totale(voisin)) &&  (indic_pena_global(voisin) == indicatrice_totale(i_elem))) // strictly fluid at both time steps
                     {
                       somme_inc += solution(voisin);
                       ++coeff;
                     }
-                  else     // On sauve le numero du voisin
+                  else     // save the neighbour index
                     {
                       stok_vois(i_face) = voisin;
                     }
                 }
             }
-          // Si on n a pas trouve de cellules fluide, on regarde les voisins des voisins
+          // If no fluid cells found, check neighbours of neighbours
           if (coeff == 0.)
             {
               for (int i_vois = 0; i_vois < nb_faces_elem; i_vois++)
@@ -766,12 +766,12 @@ void Convection_Diffusion_Temperature::mise_en_place_domaine_fantome(DoubleTab& 
     }
   solution.echange_espace_virtuel();
   //     Debog::verifier("Convection_Diffusion_Temperature::mise_en_place_domaine_fantome solution ",solution);
-  Cout <<"Mise_en_place_domaine_fantome : fluide -> ibc : "<<u<< " elem. (dont "<<k_cor2<<" corrigees) et ibc -> fluide : ";
-  Cout<<k<<" elem.(dont "<<k_cor<<" corrigees)"<<finl;
-  Cout <<"             nb elem. ibc : "<<x<<" et nb elem fluide : "<<j<<" sur un total de : "<<nb_elem<<finl;
+  Cout <<"Mise_en_place_domaine_fantome : fluid -> ibc : "<<u<< " elem. (of which "<<k_cor2<<" corrected) and ibc -> fluid : ";
+  Cout<<k<<" elem.(of which "<<k_cor<<" corrected)"<<finl;
+  Cout <<"             nb ibc elem. : "<<x<<" and nb fluid elem. : "<<j<<" out of a total of : "<<nb_elem<<finl;
   if ((u != k_cor2) || (k !=k_cor))
     {
-      Cerr <<"Mise_en_place_domaine_fantome : Les cellules fantomes ne sont pas toutes corrigees"<<finl;
+      Cerr <<"Mise_en_place_domaine_fantome : Not all ghost cells have been corrected"<<finl;
       exit();
     }
 
@@ -806,27 +806,27 @@ void Convection_Diffusion_Temperature::calcul_indic_pena_global(IntTab& indicatr
   int xf=0;
   const int nb_elem  = indicatrice_totale.dimension_tot(0);
   const int nfaces = indicatrice_face_totale.dimension_tot(0);
-  // boucle sur les ibc
+  // loop over ibcs
   for ( int w = 0 ; w<ref_penalisation_L2_FTD.size() ; ++w)
     {
       Transport_Interfaces_base& nom_eq = ref_cast(Transport_Interfaces_base,ref_penalisation_L2_FTD[w].valeur());
       nom_eq.check_indicatrice_is_up_to_date();
       const DoubleTab& indicatrice = nom_eq.get_indicatrice().valeurs();
-      // fonction characteristique (0 ou 1) pour l'ensemble des ibc
+      // characteristic function (0 or 1) for all IBCs
       for (int k_elem =0 ; k_elem <nb_elem; ++k_elem)
         {
           if (indicatrice(k_elem)>0.)
             {
               if(indicatrice_totale(k_elem) != 0)
                 {
-                  Cerr<<"calcul_indic_pena_global : Attention: les elements des indicatrices se chevauchent "<<finl;
+                  Cerr<<"calcul_indic_pena_global : Warning: the elements of the indicator functions overlap "<<finl;
                   exit();
                 }
               indicatrice_totale(k_elem) = w+1;
               ++x;
             }
         }
-      // fonction characteristique (numero ibc) pour l'ensemble des ibc
+      // characteristic function (IBC number) for all IBCs
       const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis());
       const IntTab& face_voisins = domaine_vf.face_voisins();
       for (int i = 0; i < nfaces ; i++)
@@ -840,7 +840,7 @@ void Convection_Diffusion_Temperature::calcul_indic_pena_global(IntTab& indicatr
             {
               if(indicatrice_face_totale(i) !=  0)
                 {
-                  Cerr<<"calcul_indic_pena_global : Attention: les faces des indicatrices se chevauchent "<<finl;
+                  Cerr<<"calcul_indic_pena_global : Warning: the faces of the indicator functions overlap "<<finl;
                   exit();
                 }
               indicatrice_face_totale(i) = w+1;
@@ -848,8 +848,8 @@ void Convection_Diffusion_Temperature::calcul_indic_pena_global(IntTab& indicatr
             }
         }
     }
-  Cout<<"Calcul_indic_pena_global : Nb d elements de l indicatrice globale des IBCs: "<<x;
-  Cout<<"  et nb de faces : "<<xf<<finl;
+  Cout<<"Calcul_indic_pena_global : Number of elements of the global IBC indicator: "<<x;
+  Cout<<"  and number of faces: "<<xf<<finl;
   indicatrice_totale.echange_espace_virtuel();
   indicatrice_face_totale.echange_espace_virtuel();
   //      Debog::verifier("Convection_Diffusion_Temperature::calcul_indic_pena_global indicatrice_totale ",indicatrice_totale);
@@ -919,65 +919,65 @@ DoubleTab& Convection_Diffusion_Temperature::penalisation_L2(DoubleTab& u)
   t_voisinage.echange_espace_virtuel();
   u_voisinage.echange_espace_virtuel();
 
-  //determination du champ global de penalisation L2
+  //determination of the global L2 penalization field
   DoubleTrav pena_glob(inc); //initialise a zero
   DoubleTrav tab_(inc); //initialise a zero
   DoubleTrav denom(inc); //initialise a zero
 
-  //boucle ibc
+  //loop over IBCs
   for ( int i = 0 ; i < ref_penalisation_L2_FTD.size() ; ++i)
     {
       Transport_Interfaces_base& nom_eq = ref_cast(Transport_Interfaces_base,ref_penalisation_L2_FTD[i].valeur());
       const DoubleTab& tab = tab_penalisation_L2_FTD[i];
-      //verification dimensions tab t obstacle = nb dim de l inconnu
+      //check dimensions: tab t obstacle = nb dimensions of the unknown
       if ( tab.dimension(0) != inc.line_size() )
         {
-          Cerr << " penalisation_L2: Les champs de temperature impose et calcule n'ont pas les memes dimensions" <<finl;
-          Cerr << " Dimension du champ de temperature impose "<< tab.dimension(0) << finl;
-          Cerr << " Dimension du champ de temperature calcule par TRUST "<<inc.line_size() <<finl;
-          Cerr << " Nombre d'elements stockes au dans l'iconnue " <<inc.size() <<finl;
+          Cerr << " penalisation_L2: The imposed and computed temperature fields do not have the same dimensions" <<finl;
+          Cerr << " Dimension of the imposed temperature field "<< tab.dimension(0) << finl;
+          Cerr << " Dimension of the temperature field computed by TRUST "<<inc.line_size() <<finl;
+          Cerr << " Number of elements stored in the unknown " <<inc.size() <<finl;
           Process::exit();
         }
       nom_eq.check_indicatrice_is_up_to_date();
       const DoubleTab& indicatrice = nom_eq.get_indicatrice().valeurs();
 
       DoubleTrav pena_loc(indicatrice);
-      // Determination du terme de penalisation pour l ibc courante
-      // boucle sur les elements
+      // Determine the penalization term for the current IBC
+      // loop over elements
       for (int j = 0; j<nb_elem ; ++j)
         {
-          //calcul de la fonction characteristique Ksi de l ibc courante -> pena_loc
+          //compute the characteristic function Ksi for the current IBC -> pena_loc
           if (indicatrice(j) > 0.)
             {
               double coeff_p=1.;
               pena_loc(j) = coeff_p;
-              //calcul du denominateur du terme de penalisation ( Sigma_ibc Ksi_ibc(j) )
+              //compute the denominator of the penalization term ( Sigma_ibc Ksi_ibc(j) )
               denom(j) += coeff_p;
 
-              //determination valeur a imposer T_ref
+              //determine the value to impose T_ref
               double tref_j = 0.;
               switch (choix_pena)
                 {
                 case 0 :
-                  // approximation de T_ref par T_ref = T_imp
+                  // approximation of T_ref by T_ref = T_imp
                   tref_j = tab(0);
                   break;
                 case 1 :
-                  // approximation de T_ref par T_ref = T+dt*derivee
+                  // approximation of T_ref by T_ref = T+dt*derivative
                   tref_j = inc(j) + dt*u_old(j);
                   break;
                 case 2 :
-                  // approximation de T_imp par T_ref= tau*T_imp + (1-tau)*T_voisin
-                  // approximation de T_voisin par T_voisin= 1/n * somme(1,n)(T_environnant+dt*derivee_environnant)
+                  // approximation of T_imp by T_ref= tau*T_imp + (1-tau)*T_neighbour
+                  // approximation of T_neighbour by T_neighbour= 1/n * sum(1,n)(T_surrounding+dt*derivative_surrounding)
                   tref_j = (indicatrice(j)*tab(0)+(1.-indicatrice(j))*(t_voisinage(j)+dt*u_voisinage(j)));
                   break;
                 case 3 :
-                  // approximation de T_imp par T_ref= [(1-tau)*T_voisin + (1/2)*T_imp] / (3/2 -tau)
-                  // approximation de T_voisin par T_voisin= 1/n * somme(1,n)(T_environnant+dt*derivee_environnant)
+                  // approximation of T_imp by T_ref= [(1-tau)*T_neighbour + (1/2)*T_imp] / (3/2 -tau)
+                  // approximation of T_neighbour by T_neighbour= 1/n * sum(1,n)(T_surrounding+dt*derivative_surrounding)
                   tref_j = ((1.-indicatrice(j))*(t_voisinage(j)+dt*u_voisinage(j))+0.5*tab(0))/(1.5-indicatrice(j));
                   break;
                 case 4 :
-                  // approximation de T_imp par T_ref= T_imp si tau=1 sinon T_ref=T_voisin
+                  // approximation of T_imp by T_ref= T_imp if tau=1, else T_ref=T_neighbour
                   if (indicatrice(j) == 1.)
                     {
                       tref_j = tab(0);
@@ -988,11 +988,11 @@ DoubleTab& Convection_Diffusion_Temperature::penalisation_L2(DoubleTab& u)
                     }
                   break;
                 default:
-                  Cerr << "Penalisation_L2: choix_pena invalide "<< choix_pena <<finl;
+                  Cerr << "Penalisation_L2: invalid choix_pena "<< choix_pena <<finl;
                   exit();
                   break;
                 }
-              // sauvegarde de Sigma_ibc Ksi_ibc(j) Tref_ibc pour post-traitement
+              // store Sigma_ibc Ksi_ibc(j) Tref_ibc for post-processing
               tab_(j) += tref_j;
               // penalisation_global = Sigma_ibc Ksi_ibc(j)*(Tref_ibc - inc) /  eta;
               pena_loc(j) *= (tref_j-inc(j));

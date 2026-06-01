@@ -72,15 +72,15 @@ static int chercher_arete(int elem, int somi, int somj, const IntTab& elem_arete
 static void verifier(const Op_Grad_VEF_P1B_Face& op, int& init, const Domaine_VEF& domaine_VEF, const DoubleTab& pre, DoubleTab& grad)
 
 {
-  // Methode verifier ne marche que pour P0+P1 en 2D et P0+P1+Pa en 3D
+  // Method verifier only works for P0+P1 in 2D and P0+P1+Pa in 3D
   if (Objet_U::dimension == 2 && domaine_VEF.get_alphaE() + domaine_VEF.get_alphaS() != 2)
     {
-      Cerr << "Methode verifier de Op_Grad_VEF_P1B_Face non valable pour cette discretisation." << finl;
+      Cerr << "Method verifier of Op_Grad_VEF_P1B_Face is not valid for this discretization." << finl;
       Process::exit();
     }
   if (Objet_U::dimension == 3 && domaine_VEF.get_alphaE() + domaine_VEF.get_alphaS() + domaine_VEF.get_alphaA() != 3)
     {
-      Cerr << "Methode verifier de Op_Grad_VEF_P1B_Face non valable pour cette discretisation." << finl;
+      Cerr << "Method verifier of Op_Grad_VEF_P1B_Face is not valid for this discretization." << finl;
       Process::exit();
     }
   const Domaine& domaine = domaine_VEF.domaine();

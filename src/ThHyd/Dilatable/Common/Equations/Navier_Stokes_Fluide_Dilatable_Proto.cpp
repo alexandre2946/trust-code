@@ -131,7 +131,7 @@ DoubleTab& Navier_Stokes_Fluide_Dilatable_Proto::derivee_en_temps_inco_impl(Navi
 
   if (!gradient_pression)
     {
-      Cerr<<"l'equation ne comprend pas gradient_pression "<<finl;
+      Cerr<<"the equation does not include gradient_pression "<<finl;
       Process::exit();
     }
 

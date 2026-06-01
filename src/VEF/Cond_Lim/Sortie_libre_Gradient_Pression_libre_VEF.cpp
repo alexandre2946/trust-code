@@ -180,7 +180,7 @@ double Sortie_libre_Gradient_Pression_libre_VEF::flux_impose(int face, int ncomp
   if (ncomp == 0) return flux_impose(face);
 
   Cerr << "Sortie_libre_Gradient_Pression_libre_VEF::flux_impose(int  , int )" << finl;
-  Cerr << "On ne sait imposer que la composante normale du gradient" << finl;
+  Cerr << "Only the normal component of the gradient can be imposed" << finl;
   Process::exit();
   return 0.;
 }
@@ -195,7 +195,7 @@ double Sortie_libre_Gradient_Pression_libre_VEF::Grad_P_lib_VEF(int face) const
   else if (le_champ_front->valeurs().line_size() == 1)
     return le_champ_front->valeurs()(face, 0) / d_rho;
   else
-    Cerr << "Sortie_libre_Gradient_Pression_libre_VEF::Grad_P_lib_VEF() erreur" << finl;
+    Cerr << "Sortie_libre_Gradient_Pression_libre_VEF::Grad_P_lib_VEF() error" << finl;
   exit();
   return 0.;
 }

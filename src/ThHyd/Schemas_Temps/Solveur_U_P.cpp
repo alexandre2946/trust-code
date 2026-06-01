@@ -143,24 +143,24 @@ void Solveur_U_P::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pre
       le_solveur_->reinit();
       le_solveur_->resoudre_systeme(Matrice_global,residu,Inconnues);
 
-      //Calcul de Uk = U*_k + U'k
+      //Compute Uk = U*_k + U'k
       current  += Inconnues_parts[0];
       ppart[0] += Inconnues_parts[1];
       //current.echange_espace_virtuel();
       Debog::verifier("Solveur_U_P::iterer_NS current",current);
-      eqn.solv_masse().corriger_solution(current, current);    //CoviMAC : mise en coherence de ve avec vf
+      eqn.solv_masse().corriger_solution(current, current);    //CoviMAC: enforce consistency between ve and vf
       eqnNS.assembleur_pression()->modifier_solution(pression);
 
       if (1)
         {
           divergence.calculer(current, secmem);
-          Cerr<<" apresdiv "<<mp_max_abs_vect(secmem)<<finl;;
+          Cerr<<" afterdiv "<<mp_max_abs_vect(secmem)<<finl;;
         }
     }
   else
     {
 
-      /* doit-on fixer P(elem 0) = 0 ? */
+      /* should we fix P(elem 0) = 0? */
       int has_P_ref=0;
       const Conds_lim& cls = eqnNS.domaine_Cl_dis().les_conditions_limites();
       for (int n_bord=0; n_bord < cls.size(); n_bord++)

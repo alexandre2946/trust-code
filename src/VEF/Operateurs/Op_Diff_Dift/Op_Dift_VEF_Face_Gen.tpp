@@ -70,7 +70,7 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::fill_grad_Re(const DoubleTab& tab_inconnue
       DoubleTabView3 Re = Re_.view_rw<3>();
       if (flag)
         {
-          Cerr << "On utilise une diffusion turbulente non lineaire dans NS" << finl;
+          Cerr << "Using non-linear turbulent diffusion in NS" << finl;
           Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), range_2D({0,0}, {domaine_VEF.nb_elem(),nbr_comp}), KOKKOS_LAMBDA(const int elem, const int i)
           {
 //            for (int i = 0; i < nbr_comp; i++)

@@ -137,7 +137,7 @@ int verifier( const Assembleur_P_VEFPreP1B& ass,
 {
   if (domaine_VEF.get_alphaE()+domaine_VEF.get_alphaS()+domaine_VEF.get_alphaA()!=Objet_U::dimension)
     {
-      Cerr << "Assembleur_P_VEFPreP1B::verifier n'est pas prevu pour verifier votre discretisation." << finl;
+      Cerr << "Assembleur_P_VEFPreP1B::verifier is not designed to verify your discretization." << finl;
       Process::exit();
     }
   const Navier_Stokes_std& eqn=ref_cast(Navier_Stokes_std, ass.equation());
@@ -166,26 +166,26 @@ int verifier( const Assembleur_P_VEFPreP1B& ass,
   for (int proc=0; proc<Process::nproc(); proc++)
     {
       int n = pre.dimension_tot(0);
-      // Le processeur proc impose sa valeur de n a tout le monde
+      // Processor proc broadcasts its value of n to all processes
       envoyer_broadcast(n, proc);
 
       for(int i=0; i<n; i++)
         {
-          //Cerr << "[" << Process::me() << "] On verifie la ligne " << i << " de la matrice." << finl;
+          //Cerr << "[" << Process::me() << "] Checking row " << i << " of the matrix." << finl;
           pre=0;
           if (Process::me()==proc)
             {
               if (0<=i && i<nb_elem)
                 {
-                  Cerr << "On verifie l'element reel " << i << " du processeur " << proc;
+                  Cerr << "Checking real element " << i << " of processor " << proc;
                   pre(i)=1;
                 }
               else if (nb_elem_tot<=i && i<nb_elem_tot+nb_som)
                 {
                   int sommet=i-nb_elem_tot;
-                  Cerr << "On verifie le sommet reel ";
-                  if (domaine.get_renum_som_perio(sommet)!=sommet) Cerr << "periodique ";
-                  Cerr << i-nb_elem_tot << " du processeur " << proc;
+                  Cerr << "Checking real vertex ";
+                  if (domaine.get_renum_som_perio(sommet)!=sommet) Cerr << "periodic ";
+                  Cerr << i-nb_elem_tot << " of processor " << proc;
                   pre(i)=1;
                 }
               else if (nb_elem_tot+nb_som_tot<=i && i<nb_elem_tot+nb_som_tot+nb_aretes && ok_arete[i-nb_elem_tot-nb_som_tot])
@@ -194,7 +194,7 @@ int verifier( const Assembleur_P_VEFPreP1B& ass,
                   const ArrOfInt& renum_arete_perio=domaine_VEF.get_renum_arete_perio();
                   if (renum_arete_perio[arete]==arete)
                     {
-                      Cerr << "On verifie l'arete reelle non superflue et non periodique " << arete << " du processeur " << proc;
+                      Cerr << "Checking real, non-redundant, non-periodic edge " << arete << " of processor " << proc;
                       pre(i)=1;
                     }
                 }
@@ -242,7 +242,7 @@ int verifier( const Assembleur_P_VEFPreP1B& ass,
               double app=mp_prodscal(resu,pre);
               if(erreur_absolue>1.e-12 && erreur_relative>1.e-6)
                 {
-                  Cerr << "[" << Process::me() << "] KO a la ligne " << i << " pour le proc " << proc << " (AP,P)= " << app << " erreur= " << erreur_absolue << finl;
+                  Cerr << "[" << Process::me() << "] FAIL at row " << i << " for proc " << proc << " (AP,P)= " << app << " error= " << erreur_absolue << finl;
                   ko=1;
                   Cerr << "[" << Process::me() << "] pre= ";
                   pre.ecrit(Cerr);
@@ -250,30 +250,30 @@ int verifier( const Assembleur_P_VEFPreP1B& ass,
                   resu.ecrit(Cerr);
                   Cerr << "[" << Process::me() << "] Lap(P) = ";
                   resu2.ecrit(Cerr);
-                  Cerr << "[" << Process::me() << "] erreur = ";
+                  Cerr << "[" << Process::me() << "] error = ";
                   erreur.ecrit(Cerr);
                   Cerr << "[" << Process::me() << "] invqtentrelacee = ";
                   inverse_quantitee_entrelacee.ecrit(Cerr);
                 }
               else
                 {
-                  Cerr << "[" << Process::me() << "] OK a la ligne " << i << " pour le proc " << proc << " (AP,P)= " << app << " erreur= " << erreur_absolue << finl;
+                  Cerr << "[" << Process::me() << "] OK at row " << i << " for proc " << proc << " (AP,P)= " << app << " error= " << erreur_absolue << finl;
                 }
             }
         }
     }
   if (ko)
     {
-      Cerr << "[" << Process::me() << "] Matrice en pression:" << finl;
+      Cerr << "[" << Process::me() << "] Pressure matrix:" << finl;
       matrice.imprimer_formatte(Cerr);
-      Cerr << "Echec de la methode verifier de l'assembleur. Voir les KO." << finl;
+      Cerr << "Failure in the assembler's verifier method. Check the FAIL entries above." << finl;
       Process::exit();
     }
   return 1;
 }
 //
-// trie le tableau sommets dans l'ordre croissant et
-// faces_op1 et faces_op2 consequemment.
+// sort the sommets array in ascending order and
+// faces_op1 and faces_op2 accordingly.
 //
 static inline void sort( ArrOfInt& sommets, ArrOfInt& faces_op1, ArrOfInt& faces_op2)
 {
@@ -382,7 +382,7 @@ static inline void remplir_sommets(const Domaine_VEF& domaine_VEF,
     }
   else
     {
-      Cerr << "pas prevu ... " << finl;
+      Cerr << "Not handled: elem1==-1 case" << finl;
       Process::exit();
     }
   if(elem2!=-1)
@@ -1977,7 +1977,7 @@ void updateP1P1(const Domaine_dis_base& z,
   for(int i=0; i<nb_som; i++)
     if(ARR(i,i)==0)
       {
-        //Cerr << "On modifie la ligne (sommet) orpheline " << i << finl;
+        //Cerr << "Modifying orphan vertex row " << i << finl;
         ARR(i,i)=1.;
       }
   Cerr << "Update P1 OK" << finl;
@@ -2157,8 +2157,8 @@ void updatePaPa(const Domaine_dis_base& z,
   for(int i=0; i<nb_arete; i++)
     if(ARR(i,i)==0)
       {
-        // On n'affiche pas car trop sur de gros maillages
-        //Cerr << "On modifie la ligne (arete) orpheline " << i << finl;
+        // Not displayed because too frequent on large meshes
+        //Cerr << "Modifying orphan edge row " << i << finl;
         ARR(i,i)=1;
       }
 

@@ -147,8 +147,8 @@ void Op_Diff_VDF_base::ajoute_terme_pour_axi(matrices_t matrices, DoubleTab& sec
             }
           else
             {
-              Cerr << "Probleme dans Op_Diff_VDF_base::ajoute_terme_pour_axi  avec le type de l'equation" << finl;
-              Cerr << "on n'a pas prevu d'autre cas que Navier_Stokes_std" << finl;
+              Cerr << "Problem in Op_Diff_VDF_base::ajoute_terme_pour_axi  with the equation type" << finl;
+              Cerr << "No other case than Navier_Stokes_std has been foreseen" << finl;
               Process::exit();
             }
         }

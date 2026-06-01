@@ -199,7 +199,7 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_aretes_bords(const DoubleVect& visco_tur
           break;
         default :
           {
-            Cerr << "On a rencontre un type d'arete non prevu : [ num arete : " << n_arete << " ], [ type : " << n_type << " ]" << finl;
+            Cerr << "Encountered an unexpected edge type: [ edge num: " << n_arete << " ], [ type: " << n_type << " ]" << finl;
             Process::exit();
             break;
           }
@@ -456,7 +456,7 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_contribution_aretes_bords(const DoubleVe
           break;
         default :
           {
-            Cerr << "On a rencontre un type d'arete non prevu : [ num arete : " << n_arete << " ], [ type : " << n_type << " ]" << finl;
+            Cerr << "Encountered an unexpected edge type: [ edge num: " << n_arete << " ], [ type: " << n_type << " ]" << finl;
             Process::exit();
             break;
           }
@@ -616,7 +616,7 @@ void Op_Dift_VDF_Face_Axi_base::contribue_au_second_membre(DoubleTab& resu ) con
           break;
         default :
           {
-            Cerr << "On a rencontre un type d'arete non prevu : [ num arete : " << n_arete << " ], [ type : " << n_type << " ]" << finl;
+            Cerr << "Encountered an unexpected edge type: [ edge num: " << n_arete << " ], [ type: " << n_type << " ]" << finl;
             Process::exit();
             break;
           }

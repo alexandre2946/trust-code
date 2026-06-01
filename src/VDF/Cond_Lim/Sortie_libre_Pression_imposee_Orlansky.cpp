@@ -217,7 +217,7 @@ double Sortie_libre_Pression_imposee_Orlansky::flux_impose(int face, int ncomp) 
 {
   if (ncomp == 0) return flux_impose(face);
 
-  Cerr << "Sortie_libre_Pression_imposee_Orlansky::flux_impose(int  , int ). La pression est un scalaire." << finl;
+  Cerr << "Sortie_libre_Pression_imposee_Orlansky::flux_impose(int  , int ). Pressure is a scalar." << finl;
   Process::exit();
   return 0.;
 }

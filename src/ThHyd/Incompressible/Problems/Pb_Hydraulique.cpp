@@ -84,14 +84,14 @@ void Pb_Hydraulique::associer_milieu_base(const Milieu_base& mil)
     eq_hydraulique.associer_milieu_base(mil);
   else if (sub_type(Fluide_Ostwald,mil))
     {
-      Cerr << "Je suis non newto" << finl;
+      Cerr << "Non-Newtonian fluid detected" << finl;
       eq_hydraulique.associer_milieu_base(mil);
     }
   else
     {
-      Cerr << "Un milieu de type " << mil.que_suis_je() << " ne peut etre associe a "
+      Cerr << "A medium of type " << mil.que_suis_je() << " cannot be associated with "
            << finl;
-      Cerr << "un probleme de type Pb_Hydraulique " << finl;
+      Cerr << "a problem of type Pb_Hydraulique " << finl;
       exit();
     }
 }

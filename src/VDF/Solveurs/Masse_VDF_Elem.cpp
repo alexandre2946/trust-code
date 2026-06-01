@@ -70,7 +70,7 @@ DoubleTab& Masse_VDF_Elem::appliquer_impl(DoubleTab& sm) const
         }
       else
         {
-          Cerr << "Masse_VDF_Elem::appliquer ne peut pas s'appliquer a un DoubleTab a " << sm.nb_dim() << " dimensions" << finl;
+          Cerr << "Masse_VDF_Elem::appliquer cannot be applied to a DoubleTab with " << sm.nb_dim() << " dimensions" << finl;
           Process::exit();
         }
       sm.echange_espace_virtuel();

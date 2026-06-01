@@ -60,17 +60,17 @@ double Temperature_imposee_paroi_H::val_imp(int i) const
         return le_champ_front->valeurs()(i, 0);
     }
   else
-    Cerr << "Temperature_imposee_paroi_H::val_imp erreur" << finl;
+    Cerr << "Temperature_imposee_paroi_H::val_imp error" << finl;
 
   abort();
   return 0.;
 }
 
-/*! @brief Renvoie la valeur imposee sur la (i,j)-eme composante du champ a la frontiere.
+/*! @brief Returns the imposed value for the (i,j)-th component of the boundary field.
  *
- * @param (int i) indice suivant la premiere dimension du champ
- * @param (int j) indice suivant la deuxieme dimension du champ
- * @return (double) la valeur imposee sur la composante du champ specifiee
+ * @param i Index along the first dimension of the field.
+ * @param j Index along the second dimension of the field.
+ * @return Imposed value for the specified field component.
  */
 double Temperature_imposee_paroi_H::val_imp(int i, int j) const
 {

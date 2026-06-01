@@ -65,8 +65,8 @@ Entree& Op_Conv_VEF_Face::readOn(Entree& s )
 
   if (!(type_op_lu=="amont") && !(type_op_lu=="muscl") && !(type_op_lu=="centre"))
     {
-      Cerr << type_op_lu << " n'est pas compris par " << que_suis_je() << finl;
-      Cerr << " choisir parmi : amont - muscl - centre " << finl;
+      Cerr << type_op_lu << " is not understood by " << que_suis_je() << finl;
+      Cerr << " choose among: amont - muscl - centre " << finl;
       exit();
     }
 
@@ -78,8 +78,8 @@ Entree& Op_Conv_VEF_Face::readOn(Entree& s )
       if ( !(type_lim=="minmod") && !(type_lim=="vanleer") && !(type_lim=="vanalbada")
            &&  !(type_lim=="chakravarthy") && !(type_lim=="superbee") )
         {
-          Cerr << type_lim << " n'est pas compris par " << que_suis_je() << finl;
-          Cerr << " choisir parmi : minmod - vanleer - vanalbada - chakravarthy - superbee " << finl;
+          Cerr << type_lim << " is not understood by " << que_suis_je() << finl;
+          Cerr << " choose among: minmod - vanleer - vanalbada - chakravarthy - superbee " << finl;
           exit();
         }
 
@@ -112,12 +112,12 @@ Entree& Op_Conv_VEF_Face::readOn(Entree& s )
 
       if (ordre_!=1 && ordre_!=2 && ordre_!=3)
         {
-          Cerr << "l'ordre apres " << type_lim << " dans " << que_suis_je() << " doit etre soit 1, soit 2, soit 3" <<  finl;
+          Cerr << "the order after " << type_lim << " in " << que_suis_je() << " must be 1, 2, or 3" <<  finl;
           exit();
         }
       if (ordre_==3)
         {
-          // Lecture de alpha_
+          // Read alpha_
           s >> alpha_;
         }
     }
@@ -129,7 +129,7 @@ Entree& Op_Conv_VEF_Face::readOn(Entree& s )
 
       if (ordre_!=1 && ordre_!=2)
         {
-          Cerr << "l'ordre apres " << type_op_lu << " dans " << que_suis_je() << " doit etre soit 1, soit 2 " <<  finl;
+          Cerr << "the order after " << type_op_lu << " in " << que_suis_je() << " must be 1 or 2 " <<  finl;
           exit();
         }
     }

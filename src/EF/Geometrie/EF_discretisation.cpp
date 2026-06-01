@@ -89,14 +89,14 @@ void EF_discretisation::discretiser_champ(const Motcle& directive, const Domaine
     type_champ_vitesse = "Champ_Q1_EF";
   else
     {
-      Cerr << "EF_discretisation::discretiser_champ :\n L'element geometrique ";
+      Cerr << "EF_discretisation::discretiser_champ :\n The geometric element ";
       Cerr << domaine_EF.type_elem().que_suis_je();
-      Cerr << " n'est pas supporte." << finl;
+      Cerr << " is not supported." << finl;
       exit();
     }
 
   Nom type;
-  int default_nb_comp = 0; // Valeur par defaut du nombre de composantes
+  int default_nb_comp = 0; // Default number of components
   int rang = motcles.search(directive);
   switch(rang)
     {
@@ -248,14 +248,14 @@ void EF_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
       type_champ_vitesse = "Champ_Fonc_Q1_EF";
     else
       {
-        Cerr << "EF_discretisation::discretiser_champ :\n L'element geometrique ";
+        Cerr << "EF_discretisation::discretiser_champ :\n The geometric element ";
         Cerr << elem_EF.que_suis_je();
-        Cerr << " n'est pas supporte." << finl;
+        Cerr << " is not supported." << finl;
         exit();
       }
   }
   Nom type;
-  int default_nb_comp = 0; // Valeur par defaut du nombre de composantes
+  int default_nb_comp = 0; // Default number of components
   int rang = motcles.search(directive);
   switch(rang)
     {

@@ -178,7 +178,7 @@ void Tetraedriser_homogene_fin::decoupe(Domaine& domaine, Faces& faces, IntTab& 
 
       //                if(jj!=8)
       //                {
-      //                Cerr << " il manque des nouvelles faces " << finl;
+      //                Cerr << " missing new faces " << finl;
       //                exit();
       //                }
       assert(jj == 8);

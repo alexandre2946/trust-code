@@ -48,36 +48,36 @@ void Champ_front_contact_fictif_VEF::mettre_a_jour(double temps )
   int nb_faces=la_front.nb_faces();
   DoubleTab& tab=valeurs();
 
-  // On recupere les coefficients gradient_num_transf et gradient_fro_transf de l'autre probleme
+  // Retrieve the coefficients gradient_num_transf and gradient_fro_transf from the other problem
   DoubleVect gradient_num_transf_autre_pb(nb_faces);
   DoubleVect gradient_fro_transf_autre_pb(nb_faces);
   if (!ch_fr_autre_pb)
     {
-      Cerr << "Attention: Vous utilisez une condition de contact Champ_front_contact_fictif_VEF sur le bord " << nom_bord1 << " sur le probleme "<< nom_pb1 <<" " << finl;
-      Cerr << "Vous devez avoir un Champ_front_contact_fictif_VEF equivalent sur le bord " << nom_bord2 << " du probleme "<<nom_pb2<<" " << finl;
+      Cerr << "Warning: You are using a Champ_front_contact_fictif_VEF contact condition on boundary " << nom_bord1 << " of problem "<< nom_pb1 <<" " << finl;
+      Cerr << "You must have an equivalent Champ_front_contact_fictif_VEF on boundary " << nom_bord2 << " of problem "<<nom_pb2<<" " << finl;
       Process::exit();
     }
   trace_face_raccord(fr_vf_autre_pb.valeur(),ch_fr_autre_pb->get_gradient_num_transf(),gradient_num_transf_autre_pb);
   trace_face_raccord(fr_vf_autre_pb.valeur(),ch_fr_autre_pb->get_gradient_fro_transf(),gradient_fro_transf_autre_pb);
 
 
-  // PQ : 10/09/07 : pour plus de lisibilite, on renomme les tableaux servant
-  //                     au calcul de la temperature parietale, de sorte d'avoir :
+  // PQ : 10/09/07 : for readability, we rename the arrays used
+  //                     in the wall temperature computation, so that we have :
   //
   //                h1.Tf1 + (h2.hs/(h2+hs)). Tf2
   //        Tw_1 = ------------------------------
   //                (h1+hs) - (hs*hs/(h2+hs))
   //
-  //  avec :
+  //  with:
 
-  double hs = conduct_fictif / ep_fictif;         // coefficient d'echange du solide fictif
-  DoubleVect& h1Tf1=(gradient_num_local);                   // temperature du fluide 1
-  DoubleVect& h1=(gradient_fro_local);                   // coefficient d'echange du fluide 1
-  DoubleVect& h2Tf2=(gradient_num_transf_autre_pb);  // temperature du fluide 2
-  DoubleVect& h2=(gradient_fro_transf_autre_pb);   // coefficient d'echange du fluide 2
+  double hs = conduct_fictif / ep_fictif;         // heat transfer coefficient of the fictitious solid
+  DoubleVect& h1Tf1=(gradient_num_local);                   // temperature of fluid 1
+  DoubleVect& h1=(gradient_fro_local);                   // heat transfer coefficient of fluid 1
+  DoubleVect& h2Tf2=(gradient_num_transf_autre_pb);  // temperature of fluid 2
+  DoubleVect& h2=(gradient_fro_transf_autre_pb);   // heat transfer coefficient of fluid 2
 
 
-  // Calcul de la temperature imposee
+  // Computation of the imposed temperature
   int fac_front;
   for (fac_front=0; fac_front<nb_faces; fac_front++)
     {

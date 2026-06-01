@@ -175,10 +175,10 @@ int Assembleur_P_VEFPreP1B::assembler(Matrice& la_matrice)
 
 int Assembleur_P_VEFPreP1B::assembler_rho_variable(Matrice& la_matrice, const Champ_Don_base& rho)
 {
-  // On multiplie par la masse volumique aux faces
+  // Multiply by mass density at faces
   if (!sub_type(Champ_Fonc_P1NC, rho))
     {
-      Cerr << "La masse volumique n'est pas aux faces dans Assembleur_P_VEFPreP1B::assembler_rho_variable." << finl;
+      Cerr << "The mass density is not at faces in Assembleur_P_VEFPreP1B::assembler_rho_variable." << finl;
       Process::exit();
     }
   const DoubleVect& volumes_entrelaces=domaine_Vef().volumes_entrelaces();
@@ -213,23 +213,23 @@ void zero(Matrice_Bloc_Sym& matrice)
 
 int Assembleur_P_VEFPreP1B::assembler_mat(Matrice& la_matrice,const DoubleVect& quantitee_entrelacee, int incr_pression, int resoudre_en_u)
 {
-  // On fixe les drapeaux de Assembleur_base
+  // Set the flags of Assembleur_base
   set_resoudre_increment_pression(incr_pression);
   set_resoudre_en_u(resoudre_en_u);
 
   SolveurSys& solveur_pression = ref_cast(Navier_Stokes_std, mon_equation.valeur()).solveur_pression();
-  if (solveur_pression->read_matrix()) // Lecture de la matrice dans un fichier (uniquement supporte par PETSc pour le moment)
+  if (solveur_pression->read_matrix()) // Read the matrix from a file (only supported by PETSc for now)
     {
       la_matrice.typer("Matrice_Petsc");
     }
-  else // Assemblage de la matrice
+  else // Assemble the matrix
     {
       const Domaine_VEF& domaine_vef = domaine_Vef();
-      Cerr << "Assemblage de la matrice de pression" << (domaine_vef.get_alphaE() ? " P0" : "")
-           << (domaine_vef.get_alphaS() ? " P1" : "") << (domaine_vef.get_alphaA() ? " Pa" : "") << " en cours..." << finl;
+      Cerr << "Assembling pressure matrix" << (domaine_vef.get_alphaE() ? " P0" : "")
+           << (domaine_vef.get_alphaS() ? " P1" : "") << (domaine_vef.get_alphaA() ? " Pa" : "") << " in progress..." << finl;
 
-      // Les decoupages doivent etre de largeur de joint de 2
-      // si le support P1 ou Pa est utilise...
+      // Partitions must have ghost cell width of 2
+      // if P1 or Pa support is used...
       if (Process::is_parallel() &&
           domaine_vef.domaine().nb_joints() &&
           domaine_vef.domaine().joint(0).epaisseur() < 2 &&
@@ -388,11 +388,11 @@ int Assembleur_P_VEFPreP1B::assembler_mat(Matrice& la_matrice,const DoubleVect& 
     }
 
   //////////////////////////////////////////////////////
-  // Affichage eventuel du conditionnement de la matrice
+  // Optional display of the matrix condition number
   //////////////////////////////////////////////////////
   char* theValue2 = getenv("TRUST_CONDITIONNEMENT_MATRICE");
   if(theValue2 != nullptr)
-    Cout << "Estimation du conditionnement de la matrice: " << estim_cond(la_matrice)<<finl;
+    Cout << "Estimation of the matrix condition number: " << estim_cond(la_matrice)<<finl;
 
   return 1;
 }
@@ -401,33 +401,33 @@ int Assembleur_P_VEFPreP1B::modifier_secmem(DoubleTab& b)
 {
   const Domaine_VEF& le_dom = domaine_Vef();
 
-  // Verification sur le support Pa
+  // Verification on the Pa support
   if (le_dom.get_alphaA())
     {
-      // Verification sur les aretes que:
+      // Verify on edges that:
       const ArrOfInt& renum_arete_perio=le_dom.get_renum_arete_perio();
       const ArrOfInt& ok_arete=le_dom.get_ok_arete();
       int npa=le_dom.numero_premiere_arete();
-      // b n'a pas forcement son espace virtuel a jour
+      // b does not necessarily have its virtual space up to date
       int nb_aretes=le_dom.domaine().nb_aretes();
       ToDo_Kokkos("critical");
       for(int i=0; i<nb_aretes; i++)
-        if(!ok_arete[i] && b(npa+i)!=0.) // Les aretes superflues ont une valeur nulle
+        if(!ok_arete[i] && b(npa+i)!=0.) // Superfluous edges have a zero value
           {
-            Cerr << "Pb div Aretes, la pression sur l'arete " << i << " (qui est superflue) n'est pas nulle." << finl;
+            Cerr << "Pb div Edges, the pressure on edge " << i << " (which is superfluous) is not zero." << finl;
             Process::exit();
           }
-        else if ( (renum_arete_perio[i]!=i) && b(npa+i)!=0.) // Les aretes periodiques ont une valeur nulle
+        else if ( (renum_arete_perio[i]!=i) && b(npa+i)!=0.) // Periodic edges have a zero value
           {
-            Cerr << "Pb div Aretes Perio, la pression sur l'arete " << i << " (qui est periodique) n'est pas nulle." << finl;
+            Cerr << "Pb div Periodic Edges, the pressure on edge " << i << " (which is periodic) is not zero." << finl;
             Process::exit();
           }
     }
 
-  // Verification sur le support P1
+  // Verification on the P1 support
   if (le_dom.get_alphaS())
     {
-      // Verification que la pression sur les sommets periodiques est nulle
+      // Verify that the pressure on periodic vertices is zero
       const Domaine& dom=le_dom.domaine();
       int nps=le_dom.numero_premier_sommet();
       int ns=le_dom.domaine().nb_som();
@@ -660,33 +660,33 @@ int Assembleur_P_VEFPreP1B::modifier_solution(DoubleTab& tab_pression)
   //  if (!has_P_ref) exit();
   const Domaine_VEF& le_dom = domaine_Vef();
 
-  // Verification sur les aretes
+  // Verification on edges
   if (le_dom.get_alphaA())
     {
-      // On impose la pression a 0 sur les aretes superflues:
+      // Impose pressure = 0 on superfluous edges:
       const IntVect& ok_arete=le_dom.get_ok_arete();
       const ArrOfInt& renum_arete_perio=le_dom.get_renum_arete_perio();
-      // Nombre d'aretes reelles
+      // Number of real edges
       int nb_aretes=ok_arete.size();
       int npa=le_dom.numero_premiere_arete();
       for(int i=0; i<nb_aretes; i++)
         {
           if(!ok_arete(i) && tab_pression(npa+i)!=0.)
             {
-              Cerr << "Pb pression arete superflue, P(" << npa+i << ")=" << tab_pression(npa+i) << finl;
+              Cerr << "Pb: pressure on superfluous edge, P(" << npa+i << ")=" << tab_pression(npa+i) << finl;
               tab_pression(npa+i)=0;
               Process::exit();
             }
           else if ( (renum_arete_perio[i]!=i) && tab_pression(npa+i)!=0.)
             {
-              Cerr << "Pb pression arete superflue periodique, P(" << npa+i << ")=" << tab_pression(npa+i) << finl;
+              Cerr << "Pb: pressure on superfluous periodic edge, P(" << npa+i << ")=" << tab_pression(npa+i) << finl;
               tab_pression(npa+i)=0;
               Process::exit();
             }
         }
     }
 
-  // On applique la periodicite sur les sommets pour la pression:
+  // Apply periodicity on vertices for the pressure:
   if (le_dom.get_alphaS())
     {
       const Domaine& dom=le_dom.domaine();
@@ -718,11 +718,11 @@ void Assembleur_P_VEFPreP1B::verifier_dirichlet()
 {
   if (domaine_Vef().get_alphaE()+domaine_Vef().get_alphaS()+domaine_Vef().get_alphaA()!=dimension)
     {
-      Cerr << "Assembleur_P_VEFPreP1B::verifier_dirichlet ne fonctionne pas encore avec votre discretisation" << finl;
+      Cerr << "Assembleur_P_VEFPreP1B::verifier_dirichlet does not yet work with your discretization" << finl;
       Process::exit();
     }
-  // Verifications diverses des conditions limites
-  // en postraitant le resultat dans le champ Divergence_U
+  // Various verifications of boundary conditions
+  // by post-processing the result in the Divergence_U field
   IntVect Faces_de_Dirichlet(domaine_Vef().nb_elem_tot());
   IntTab faces(domaine_Vef().nb_elem_tot(),2);
   faces=-1;
@@ -760,18 +760,18 @@ void Assembleur_P_VEFPreP1B::verifier_dirichlet()
       //post(elem)=Faces_de_Dirichlet(elem);
       if (Faces_de_Dirichlet(elem)>1)
         {
-          Cerr << "L'element " << elem << " a " << Faces_de_Dirichlet(elem) << " faces de Dirichlet separees par une ";
+          Cerr << "Element " << elem << " has " << Faces_de_Dirichlet(elem) << " Dirichlet faces separated by a ";
           const IntVect& ok_arete=domaine_Vef().get_ok_arete();
           const IntTab& aretes_som=domaine_Vef().domaine().aretes_som();
-          // Parcours des aretes pour verifier les aretes de bord
+          // Loop over edges to verify boundary edges
           for (int k=0; k<6; k++)
             {
               int arete=domaine_Vef().domaine().elem_aretes(elem,k);
-              // Les 2 sommets de l'arete
+              // The 2 vertices of the edge
               int S0=aretes_som(arete,0);
               int S1=aretes_som(arete,1);
-              // On verifie s'ils sont 2 fois dans les sommets des faces
-              // auquels cas c'est l'arete qui partage 2 faces de Dirichlet
+              // Verify if they appear twice in the vertices of the faces,
+              // in which case this is the edge shared by 2 Dirichlet faces
               int ok=0;
               for (int l=0; l<2; l++)
                 {
@@ -782,8 +782,8 @@ void Assembleur_P_VEFPreP1B::verifier_dirichlet()
                       if (face_sommets(face,s)==S1) ok++;
                     }
                 }
-              if (ok==4) Cerr << "arete " << (ok_arete(arete)==0?"superflue":"") << finl;
-              // On compte les aretes superflues
+              if (ok==4) Cerr << "edge " << (ok_arete(arete)==0?"superfluous":"") << finl;
+              // Count the superfluous edges
               post(elem)+=(ok_arete(arete)==0);
             }
           //Process::exit();
@@ -795,7 +795,7 @@ void Assembleur_P_VEFPreP1B::projete_L2(DoubleTab& pression)
 {
   if (domaine_Vef().get_alphaE()+domaine_Vef().get_alphaS()+domaine_Vef().get_alphaA()!=3)
     {
-      Cerr << "Assembleur_P_VEFPreP1B::projete_L2 ne fonctionne qu'en P0+P1+Pa" << finl;
+      Cerr << "Assembleur_P_VEFPreP1B::projete_L2 only works in P0+P1+Pa mode" << finl;
       Process::exit();
     }
   //Cerr << "Projection L2" << finl;
@@ -845,22 +845,22 @@ int Assembleur_P_VEFPreP1B::modifier_matrice(Matrice& la_matrice)
   has_P_ref=0;
   const Conds_lim& les_cl = le_dom_Cl_VEF->les_conditions_limites();
   const Domaine_VEF& domaine_VEF = domaine_Vef();
-  // Recherche s'il y'a une pression de reference, et si oui la matrice n'est pas modifiee
+  // Check if there is a reference pressure; if so, the matrix is not modified
   for(int i=0; i<les_cl.size(); i++)
     if (sub_type(Neumann_sortie_libre,les_cl[i].valeur()) ||sub_type(Robin_VEF, les_cl[i].valeur()))
       {
         has_P_ref=1;
         if (domaine_VEF.get_alphaA())
           {
-            // On en profite pour verifier si la pression est bien nulle si support Pa
+            // Also verify that the pressure is indeed zero on Pa support
             const DoubleTab& val=ref_cast(Neumann_sortie_libre,les_cl[i].valeur()).champ_front().valeurs();
             int nbval=val.dimension(0);
             for (int n=0; n<nbval; n++)
               if (val(n,0)!=0)
                 {
-                  Cerr << "La condition limite pression imposee non nulle n'est pas encore" << finl;
-                  Cerr << "supportee en VEF avec support arete Pa." << finl;
-                  // Le travail est a faire dans Assembleur_P_VEFPreP1B::modifier_secmem_aretes
+                  Cerr << "Non-zero imposed pressure boundary condition is not yet" << finl;
+                  Cerr << "supported in VEF with edge support Pa." << finl;
+                  // Work to be done in Assembleur_P_VEFPreP1B::modifier_secmem_aretes
                   Process::exit();
                 }
           }
@@ -915,7 +915,7 @@ int Assembleur_P_VEFPreP1B::modifier_matrice(Matrice& la_matrice)
                   sommet_referent=i;
                 }
             }
-          //Cerr << "On modifie la ligne (sommet) " << sommet_referent << finl;
+          //Cerr << "Modifying vertex row " << sommet_referent << finl;
           A11RR(sommet_referent,sommet_referent)*=2;
           // has_P_ref=1;
           matrice_modifiee=1;
@@ -949,7 +949,7 @@ int Assembleur_P_VEFPreP1B::modifier_matrice(Matrice& la_matrice)
                   arete_referente=i;
                 }
             }
-          //Cerr << "On modifie la ligne (arete) " << arete_referente << finl;
+          //Cerr << "Modifying edge row " << arete_referente << finl;
           A22RR(arete_referente,arete_referente)*=2;
           //has_P_ref=1;
           matrice_modifiee=1;
@@ -1136,22 +1136,22 @@ void operation01(Matrice_Bloc& A00, Matrice_Bloc& A01, double alpha, double beta
 void Assembleur_P_VEFPreP1B::changer_base_matrice(Matrice& la_matrice)
 {
   assert(domaine_Vef().get_alphaE() && domaine_Vef().get_alphaS() && !domaine_Vef().get_alphaA()); // P0+P1 uniquement
-  Cerr << "Changement de base pour la matrice: P0+P1->P1Bulle" << finl;
+  Cerr << "Basis change for the matrix: P0+P1->P1Bulle" << finl;
   Matrice_Bloc_Sym& matrice=ref_cast(Matrice_Bloc_Sym, la_matrice.valeur());
   Matrice_Bloc& A00=ref_cast(Matrice_Bloc, matrice.get_bloc(0,0).valeur());
   Matrice_Bloc& A01=ref_cast(Matrice_Bloc, matrice.get_bloc(0,1).valeur());
   Matrice_Bloc& A11=ref_cast(Matrice_Bloc, matrice.get_bloc(1,1).valeur());
 
-  // Modification du bloc A11
-  // As1s2~=As1s2-beta*[somme(Ak1s2)(s1 appartient a k1)+somme(Ak1s1)(s2 appartenant a k1)]+beta*beta*somme(Ak1k2)(s1 appartenant a k1 et s2 appartenant a k2)
+  // Modification of block A11
+  // As1s2~=As1s2-beta*[somme(Ak1s2)(s1 belongs to k1)+somme(Ak1s1)(s2 belonging to k1)]+beta*beta*somme(Ak1k2)(s1 belonging to k1 and s2 belonging to k2)
   operation11(A00,A01,A11,beta_,domaine_Vef().domaine());
 
-  // Modification du bloc A01
-  // Ak1s~=alpha*Ak1s - alpha*beta*somme(Ak1k2)(s appartenant a k2)
+  // Modification of block A01
+  // Ak1s~=alpha*Ak1s - alpha*beta*somme(Ak1k2)(s belonging to k2)
   A01*=alpha_;
   operation01(A00,A01,alpha_,beta_,domaine_Vef().domaine());
 
-  // Modification du bloc A00
+  // Modification of block A00
   // Ak1k2~ = alpha * alpha * Ak1k2
   A00*=alpha_*alpha_;
 }

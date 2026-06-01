@@ -67,18 +67,18 @@ Entree& Terme_Source_Canal_RANS_LES_VDF_Elem::readOn(Entree& is )
 
   Motcles les_mots(6);
   {
-    les_mots[0]="alpha_tau"; //coeff de relaxation du terme source
-    les_mots[1]="Ly"; //Hauteur du canal plan (utile pour la moyenne spatiale)
-    les_mots[2]="f_start"; //temps a partir duquel le terme source est active
-    les_mots[3]="t_av"; //temps de prise de moyenne (moyenne temporelle glissante)
+    les_mots[0]="alpha_tau"; //relaxation coefficient of the source term
+    les_mots[1]="Ly"; //height of the plane channel (useful for spatial averaging)
+    les_mots[2]="f_start"; //time from which the source term is activated
+    les_mots[3]="t_av"; //averaging time (sliding temporal average)
     les_mots[4]="type_moyenne"; //
     les_mots[5]="nom_pb_rans"; //
   }
   is >> mot_lu;
   if(mot_lu != acc_ouverte)
     {
-      Cerr << "On attendait { a la place de " << mot_lu
-           << " lors de la lecture des parametres de la loi de paroi " << finl;
+      Cerr << "Expected { instead of " << mot_lu
+           << " while reading the wall law parameters" << finl;
     }
   is >> mot_lu;
   while(mot_lu != acc_fermee)
@@ -104,10 +104,10 @@ Entree& Terme_Source_Canal_RANS_LES_VDF_Elem::readOn(Entree& is )
         case 3  :
           is >> t_av;
           Cerr << "t_av = " << t_av << finl;
-          Cerr << "type_moyenne : " << moyenne << finl;
+          Cerr << "averaging_type: " << moyenne << finl;
           if((moyenne==1)&&(t_av<=0))
             {
-              Cerr << "La periode en temps de la moyenne temporelle glissante est non precisee !"
+              Cerr << "The time period for the sliding temporal average is not specified!"
                    << finl;
               exit();
             }
@@ -115,7 +115,7 @@ Entree& Terme_Source_Canal_RANS_LES_VDF_Elem::readOn(Entree& is )
           break;
         case 4  :
           is >> moyenne;
-          Cerr << "type_moyenne : " << moyenne << finl;
+          Cerr << "averaging_type: " << moyenne << finl;
           compteur++;
           break;
         case 5  :
@@ -125,15 +125,15 @@ Entree& Terme_Source_Canal_RANS_LES_VDF_Elem::readOn(Entree& is )
           break;
         default :
           {
-            Cerr << mot_lu << " n'est pas un mot compris" << finl;
-            Cerr << "Les mots compris sont : " << les_mots << finl;
+            Cerr << mot_lu << " is not a recognized keyword" << finl;
+            Cerr << "The recognized keywords are: " << les_mots << finl;
             exit();
           }
         }
       is >> mot_lu;
     }
   Cerr << "nom_pb_rans = " << nom_pb_rans << finl;
-  Cerr << compteur << " motcles ont ete lus dans le readOn du terme de forcage thermique" << finl;
+  Cerr << compteur << " keywords were read in the readOn of the thermal forcing term" << finl;
 
   init();
 
@@ -328,7 +328,7 @@ void Terme_Source_Canal_RANS_LES_VDF_Elem::mettre_a_jour(double temps)
   else
     {
       Cerr << "moyenne = " << moyenne << finl;
-      Cerr << "Probleme pour le choix du type de moyenne" << finl;
+      Cerr << "Problem with the choice of averaging type" << finl;
     }
   compteur_reprise++;
 

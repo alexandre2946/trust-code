@@ -103,8 +103,8 @@ void Pb_Thermohydraulique_Concentration_Turbulent::associer_milieu_base(const Mi
     eq_concentration.associer_milieu_base(mil);
   else
     {
-      Cerr << "Un milieu de type " << mil.que_suis_je() << " ne peut etre associe a " << finl;
-      Cerr << "un probleme de type Pb_Thermohydraulique_Concentration_Turbulent " << finl;
+      Cerr << "A medium of type " << mil.que_suis_je() << " cannot be associated with " << finl;
+      Cerr << "a problem of type Pb_Thermohydraulique_Concentration_Turbulent " << finl;
       exit();
     }
 }

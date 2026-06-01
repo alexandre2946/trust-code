@@ -78,20 +78,20 @@ Entree& Traitement_particulier_NS_THI::lire(Entree& is)
                       is >> motlu;
                       if (motlu==valec)
                         {
-                          is >> Ec_init; // on lit la valeur de Ec_init
-                          Cerr << "Avec Initialisation de l Energie Cinetique Ec_init= " << Ec_init << finl;
+                          is >> Ec_init; // read the value of Ec_init
+                          Cerr << "With initialization of kinetic energy Ec_init= " << Ec_init << finl;
                           is >> motlu;
                           if (motlu==facon)
                             {
-                              is >> fac_init; // Sur quelle valeur se base l initialisation??
-                              Cerr << "Avec Initialisation de l Energie Cinetique sur Ecspat (init_fac==0) ou Ecspec (init_fac==1) : fac_init=" << fac_init << finl;
+                              is >> fac_init; // Which value is the initialization based on??
+                              Cerr << "With initialization of kinetic energy on Ecspat (init_fac==0) or Ecspec (init_fac==1) : fac_init=" << fac_init << finl;
                             }
                         }
                       else
                         {
-                          Cerr << "Erreur dans la lecture de Traitement_particulier_NS_THI_VDF" << finl;
-                          Cerr << "Le seul mot cle possible ici est : val_Ec" << finl;
-                          Cerr << "Vous avez lu :" << motlu << finl;
+                          Cerr << "Error while reading Traitement_particulier_NS_THI_VDF" << finl;
+                          Cerr << "The only possible keyword here is: val_Ec" << finl;
+                          Cerr << "You read:" << motlu << finl;
                           exit();
                         }
                     }
@@ -100,15 +100,15 @@ Entree& Traitement_particulier_NS_THI::lire(Entree& is)
               case 1 :
                 {
                   is >> oui_calc_spectre;
-                  if (oui_calc_spectre!=0) Cerr << "Calcul des spectres." << finl;
+                  if (oui_calc_spectre!=0) Cerr << "Computing spectra." << finl;
                   break;
                 }
 
               default :
                 {
-                  Cerr << "Erreur dans la lecture de Traitement_particulier_NS_THI";
-                  Cerr << "Les mots cles possibles sont : init_Ec, calc_spectre, { et }" << finl;
-                  Cerr << "Vous avez lu :" << motlu << finl;
+                  Cerr << "Error while reading Traitement_particulier_NS_THI";
+                  Cerr << "Possible keywords are: init_Ec, calc_spectre, { and }" << finl;
+                  Cerr << "You read:" << motlu << finl;
                   exit();
                   break;
                 }
@@ -118,16 +118,16 @@ Entree& Traitement_particulier_NS_THI::lire(Entree& is)
         is >> motlu;
         if (motlu != accfermee)
           {
-            Cerr << "Erreur dans la lecture de Traitement_particulier_NS_THI";
-            Cerr << "On attendait une }" << finl;
+            Cerr << "Error while reading Traitement_particulier_NS_THI";
+            Cerr << "We expected a }" << finl;
             exit();
           }
       }
     }
   else
     {
-      Cerr << "Erreur dans la lecture de Traitement_particulier_NS_THI";
-      Cerr << "On attendait une {" << finl;
+      Cerr << "Error while reading Traitement_particulier_NS_THI";
+      Cerr << "We expected a {" << finl;
       exit();
     }
   return is;
@@ -210,10 +210,10 @@ void Traitement_particulier_NS_THI::msg_erreur_maillage(const char* methode_actu
   if (je_suis_maitre())
     {
       Cerr << finl;
-      Cerr << "Probleme dans " << methode_actuelle << " :" << finl;
-      Cerr << "Votre maillage ne semble pas comporter le meme nombre de noeuds" << finl;
-      Cerr << "suivant toutes les directions. Verifiez votre jeu de donnee... " << finl << finl;
-      // Abort pour les cas paralleles !
+      Cerr << "Problem in " << methode_actuelle << " :" << finl;
+      Cerr << "Your mesh does not seem to have the same number of nodes" << finl;
+      Cerr << "in all directions. Check your data file... " << finl << finl;
+      // Abort for parallel cases!
       abort();
     }
 }

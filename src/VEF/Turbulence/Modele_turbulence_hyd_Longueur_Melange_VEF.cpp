@@ -193,7 +193,7 @@ Champ_Fonc_base& Modele_turbulence_hyd_Longueur_Melange_VEF::calculer_viscosite_
       }
     else
       {
-        Cerr << cas_ << " non prevu " << que_suis_je() << finl;
+        Cerr << cas_ << " not handled in " << que_suis_je() << finl;
         Cerr << que_suis_je() << " Case " << cas_ << " not known." << finl;
         exit();
       }

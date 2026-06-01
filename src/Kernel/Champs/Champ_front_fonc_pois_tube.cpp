@@ -66,7 +66,7 @@ Entree& Champ_front_fonc_pois_tube::readOn(Entree& is )
       is >> R_loc_mult(i) ;
     }
 
-  //Cerr << "Champ_front_fonc_pois_tube lu U_moy = "<< U_moy << finl ;
+  //Cerr << "Champ_front_fonc_pois_tube read U_moy = "<< U_moy << finl ;
   return is ;
 }
 

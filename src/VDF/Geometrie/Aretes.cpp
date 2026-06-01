@@ -144,11 +144,11 @@ void Aretes::calculer_centre_de_gravite(Domaine_VDF& domaine)
                 }
               else
                 {
-                  Cerr<<"Erreur on a pas trouve de sommets communs"<<finl;
+                  Cerr<<"Error: no common vertices found"<<finl;
                   exit();
                 }
             }
-          else if((type == 0)||(type == -1)) // arete bord ou coin
+          else if((type == 0)||(type == -1)) // boundary or corner edge
             {
               for(j=0; j<4; j++)
                 {
@@ -179,7 +179,7 @@ void Aretes::calculer_centre_de_gravite(Domaine_VDF& domaine)
                 }
               else
                 {
-                  Cerr<<"Erreur on a pas trouve de sommets communs"<<finl;
+                  Cerr<<"Error: no common vertices found"<<finl;
                   exit();
                 }
             }

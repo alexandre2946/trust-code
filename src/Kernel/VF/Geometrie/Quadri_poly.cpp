@@ -107,15 +107,15 @@ void Quadri_poly::normale(int num_Face,DoubleTab& Face_normales,
           y1g+=les_coords(Face_sommets(elem_faces(elem1,i),0),1);
           y1g+=les_coords(Face_sommets(elem_faces(elem1,i),1),1);
         }
-      // Cerr << "xg et yg de Face_normales: " << x1g << " " << y1g << finl;
+      // Cerr << "xg and yg of Face_normales: " << x1g << " " << y1g << finl;
 
       x2g = les_coords(n0,0)+les_coords(n1,0);
       y2g = les_coords(n0,1)+les_coords(n1,1);
       grx=x2g*0.5-x1g*0.125;
       gry=y2g*0.5-y1g*0.125;
 
-      //   Cerr << "grx et gry : " << grx << " " << gry << finl;
-      //on regarde le signe du produit scalaire
+      //   Cerr << "grx and gry : " << grx << " " << gry << finl;
+      //check the sign of the dot product
       psc=grx*nx+gry*ny;
       if(psc<0)
         sign=-1;
@@ -141,67 +141,67 @@ void Quadri_poly::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
                             const ArrOfDouble& vs,const DoubleTab& vsom,
                             const Champ_Inc_base& vitesse,int type_cl) const
 {
-  //Cerr << " DANS Quadri_poly::calcul_vc , type_cl = " << type_cl << finl;
-  //Cerr << "vs " << vs << " et vsom " << vsom << " et vitesse " << vitesse << finl;
+  //Cerr << " IN Quadri_poly::calcul_vc , type_cl = " << type_cl << finl;
+  //Cerr << "vs " << vs << " and vsom " << vsom << " and vitesse " << vitesse << finl;
 
 //   switch(type_cl) {
-//   case 0: //  pas de Face de Dirichlet
+//   case 0: //  no Dirichlet face
 //     {
   vc[0] = vs[0]*0.25;
   vc[1] = vs[1]*0.25;
 //       break;
 //     }
 
-//   case 1: // une Face de Dirichlet : Face 3
+//   case 1: // one Dirichlet face : Face 3
 //     {
 //       vc[0] = vitesse.valeurs()(Face[3],0);
 //       vc[1] = vitesse.valeurs()(Face[3],1);
 //       break;
 //     }
 
-//   case 3: // une Face de Dirichlet : Face 2
+//   case 3: // one Dirichlet face : Face 2
 //     {
 //       vc[0] = vitesse.valeurs()(Face[2],0);
 //       vc[1] = vitesse.valeurs()(Face[2],1);
 //       break;
 //     }
 
-//   case 9: // une Face de Dirichlet : Face 1
+//   case 9: // one Dirichlet face : Face 1
 //     {
 //       vc[0] = vitesse.valeurs()(Face[1],0);
 //       vc[1] = vitesse.valeurs()(Face[1],1);
 //       break;
 //     }
 
-//   case 27: // une Faces de Dirichlet :Face 0
+//   case 27: // one Dirichlet face : Face 0
 //     {
 //       vc[0] = vitesse.valeurs()(Face[0],0);
 //       vc[1] = vitesse.valeurs()(Face[0],1);
 //       break;
 //     }
 
-//   case 4: // deux Faces de Dirichlet : Faces 2,3
+//   case 4: // two Dirichlet faces : Faces 2,3
 //     {
 //       vc[0]= vsom(3,0);
 //       vc[1]= vsom(3,1);
 //       break;
 //     }
 
-//   case 28: // deux Faces de Dirichlet : Faces 0,3
+//   case 28: // two Dirichlet faces : Faces 0,3
 //     {
 //       vc[0]= vsom(2,0);
 //       vc[1]= vsom(2,1);
 //       break;
 //     }
 
-//   case 12: // deux Faces de Dirichlet : Faces 1,2
+//   case 12: // two Dirichlet faces : Faces 1,2
 //     {
 //       vc[0]= vsom(1,0);
 //       vc[1]= vsom(1,1);
 //       break;
 //     }
 
-//   case 36: // deux Faces de Dirichlet : Faces 0,1
+//   case 36: // two Dirichlet faces : Faces 0,1
 //     {
 //       vc[0]= vsom(0,0);
 //       vc[1]= vsom(0,1);
@@ -253,17 +253,18 @@ void Quadri_poly::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
 
 //   default :
 //     {
-//       Cerr << "\n  type inconnu : " << type_cl ;
+//       Cerr << "\n  unknown type : " << type_cl ;
 //       exit();
 //     }
 
-//   } // fin du switch
+//   } // end of switch
 
 }
 
-/*! @brief calcule les coord xg du centre d'un element non standard calcule aussi idirichlet=nb de faces de Dirichlet de l'element
+/*! @brief Computes the coordinates xg of the centre of a non-standard element;
+ *   also computes idirichlet = number of Dirichlet faces of the element.
  *
- *  si idirichlet=2, n1 est le numero du sommet confondu avec G
+ *  If idirichlet=2, n1 is the index of the vertex coinciding with G.
  *
  */
 void Quadri_poly::calcul_xg(DoubleVect& xg, const DoubleTab& x,

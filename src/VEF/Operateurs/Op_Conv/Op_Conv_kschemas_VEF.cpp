@@ -32,10 +32,10 @@ Entree& Op_Conv_kschemas_VEF::readOn(Entree& s )
 
 void Op_Conv_kschemas_VEF::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_cl_dis, const Champ_Inc_base& ch)
 {
-  // CCa le 28/05/99 Le schema Kquick ne marche pas en paralle !!
+  // CCa le 28/05/99 The Kquick scheme does not work in parallel!!
   if (Process::is_parallel())
     {
-      Cerr << "ATTENTION le kquick ne marche pas en parallele !!!" << finl;
+      Cerr << "WARNING: kquick scheme does not work in parallel !!!" << finl;
       exit();
     }
 
@@ -384,20 +384,20 @@ DoubleTab& Op_Conv_kschemas_VEF::ajouter(const DoubleTab& transporte,
                 }
             }
         }
-      // calcul de la vitesse au centre de gravite
+      // compute the velocity at the centre of gravity
       domaine_VEF.type_elem().calcul_vc(face,vc,vs,vsom,vitesse(),itypcl,porosite_face);
 
-      // Boucle sur les facettes du polyedre non standard:
+      // Loop over facets of the non-standard polyhedron:
       for (fa7=0; fa7<nfa7; fa7++)
         {
-          //Cerr << "la facette etudiee est " << fa7 << finl;
-          // fa7 separe num1 et num2. num3 est la troisieme face (2D).
+          //Cerr << "the facet being studied is " << fa7 << finl;
+          // fa7 separates num1 and num2. num3 is the third face (2D).
 
           num10 = face(KEL(0,fa7));
           num20 = face(KEL(1,fa7));
           num3 = face(KEL(2,fa7));
 
-          // Determination des elements voisins aux faces num1 et num2
+          // Determine the neighbouring elements at faces num1 and num2
 
           poly1 = face_voisins(num10,0);
           if (poly1==poly)
@@ -585,17 +585,17 @@ DoubleTab& Op_Conv_kschemas_VEF::ajouter(const DoubleTab& transporte,
           else
             itypcl=domaine_Cl_VEF.type_elem_Cl(rang);
 
-          // calcul des numeros des faces du polyedre
+          // compute the face indices of the polyhedron
           for (face_adj=0; face_adj<nfac; face_adj++)
             {
               face(face_adj)= elem_faces(poly,face_adj);
-              //Cerr << "les faces de l'elements sont : " << face(face_adj) << finl;
+              //Cerr << "the faces of the element are: " << face(face_adj) << finl;
             }
 
           int scom;
           DoubleVect rx0(dimension);
 
-          // calcul de la vitesse aux sommets des polyedres
+          // compute velocity at the vertices of the polyhedra
           for (j=0; j<dimension; j++)
             {
               vs(j) = la_vitesse.valeurs()(face(0),j)*porosite_face(face(0));
@@ -609,23 +609,23 @@ DoubleTab& Op_Conv_kschemas_VEF::ajouter(const DoubleTab& transporte,
               for (ncomp=0; ncomp<dimension; ncomp++)
                 vsom(j,ncomp) = la_vitesse.valeur_a_sommet_compo(num_som,poly,ncomp);
             }
-          // calcul de la vitesse au centre de gravite
+          // compute the velocity at the centre of gravity
 
           domaine_VEF.type_elem().calcul_vc(face,vc,vs,vsom,vitesse(),itypcl,porosite_face);
 
 
-          // Boucle sur les facettes du polyedre non standard:
+          // Loop over facets of the non-standard polyhedron:
 
           for (fa7=0; fa7<nfa7; fa7++)
             {
-              //Cerr << "la facette etudiee est " << fa7 << finl;
-              // fa7 separe num1 et num2. num3 est la troisieme face (2D).
+              //Cerr << "the facet being studied is " << fa7 << finl;
+              // fa7 separates num1 and num2. num3 is the third face (2D).
 
               num10 = face(KEL(0,fa7));
               num20 = face(KEL(1,fa7));
               num3 = face(KEL(2,fa7));
 
-              // Determination des elements voisins aux faces num1 et num2
+              // Determine the neighbouring elements at faces num1 and num2
 
               poly1 = face_voisins(num10,0);
               if (poly1==poly)

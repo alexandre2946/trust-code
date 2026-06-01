@@ -446,37 +446,37 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
               nb_som_face=htoi(motlu);
               if (nb_som_face==0)
                 {
-                  mixte=1;                // On va lire des elements mixtes en esperant qu'ils sont de meme type
-                  fic >> motlu;        // On lit la premiere ligne
+                  mixte=1;                // We will read mixed elements, hoping they are all of the same type
+                  fic >> motlu;        // Read the first line
                   nb_som_face=htoi(motlu);
                 }
               if (nb_som_face==3)
-                nb_som_elem=4;         // On va lire des triangles donc les elements sont des tetras (4 sommets)
+                nb_som_elem=4;         // Reading triangles: elements are tetrahedra (4 vertices)
               else if (nb_som_face==4)
-                nb_som_elem=8;        // On va lire des quadrangles donc les elements sont des hexas (8 sommets)
+                nb_som_elem=8;        // Reading quadrangles: elements are hexahedra (8 vertices)
               else if (nb_som_face==2 && type_elements==1)
-                nb_som_elem=3;        // On va lire des segments dont les elements sont des triangles (3 sommets)
+                nb_som_elem=3;        // Reading segments: elements are triangles (3 vertices)
               else if (nb_som_face==2 && type_elements==3)
-                nb_som_elem=4;        // On va lire des segments dont les elements sont des quadrangles (4 sommets)
+                nb_som_elem=4;        // Reading segments: elements are quadrangles (4 vertices)
               else
                 {
                   if (nb_som_face==0)
                     Cerr << "It seems that we try to read faces with different types..." << finl;
-                  //                        if (nb_som_face==2)                                                        // N'est plus necessaire, vu qu'on sait lire
-                  //                           Cerr << "Il semble que l'on essaie de lire un segment..." << finl;        // maintenant des segments
+                  //                        if (nb_som_face==2)                                                        // No longer necessary since we can now read
+                  //                           Cerr << "It seems we are trying to read a segment..." << finl;        // segments
                   Cerr << "The case of faces that are not triangles or quadrangles" << finl;
                   Cerr << "or a mixture of several types of faces" << finl;
                   Cerr << "is not yet provided. Your mesh is not only composed" << finl;
                   Cerr << "of tetrahedra, hexahedra, triangles or quadrangles." << finl;
                   exit();
                 }
-              // Tableaux de travail
+              // Work arrays
               IntTab& les_elems=dom.les_elems();
               if (les_elems.size()==0)
                 {
-                  // Si les_elems n'est pas dimensionne (1ere lecture de faces)
+                  // If les_elems is not yet dimensioned (first face reading)
                   les_elems.resize(nb_elem,nb_som_elem);
-                  // On initialise a -1 pour voir les sommets non definis
+                  // Initialise to -1 to identify undefined vertices
                   les_elems=-1;
                   nb_som_lu_elem.resize_array(nb_elem);
                   nb_som_lu_elem=0;

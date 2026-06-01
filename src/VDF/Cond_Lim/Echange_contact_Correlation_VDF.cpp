@@ -218,7 +218,7 @@ void Echange_contact_Correlation_VDF::init_tab_echange()
   for (int i=0; i<nb_voisins; i++)
     {
       int mon_voisin = joints[i].PEvoisin();
-      Cerr << " Echange_contact_Correlation_VDF::init_tab_echange() A verifier pour envoi blocant" << finl;
+      Cerr << " Echange_contact_Correlation_VDF::init_tab_echange() To check for blocking send" << finl;
       exit();
       envoyer(y_envoye,ME,mon_voisin,ME);
 
@@ -408,7 +408,7 @@ void Echange_contact_Correlation_VDF::calculer_CL()
     {
       int mon_voisin = joints[i].PEvoisin();
 
-      Cerr << " Echange_contact_Correlation_VDF::calculer_CL() A verifier pour envoi blocant" << finl;
+      Cerr << " Echange_contact_Correlation_VDF::calculer_CL() To check for blocking send" << finl;
       exit();
       envoyer(les_cl_envoyees,ME,mon_voisin,ME);
 
@@ -425,9 +425,9 @@ void Echange_contact_Correlation_VDF::calculer_CL()
         }
       else
         {
-          Cerr << "Erreur de communication entre les processeurs " <<ME<< " et " <<mon_voisin << finl;
-          Cerr << "dans Echange_contact_Correlation_VDF::calculer_CL" << finl;
-          if (Process::is_parallel()) Cerr << "Verifier que votre decoupage est bien en tranches selon l'axe du modele 1D." << finl;
+          Cerr << "Communication error between processors " <<ME<< " and " <<mon_voisin << finl;
+          Cerr << "in Echange_contact_Correlation_VDF::calculer_CL" << finl;
+          if (Process::is_parallel()) Cerr << "Verify that your partition is in slices along the axis of the 1D model." << finl;
           exit();
 
         }
@@ -517,57 +517,57 @@ void Echange_contact_Correlation_VDF::mettre_a_jour(double temps)
     {
       if (nbproc>1)
         {
-          Cerr << "A verifier pour envoi blocant" << finl;
+          Cerr << "To check for blocking send" << finl;
           exit();
-          envoyer(T,ME,0,ME);                                                                // J'envoie T pour connaitre la dimension de son tableau
+          envoyer(T,ME,0,ME);                                                                // send T to know its array dimension
           if (je_suis_maitre())
             {
               double temps_lu=0., Temperature_reprise=0.;
               char tmp_lu;
               //int code;
-              Fichier_sauv=fopen(Fichier_sauv_nom,"r");                                // J'ouvre le fichier de sauvgarde en lecture seule
+              Fichier_sauv=fopen(Fichier_sauv_nom,"r");                                // open the backup file in read-only mode
               if (Fichier_sauv!=nullptr)
                 {
-                  if (!fscanf(Fichier_sauv,"%s",&tmp_lu)) exit();                                // Je lis le premier mot "Temps" pour rien
-                  if (!fscanf(Fichier_sauv,"%s",&tmp_lu)) exit();                                // Je lis le deuxieme mot "=" pour rien
-                  if (!fscanf(Fichier_sauv,"%lf",&temps_lu)) exit();                                // Je lis le temps et je le mets dans temps_lu
+                  if (!fscanf(Fichier_sauv,"%s",&tmp_lu)) exit();                                // read the first word "Temps" (discarded)
+                  if (!fscanf(Fichier_sauv,"%s",&tmp_lu)) exit();                                // read the second word "=" (discarded)
+                  if (!fscanf(Fichier_sauv,"%lf",&temps_lu)) exit();                                // read the time and store it in temps_lu
                   if (temps_lu==temps)
                     {
-                      for (int p=0; p<nbproc; p++)                                      // Je boucle sur le nombre de processeur
+                      for (int p=0; p<nbproc; p++)                                      // loop over the number of processors
                         {
-                          Cerr << "Reprise du champs de temperature (" << Fichier_sauv_nom << ") pour la correlation sur le processeur " << p << "...";
+                          Cerr << "Resuming temperature field (" << Fichier_sauv_nom << ") for the correlation on processor " << p << "...";
                           DoubleVect T_tmp;
-                          recevoir(T_tmp,p,0,p);                                        // Je recupere T pour connaitre la dimension de son tableau au niveau du processeur maitre.
-                          for (int i=0; i<T_tmp.size(); i++)                      // Je boucle sur le nombre de temperature a definir
+                          recevoir(T_tmp,p,0,p);                                        // retrieve T to know its array dimension at the master processor level
+                          for (int i=0; i<T_tmp.size(); i++)                      // loop over the number of temperatures to define
                             {
-                              if (!fscanf(Fichier_sauv,"%s",&tmp_lu)) exit();                // Je lis le mot "T(i)" pour rien
-                              if (!fscanf(Fichier_sauv,"%s",&tmp_lu)) exit();                // Je lis le mot "=" pour rien
-                              if (!fscanf(Fichier_sauv,"%lf",&Temperature_reprise)) exit();// Je lis la valeur de la temperature et je la mets dans Temperature_reprise
-                              T_tmp(i) = Temperature_reprise;                        // J'egale la variable du calcul T(i) a Temperature_reprise
+                              if (!fscanf(Fichier_sauv,"%s",&tmp_lu)) exit();                // read the word "T(i)" (discarded)
+                              if (!fscanf(Fichier_sauv,"%s",&tmp_lu)) exit();                // read the word "=" (discarded)
+                              if (!fscanf(Fichier_sauv,"%lf",&Temperature_reprise)) exit();// read the temperature value and store it in Temperature_reprise
+                              T_tmp(i) = Temperature_reprise;                        // assign the computation variable T(i) to Temperature_reprise
                             }
-                          envoyer(T_tmp,0,p,0);                                        // J'envoie T_tmp a tous les processeurs
+                          envoyer(T_tmp,0,p,0);                                        // send T_tmp to all processors
                           Cerr << "   OK!" << finl;
                         }
                       fclose(Fichier_sauv);
                     }
                   else
                     {
-                      Cerr << "\nLe temps indique dans le fichier \""<< Fichier_sauv_nom << "\" "<< temps_lu << finl;
-                      Cerr << "est different du temps de reprise du calcul "<< temps << " !!!" << finl << finl;
-                      Cerr << "Vous ne pouvez pas faire de reprise pour la correlation. Supprimez" << finl;
-                      Cerr << "dans la correlation le mot clef \"Reprise\". La phase transitoire" << finl;
-                      Cerr << "du calcul sera fausse, mais l'etat stationnaire sera juste." << finl << finl;
+                      Cerr << "\nThe time indicated in the file \""<< Fichier_sauv_nom << "\" "<< temps_lu << finl;
+                      Cerr << "differs from the restart time of the computation "<< temps << " !!!" << finl << finl;
+                      Cerr << "You cannot resume with this correlation. Remove" << finl;
+                      Cerr << "the keyword \"Reprise\" from the correlation. The transient phase" << finl;
+                      Cerr << "of the computation will be wrong, but the steady state will be correct." << finl << finl;
                       fclose(Fichier_sauv);
                       exit();
                     }
                 }
               else
                 {
-                  Cerr << "\nLa reprise ne peut pas etre faite : Le fichier \"" << Fichier_sauv_nom << "\" est manquant !!!" << finl << finl;
+                  Cerr << "\nThe resume cannot be performed: the file \"" << Fichier_sauv_nom << "\" is missing !!!" << finl << finl;
                   exit();
                 }
             }
-          recevoir(T,0,ME,0);                                                                // Je recupere T=T_tmp au niveau de chaque processeur
+          recevoir(T,0,ME,0);                                                                // retrieve T=T_tmp at each processor level
         }
       else
         {
@@ -577,36 +577,36 @@ void Echange_contact_Correlation_VDF::mettre_a_jour(double temps)
 
           if (Fichier_sauv!=nullptr)
             {
-              if (!fscanf(Fichier_sauv,"%s",&tmp_lu)) exit();                        // Je lis le premier mot "Temps" pour rien
-              if (!fscanf(Fichier_sauv,"%s",&tmp_lu)) exit();                        // Je lis le deuxieme mot "=" pour rien
-              if (!fscanf(Fichier_sauv,"%lf",&temps_lu)) exit();                        // Je lis le temps et je le mets dans temps_lu
+              if (!fscanf(Fichier_sauv,"%s",&tmp_lu)) exit();                        // read the first word "Temps" (discarded)
+              if (!fscanf(Fichier_sauv,"%s",&tmp_lu)) exit();                        // read the second word "=" (discarded)
+              if (!fscanf(Fichier_sauv,"%lf",&temps_lu)) exit();                        // read the time and store it in temps_lu
               if (temps_lu==temps)
                 {
-                  Cerr << "Reprise du champs de temperature (" << Fichier_sauv_nom << ") pour la correlation...";
+                  Cerr << "Resuming temperature field (" << Fichier_sauv_nom << ") for the correlation...";
                   for (int i=0; i<N; i++)
                     {
-                      if (!fscanf(Fichier_sauv,"%s",&tmp_lu)) exit();                // Je lis le mot "T(i)" pour rien
-                      if (!fscanf(Fichier_sauv,"%s",&tmp_lu)) exit();                // Je lis le mot "=" pour rien
-                      if (!fscanf(Fichier_sauv,"%lf",&Temperature_reprise)) exit();// Je lis la valeur de la temperature et je la mets dans Temperature_reprise
-                      T(i) = Temperature_reprise;                        // J'egale la variable du calcul T(i) a Temperature_reprise
+                      if (!fscanf(Fichier_sauv,"%s",&tmp_lu)) exit();                // read the word "T(i)" (discarded)
+                      if (!fscanf(Fichier_sauv,"%s",&tmp_lu)) exit();                // read the word "=" (discarded)
+                      if (!fscanf(Fichier_sauv,"%lf",&Temperature_reprise)) exit();// read the temperature value and store it in Temperature_reprise
+                      T(i) = Temperature_reprise;                        // assign the computation variable T(i) to Temperature_reprise
                     }
                   fclose(Fichier_sauv);
                   Cerr << "   OK!" << finl;
                 }
               else
                 {
-                  Cerr << "\nLe temps indique dans le fichier \""<< Fichier_sauv_nom << "\" "<< temps_lu << finl;
-                  Cerr << "est different du temps de reprise du calcul "<< temps << " !!!" << finl << finl;
-                  Cerr << "Vous ne pouvez pas faire de reprise pour la correlation. Supprimez" << finl;
-                  Cerr << "dans la correlation le mot clef \"Reprise\". La phase transitoire" << finl;
-                  Cerr << "du calcul sera fausse, mais l'etat stationnaire sera juste." << finl << finl;
+                  Cerr << "\nThe time indicated in the file \""<< Fichier_sauv_nom << "\" "<< temps_lu << finl;
+                  Cerr << "differs from the restart time of the computation "<< temps << " !!!" << finl << finl;
+                  Cerr << "You cannot resume with this correlation. Remove" << finl;
+                  Cerr << "the keyword \"Reprise\" from the correlation. The transient phase" << finl;
+                  Cerr << "of the computation will be wrong, but the steady state will be correct." << finl << finl;
                   fclose(Fichier_sauv);
                   exit();
                 }
             }
           else
             {
-              Cerr << "\nLa reprise ne peut pas etre faite : Le fichier \"" << Fichier_sauv_nom << "\" est manquant !!!" << finl << finl;
+              Cerr << "\nThe resume cannot be performed: the file \"" << Fichier_sauv_nom << "\" is missing !!!" << finl << finl;
               exit();
             }
         }

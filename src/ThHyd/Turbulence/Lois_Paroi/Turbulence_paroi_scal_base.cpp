@@ -43,23 +43,26 @@ void Turbulence_paroi_scal_base::creer_champ(const Motcle& motlu)
 {
 }
 
-/*! @brief Lit les caracteristques de la loi de parois a partir d'un flot d'entree.
+/*! @brief Reads the characteristics of the scalar wall law from an input stream.
  *
  *     Format: type_de_loi_de_paroi
- *     Les valeurs possibles du type de loi de paroi sont:
+ *     Possible values for the wall law type:
  *       - "loi_standard_hydr"
  *       - "negligeable"
  *       - "loi_VanDriest"
  *       - "loi_standard_hydr_scalaire"
  *
+ * @param turb_par Scalar wall law object to type and initialize.
+ * @param mod_turb_scal Reference to the scalar turbulence model.
+ * @param s Input stream.
  */
 void Turbulence_paroi_scal_base::typer_lire_turbulence_paroi_scal(OWN_PTR(Turbulence_paroi_scal_base)& turb_par, const Modele_turbulence_scal_base& mod_turb_scal, Entree& s)
 {
-  Cerr << "Lecture du type de loi de parois " << finl;
+  Cerr << "Reading the wall law type " << finl;
   Motcle typ;
   s >> typ;
 
-  const Equation_base& eqn = mod_turb_scal.equation().probleme().equation(0); // equation hydraulique
+  const Equation_base& eqn = mod_turb_scal.equation().probleme().equation(0); // hydraulic equation
   const RefObjU& modele_turbulence = eqn.get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base, modele_turbulence.valeur());
   const Turbulence_paroi_base& loi = mod_turb_hydr.loi_paroi();
@@ -67,29 +70,29 @@ void Turbulence_paroi_scal_base::typer_lire_turbulence_paroi_scal(OWN_PTR(Turbul
   if (typ != "negligeable_scalaire")
     if ((loi.que_suis_je() == "negligeable_VDF") || (loi.que_suis_je() == "negligeable_VEF"))
       {
-        Cerr << "La loi de paroi de type " << typ << " choisie pour le scalaire n'est pas compatible avec" << finl;
-        Cerr << "la loi de type " << loi.que_suis_je() << " choisie pour l'hydraulique" << finl;
-        Cerr << "Utiliser le type 'negligeable_scalaire' pour le scalaire ou utiliser une loi de paroi" << finl;
-        Cerr << "non negligeable pour l hydraulique" << finl;
+        Cerr << "The wall law of type " << typ << " chosen for the scalar is not compatible with" << finl;
+        Cerr << "the wall law of type " << loi.que_suis_je() << " chosen for the hydraulics" << finl;
+        Cerr << "Use the type 'negligeable_scalaire' for the scalar or use a non-negligible wall law" << finl;
+        Cerr << "for the hydraulics" << finl;
         exit();
       }
   typ += "_";
 
   Nom discr = eqn.discretisation().que_suis_je();
 
-  //  les operateurs de diffusion sont communs aux discretisations VEF et VEFP1B
+  //  diffusion operators are shared by VEF and VEFP1B discretisations
   if (discr == "VEFPreP1B")
     discr = "VEF";
   typ += discr;
 
   if (typ == "loi_analytique_scalaire_VDF")
     {
-      Cerr << "La loi de paroi scalaire de type loi_analytique_scalaire" << finl;
-      Cerr << "n est utilisable qu avec une discretisation de type VEF" << finl;
+      Cerr << "The scalar wall law of type loi_analytique_scalaire" << finl;
+      Cerr << "can only be used with a VEF discretization" << finl;
       exit();
     }
 
-  Cerr << "et typage : " << typ << finl;
+  Cerr << "and typing: " << typ << finl;
   turb_par.typer(typ);
   turb_par->associer_modele(mod_turb_scal);
   turb_par->associer(eqn.domaine_dis(), eqn.domaine_Cl_dis());

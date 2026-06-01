@@ -117,8 +117,8 @@ inline double Champ_Q1NC_implementation::fonction_forme_2D_normalise(double ksi,
       }
     default:
       {
-        Cerr << "Erreur dans Champ_Q1NC_implementation::fonction_forme_2D : " << finl;
-        Cerr << "Un quadrangle n'a pas " << face << " faces" << finl;
+        Cerr << "Error in Champ_Q1NC_implementation::fonction_forme_2D: " << finl;
+        Cerr << "A quadrilateral does not have " << face << " faces" << finl;
         Process::exit();
         fonction_de_forme_normalisee = -1;
       }
@@ -176,8 +176,8 @@ inline double Champ_Q1NC_implementation::fonction_forme_3D_normalise(double ksi,
       }
     default:
       {
-        Cerr << "Erreur dans Champ_Q1NC_implementation::fonction_forme_2D : " << finl;
-        Cerr << "Un quadrangle n'a pas " << face << " faces" << finl;
+        Cerr << "Error in Champ_Q1NC_implementation::fonction_forme_2D: " << finl;
+        Cerr << "A quadrilateral does not have " << face << " faces" << finl;
         fonction_de_forme_normalisee = -1;
         Process::exit();
       }

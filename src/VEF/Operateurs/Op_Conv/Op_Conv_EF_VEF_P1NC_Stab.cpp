@@ -89,10 +89,10 @@ Entree& Op_Conv_EF_VEF_P1NC_Stab::readOn(Entree& s )
   s >> motlu;
   if (motlu!=accouverte)
     {
-      Cerr << "Erreur Op_Conv_EF_VEF_P1NC_Stab::readOn()" << finl;
-      Cerr << "Depuis la 1.5.3, la syntaxe du mot cle EF_stab a change." << finl;
-      Cerr << "Il faut commencer par une accolade ouvrante {" << finl;
-      Cerr << "et les options eventuelles sont entre les accolades:" << finl;
+      Cerr << "Error Op_Conv_EF_VEF_P1NC_Stab::readOn()" << finl;
+      Cerr << "Since version 1.5.3, the syntax of the keyword EF_stab has changed." << finl;
+      Cerr << "It must begin with an opening brace {" << finl;
+      Cerr << "and the optional parameters are between the braces:" << finl;
       Cerr << "Convection { EF_stab } -> Convection { EF_stab { } }" << finl;
       Process::exit();
     }
@@ -156,17 +156,17 @@ Entree& Op_Conv_EF_VEF_P1NC_Stab::readOn(Entree& s )
           break;
         default :
 
-          Cerr << "Erreur Op_Conv_EF_VEF_P1NC_Stab::readOn()" << finl;
-          Cerr << "Mot clef " << motlu << " non connu." << finl;
-          Cerr << "Sortie du programme." << finl;
+          Cerr << "Error Op_Conv_EF_VEF_P1NC_Stab::readOn()" << finl;
+          Cerr << "Keyword " << motlu << " not recognized." << finl;
+          Cerr << "Exiting." << finl;
           Process::exit();
 
-        }//fin du switch
+        }//end switch
 
-      //Suite de la lecture
+      //Continue reading
       s >> motlu;
 
-    }//fin du while
+    }//end while
 
   return s ;
 }
@@ -488,52 +488,52 @@ void Op_Conv_EF_VEF_P1NC_Stab::calculer_coefficients_operateur_centre(DoubleTab&
                 end_gpu_timer(__KERNEL_NAME__);
 
                 //
-                //Fin de la modification des coefficients de la matrice
+                //End of matrix coefficient modification
                 //
 
-              }//fin du if sur "volumes_etendus_"
+              }//end of if on "volumes_etendus_"
 
           }// sub_type Dirichlet
 
 
         else if (sub_type(Neumann,la_cl.valeur()) || sub_type(Neumann_homogene,la_cl.valeur()) || sub_type(Neumann_val_ext,la_cl.valeur()))
           {
-            //On ne fait rien
-          }//fin du if sur Neumann
+            //Do nothing
+          }//end of if on Neumann
 
         else if (sub_type(Symetrie,la_cl.valeur()))
           {
-            //On ne fait rien
-          }//fin du if sur Symetrie
+            //Do nothing
+          }//end of if on Symetrie
 
         else if (sub_type(Periodique,la_cl.valeur()))
           {
-            //On ne fait rien
-          }//fin du if sur Periodique
+            //Do nothing
+          }//end of if on Periodique
 
         else if (sub_type(Echange_impose_base,la_cl.valeur()))
           {
-            //On ne fait rien
-          }//fin du if sur Echange_impose_base
+            //Do nothing
+          }//end of if on Echange_impose_base
 
         else
           {
-            Cerr << "Erreur Op_Conv_EF_VEF_P1NC_Stab::calculer_coefficients_operateur_centre()" << finl;
-            Cerr << "Condition aux limites " << la_cl.que_suis_je() << " non codee."   << finl;
-            Cerr << "Sortie du programme." << finl;
+            Cerr << "Error Op_Conv_EF_VEF_P1NC_Stab::calculer_coefficients_operateur_centre()" << finl;
+            Cerr << "Boundary condition " << la_cl.que_suis_je() << " not implemented."   << finl;
+            Cerr << "Exiting." << finl;
             Process::exit();
-          }//fin du else sur les autres conditions aux limites
+          }//end of else on other boundary conditions
 
-      }//fin des conditions aux limites
+      }//end of boundary conditions
   }
 
   //
-  // Fin de la correction des Kij
+  // End of Kij correction
   //
 }
 void Op_Conv_EF_VEF_P1NC_Stab::remplir_fluent() const
 {
-  // calcul de la CFL.
+  // CFL computation.
   const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
   const int nb_faces = domaine_VEF.nb_faces();
   int nb_comp = Objet_U::dimension;
@@ -758,14 +758,14 @@ void Op_Conv_EF_VEF_P1NC_Stab::calculer_flux_bords(const DoubleTab& Kij, const D
           });
           end_gpu_timer(__KERNEL_NAME__);
 
-        }//fin du if sur "Neumann", "Neumann_homogene", "Symetrie", "Echange_impose_base"
+        }//end of if on "Neumann", "Neumann_homogene", "Symetrie", "Echange_impose_base"
       else
         {
-          Cerr << "Erreur Op_Conv_EF_VEF_P1NC_Stab::calculer_flux_bords()" << finl;
-          Cerr << "Condition aux limites " << la_cl.que_suis_je() << " non codee."   << finl;
-          Cerr << "Sortie du programme." << finl;
+          Cerr << "Error Op_Conv_EF_VEF_P1NC_Stab::calculer_flux_bords()" << finl;
+          Cerr << "Boundary condition " << la_cl.que_suis_je() << " not implemented."   << finl;
+          Cerr << "Exiting." << finl;
           Process::exit();
-        }//fin du else sur les autres conditions aux limites
+        }//end of else on other boundary conditions
     }
 }
 
@@ -1211,8 +1211,8 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_difference_Kij(const DoubleTab& transporte, 
   const double max_kij = local_max_abs_vect(Kij);
   if (max_kij > 1.e-15)
     {
-      Cerr << "Erreur dans le calcul des Kij : " << max_kij << finl;
-      Cerr << "Sortie du programme" << finl;
+      Cerr << "Error in Kij computation: " << max_kij << finl;
+      Cerr << "Exiting" << finl;
       Process::exit();
     }
 
@@ -1504,11 +1504,11 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_difference_resu(const DoubleTab& Kij, const 
 
   if (max_abs_resu1 > 1.e-15)
     {
-      Cerr << "Erreur dans le calcul des resu : " << max_abs_resu1 << finl;
-      Cerr << "Affichage des faces de bord" << finl;
+      Cerr << "Error in resu computation: " << max_abs_resu1 << finl;
+      Cerr << "Displaying boundary faces" << finl;
 
       /**************************************************/
-      Cerr << "Affichage des faces de bord." << finl;
+      Cerr << "Displaying boundary faces." << finl;
 
       for (int n_bord=0; n_bord<nb_bord; n_bord++)
         {
@@ -1520,7 +1520,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_difference_resu(const DoubleTab& Kij, const 
 
           if (sub_type(Periodique,la_cl.valeur()))
             {
-              Cerr << "Bord periodique : ";
+              Cerr << "Periodic boundary: ";
               for (face=num1; face<num2; face++)
                 {
                   Cerr << face << ",";
@@ -1530,7 +1530,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_difference_resu(const DoubleTab& Kij, const 
 
           else if (sub_type(Dirichlet,la_cl.valeur()) || (sub_type(Dirichlet_homogene,la_cl.valeur())) )
             {
-              Cerr << "Bord de Dirichlet : ";
+              Cerr << "Dirichlet boundary: ";
               for (face=num1; face<num2; face++)
                 {
                   Cerr << face << ",";
@@ -1538,11 +1538,11 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_difference_resu(const DoubleTab& Kij, const 
               Cerr << finl;
             }
 
-        }//fin du for sur "nbord"
+        }//end of for on "nbord"
       /**************************************************/
 
       /**************************************************/
-      Cerr << "Affichage des faces qui posent probleme : " << finl;
+      Cerr << "Display of problematic faces: " << finl;
       if (nb_comp==1)
         {
           for (int face_i=0; face_i<nb_faces0; face_i++)
@@ -1584,7 +1584,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_difference_resu(const DoubleTab& Kij, const 
 
           if (sub_type(Periodique,la_cl.valeur()))
             {
-              Cerr << "Affichage des valeurs des resu au bord perio" << finl;
+              Cerr << "Display of resu values at the periodic boundary" << finl;
               for (face=num1; face<num2; face++)
                 {
                   Cerr << "resu1(" << face << ") : " << resu1(face) << finl;
@@ -1601,7 +1601,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_difference_resu(const DoubleTab& Kij, const 
       count++;
       if (count==2)
         {
-          Cerr << "Sortie du programme" << finl;
+          Cerr << "Exiting" << finl;
           Process::exit();
         }
     }
@@ -2126,20 +2126,20 @@ void Op_Conv_EF_VEF_P1NC_Stab::calculer_data_pour_dirichlet()
               else if (Objet_U::dimension==3 && elem_faces_dirichlet_(elem,2)==-1) elem_faces_dirichlet_(elem,2)=face;
               else
                 {
-                  Cerr << "Erreur Op_Conv_EF_VEF_P1NC_Stab::calculer_data_pour_dirichlet()" << finl;
-                  Cerr << "L'element numero " << elem << " contient plus de "
-                       << Objet_U::dimension << " faces de Dirichlet" << finl;
-                  Cerr << "Sortie du programme." << finl;
+                  Cerr << "Error in Op_Conv_EF_VEF_P1NC_Stab::calculer_data_pour_dirichlet()" << finl;
+                  Cerr << "Element number " << elem << " contains more than "
+                       << Objet_U::dimension << " Dirichlet faces" << finl;
+                  Cerr << "Exiting." << finl;
                   Process::exit();
                 }
-            }//fin du for sur "face"
+            }//end of for on "face"
           //
-          //Fin du remplissage des tableaux
+          //End of array filling
           //
 
-        }//fin du if sur "Dirichlet"
+        }//end of if on "Dirichlet"
       array_trier_retirer_doublons(elem_faces_frontiere[n_bord]);
-    }//fin du for sur "n_bord"
+    }//end of for on "n_bord"
 }
 
 void Op_Conv_EF_VEF_P1NC_Stab::completer()
@@ -2178,7 +2178,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::completer()
 
           if(!trouve)
             {
-              Cerr << "On ne trouve pas le sous_domaine discretise associe a " << noms_ssz_alpha[i] << finl;
+              Cerr << "Cannot find the discretized sub-domain associated with " << noms_ssz_alpha[i] << finl;
               Process::exit();
             }
           const Sous_domaine_VF& ssz=la_ssz.valeur();
@@ -2212,7 +2212,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::completer()
 
       if(!sous_domaine)
         {
-          Cerr << "On ne trouve pas le sous_domaine discretise associe a " << nom_sous_domaine << finl;
+          Cerr << "Cannot find the discretized sub-domain associated with " << nom_sous_domaine << finl;
           Process::exit();
         }
 

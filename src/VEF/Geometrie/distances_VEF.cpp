@@ -502,11 +502,11 @@ DoubleVect& calcul_longueur_filtre(DoubleVect& longueur_filtre, const Motcle& me
 
   if (longueur_filtre.size() != nbr_element)
     {
-      Cerr << "erreur dans la taille du DoubleVect valeurs de la longueur du filtre" << finl;
+      Cerr << "error in the size of the DoubleVect for filter length values" << finl;
       Process::exit();
     }
 
-  if (methode == Motcle("volume") || methode == Motcle("volume_sans_lissage"))  // racine cubique du volume
+  if (methode == Motcle("volume") || methode == Motcle("volume_sans_lissage"))  // cubic root of the volume
     {
       longueur_filtre=-1.;
 
@@ -631,14 +631,14 @@ DoubleVect& calcul_longueur_filtre(DoubleVect& longueur_filtre, const Motcle& me
     }
   else
     {
-      Cerr << "calcul_longueur_filtre.cpp n'a pas reconnu l'argument : " << methode << finl;
-      Cerr << "les arguments possibles sont : \"volume\", \"volume_sans_lissage\", \"Scotti\", \"arete\"." << finl;
+      Cerr << "calcul_longueur_filtre.cpp did not recognize the argument: " << methode << finl;
+      Cerr << "possible arguments are: \"volume\", \"volume_sans_lissage\", \"Scotti\", \"arete\"." << finl;
       Process::exit();
 
     }
 
 
-  if ( ! (methode == Motcle("volume_sans_lissage")) )  // processus de "regularisation"
+  if ( ! (methode == Motcle("volume_sans_lissage")) )  // "regularization" process
     {
       const Domaine& dom=domaine.domaine();
       const IntTab& les_sommets = domaine_geom.les_elems();

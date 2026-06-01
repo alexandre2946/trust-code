@@ -17,15 +17,15 @@
 #include <Schema_Temps_base.h>
 #include <Probleme_base.h>
 
-/*! @brief Lit le terme de puissance a partir d'un flot d'entree.
+/*! @brief Reads the power term from an input stream.
  *
- *     Lit uniquement un champ donne representant la_puissance.
+ *     Reads only a given field representing the power.
  *
- * @param (Entree& is) un flot d'entree
+ * @param is an input stream
  */
 void Terme_Source_Constituant::lire_donnees(Entree& is)
 {
-  Cerr << "Lecture du Champ Source pour le terme source du/des constituants" << finl;
+  Cerr << "Reading the source field for the constituent(s) source term" << finl;
   is >> la_source_constituant;
 }
 

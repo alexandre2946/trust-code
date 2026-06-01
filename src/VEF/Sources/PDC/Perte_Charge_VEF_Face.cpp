@@ -75,8 +75,8 @@ void Perte_Charge_VEF_Face::associer_pb(const Probleme_base& pb)
 
   if (!ok)
     {
-      Cerr << "Erreur TRUST dans Perte_Charge_VEF_Face::associer_pb()" << finl;
-      Cerr << "On ne trouve pas d'equation d'hydraulique dans le probleme" << finl;
+      Cerr << "TRUST error in Perte_Charge_VEF_Face::associer_pb()" << finl;
+      Cerr << "Cannot find a hydraulic equation in the problem" << finl;
       Process::exit();
     }
 }

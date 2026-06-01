@@ -78,12 +78,12 @@ DoubleTab& Op_Diff_RotRot::calculer(const DoubleTab& vitesse, DoubleTab& diffusi
   return ajouter(vitesse, diffusion);
 }
 
-//Methode de l'operateur de diffusion sous forme
-//rotationnel de la vorticite sans const la seule qui
-//doit etre appelee.
+//Method of the diffusion operator in the form
+//curl of the vorticity without const — the only one that
+//should be called.
 DoubleTab& Op_Diff_RotRot::ajouter(const DoubleTab& vitesse, DoubleTab& diffusion) const
 {
-  Cerr << "je suis dans OpDiffRotRot" << finl;
+  Cerr << "entering OpDiffRotRot" << finl;
   DoubleTab curl(matrice_vorticite_->ordre());
 
   curl_.calculer(vitesse, curl);
@@ -156,26 +156,26 @@ int Op_Diff_RotRot::assembler_matrice(Matrice& matrice)
 
   int colonne_a_remplir_tab2, colonne_a_remplir_coeff;
 
-  Cerr << "Assemblage de la matrice de vorticite en cours..." << finl;
+  Cerr << "Assembling the vorticity matrix..." << finl;
   matrice.typer("Matrice_Morse_Sym");
   //Matrice_Morse& la_matrice=(Matrice_Morse&) matrice.valeur();
 
-  // On dimensionne la matrice de maniere convenable.
-  // La matrice est carree et de taille (nombre_elem+nombre_som)
-  // Le nombre de coeff non nuls n'excedent pas
-  // (2* (dimension+1) + 1)* nb_elem + (nb_som-1) * (nb_som-1)
-  // ATTENTION: une BASE de mon espace est les fonctions indicatrices
-  // des elements + les fonctions chapeaux - 1 de ces fonctions
-  // Sinon la somme des toutes les fontions chapeaux - la somme
-  // de toutes les fonctions indicatrices = 0
-  // Par defaut, on enleve la derniere fonction chapeau pour
-  // former notre base.
-  // Cf. Papier dans Latex/Vorticity
+  // Size the matrix appropriately.
+  // The matrix is square of size (nb_elem + nb_som).
+  // The number of non-zero coefficients does not exceed
+  // (2*(dimension+1) + 1)*nb_elem + (nb_som-1)*(nb_som-1).
+  // NOTE: a BASIS of our space consists of element indicator functions
+  // + hat functions - 1 of those functions.
+  // Otherwise the sum of all hat functions - the sum
+  // of all indicator functions = 0.
+  // By default we remove the last hat function to
+  // to form our basis.
+  // Cf. Paper in Latex/Vorticity
   int nombre_coeff_non_nuls = (2 * dimension + 3) * domaine.nb_elem() + (domaine.nb_som() - 1) * (domaine.nb_som() - 1);
   //la_matrice.dimensionner(domaine.nb_elem()+domaine.nb_som()-1,nombre_coeff_non_nuls);
   Matrice_Morse la_matrice(domaine.nb_elem() + domaine.nb_som() - 1, nombre_coeff_non_nuls);
 
-  //Au cas ou la matrice existe deja dans un fichier
+  // In case the matrix already exists in a file
   Nom nomfic("Vorticite.sv");
   LecFicDistribueBin vorticite;
   int fic_vorticite_existe;
@@ -187,152 +187,141 @@ int Op_Diff_RotRot::assembler_matrice(Matrice& matrice)
 
   if (fic_vorticite_existe)
     {
-      Cerr << "Relecture de la matrice de vorticite sur le fichier: " << nomfic << finl;
+      Cerr << "Reading the vorticity matrix from file: " << nomfic << finl;
       vorticite >> la_matrice;
       vorticite.close();
-      Cerr << "Fin de la relecture de la matrice de vorticite." << finl;
+      Cerr << "Done reading the vorticity matrix." << finl;
       return 1;
     }
 
-  Cerr << "Assemblage de la matrice de vorticite " << nomfic << finl;
+  Cerr << "Assembling the vorticity matrix " << nomfic << finl;
 
-  // Maintenant on remplit la matrice ligne par ligne
-  // On rappelle que les elements et les sommets sont numerotes
-  // a partir de 0.
-  // Mais les indices de colonnes et de lignes des tableaux
-  // d'une matrice morse FORTRAN commencent a 1.
-  // Ex de construction: matrice[numerotation_C++] = numerotation_FORTRAN
+  // Now fill the matrix row by row.
+  // Elements and vertices are numbered starting from 0.
+  // However, column and row indices of the arrays
+  // in a FORTRAN Morse matrix start at 1.
+  // Construction example: matrice[C++ index] = FORTRAN index
 
-  // Parametres importants pour remplir les tableaux
+  // Key parameters for filling the arrays
   nombre_coeff_non_nuls = 1;
-  colonne_a_remplir_tab2 = 0; //pour le C++
-  colonne_a_remplir_coeff = 0; //pour le C++
+  colonne_a_remplir_tab2 = 0; // for C++
+  colonne_a_remplir_coeff = 0; // for C++
 
-  // On commence par remplir les lignes de la sous-matrice
-  // de taille nb_elem * (nb_elem + nb_som) : cf. structure de la matrice
+  // Start by filling the rows of the sub-matrix
+  // of size nb_elem * (nb_elem + nb_som): cf. matrix structure
   for (int numero_elem = 0; numero_elem < domaine.nb_elem(); numero_elem++)
     {
-      // Pour un element donne "numero_elem", on calcule la liste
-      // des sommets qui appartiennent a cet element.
+      // For a given element "numero_elem", compute the list
+      // of vertices belonging to that element.
       IntList sommets_pour_elem = sommets_pour_element(numero_elem);
-      Tri(sommets_pour_elem); //tableau trie
+      Tri(sommets_pour_elem); //sorted array
 
-      // On remplit tab1
+      // Fill tab1
       la_matrice.get_set_tab1()(numero_elem) = nombre_coeff_non_nuls;
 
-      // On remplit tab2 et coeff
+      // Fill tab2 and coeff
 
-      //Les nb_elem premiers elements de la ligne "numero_elem"
-      //a cause du FORTRAN
+      // The nb_elem first entries of row "numero_elem" (FORTRAN indexing)
       la_matrice.get_set_tab2()(colonne_a_remplir_tab2) = numero_elem + 1;
       la_matrice.get_set_coeff()(colonne_a_remplir_coeff) = remplir_elem_elem_EF(numero_elem);
 
-      //On incremente nb_coeff_non_nuls car on vient de remplir
-      //une ligne par l'un de ces elements non nul
+      // Increment nb_coeff_non_nuls because one non-zero entry was just filled
       nombre_coeff_non_nuls++;
 
-      //On incremente les compteurs puisque l'on vient de remplir
-      //des cases du tableau
+      // Increment column counters since array slots were just filled
       colonne_a_remplir_tab2++;
       colonne_a_remplir_coeff++;
 
-      //Les nb_som elements de la ligne "numero_elem"
+      // The nb_som entries of row "numero_elem"
       for (int i = 0; i < domaine.nb_som_elem(); i++)
         {
-          //Si ce "sommet_pour_elem[i]" est different du numero
-          //du dernier sommet alors on stocke le bon coefficient
+          // If "sommet_pour_elem[i]" differs from the index of the last vertex,
+          // store the correct coefficient
           if (sommets_pour_elem[i] != domaine.nb_som() - 1)
             {
-              la_matrice.get_set_tab2()(colonne_a_remplir_tab2) = domaine.nb_elem() + sommets_pour_elem[i] + 1; //pour FORTRAN
+              la_matrice.get_set_tab2()(colonne_a_remplir_tab2) = domaine.nb_elem() + sommets_pour_elem[i] + 1; //for FORTRAN indexing
               la_matrice.get_set_coeff()(colonne_a_remplir_coeff) = remplir_elem_som_EF(numero_elem, sommets_pour_elem[i]);
 
-              //On incremente nb_coeff_non_nuls car on vient de remplir
-              //une ligne avec l'un de ces elements non nul
+              // Increment nb_coeff_non_nuls since one non-zero entry was just filled
               nombre_coeff_non_nuls++;
 
-              //Enfin on incremente les colonne_* pour eviter de reecrire
-              //sur des coefficients deja stockes
+              // Increment colonne_* to avoid overwriting already stored coefficients
               colonne_a_remplir_tab2++;
               colonne_a_remplir_coeff++;
             }
 
         }
 
-      //Pas besoin de modifier les entiers nombre_coeff_non_nuls et
-      //colonne_* : ils sont a la bonne valeur.
+      // No need to modify the integers nombre_coeff_non_nuls and
+      // colonne_*: they are already at the correct value.
 
     }
 
-  // On remplit les lignes de la sous-matrice de taille
-  // nb_som *( nb_elem+nb_som) :cf. structure de la matrice
+  // Fill the rows of the sub-matrix of size
+  // nb_som * (nb_elem + nb_som): cf. matrix structure
   for (int numero_som = 0; numero_som < domaine.nb_som() - 1; numero_som++)
     {
-      // On stocke les tableaux qui nous sont utiles
-      // Ainsi que leur taille respective
+      // Store the arrays we need along with their respective sizes
       IntList Elem_pour_sommet = elements_pour_sommet(numero_som);
       IntList Sommets_voisins = sommets_voisins(numero_som, Elem_pour_sommet);
       Tri(Elem_pour_sommet); //liste triee
       Tri(Sommets_voisins); //liste triee
 
-      //On remplit tab1
-      //pour FORTRAN
+      // Fill tab1 (FORTRAN indexing)
       la_matrice.get_set_tab1()(domaine.nb_elem() + numero_som) = nombre_coeff_non_nuls;
 
-      //On remplit tab2 et coeff
+      // Fill tab2 and coeff
 
-      //Les nb_elem premiers elements de la ligne "numero_som"
+      // The nb_elem first entries of row "numero_som"
       for (int i = 0; i < Elem_pour_sommet.size(); i++)
         {
-          //A cause du FORTRAN
+          // FORTRAN indexing
           la_matrice.get_set_tab2()(colonne_a_remplir_tab2) = Elem_pour_sommet[i] + 1;
           la_matrice.get_set_coeff()(colonne_a_remplir_coeff) = remplir_som_elem_EF(Elem_pour_sommet[i], numero_som);
 
-          //On incremente nb_coeff_non_nuls car on vient de remplir
-          //une ligne avec l'un de ces elements non nul
+          // Increment nb_coeff_non_nuls since one non-zero entry was just filled
           nombre_coeff_non_nuls++;
 
-          //On incremente convenablement les indices de colonnes
+          // Increment column indices accordingly
           colonne_a_remplir_tab2++;
           colonne_a_remplir_coeff++;
         }
 
-      //Pas besoin de modifier les entiers nb_coeff_non_nuls et
-      //colonne_* : ils sont a la bonne valeur.
+      // No need to modify nb_coeff_non_nuls and colonne_*: they are at the correct value.
 
-      //Les nb_som elements de la ligne "numero_som"
+      // The nb_som entries of row "numero_som"
       for (int i = 0; i < Sommets_voisins.size(); i++)
         {
-          //On recupere le numero global du sommet_voisin
+          // Retrieve the global index of the neighbouring vertex
           int numero_som_global = Sommets_voisins[i];
 
-          //Et si "numero_som_global" est different du numero
-          //du dernier sommet, alors on stocke le bon coefficient
+          // If "numero_som_global" differs from the index of the last vertex,
+          // store the correct coefficient
 
           if (numero_som_global != domaine.nb_som() - 1)
             {
-              //A cause du FORTRAN
+              // FORTRAN indexing
               la_matrice.get_set_tab2()(colonne_a_remplir_tab2) = domaine.nb_elem() + Sommets_voisins[i] + 1;
               la_matrice.get_set_coeff()(colonne_a_remplir_coeff) = remplir_som_som_EF(numero_som, Sommets_voisins[i], Elem_pour_sommet);
 
-              //On incremente nb_coeff_non_nuls car on vient de remplir
-              //une ligne avec l'un de ces elements non nul
+              // Increment nb_coeff_non_nuls since one non-zero entry was just filled
               nombre_coeff_non_nuls++;
 
-              //On incremente les indices
+              // Increment indices
               colonne_a_remplir_tab2++;
               colonne_a_remplir_coeff++;
             }
 
         }
 
-      //Pas besoin d'incrementer nombre_coeff_non_nuls et colonne_*
-      //: ils sont deja a la bonne valeur
+      // No need to increment nombre_coeff_non_nuls and colonne_*:
+      // they are already at the correct value.
     }
 
-  //Par convention pour les matrices morses, le dernier element
-  //de tab1 est tab1[domaine.nb_elem()+domaine.nb_som()+1] et vaut
-  //le nombre total de coefficients non nuls +1
-  //soit avec notre algorithme: nombre_coeff_non_nuls
+  // By convention for Morse matrices, the last entry
+  // of tab1 is tab1[nb_elem + nb_som + 1] and equals
+  // the total number of non-zero coefficients + 1,
+  // i.e. with our algorithm: nombre_coeff_non_nuls
   la_matrice.get_set_tab1()(domaine.nb_elem() + domaine.nb_som() - 1) = nombre_coeff_non_nuls;
 
   //   if(Debog::mode_db==2) Debog::save_matrix_seq(la_matrice);
@@ -425,15 +414,15 @@ IntList Op_Diff_RotRot::sommets_voisins(int numero_sommet, const IntList& liste)
   return resultat;
 }
 
-/* Fonction de tri d'une IntList */
-/* Le tri s'effectue par ordre croissant */
-/* REM: on n'a aucun doublon dans la liste triee */
+/* Sorting function for an IntList */
+/* The sort is performed in ascending order */
+/* REM: there are no duplicates in the sorted list */
 void Op_Diff_RotRot::Tri(IntList& liste_a_trier) const
 {
   if (liste_a_trier.est_vide())
     {
-      Cerr << "Erreur dans Op_Diff_RotRot::Tri()." << finl;
-      Cerr << "La liste a trier est vide: sortie du programme." << finl;
+      Cerr << "Error in Op_Diff_RotRot::Tri()." << finl;
+      Cerr << "The list to sort is empty: exiting." << finl;
       Process::exit();
     }
 
@@ -520,15 +509,15 @@ double Op_Diff_RotRot::remplir_som_som_EF(const int numero_som, const int sommet
         }
     }
 
-  //On tient compte de la dimension dans laquelle on evolue
+  //Account for the spatial dimension
   resultat *= 1. / ((dimension + 1) * (dimension + 2));
 
-  //On verifier que sommet_voisin etait bien dans le voisinage de numero_voisin
+  //Verify that sommet_voisin was indeed in the neighbourhood of numero_voisin
   if (test == 0)
     {
-      Cerr << "Erreur Op_Diff_RotRot::remplir_som_som_EF." << finl;
-      Cerr << "sommet_voisin n'est pas dans le voisinage de numero_voisin." << finl;
-      Cerr << "Sortie du programme." << finl;
+      Cerr << "Error in Op_Diff_RotRot::remplir_som_som_EF." << finl;
+      Cerr << "sommet_voisin is not in the neighbourhood of numero_voisin." << finl;
+      Cerr << "Exiting." << finl;
       Process::exit();
     }
 
@@ -558,11 +547,11 @@ int Op_Diff_RotRot::tester() const
   //       domaine.nb_elem()+domaine.nb_som()-1 )
   //     {
   //       Cerr << "Probleme dans la definition de la vorticite." << finl;
-  //       Cerr << "Le nombre de composante enregistree n'est pas le bon." << finl;
+  //       Cerr << "The number of registered components is incorrect." << finl;
   //       Process::exit();
   //     }
 
-  //Test de la matrice de vorticite
+  //Test the vorticity matrix
   const Matrice_Morse_Sym& la_matrice = ref_cast(Matrice_Morse_Sym, matrice_vorticite_.valeur());
   Solv_GCP& solv = ref_cast_non_const(Solv_GCP, solveur_.valeur());
 

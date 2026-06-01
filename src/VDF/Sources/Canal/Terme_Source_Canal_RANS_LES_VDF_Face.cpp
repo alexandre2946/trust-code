@@ -65,25 +65,25 @@ Entree& Terme_Source_Canal_RANS_LES_VDF_Face::readOn(Entree& is )
   Motcle acc_fermee("}");
 
   nom_pb_rans="non_couple";
-  // 0 => moyenne spatiale
-  // 1 => moyenne temporelle glissante (moyenne en alpha)
-  // 2 => moyenne temporelle commence a t=f_start-t_av
-  // 3 => moyenne temporelle commence a t=0 (mettre valeur positive a t_av dans .data)
+  // 0 => spatial average
+  // 1 => sliding temporal average (alpha average)
+  // 2 => temporal average starting at t=f_start-t_av
+  // 3 => temporal average starting at t=0 (set a positive value for t_av in the .data file)
 
   Motcles les_mots(6);
   {
-    les_mots[0]="alpha_tau"; //coeff de relaxation du terme source
-    les_mots[1]="Ly"; //Hauteur du canal plan (utile pour la moyenne spatiale)
-    les_mots[2]="f_start"; //temps a partir duquel le terme source est active
-    les_mots[3]="t_av"; //temps de prise de moyenne (moyenne temporelle glissante)
-    les_mots[4]="type_moyenne"; //temps de prise de moyenne (moyenne temporelle glissante)
+    les_mots[0]="alpha_tau"; //relaxation coefficient of the source term
+    les_mots[1]="Ly"; //height of the plane channel (useful for spatial averaging)
+    les_mots[2]="f_start"; //time from which the source term is activated
+    les_mots[3]="t_av"; //averaging time (sliding temporal average)
+    les_mots[4]="type_moyenne"; //averaging time (sliding temporal average)
     les_mots[5]="nom_pb_rans";
   }
   is >> mot_lu;
   if(mot_lu != acc_ouverte)
     {
-      Cerr << "On attendait { a la place de " << mot_lu
-           << " lors de la lecture des parametres de la loi de paroi " << finl;
+      Cerr << "Expected { instead of " << mot_lu
+           << " while reading the wall law parameters" << finl;
     }
   is >> mot_lu;
   while(mot_lu != acc_fermee)
@@ -109,10 +109,10 @@ Entree& Terme_Source_Canal_RANS_LES_VDF_Face::readOn(Entree& is )
         case 3  :
           is >> t_av;
           Cerr << "t_av = " << t_av << finl;
-          Cerr << "type_moyenne : " << moyenne << finl;
+          Cerr << "averaging_type: " << moyenne << finl;
           if((moyenne==1)&&(t_av<=0))
             {
-              Cerr << "La periode en temps de la moyenne temporelle glissante est non precisee !"
+              Cerr << "The time period for the sliding temporal average is not specified!"
                    << finl;
               exit();
             }
@@ -120,10 +120,10 @@ Entree& Terme_Source_Canal_RANS_LES_VDF_Face::readOn(Entree& is )
           break;
         case 4  :
           is >> moyenne;
-          Cerr << "type_moyenne : " << moyenne << finl;
+          Cerr << "averaging_type: " << moyenne << finl;
           if((moyenne==1)&&(t_av<=0))
             {
-              Cerr << "La periode en temps de la moyenne temporelle glissante est non precisee !"
+              Cerr << "The time period for the sliding temporal average is not specified!"
                    << finl;
               exit();
             }
@@ -136,15 +136,15 @@ Entree& Terme_Source_Canal_RANS_LES_VDF_Face::readOn(Entree& is )
           break;
         default :
           {
-            Cerr << mot_lu << " n'est pas un mot compris" << finl;
-            Cerr << "Les mots compris sont : " << les_mots << finl;
+            Cerr << mot_lu << " is not a recognized keyword" << finl;
+            Cerr << "The recognized keywords are: " << les_mots << finl;
             exit();
           }
         }
       is >> mot_lu;
     }
   Cerr << "nom_pb_rans = " << nom_pb_rans << finl;
-  Cerr << compteur << " motcles ont ete lus dans le readOn" << finl;
+  Cerr << compteur << " keywords were read in the readOn" << finl;
 
   init();
 
@@ -261,11 +261,11 @@ void Terme_Source_Canal_RANS_LES_VDF_Face::init()
 
 void Terme_Source_Canal_RANS_LES_VDF_Face::init_calcul_moyenne_spat()
 {
-  Cerr << "Debut initialisation des tableaux de moyenne spatiale..." << finl;
+  Cerr << "Starting initialization of spatial average arrays..." << finl;
 
-  // On va initialiser les differents parametres membres de la classe
-  // utiles au calcul des differentes moyennes
-  // Initialisation de : Yu,Yv,Yw + compt_x,compt_y,compt_z
+  // Initialize the different class member parameters
+  // used for computing the various averages
+  // Initialization of: Yu,Yv,Yw + compt_x,compt_y,compt_z
   // + corresp_u,corresp_v,corresp_w
   const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
   const Domaine_VDF& domaine_VDF=ref_cast(Domaine_VDF, zdisbase);
@@ -409,17 +409,17 @@ void Terme_Source_Canal_RANS_LES_VDF_Face::init_calcul_moyenne_spat()
           }
         default :
           {
-            Cerr << "Cas de figure impossible!!" << finl;
+            Cerr << "Impossible case!!" << finl;
             exit();
             break;
           }
         }
     }
-  Nxy = indic;  // nombre de y pour umoy
+  Nxy = indic;  // number of y positions for umoy
   Nyy = indicv;
   Nzy = indicw;
 
-  Cerr << "Initialisation des tableaux de moyenne spatiale : OK" << finl;
+  Cerr << "Initialization of spatial average arrays: OK" << finl;
 
 }
 
@@ -730,12 +730,12 @@ void Terme_Source_Canal_RANS_LES_VDF_Face::mettre_a_jour(double temps)
                   umoy(num_face) = umoy_z(j);
                 }
               else
-                Cerr << "Erreur orientation dans la redistribution de la moy. spat. de SouCanRANS_LESVDFFa" << finl;
+                Cerr << "Error: orientation issue in redistribution of spatial average in SouCanRANS_LESVDFFa" << finl;
 
             }
 
           //******************************************************
-          //************** FIN MOYENNE SPATIALE ******************
+          //************** END SPATIAL AVERAGE ******************
           //******************************************************
         }
     }//fin if moyenne = 0
@@ -968,7 +968,7 @@ void Terme_Source_Canal_RANS_LES_VDF_Face::mettre_a_jour(double temps)
   else
     {
       Cerr << "moyenne = " << moyenne << finl;
-      Cerr << "Probleme pour le choix du type de moyenne" << finl;
+      Cerr << "Problem with the choice of averaging type" << finl;
     }
 
   compteur_reprise++;

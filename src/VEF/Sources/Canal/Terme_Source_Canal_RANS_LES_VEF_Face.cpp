@@ -52,30 +52,30 @@ Entree& Terme_Source_Canal_RANS_LES_VEF_Face::readOn(Entree& is )
   Motcle acc_ouverte("{");
   Motcle acc_fermee("}");
 
-  // 0 => moyenne spatiale
-  // 1 => moyenne temporelle glissante (moyenne en alpha)
-  // 2 => moyenne temporelle
-  // 3 => moyenne temporelle t=0
+  // 0 => spatial average
+  // 1 => sliding temporal average (alpha average)
+  // 2 => temporal average
+  // 3 => temporal average starting at t=0
 
   Motcles les_mots(11);
   {
-    les_mots[0]="alpha_tau";   //coeff de relaxation du terme source
-    les_mots[1]="Ly";          //Hauteur du canal plan (utile pour la moyenne spatiale)
-    les_mots[2]="t_moy_start"; //temps de demarrage de la moyenne
-    les_mots[3]="f_start";     //temps a partir duquel le terme source commence a etre active (pondere)
-    les_mots[4]="f_tot";       //temps a partir duquel le terme source est totalement applique
-    les_mots[5]="type_moyenne";// 0: moyenne spatiale 1: moyenne temp. glissante 2: moyenne temporelle
-    les_mots[6]="dir";         // direction de forcage de l'ecoulement
-    les_mots[7]="u_tau";       // vitesse de frottement theorique
-    les_mots[8]="nu";          // viscosite moleculaire
-    les_mots[9]="rayon";       // rayon du cylindre
-    les_mots[10]="u_target";   // cle pour  champ target  : 1=stockage 2=lecture
+    les_mots[0]="alpha_tau";   //source term relaxation coefficient
+    les_mots[1]="Ly";          //height of the plane channel (useful for spatial averaging)
+    les_mots[2]="t_moy_start"; //averaging start time
+    les_mots[3]="f_start";     //time from which the source term starts to be activated (weighted)
+    les_mots[4]="f_tot";       //time from which the source term is fully applied
+    les_mots[5]="type_moyenne";// 0: spatial average 1: sliding temporal average 2: temporal average
+    les_mots[6]="dir";         // forcing direction of the flow
+    les_mots[7]="u_tau";       // theoretical friction velocity
+    les_mots[8]="nu";          // molecular viscosity
+    les_mots[9]="rayon";       // cylinder radius
+    les_mots[10]="u_target";   // key for target field: 1=storage 2=reading
   }
   is >> mot_lu;
   if(mot_lu != acc_ouverte)
     {
-      Cerr << "On attendait { a la place de " << mot_lu
-           << " lors de la lecture des parametres de la loi de paroi " << finl;
+      Cerr << "Expected { instead of " << mot_lu
+           << " while reading the parameters of the wall law " << finl;
     }
   is >> mot_lu;
   while(mot_lu != acc_fermee)
@@ -113,7 +113,7 @@ Entree& Terme_Source_Canal_RANS_LES_VEF_Face::readOn(Entree& is )
           Cerr << "type_moyenne : " << moyenne << finl;
           if(moyenne==0)
             {
-              Cerr << " Pertinence de la moyenne spatiale en VEF ? -> ARRET (non code)" << finl;
+              Cerr << " Relevance of spatial averaging in VEF? -> STOP (not implemented)" << finl;
               exit();
             }
           if(moyenne==1)
@@ -135,17 +135,17 @@ Entree& Terme_Source_Canal_RANS_LES_VEF_Face::readOn(Entree& is )
               Cerr << " 'dir' parameter has to be selected among following list : +X, -X, +Y, -Y, +Z or -Z " << finl;
               exit();
             }
-          Cerr << " forcage suivant l'axe : " << dir_nom << " -> composante : " << dir <<finl;
+          Cerr << " forcing along axis: " << dir_nom << " -> component: " << dir <<finl;
           compteur++;
           break;
         case 7  :
           is >> u_tau;
-          Cerr << "vitesse de frottement : " << u_tau << finl;
+          Cerr << "friction velocity: " << u_tau << finl;
           compteur++;
           break;
         case 8  :
           is >> nu;
-          Cerr << "viscosite moleculaire : " << nu << finl;
+          Cerr << "molecular viscosity: " << nu << finl;
           compteur++;
           break;
         case 9  :
@@ -160,14 +160,14 @@ Entree& Terme_Source_Canal_RANS_LES_VEF_Face::readOn(Entree& is )
           break;
         default :
           {
-            Cerr << mot_lu << " n'est pas un mot compris par Source_Canal_RANS_LES_VEF_P1NC" << finl;
-            Cerr << "Les mots compris sont : " << les_mots << finl;
+            Cerr << mot_lu << " is not a keyword understood by Source_Canal_RANS_LES_VEF_P1NC" << finl;
+            Cerr << "Understood keywords are: " << les_mots << finl;
             exit();
           }
         }
       is >> mot_lu;
     }
-  Cerr << compteur << " motcles ont ete lus dans le readOn de Source_Canal_RANS_LES_VEF_P1NC" << finl;
+  Cerr << compteur << " keywords were read in the readOn of Source_Canal_RANS_LES_VEF_P1NC" << finl;
 
   init();
 
@@ -276,12 +276,12 @@ void Terme_Source_Canal_RANS_LES_VEF_Face::init()
       if( dir_nom=="-X" || dir_nom=="-Y" || dir_nom=="-Z") U_RANS*=-1.;
     }
 
-}//fin init
+}//end init
 
 
 void Terme_Source_Canal_RANS_LES_VEF_Face::mettre_a_jour(double temps)
 {
-  //Cerr << "Je suis dans le mettre_a_jour" << finl;
+  //Cerr << "Inside mettre_a_jour" << finl;
 
   const Domaine_VEF& domaine_VEF = le_dom_VEF.valeur();
   //  const DoubleTab& xv = domaine_VEF.xv();
@@ -299,14 +299,14 @@ void Terme_Source_Canal_RANS_LES_VEF_Face::mettre_a_jour(double temps)
   if(moyenne==1)
     {
 
-      Cerr << "code en VDF, necessite codage VEF ? " << finl;
+      Cerr << "coded in VDF, requires VEF implementation? " << finl;
       exit();
 
-    }// fin moyenne = 1
+    }// end moyenne == 1
   else if(moyenne==2)
     {
       //******************************************************
-      //*************** MOYENNE TEMPORELLE *******************
+      //*************** TEMPORAL AVERAGE *********************
       //******************************************************
 
 
@@ -376,11 +376,11 @@ void Terme_Source_Canal_RANS_LES_VEF_Face::mettre_a_jour(double temps)
   else
     {
       Cerr << "moyenne = " << moyenne << finl;
-      Cerr << "Probleme pour le choix du type de moyenne" << finl;
+      Cerr << "Problem selecting the averaging type" << finl;
     }
 
 
-}//fin mettre_a_jour
+}//end mettre_a_jour
 
 DoubleTab& Terme_Source_Canal_RANS_LES_VEF_Face::ajouter(DoubleTab& resu) const
 {

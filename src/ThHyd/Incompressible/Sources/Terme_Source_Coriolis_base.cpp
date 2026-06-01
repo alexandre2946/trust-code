@@ -69,8 +69,8 @@ int Terme_Source_Coriolis_base::lire_motcle_non_standard(const Motcle& mot, Entr
     }
   else
     {
-      Cerr << "Erreur a la lecture des parametres de Terme_Source_Coriolis_base " << finl;
-      Cerr << "On attendait le mot cle omega a la place de  "  << mot << finl;
+      Cerr << "Error while reading the parameters of Terme_Source_Coriolis_base " << finl;
+      Cerr << "We expected the keyword omega instead of  "  << mot << finl;
       Process::exit();
     }
   return -1;

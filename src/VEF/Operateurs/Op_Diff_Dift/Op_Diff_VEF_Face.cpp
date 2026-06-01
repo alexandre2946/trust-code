@@ -317,7 +317,7 @@ void Op_Diff_VEF_Face::ajouter_cas_vectoriel(const DoubleTab& inconnue,
   Re = 0.;
   if (le_modele_turbulence->calcul_tenseur_Re(nu_turb, grad_, Re))
   {
-      Cerr << "On utilise une diffusion turbulente non linaire dans NS" << finl;
+      Cerr << "Using nonlinear turbulent diffusion in NS" << finl;
       for (int elem=0; elem<nb_elem; elem++)
           for (int i=0; i<nbr_comp; i++)
               for (int j=0; j<nbr_comp; j++)
@@ -1331,7 +1331,7 @@ void Op_Diff_VEF_Face::verifier() const
   if(dimension==2)
     {
       const int nbf = vit.dimension(0);
-      Cerr << " Verification de delta(x,0) " << finl;
+      Cerr << " Verification of delta(x,0) " << finl;
       for(i=0; i<nbf; i++)
         {
           vit(i,0)=xv(i,0);
@@ -1350,7 +1350,7 @@ void Op_Diff_VEF_Face::verifier() const
               Cerr << finl;
             }
         }
-      Cerr << " Verification de delta(y(1-y),0) " << finl;
+      Cerr << " Verification of delta(y(1-y),0) " << finl;
       for(i=0; i<nbf; i++)
         {
           vit(i,0)=xv(i,1)*(1-xv(i,1));

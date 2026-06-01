@@ -39,8 +39,8 @@ DoubleTab& Champ_Face_VDF_implementation::valeur_aux_elems_(const DoubleTab& val
 {
   if (val_elem.nb_dim() > 2)
     {
-      Cerr << "Erreur TRUST dans Champ_Face_implementation::valeur_aux_elems()" << finl;
-      Cerr << "Le DoubleTab val a plus de 2 entrees" << finl;
+      Cerr << "TRUST error in Champ_Face_implementation::valeur_aux_elems()" << finl;
+      Cerr << "The DoubleTab val has more than 2 entries" << finl;
       Process::exit();
     }
 
@@ -251,8 +251,8 @@ DoubleTab& Champ_Face_VDF_implementation::remplir_coord_noeuds(DoubleTab& positi
     positions.ref(xv);
   else
     {
-      Cerr << "Erreur dans Champ_Face::remplir_coord_noeuds()" << finl;
-      Cerr << "Les centres de gravite des faces n'ont pas ete calcules" << finl;
+      Cerr << "Error in Champ_Face::remplir_coord_noeuds()" << finl;
+      Cerr << "The face centers of gravity have not been computed" << finl;
       Process::exit();
     }
   return positions;

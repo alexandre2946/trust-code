@@ -29,7 +29,7 @@ Sortie& Modele_turbulence_scal_Schmidt::printOn(Sortie& s) const { return Modele
 Entree& Modele_turbulence_scal_Schmidt::readOn(Entree& is)
 {
   Modele_turbulence_scal_diffturb_base::readOn(is);
-  Cerr << "La valeur du nombre de Schmidt turbulent est de " << LeScturb_ << finl;
+  Cerr << "The value of the turbulent Schmidt number is " << LeScturb_ << finl;
   return is;
 }
 
@@ -104,8 +104,8 @@ Champ_Fonc_base& Modele_turbulence_scal_Schmidt::calculer_diffusion_turbulente()
   int n = alpha_t.size();
   if (nu_t.size() != n)
     {
-      Cerr << "Les DoubleTab des champs diffusivite_turbulente et viscosite_turbulente" << finl;
-      Cerr << "doivent avoir le meme nombre de valeurs nodales" << finl;
+      Cerr << "The DoubleTab arrays of diffusivite_turbulente and viscosite_turbulente fields" << finl;
+      Cerr << "must have the same number of nodal values" << finl;
       exit();
     }
 

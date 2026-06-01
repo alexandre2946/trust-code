@@ -125,15 +125,15 @@ void Face_rayo_transp::ecrire_temperature_bord() const
   EcrFicPartage sortie(fic);
   if (je_suis_maitre())
     {
-      Cerr << "ecriture des temperatures de bord dans " << fic << finl;
+      Cerr << "writing boundary temperatures to " << fic << finl;
       sortie << "# temperatures bord du bord " << nom_bord_rayo_lu() << " emissivites " << emissivite_ << finl;
       sortie << "# x y (z) temperature surface" << finl;
     }
   sortie.lockfile();
   for (int j = 0; j < nb_ensembles_faces(); j++)
     {
-      // cast en dur a cause de teta_i
-      // a nettoyer quand teta_i sera une methode const...
+      // hard cast due to teta_i
+      // to be cleaned up when teta_i becomes a const method...
       Ensemble_faces_rayo_transp& faces_j = ref_cast_non_const(Ensemble_faces_rayo_transp, ensembles_faces_bord(j));
       double T = 0;
       if (faces_j.nb_faces_bord() != 0)

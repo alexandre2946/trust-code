@@ -324,7 +324,7 @@ void Quadri_VEF::modif_volumes_entrelaces(int j,int elem,
                                           int type_cl) const
 {
 
-  Cerr << "Quadri_VEF::modif_volumes_entrelaces() ne fait rien pour le moment " << finl;
+  Cerr << "Quadri_VEF::modif_volumes_entrelaces() does nothing for now" << finl;
   //  double surf_mod;
   //   const DoubleVect& volumes_entrelaces = le_dom_VEF.volumes_entrelaces();
   //   const IntTab& elem_faces = le_dom_VEF.elem_faces();

@@ -61,21 +61,21 @@ Entree& Traitement_particulier_NS_chmoy_faceperio::lire(Entree& is)
             {
             case 0 :
               {
-                // Pour stats
-                is >> temps_deb;     // temps de debut de calcul des stats temp.
-                is >> temps_fin;     // temps de fin de calcul des stats temp.
-                // initialisation pour le calcul des stats temp.
-                oui_stat=1;          // =1 : on calcul des stats temp.
+                // For stats
+                is >> temps_deb;     // start time for temporal stats computation
+                is >> temps_fin;     // end time for temporal stats computation
+                // initialisation for temporal stats computation
+                oui_stat=1;          // =1 : computing temporal stats
                 Cerr << "Reading time statitics parameters..." << finl;
                 Cerr << "Initial time : " << temps_deb << " End time : " << temps_fin << finl;
-                // Verif ensuite pour voir si on a rentrer les valeurs specifiques aux calculs des stats spat.
+                // Check whether values specific to spatial stats computations have been provided
                 break;
               }
             default :
               {
                 Cerr << "Default case..." << finl;
-                Cerr << "Les mots cles possibles sont "<< les_mots <<" { et }" << finl;
-                Cerr << "Vous avez lu :" << motlu << finl;
+                Cerr << "Possible keywords are "<< les_mots <<" { and }" << finl;
+                Cerr << "You read:" << motlu << finl;
                 break;
               }
             }
@@ -105,7 +105,7 @@ void Traitement_particulier_NS_chmoy_faceperio::preparer_calcul_particulier()
 
   if(Objet_U::dimension!=3)
     {
-      Cerr << " Traitement_particulier_NS_chmoy_faceperio : non prevu pour des calculs autres que 3D " << finl;
+      Cerr << " Traitement_particulier_NS_chmoy_faceperio : not designed for calculations other than 3D " << finl;
       exit();
     }
 
@@ -121,7 +121,7 @@ void Traitement_particulier_NS_chmoy_faceperio::preparer_calcul_particulier()
       ifstream fic(fichier);
       if (!fic)
         {
-          Cerr << " pas de fichier : chmoy_face_perio  - reprise des calculs impossible" << finl;
+          Cerr << " no file : chmoy_face_perio  - resuming calculations not possible" << finl;
           exit();
         }
       else

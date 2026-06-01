@@ -82,7 +82,7 @@ void Simpler_Base::assembler_matrice_pression_implicite(Equation_base& eqn_NS,co
           for (int c=1; c<nb_comp; c++)
             if (!est_egal(ref,coeff[tab1[i*nb_comp+c]-1]))
               {
-                Cerr<<"Pb dans Piso sur la diagonale case"<<i<<" comp "<< c<<" ref "<<ref<<" valeurs "<<coeff[tab1[i*nb_comp+c]-1]<<finl;
+                Cerr<<"Problem in Piso on the diagonal entry"<<i<<" comp "<< c<<" ref "<<ref<<" values "<<coeff[tab1[i*nb_comp+c]-1]<<finl;
                 exit();
               }
           vol2[i] = coeff[idiag];

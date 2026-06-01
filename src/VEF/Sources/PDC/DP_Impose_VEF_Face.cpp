@@ -36,12 +36,12 @@ Entree& DP_Impose_VEF_Face::readOn(Entree& s)
   remplir_num_faces(s);
   if (!mp_max(sgn.size()))
     {
-      Cerr << "DP_Impose_VEF_Face: champ d'orientation non renseigne!" << finl;
+      Cerr << "DP_Impose_VEF_Face: orientation field not set!" << finl;
       Process::exit();
     }
-  //fichier de sortie
+  //output file
   set_fichier(Nom("DP_") + identifiant_);
-  set_description(Nom("DP impose sur la surface ") + identifiant_);
+  set_description(Nom("DP imposed on surface ") + identifiant_);
   Noms col_names;
   if (regul_)
     {

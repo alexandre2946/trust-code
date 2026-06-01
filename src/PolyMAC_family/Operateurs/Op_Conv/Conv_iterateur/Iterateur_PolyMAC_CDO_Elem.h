@@ -391,7 +391,7 @@ template <class _TYPE_>  DoubleTab& Iterateur_PolyMAC_CDO_Elem<_TYPE_>::ajouter_
                                                                             break;
           */
         default :
-          Cerr << "On ne reconnait pas la condition limite : " << la_cl.valeur();
+          Cerr << "The boundary condition is not recognised: " << la_cl.valeur();
           Cerr << "Dans Iterateur_PolyMAC_CDO_Elem<_TYPE_>::ajouter_bords"<<finl;
           exit();
           break;
@@ -640,7 +640,7 @@ template <class _TYPE_>  void Iterateur_PolyMAC_CDO_Elem<_TYPE_>::calculer_flux_
                                                                             break;
           */
         default :
-          Cerr << "On ne reconnait pas la condition limite : " << la_cl.valeur();
+          Cerr << "The boundary condition is not recognised: " << la_cl.valeur();
           Cerr << "Dans Iterateur_PolyMAC_CDO_Elem<_TYPE_>::ajouter_bords"<<finl;
           exit();
           break;
@@ -926,7 +926,7 @@ template <class _TYPE_>  DoubleTab& Iterateur_PolyMAC_CDO_Elem<_TYPE_>::ajouter_
                                                                             break;
           */
         default :
-          Cerr << "On ne reconnait pas la condition limite : " << la_cl.valeur();
+          Cerr << "The boundary condition is not recognised: " << la_cl.valeur();
           exit();
           break;
         }
@@ -1378,7 +1378,7 @@ template <class _TYPE_>  void Iterateur_PolyMAC_CDO_Elem<_TYPE_>::contribuer_au_
                                                                             break;
           */
         default :
-          Cerr << "On ne reconnait pas la condition limite : " << la_cl.valeur();
+          Cerr << "The boundary condition is not recognised: " << la_cl.valeur();
           exit();
           break;
         }
@@ -1645,7 +1645,7 @@ template <class _TYPE_>  void Iterateur_PolyMAC_CDO_Elem<_TYPE_>::contribuer_au_
                                                                             break;
           */
         default :
-          Cerr << "On ne reconnait pas la condition limite : " << la_cl.valeur();
+          Cerr << "The boundary condition is not recognised: " << la_cl.valeur();
           exit();
           break;
         }
@@ -1916,7 +1916,7 @@ template <class _TYPE_>  void Iterateur_PolyMAC_CDO_Elem<_TYPE_>::ajouter_contri
         case scalaire_impose_paroi :
           break;
         default :
-          Cerr << "On ne reconnait pas la condition limite : " << la_cl.valeur();
+          Cerr << "The boundary condition is not recognised: " << la_cl.valeur();
           exit();
           break;
         }
@@ -2211,10 +2211,10 @@ template <class _TYPE_>  void Iterateur_PolyMAC_CDO_Elem<_TYPE_>::ajouter_contri
             }
           break;
         case scalaire_impose_paroi :
-          // on n'a rien a convecter
+          // nothing to convect
           break;
         default :
-          Cerr << "On ne reconnait pas la condition limite : " << la_cl.valeur();
+          Cerr << "The boundary condition is not recognised: " << la_cl.valeur();
           exit();
           break;
         }
@@ -2454,7 +2454,7 @@ template <class _TYPE_>  void Iterateur_PolyMAC_CDO_Elem<_TYPE_>::ajouter_contri
             }
           break;
         default :
-          Cerr << "On ne reconnait pas la condition limite : " << la_cl.valeur();
+          Cerr << "The boundary condition is not recognised: " << la_cl.valeur();
           exit();
           break;
         }

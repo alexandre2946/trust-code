@@ -371,7 +371,7 @@ int Memoire::imprime() const
               else
                 Cerr << " NAME : " << obj.le_nom() << flush;
               Cerr << " address : " << (long)(&(obj))<< flush;
-              Cerr << " SIZE : " << (int)(obj.taille_memoire())<< " octets "<< flush;
+              Cerr << " SIZE : " << (int)(obj.taille_memoire())<< " bytes"<< flush;
             }
         }
       else

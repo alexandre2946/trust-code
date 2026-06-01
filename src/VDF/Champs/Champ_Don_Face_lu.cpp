@@ -55,11 +55,11 @@ Entree& Champ_Don_Face_lu::readOn(Entree& is)
   is >> dim;
   dimensionner(nb_faces, dim);
   is >> nom;
-  Cerr << "Champ_Don_Face_lu: lecture du fichier " << nom << finl;
+  Cerr << "Champ_Don_Face_lu: reading file " << nom << finl;
   EFichier fic(nom);
   fic.set_check_types(1); //Remplace UFichier
 
-  // Lecture des valeurs dans le fichier fic
+  // Reading values from file fic
   DoubleTab& mes_val = valeurs();
   const DoubleTab& xv = zvdf.xv();
   ArrOfInt point(dimension);
@@ -104,12 +104,12 @@ Entree& Champ_Don_Face_lu::readOn(Entree& is)
   int erreur = static_cast<int>(mp_sum(nb_faces - nb_faces_affectees)); // should remain small
   if (erreur)
     {
-      Cerr << "Erreur dans Champ_Don_Face_lu.\n" << erreur << " faces n'ont pas ete affectees.\n" << "Voir la liste des faces dans les fichiers .log" << finl;
-      Journal() << "Champ_Don_Face_lu. Liste des faces non affectees :\n";
+      Cerr << "Error in Champ_Don_Face_lu.\n" << erreur << " faces were not assigned.\n" << "See the list of faces in the .log files" << finl;
+      Journal() << "Champ_Don_Face_lu. List of unassigned faces:\n";
       for (i = 0; i < nb_faces; i++)
         if (!flag[i])
           Journal() << i << " " << xv(i, 0) << " " << xv(i, 1) << " " << ((dimension == 3) ? xv(i, 3) : 0.) << finl;
-      barrier(); // Attend que tout le monde ait fini d'ecrire
+      barrier(); // Wait for everyone to finish writing
       exit();
     }
   return is;

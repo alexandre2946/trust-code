@@ -78,31 +78,30 @@ Entree& Loi_Fermeture_base::readOn(Entree& is)
   return is;
 }
 
-/*! @brief Pour l'instant, exit()
+/*! @brief For now, exit()
  *
  */
 Sortie& Loi_Fermeture_base::printOn(Sortie& os) const
 {
-  Cerr << "Loi_Fermeture_base::printOn non code" << finl;
+  Cerr << "Loi_Fermeture_base::printOn not coded" << finl;
   exit();
   return os;
 }
 
-/*! @brief Cette methode est appelee par le readOn de la classe.
+/*! @brief This method is called by the readOn of the class.
  *
- * Elle doit etre reimplementee dans les classes derivees pour
- *   ajouter dans "param" les differents parametres a lire
- *   dans le jeu de donnees et appeler la methode de l'ancetre.
- *   Dans la classe de base: aucun parametre.
+ * It must be overridden in derived classes to add to "param" the
+ *   various parameters to be read from the dataset and call
+ *   the ancestor method. In the base class: no parameters.
  *
  */
 void Loi_Fermeture_base::set_param(Param& param) const
 {
 }
 
-/*! @brief Cette methode est appelee apres avoir lu toutes les equations et les lois de fermeture (tous les champs et les conditions aux limites
+/*! @brief This method is called after reading all equations and closure laws (all fields and boundary conditions
  *
- *   du probleme sont disponibles)
+ *   of the problem are available)
  *
  */
 void Loi_Fermeture_base::completer()

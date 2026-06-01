@@ -120,7 +120,7 @@ void EcrFicPartageMPIIO::check()
   if (disp_!=disp)
     {
       Cerr << "Error in EcrFicPartageMPIIO::check()" << finl;
-      Cerr << "Decalage : disp_= " << (int)disp_ << " disp=" << (int)disp << finl;
+      Cerr << "Offset: disp_= " << (int)disp_ << " disp=" << (int)disp << finl;
       Cerr << "Contact TRUST support." << finl;
     }
 }

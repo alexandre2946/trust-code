@@ -527,7 +527,7 @@ void Op_Dift_EF_Q1::ajouter_bords(const DoubleTab& tab_inconnue,DoubleTab& resu,
                         }
                       if (nb_iok != nb_som_free)
                         {
-                          Cerr<<"Op_Dift_EF_Q1::ajouter_bords: erreur nombre de noeuds"<<finl;
+                          Cerr<<"Op_Dift_EF_Q1::ajouter_bords: error in node count"<<finl;
                           exit();
                         }
                     }

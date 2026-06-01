@@ -3,7 +3,7 @@ check()
 {
    [ "$2" = -nsys ] && exit
    #grep "AMG solver" $1.out_err 2>/dev/null
-   if [ ! -f $1.TU ] || [ "`grep 'Arret des processes' $1.out_err`" = "" ]
+   if [ ! -f $1.TU ] || [ "`grep 'Stopping processes.' $1.out_err`" = "" ]
    then
       echo "Performance is KO for $1 on $2 : case does not run!"
       exit -1

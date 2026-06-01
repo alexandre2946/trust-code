@@ -93,26 +93,26 @@ DoubleTab& valeur_P1_L2(Champ_P1NC& cha, const Domaine& dom)
       miiK= 1./12.;
     }
 
-  // dans le cas d'un domaine nul on doit effectuer le dimensionnement
-  // mais une seule fois
+  // in the case of a null domain, sizing must be performed
+  // but only once
   double non_prepare=0;
   if (cha.MatP1NC2P1_L2.nb_lignes() <2)
     non_prepare=1;
   non_prepare=Process::mp_min(non_prepare);
   if (non_prepare==1)
     {
-      // Initialisation du solveur
+      // Initialize the solver
       SolveurSys& solv=ref_cast(SolveurSys, (cha.solveur_L2));
       LecFicDiffuse fic;
       fic.ouvrir("solveur.bar");
       if(fic.good())
         {
           fic >> solv;
-          Cerr << Process::me() << "solveur.bar ouvert pour lire: " << solv << finl;
+          Cerr << Process::me() << "solveur.bar opened for reading: " << solv << finl;
         }
       solv->reinit();
 
-      Cerr<<"On remplit la matrice cha.MatP1NC2P1_L2 pour le champ "<< cha.le_nom() <<finl;
+      Cerr<<"Filling matrix cha.MatP1NC2P1_L2 for field "<< cha.le_nom() <<finl;
       Matrice_Morse_Sym& mat=ref_cast(Matrice_Morse_Sym, (cha.MatP1NC2P1_L2));
       int rang;
       int nnz=0;
@@ -504,26 +504,26 @@ DoubleTab& valeur_P1_L2(Champ_Fonc_P1NC& cha, const Domaine& dom)
       miiK= 1./12.;
     }
 
-  // dans le cas d'un domaine nul on doit effectuer le dimensionnement
-  // mais une seule fois
+  // in the case of a null domain, sizing must be performed
+  // but only once
   double non_prepare=0;
   if (cha.MatP1NC2P1_L2.nb_lignes() <2)
     non_prepare=1;
   non_prepare=Process::mp_min(non_prepare);
   if (non_prepare==1)
     {
-      // Initialisation du solveur
+      // Initialize the solver
       SolveurSys& solv=ref_cast(SolveurSys, (cha.solveur_L2));
       LecFicDiffuse fic;
       fic.ouvrir("solveur.bar");
       if(fic.good())
         {
           fic >> solv;
-          Cerr << Process::me() << "solveur.bar ouvert pour lire: " << solv << finl;
+          Cerr << Process::me() << "solveur.bar opened for reading: " << solv << finl;
         }
       solv->reinit();
 
-      Cerr<<"On remplit la matrice cha.MatP1NC2P1_L2 pour le champ "<< cha.le_nom() <<finl;
+      Cerr<<"Filling matrix cha.MatP1NC2P1_L2 for field "<< cha.le_nom() <<finl;
       Matrice_Morse_Sym& mat=ref_cast(Matrice_Morse_Sym, (cha.MatP1NC2P1_L2));
       int rang;
       int nnz=0;
@@ -890,13 +890,13 @@ void Champ_P1NC_implementation::filtrer_H1(DoubleTab& valeurs) const
       Cerr << "TEST filtrer_H1 solution = " << mp_norme_vect(xv) << finl;
       filtrer_H1(xv);
       xv-=domaine_VEF.xv();
-      Cerr << "TEST filtrer_H1 erreur = " << mp_norme_vect(xv) << finl;
+      Cerr << "TEST filtrer_H1 error = " << mp_norme_vect(xv) << finl;
       Cerr << "err = " << xv
            << "domaine_VEF.xv() " << domaine_VEF.xv() << finl;
       xv=1.;
       filtrer_H1(xv);
       xv-=1.;
-      Cerr << "erreur sur les constantes : " << mp_norme_vect(xv) << finl;
+      Cerr << "error on constants: " << mp_norme_vect(xv) << finl;
     }
   int nb_som= domaine_VEF.domaine().nb_som_tot();
   int nb_faces=valeurs.dimension(0);
@@ -938,7 +938,7 @@ void Champ_P1NC_implementation::filtrer_L2(DoubleTab& valeurs) const
   Champ_base& cha = ref_cast_non_const(Champ_base,le_champ());
   if (!sub_type(Champ_P1NC,cha) && (!sub_type(Champ_Fonc_P1NC,cha)))
     {
-      Cerr<<"on ne doit pas filtre_L2 des champs qui ne sont pas de type P1NC"<<finl;
+      Cerr<<"filtrer_L2 must not be applied to fields that are not of type P1NC"<<finl;
       Process::exit();
     }
 
@@ -1398,8 +1398,8 @@ DoubleTab& Champ_P1NC_implementation::valeur_aux_centres_de_gravite(const Domain
   if (domaine_VEF.domaine() != dom) Process::exit("Error, you must use valeur_aux_centres_de_gravite() on the whole discretized mesh.");
   if (tab_val.nb_dim() > 2)
     {
-      Cerr << "Erreur TRUST dans Champ_P1NC_implementation::valeur_aux_elems()\n";
-      Cerr << "Le DoubleTab val a plus de 2 entrees\n";
+      Cerr << "TRUST Error in Champ_P1NC_implementation::valeur_aux_elems()\n";
+      Cerr << "The DoubleTab val has more than 2 dimensions\n";
       Process::exit();
     }
 
@@ -1446,8 +1446,8 @@ valeur_aux_elems(const DoubleTab& positions,
   const IntTab& sommet_poly = domaine_geom.les_elems();
   if (tab_val.nb_dim() > 2)
     {
-      Cerr << "Erreur TRUST dans Champ_P1NC_implementation::valeur_aux_elems()\n";
-      Cerr << "Le DoubleTab val a plus de 2 entrees\n";
+      Cerr << "TRUST Error in Champ_P1NC_implementation::valeur_aux_elems()\n";
+      Cerr << "The DoubleTab val has more than 2 dimensions\n";
       Process::exit();
     }
 
@@ -1540,10 +1540,10 @@ valeur_aux_elems_smooth(const DoubleTab& positions,
 {
   if ((!sub_type(Champ_P1NC,le_champ()))&&(!sub_type(Champ_Fonc_P1NC,le_champ())))
     {
-      Cerr << "L'option chsom des sondes ne s'applique pour le moment que pour les Champ_P1NC en VEF" << finl;
-      Cerr << "or votre champ " << le_champ().le_nom() << " est de type " << le_champ().que_suis_je() << "." << finl;
-      //        Je rajoute le message ci-dessous car le message habituel n'apparait pas !
-      Cerr << "TRUST a provoque une erreur et va s'arreter" << finl;
+      Cerr << "The chsom option for probes applies for now only to Champ_P1NC in VEF" << finl;
+      Cerr << "but your field " << le_champ().le_nom() << " is of type " << le_champ().que_suis_je() << "." << finl;
+      //        Adding the message below because the usual message does not appear!
+      Cerr << "TRUST encountered an error and will stop" << finl;
       Process::exit();
     }
 
@@ -1562,14 +1562,14 @@ valeur_aux_elems_smooth(const DoubleTab& positions,
     }
   else
     {
-      Cerr << "Erreur TRUST dans Champ_P1NC_implementation::valeur_aux_elems_smooth()\n";
-      Cerr << "Le DoubleTab val a plus de 2 entrees\n";
+      Cerr << "Error in Champ_P1NC_implementation::valeur_aux_elems_smooth()\n";
+      Cerr << "The DoubleTab val has more than 2 entries\n";
       Process::exit();
     }
   if (!filtrer_L2_deja_appele_)
     {
-      // Filtrer L2 ne marche que pour les vecteurs
-      // C.MALOD 19/12/2006 : Ce n'est plus vrai, ca marche aussi avec les scalaires.
+      // filtrer_L2 only works for vectors
+      // C.MALOD 19/12/2006 : This is no longer true, it also works with scalars.
       if (nb_compo_>0)
         {
           DoubleTab val_sauv=cha.valeurs();
@@ -1607,10 +1607,10 @@ valeur_aux_elems_compo_smooth(const DoubleTab& positions,
 {
   if ((!sub_type(Champ_P1NC,le_champ()))&&(!sub_type(Champ_Fonc_P1NC,le_champ())))
     {
-      Cerr << "L'option chsom des sondes ne s'applique pour le moment que pour les Champ_P1NC en VEF" << finl;
-      Cerr << "or votre champ " << le_champ().le_nom() << " est de type " << le_champ().que_suis_je() << "." << finl;
-      //        Je rajoute le message ci-dessous car le message habituel n'apparait pas !
-      Cerr << "TRUST a provoque une erreur et va s'arreter" << finl;
+      Cerr << "The chsom option for probes applies for now only to Champ_P1NC in VEF" << finl;
+      Cerr << "but your field " << le_champ().le_nom() << " is of type " << le_champ().que_suis_je() << "." << finl;
+      //        Adding the message below because the usual message does not appear!
+      Cerr << "TRUST encountered an error and will stop" << finl;
       Process::exit();
     }
   Champ_base& cha =le_champ();
@@ -1947,8 +1947,8 @@ DoubleTab& Champ_P1NC_implementation::remplir_coord_noeuds(DoubleTab& noeuds) co
     noeuds.ref(xv);
   else
     {
-      Cerr << "Erreur dans Champ_P1NC_implementation::remplir_coord_noeuds()" << finl;
-      Cerr << "Les centres de gravite des faces n'ont pas ete calcules" << finl;
+      Cerr << "Error in Champ_P1NC_implementation::remplir_coord_noeuds()" << finl;
+      Cerr << "The face centers of gravity have not been computed" << finl;
       Process::exit();
     }
   return noeuds;

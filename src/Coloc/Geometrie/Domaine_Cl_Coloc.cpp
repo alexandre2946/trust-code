@@ -29,7 +29,7 @@ void Domaine_Cl_Coloc::imposer_cond_lim(Champ_Inc_base& ch, double temps)
   if ( (ch.nature_du_champ() == scalaire) || (sub_type(Champ_Inc_P0_base, ch))) { }
   else
     {
-      Cerr << "Le type de OWN_PTR(Champ_Inc_base) " << ch.que_suis_je() << " n'est pas prevu en Coloc family " << finl;
+      Cerr << "The type of OWN_PTR(Champ_Inc_base) " << ch.que_suis_je() << " is not handled in Coloc family " << finl;
       Process::exit();
     }
   Debog::verifier("Domaine_Cl_Coloc::imposer_cond_lim ch_tab", ch.valeurs(temps));

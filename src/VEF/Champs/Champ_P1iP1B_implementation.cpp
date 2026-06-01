@@ -153,31 +153,31 @@ DoubleTab& Champ_P1iP1B_implementation::valeur_aux_elems(const DoubleTab& positi
     }
   else // nb_compo_ > 1
     {
-      Cerr << "Vous en etes deja la vous ?" << finl;
+      Cerr << "Are you really here already?" << finl;
       Process::exit();
     }
   return val;
 }
 
-// Idem que valeur_aux_elems mais pour une composante d'un champ vecteur
+// Same as valeur_aux_elems but for one component of a vector field
 DoubleVect& Champ_P1iP1B_implementation::valeur_aux_elems_compo(const DoubleTab& positions, const IntVect& les_polys, DoubleVect& val, int ncomp) const
 {
-  Cerr << "Champ_P1iP1B_implementation::valeur_aux_elems_compo non code." << finl;
-  // Factoriser le code avec la methode valeur_aux_elems()
+  Cerr << "Champ_P1iP1B_implementation::valeur_aux_elems_compo not implemented." << finl;
+  // Factorize code with the valeur_aux_elems() method
   Process::exit();
   return val;
 }
 
 
-// Recupere un domaine
-// Renvoie un tableau contenant les valeurs du champ aux sommets du domaine
+// Retrieves a domain
+// Returns an array containing the field values at the domain vertices
 DoubleTab& Champ_P1iP1B_implementation::valeur_aux_sommets(const Domaine& dom, DoubleTab& tab_val) const
 {
   const Domaine_VEF& zvef = domaine_vef();
   int nb_compo_=le_champ().nb_comp();
   assert(nb_compo_ == tab_val.line_size());
 
-  // Filtrage du champ pour le postraitement (contenu dans le tableau champ_filtre_)
+  // Filter the field for post-processing (stored in the champ_filtre_ array)
   champ_filtre_=filtrage(zvef,le_champ());
 
   if (zvef.get_alphaE()) // Support P0
@@ -205,7 +205,7 @@ DoubleTab& Champ_P1iP1B_implementation::valeur_aux_sommets(const Domaine& dom, D
         }
       else // nb_compo_ > 1
         {
-          Cerr << "Vous en etes deja la vous ?" << finl;
+          Cerr << "Are you really here already?" << finl;
           Process::exit();
         }
     }
@@ -219,8 +219,8 @@ valeur_aux_sommets_compo(const Domaine& dom,
                          DoubleVect& val,
                          int ncomp) const
 {
-  Cerr << "Champ_P1iP1B_implementation::valeur_aux_sommets_compo pas code." << finl;
-  // Factoriser avec la methode valeur_aux_sommets()
+  Cerr << "Champ_P1iP1B_implementation::valeur_aux_sommets_compo not implemented." << finl;
+  // Factorize with the valeur_aux_sommets() method
   Process::exit();
   return val;
 }
@@ -263,7 +263,7 @@ int Champ_P1iP1B_implementation::
 remplir_coord_noeuds_et_polys(DoubleTab& positions,
                               IntVect& polys) const
 {
-  Cerr << "Pas code " << finl;
+  Cerr << "Not implemented" << finl;
   assert(0);
   Process::exit();
   return 1;
@@ -350,17 +350,17 @@ void corriger(const Domaine_VEF& domaine_VEF, DoubleTab& champ_filtre_, Matrice&
   int nb_elem=domaine_VEF.nb_elem();
   int nb_som=domaine_VEF.nb_som();
 
-  // Tableaux d'acces aux valeurs Pk et Ps
+  // Access arrays for Pk and Ps values
   if (!domaine_VEF.get_alphaE() || !domaine_VEF.get_alphaS())
     {
-      Cerr << "Erreur dans Champ_P1iP1B_impl.cpp: corriger(...), le champ doit avoir une partie sommets et elements" << finl;
+      Cerr << "Error in Champ_P1iP1B_impl.cpp: corriger(...), the field must have both vertex and element parts" << finl;
       Process::exit();
     }
   DoubleTab_parts parties_P(champ_filtre_);
-  DoubleVect& Pk = parties_P[0];  // partie elements
-  DoubleVect& Ps = parties_P[1];  // partie sommets
+  DoubleVect& Pk = parties_P[0];  // element part
+  DoubleVect& Ps = parties_P[1];  // vertex part
 
-  // Filtrage si support arete
+  // Filtering if edge support is active
   if (domaine_VEF.get_alphaA())
     {
       if (domaine_VEF.get_renum_arete_perio().size_array()==0)
@@ -416,12 +416,12 @@ void corriger(const Domaine_VEF& domaine_VEF, DoubleTab& champ_filtre_, Matrice&
         {
           if(!ok_arete[arete] && Pa(arete)!=0)
             {
-              Cerr << "Pa(arete_superflue)!=0 dans Champ_P1iP1B_implementation::corriger" << finl;
-              Cerr << "Contacter le support TRUST." << finl;
-              Cerr << "S'il s'agit d'une reprise au format xyz d'un calcul" << finl;
-              Cerr << "alors il faut ecraser le fichier .ok_arete de votre calcul de reprise" << finl;
-              Cerr << "par le fichier .ok_arete de votre calcul precedant afin d'avoir les" << finl;
-              Cerr << "memes aretes superflues." << finl;
+              Cerr << "Pa(arete_superflue)!=0 in Champ_P1iP1B_implementation::corriger" << finl;
+              Cerr << "Please contact TRUST support." << finl;
+              Cerr << "If this is a restart from an xyz format calculation," << finl;
+              Cerr << "you must overwrite the .ok_arete file of your restart calculation" << finl;
+              Cerr << "with the .ok_arete file of your previous calculation so as to have the" << finl;
+              Cerr << "same superfluous edges." << finl;
               Process::exit();
             }
           int som1=aretes_som(arete, 0);
@@ -478,15 +478,15 @@ DoubleTab& Champ_P1iP1B_implementation::filtrage(const Domaine_VEF& zvef, const 
           && !implicitCoupling)
         return champ_filtre_;
 
-      // On copie le champ a filtrer dans le tableau qui contiendra le champ filtre
+      // Copy the field to filter into the array that will hold the filtered field
       champ_filtre_=un_champ.valeurs();
       temps_filtrage_=un_champ.temps();
       adresse_champ_filtre_=un_champ.valeurs().data();
-      //Cout << "Filtrage du champ " << un_champ.le_nom() << " au temps " << un_champ.temps() << finl;
+      //Cout << "Filtering the field " << un_champ.le_nom() << " at time " << un_champ.temps() << finl;
 
-      // Correction du champ
+      // Correct the field
       corriger(zvef, champ_filtre_, matrice_filtrage_, Condition_Neumann_imposee_);
-      Debog::verifier("champ apres filtre=", champ_filtre_);
+      Debog::verifier("field after filter=", champ_filtre_);
       return champ_filtre_;
     }
   else

@@ -46,8 +46,8 @@ void Perte_Charge_PolyMAC_CDO_Face::associer_pb(const Probleme_base& pb)
 
   if (!ok)
     {
-      Cerr << "Erreur TRUST dans Perte_Charge_PolyMAC_CDO_Face::associer_pb()" << finl;
-      Cerr << "On ne trouve pas d'equation d'hydraulique dans le probleme" << finl;
+      Cerr << "TRUST Error in Perte_Charge_PolyMAC_CDO_Face::associer_pb()" << finl;
+      Cerr << "Cannot find a hydraulic equation in the problem" << finl;
       Process::exit();
     }
 }

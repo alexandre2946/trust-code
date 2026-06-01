@@ -415,7 +415,7 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
 
         if (sub_type(Champ_front_softanalytique, la_cl.valeur().champ_front()))
           {
-            Cerr << " Il faut utiliser Champ_front_fonc_txyz et non " << la_cl.valeur().champ_front().que_suis_je() << finl;
+            Cerr << " Use Champ_front_fonc_txyz instead of " << la_cl.valeur().champ_front().que_suis_je() << finl;
             exit();
           }
 

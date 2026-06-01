@@ -39,15 +39,15 @@ Entree& Terme_Source_Rappel_T_VEF_Face::readOn(Entree& is )
 
   Motcles les_mots(3);
   {
-    les_mots[0]="alpha_tau"; //coeff de relaxation du terme source
-    les_mots[1]="force_rappel"; // Expression de la force de rappel
-    les_mots[2]="probleme"; // Expression de la force de rappel
+    les_mots[0]="alpha_tau"; //source term relaxation coefficient
+    les_mots[1]="force_rappel"; // Expression for the restoring force
+    les_mots[2]="probleme"; // Expression for the restoring force
   }
   is >> mot_lu;
   if(mot_lu != acc_ouverte)
     {
-      Cerr << "On attendait { a la place de " << mot_lu
-           << " lors de la lecture des parametres de la loi de paroi " << finl;
+      Cerr << "Expected { instead of " << mot_lu
+           << " while reading wall law parameters " << finl;
     }
   is >> mot_lu;
   while(mot_lu != acc_fermee)
@@ -78,8 +78,8 @@ Entree& Terme_Source_Rappel_T_VEF_Face::readOn(Entree& is )
           break;
         default :
           {
-            Cerr << mot_lu << " n'est pas un mot compris par Source_Canal_RANS_LES_VEF_P1NC" << finl;
-            Cerr << "Les mots compris sont : " << les_mots << finl;
+            Cerr << mot_lu << " is not a keyword understood by Source_Canal_RANS_LES_VEF_P1NC" << finl;
+            Cerr << "The understood keywords are: " << les_mots << finl;
             exit();
           }
         }
@@ -116,7 +116,7 @@ void Terme_Source_Rappel_T_VEF_Face::completer()
         pb = ref_cast(Probleme_base, ob1);
       else
         {
-          Cerr << "On ne trouve pas de probleme de nom " << nom_autre_pb << finl;
+          Cerr << "Cannot find a problem named " << nom_autre_pb << finl;
           exit();
         }
 

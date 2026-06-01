@@ -157,7 +157,7 @@ double Echange_global_impose::champ_exterieur(int i, const Champ_front_base& cha
       else if (champ_ext.valeurs().dimension(1)==1)
         return champ_ext.valeurs()(i,0)/(d_rho*d_Cp);
       else
-        Cerr << "Echange_global_impose::flux_impose erreur" << finl;
+        Cerr << "Echange_global_impose::flux_impose error" << finl;
       exit();
       return 0.;
     }
@@ -168,7 +168,7 @@ double Echange_global_impose::champ_exterieur(int i, const Champ_front_base& cha
       else if (champ_ext.valeurs().dimension(1)==1)
         return champ_ext.valeurs()(i,0);
       else
-        Cerr << "Echange_global_impose::flux_impose erreur" << finl;
+        Cerr << "Echange_global_impose::flux_impose error" << finl;
       exit();
       return 0.;
 

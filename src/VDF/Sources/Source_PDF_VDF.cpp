@@ -89,7 +89,7 @@ void Source_PDF_VDF::multiply_coeff_volume(DoubleTab& coeff) const
   int nc = coeff.dimension_tot(0) ;
   if (n != nc)
     {
-      Cerr<<" dimensions differentes n nc = "<<n<<" "<<nc<<finl;
+      Cerr<<" different dimensions n nc = "<<n<<" "<<nc<<finl;
       exit();
     }
   int ndim = coeff.dimension(1) ;
@@ -126,7 +126,7 @@ DoubleTab& Source_PDF_VDF::ajouter_(const DoubleTab& variable, DoubleTab& resu, 
   // Cerr << "erreur ici" << finl;
   if (dim_var != 1 && dim_var != dim_esp)
     {
-      Cerr<<"ajouter_: dimension variable differente 1 ou "<<dim_esp<<"! "<<finl;
+      Cerr<<"ajouter_: variable dimension different from 1 or "<<dim_esp<<"! "<<finl;
       exit();
     }
   ArrOfDouble tuvw(dim_var);
@@ -213,7 +213,7 @@ void  Source_PDF_VDF::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& ma
   int dim_esp = Objet_U::dimension ;
   if (dim_var != 1 && dim_var != dim_esp)
     {
-      Cerr<<"contribuer_a_avec: dimension variable differente 1 ou "<<dim_esp<<"! "<<finl;
+      Cerr<<"contribuer_a_avec: variable dimension different from 1 or "<<dim_esp<<"! "<<finl;
       exit();
     }
   ArrOfDouble tuvw(dim_var);
@@ -417,7 +417,7 @@ void Source_PDF_VDF::calculer_variable_imposee_mean_grad()
               double xp = solid_points(i,j);
               d2 += (x - xp)*(x - xp);
             }
-          Cerr << "On passe ICI" << finl;
+          Cerr << "Passing HERE" << finl;
           for(int j = 0; j <nb_comp ; j++) variable_imposee_sommet(i,j) = variable_imposee_mod(i,j);
           d2 = sqrt(d2);
           if (d2 > eps)
@@ -446,7 +446,7 @@ void Source_PDF_VDF::calculer_variable_imposee_mean_grad()
                             {
                               double vpf = variable_imposee_mod(num_som,j);
                               double vf = variable_inconnue(num_som,j);
-                              Cerr << vf << finl;// calcul de la vitesse a voir comment (besoin d'une fonction d'interp ou moyenne)
+                              Cerr << vf << finl;// velocity computation: to be clarified (needs an interpolation or averaging function)
                               mean_grad[j] += (vf - vpf)/d1;
                             }
                           nb_contrib += 1;
@@ -657,32 +657,32 @@ void Source_PDF_VDF::calculer_vitesse_imposee_power_law_tbl()
               if (norme_v_ref_t < 1.0e-6) norme_v_ref_t = 1.e-6;
 
               double nu = (flag ? opdiffu.diffusivite().valeurs()(cells) : opdiffu.diffusivite().valeurs()(0,0));
-              // On calcule U_tau_ref pour pouvoir calculer les quantites adimensionees ( y+ ...)
-              // Hypothese : sous-couche puissance
+              // Compute U_tau_ref in order to calculate the dimensionless quantities (y+ ...)
+              // Assumption: power-law sublayer
               double u_tau_ref = pow ( norme_v_ref_t , (1/(1+B_pwl)) ) * pow ( A_pwl, (-1/(1+B_pwl)) )  * pow ( y_ref , (-B_pwl/(1+B_pwl)) ) * pow ( nu,(B_pwl/(1+B_pwl)) ) ;
               // Cerr<<"u_tau_ref y_ref   nu ="<<u_tau_ref<<" "<<y_ref<<" "<<nu<<finl;;
-              double y_ref_p = y_ref * u_tau_ref  / nu;  //la on a enfin tout ce qu'il faut pour etablir la loi polynomiale pour y r+
+              double y_ref_p = y_ref * u_tau_ref  / nu;  //now we have everything needed to establish the polynomial law for y r+
 
               double test_ref;
 
               if (!form_WJSP)
                 {
-                  if ( y_ref_p > y_c_p_pwl)  // a partir de la commence l'expression de la loi de paroi polynomiale turbulente
+                  if ( y_ref_p > y_c_p_pwl)  // from here begins the expression of the turbulent polynomial wall law
                     {
                       if (!form_lin_pwl)
                         {
                           for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) =  v_ref_t(0,j) * pow ( d1 / y_ref , B_pwl )  ;
                         }
-                      else // Formulation lineaire de la loi polynomilale ------------------------------
+                      else // Linear formulation of the polynomial law ------------------------------
                         {
                           for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) =  v_ref_t(0,j) *(1. - B_pwl*(1-d1/y_ref)) ;
                         }
                       test_ref = 1.;
-                      // Cerr << "zone log/sous-couche inertielle en coherence avec le calcul de u tau" << finl;
+                      // Cerr << "log zone/inertial sublayer consistent with u tau calculation" << finl;
                     }
                   else
                     {
-                      // En fait, on est en sous-couche visqueuse
+                      // Actually, we are in the viscous sublayer
                       if (!form_lin_pwl)
                         {
                           for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) =  v_ref_t(0,j) * ( d1 / y_ref )   ;
@@ -692,21 +692,21 @@ void Source_PDF_VDF::calculer_vitesse_imposee_power_law_tbl()
                           for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) = v_ref_t(0,j) * (1. - pow(u_tau_ref, 2.)*(y_ref-d1)/(nu *norme_v_ref_t));
                         }
                       test_ref = -1. ;
-                      u_tau_ref = pow ( (nu * norme_v_ref_t / y_ref) , 0.5 ) ; // on recalcule u_tau et y_plus en lineaire au pt reference
+                      u_tau_ref = pow ( (nu * norme_v_ref_t / y_ref) , 0.5 ) ; // recompute u_tau and y_plus using linear law at reference point
                       y_ref_p = y_ref * u_tau_ref / nu;
                       if ( y_ref_p > y_c_p_pwl )
                         {
-                          // Incoherence : on n utilise pas de lois de paroi
+                          // Inconsistency: we are not using wall laws
                           itisok = 0;
                         }
-                      // Cerr << "zone lineaire/sous-couche visqueuse" << finl;
-                    }                   // Fin LdPturb
+                      // Cerr << "linear zone/viscous sublayer" << finl;
+                    }                   // End LdPturb
 
                   double norme_v_imp_c = 0;
                   for(int j=0 ; j < nb_comp; j++) norme_v_imp_c += vitesse_imposee_sommet(i ,j) * vitesse_imposee_sommet(i ,j);
                   norme_v_imp_c = sqrt( norme_v_imp_c );
 
-                  double u_tau = pow ( norme_v_imp_c , (1/(1+B_pwl)) ) * pow ( A_pwl, (-1/(1+B_pwl)) )  * pow ( d1 , (-B_pwl/(1+B_pwl)) ) * pow ( nu,(B_pwl/(1+B_pwl)) ) ; // Hypothese : sous-couche puissance
+                  double u_tau = pow ( norme_v_imp_c , (1/(1+B_pwl)) ) * pow ( A_pwl, (-1/(1+B_pwl)) )  * pow ( d1 , (-B_pwl/(1+B_pwl)) ) * pow ( nu,(B_pwl/(1+B_pwl)) ) ; // Assumption: power-law sublayer
                   y_plus = u_tau * d1 / nu;
                   double test_;
                   if (y_plus >y_c_p_pwl)
@@ -717,21 +717,21 @@ void Source_PDF_VDF::calculer_vitesse_imposee_power_law_tbl()
                   else
                     {
                       test_ = -1.;
-                      u_tau = pow ( (nu * norme_v_imp_c/ d1) , 0.5 ) ; // on recalcule u_tau et y_plus en lineaire au pt force
+                      u_tau = pow ( (nu * norme_v_imp_c/ d1) , 0.5 ) ; // recompute u_tau and y_plus using linear law at forcing point
                       y_plus = u_tau * d1 / nu;
                       if ( y_plus > y_c_p_pwl )
                         {
-                          // Incoherence : on n utilise pas de lois de paroi
-                          Cerr<<"INCOHERENCE: u_tau ="<<u_tau<<" y+ = "<<y_plus<<" y+ref = "<<y_ref_p<<finl;
+                          // Inconsistency: we are not using wall laws
+                          Cerr<<"INCONSISTENCY: u_tau ="<<u_tau<<" y+ = "<<y_plus<<" y+ref = "<<y_ref_p<<finl;
                           itisok = 0;
                         }
                     }
                   // Cerr<<"u_tau d1   nu ="<<u_tau<<" "<<d1<<" "<<nu<<finl;;
 
-                  // ici on effectue le test pour savoir si le noeud de frontiere et le point fluide se trouvent dans la meme zone: si oui ok, si non on impose la vitesse
+                  // here we test whether the boundary node and the fluid point are in the same zone: if yes ok, if not impose the wall velocity
 
-                  // Traitement des exceptions
-                  if ( (test_ * test_ref < 0) || (itisok == 0) )  //si non on affecte la vitesse paroi
+                  // Handling of exceptions
+                  if ( (test_ * test_ref < 0) || (itisok == 0) )  //if not, assign the wall velocity
                     {
                       for(int j = 0; j < nb_comp; j++)  vitesse_imposee_sommet(i,j) = vitesse_imposee_mod(i,j);
 
@@ -770,9 +770,9 @@ void Source_PDF_VDF::calculer_vitesse_imposee_power_law_tbl()
                 }
               else
                 {
-                  Cerr << "On passe bien dans le WJSP" << finl;
+                  Cerr << "Entering the WJSP branch" << finl;
                   //double u_tau;
-                  if ( y_ref_p > y_c2_p_pwl_WJSP)  // a partir de la commence l'expression de la loi de paroi polynomiale turbulente
+                  if ( y_ref_p > y_c2_p_pwl_WJSP)  // from here begins the expression of the turbulent polynomial wall law
                     {
                       y_plus = u_tau_ref * d1/nu;
                       if (y_plus > y_c2_p_pwl_WJSP)
@@ -803,14 +803,14 @@ void Source_PDF_VDF::calculer_vitesse_imposee_power_law_tbl()
                             {
                               for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) =  y_plus * u_tau_ref * v_ref_t(0,j)/norme_v_ref_t;
                             }
-                          else // Formulation lineaire de la loi polynomilale ------------------------------
+                          else // Linear formulation of the polynomial law ------------------------------
                             {
                               for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) =  v_ref_t(0,j) * (1. - B_pwl*(1-d1/y_ref)) ;
                             }
                         }
-                      // Cerr << "zone log/sous-couche inertielle en coherence avec le calcul de u tau" << finl;
+                      // Cerr << "log zone/inertial sublayer consistent with u tau calculation" << finl;
                     }
-                  else // hypothèse buffer layer
+                  else // buffer layer hypothesis
                     {
                       u_tau_ref = (nu/y_ref) * pow(-(D_pwl_WJSP/(2*C_pwl_WJSP)) * (1 + pow(1 + 4 * C_pwl_WJSP/pow(D_pwl_WJSP,2) * norme_v_ref_t * y_ref /nu ,1/2)),1/p_pwl_WJSP) ;
                       y_ref_p = y_ref * u_tau_ref  / nu;
@@ -853,22 +853,22 @@ void Source_PDF_VDF::calculer_vitesse_imposee_power_law_tbl()
                             {
                               for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) = v_ref_t(0,j) * (1. - pow(u_tau_ref, 2.)*(y_ref-d1)/(nu *norme_v_ref_t));
                             }
-                          u_tau_ref = pow ( (nu * norme_v_ref_t / y_ref) , 0.5 ) ; // on recalcule u_tau et y_plus en lineaire au pt reference
+                          u_tau_ref = pow ( (nu * norme_v_ref_t / y_ref) , 0.5 ) ; // recompute u_tau and y_plus using linear law at reference point
                           y_ref_p = y_ref * u_tau_ref / nu;
                           if ( y_ref_p > y_c1_p_pwl_WJSP)
                             {
-                              // Incoherence : on n utilise pas de lois de paroi
+                              // Inconsistency: we are not using wall laws
                               itisok = 0;
-                              Cerr << "Incoherence" << finl;
+                              Cerr << "Inconsistency" << finl;
                             }
                         }
                     }
                   // Cerr<<"u_tau d1   nu ="<<u_tau<<" "<<d1<<" "<<nu<<finl;;
 
-                  // ici on effectue le test pour savoir si le noeud de frontiere et le point fluide se trouvent dans la meme zone: si oui ok, si non on impose la vitesse
+                  // here we test whether the boundary node and the fluid point are in the same zone: if yes ok, if not impose the wall velocity
 
-                  // Traitement des exceptions
-                  if (itisok == 0)  //si non on affecte la vitesse paroi
+                  // Handling of exceptions
+                  if (itisok == 0)  //if not, assign the wall velocity
                     {
                       for(int j = 0; j < nb_comp; j++)  vitesse_imposee_sommet(i,j) = vitesse_imposee_mod(i,j);
 
@@ -953,15 +953,15 @@ void Source_PDF_VDF::calculer_vitesse_imposee_power_law_tbl()
               if ( abs_h(0,j) < tab_h(0,i) &&  tab_h(0,i) <= abs_h(0,j+1) ) compteur_h(0,j) +=1;
             }
         }
-      Cerr<<"histogramme y+ compteur =";
+      Cerr<<"y+ histogram count =";
       for (int j = 0; j < N; j++) Cerr<<" "<<compteur_h(0,j)<<" ";
       Cerr<<finl;
-      Cerr<<"histogramme y+ abscisse =";
+      Cerr<<"y+ histogram abscissa =";
       for (int j = 0; j < N+1; j++) Cerr<<" "<<abs_h(0,j)<<" ";
       Cerr<<finl;
-      Cerr<<"histogramme y+ : min = "<<h_yplus_min<<" - mean = "<<h_yplus_mean<<" - max =  "<<h_yplus_max<<finl;
+      Cerr<<"y+ histogram: min = "<<h_yplus_min<<" - mean = "<<h_yplus_mean<<" - max =  "<<h_yplus_max<<finl;
 
-      Cerr<<"Moyenne sur "<<yplus_count<<" points"<<finl;
+      Cerr<<"Average over "<<yplus_count<<" points"<<finl;
     }
 }
 
@@ -1314,7 +1314,7 @@ void Source_PDF_VDF::get_noms_champs_postraitables(Noms& nom,Option opt) const
   Noms noms_compris = champs_compris_.liste_noms_compris();
   if(imm_wall_law_)
     {
-      Cerr<<" imm_wall_law_ : "<<finl;
+      Cerr<<" imm_wall_law_: "<<finl;
       noms_compris.add("u_star_ibm");
       noms_compris.add("y_plus_ibm");
     }

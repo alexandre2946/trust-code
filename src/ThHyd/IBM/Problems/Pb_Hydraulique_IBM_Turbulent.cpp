@@ -59,8 +59,8 @@ void Pb_Hydraulique_IBM_Turbulent::associer_milieu_base(const Milieu_base& mil)
     eq_hydraulique.associer_milieu_base(mil);
   else
     {
-      Cerr << "Un milieu de type " << mil.que_suis_je() << " ne peut etre associe a " << finl;
-      Cerr << "un probleme de type Pb_Hydraulique_IBM_Turbulent " << finl;
+      Cerr << "A medium of type " << mil.que_suis_je() << " cannot be associated with " << finl;
+      Cerr << "a problem of type Pb_Hydraulique_IBM_Turbulent " << finl;
       exit();
     }
 }

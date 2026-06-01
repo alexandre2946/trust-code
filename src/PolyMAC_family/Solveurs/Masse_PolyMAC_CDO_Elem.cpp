@@ -62,14 +62,14 @@ DoubleTab& Masse_PolyMAC_CDO_Elem::appliquer_impl(DoubleTab& sm) const
     }
   else
     {
-      Cerr << "Masse_PolyMAC_CDO_Elem::appliquer ne peut pas s'appliquer a un DoubleTab a " << sm.nb_dim() << " dimensions" << finl;
+      Cerr << "Masse_PolyMAC_CDO_Elem::appliquer cannot be applied to a DoubleTab with " << sm.nb_dim() << " dimensions" << finl;
       Process::exit();
     }
   sm.echange_espace_virtuel();
   return sm;
 }
 
-//Masse_PolyMAC_CDO_Elem est responsable des parties de la matrice n'impliquant pas la diffusion
+//Masse_PolyMAC_CDO_Elem is responsible for the parts of the matrix not involving diffusion
 void Masse_PolyMAC_CDO_Elem::dimensionner(Matrice_Morse& matrix) const
 {
   const Domaine_PolyMAC_CDO& domaine = le_dom_PolyMAC_CDO.valeur();

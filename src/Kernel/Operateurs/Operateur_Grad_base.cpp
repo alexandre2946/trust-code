@@ -59,25 +59,25 @@ void Operateur_Grad_base::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse
 {
   if (has_interface_blocs())
     {
-      DoubleTrav secmem(equation().inconnue().valeurs()); //on va le jeter
-      matrice.get_set_coeff() *= -1, ajouter_blocs({{ "pression", &matrice }}, secmem), matrice.get_set_coeff() *= -1; /* pour avoir le bon signe */
+      DoubleTrav secmem(equation().inconnue().valeurs()); //will be discarded
+      matrice.get_set_coeff() *= -1, ajouter_blocs({{ "pression", &matrice }}, secmem), matrice.get_set_coeff() *= -1; /* to get the correct sign */
     }
   else Process::exit(que_suis_je() + " : contribuer_a_avec() not coded!");
 }
 
-/*! @brief Calcul sans les conditions aux limites ?
+/*! @brief Computation without boundary conditions ?
  *
  */
 DoubleVect& Operateur_Grad_base::multvect(const DoubleTab& x, DoubleTab& b) const
 {
   //
-  //Cerr << que_suis_je()<<"::multvect n'est surcharge!!" << finl;
-  // copie de X en mettant 0 dans le vecteur
-  //  (on recupere un resultat tenant compte uniquement des conditions aux limites)
+  //Cerr << que_suis_je()<<"::multvect is not overridden!!" << finl;
+  // copy of X with zeros in the vector
+  //  (we recover a result taking into account only the boundary conditions)
 #if 0
-  // Tentative de codage plus efficace: ne marche pas !
-  // ecart sur SGE_3D_VEF
-  DoubleTrav x0(x); // copie de la structure, initialisee a zero
+  // Attempt at more efficient coding: does not work!
+  // discrepancy on SGE_3D_VEF
+  DoubleTrav x0(x); // copy of the structure, initialized to zero
   calculer(x0, b);
   operator_negate(b);
   ajouter(x, b);

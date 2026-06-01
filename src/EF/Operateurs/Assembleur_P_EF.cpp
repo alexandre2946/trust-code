@@ -107,10 +107,10 @@ int Assembleur_P_EF::assembler(Matrice& la_matrice)
 
 int Assembleur_P_EF::assembler_rho_variable(Matrice& la_matrice, const Champ_Don_base& rho)
 {
-  // On multiplie par la masse volumique aux sommets
+  // Multiply by density at vertices
   if (!sub_type(Champ_Fonc_Q1_EF, rho))
     {
-      Cerr << "La masse volumique n'est pas aux sommets dans Assembleur_P_EF::assembler_rho_variable." << finl;
+      Cerr << "The density is not at vertices in Assembleur_P_EF::assembler_rho_variable." << finl;
       Process::exit();
     }
   const DoubleVect& volumes_som=ref_cast(Domaine_EF, le_dom_EF.valeur()).volumes_sommets_thilde();

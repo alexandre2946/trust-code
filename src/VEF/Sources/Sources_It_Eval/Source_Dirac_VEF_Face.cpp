@@ -23,7 +23,7 @@ Sortie& Source_Dirac_VEF_Face::printOn(Sortie& s ) const { return s << que_suis_
 
 Entree& Source_Dirac_VEF_Face::readOn(Entree& s)
 {
-  Cerr << "Entree dans le readOn Terme_Source_Dirac_VEF_Face " << finl;
+  Cerr << "Entering readOn Terme_Source_Dirac_VEF_Face " << finl;
   point = 0;
   point.resize(dimension);
   s >> point;

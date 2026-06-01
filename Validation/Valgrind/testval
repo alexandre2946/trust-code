@@ -6,7 +6,7 @@ analyse()
      echo $ECHO_OPTS "$cas...OK"
    else
      # Error detected
-     if [ "`grep 'Arret des processes.' $cas.err`" = "" ]
+     if [ "`grep 'Stopping processes.' $cas.err`" = "" ]
      then
         # If it is a TRUST error:
 	echo $ECHO_OPTS "$cas...KO See $DEST/$cas.err"

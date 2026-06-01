@@ -44,7 +44,7 @@ int Frontiere_ouverte_rho_u_impose::compatible_avec_eqn(const Equation_base& eqn
 
 double Frontiere_ouverte_rho_u_impose::val_imp_au_temps(double temps, int i) const
 {
-  Cerr << "Acces a une condition limite en rho.u sans preciser la composante" << finl;
+  Cerr << "Access to a boundary condition in rho.u without specifying the component" << finl;
   Process::exit();
   return 0;
 }

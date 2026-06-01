@@ -37,13 +37,13 @@ Entree& Terme_Source_inc_th::lire_donnees(Entree& is)
   //   coeff = 1;
   //   dir_source = 1;
   impr = 0;
-  // Fin Init
+  // End Init
   Motcle motlu, accolade_fermee="}", accolade_ouverte="{", mot="impr";
   is >> motlu;
   if(motlu != accolade_ouverte)
     {
-      Cerr << "On attendait { a la place de " << motlu
-           << " lors de la lecture de inc " << finl;
+      Cerr << "Expected { instead of " << motlu
+           << " while reading inc " << finl;
     }
   is >> motlu;
   while (motlu != accolade_fermee)
@@ -55,8 +55,8 @@ Entree& Terme_Source_inc_th::lire_donnees(Entree& is)
         }
       else
         {
-          Cerr << "Le mot lu : " <<  motlu << " n'est pas compris dans Source_inc_th" << finl;
-          Cerr << "Le mot compris est :  impr " << finl;
+          Cerr << "The keyword read: " <<  motlu << " is not understood in Source_inc_th" << finl;
+          Cerr << "The understood keyword is:  impr " << finl;
           Process::exit();
         }
     }

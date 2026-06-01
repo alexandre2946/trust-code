@@ -266,7 +266,7 @@ void Domaine_Cl_EF::remplir_type_elem_Cl(const Domaine_EF& le_dom_EF)
               n/=norm_n;
               for (int d=0; d<dimension; d++)
                 normales_symetrie_->valeurs()(som,d)=n[d];
-              //	    Cerr<<som<<" on doit annuler une premiere direction "<<n(0) << " " <<n(1)<<" "<<n(dimension==3?2:1)<<finl;
+              //	    Cerr<<som<<" must cancel a first direction "<<n(0) << " " <<n(1)<<" "<<n(dimension==3?2:1)<<finl;
 
               for (int f=0; f<nbf; f++)
                 {
@@ -290,13 +290,13 @@ void Domaine_Cl_EF::remplir_type_elem_Cl(const Domaine_EF& le_dom_EF)
                   if (norme_array(t1)>(1e-4*sqrt(s)))
                     {
 
-                      // facilite le debugage
+                      // ease debugging
                       if (std::fabs(min_array(t1))>max_array(t1))
                         t1*=-1;
                       t1/=norme_array(t1);
 
 
-                      //	    Cerr<<som<<" on doit annuler une deuxieme direction "<<t1(0) << " " <<t1(1)<<" "<<t1(dimension==3?2:1)<<finl;
+                      //	    Cerr<<som<<" must cancel a second direction "<<t1(0) << " " <<t1(1)<<" "<<t1(dimension==3?2:1)<<finl;
                       f=nbf;
                       for (int d=0; d<dimension; d++)
                         normales_symetrie_bis_->valeurs()(som,d)=t1[d];
@@ -687,7 +687,7 @@ void Domaine_Cl_EF::imposer_cond_lim(Champ_Inc_base& ch, double temps)
           const Dirichlet& la_cl_diri = ref_cast(Dirichlet,la_cl);
           if (sub_type(Champ_front_softanalytique,la_cl_diri.champ_front()))
             {
-              Cerr<<" Il faut utiliser Champ_front_fonc_txyz et non "<<la_cl_diri.champ_front().que_suis_je()<<finl;
+              Cerr<<" You must use Champ_front_fonc_txyz instead of "<<la_cl_diri.champ_front().que_suis_je()<<finl;
               exit();
             }
           int avec_valeur_aux_sommets=0;
@@ -809,7 +809,7 @@ int Domaine_Cl_EF::initialiser(double temps)
 
   if (nb_bord_periodicite()>0)
     {
-      Cerr<<" La periodicite n'est pas codee !!!"<<finl;
+      Cerr<<" Periodicity is not implemented !!!"<<finl;
       abort();
     }
   return 1;

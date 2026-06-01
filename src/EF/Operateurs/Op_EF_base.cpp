@@ -248,17 +248,17 @@ void Op_EF_base::modifier_pour_Cl(const Domaine_EF& le_dom,
                                   const Domaine_Cl_EF& le_dom_cl,
                                   Matrice_Morse& la_matrice, DoubleTab& secmem) const
 {
-  // Dimensionnement de la matrice qui devra recevoir les coefficients provenant de
-  // la convection, de la diffusion pour le cas des faces.
-  // Cette matrice a une structure de matrice morse.
-  // Nous commencons par calculer les tailles des tableaux tab1 et tab2.
+  // Sizing the matrix that will receive coefficients from
+  // convection and diffusion in the face case.
+  // This matrix has a Morse matrix structure.
+  // We start by computing the sizes of arrays tab1 and tab2.
   const Conds_lim& les_cl = le_dom_cl.les_conditions_limites();
 
   const auto& tab1 = la_matrice.get_tab1();
   auto& coeff = la_matrice.get_set_coeff();
 
-  // determination de la taille du champ inconnue.
-  // Cerr << "dans modifier cl " << finl;
+  // determining the size of the unknown field.
+  // Cerr << "in modifier cl " << finl;
   const DoubleTab& champ_inconnue = le_dom_cl.equation().inconnue().valeurs();
   int nb_comp = champ_inconnue.line_size();
 
@@ -315,13 +315,13 @@ void Op_EF_base::modifier_pour_Cl(const Domaine_EF& le_dom,
                       coeff[idiag+k]=0;
                     la_matrice.coef(m,m)=1;
                     assert(la_matrice.coef(som*nb_comp+comp,som*nb_comp+comp)==1);
-                    // pour les voisins
+                    // for neighbors
 
-                    // pour le second membre
+                    // for the right-hand side
                     secmem(som,comp)= 0;
                     if (la_cl_Dirichlet.val_imp(ind_face,comp)!=0)
                       {
-                        Cerr<<"impossible non ??? "<<finl;
+                        Cerr<<"not possible, is it ??? "<<finl;
                         Process::exit();
                       }
                   }
@@ -388,7 +388,7 @@ int Op_EF_base::impr(Sortie& os, const Operateur_base& op) const
   const DoubleTab& flux_bords_=op.flux_bords();
   if (flux_bords_.nb_dim()!=2)
     {
-      Cout << "L'impression des flux n'est pas codee pour l'operateur " << op.que_suis_je() << finl;
+      Cout << "Flux printing is not implemented for the operator " << op.que_suis_je() << finl;
       return 1;
     }
   if (controle_modifier_flux_==0)

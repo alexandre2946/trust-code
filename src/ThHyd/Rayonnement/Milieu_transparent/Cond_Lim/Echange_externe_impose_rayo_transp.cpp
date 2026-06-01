@@ -55,9 +55,9 @@ Entree& Echange_externe_impose_rayo_transp::readOn(Entree& is)
           }
         default:
           {
-            Cerr << "Erreur a la lecture de la condition aux limites de type " << finl;
+            Cerr << "Error reading the boundary condition of type " << finl;
             Cerr << "Echange_externe_impose_rayo_transp " << finl;
-            Cerr << "On attendait " << les_motcles << "a la place de " << motlu << finl;
+            Cerr << "Expected " << les_motcles << "instead of " << motlu << finl;
             Process::exit();
           }
         }
@@ -66,10 +66,10 @@ Entree& Echange_externe_impose_rayo_transp::readOn(Entree& is)
 
   if (local_min_vect(h_imp_->valeurs()) < 1.e9)
     {
-      Cerr << "Erreur sur l'utilisation de la condition a la limite" << finl;
-      Cerr << "Echange_externe_impose_rayo_transp. Celle ci ne peut" << finl;
-      Cerr << "etre utilisee pour un probleme de rayonnement que pour " << finl;
-      Cerr << "imposer une temperature sur une paroi" << finl;
+      Cerr << "Error using the boundary condition" << finl;
+      Cerr << "Echange_externe_impose_rayo_transp. This condition can only" << finl;
+      Cerr << "be used for a radiation problem to " << finl;
+      Cerr << "impose a temperature on a wall" << finl;
       Process::exit();
     }
 

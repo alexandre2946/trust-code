@@ -223,43 +223,43 @@ void Op_Conv_Muscl_New_VEF_Face::calculer_coefficients_operateur_centre(DoubleTa
              || (sub_type(Dirichlet_homogene,la_cl.valeur()))
            )
           {
-            //On ne fait rien
+            // Nothing to do
           }// sub_type Dirichlet
 
 
         else if (sub_type(Neumann,la_cl.valeur()) || sub_type(Neumann_homogene,la_cl.valeur()))
           {
-            //On ne fait rien
-          }//fin du if sur Neumann
+            // Nothing to do
+          }// end if Neumann
 
         else if (sub_type(Symetrie,la_cl.valeur()))
           {
-            //On ne fait rien
-          }//fin du if sur Symetrie
+            // Nothing to do
+          }// end if Symetrie
 
         else if (sub_type(Periodique,la_cl.valeur()))
           {
-            //On ne fait rien
-          }//fin du if sur Periodique
+            // Nothing to do
+          }// end if Periodique
 
         else if (sub_type(Echange_impose_base,la_cl.valeur()))
           {
-            //On ne fait rien
-          }//fin du if sur Echange_impose_base
+            // Nothing to do
+          }// end if Echange_impose_base
 
         else
           {
-            Cerr << "Erreur Op_Conv_Muscl_New_VEF_Face::calculer_coefficients_operateur_centre()" << finl;
-            Cerr << "Condition aux limites " << la_cl.que_suis_je() << " non codee."   << finl;
-            Cerr << "Sortie du programme." << finl;
+            Cerr << "Error Op_Conv_Muscl_New_VEF_Face::calculer_coefficients_operateur_centre()" << finl;
+            Cerr << "Boundary condition " << la_cl.que_suis_je() << " not coded."   << finl;
+            Cerr << "Exiting program." << finl;
             Process::exit();
-          }//fin du else sur les autres conditions aux limites
+          }// end else for other boundary conditions
 
-      }//fin des conditions aux limites
+      }// end boundary conditions loop
   }
 
   //
-  // Fin de la correction des Kij
+  // End of Kij correction
   //
 }
 
@@ -852,11 +852,11 @@ void Op_Conv_Muscl_New_VEF_Face::calculer_flux_bords(const DoubleTab& Kij, const
         }
       else
         {
-          Cerr << "Erreur Op_Conv_Muscl_New_VEF_Face::calculer_flux_bords()" << finl;
-          Cerr << "Condition aux limites " << la_cl.que_suis_je() << " non codee."   << finl;
-          Cerr << "Sortie du programme." << finl;
+          Cerr << "Error Op_Conv_Muscl_New_VEF_Face::calculer_flux_bords()" << finl;
+          Cerr << "Boundary condition " << la_cl.que_suis_je() << " not coded."   << finl;
+          Cerr << "Exiting program." << finl;
           Process::exit();
-        }//fin du else sur les autres conditions aux limites
+        }// end else for other boundary conditions
     }
 }
 

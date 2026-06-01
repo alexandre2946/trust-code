@@ -140,29 +140,29 @@ int Solv_Cholesky::Cholesky(const Matrice_Morse_Sym& matrice,
   DoubleVect vecteur(secmem);
   const int n = secmem.size_totale();//ordre;
 
-  // permutation du second membre
+  // permutation of the RHS
   // subroutine dvperm (n, x, perm)
   // SPARSKIT2/FORMATS/unary.f
   F77NAME(DVPERM)(&n, vecteur.addr(), matrice.permutation().addr());
 
-  char UPLO = 'U';                          // A est triangulaire superieure
-  int KD   = largeur_de_bande_-1;           // largeur de bande sup
-  int LDAB = largeur_de_bande_;             //n_;// nb de lg de abd_
-  int LDB  = n;                             //m_;// nb de lg de b
-  int NRHS = 1;                             // nb de col de b (=vecteur)
+  char UPLO = 'U';                          // A is upper triangular
+  int KD   = largeur_de_bande_-1;           // upper bandwidth
+  int LDAB = largeur_de_bande_;             //n_;// number of rows of abd_
+  int LDB  = n;                             //m_;// number of rows of b
+  int NRHS = 1;                             // number of columns of b (= vector)
   int INFO = 0;
 
-  // resolution du systeme
+  // solve the system
   F77NAME(DPBTRS)(&UPLO, &n, &KD, &NRHS, matrice_bande_factorisee_fortran_.addr() , &LDAB, vecteur.addr(), &LDB, &INFO);
 
   if(INFO)
     {
       Cerr << "Solv_Cholesky::resoudre_systeme error : ";
       if(INFO<0) Cerr << "F77NAME(DPBTRS) param. " << -INFO << " invalid" << finl;
-      if(INFO>0) Cerr << "singular matrix ! resolution impossible" << finl;
+      if(INFO>0) Cerr << "singular matrix ! resolution not possible" << finl;
       exit();
     };
-  // permutation inverse du resultat
+  // inverse permutation of the result
   // subroutine dvperm (n, x, perm)
   // SPARSKIT2/FORMATS/unary.f
   F77NAME(DVPERM)(&n, vecteur.addr(), matrice.permutation_inverse().addr());

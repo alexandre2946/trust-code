@@ -33,37 +33,34 @@
 #include <kokkos++.h>
 #include <fstream>
 
-// Chacun des fichiers Cerr, Cout et Journal(i)
-// peut etre redirige vers l'un des quatre fichiers suivants:
-// Instance de la Sortie nulle (equivalent de /dev/null)
+// Each of Cerr, Cout and Journal(i) can be redirected to one of the following four streams:
+// Null output instance (equivalent of /dev/null)
 static Sortie_Nulle  journal_zero_;
-// Instance de la Sortie pointant vers cerr
+// Output instance pointing to cerr
 static Sortie        std_err_(cerr);
-// Instance de la Sortie pointant vers cout
+// Output instance pointing to cout
 static Sortie        std_out_(cout);
-// Instances du fichier Journal
+// Journal file instances
 static SFichier     journal_file_;
 
 static int          journal_file_open_;
 static Nom          journal_file_name_;
-// Niveau maximal des messages ecrits. La valeur initiale determine
-// si les messages ecrits avant l'initialisation du journal sont ecrits
-// ou pas.
+// Maximum level of messages written. The initial value determines
+// whether messages written before journal initialization are written or not.
 static int        verbose_level_ = 0;
 static int        disable_stop_ = 0;
 
-// Drapeau indiquant si les sorties cerr et cout doivent
-// etre redirigees vers le fichier journal
+// Flag indicating whether cerr and cout should be redirected to the journal file
 static int        cerr_to_journal_ = 0;
 int Process::exception_sur_exit=0;
-int Process::multiple_files=5120; // Valeur modifiable avec la variable d'environnement TRUST_MultipleFiles
+int Process::multiple_files=5120; // Can be modified via the TRUST_MultipleFiles environment variable
 bool Process::force_single_file(const int ranks, const Nom& filename)
 {
   char* theValue = getenv("TRUST_MultipleFiles");
   if (theValue != nullptr) multiple_files=atoi(theValue);
   if (ranks>multiple_files)
     {
-      if (Process::je_suis_maitre())   // Attention, necessaire, car appel possible tres tot dans main.cpp alors que Cerr par defini completement sur les processes
+      if (Process::je_suis_maitre())   // Necessary: called very early in main.cpp before Cerr is fully defined on all processes
         {
           Cerr << "======================================================================================================" << finl;
           Cerr << "Warning! Single file option is forced for " << filename << " above " << multiple_files << " MPI ranks." << finl;
@@ -667,7 +664,7 @@ void Process::imprimer_ram_totale(int all_process)
 
   if (memoire)
     {
-      //Cout << "RAM provisoire: PETSc " << ram_processeur() << "  ru_maxrss " << memoire << " mallinfo " << heap_allocated << finl;
+      //Cout << "RAM preliminary: PETSc " << ram_processeur() << "  ru_maxrss " << memoire << " mallinfo " << heap_allocated << finl;
       int Mo=1024*1024;
       if (all_process) Journal() << (int)(memoire/Mo) << " MBytes of RAM taken by the processor " << Process::me() << finl;
       {
@@ -751,16 +748,17 @@ void init_journal_file(int verbose_level, const char * file_name, int append)
 
 void end_journal(int verbose_level)
 {
-  // Attention: acrobatie pour que ca "plante proprement" si le destructeur
-  // ecrit dans le journal !
+  // Note: careful handling so that it "fails cleanly" if the destructor
+  // writes to the journal!
   journal_file_.close();
   journal_file_open_ = 0;
 }
 
-/*! @brief Renvoie l'objet Sortie sur lequel seront redirigees les objets ecrits dans Cerr.
+/*! @brief Returns the Sortie object to which Cerr output is redirected.
  *
- * Cela peut etre std_err_ ou journal_file_
+ * This can be std_err_ or journal_file_.
  *
+ * @return Reference to the output stream used for Cerr.
  */
 Sortie& get_Cerr()
 {
@@ -782,9 +780,10 @@ Sortie& get_Cerr()
     }
 }
 
-/*! @brief Si on est sur le maitre, on renvoie cout ou le fichier journal sinon journal_zero_.
+/*! @brief Returns cout or the journal file on the master processor, or journal_zero_ otherwise.
  *
- *   @sa cerr_to_journal_
+ * @return Reference to the output stream used for Cout.
+ * @sa cerr_to_journal_
  *
  */
 Sortie& get_Cout()
@@ -802,11 +801,12 @@ Sortie& get_Cout()
     }
 }
 
-/*! @brief change la destination de Cerr et Cout Si flag=0, c'est stderr et stdout, sinon, si le fichier
+/*! @brief Changes the destination of Cerr and Cout.
  *
- *   journal est ouvert, c'est le journal, sinon c'est
- *   Sortie_Nulle
+ * If flag=0, output goes to stderr and stdout; otherwise, if the journal file is open, output goes to
+ * the journal; otherwise output goes to Sortie_Nulle.
  *
+ * @param flag If 0, use stderr/stdout; if non-zero, redirect to journal or Sortie_Nulle.
  */
 void set_Cerr_to_journal(int flag)
 {

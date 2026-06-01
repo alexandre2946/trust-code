@@ -78,7 +78,7 @@ Entree& Traitement_particulier_NS_Pression_VDF::lire(Entree& is)
             {
             case 0 :
               {
-                Cerr << " Lire Pression_porosite " << finl;
+                Cerr << " Reading Pression_porosite " << finl;
                 const Domaine_dis_base& zdis=mon_equation->inconnue().domaine_dis_base();
                 const Domaine_VDF& domaine_VDF=ref_cast(Domaine_VDF, zdis);
                 //                  const Probleme_base& pb = mon_equation->probleme();
@@ -102,9 +102,9 @@ Entree& Traitement_particulier_NS_Pression_VDF::lire(Entree& is)
                   }
                 else
                   {
-                    Cerr << "Erreur dans la lecture de Traitement_particulier_Brech_VEF" << finl;
-                    Cerr << "Les mots cles possibles sont : calcul_flux ou Richardson " << finl;
-                    Cerr << "Vous avez lu :" << motlu << finl;
+                    Cerr << "Error while reading Traitement_particulier_Brech_VEF" << finl;
+                    Cerr << "Possible keywords are: calcul_flux or Richardson " << finl;
+                    Cerr << "You read: " << motlu << finl;
                     exit();
                     break;
                   }
@@ -114,8 +114,8 @@ Entree& Traitement_particulier_NS_Pression_VDF::lire(Entree& is)
       is >> motlu;
       if (motlu != accfermee)
         {
-          Cerr << "Erreur dans la lecture de Traitement_particulier_NS_Brech_VEF 1 ";
-          Cerr << "On attendait une } et pas " << motlu << finl;
+          Cerr << "Error while reading Traitement_particulier_NS_Brech_VEF 1: ";
+          Cerr << "Expected a } but got " << motlu << finl;
           exit();
         }
     }

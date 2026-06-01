@@ -99,7 +99,7 @@ void  Champ_front_pression_from_u::mettre_a_jour(double tps)
   const DoubleTab& Flux0=opdiv->flux_bords();
   if (Flux0.size()==0)
     {
-      Cerr<<" Div pas encore pres...."<<finl;
+      Cerr<<" Div not yet ready...."<<finl;
       return;
       //   DoubleTrav resu(eqns.div());
       //opdiv.calculer(inco.valeurs(),resu);

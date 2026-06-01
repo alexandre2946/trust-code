@@ -117,24 +117,23 @@ int Navier_Stokes_IBM::preparer_calcul()
         }
     }
 
-  // GF en cas de reprise on conserve la valeur de la pression
-  // avant elle ne servait qu' a initialiser le lagrange pour la projection
-  // C'est important pour le Simpler/Piso de bien repartir de la pression
-  // sauvegardee...
+  // GF on restart, keep the pressure value
+  // previously it was only used to initialize the Lagrange multiplier for the projection
+  // it is important for Simpler/Piso to restart correctly from the saved pressure
   //la_pression->valeurs()=0.;
   Debog::verifier("Navier_Stokes_std::preparer_calcul, la_pression av projeter", la_pression->valeurs());
   if (projection_a_faire())
     projeter();
 
-  // Au cas ou une cl de pression depend de u que l'on vient de modifier
+  // In case a pressure BC depends on u that was just modified
   le_dom_Cl_dis->mettre_a_jour(temps);
   Debog::verifier("Navier_Stokes_std::preparer_calcul, la_pression ap projeter", la_pression->valeurs());
 
-  // Initialisation du champ de pression (resolution de Laplacien(P)=0 avec les conditions limites en pression)
-  // Permet de demarrer la resolution avec une bonne approximation de la pression (important pour le Piso ou P!=0)
+  // Initialise the pressure field (solve Laplacian(P)=0 with pressure boundary conditions)
+  // Allows starting the solve with a good pressure approximation (important for Piso where P!=0)
   if (!probleme().reprise_effectuee() && methode_calcul_pression_initiale_ != 3)
     {
-      Cout << "Estimation du champ de pression au demarrage:" << finl;
+      Cout << "Estimating the pressure field at startup:" << finl;
       DoubleTrav secmem(la_pression->valeurs());
       DoubleTrav vpoint(gradient_P->valeurs());
       gradient.calculer(la_pression->valeurs(), gradient_P->valeurs());

@@ -399,7 +399,7 @@ int Op_VEF_Face::impr(Sortie& os, const Operateur_base& op) const
   const DoubleTab& flux_bords_ = op.flux_bords();
   if (flux_bords_.nb_dim() != 2)
     {
-      Cout << "L'impression des flux n'est pas codee pour l'operateur " << op.que_suis_je() << finl;
+      Cout << "Printing of fluxes is not implemented for the operator " << op.que_suis_je() << finl;
       return 1;
     }
   if (controle_modifier_flux_ == 0)
@@ -784,7 +784,7 @@ void Op_VEF_Face::modifier_matrice_pour_periodique_apres_contribuer(Matrice_Mors
                         double test = matrice(n0, c) - matrice(n0perio, c);
                         if (test != 0)
                           {
-                            Cerr << "Pb matrice non periodique face" << num_face << " composante " << nc << " colonne " << c << finl;
+                            Cerr << "Pb non-periodic matrix face" << num_face << " component " << nc << " column " << c << finl;
                             Cerr << " diff " << test << " coef1 " << matrice(n0, c) << " coef2 " << matrice(n0perio, c) << finl;
                             Process::exit();
                           }
@@ -792,15 +792,15 @@ void Op_VEF_Face::modifier_matrice_pour_periodique_apres_contribuer(Matrice_Mors
                   }
                 if ((matrice(n0, n0perio) != 0) || (matrice(n0perio, n0) != 0))
                   {
-                    Cerr << "Pb matrice non periodique face" << num_face << " composante " << nc << finl;
-                    Cerr << " coef  non nul" << matrice(n0, n0perio) << " " << matrice(n0perio, n0) << finl;
+                    Cerr << "Pb non-periodic matrix face" << num_face << " component " << nc << finl;
+                    Cerr << " non-zero coef" << matrice(n0, n0perio) << " " << matrice(n0perio, n0) << finl;
                     Process::exit();
                   }
                 if (matrice(n0, n0) != matrice(n0perio, n0perio))
                   {
                     double test = matrice(n0, n0perio) - matrice(n0perio, n0);
-                    Cerr << "Pb matrice non periodique face" << num_face << " composante " << nc << finl;
-                    Cerr << " diff " << test << " coef  different " << matrice(n0, n0) << " " << matrice(n0perio, n0perio) << finl;
+                    Cerr << "Pb non-periodic matrix face" << num_face << " component " << nc << finl;
+                    Cerr << " diff " << test << " differing coef " << matrice(n0, n0) << " " << matrice(n0perio, n0perio) << finl;
                     Process::exit();
                   }
               }
@@ -812,7 +812,7 @@ void Op_VEF_Face::modifier_matrice_pour_periodique_apres_contribuer(Matrice_Mors
    modif_matrice_pour_periodique_avant_contribuer(es,eqn);
    modif_matrice_pour_periodique_apres_contribuer(es,eqn);
    es.coeff_-=(matrice.coeff_);
-   Cerr<<" erreur apres modifier_matrice_pour_periodique_apres_contribuer"<< mp_max_abs_vect(es.coeff_)<<finl;
+   Cerr<<" error after modifier_matrice_pour_periodique_apres_contribuer"<< mp_max_abs_vect(es.coeff_)<<finl;
    assert(mp_max_abs_vect(es.coeff_)<1e-9);
    */
 

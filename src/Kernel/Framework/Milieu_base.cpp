@@ -696,7 +696,7 @@ void Milieu_base::resetTime(double time)
 
 void Milieu_base::creer_alpha()
 {
-  Cerr << "Milieu_base::creer_alpha (champ non lu)" << finl;
+  Cerr << "Milieu_base::creer_alpha (field not read)" << finl;
   assert(ch_lambda_);
   assert(ch_rho_);
   assert(ch_Cp_);

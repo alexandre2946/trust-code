@@ -67,8 +67,8 @@ Entree& Source_Scalaire_EF::readOn(Entree& s )
   champs_compris_.ajoute_champ(la_source_);
   if (la_source_->nb_comp() != equation().inconnue().nb_comp())
     {
-      Cerr << "Erreur a la lecture du terme source de type " << que_suis_je() << finl;
-      Cerr << "le champ source doit avoir " << equation().inconnue().nb_comp() << " composantes" << finl;
+      Cerr << "Error reading the source term of type " << que_suis_je() << finl;
+      Cerr << "the source field must have " << equation().inconnue().nb_comp() << " components" << finl;
       exit();
     }
 

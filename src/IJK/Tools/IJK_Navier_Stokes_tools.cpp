@@ -1707,7 +1707,7 @@ void add_gradient_temperature(const IJK_Field_double& temperature, const double 
                 {
                   f = constant * 2. / delta_z_all[k - 1 + offset];
 
-                  Cerr << "IJK_Naviers_Stokes" << " " << "erreur_dans_le_calcul_du_gradient_de_T" << finl;
+                  Cerr << "IJK_Naviers_Stokes" << " " << "error_in_the_computation_of_the_gradient_of_T" << finl;
 
                   const double temperature_kmax = boundary.get_temperature_kmax();
                   //const double coef = 1./48.;

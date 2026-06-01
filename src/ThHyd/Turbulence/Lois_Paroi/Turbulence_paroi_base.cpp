@@ -50,40 +50,43 @@ Entree& Turbulence_paroi_base::readOn(Entree& is)
   return is;
 }
 
-/*! @brief Lit les caracteristques de la loi de parois a partir d'un flot d'entree.
+/*! @brief Reads the characteristics of the wall law from an input stream.
  *
  *     Format:
  *       type_de_loi_de_paroi
- *     Les valeurs possibles du type de loi de paroi sont:
+ *     Possible values for the wall law type:
  *       - "loi_standard_hydr"
  *       - "negligeable"
  *       - "loi_VanDriest"
  *
+ * @param loi_par Wall law object to type and initialize.
+ * @param mod_turb_hyd Reference to the hydraulic turbulence model.
+ * @param s Input stream.
  */
 void Turbulence_paroi_base::typer_lire_turbulence_paroi(OWN_PTR(Turbulence_paroi_base) &loi_par, const Modele_turbulence_hyd_base& mod_turb_hyd, Entree& s)
 {
-  Cerr << "Lecture du type de loi de parois " << finl;
+  Cerr << "Reading the wall law type " << finl;
   Motcle typ;
   s >> typ;
 
   const Equation_base& eqn = mod_turb_hyd.equation();
   if (typ == "loi_standard_hydr_scalaire" || typ == "loi_paroi_2_couches_scalaire" || typ == "negligeable_scal")
     {
-      Cerr << "Le format du jeu de donnees a change:" << finl;
-      Cerr << "Chaque modele de turbulence doit avoir sa loi de paroi specifiee." << finl;
-      Cerr << "Ainsi par exemple, loi_standard_hydr sera pour le modele de turbulence de l'equation de qdm" << finl;
-      Cerr << "et loi_standard_hydr_scalaire pour le modele de turbulence de l'equation d'energie." << typ << finl;
+      Cerr << "The data file format has changed:" << finl;
+      Cerr << "Each turbulence model must have its wall law specified." << finl;
+      Cerr << "For example, loi_standard_hydr is for the turbulence model of the momentum equation" << finl;
+      Cerr << "and loi_standard_hydr_scalaire for the turbulence model of the energy equation." << typ << finl;
       Process::exit();
     }
   typ += "_";
 
   Nom discr = eqn.discretisation().que_suis_je();
 
-  //  les operateurs de diffusion sont communs aux discretisations VEF et VEFP1B
+  //  diffusion operators are shared by VEF and VEFP1B discretisations
   if (discr == "VEFPreP1B") discr = "VEF";
   typ += discr;
 
-  Cerr << "et typage : " << typ << finl;
+  Cerr << "and typing: " << typ << finl;
   loi_par.typer(typ);
   loi_par->associer_modele(mod_turb_hyd);
   loi_par->associer(eqn.domaine_dis(), eqn.domaine_Cl_dis());

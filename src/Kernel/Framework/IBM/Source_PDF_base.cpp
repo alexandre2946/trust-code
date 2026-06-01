@@ -283,7 +283,7 @@ void Source_PDF_base::set_variable_imposee()
     {
       if (nb_comp != dim_esp)
         {
-          Cerr<<"Source_PDF_base::calcul_variable_imposee: dimension variable differente "<<dim_esp<<"! "<<finl;
+          Cerr<<"Source_PDF_base::calcul_variable_imposee: variable dimension different from "<<dim_esp<<"! "<<finl;
           abort();
         }
       rotate_imposed_velocity(modele_lu_.variable_imposee_->valeurs());
@@ -543,15 +543,15 @@ void Source_PDF_base::update_pseudo_level_set_IBM(DoubleTab& vecteur_deplacement
                     {
                       level_set_ref = level_set(i) ;
                       for (int k=0; k<dim_esp; k++) XYZ_ref(k) = coordsDom3D(i,k);
-                      break; // on a trouve
+                      break; // found
                     }
                 }
-              if (e == etarg) Cerr<<"Vertex non initialise : level_set_ref = "<<level_set_ref<<finl;
-              // boucle definition level_set vertex non initialises
+              if (e == etarg) Cerr<<"Vertex not initialized : level_set_ref = "<<level_set_ref<<finl;
+              // loop to define level_set for uninitialized vertices
               for (int il=0; il<nb_som_elem; il++)
                 {
                   int i = elems(e,il);
-                  if (level_set(i) == -99999.) // on initialise
+                  if (level_set(i) == -99999.) // initialize
                     {
                       double prod_sca = 0.;
                       for (int k=0; k<dim_esp; k++) prod_sca += (coordsDom3D(i,k)-XYZ_ref(k))*grad_phi_e_0(e,k);
@@ -1306,7 +1306,7 @@ double Source_PDF_base::fonct_coeff(const double rho_m, const double aire, const
     }
 
   double inv_dt = 1./dt;
-  // Cerr<<"dt pour Source_PDF_base::fonct_coeff : "<< dt <<finl;
+  // Cerr<<"dt for Source_PDF_base::fonct_coeff : "<< dt <<finl;
   val_coeff = rho_m * inv_dt;
   const double tps_cour = equation().probleme().schema_temps().temps_courant();
   if (temps_relax_ != 1.0e+12)
@@ -1318,13 +1318,13 @@ double Source_PDF_base::fonct_coeff(const double rho_m, const double aire, const
       // double coeff_relax = 1.0 - exp(-tps_cour / temps_relax_);
       // double coeff_relax = tanh(tps_cour / temps_relax_);
       val_coeff *= coeff_relax ;
-      // Cerr<< "coeff. relax. pour PDF = "<<coeff_relax<<" val_coeff = "<<val_coeff <<finl;
+      // Cerr<< "coeff. relax. for PDF = "<<coeff_relax<<" val_coeff = "<<val_coeff <<finl;
     }
   return val_coeff;
 }
 
 // TENSOR CALCULATION
-// Pour pouvoir eventuellement traiter differements les directions d'espace
+// To possibly handle space directions differently
 ArrOfDouble Source_PDF_base::get_tuvw_local() const
 {
   assert(Objet_U::dimension==3);
@@ -1377,7 +1377,7 @@ DoubleTab Source_PDF_base::compute_coeff_elem() const
   int dim_esp = Objet_U::dimension ;
   if (dim_var != 1 && dim_var != dim_esp)
     {
-      Cerr<<"compute_coeff_elem: dimension variable differente 1 ou "<<dim_esp<<"! "<<finl;
+      Cerr<<"compute_coeff_elem: variable dimension different from 1 or "<<dim_esp<<"! "<<finl;
       exit();
     }
   DoubleTab coeff(nb_elems, dim_var);
@@ -1388,7 +1388,7 @@ DoubleTab Source_PDF_base::compute_coeff_elem() const
     {
       dt = 1.0;
     }
-  // Cerr<<"dt pour compute_coeff_elem : "<< dt <<finl;
+  // Cerr<<"dt for compute_coeff_elem : "<< dt <<finl;
 
   double val_coeff ;
   DoubleVect val_diag_coef(dim_var);
@@ -1459,7 +1459,7 @@ DoubleTab Source_PDF_base::compute_coeff_matrice() const
   int dim_var = variable.dimension(1);
   if (dim_var != 1 && dim_var != dim_esp)
     {
-      Cerr<<"compute_coeff_matrice: dimension variable differente 1 ou "<<dim_esp<<"! "<<finl;
+      Cerr<<"compute_coeff_matrice: variable dimension different from 1 or "<<dim_esp<<"! "<<finl;
       exit();
     }
   ArrOfDouble variable_elem(dim_var);
@@ -1470,7 +1470,7 @@ DoubleTab Source_PDF_base::compute_coeff_matrice() const
 
   double dt = (ref_cast_non_const(Source_PDF_base, *this)).calcul_dt_pdf();
   const DoubleTab& rho_m=champ_rho_->valeurs();
-  // Cerr<<"dt pour compute_coeff_matrice : "<< dt <<finl;
+  // Cerr<<"dt for compute_coeff_matrice : "<< dt <<finl;
 
   double val_coeff ;
   DoubleVect val_diag_coef(dim_var), coeff_el(dim_var) ;
@@ -1611,9 +1611,9 @@ DoubleVect& Source_PDF_base::compute_source_term_PDF(int i_traitement_special, D
 {
   assert(Objet_U::dimension <= 3);
   // double temps_corrige = temps_computation_pdf_ + dt_computation_pdf_;
-  // Cerr<<"compute_source_term_PDF:: temps courant, temps computation_pdf et temps corrige = "<<equation().probleme().schema_temps().temps_courant() <<" "<<temps_computation_pdf_<<" "<<temps_corrige<<finl;
+  // Cerr<<"compute_source_term_PDF:: current time, temps computation_pdf and corrected time = "<<equation().probleme().schema_temps().temps_courant() <<" "<<temps_computation_pdf_<<" "<<temps_corrige<<finl;
   DoubleTab& variable=equation().inconnue().valeurs();
-  // Si temps courant n'a pas ete mis a jour, on prend temps futur pour inconnue
+  // If the current time has not been updated yet, use the future time for the unknown
   if (equation().probleme().schema_temps().temps_courant() == temps_computation_pdf_) variable=equation().inconnue().futur();
   int nb_som= variable.dimension(0);
   int nb_comp = variable.dimension(1);

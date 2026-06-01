@@ -33,11 +33,11 @@ Entree& Terme_Source_Decroissance_Radioactive_VEF_Face::readOn(Entree& s)
   double lambda_tmp;
   int nb_groupes;
   s >> nb_groupes;
-  Cerr << "Nombre de groupes a lire : " << nb_groupes << finl;
+  Cerr << "Number of groups to read: " << nb_groupes << finl;
   for (int i = 0; i < nb_groupes; i++)
     {
       s >> lambda_tmp;
-      Cerr << "lambda lu : " << lambda_tmp << finl;
+      Cerr << "lambda read: " << lambda_tmp << finl;
       lambda.push_back(lambda_tmp);
     }
 

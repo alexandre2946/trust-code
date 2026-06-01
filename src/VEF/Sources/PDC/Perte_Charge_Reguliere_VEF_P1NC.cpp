@@ -147,9 +147,9 @@ DoubleTab& Perte_Charge_Reguliere_VEF_P1NC::ajouter(DoubleTab& resu) const
 
   if (couronne_tube == 1)
     {
-      Cerr << " PQ : 17/06/08 : Cette option a ete supprimee dans Perte_Charge_Reguliere_VEF_P1NC" << finl;
-      Cerr << " Possibilite de retrouver la meme fonctionnalite a l'aide du mot cle : " << finl;
-      Cerr << "  Perte_charge_anisotrope (voir doc) " << finl;
+      Cerr << " PQ : 17/06/08: This option has been removed from Perte_Charge_Reguliere_VEF_P1NC" << finl;
+      Cerr << " It is possible to recover the same functionality using the keyword: " << finl;
+      Cerr << "  Perte_charge_anisotrope (see doc) " << finl;
       exit();
     }
 
@@ -228,9 +228,9 @@ void  Perte_Charge_Reguliere_VEF_P1NC::contribuer_a_avec(const DoubleTab&, Matri
 
   if (couronne_tube == 1)
     {
-      Cerr << " PQ : 17/06/08 : Cette option a ete supprimee dans Perte_Charge_Reguliere_VEF_P1NC" << finl;
-      Cerr << " Possibilite de retrouver la meme fonctionnalite a l'aide du mot cle : " << finl;
-      Cerr << "  Perte_charge_anisotrope (voir doc) " << finl;
+      Cerr << " PQ : 17/06/08: This option has been removed from Perte_Charge_Reguliere_VEF_P1NC" << finl;
+      Cerr << " It is possible to recover the same functionality using the keyword: " << finl;
+      Cerr << "  Perte_charge_anisotrope (see doc) " << finl;
       exit();
     }
 

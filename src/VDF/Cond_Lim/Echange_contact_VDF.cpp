@@ -255,8 +255,8 @@ void Echange_contact_VDF::calculer_h_autre_pb(DoubleTab& tab,double invhparoi,in
   if (tab.dimension(0)!=nb_faces_raccord1
       ||tab.dimension(1)!=nb_comp)
     {
-      Cerr << "Dans Echange_contact_VDF::calculer_h_autre_pb, tab n'est plus dimensionne." << finl;
-      Cerr << "Le dimensionnement est fait dans Echange_contact_VDF::initialiser." << finl;
+      Cerr << "In Echange_contact_VDF::calculer_h_autre_pb, tab is no longer dimensioned." << finl;
+      Cerr << "Dimensioning is done in Echange_contact_VDF::initialiser." << finl;
       exit();
     }
   if (domaine_dis1.domaine().raccord(nom_racc1)->que_suis_je() =="Raccord_distant_homogene")

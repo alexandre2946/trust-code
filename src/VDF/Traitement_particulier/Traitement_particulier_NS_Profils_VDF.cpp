@@ -496,7 +496,7 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
 
 
 
-  // Impression dans le Cerr pour verifications
+  // Print to Cerr for verification
   Cerr << finl;
   Cerr << "       UPPER/LOWER BOUNDS FOR PROFILES :" << finl;
   for(i=0; i<n_probes; i++)
@@ -534,8 +534,8 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
                       {
                         if (j==Nap)
                           {
-                            Cerr << "Erreur dans la valeur du nombre de points pour le traitement particulier"<<finl;
-                            Cerr <<"qui est trop petite dans votre jeu de donnees=" << Nap << finl;
+                            Cerr << "Error in the number of points value for the particular treatment"<<finl;
+                            Cerr <<"which is too small in your data set=" << Nap << finl;
                             exit();
                           }
                         if(est_egal(y,Yu_m(i,j)))
@@ -563,8 +563,8 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
                       {
                         if (j==Nap)
                           {
-                            Cerr << "Erreur dans la valeur du nombre de points pour le traitement particulier"<<finl;
-                            Cerr <<"qui est trop petite dans votre jeu de donnees=" << Nap << finl;
+                            Cerr << "Error in the number of points value for the particular treatment"<<finl;
+                            Cerr <<"which is too small in your data set=" << Nap << finl;
                             exit();
                           }
                         if(est_egal(y,Yu_p(i,j)))
@@ -597,8 +597,8 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
                       {
                         if (j==Nap)
                           {
-                            Cerr << "Erreur dans la valeur du nombre de points pour le traitement particulier"<<finl;
-                            Cerr <<"qui est trop petite dans votre jeu de donnees=" << Nap << finl;
+                            Cerr << "Error in the number of points value for the particular treatment"<<finl;
+                            Cerr <<"which is too small in your data set=" << Nap << finl;
                             exit();
                           }
                         if(est_egal(y,Yv_m(i,j)))
@@ -626,8 +626,8 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
                       {
                         if (j==Nap)
                           {
-                            Cerr << "Erreur dans la valeur du nombre de points pour le traitement particulier"<<finl;
-                            Cerr <<"qui est trop petite dans votre jeu de donnees=" << Nap << finl;
+                            Cerr << "Error in the number of points value for the particular treatment"<<finl;
+                            Cerr <<"which is too small in your data set=" << Nap << finl;
                             exit();
                           }
                         if(est_egal(y,Yv_p(i,j)))
@@ -660,8 +660,8 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
                       {
                         if (j==Nap)
                           {
-                            Cerr << "Erreur dans la valeur du nombre de points pour le traitement particulier"<<finl;
-                            Cerr <<"qui est trop petite dans votre jeu de donnees=" << Nap << finl;
+                            Cerr << "Error in the number of points value for the particular treatment"<<finl;
+                            Cerr <<"which is too small in your data set=" << Nap << finl;
                             exit();
                           }
                         if(est_egal(y,Yw_m(i,j)))
@@ -689,8 +689,8 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
                       {
                         if (j==Nap)
                           {
-                            Cerr << "Erreur dans la valeur du nombre de points pour le traitement particulier"<<finl;
-                            Cerr <<"qui est trop petite dans votre jeu de donnees=" << Nap << finl;
+                            Cerr << "Error in the number of points value for the particular treatment"<<finl;
+                            Cerr <<"which is too small in your data set=" << Nap << finl;
                             exit();
                           }
                         if(est_egal(y,Yw_p(i,j)))
@@ -713,18 +713,18 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
               }
             default :
               {
-                Cerr << "Cas de figure impossible..." << finl;
+                Cerr << "Impossible case..." << finl;
                 exit();
                 break;
               }
-            }//Fin du switch
-        }//Fin de boucle sur faces
+            }//End of switch
+        }//End loop over faces
 
 
-      //Boucle sur les elements pour table de correspondance pour nu_t et temperature
+      //Loop over elements for correspondence table for nu_t and temperature
       for (num_elem=0; num_elem<nb_elems; num_elem++)
         {
-          //Point avant
+          //Point before
           if(xp(num_elem,dir_profil)==xUVm(i))
             {
               y = xp(num_elem,3-homo_dir-dir_profil);

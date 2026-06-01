@@ -56,7 +56,7 @@ public:
   virtual void compute_nusselt() const =0;
   virtual void imprimer_nusselt(Sortie&) const
   {
-    Cerr << "imprimer_nusselt non code pour " << que_suis_je() << finl;
+    Cerr << "imprimer_nusselt not implemented for " << que_suis_je() << finl;
   }
   void imprimer_premiere_ligne_nusselt(int, const LIST(Nom)&, const Nom&) const;
   void imprimer_nusselt_mean_only(Sortie&, int, const LIST(Nom)&, const Nom&) const;

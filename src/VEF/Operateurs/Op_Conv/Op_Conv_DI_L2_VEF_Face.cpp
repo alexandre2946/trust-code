@@ -72,7 +72,7 @@ void flora(DoubleTab A, int& N , DoubleVect B, DoubleVect& U, int& test_flora)
         }
       else
         {
-          Cerr<<"Erreur flora: matrice non inversible a l'indice "<<m<<finl;
+          Cerr<<"Error flora: non-invertible matrix at index "<<m<<finl;
           test_flora = 1;
         }
 
@@ -92,7 +92,7 @@ void flora(DoubleTab A, int& N , DoubleVect B, DoubleVect& U, int& test_flora)
     }
   else
     {
-      Cerr<<"Erreur flora: matrice non inversible a l'indice"<<N-1<<finl;
+      Cerr<<"Error flora: non-invertible matrix at index"<<N-1<<finl;
       test_flora = 1;
     }
 }
@@ -129,10 +129,10 @@ void flora_p(DoubleTab& A, int& N, DoubleVect& B, DoubleVect& U, int& test_flora
             }
           if(j == N)
             {
-              Cerr<<"Erreur flora: matrice non inversible a l'indice "<<m<<finl;
+              Cerr<<"Error flora: non-invertible matrix at index "<<m<<finl;
               test_flora = 1;
             }
-          else         //echange des colonnes m et j
+          else         //swap columns m and j
             {
               for(i=0; i<N; i++)
                 {
@@ -164,7 +164,7 @@ void flora_p(DoubleTab& A, int& N, DoubleVect& B, DoubleVect& U, int& test_flora
     }
   else
     {
-      //Cerr<<"Erreur flora: matrice non inversible a l'indice"<<N-1<<finl;
+      //Cerr<<"Error flora: non-invertible matrix at index"<<N-1<<finl;
       test_flora = 0;
     }
 }
@@ -253,18 +253,18 @@ void qrsolv( DoubleTab& A, int& N, DoubleVect& B, DoubleVect& X, int& sing,
       rsolv(A, N, D, B);//resout Rx=QtB
       for(i=0; i<N; i++)        X(i) = B(i);
     }
-  //else        Cerr<<"erreur"<<finl;
+  //else        Cerr<<"error"<<finl;
 }
 
 
 
 
-//methode du gradient biconjugue
+//biconjugate gradient method
 void gradient_biconjugue(DoubleTab A, int n, DoubleVect b, DoubleVect& x, int& sing, int& niter)
 {
   if (Process::is_parallel())
     {
-      Cerr << "OpVEF_DI_L2.cpp: gradient_biconjugue() n'est pas parallele" << finl;
+      Cerr << "OpVEF_DI_L2.cpp: gradient_biconjugue() is not parallel" << finl;
       assert(0);
       Process::exit();
     }

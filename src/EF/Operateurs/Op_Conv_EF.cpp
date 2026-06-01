@@ -76,7 +76,7 @@ Entree& Op_Conv_EF::readOn(Entree& s )
 
   if (!(type_op_lu=="amont") &&  !(type_op_lu=="centre")  &&  !(type_op_lu=="amont3")&&!(type_op_lu=="btd"))
     {
-      Cerr << type_op_lu << " n'est pas compris par " << que_suis_je() << finl;
+      Cerr << type_op_lu << " is not understood by " << que_suis_je() << finl;
       Cerr << " choisir parmi : amont -btd - centre " << finl;
       exit();
     }

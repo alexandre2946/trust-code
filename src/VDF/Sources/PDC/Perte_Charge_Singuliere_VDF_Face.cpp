@@ -62,9 +62,9 @@ void Perte_Charge_Singuliere_VDF_Face::remplir_num_faces(Entree& s)
   int nfac_tot = static_cast<int>(mp_sum(num_faces.size()));
   if (nfac_tot==0)
     {
-      Cerr << "Erreur a la lecture des donnees de la perte de charge singuliere :" << finl;
-      Cerr << " la surface sur laquelle vous avez defini une perte de charge" << finl;
-      Cerr << " ne contient entierement aucune des faces de la geometrie " <<  finl;
+      Cerr << "Error reading the data of the singular pressure drop:" << finl;
+      Cerr << " the surface on which you have defined a pressure drop" << finl;
+      Cerr << " does not entirely contain any faces of the geometry " <<  finl;
       exit();
     }
 
@@ -73,9 +73,9 @@ void Perte_Charge_Singuliere_VDF_Face::remplir_num_faces(Entree& s)
       int ori = domaine_VDF.orientation(num_faces[0]);
       if (ori != direction_perte_charge())
         {
-          Cerr << "Erreur a la lecture des donnees de la perte de charge singuliere : " << finl;
-          Cerr << " l'orientation de la surface est differente de la direction" << finl;
-          Cerr << " de la perte de charge" << finl;
+          Cerr << "Error reading the data of the singular pressure drop: " << finl;
+          Cerr << " the orientation of the surface is different from the direction" << finl;
+          Cerr << " of the pressure drop" << finl;
           exit();
         }
     }

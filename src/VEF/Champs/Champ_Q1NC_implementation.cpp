@@ -164,8 +164,8 @@ DoubleTab& Champ_Q1NC_implementation::valeur_aux_elems(const DoubleTab& position
 
   if (val.nb_dim() > 2)
     {
-      Cerr << "Erreur TRUST dans Champ_Q1NC_implementation::valeur_aux_elems()\n";
-      Cerr << "Le DoubleTab val a plus de 2 entrees\n";
+      Cerr << "TRUST Error in Champ_Q1NC_implementation::valeur_aux_elems()\n";
+      Cerr << "The DoubleTab val has more than 2 dimensions\n";
       Process::exit();
     }
 
@@ -317,8 +317,8 @@ DoubleTab& Champ_Q1NC_implementation::remplir_coord_noeuds(DoubleTab& noeuds) co
     noeuds.ref(xv);
   else
     {
-      Cerr << "Erreur dans Champ_Q1NC_implementation::remplir_coord_noeuds()" << finl;
-      Cerr << "Les centres de gravite des faces n'ont pas ete calcules" << finl;
+      Cerr << "Error in Champ_Q1NC_implementation::remplir_coord_noeuds()" << finl;
+      Cerr << "The face centers of gravity have not been computed" << finl;
       Process::exit();
     }
   return noeuds;

@@ -220,14 +220,14 @@ void Tri_VEF::modif_volumes_entrelaces(int j,int elem,
   switch(type_cl)
     {
 
-      // pas de Face de Dirichlet : impossible
+      // no Dirichlet face: impossible
     case 0:
       {
-        Cerr << "Tri_VEF::modif_volumes_entrelaces() type 0 impossible!\n";
+        Cerr << "Tri_VEF::modif_volumes_entrelaces() type 0 not possible!\n";
         break;
       }
 
-    case 1: // une Face de Dirichlet : Face 2
+    case 1: // one Dirichlet face: Face 2
       {
         surf_mod = volumes_entrelaces[j]/2 ;
         volumes_entrelaces_Cl[elem_faces(elem,0)]  += surf_mod;
@@ -277,15 +277,15 @@ void Tri_VEF::modif_volumes_entrelaces(int j,int elem,
 
     default :
       {
-        Cerr << "\n  type inconnu Tri_VEF::modif_volumes_entrelaces: " << type_cl ;
+        Cerr << "\n  unknown type in Tri_VEF::modif_volumes_entrelaces: " << type_cl ;
         exit();
       }
 
-    } // fin du switch
+    } // end switch
 
 }
 
-/*! @brief modifie les volumes entrelaces pour la face joint j d'un elem non standard
+/*! @brief Modifies the interlaced volumes for joint face j of a non-standard element.
  *
  */
 void Tri_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
@@ -302,14 +302,14 @@ void Tri_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
   switch(type_cl)
     {
 
-      // pas de Face de Dirichlet : impossible
+      // no Dirichlet face: impossible
     case 0:
       {
-        Cerr << "Tri_VEF::modif_volumes_entrelaces() type 0 impossible!\n";
+        Cerr << "Tri_VEF::modif_volumes_entrelaces() type 0 not possible!\n";
         break;
       }
 
-    case 1: // une Face de Dirichlet : Face 2
+    case 1: // one Dirichlet face: Face 2
       {
         surf_mod = volumes_entrelaces[j]/2 ;
         face=elem_faces(elem,0);
@@ -377,11 +377,11 @@ void Tri_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
 
     default :
       {
-        Cerr << "\n  type inconnu Tri_VEF::modif_volumes_entrelaces: " << type_cl ;
+        Cerr << "\n  unknown type in Tri_VEF::modif_volumes_entrelaces: " << type_cl ;
         exit();
       }
 
-    } // fin du switch
+    } // end switch
 
 }
 

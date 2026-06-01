@@ -183,11 +183,11 @@ void  Op_Diff_VDF_Face_Axi_base::ajouter_aretes_bords(const DoubleTab& inco, Dou
               }
             break;
           }
-        case TypeAreteBordVDF::NAVIER_NAVIER: // pas de flux diffusif calcule
+        case TypeAreteBordVDF::NAVIER_NAVIER: // no diffusive flux computed
           break;
         default :
           {
-            Cerr << "On a rencontre un type d'arete non prevu : [ num arete : " << n_arete << " ], [ type : " << n_type << " ]" << finl;
+            Cerr << "Encountered an unexpected edge type: [ edge num: " << n_arete << " ], [ type: " << n_type << " ]" << finl;
             Process::exit();
             break;
           }
@@ -458,11 +458,11 @@ void Op_Diff_VDF_Face_Axi_base::ajouter_contribution_aretes_bords(Matrice_Morse&
               }
             break;
           }
-        case TypeAreteBordVDF::NAVIER_NAVIER: // pas de flux diffusif calcule
+        case TypeAreteBordVDF::NAVIER_NAVIER: // no diffusive flux computed
           break;
         default :
           {
-            Cerr << "On a rencontre un type d'arete non prevu : [ num arete : " << n_arete << " ], [ type : " << n_type << " ]" << finl;
+            Cerr << "Encountered an unexpected edge type: [ edge num: " << n_arete << " ], [ type: " << n_type << " ]" << finl;
             Process::exit();
             break;
           }
@@ -654,11 +654,11 @@ void Op_Diff_VDF_Face_Axi_base::contribue_au_second_membre(DoubleTab& resu) cons
               }
             break;
           }
-        case TypeAreteBordVDF::NAVIER_NAVIER: // pas de flux diffusif calcule
+        case TypeAreteBordVDF::NAVIER_NAVIER: // no diffusive flux computed
           break;
         default :
           {
-            Cerr << "On a rencontre un type d'arete non prevu : [ num arete : " << n_arete << " ], [ type : " << n_type << " ]" << finl;
+            Cerr << "Encountered an unexpected edge type: [ edge num: " << n_arete << " ], [ type: " << n_type << " ]" << finl;
             Process::exit();
             break;
           }

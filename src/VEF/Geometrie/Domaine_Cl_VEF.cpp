@@ -118,32 +118,32 @@ void Domaine_Cl_VEF::completer(const Domaine_dis_base& un_domaine_dis)
     }
   else
     {
-      Cerr << "Domaine_Cl_VEF::completer() prend comme argument un Domaine_VEF " << finl;
+      Cerr << "Domaine_Cl_VEF::completer() expects a Domaine_VEF argument " << finl;
       exit();
     }
 }
 
-/*! @brief appele par completer() : remplissage de type_elem_Cl_ et volumes_entrelaces_Cl_
+/*! @brief Called by completer(): fills type_elem_Cl_ and volumes_entrelaces_Cl_.
  *
  */
 void Domaine_Cl_VEF::remplir_volumes_entrelaces_Cl(const Domaine_VEF& le_dom_VEF)
 {
-  Cerr << "On passe dans Domaine_Cl_VEF::remplir_volumes_entrelaces" << finl;
+  Cerr << "Entering Domaine_Cl_VEF::remplir_volumes_entrelaces" << finl;
   const Domaine_VEF& z = ref_cast(Domaine_VEF, le_dom_VEF);
 
-  // On etendre les volumes de controles sur les faces non standard. Uniquement en conduction pour l'instant ou en P0 seul
+  // Extend control volumes on non-standard faces. Only in conduction for now or in P0-only mode
   if ((z.get_modif_div_face_dirichlet()) || sub_type(Conduction, equation()) || (z.get_alphaE() && !z.get_alphaS() && !z.get_alphaA()))
     {
       const DoubleVect& volumes_entrelaces = le_dom_VEF.volumes_entrelaces();
       const IntVect& rang_elem = le_dom_VEF.rang_elem_non_std();
 
-      // Initialisation du tableau volumes_entrelaces_Cl
-      // a priori les faces non standard ne sont pas touchees par les C.L
+      // Initialise the volumes_entrelaces_Cl array
+      // non-standard faces are not a priori touched by boundary conditions
 
       for (int i = 0; i < le_dom_VEF.nb_faces_non_std(); i++)
         volumes_entrelaces_Cl_[i] = volumes_entrelaces(i);
 
-      // Calcul des valeurs des volumes entrelaces modifiees par les C.L:
+      // Compute the interlaced volumes modified by boundary conditions:
 
       int nb_poly_tot = le_dom_VEF.domaine().nb_elem_tot();
       ArrOfInt poly_fait(nb_poly_tot);
@@ -193,16 +193,16 @@ void Domaine_Cl_VEF::remplir_volumes_entrelaces_Cl(const Domaine_VEF& le_dom_VEF
   else
     {
       const DoubleVect& volumes_entrelaces = le_dom_VEF.volumes_entrelaces();
-      // Initialisation du tableau volumes_entrelaces_Cl a priori les faces non standard ne sont pas touchees par les C.L
+      // Initialization of the volumes_entrelaces_Cl array: non-standard faces are a priori not affected by boundary conditions
       for (int i = 0; i < le_dom_VEF.nb_faces_non_std(); i++)
         volumes_entrelaces_Cl(i) = volumes_entrelaces(i);
-      Cerr << "Fin creation esp. virtuel volumes_entrelaces_Cl_" << finl;
+      Cerr << "End of virtual space creation for volumes_entrelaces_Cl_" << finl;
     }
 }
 
-/*! @brief appele par completer() : remplissage de normales_facettes_Cl_ et vecteur_face_caette_Cl_
+/*! @brief Called by completer(): fills normales_facettes_Cl_ and vecteur_face_facette_Cl_.
  *
- *  CHANGER LE NOM
+ *  RENAME THIS METHOD
  *
  */
 void Domaine_Cl_VEF::remplir_normales_facettes_Cl(const Domaine_VEF& le_dom_VEF)
@@ -336,7 +336,7 @@ void Domaine_Cl_VEF::remplir_type_elem_Cl(const Domaine_VEF& le_dom_VEF)
                 if (elem_faces(elem, numero1) == j)
                   numero2 = numero1;
               if (numero2 == -1)
-                Cerr << "Domaine_Cl_VEF::creer_type_elem_Cl() PAS POSSIBLE!! " << finl;
+                Cerr << "Domaine_Cl_VEF::creer_type_elem_Cl() NOT POSSIBLE!! " << finl;
               num_elem = rang_elem(elem);
               assert(num_elem != -1);
               if (sub_type(Tri_VEF,le_dom_VEF.type_elem()) || sub_type(Tetra_VEF, le_dom_VEF.type_elem()))
@@ -345,7 +345,7 @@ void Domaine_Cl_VEF::remplir_type_elem_Cl(const Domaine_VEF& le_dom_VEF)
                 type_elem_Cl_[num_elem] += trois_puissance((int) (nfac - 1 - numero2));
               else
                 {
-                  Cerr << "erreur dans Domaine_Cl_VEF::remplir_type_elem_Cl mauvais typage d'element " << finl;
+                  Cerr << "error in Domaine_Cl_VEF::remplir_type_elem_Cl wrong element type " << finl;
                   exit();
                 }
 
@@ -534,7 +534,7 @@ void Domaine_Cl_VEF::imposer_cond_lim(Champ_Inc_base& ch, double temps)
               CDoubleTabView face_normales = domaine_vef().face_normales().view_ro();
               if (nb_comp != dimension)
                 {
-                  Cerr << "Cas non prevu dans Domaine_Cl_VEF::imposer_cond_lim." << finl;
+                  Cerr << "Case not handled in Domaine_Cl_VEF::imposer_cond_lim." << finl;
                   exit();
                 }
               else
@@ -564,13 +564,13 @@ void Domaine_Cl_VEF::imposer_cond_lim(Champ_Inc_base& ch, double temps)
     }
   else
     {
-      Cerr << "Le type de OWN_PTR(Champ_Inc_base) " << ch.que_suis_je() << " n'est pas prevu en VEF\n" << finl;
+      Cerr << "The type of OWN_PTR(Champ_Inc_base) " << ch.que_suis_je() << " is not handled in VEF\n" << finl;
       exit();
     }
   ch_tab.echange_espace_virtuel();
 
-  // PARTIE PRESSION
-  // dans le cas Navier stokes et si la condition est forte en pression aux sommets on impose la valeur aux sommets
+  // PRESSURE PART
+  // In the Navier-Stokes case and if the pressure BC is imposed strongly at vertices, impose the pressure values at vertices
   if (sub_type(Navier_Stokes_std, ch.equation()))
     {
       const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, equation().domaine_dis());
@@ -702,7 +702,7 @@ int Domaine_Cl_VEF::initialiser(double temps)
     {
       if (modif_perio_fait_ == 0)
         {
-          Cerr << "modification du Domaine_Cl_VEF pour periodicite" << finl;
+          Cerr << "Updating Domaine_Cl_VEF for periodicity" << finl;
           const Domaine_VEF& le_dom_VEF = ref_cast(Domaine_VEF, domaine_dis());
           const DoubleVect& volumes_entrelaces = le_dom_VEF.volumes_entrelaces();
           remplir_volumes_entrelaces_Cl(le_dom_VEF);

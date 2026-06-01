@@ -81,7 +81,7 @@ Entree& Traitement_particulier_NS_EC::lire(Entree& is)
                   is >> motlu;
                   if (motlu!="periode")
                     {
-                      Cerr<<"On attendait le mot cle periode apres " << les_mots[rang] << "."<<finl;
+                      Cerr<<"We expected the keyword periode after " << les_mots[rang] << "."<<finl;
                       exit();
                     }
                   is >> periode;
@@ -89,9 +89,9 @@ Entree& Traitement_particulier_NS_EC::lire(Entree& is)
                 }
               default :
                 {
-                  Cerr << "Erreur dans la lecture de Traitement_particulier_NS_EC";
-                  Cerr << "Les mots cles possibles sont "<< les_mots <<" { et }" << finl;
-                  Cerr << "Vous avez lu :" << motlu << finl;
+                  Cerr << "Error while reading Traitement_particulier_NS_EC";
+                  Cerr << "Possible keywords are "<< les_mots <<" { and }" << finl;
+                  Cerr << "You read:" << motlu << finl;
                   exit();
                   break;
                 }
@@ -101,16 +101,16 @@ Entree& Traitement_particulier_NS_EC::lire(Entree& is)
         is >> motlu;
         if (motlu != accfermee)
           {
-            Cerr << "Erreur dans la lecture de Traitement_particulier_NS_EC";
-            Cerr << "On attendait une }" << finl;
+            Cerr << "Error while reading Traitement_particulier_NS_EC";
+            Cerr << "We expected a }" << finl;
             exit();
           }
       }
     }
   else
     {
-      Cerr << "Erreur dans la lecture de Traitement_particulier_NS_EC";
-      Cerr << "On attendait une {" << finl;
+      Cerr << "Error while reading Traitement_particulier_NS_EC";
+      Cerr << "We expected a {" << finl;
       exit();
     }
   return is;
@@ -214,28 +214,28 @@ static double trait_part_calculer_ec_faces(const int         face_debut,
       double volume;
       if (nb_dim_1)
         {
-          // Une composante de vitesse a la face (VDF)
+          // One velocity component at the face (VDF)
           const double v = vitesse(face);
           if (repere_mobile_)
             {
-              Cerr << "Le codage de l'energie cinetique calculee dans un repere fixe" <<finl;
-              Cerr << "n'est pas fait en VDF." << finl;
-              Process::exit(); // En effet probleme de conception, il faudrait avoir l'orientation des faces VDF
+              Cerr << "The computation of kinetic energy in a fixed frame" <<finl;
+              Cerr << "is not implemented in VDF." << finl;
+              Process::exit(); // Indeed, a design issue: the orientation of VDF faces would be needed
             }
           v2 = v * v;
-          // En VDF, sur les frontieres, on ne prend que le 1/2 volume entrelace
+          // In VDF, at boundaries, only half the staggered volume is taken
           volume = (frontiere ? 0.5 : 1) * volumes_entrelaces(face);
         }
       else
         {
-          // Deux ou trois composantes (VEFP1B)
+          // Two or three components (VEFP1B)
           v2 = 0.;
           for (int i = 0; i < dim; i++)
             {
               const double v_i = vitesse(face, i);
               v2 += (v_i + ve[i]) * (v_i + ve[i]);
             }
-          // En VEF, cela est incorrect, il faudrait les volumes etendus:
+          // In VEF, this is incorrect; extended volumes should be used:
           volume = volumes_entrelaces(face);
         }
       const int k = (masse_volumique.dimension(0)==1) ? 0 : face;
@@ -297,11 +297,11 @@ void Traitement_particulier_NS_EC::calculer_Ec(double& energie_cinetique)
         }
       if (!ok)
         {
-          Cerr << "Vous ne pouvez calculer l'energie cinetique dans un repere fixe" << finl;
-          Cerr << "que si le repere de calcul est mobile, c'est a dire que vous avez" << finl;
-          Cerr << "defini un terme source d'acceleration dans l'equation Navier Stokes." << finl;
-          Cerr << "Ou bien il manque dans ce terme source la definition de la vitesse" << finl;
-          Cerr << "du repere mobile dans le repere fixe. Modifier votre jeu de donnees." << finl;
+          Cerr << "You cannot compute kinetic energy in a fixed frame" << finl;
+          Cerr << "unless the calculation frame is moving, i.e. you have" << finl;
+          Cerr << "defined an acceleration source term in the Navier Stokes equation." << finl;
+          Cerr << "Or the definition of the velocity of the" << finl;
+          Cerr << "moving frame in the fixed frame is missing in this source term. Modify your data file." << finl;
           exit();
         }
     }
@@ -313,8 +313,8 @@ void Traitement_particulier_NS_EC::calculer_Ec(double& energie_cinetique)
       rho = champ_rho.valeurs();
       if (rho->dimension(0) != domaine_VF.nb_faces() || rho->line_size() != 1)
         {
-          Cerr << "Erreur dans Traitement_particulier_NS_EC::calculer_Ec" << finl;
-          Cerr << "le champ de masse volumique n'est pas un champ scalaire aux faces" << finl;
+          Cerr << "Error in Traitement_particulier_NS_EC::calculer_Ec" << finl;
+          Cerr << "the density field is not a scalar field at faces" << finl;
           Process::exit();
         }
     }

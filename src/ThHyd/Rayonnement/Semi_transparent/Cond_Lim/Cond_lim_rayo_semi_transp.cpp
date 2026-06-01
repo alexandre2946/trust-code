@@ -53,18 +53,18 @@ void Cond_lim_rayo_semi_transp::recherche_emissivite_et_A()
             }
           else
             {
-              Cerr<<"Erreur dans Frontiere_ouverte_rayo_semi_transp::recherche_emissivite_et_A()"<<finl;
-              Cerr<<"Les conditions a utiliser pour l'equation de rayonnement "<<finl;
-              Cerr<<"doivent forcement etre du type Flux_radiatif_base ou symetrie"<<finl;
+              Cerr<<"Error in Frontiere_ouverte_rayo_semi_transp::recherche_emissivite_et_A()"<<finl;
+              Cerr<<"The conditions to use for the radiation equation "<<finl;
+              Cerr<<"must necessarily be of type Flux_radiatif_base or symetrie"<<finl;
               Process::exit();
             }
         }
     }
   if (test_nom == 0)
     {
-      Cerr<<"Erreur dans Frontiere_ouverte_rayo_semi_transp::recherche_emissivite_et_A()"<<finl;
-      Cerr<<"Probleme de compatibilite entre les conditions de l'equation de"<<finl;
-      Cerr<<"rayonnement et l'equation de temperature"<<finl;
+      Cerr<<"Error in Frontiere_ouverte_rayo_semi_transp::recherche_emissivite_et_A()"<<finl;
+      Cerr<<"Compatibility problem between the conditions of the radiation equation"<<finl;
+      Cerr<<"and the temperature equation"<<finl;
       Process::exit();
     }
 }

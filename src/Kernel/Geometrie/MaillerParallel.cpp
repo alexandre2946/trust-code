@@ -757,7 +757,7 @@ Entree& MaillerParallel::interpreter(Entree& is)
       elem.typer("Hexaedre");
       break;
     default:
-      Cerr << "MaillerParallel::construire_domaine  erreur" << finl;
+      Cerr << "MaillerParallel::construire_domaine  error" << finl;
       exit();
     }
   elem->associer_domaine(domaine);

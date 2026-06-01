@@ -126,7 +126,7 @@ void Domaine_PolyMAC_CDO::init_equiv() const
   equiv_.resize(nb_faces_tot(), 2, e_f.dimension(1));
   equiv_ = -1;
 
-  Cerr << domaine().le_nom() << " : intializing equiv... " ;
+  Cerr << domaine().le_nom() << " : initializing equiv... " ;
 
   const bool is_PolyMAC_CDO = (que_suis_je() == "Domaine_PolyMAC_CDO");
 
@@ -211,7 +211,7 @@ void Domaine_PolyMAC_CDO::init_equiv() const
 
 void Domaine_PolyMAC_CDO::modifier_pour_Cl(const Conds_lim& conds_lim)
 {
-  Cerr << "Le Domaine_PolyMAC_CDO a ete rempli avec succes" << finl;
+  Cerr << "Le Domaine_PolyMAC_CDO has been filled successfully" << finl;
   //      calculer_h_carre();
 
   Journal() << "Domaine_PolyMAC_CDO::Modifier_pour_Cl" << finl;
@@ -450,23 +450,23 @@ int Domaine_PolyMAC_CDO::W_stabiliser(DoubleTab& W, DoubleTab& R, DoubleTab& N, 
               for (k = 0; k < n_f; k++)
                 if(idx(j, k) >= 0) C[idx(j, k)][il]  += Ws(i, j) * Ws(i, k);
             lb.push_back(l_min * (S(i) < l_min ? 1.1 : 1)), ub.push_back(l_max / (S(i) > l_max ? 1.1 : 1));
-            cv = 0, il++; //on repart avec une ligne en plus
+            cv = 0, il++; //restart with one additional row
           }
       osqp_cleanup(osqp), free(data.A);
     }
   free(data.P);
-  std::fesetenv(&fenv);     //remet les exceptions FP
+  std::fesetenv(&fenv);     //restore floating-point exceptions
 
   if (!cv)
     {
-      Cerr << "Matrice non stabilisee : attention le maillage est trop deforme!!" << finl;
-      return 0; //ca passe ou ca casse
+      Cerr << "Non-stabilized matrix: warning, the mesh is too deformed!!" << finl;
+      return 0; //pass or fail
     }
   if (spectre)
     for (i = 0; i < n_f; i++) spectre[1] = std::min(spectre[1], S(i)), spectre[3] = std::max(spectre[3], S(i));
 
-  //statistiques
-  //ctr[0] : diagonale, ctr[1] : symetrique
+  //statistics
+  //ctr[0]: diagonal, ctr[1]: symmetric
   for (i = 0, diag = 1; i < n_f; i++)
     for (j = 0; j < n_f; j++) diag &= (i == j || std::fabs(W(i, j)) < 1e-6);
   ctr[0] += diag, ctr[1] += sym;
@@ -775,23 +775,23 @@ void Domaine_PolyMAC_CDO::init_m1_2d() const
   CRIMP(m1deb), CRIMP(m1ji), CRIMP(m1ci);
 }
 
-//en 3D, c'est moins trivial...
+//in 3D, this is less trivial...
 void Domaine_PolyMAC_CDO::init_m1_3d() const
 {
   const IntTab& f_s = face_sommets_, &e_a = domaine().elem_aretes(), &e_f = elem_faces_;
   const DoubleVect& la = longueur_aretes_, &ve = volumes();
   int a, ab, i, j, k, e, f, s, s2, n_a;
 
-  Cerr << domaine().le_nom() << " : initialisation de m1... ";
+  Cerr << domaine().le_nom() << " : initializing m1... ";
   DoubleTab M, N;
 
-  /* tableau parallele */
+  /* parallel array */
   DoubleTrav m1e(0, e_a.dimension(1), e_a.dimension(1));
   domaine().creer_tableau_elements(m1e);
   std::map<int, int> idxa;
   for (e = 0; e < nb_elem(); e++)
     {
-      /* matrice non stabilisee : contribution par facette (couple face/arete) */
+      /* non-stabilized matrix: contribution per facet (face/edge pair) */
       for (i = 0, idxa.clear(), n_a = 0; i < e_a.dimension(1) && (a = e_a(e, i)) >= 0; i++) idxa[a] = i, n_a++;
       M.resize(n_a, n_a), N.resize(dimension, n_a);
       for (i = 0, M = 0; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++)

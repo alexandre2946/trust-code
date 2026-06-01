@@ -85,7 +85,7 @@ void Interpolation_IBM_mean_gradient_proto::computeSommetsVoisins(Domaine_dis_ba
             }
           else
             {
-              Cerr<<"erreur in computeSommetsVoisins : elem corresp_elemsref(elem) = "<<i<<" "<<corresp_elemsref(i)<<" ; indextag = "<<indextag<<" < 0 ou >= "<<dimtag<<finl;
+              Cerr<<"error in computeSommetsVoisins : elem corresp_elemsref(elem) = "<<i<<" "<<corresp_elemsref(i)<<" ; indextag = "<<indextag<<" < 0 or >= "<<dimtag<<finl;
               Process::exit();
             }
         }

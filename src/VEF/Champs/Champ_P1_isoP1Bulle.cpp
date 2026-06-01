@@ -213,10 +213,10 @@ DoubleTab& Champ_P1_isoP1Bulle::trace(const Frontiere_dis_base& fr, DoubleTab& x
 {
   if (!est_egal(temps_, tps))
     {
-      Cerr << "La methode Champ_P1_isoP1Bulle::trace effectue une interpolation des valeurs" << finl;
-      Cerr << "du champ dont on veut prendre la trace sur la frontiere" << finl;
-      Cerr << "Cette interpolation utilise par defaut les valeurs au temps present " << temps_ << finl;
-      Cerr << "de ce champ qui ne correspond pas au temps passe en parametre " << tps << finl;
+      Cerr << "The method Champ_P1_isoP1Bulle::trace performs an interpolation of the field values" << finl;
+      Cerr << "for which the trace on the boundary is requested" << finl;
+      Cerr << "This interpolation uses by default the values at the current time " << temps_ << finl;
+      Cerr << "of this field which does not match the time passed as parameter " << tps << finl;
       exit();
     }
   return Champ_P1iP1B_implementation::trace(fr, valeurs(tps), x, distant);
@@ -233,8 +233,8 @@ double Champ_P1_isoP1Bulle::valeur_au_bord(int face) const
   int elem = face_voisins(face, 0);
   if (face_voisins(face, 1) != -1)
     {
-      Cerr << "Erreur dans Champ_P1_isoP1Bulle::valeur_au_bord." << finl;
-      Cerr << "La face n'est pas une face de bord." << finl;
+      Cerr << "Error in Champ_P1_isoP1Bulle::valeur_au_bord." << finl;
+      Cerr << "The face is not a boundary face." << finl;
       Process::exit();
     }
 

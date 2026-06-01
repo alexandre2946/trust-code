@@ -106,9 +106,9 @@ Entree& Perte_Charge_Reguliere::lire_donnees(Entree& is)
       int rang = les_motcles.search(motlu);
       if (rang == -1)
         {
-          Cerr << "Erreur a la lecture des donnees de Perte_Charge_Reguliere" << finl;
-          Cerr << "On attendait l'un des mots cles" << les_motcles << finl;
-          Cerr << "a la place de " << motlu << finl;
+          Cerr << "Error reading Perte_Charge_Reguliere data" << finl;
+          Cerr << "Expected one of the keywords" << les_motcles << finl;
+          Cerr << "instead of " << motlu << finl;
           Process::exit();
         }
       else
@@ -125,9 +125,9 @@ Entree& Perte_Charge_Reguliere::lire_donnees(Entree& is)
       int rang = les_motcles.search(motlu);
       if (rang == -1)
         {
-          Cerr << "Erreur a la lecture des donnees de Perte_Charge_Reguliere" << finl;
-          Cerr << "On attendait l'un des mots cles" << les_motcles << finl;
-          Cerr << "a la place de " << motlu << finl;
+          Cerr << "Error reading Perte_Charge_Reguliere data" << finl;
+          Cerr << "Expected one of the keywords" << les_motcles << finl;
+          Cerr << "instead of " << motlu << finl;
           Process::exit();
         }
       else
@@ -138,8 +138,8 @@ Entree& Perte_Charge_Reguliere::lire_donnees(Entree& is)
       is >> motlu;
       if (motlu != "d")
         {
-          Cerr << "Erreur a la lecture des donnees de Perte_Charge_Reguliere" << finl;
-          Cerr << "On attendait le mot cle d a la place de " << motlu << finl;
+          Cerr << "Error reading Perte_Charge_Reguliere data" << finl;
+          Cerr << "Expected keyword d instead of " << motlu << finl;
           Process::exit();
         }
       else
@@ -153,14 +153,14 @@ Entree& Perte_Charge_Reguliere::lire_donnees(Entree& is)
 
       if(dimension!=2)
         {
-          // Une Couronne en 2D seulement !
-          Cerr << "Une couronne est en 2D seulement : en dim 3 Tube "<< finl;
+          // A ring (couronne) is in 2D only!
+          Cerr << "A ring (couronne) is in 2D only: in 3D use Tube "<< finl;
           Process::exit();
         }
       is >> motlu;
       if(motlu!=Motcle("Origine"))
         {
-          Cerr << "On attendait le mot cle ORIGINE " << finl;
+          Cerr << "Expected keyword ORIGINE" << finl;
           Process::exit();
         }
 
@@ -168,8 +168,8 @@ Entree& Perte_Charge_Reguliere::lire_donnees(Entree& is)
       is >> motlu;
       if (motlu != "d")
         {
-          Cerr << "Erreur a la lecture des donnees de Perte_Charge_Reguliere" << finl;
-          Cerr << "On attendait le mot cle d a la place de " << motlu << finl;
+          Cerr << "Error reading Perte_Charge_Reguliere data" << finl;
+          Cerr << "Expected keyword d instead of " << motlu << finl;
           Process::exit();
         }
       else
@@ -186,21 +186,21 @@ Entree& Perte_Charge_Reguliere::lire_donnees(Entree& is)
       couronne_tube = 1 ;
       if(dimension!=3)
         {
-          // Un tube en 3D seulement !
-          Cerr << "Un tube est en 3D seulement : en dim 2 couronne "<< finl;
+          // A tube is in 3D only!
+          Cerr << "A tube is in 3D only: in 2D use couronne "<< finl;
           Process::exit();
         }
       is >> motlu;
       if(motlu!=Motcle("Origine"))
         {
-          Cerr << "On attendait le mot cle ORIGINE " << finl;
+          Cerr << "Expected keyword ORIGINE" << finl;
           Process::exit();
         }
       is >> xo >> yo >> zo;
       is >> motlu;
       if(motlu!=Motcle("DIR"))
         {
-          Cerr << "On attendait la direction du tube, mot cle : DIR " << finl;
+          Cerr << "Expected the tube direction keyword: DIR" << finl;
           Process::exit();
         }
       int idir;
@@ -224,14 +224,14 @@ Entree& Perte_Charge_Reguliere::lire_donnees(Entree& is)
           break;
         default:
           h0=-1;
-          Cerr << "DIR vaut 0 pour tube // OX ; 1 pour un tube // OY et 2 pour un tube // OZ " << finl;
+          Cerr << "DIR is 0 for tube // OX ; 1 for a tube // OY and 2 for a tube // OZ " << finl;
           Process::exit();
         }
       is >> motlu;
       if (motlu != "d")
         {
-          Cerr << "Erreur a la lecture des donnees de Perte_Charge_Reguliere" << finl;
-          Cerr << "On attendait le mot cle d a la place de " << motlu << finl;
+          Cerr << "Error reading Perte_Charge_Reguliere data" << finl;
+          Cerr << "Expected keyword d instead of " << motlu << finl;
           Process::exit();
         }
       else
@@ -243,13 +243,13 @@ Entree& Perte_Charge_Reguliere::lire_donnees(Entree& is)
     }
   else
     {
-      Cerr << "Erreur a la lecture des donnees de Perte_Charge_Reguliere" << finl;
-      Cerr << "On attendait le mot cle longitudinale ou transversale ou couronne(en 2D) ou tube(en 3D)" << finl;
-      Cerr << "a la place de " << motlu << finl;
+      Cerr << "Error reading Perte_Charge_Reguliere data" << finl;
+      Cerr << "Expected keyword longitudinale or transversale or couronne (2D) or tube (3D)" << finl;
+      Cerr << "instead of " << motlu << finl;
       Process::exit();
     }
 
-  // Lecture obligatoire de a_ et b_ :
+  // Mandatory reading of a_ and b_:
   int err=0;
   is >> motlu;
   if (motlu == "A")
@@ -278,11 +278,11 @@ Entree& Perte_Charge_Reguliere::lire_donnees(Entree& is)
     {
       if (!Cf_utilisateur)
         {
-          Cerr << "Erreur a la lecture des donnees de Perte_Charge_Reguliere" << finl;
-          Cerr << "Il faut desormais specifier les valeurs de la loi de la perte de charge :" << finl;
-          Cerr << "Exemple : Perte_Charge_Reguliere longitudinale X val A val B val" << finl;
-          Cerr << "Avec A et B, pour une loi de perte de charge en A.Re**(-B)" << finl;
-          Cerr << "Pour la loi de Blasius : A=0.316, B=0.25" << finl;
+          Cerr << "Error reading Perte_Charge_Reguliere data" << finl;
+          Cerr << "You must now specify the values of the pressure drop law:" << finl;
+          Cerr << "Example: Perte_Charge_Reguliere longitudinale X val A val B val" << finl;
+          Cerr << "With A and B, for a pressure drop law A.Re**(-B)" << finl;
+          Cerr << "For Blasius law: A=0.316, B=0.25" << finl;
           Process::exit();
         }
     }

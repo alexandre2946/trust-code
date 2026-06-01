@@ -208,8 +208,8 @@ Entree& Traitement_particulier_NS_Profils::lire(Entree& is)
   if ((oui_profil_nu_t!=1)&&(oui_repr_nu_t!=0))
     {
       Cerr << "User asked for time statistics on nu_t :" << finl;
-      Cerr << "pour cela il faut egalement demander le calcul des stats spatiales," << finl;
-      Cerr << "puisque il est necessaire au calcul des stats temp." << finl;
+      Cerr << "to do so, you also need to request the computation of space statistics," << finl;
+      Cerr << "since it is necessary for computing the temporal stats." << finl;
       exit();
     }
   return is;
@@ -328,16 +328,16 @@ void Traitement_particulier_NS_Profils::reprendre_stat()
             {
               if (ti > temps_deb)
                 {
-                  Cerr << "pb de reprise des stats de la vitesse!!" << finl;
-                  Cerr << "Le temps de debut des stats demande " << temps_deb  << finl;
-                  Cerr << "est inferieur a celui de debut des stats sauvees !" << ti << finl;
+                  Cerr << "problem resuming velocity stats!!" << finl;
+                  Cerr << "The requested start time for stats " << temps_deb  << finl;
+                  Cerr << "is less than the start time of the saved stats!" << ti << finl;
                   exit();
                 }
               else
                 {
                   if (temps_deb>=tps)
                     {
-                      Cerr << "On recommence le calcul des stats de la vitesse a partir de t=" << temps_deb << "s" << finl;
+                      Cerr << "Restarting velocity stats computation from t=" << temps_deb << "s" << finl;
                       u_moy_temp_x = 0.;
                       u_moy_temp_y = 0.;
                       u_moy_temp_z = 0.;
@@ -349,14 +349,14 @@ void Traitement_particulier_NS_Profils::reprendre_stat()
                     }
                   else
                     {
-                      Cerr << "On a deja depasse le temps auquel vous voulez commencer les stats!!" << finl;
+                      Cerr << "The time at which you want to start stats has already been passed!!" << finl;
                       exit();
                     }
                 }
             }
           else
             {
-              Cerr << "On continue le calcul des stats de la vitesse, debute a t=" <<  ti << "s" << finl;
+              Cerr << "Continuing velocity stats computation, started at t=" <<  ti << "s" << finl;
               temps_deb = ti;
             }
         }
@@ -364,12 +364,12 @@ void Traitement_particulier_NS_Profils::reprendre_stat()
         {
           if (tps<=temps_deb)
             {
-              Cerr << "On n a pas encore debute le calcul des stats" << finl;
+              Cerr << "Stats computation has not started yet" << finl;
               oui_repr = 0;
             }
           else
             {
-              Cerr << "Il faut donner le fichier pour reprendre les stats!!" << finl;
+              Cerr << "You must provide the file to resume the stats!!" << finl;
               exit();
             }
         }
@@ -391,7 +391,7 @@ void Traitement_particulier_NS_Profils::reprendre_stat()
               ficu >> ti2 ;
               if (ti2!=ti)
                 {
-                  Cerr << "Pbs : les stats de nut et de la vitesse sont decalees!!" << finl;
+                  Cerr << "Problem : the nut stats and velocity stats are misaligned!!" << finl;
                   exit();
                 }
               Cerr << "ti2=" << ti2 << finl;
@@ -401,29 +401,29 @@ void Traitement_particulier_NS_Profils::reprendre_stat()
                 {
                   if (ti2 > temps_deb)
                     {
-                      Cerr << "pb de reprise des stats de nu_t!!" << finl;
-                      Cerr << "Le temps de debut des stats demande " << temps_deb  << finl;
-                      Cerr << "est inferieur a celui de debut des stats sauvees !" << ti << finl;
+                      Cerr << "problem resuming nu_t stats!!" << finl;
+                      Cerr << "The requested start time for stats " << temps_deb  << finl;
+                      Cerr << "is less than the start time of the saved stats!" << ti << finl;
                       exit();
                     }
                   else
                     {
                       if (temps_deb>=tps)
                         {
-                          Cerr << "On recommence le calcul des stats de nu_t a partir de t=" << temps_deb << "s" << finl;
+                          Cerr << "Restarting nu_t stats computation from t=" << temps_deb << "s" << finl;
                           nu_t_temp = 0.;
                           oui_repr_nu_t = 0;
                         }
                       else
                         {
-                          Cerr << "On a deja depasse le temps auquel vous voulez commencer les stats !" << finl;
+                          Cerr << "The time at which you want to start stats has already been passed!" << finl;
                           exit();
                         }
                     }
                 }
               else
                 {
-                  Cerr << "On continue le calcul des stats de nu_t, debute a t=" <<  ti << "s" << finl;
+                  Cerr << "Continuing nu_t stats computation, started at t=" <<  ti << "s" << finl;
                   temps_deb = ti2;
                 }
             }
@@ -431,12 +431,12 @@ void Traitement_particulier_NS_Profils::reprendre_stat()
             {
               if (tps<=temps_deb)
                 {
-                  Cerr << "On n a pas encore debute le calcul des stats" << finl;
+                  Cerr << "Stats computation has not started yet" << finl;
                   oui_repr_nu_t = 0;
                 }
               else
                 {
-                  Cerr << "Il faut donner le fichier pour reprendre les stats !" << finl;
+                  Cerr << "You must provide the file to resume the stats!" << finl;
                   exit();
                 }
             }
@@ -444,8 +444,8 @@ void Traitement_particulier_NS_Profils::reprendre_stat()
     }
   else
     {
-      Cerr << "Pas de Calcul des stats commence !" << finl;
-      Cerr << "Pas de reprise de u_moy_temp,u_et_temp et teta_moy_temp" << finl;
+      Cerr << "No stats computation started!" << finl;
+      Cerr << "No resumption of u_moy_temp, u_et_temp and teta_moy_temp" << finl;
     }
 }
 
@@ -454,15 +454,15 @@ void Traitement_particulier_NS_Profils::sauver_stat() const
   double tps = mon_equation->inconnue().temps();
   if (  (oui_stat == 1)&&(tps>=temps_deb)&&(tps<=temps_fin) )
     {
-      Cerr << "Dans Traitement_particulier_NS_canal::sauver_stat!!" << finl;
-      // On sauve la somme (sans diviser par dt)
+      Cerr << "In Traitement_particulier_NS_canal::sauver_stat!!" << finl;
+      // Save the sum (without dividing by dt)
       int j;
       Nom temps = Nom(tps);
       Nom fich_sauv_u ="u_moy_temp_";
       fich_sauv_u+=temps;
       fich_sauv_u+=".sauv";
 
-      // On sauve u_moy!!
+      // Save u_moy!!
       EcrFicCollecteBin ficu (fich_sauv_u);
       //      EcrFicCollecte ficu (fich_sauv_u);
       //      EcrFicCollecteBin ficu ("u_moy_temp.sauv");
@@ -490,15 +490,15 @@ void Traitement_particulier_NS_Profils::sauver_stat() const
             ficu << uv_moy_temp(num_prof,j) << finl;
         }
       ficu << temps_deb << finl;
-      Cerr << "Sauvegarde de  u_moy_temp a t=" << tps << finl;
-      Cerr << "Debut du calcul des stats a t=" << temps_deb << " a noter pour la reprise des stats !" << finl;
+      Cerr << "Saving u_moy_temp at t=" << tps << finl;
+      Cerr << "Start of stats computation at t=" << temps_deb << " to note for stats resumption!" << finl;
 
       if (oui_profil_nu_t!=0)
         {
           Nom fich_sauv_nut ="nut_temp_";
           fich_sauv_nut+=temps;
           fich_sauv_nut+=".sauv";
-          // On sauve nut!!
+          // Save nut!!
           EcrFicCollecteBin ficu2 (fich_sauv_nut);
           ficu2 << temps << finl;
           for(num_prof=0; num_prof<n_probes; num_prof++)
@@ -508,8 +508,8 @@ void Traitement_particulier_NS_Profils::sauver_stat() const
                 ficu2 << nu_t_temp(num_prof,j) << finl;
             }
           ficu2 << temps_deb << finl;
-          Cerr << "Sauvegarde de  nu_t_temp a t=" << tps << finl;
-          Cerr << "Debut du calcul des stats a t=" << temps_deb << " a noter pour la reprise des stats !" << finl;
+          Cerr << "Saving nu_t_temp at t=" << tps << finl;
+          Cerr << "Start of stats computation at t=" << temps_deb << " to note for stats resumption!" << finl;
         }
     }
 }

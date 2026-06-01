@@ -50,7 +50,7 @@ double Sortie_libre_Gradient_Pression_impose_VEF::flux_impose(int face) const
       return (trace_pression_int[face] + coeff[face] * le_champ_front->valeurs()(face, 0));
     }
   else
-    Cerr << "Sortie_libre_Gradient_Pression_impose_VEF::flux_impose erreur" << finl;
+    Cerr << "Sortie_libre_Gradient_Pression_impose_VEF::flux_impose error" << finl;
   exit();
   return 0.;
 }
@@ -60,7 +60,7 @@ double Sortie_libre_Gradient_Pression_impose_VEF::flux_impose(int face, int ncom
   if (ncomp == 0) return flux_impose(face);
 
   Cerr << "Sortie_libre_Gradient_Pression_impose_VEF::flux_impose(int  , int )" << finl;
-  Cerr << "On ne sait imposer que la composante normale du gradient" << finl;
+  Cerr << "Only the normal component of the gradient can be imposed" << finl;
   Process::exit();
   return 0.;
 }

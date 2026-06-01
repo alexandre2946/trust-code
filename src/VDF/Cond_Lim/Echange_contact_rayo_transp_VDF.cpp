@@ -97,9 +97,9 @@ void Echange_contact_rayo_transp_VDF::mettre_a_jour(double temps)
 
   if (num_premiere_face_dans_pb_fluide_ == -1)
     {
-      Cerr << "fin de construction dans " << que_suis_je() << finl;
+      Cerr << "end of construction in " << que_suis_je() << finl;
       T_autre_pb().associer_fr_dis_base(T_ext().frontiere_dis());
-      // on regarde qui est le pb fluide
+      // determine which is the fluid problem
       const Equation_base *eqn = nullptr;
       const Equation_base& mon_eqn = domaine_Cl_dis().equation();
 
@@ -121,12 +121,12 @@ void Echange_contact_rayo_transp_VDF::mettre_a_jour(double temps)
 
       if (m != 1)
         {
-          Cerr << "gros pb " << que_suis_je() << finl;
+          Cerr << "big problem in " << que_suis_je() << finl;
           Process::exit();
         }
 
       if (frontiere_dis().le_nom() != chcal.front_dis().le_nom())
-        Process::exit("Le nom de bord doit etre le meme pour les deux domaines au niveau du raccord");
+        Process::exit("The boundary name must be the same for both domains at the raccord level");
 
       const Front_VF& frontvf = ref_cast(Front_VF, eqn->domaine_dis().frontiere_dis(frontiere_dis().le_nom()));
       num_premiere_face_dans_pb_fluide_ = frontvf.num_premiere_face();
@@ -169,13 +169,13 @@ void Echange_contact_rayo_transp_VDF::mettre_a_jour(double temps)
 
 void Echange_contact_rayo_transp_VDF::calculer_Teta_equiv(DoubleTab& Teta_eq, const DoubleTab& mon_h, const DoubleTab& lautre_h, int i, double temps)
 {
-  Cerr << "On ne doit pas passer par la Echange_contact_rayo_transp_VDF::calculer_Teta_equiv " << __FILE__ << finl;
+  Cerr << "This path should not be taken: Echange_contact_rayo_transp_VDF::calculer_Teta_equiv " << __FILE__ << finl;
   Process::exit();
 }
 
 void Echange_contact_rayo_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_equiv, const DoubleTab& mon_h, const DoubleTab& lautre_h, int i, double temps)
 {
-  // i servira en radiatif
+  // i will be used in the radiation step
   //
   //mon_h(monT-Tw)=autre_h*(Tw-Tautre)
   // Tautre=Text;

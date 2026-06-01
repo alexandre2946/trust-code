@@ -26,7 +26,7 @@ Entree& Perte_Charge_Anisotrope_PolyMAC_CDO_Face::readOn(Entree& s)
   Perte_Charge_PolyMAC_CDO::readOn(s);
   if (v->nb_comp() != dimension)
     {
-      Cerr << "Il faut definir le champ direction a " << dimension << " composantes" << finl;
+      Cerr << "The direction field must be defined with " << dimension << " components" << finl;
       Process::exit();
     }
   return s;
@@ -65,7 +65,7 @@ Entree& Perte_Charge_Anisotrope_PolyMAC_HFV_Face::readOn(Entree& s)
   Perte_Charge_PolyMAC_HFV::readOn(s);
   if (v->nb_comp() != dimension)
     {
-      Cerr << "Il faut definir le champ direction a " << dimension << " composantes" << finl;
+      Cerr << "The direction field must be defined with " << dimension << " components" << finl;
       Process::exit();
     }
   return s;

@@ -176,48 +176,48 @@ void Traitement_particulier_NS_canal_VDF::remplir_Tab_recap(IntTab& Tab_rec) con
               if(est_egal(y,Y[i]))
                 break;
             }
-          Tab_rec(elem_test2,2)=i; // on garde la valeur de i pour ne pas reefectuer la boucle a chaque pas de temps.
+          Tab_rec(elem_test2,2)=i; // store i to avoid repeating the loop at each time step
 
         }
-      // sinon rien
+      // otherwise do nothing
     }
 
-  Cerr << "Traitement particulier canal : Il y a une amelioration a apporter aux face de bord !! " << finl;
+  Cerr << "Traitement particulier canal: there is a possible improvement to make for boundary faces!! " << finl;
   for (num_elem=0; num_elem<nb_elems; num_elem++)
     {
-      q=0;// on utilise le compteur q qui ne nous sert plus pour verifier si on a trouver un equivalent.
-      for(i=0; i<(trouve.size()-1); i++) // trouve est une case trop grand, mais plutot que de le redimentionner on utilise le critere taille -1
+      q=0;// reuse counter q (no longer needed) to check whether an equivalent was found
+      for(i=0; i<(trouve.size()-1); i++) // trouve is one slot too large, but instead of resizing it we use the criterion size-1
         if(num_elem==trouve[i])
           {
-            q = 0;  // on met fixe q qui ne peu repondre au prochain test. // correction on fixe q =0 car c'etais un faux probleme.
+            q = 0;  // fix q so it cannot pass the next test. // correction: set q=0 because it was a false problem
             break;
           }
-      // en realite lambda explose a l'interface.
+      // in reality lambda diverges at the interface
       if(q==0) //
         {
-          face=elem_faces(num_elem,1); //face inferieure
+          face=elem_faces(num_elem,1); //lower face
           elem_test=domaine_VDF.elem_voisin(num_elem,face,1);
 
 
           if (elem_test+1)
             {
-              Tab_rec(num_elem,1)=elem_test; // faux si elem_test=-1 sinon remplit avec l'element en dessous
+              Tab_rec(num_elem,1)=elem_test; // wrong if elem_test=-1, otherwise fills with the element below
             }
           else
             {
-              Tab_rec(num_elem,1)=domaine_VDF.elem_voisin(num_elem,elem_faces(num_elem,1+dimension),0); // on le traite alors comme un virtuel
+              Tab_rec(num_elem,1)=domaine_VDF.elem_voisin(num_elem,elem_faces(num_elem,1+dimension),0); // treat it as a virtual element
             }
 
-          face= elem_faces(num_elem,1+dimension); //face superieure
+          face= elem_faces(num_elem,1+dimension); //upper face
           elem_test=domaine_VDF.elem_voisin(num_elem,face,0);
 
           if (elem_test+1)
             {
-              Tab_rec(num_elem,0)=elem_test; // faux si elem_test=-1 sinon remplit avec l'element au dessus
+              Tab_rec(num_elem,0)=elem_test; // wrong if elem_test=-1, otherwise fills with the element above
             }
           else
             {
-              Tab_rec(num_elem,0)=domaine_VDF.elem_voisin(num_elem,elem_faces(num_elem,1),1); // on le traite alors comme un virtuel
+              Tab_rec(num_elem,0)=domaine_VDF.elem_voisin(num_elem,elem_faces(num_elem,1),1); // treat it as a virtual element
             }
 
           y = xp(num_elem,1);

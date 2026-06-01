@@ -39,10 +39,10 @@ Entree& Loi_Etat_rhoT_GR_QC::readOn(Entree& is)
 
   Motcle motlu;
   is >> motlu;
-  Cerr<<"Lecture de la loi d'etat Gaz Reel rhoT"<<finl;
+  Cerr<<"Reading the real gas state law rhoT"<<finl;
   if (motlu != accouverte)
     {
-      Cerr<<" On attendait "<<accouverte<<" au lieu de "<<motlu<<finl;
+      Cerr<<" Expected "<<accouverte<<" instead of "<<motlu<<finl;
       abort();
     }
   Motcles les_mots(4);
@@ -114,8 +114,8 @@ Entree& Loi_Etat_rhoT_GR_QC::readOn(Entree& is)
           }
         default :
           {
-            Cerr<<"Une loi d'etat "<<que_suis_je()<<" n'a pas la propriete "<<motlu<<finl;
-            Cerr<<"On attendait un mot dans :"<<finl<<les_mots<<finl;
+            Cerr<<"An equation of state "<<que_suis_je()<<" does not have the property "<<motlu<<finl;
+            Cerr<<"Expected a keyword in:"<<finl<<les_mots<<finl;
             abort();
           }
         }
@@ -124,18 +124,18 @@ Entree& Loi_Etat_rhoT_GR_QC::readOn(Entree& is)
 
   if (Pr_lu==-1)
     {
-      Cerr<<"ERREUR : on attendait la definition du nombre de Prandtl (Prandtl pr)"<<finl;
+      Cerr<<"ERROR: expected the definition of the Prandtl number (Prandtl pr)"<<finl;
       abort();
     }
   if (PolyRho_lu==-1)
     {
-      Cerr<<"ERREUR : on attendait la definition du polynome de la masse volumique (Poly_Rho nb_coeff1 nb_coeff2 a00 a01 a02 ...)"<<finl;
+      Cerr<<"ERROR: expected the definition of the density polynomial (Poly_Rho nb_coeff1 nb_coeff2 a00 a01 a02 ...)"<<finl;
       abort();
     }
   else
     {
       int i,j;
-      Cerr<<"Polynome de rho :"<<finl;
+      Cerr<<"Polynomial for rho:"<<finl;
       for (i=0 ; i<PolyRho_.dimension(0) ; i++)
         {
           for (j=0 ; j<PolyRho_.dimension(1) ; j++)
@@ -147,13 +147,13 @@ Entree& Loi_Etat_rhoT_GR_QC::readOn(Entree& is)
     }
   if (PolyT_lu==-1)
     {
-      Cerr<<"ERREUR : on attendait la definition du polynome de la temperature (Poly_T nb_coeff1 nb_coeff2 a00 a01 a02 ...)"<<finl;
+      Cerr<<"ERROR: expected the definition of the temperature polynomial (Poly_T nb_coeff1 nb_coeff2 a00 a01 a02 ...)"<<finl;
       abort();
     }
   else
     {
       int i,j;
-      Cerr<<"Polynome de T :"<<finl;
+      Cerr<<"Polynomial for T:"<<finl;
       for (i=0 ; i<PolyT_.dimension(0) ; i++)
         {
           for (j=0 ; j<PolyT_.dimension(1) ; j++)
@@ -165,17 +165,17 @@ Entree& Loi_Etat_rhoT_GR_QC::readOn(Entree& is)
     }
   if (MMole_lu==-1)
     {
-      Cerr<<"ERREUR : on attendait la definition de la masse molaire (masse_molaire m)"<<finl;
+      Cerr<<"ERROR: expected the definition of the molar mass (masse_molaire m)"<<finl;
       abort();
     }
   return is;
 }
 
-/*! @brief Calcule la masse volumique ponctuelle
+/*! @brief Computes the pointwise density.
  *
- * @param (double P) pression
- * @param (double h) enthalpie
- * @return (double) masse volumique correspondante
+ * @param P Pressure.
+ * @param h Enthalpy.
+ * @return Corresponding density value.
  */
 double Loi_Etat_rhoT_GR_QC::calculer_masse_volumique(double P, double h) const
 {
@@ -266,7 +266,7 @@ double Loi_Etat_rhoT_GR_QC::calculer_H(double Pth_, double T_) const
 
       if (dH/H>eps)
         {
-          Cerr<<"PB Loi_Etat_rhoT_GR_QC::calculer_H: resolution Newton impossible "<<finl;
+          Cerr<<"Problem in Loi_Etat_rhoT_GR_QC::calculer_H: Newton resolution not possible "<<finl;
           Cerr<<"Pth= "<<Pth_<<" t="<<T_<<" H="<<H<<finl;
           abort();
         }

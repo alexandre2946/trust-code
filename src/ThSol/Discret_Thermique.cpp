@@ -28,19 +28,19 @@ Entree& Discret_Thermique::readOn(Entree& s) { return s; }
 
 void Discret_Thermique::temperature(const Schema_Temps_base& sch, Domaine_dis_base& z, OWN_PTR(Champ_Inc_base)& ch, int nb_comp) const
 {
-  Cerr << "Discretisation de la temperature" << finl;
+  Cerr << "Discretising temperature" << finl;
   discretiser_champ("temperature", z, "temperature", "K", nb_comp, sch.nb_valeurs_temporelles(), sch.temps_courant(), ch);
 }
 
 void Discret_Thermique::enthalpie(const Schema_Temps_base& sch, Domaine_dis_base& z, OWN_PTR(Champ_Inc_base)& ch, int nb_comp) const
 {
-  Cerr << "Discretisation de l'enthalpie" << finl;
-  discretiser_champ("temperature" /* comme T */, z, "enthalpie", "J/kg", nb_comp, sch.nb_valeurs_temporelles(), sch.temps_courant(), ch);
+  Cerr << "Discretising enthalpy" << finl;
+  discretiser_champ("temperature" /* same type as T */, z, "enthalpie", "J/kg", nb_comp, sch.nb_valeurs_temporelles(), sch.temps_courant(), ch);
 }
 
 void Discret_Thermique::Fluctu_Temperature(const Schema_Temps_base& sch, Domaine_dis_base& z, OWN_PTR(Champ_Inc_base)& ch) const
 {
-  Cerr << "Discretisation des fluctuations en temperature" << finl;
+  Cerr << "Discretising temperature fluctuations" << finl;
   Noms noms(2), unit(2);
   noms[0] = "variance_temperature";
   noms[1] = "taux_dissipation_temperature";
@@ -51,12 +51,12 @@ void Discret_Thermique::Fluctu_Temperature(const Schema_Temps_base& sch, Domaine
 }
 void Discret_Thermique::Flux_Chaleur_Turb(const Schema_Temps_base& sch, Domaine_dis_base& z, OWN_PTR(Champ_Inc_base)& ch) const
 {
-  Cerr << "Discretisation du flux de chaleur turbulente" << finl;
+  Cerr << "Discretising turbulent heat flux" << finl;
   discretiser_champ("vitesse", z, "Flux_Chaleur_Turbulente", "truc1", dimension, sch.nb_valeurs_temporelles(), sch.temps_courant(), ch);
 }
 
 void Discret_Thermique::flux_neutronique(const Schema_Temps_base& sch, Domaine_dis_base& z, OWN_PTR(Champ_Inc_base)& ch, int nb_comp) const
 {
-  Cerr << "Discretisation du flux neutronique" << finl;
+  Cerr << "Discretising neutron flux" << finl;
   discretiser_champ("temperature", z, "flux_neutronique", "m-2.s-1", nb_comp, sch.nb_valeurs_temporelles(), sch.temps_courant(), ch);
 }

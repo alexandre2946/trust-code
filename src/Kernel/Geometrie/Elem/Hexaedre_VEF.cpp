@@ -398,32 +398,32 @@ void Hexaedre_VEF_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
       face_sommet_global(5,2) =som3;
       face_sommet_global(5,3) =som7;
 
-      // le sommet 0 sera toujours le centre de gravite
+      // vertex 0 will always be the center of gravity
       x0 = ( dom.coord(som0,0) + dom.coord(som1,0) + dom.coord(som2,0) + dom.coord(som3,0) + dom.coord(som4,0) + dom.coord(som5,0) + dom.coord(som6,0) + dom.coord(som7,0) )*0.125;
       y0 = ( dom.coord(som0,1) + dom.coord(som1,1) + dom.coord(som2,1) + dom.coord(som3,1) + dom.coord(som4,1) + dom.coord(som5,1) + dom.coord(som6,1) + dom.coord(som7,1) )*0.125;
       z0 = ( dom.coord(som0,2) + dom.coord(som1,2) + dom.coord(som2,2) + dom.coord(som3,2) + dom.coord(som4,2) + dom.coord(som5,2) + dom.coord(som6,2) + dom.coord(som7,2) )*0.125;
 
-      //  Cerr << "le num poly traite " << num_poly << finl;
-      //  Cerr << "le centre de gravite " << x0 << " " << y0 << " " << z0 << finl;
+      //  Cerr << "the processed poly index " << num_poly << finl;
+      //  Cerr << "the center of gravity " << x0 << " " << y0 << " " << z0 << finl;
 
       volume =0;
 
 
-      // On decoupe en tetra.
-      // pour chaque face de l'hexa ( 0 a 7 )
+      // Split into tetrahedra.
+      // for each face of the hexahedron (0 to 7)
       for ( int k=0 ; k<nb_faces(); k++)
         {
-          // on recupere les sommets de la face consideree
+          // retrieve the vertices of the current face
           s1 = face_sommet_global(k,0);
           s2 = face_sommet_global(k,1);
           s3 = face_sommet_global(k,2);
           s4 = face_sommet_global(k,3);
 
-          // Cerr << " les sommets de la face " << k << " = " << s1 << " " << s2 << " " << s3 << " " << s4 << finl;
-          //         Cerr << "coord de s1 " << dom.coord(s1,0) << " " << dom.coord(s1,1) << " " << dom.coord(s1,2) << finl;
-          //         Cerr << "coord de s2 " << dom.coord(s2,0) << " " << dom.coord(s2,1) << " " << dom.coord(s2,2) << finl;
-          //         Cerr << "coord de s3 " << dom.coord(s3,0) << " " << dom.coord(s3,1) << " " << dom.coord(s3,2) << finl;
-          //         Cerr << "coord de s4 " << dom.coord(s4,0) << " " << dom.coord(s4,1) << " " << dom.coord(s4,2) << finl;
+          // Cerr << " the vertices of face " << k << " = " << s1 << " " << s2 << " " << s3 << " " << s4 << finl;
+          //         Cerr << "coord of s1 " << dom.coord(s1,0) << " " << dom.coord(s1,1) << " " << dom.coord(s1,2) << finl;
+          //         Cerr << "coord of s2 " << dom.coord(s2,0) << " " << dom.coord(s2,1) << " " << dom.coord(s2,2) << finl;
+          //         Cerr << "coord of s3 " << dom.coord(s3,0) << " " << dom.coord(s3,1) << " " << dom.coord(s3,2) << finl;
+          //         Cerr << "coord of s4 " << dom.coord(s4,0) << " " << dom.coord(s4,1) << " " << dom.coord(s4,2) << finl;
 
           x1 = dom.coord(s1,0);
           y1 = dom.coord(s1,1);

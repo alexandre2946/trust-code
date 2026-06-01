@@ -18,30 +18,30 @@
 
 Implemente_instanciable(Op_Diff_VEF_Face_Penalise,"Op_Diff_VEFpenalise_P1NC",Op_Diff_VEF_Face);
 
-/* Implementation obligatoire de la fonction printOn() */
+/* Mandatory implementation of the printOn() function */
 Sortie& Op_Diff_VEF_Face_Penalise::
 printOn(Sortie& s ) const
 {
   return s << que_suis_je() ;
 }
 
-/* Implementation obligatoire de la fonction readOn() */
+/* Mandatory implementation of the readOn() function */
 Entree& Op_Diff_VEF_Face_Penalise::readOn(Entree& is )
 {
-  /* REMARQUE IMPORTANTE: on a cree cette classe par derivation mais
-   * mais elle doit uniquement s'appliquer sur des equations de
-   * Navier-Stokes non turbulentes d'ou les tests suivants
+  /* IMPORTANT NOTE: this class was created by derivation but
+   * it should only be applied to non-turbulent Navier-Stokes equations,
+   * hence the following checks.
    */
 
-  Cerr<<"je suis dans Op_Diff_VEF_Face_Penalise::readOn()"<<finl;
+  Cerr<<"In Op_Diff_VEF_Face_Penalise::readOn()"<<finl;
 
-  /* On teste la dimension du probleme car la theorie n'a ete validee
-   * que sur du 2D
+  /* Check problem dimension since the theory has only been validated
+   * in 2D.
    */
   if (dimension != 2)
     {
-      Cerr << "Erreur dans Op_Diff_VEF_Face_Penalise::readOn()" << finl;
-      Cerr << "La dimension du probleme doit etre 2" << finl;
+      Cerr << "Error in Op_Diff_VEF_Face_Penalise::readOn()" << finl;
+      Cerr << "Problem dimension must be 2" << finl;
       Process::exit();
     }
 
@@ -74,13 +74,13 @@ calculer(const DoubleTab& inconnue, DoubleTab& resu) const
  *
  */
 
-/*! @brief methode qui calcule la vitesse au temps n+1 lorsque le schema explicite est utilise.
+/*! @brief Method that computes the velocity at time n+1 when the explicit scheme is used.
  *
  */
 DoubleTab& Op_Diff_VEF_Face_Penalise::
 ajouter(const DoubleTab& inconnue, DoubleTab& resu) const
 {
-  //  Cerr << "J'entre dans ajouter() de penalisation" << finl;
+  //  Cerr << "Entering ajouter() of penalisation" << finl;
   int nb_composante,numero_global_face,local;
   int face_penalisation,face;
   double coeff;
@@ -196,10 +196,10 @@ ajouter(const DoubleTab& inconnue, DoubleTab& resu) const
     }
 
 
-  /* Ajout de la matrice de diffusion classique */
+  /* Add the classical diffusion matrix */
   Op_Diff_VEF_Face::ajouter(inconnue,resu);
 
-  //  Cerr << "Je sors de calcul_matrice_de_penalisation_" << finl;
+  //  Cerr << "Exiting calcul_matrice_de_penalisation_" << finl;
   return resu;
 }
 
@@ -211,69 +211,65 @@ ajouter(const DoubleTab& inconnue, DoubleTab& resu) const
  *
  */
 
-/*! @brief methode qui calcule le voisinage d'une face.
+/*! @brief Method computing the neighbourhood of a face.
  *
  */
 void Op_Diff_VEF_Face_Penalise::
 voisinage(const int Numero_face, IntList& Voisinage) const
 {
-  //  Cerr << "J'entre dans voisinage pour un numero face" << finl;
+  //  Cerr << "Entering voisinage for a face index" << finl;
 
-  /* On vide la liste Voisinage pour eviter les mauvaises surprises */
+  /* Clear the list Voisinage to avoid surprises */
   if (! Voisinage.est_vide() ) Voisinage.vide();
 
-  /* Declaration des principaux parametres locaux. */
+  /* Declaration of the main local parameters. */
   int numero_local;
 
-  /* Le nombre de faces des elements constituant le domaine
-   * de discretisation.
-   * REM: on suppose que l'on ne travaille pas sur des prismes.
+  /* The number of faces per element in the discretisation domain.
+   * NOTE: prisms are excluded.
    */
   const int nb_faces_element = domaine().nb_faces_elem();
 
-  /* Les elements voisins de Numero_face */
+  /* The neighbouring elements of Numero_face */
   const int voisin1 = domaine_vef().face_voisins(Numero_face,1);
   const int voisin2 = domaine_vef().face_voisins(Numero_face,0);
 
-  /* Ici, on recupere les faces de voisin*
-   * que l'on injecte dans la liste Voisinage.
-   * Il faut donc que l'element existe d'ou le premier test realise.
+  /* Retrieve the faces of voisin* and inject them into the list Voisinage.
+   * The element must exist, hence the first test.
    */
   if (voisin1 != -1)
     {
       for (numero_local = 0; numero_local < nb_faces_element; numero_local++)
         {
-          /* On recupere le numero global de chacune des
-           * faces de voisin*
-           */
+          /* Retrieve the global index of each face of voisin* */
           const int numero_global_face =
             domaine_vef().elem_faces(voisin1,numero_local);
 
-          /* Puis on place ce numero dans la liste Voisinage. */
+          /* Then store this index in the list Voisinage. */
           Voisinage.add_if_not(numero_global_face);
 
-        }//fin du for
+        }// end for
 
-    }//fin du if
+    }// end if
 
   if (voisin2 != -1)
     {
       for (numero_local = 0; numero_local < nb_faces_element; numero_local++)
         {
-          /* On recupere le numero global de chacune des
-           * faces de numero_element_*
+          /* Retrieve the global index of each
+           * face of numero_element_*
            */
           const int numero_global_face =
             domaine_vef().elem_faces(voisin2,numero_local);
 
-          /* Puis on place ce numero dans la liste Voisinage. */
+          /* Then store this index in the list Voisinage. */
           Voisinage.add_if_not(numero_global_face);
 
-        }// fin du for
+        }// end for
 
-    }//fin du if
+    }//end if
 
-  //  Cerr << "Je sors de voisinage pour un numero de face" << finl;
+  //  Cerr << "Exiting voisinage for a face index" << finl;
 }
 
 /*
@@ -284,18 +280,18 @@ voisinage(const int Numero_face, IntList& Voisinage) const
  *
  */
 
-/*! @brief methode qui calcule le voisinage d'une liste de faces.
+/*! @brief Method computing the neighbourhood of a list of faces.
  *
  */
 void  Op_Diff_VEF_Face_Penalise::
 voisinage(const IntList& Ensemble_faces, IntList& Voisinage) const
 {
-  //  Cerr << "J'entre dans voisinage pour un ensemble de face" << finl;
+  //  Cerr << "Entering voisinage for a set of faces" << finl;
 
-  /* On vide la liste Voisinage pour eviter les mauvaises surprises */
+  /* Clear the list Voisinage to avoid surprises */
   if (! Voisinage.est_vide() ) Voisinage.vide();
 
-  /* Declaration des principaux parametres locaux. */
+  /* Declaration of the main local parameters. */
   int nb_elements_Ensemble_faces,nb_elements_liste_temporaire;
   IntList liste_temporaire;
 
@@ -322,18 +318,18 @@ voisinage(const IntList& Ensemble_faces, IntList& Voisinage) const
            nb_elements_liste_temporaire++)
         {
           //          Cerr << "les elements " << liste_temporaire[nb_elements_liste_temporaire] << finl;
-          /* Parametre interne a la deuxieme boucle */
+          /* Second-loop-internal parameter */
           const int numero_face_dans_liste_temporaire =
             liste_temporaire[nb_elements_liste_temporaire];
 
-          /* Enfin, on stoke dans Voisinage */
+          /* Finally, store in Voisinage */
           Voisinage.add_if_not(numero_face_dans_liste_temporaire);
 
-        }//fin du deuxieme for
+        }// end second for
 
-    }//fin du premier for
+    }// end first for
 
-  // Cerr << "Je sors de voisinage pour un ensemble face" << finl;
+  // Cerr << "Exiting voisinage for a set of faces" << finl;
 }
 
 /*
@@ -348,26 +344,24 @@ voisinage(const IntList& Ensemble_faces, IntList& Voisinage) const
 double  Op_Diff_VEF_Face_Penalise::
 signe(const int Face1, const int Face2) const
 {
-  //  Cerr << "J'entre dans signe" << finl;
+  //  Cerr << "Entering signe" << finl;
 
-  /* Parametres locaux a la procedure */
+  /* Local parameters of the procedure */
   int numero_local;
 
-  /* On recupere le nombre de sommets des faces
-   * des elements constituant le domaine discretise.
-   * REM: on exclut le prisme par convention.
+  /* Retrieve the number of vertices per face in the discretised domain.
+   * NOTE: prismes are excluded by convention.
    */
   const int nb_sommets_par_face = domaine_vef().nb_som_face();
 
-  /* On cree une liste qui contient les sommets de la Face2 */
+  /* Create a list containing the vertices of Face2 */
   IntList sommets_Face2;
 
   for (numero_local = 0 ; numero_local < nb_sommets_par_face ; numero_local++)
     sommets_Face2.add(domaine_vef().face_sommets(Face2,numero_local));
 
-  /* Enfin, on regarde si des sommets de la Face2 appartiennent
-   * a la Face1.
-   * Si oui, alors on retourne 1 sinon on retourne -1
+  /* Check whether any vertices of Face2 belong to Face1.
+   * If yes, return 1; otherwise return -1.
    */
   for (numero_local = 0; numero_local < nb_sommets_par_face ; numero_local++)
     if ( sommets_Face2.contient(domaine_vef().face_sommets(Face1,numero_local)))
@@ -375,7 +369,7 @@ signe(const int Face1, const int Face2) const
 
   return -1.;
 
-  //  Cerr << "Je sors de signe" << finl;
+  //  Cerr << "Exiting signe" << finl;
 }
 
 /*
@@ -386,14 +380,14 @@ signe(const int Face1, const int Face2) const
  *
  */
 
-/*! @brief fonction membre qui retourne le coefficient de penalisation associee a chaque face du maillage primaire.
+/*! @brief Member function returning the penalisation coefficient associated with each face of the primary mesh.
  *
  */
 double  Op_Diff_VEF_Face_Penalise::
 coefficient_penalisation(const int Numero_face) const
 {
-  //  Cerr << "J'entre dans coefficient_penalisation" << finl;
-  /* Initialisation de parametres locaux */
+  //  Cerr << "Entering coefficient_penalisation" << finl;
+  /* Initialisation of local parameters */
   double eta=0.;
   double coefficientpenalisation = 0.;
 
@@ -405,14 +399,14 @@ coefficient_penalisation(const int Numero_face) const
 
   if (voisin1 == -1 && voisin2 == -1)
     {
-      Cerr << "Erreur dans Op_Dift_standard_Face_VEF_penalise::"
+      Cerr << "Error in Op_Dift_standard_Face_VEF_penalise::"
            << "coefficient_penalisation()" << finl;
       Process::exit();
     }
 
   if (voisin1 != -1 && voisin2 != -1)
     {
-      /* Calcul des coefficients de penalisation proprement dit */
+      /* Compute the penalisation coefficients */
       coefficientpenalisation = 1./diametre(voisin1);
       eta = 1./diametre(voisin2);
 
@@ -426,7 +420,7 @@ coefficient_penalisation(const int Numero_face) const
     coefficientpenalisation = 1./diametre(voisin1);
 
   return coefficientpenalisation;
-  //  Cerr << "Je sors de coefficient_penalisation" << finl;
+  //  Cerr << "Exiting coefficient_penalisation" << finl;
 }
 
 /*
@@ -445,19 +439,19 @@ faces_communes(const int Face1,const int Face2,
                IntList& Faces_communes) const
 {
 
-  //  Cerr <<"J'entre dans faces_communes" << finl;
-  /* On vide d'abord Faces_commnunes pour eviter les erreurs. */
+  //  Cerr <<"Entering faces_communes" << finl;
+  /* First clear Faces_communes to avoid errors. */
   if (! Faces_communes.est_vide() ) Faces_communes.vide();
 
-  /* Declaration des parametres locaux a la procedure */
+  /* Declaration of local parameters of the procedure */
   IntList voisinage_Face1,voisinage_Face2;
   int nb_element_voisinage_Face2;
 
-  /* On calcule chacun des voisinages de Face1 et Face2 */
+  /* Compute the neighbourhoods of both Face1 and Face2 */
   voisinage(Face1,voisinage_Face1);
   voisinage(Face2,voisinage_Face2);
 
-  /* Ensuite, on retrouve les faces communes a ces 2 voisinages. */
+  /* Then find the faces common to these 2 neighbourhoods. */
   for (nb_element_voisinage_Face2 = 0;
        nb_element_voisinage_Face2 < voisinage_Face2.size();
        nb_element_voisinage_Face2++)
@@ -468,9 +462,9 @@ faces_communes(const int Face1,const int Face2,
       if (voisinage_Face1.contient(numero_face_voisinage_Face2))
         Faces_communes.add_if_not(numero_face_voisinage_Face2);
 
-    }//fin du for
+    }// end for
 
-  //  Cerr << "Je sors de faces_communes" << finl;
+  //  Cerr << "Exiting faces_communes" << finl;
 }
 
 /*
@@ -485,16 +479,16 @@ void  Op_Diff_VEF_Face_Penalise::
 reduction(const IntList& Liste1,const IntList& Liste2,
           IntList& Liste_reduite) const
 {
-  //  Cerr << "J'entre dans reduction" << finl;
-  /* On nettoie Liste_reduite afin d'eviter les erreurs */
+  //  Cerr << "Entering reduction" << finl;
+  /* Clear Liste_reduite to avoid errors */
   if (! Liste_reduite.est_vide() ) Liste_reduite.vide();
 
-  /* Declaration des parametres locaux a la procedure */
+  /* Declaration of local parameters of the procedure */
   const IntList *liste_de_plus_petite_taille,*liste_de_plus_grande_taille;
   int nb_element_dans_liste;
 
-  /* On teste la taille des listes passees en parametres puis
-   * on effectue l'allocation en fonction du resultat.
+  /* Check the sizes of the lists passed as parameters, then
+   * allocate accordingly.
    */
   if (Liste1.size() >= Liste2.size())
     {
@@ -522,7 +516,7 @@ reduction(const IntList& Liste1,const IntList& Liste2,
       Liste_reduite.suppr( (*liste_de_plus_petite_taille)
                            [nb_element_dans_liste] );
 
-  //  Cerr << "Je sors de reduction" << finl;
+  //  Cerr << "Exiting reduction" << finl;
 }
 
 
@@ -534,23 +528,23 @@ reduction(const IntList& Liste1,const IntList& Liste2,
  *
  */
 
-/*! @brief fonction membre qui renvoie le numero de l'element contenant Face1 et Face2 s'il existe et renvoie -1 sinon.
+/*! @brief Member function returning the index of the element containing both Face1 and Face2 if it exists, or -1 otherwise.
  *
  */
 int Op_Diff_VEF_Face_Penalise::
 element_commun(const int Face1,const int Face2) const
 {
-  //  Cerr << "J'entre dans element_commun" << finl;
+  //  Cerr << "Entering element_commun" << finl;
 
-  /* Les elements voisins de Face1 */
+  /* Neighbouring elements of Face1 */
   const int voisin1_Face1 = domaine_vef().face_voisins(Face1,1);
   const int voisin2_Face1 = domaine_vef().face_voisins(Face1,0);
 
-  /* Les elements voisins de Face2 */
+  /* Neighbouring elements of Face2 */
   const int voisin1_Face2 = domaine_vef().face_voisins(Face2,1);
   const int voisin2_Face2 = domaine_vef().face_voisins(Face2,0);
 
-  /* On cherche l'element commun */
+  /* Search for the common element */
   if (voisin1_Face1 != -1)
     if (voisin1_Face1 == voisin1_Face2 || voisin1_Face1 == voisin2_Face2)
       return voisin1_Face1;
@@ -560,9 +554,9 @@ element_commun(const int Face1,const int Face2) const
       return voisin2_Face1;
 
   Cerr << " Op_Diff_VEF_Face_Penalise::element_commun()" << finl;
-  Cerr << "Attention: la face " << Face1 << " et la face " << Face2
-       << "n'ont pas d'element commun" << finl;
-  Cerr << "Je sors de elements_communs" << finl;
+  Cerr << "Warning: face " << Face1 << " and face " << Face2
+       << " have no common element" << finl;
+  Cerr << "Exiting element_commun" << finl;
   return -1;
 
 }
@@ -575,28 +569,27 @@ element_commun(const int Face1,const int Face2) const
  *
  */
 
-/*! @brief fonction membre qui retourne la 3eme face de l'element Element si Face1 et Face2 appartiennent au meme element.
+/*! @brief Member function returning the 3rd face of element Element if Face1 and Face2 belong to the same element.
  *
- *  Sinon retourne -1.
+ *  Returns -1 otherwise.
  *
  */
 int Op_Diff_VEF_Face_Penalise::
 autre_face(const int Face1, const int Face2)
 const
 {
-  //  Cerr << "J'entre dans autre_face" << finl;
-  /* Declaration des variables locales */
+  //  Cerr << "Entering autre_face" << finl;
+  /* Declaration of local variables */
   int numero_local,lautre_face=-1;
   int elem_commun = element_commun(Face1,Face2);
 
-  /* Le nombre de faces des elements constituant le domaine
-   * de discretisation.
-   * REM: on suppose que l'on ne travaille pas sur des prismes.
+  /* Number of faces per element in the discretisation domain.
+   * NOTE: prismes are excluded.
    */
   if (elem_commun == -1)
     {
-      Cerr << "Fonction element_commun" << finl;
-      Cerr << "Les 2 faces n'appartiennent pas au meme element." << finl;
+      Cerr << "Function element_commun" << finl;
+      Cerr << "The 2 faces do not belong to the same element." << finl;
       Process::exit();
       return lautre_face;
     }
@@ -616,9 +609,8 @@ const
           break;
         }
 
-    }//fin du for
+    }// end for
 
-  //  Cerr << "Je sors de autre_face" << finl;
   return lautre_face;
 
 }

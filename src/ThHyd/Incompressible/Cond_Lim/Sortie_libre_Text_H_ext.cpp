@@ -60,7 +60,7 @@ Entree& Sortie_libre_Text_H_ext::readOn(Entree& s)
   int rang;
   if (motlu != accouverte)
     {
-      Cerr << "On attendait une { dans la lecture de l'interface " << finl;
+      Cerr << "Expected a { when reading the interface " << finl;
       exit();
     }
   s >> motlu;
@@ -84,9 +84,9 @@ Entree& Sortie_libre_Text_H_ext::readOn(Entree& s)
           }
         default:
           {
-            Cerr << "Erreur a la lecture de la condition aux limites de type: " << finl;
+            Cerr << "Error reading boundary condition of type: " << finl;
             Cerr << que_suis_je() << finl;
-            Cerr << "On attendait " << les_motcles << " a la place de " << motlu << finl;
+            Cerr << "Expected " << les_motcles << " instead of " << motlu << finl;
             exit();
           }
         }

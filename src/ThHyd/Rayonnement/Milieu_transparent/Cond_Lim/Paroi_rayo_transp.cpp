@@ -57,7 +57,7 @@ double Paroi_rayo_transp::flux_impose(int i) const
   else if (le_champ_front->valeurs().dimension(1) == 1)
     return le_champ_front->valeurs()(i, 0) - flux_radia;
   else
-    Cerr << "Paroi_rayo_transp::flux_impose erreur" << finl;
+    Cerr << "Paroi_rayo_transp::flux_impose error" << finl;
 
   Process::exit();
   return 0.;

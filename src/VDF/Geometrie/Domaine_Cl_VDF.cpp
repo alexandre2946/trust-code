@@ -117,20 +117,20 @@ void Domaine_Cl_VDF::completer(const Domaine_dis_base& un_domaine_dis)
           if (rang2 >= sz_faces_Cl)
             rang2 = ind_faces_virt_bord[rang2 - decal_virt];
 
-          if (les_faces_Cl[rang1] == 0) // paroi
+          if (les_faces_Cl[rang1] == 0) // wall
             {
-              if (les_faces_Cl[rang2] == 0) // paroi
+              if (les_faces_Cl[rang2] == 0) // wall
                 type_arete_bord_[num_arete_] = TypeAreteBordVDF::PAROI_PAROI;
-              else if (les_faces_Cl[rang2] == 1) // entree/sortie fluide
+              else if (les_faces_Cl[rang2] == 1) // fluid inlet/outlet
                 type_arete_bord_[num_arete_] = TypeAreteBordVDF::PAROI_FLUIDE;
               else if (les_faces_Cl[rang2] == 2) // navier
                 type_arete_bord_[num_arete_] = TypeAreteBordVDF::PAROI_NAVIER;
               else
                 {
-                  Cerr << "On traite une arete qui separe deux faces de meme orientation : " << finl;
-                  Cerr << "l'une de ces faces porte une condition limite de type paroi " << finl;
-                  Cerr << "et l'autre porte une condition de type Periodicite" << finl;
-                  Cerr << "TRUST ne sait pas traiter cette situation" << finl;
+                  Cerr << "Processing an edge separating two faces of the same orientation: " << finl;
+                  Cerr << "one of these faces has a wall-type boundary condition " << finl;
+                  Cerr << "and the other has a Periodicity condition" << finl;
+                  Cerr << "TRUST cannot handle this situation" << finl;
                   Process::Journal() << "ERREUR Faces_CL" << finl;
                   Process::Journal() << "face1:" << face1 << " , face2:" << face2 << finl;
                   Process::Journal() << "rang1:" << rang1 << " , rang2:" << rang2 << finl;
@@ -138,37 +138,37 @@ void Domaine_Cl_VDF::completer(const Domaine_dis_base& un_domaine_dis)
                   Process::exit();
                 }
             }
-          else if (les_faces_Cl[rang1] == 1) // entree/sortie fluide
+          else if (les_faces_Cl[rang1] == 1) // fluid inlet/outlet
             {
-              if (les_faces_Cl[rang2] == 0) // paroi
+              if (les_faces_Cl[rang2] == 0) // wall
                 type_arete_bord_[num_arete_] = TypeAreteBordVDF::PAROI_FLUIDE;
-              else if (les_faces_Cl[rang2] == 1) // fluide
+              else if (les_faces_Cl[rang2] == 1) // fluid
                 type_arete_bord_[num_arete_] = TypeAreteBordVDF::FLUIDE_FLUIDE;
               else if (les_faces_Cl[rang2] == 2) // navier
                 type_arete_bord_[num_arete_] = TypeAreteBordVDF::FLUIDE_NAVIER;
               else
                 {
-                  Cerr << "On traite une arete qui separe deux faces de meme orientation : " << finl;
-                  Cerr << "l'une de ces faces porte une condition limite de type frontiere fluide " << finl;
-                  Cerr << "et l'autre porte une condition de type  Periodicite" << finl;
-                  Cerr << "TRUST ne sait pas traiter cette situation" << finl;
+                  Cerr << "Processing an edge separating two faces of the same orientation: " << finl;
+                  Cerr << "one of these faces has a fluid boundary condition " << finl;
+                  Cerr << "and the other has a Periodicity condition" << finl;
+                  Cerr << "TRUST cannot handle this situation" << finl;
                   Process::exit();
                 }
             }
           else if (les_faces_Cl[rang1] == 2) // navier
             {
-              if (les_faces_Cl[rang2] == 0) // paroi
+              if (les_faces_Cl[rang2] == 0) // wall
                 type_arete_bord_[num_arete_] = TypeAreteBordVDF::PAROI_NAVIER;
-              else if (les_faces_Cl[rang2] == 1) // entree
+              else if (les_faces_Cl[rang2] == 1) // inlet
                 type_arete_bord_[num_arete_] = TypeAreteBordVDF::FLUIDE_NAVIER;
               else if (les_faces_Cl[rang2] == 2) // navier
                 type_arete_bord_[num_arete_] = TypeAreteBordVDF::NAVIER_NAVIER;
               else
                 {
-                  Cerr << "On traite une arete qui separe deux faces de meme orientation : " << finl;
-                  Cerr << "l'une de ces faces porte une condition limite de type Symetrie " << finl;
-                  Cerr << "et l'autre porte une condition de type Periodicite" << finl;
-                  Cerr << "TRUST ne sait pas traiter cette situation" << finl;
+                  Cerr << "Processing an edge separating two faces of the same orientation: " << finl;
+                  Cerr << "one of these faces has a Symmetry-type boundary condition " << finl;
+                  Cerr << "and the other has a Periodicity condition" << finl;
+                  Cerr << "TRUST cannot handle this situation" << finl;
                   Process::exit();
                 }
             }
@@ -238,30 +238,30 @@ void Domaine_Cl_VDF::completer(const Domaine_dis_base& un_domaine_dis)
           if (rang2 >= sz_faces_Cl)
             rang2 -= decal_virt;
 
-          if (les_faces_Cl[rang1] == 3) // face de periodicite
+          if (les_faces_Cl[rang1] == 3) // periodic face
             {
-              if (les_faces_Cl[rang2] == 3)  // face de periodicite
+              if (les_faces_Cl[rang2] == 3)  // periodic face
                 type_arete_coin_[num_arete_] = TypeAreteCoinVDF::PERIO_PERIO;
-              else if (les_faces_Cl[rang2] == 0) // face de paroi
+              else if (les_faces_Cl[rang2] == 0) // wall face
                 type_arete_coin_[num_arete_] = TypeAreteCoinVDF::PERIO_PAROI;
-              else if (les_faces_Cl[rang2] == 1) // Sortie libre ou entree de fluide
+              else if (les_faces_Cl[rang2] == 1) // free outlet or fluid inlet
                 type_arete_coin_[num_arete_] = TypeAreteCoinVDF::PERIO_FLUIDE;
               else
                 {
-                  Cerr << "On traite une arete qui separe deux faces dans un coin : " << finl;
-                  Cerr << "l'une de ces faces porte une condition limite de type periodicite " << finl;
-                  Cerr << "et l'autre porte une condition autre que periodicite ou paroi" << finl;
-                  Cerr << "On n a pas encore fait la modif!!!" << finl;
+                  Cerr << "Processing an edge separating two faces in a corner: " << finl;
+                  Cerr << "one of these faces has a periodicity boundary condition " << finl;
+                  Cerr << "and the other has a condition other than periodicity or wall" << finl;
+                  Cerr << "This modification has not yet been implemented!!!" << finl;
                   // exit();
                 }
             }
-          else if (les_faces_Cl[rang1] == 0)  // face de paroi
+          else if (les_faces_Cl[rang1] == 0)  // wall face
             {
-              if (les_faces_Cl[rang2] == 3)   // face de periodicite
+              if (les_faces_Cl[rang2] == 3)   // periodic face
                 type_arete_coin_[num_arete_] = TypeAreteCoinVDF::PERIO_PAROI;
-              else if (les_faces_Cl[rang2] == 0) // face de paroi
+              else if (les_faces_Cl[rang2] == 0) // wall face
                 type_arete_coin_[num_arete_] = TypeAreteCoinVDF::PAROI_PAROI;
-              else if (les_faces_Cl[rang2] == 1)   // face de fluide
+              else if (les_faces_Cl[rang2] == 1)   // fluid face
                 {
                   if (Option_VDF::traitement_coins)
                     type_arete_coin_[num_arete_] = TypeAreteCoinVDF::PAROI_FLUIDE;
@@ -272,59 +272,59 @@ void Domaine_Cl_VDF::completer(const Domaine_dis_base& un_domaine_dis)
                      Cerr << "et l'autre porte une condition autre que periodicite" << finl;
                      Cerr << "On n a pas encore fait la modif!!!" << finl;
                      } */
-                    // On ne change rien. De toute facon, ce type d'arete ne necessite pas de traitement particulier
+                    // Do not change anything. This edge type does not require special treatment.
                     type_arete_coin_[num_arete_] = TypeAreteCoinVDF::VIDE;
                 }
             }
-          else if (les_faces_Cl[rang1] == 1)  // face sortie libre ou entree de fluide
+          else if (les_faces_Cl[rang1] == 1)  // free outlet or fluid inlet face
             {
-              if (les_faces_Cl[rang2] == 2)  // face symetrie
+              if (les_faces_Cl[rang2] == 2)  // symmetry face
                 type_arete_coin_[num_arete_] = TypeAreteCoinVDF::FLUIDE_NAVIER;
-              else if (les_faces_Cl[rang2] == 0) // face paroi
+              else if (les_faces_Cl[rang2] == 0) // wall face
                 {
                   if (Option_VDF::traitement_coins)
                     type_arete_coin_[num_arete_] = TypeAreteCoinVDF::FLUIDE_PAROI;
                   else
-                    // On ne change rien. De toute facon, ce type d'arete ne necessite pas de traitement particulier
+                    // Do not change anything. This edge type does not require special treatment.
                     type_arete_coin_[num_arete_] = TypeAreteCoinVDF::VIDE;
                 }
-              else if (les_faces_Cl[rang2] == 1) // face sortie libre ou entree de fluide
+              else if (les_faces_Cl[rang2] == 1) // free outlet or fluid inlet face
                 {
                   if (Option_VDF::traitement_coins)
                     type_arete_coin_[num_arete_] = TypeAreteCoinVDF::FLUIDE_FLUIDE;
                   else
-                    // On ne change rien. De toute facon, ce type d'arete ne necessite pas de traitement particulier
+                    // Do not change anything. This edge type does not require special treatment.
                     type_arete_coin_[num_arete_] = TypeAreteCoinVDF::VIDE;
                 }
               // Modif AC : 27/02/03
-              else if (les_faces_Cl[rang2] == 3) // face periodique
+              else if (les_faces_Cl[rang2] == 3) // periodic face
                 {
                   type_arete_coin_[num_arete_] = TypeAreteCoinVDF::PERIO_FLUIDE;
                 }
-              // Fin Modif AC : 27/02/03
+              // End Modif AC : 27/02/03
               else
                 {
-                  Cerr << "On ne traite pas ce cas pour les_faces_Cl[rang1] = 1 " << finl;
+                  Cerr << "This case is not handled for les_faces_Cl[rang1] = 1 " << finl;
                   Cerr << "les_faces_Cl[rang2] = " << les_faces_Cl[rang2] << finl;
                   exit();
                 }
             }
-          else if (les_faces_Cl[rang1] == 2)   // face symetrie
+          else if (les_faces_Cl[rang1] == 2)   // symmetry face
             {
-              if (les_faces_Cl[rang2] == 0)  // face paroi
+              if (les_faces_Cl[rang2] == 0)  // wall face
                 type_arete_coin_[num_arete_] = TypeAreteCoinVDF::PAROI_NAVIER;
-              else if (les_faces_Cl[rang2] == 1)  // face sortie libre ou entree de fluide
+              else if (les_faces_Cl[rang2] == 1)  // free outlet or fluid inlet face
                 type_arete_coin_[num_arete_] = TypeAreteCoinVDF::FLUIDE_NAVIER;
-              else if (les_faces_Cl[rang2] == 2) // symetrie
+              else if (les_faces_Cl[rang2] == 2) // symmetry
                 type_arete_coin_[num_arete_] = TypeAreteCoinVDF::NAVIER_NAVIER;
-              else if (les_faces_Cl[rang2] == 3) // periodicite
+              else if (les_faces_Cl[rang2] == 3) // periodicity
                 {
-                  // On ne change rien. De toute facon, ce type d'arete ne necessite pas de traitement particulier
+                  // Do not change anything. This edge type does not require special treatment.
                   type_arete_coin_[num_arete_] = TypeAreteCoinVDF::VIDE;
                 }
               else
                 {
-                  Cerr << "On ne traite pas ce cas pour les_faces_Cl[rang1] = 2 " << finl;
+                  Cerr << "This case is not handled for les_faces_Cl[rang1] = 2 " << finl;
                   Cerr << "les_faces_Cl[rang2] = " << les_faces_Cl[rang2] << finl;
                   Process::exit();
                 }
@@ -334,13 +334,15 @@ void Domaine_Cl_VDF::completer(const Domaine_dis_base& un_domaine_dis)
 
   else
     {
-      Cerr << "Domaine_Cl_VDF::completer() attend en argument un Domaine_VDF\n";
+      Cerr << "Domaine_Cl_VDF::completer() expects a Domaine_VDF argument\n";
       Process::exit();
     }
 }
 
-/*! @brief Impose les conditions aux limites a la valeur temporelle "temps" du Champ_Inc
+/*! @brief Enforces the boundary conditions at time "temps" on the Champ_Inc.
  *
+ * @param ch The field on which boundary conditions are imposed.
+ * @param temps The current time.
  */
 void Domaine_Cl_VDF::imposer_cond_lim(Champ_Inc_base& ch, double temps)
 {
@@ -432,7 +434,7 @@ void Domaine_Cl_VDF::imposer_cond_lim(Champ_Inc_base& ch, double temps)
     }
   else
     {
-      Cerr << "Le type de OWN_PTR(Champ_Inc_base) " <<  ch.que_suis_je() << " n'est pas prevu en VDF\n";
+      Cerr << "The type OWN_PTR(Champ_Inc_base) " <<  ch.que_suis_je() << " is not supported in VDF\n";
       exit();
     }
   ch_tab.echange_espace_virtuel();

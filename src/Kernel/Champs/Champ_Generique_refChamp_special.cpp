@@ -57,7 +57,7 @@ const Champ_base& Champ_Generique_refChamp_special::get_champ(OWN_PTR(Champ_base
     ref_cast(Champ_Inc_base,espace_stockage.valeur()).avancer(case_);
   if (case_<0)
     {
-      Cerr<<"KO si case_<0; pourquoi ????????,"<<finl;
+      Cerr<<"KO if case_<0; why ????????,"<<finl;
       ref_cast(Champ_Inc_base,espace_stockage.valeur()).reculer(-case_);
       exit();
     }

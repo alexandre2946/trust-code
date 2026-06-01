@@ -72,17 +72,17 @@ DoubleTab& Op_Rot_VEFP1B::ajouter(const DoubleTab& vorticite, DoubleTab& rot) co
   IntList sommets_elem0, sommets_elem1;
   IntList faces_opp_elem0, faces_opp_elem1;
 
-  // On traite les conditions limites:
-  // pour l'instant pas de conditions aux limites pour la vorticite.
-  // Sortie libre = pas de conditions aux limites ????
+  // Process the boundary conditions:
+  // for now, no boundary conditions for the vorticity.
+  // Free outlet = no boundary conditions ????
 
-  // On traite les faces internes i.e. sans les conditions aux limites
+  // Process the internal faces, i.e. without boundary conditions
   int premiere_face_int = domaine_VEF.premiere_face_int();
   int nb_faces = domaine_VEF.nb_faces();
 
   if (dimension > 2)
     {
-      Cerr << "Erreur OpRot: seul le cas 2D est etudie pour le moment" << finl;
+      Cerr << "Error OpRot: only the 2D case is supported at the moment" << finl;
       Process::exit();
     }
 

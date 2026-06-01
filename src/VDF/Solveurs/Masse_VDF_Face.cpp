@@ -53,33 +53,33 @@ DoubleTab& Masse_VDF_Face::appliquer_impl(DoubleTab& sm) const
 
       if (sm.dimension(0) != nb_faces)
         {
-          Cerr << "Masse_VDF_Face::appliquer :  erreur dans la taille de sm" << finl;
+          Cerr << "Masse_VDF_Face::appliquer: error in the size of sm" << finl;
           Process::exit();
         }
 
-      // Boucle sur les faces joint
+      // Loop over joint faces
 
-      // Boucle sur les bords
-      // Sur les faces qui portent des conditions aux limites de Dirichlet ou de Symetrie
-      // la vitesse normale reste egale a sa valeur initiale.
-      // Donc sur ces faces vpoint doit rester a 0.
+      // Loop over boundaries
+      // On faces carrying Dirichlet or Symmetry boundary conditions,
+      // the normal velocity remains equal to its initial value.
+      // Therefore vpoint must remain 0 on these faces.
 
       for (int n_bord = 0; n_bord < domaine_VDF.nb_front_Cl(); n_bord++)
         {
 
-          // pour chaque Condition Limite on regarde son type
+          // for each boundary condition, check its type
           const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
           const Front_VF& la_front_dis = ref_cast(Front_VF, la_cl->frontiere_dis());
           const int ndeb = la_front_dis.num_premiere_face();
           const int nfin = ndeb + la_front_dis.nb_faces();
 
           if ( sub_type(Dirichlet,la_cl.valeur()) || sub_type(Dirichlet_homogene, la_cl.valeur()))
-            // Pour les faces de Dirichlet on met sm a 0
+            // For Dirichlet faces, set sm to 0
             for (int f = ndeb; f < nfin; f++)
               for (int n = 0; n < N; n++)
                 sm(f, n) = 0;
           else if (sub_type(Symetrie, la_cl.valeur()))
-            // Pour les faces de Symetrie on met vpoint a 0
+            // For Symmetry faces, set vpoint to 0
             for (int f = ndeb; f < nfin; f++)
               for (int n = 0; n < N; n++)
                 sm(f, n) = 0;

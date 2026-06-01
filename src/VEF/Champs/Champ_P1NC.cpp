@@ -1080,8 +1080,8 @@ double Champ_P1NC::calculer_integrale_volumique(const Domaine_VEF& domaine, cons
 {
   if (ok != FAUX_EN_PERIO)
     {
-      // BM: desole
-      Cerr << "Champ_P1NC::calculer_integrale_volumique pas encore code juste en perio !" << finl;
+      // BM: sorry
+      Cerr << "Champ_P1NC::calculer_integrale_volumique not yet correctly implemented in periodic case!" << finl;
       exit();
     }
 

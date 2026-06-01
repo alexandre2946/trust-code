@@ -96,12 +96,12 @@ void Fluide_base::creer_champs_non_lus()
 void Fluide_base::discretiser(const Probleme_base& pb, const Discretisation_base& dis)
 {
   const Domaine_dis_base& domaine_dis = pb.equation(0).domaine_dis();
-  // mu rho nu  revoir
+  // mu rho nu  to review
   double temps = pb.schema_temps().temps_courant();
   if (ch_mu_)
     if (sub_type(Champ_Fonc_MED, ch_mu_.valeur()))
       {
-        Cerr << " on convertit le champ_fonc_med en champ_don" << finl;
+        Cerr << " converting the champ_fonc_med to champ_don" << finl;
         OWN_PTR(Champ_Don_base) mu_prov;
         dis.discretiser_champ("champ_elem", domaine_dis, "neant", "neant", 1, temps, mu_prov);
         mu_prov->affecter(ch_mu_.valeur());

@@ -128,7 +128,7 @@ void Terme_Source_Th_TdivU_VEF_Face::modifier_domaine_cl()
         }
       else
         {
-          Cerr<<"surcharge de la cl "<<la_cl.que_suis_je()<<"pas codee dans "<<__FILE__<<finl;
+          Cerr<<"override of boundary condition "<<la_cl.que_suis_je()<<" not coded in "<<__FILE__<<finl;
           exit();
         }
       if (modif)

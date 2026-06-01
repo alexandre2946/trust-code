@@ -104,11 +104,11 @@ int Convection_Diffusion_Concentration::lire_motcle_non_standard(const Motcle& m
     }
   else if (mot=="alias")
     {
-      Motcle nom; // Question: veut-on le mettre en majuscules ?
+      Motcle nom; // Question: should it be uppercased?
       is >> nom;
-      Cerr << "nom_inconnue: On renomme l'equation et son inconnue"
-           << "\n Ancien nom : " << inconnue().le_nom()
-           << "\n Nouveau nom : " << nom << finl;
+      Cerr << "nom_inconnue: Renaming equation and its unknown"
+           << "\n Old name : " << inconnue().le_nom()
+           << "\n New name : " << nom << finl;
       inconnue().nommer(nom);
       champs_compris_.ajoute_champ(la_concentration);
       return 1;

@@ -22,7 +22,7 @@ int PDC_Anisotrope_PolyMAC_CDO::lire_motcle_non_standard_impl(const Motcle& mot,
 {
   Nom tmp;
   is >> tmp;
-  Cerr << "Lecture et interpretation de la fonction " << tmp << " ... ";
+  Cerr << "Reading and interpreting the function " << tmp << " ... ";
   lambda_ortho.setNbVar(2 + Objet_U::dimension);
   lambda_ortho.setString(tmp);
   lambda_ortho.addVar("Re");
@@ -87,7 +87,7 @@ int PDC_Circulaire_PolyMAC_CDO::lire_motcle_non_standard_impl(const Motcle& mot,
 {
   Nom tmp;
   is >> tmp;
-  Cerr << "Lecture et interpretation de la fonction " << tmp << " ... ";
+  Cerr << "Reading and interpreting the function " << tmp << " ... ";
   lambda_ortho.setNbVar(3 + Objet_U::dimension);
   lambda_ortho.setString(tmp);
   lambda_ortho.addVar("Re_tot");

@@ -30,12 +30,12 @@ Entree& Source_QC_QDM_Gen::readOn(Entree& is)
   Nom typ_complet;
   is >> typ_complet;
   readOn_spec(is, typ_complet);
-  Cerr << " Source_QC_QDM_Gen Pas teste encore.... on s'arrete " << finl;
+  Cerr << " Source_QC_QDM_Gen not tested yet.... stopping " << finl;
   Process::exit();
   return is;
 }
 
-// Desciption: methode appele par les classes filles pour typer le terme source
+// Description: method called by derived classes to type the source term
 Entree& Source_QC_QDM_Gen::readOn_spec(Entree& is,Nom& typ)
 {
   source_incompressible.typer_direct(typ);
@@ -97,7 +97,7 @@ void Source_QC_QDM_Gen::associer_pb(const Probleme_base& pb)
 {
   if (!sub_type(Fluide_Quasi_Compressible, pb.equation(0).milieu()))
     {
-      Cerr << que_suis_je() << " n'est a utiliser qu'en Quasi Compressible" << finl;
+      Cerr << que_suis_je() << " can only be used in Quasi Compressible" << finl;
       Process::exit();
     }
 }

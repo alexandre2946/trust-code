@@ -59,16 +59,16 @@ void Source::typer(const Nom& typ, const Equation_base& eqn)
 
 
   Cerr << type << finl;
-  //Cout << "Dans source.cpp type source = " << type << finl;
+  //Cout << "In source.cpp source type = " << type << finl;
   OWN_PTR(Source_base)::typer(type);
 }
 
-/*! @brief Appel a l'objet sous-jacent.
+/*! @brief Call to the underlying object.
  *
- * Ajoute la contribution de la source au tableau passe en parametre.
+ * Adds the contribution of the source to the array passed as parameter.
  *
- * @param (DoubleTab& xx) le tableau auquel on ajoute la contribution de la source
- * @return (DoubleTab&) le parametre xx modifie
+ * @param (DoubleTab& xx) the array to which the source contribution is added
+ * @return (DoubleTab&) the modified parameter xx
  */
 DoubleTab& Source::ajouter(DoubleTab& xx) const
 {

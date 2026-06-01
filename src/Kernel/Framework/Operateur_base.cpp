@@ -608,17 +608,17 @@ void Operateur_base::tester_contribuer_a_avec(const DoubleTab& inco, const Matri
       // mat_DF.imprimer_formatte(Cerr);
       // mat_contribuer.imprimer_formatte(Cerr);
       mat_DF += -mat_contribuer;
-      // mat_DF.imprimer_formatte(Cerr); // la difference des deux
+      // mat_DF.imprimer_formatte(Cerr); // the difference of the two
       Cerr << "Max difference between contribuer_a_avec and finite difference jacobian : " << coeff_DF.mp_max_abs_vect() << finl;
     }
   else Cerr << "nbcomp > 1 : the finite difference jacobian matrix is not compared to the contribuer_a_avec one.";
 
-  mat_contribuer.ajouter_multvect(inco, resu); // Calcule le flux avec la matrice et l'ajoute a resu (resu=Op(Inc(n))-A*Inc(n))
+  mat_contribuer.ajouter_multvect(inco, resu); // Computes the flux with the matrix and adds it to resu (resu=Op(Inc(n))-A*Inc(n))
   resu*=-1;
-  contribuer_au_second_membre(resu); // Ajoute flux impose
+  contribuer_au_second_membre(resu); // Adds imposed flux
   mon_equation->solv_masse().appliquer(resu); // M-1*(Op(Inc(n))-A*Inc(n))
-  // On multiplie par le volume car les coefficients sont divises par le volume et on ne veut pas
-  // qu'un calcul sur des petites mailles semblent disfonctionner;
+  // We multiply by the volume because the coefficients are divided by the volume and we don't want
+  // a computation on small meshes to seem broken;
   DoubleTab un(inco);
   un=1;
   mon_equation->solv_masse().appliquer(un);

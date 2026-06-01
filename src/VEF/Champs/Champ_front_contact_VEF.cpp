@@ -166,8 +166,8 @@ void Champ_front_contact_VEF::creer(const Nom& nompb1, const Nom& nom1, const No
 
   if (nom_inco1 != nom_inco2)
     {
-      Cerr << "Une condition limite de contact est mal specifiee" << finl;
-      Cerr << "Il existe une incoherence sur l'inconnue mise en jeu de part et d'autre de la frontiere de contact" << finl;
+      Cerr << "A contact boundary condition is incorrectly specified" << finl;
+      Cerr << "There is an inconsistency in the unknown involved on both sides of the contact boundary" << finl;
       exit();
     }
 
@@ -385,13 +385,13 @@ void Champ_front_contact_VEF::mettre_a_jour(double temps )
   int nb_faces=la_front.nb_faces();
   DoubleTab& tab=valeurs_au_temps(temps);
 
-  // On recupere les coefficients gradient_num_transf et gradient_fro_transf de l'autre probleme
+  // Retrieve the gradient_num_transf and gradient_fro_transf coefficients from the other problem
   DoubleVect gradient_num_transf_autre_pb(nb_faces);
   DoubleVect gradient_fro_transf_autre_pb(nb_faces);
   if (!ch_fr_autre_pb)
     {
-      Cerr << "Attention: Vous utilisez une condition de contact Champ_front_contact_VEF sur le bord " << nom_bord1 << " sur le probleme "<< nom_pb1 <<" " << finl;
-      Cerr << "Vous devez avoir un Champ_front_contact_VEF equivalent sur le bord " << nom_bord2 << " du probleme "<<nom_pb2<<" " << finl;
+      Cerr << "Warning: You are using a contact condition Champ_front_contact_VEF on boundary " << nom_bord1 << " of problem "<< nom_pb1 <<" " << finl;
+      Cerr << "You must have an equivalent Champ_front_contact_VEF on boundary " << nom_bord2 << " of problem "<<nom_pb2<<" " << finl;
       exit();
     }
   trace_face_raccord(fr_vf_autre_pb.valeur(),ch_fr_autre_pb->gradient_num_transf,gradient_num_transf_autre_pb);
@@ -433,17 +433,17 @@ void Champ_front_contact_VEF::verifier_scalaire_bord(double temps)
             {
               if (tab(fac_front,0)>Scal_moy(fac_front))
                 {
-                  Cerr<<"Attention, Tp n'est pas compris entre les temperatures"<<finl;
-                  Cerr<<"fluide et solide au voisinage de la paroi"<<finl;
-                  Cerr<<"Tp("<<fac_front<<") = "<<tab(fac_front,0)<<" est trop elevee"<<finl;
-                  Cerr<<"de DT = "<<tab(fac_front,0)-Scal_moy(fac_front)<<" K"<<finl;
+                  Cerr<<"Warning, Tp is not between the temperatures"<<finl;
+                  Cerr<<"of the fluid and solid near the wall"<<finl;
+                  Cerr<<"Tp("<<fac_front<<") = "<<tab(fac_front,0)<<" is too high"<<finl;
+                  Cerr<<"by DT = "<<tab(fac_front,0)-Scal_moy(fac_front)<<" K"<<finl;
                 }
               else
                 {
-                  Cerr<<"Attention, Tp n'est pas compris entre les temperatures"<<finl;
-                  Cerr<<"fluide et solide au voisinage de la paroi"<<finl;
-                  Cerr<<"Tp("<<fac_front<<") = "<<tab(fac_front,0)<<" est trop basse "<<finl;
-                  Cerr<<"de DT = "<<Scal_moy_autre_pb(fac_front)-tab(fac_front,0)<<" K"<<finl;
+                  Cerr<<"Warning, Tp is not between the temperatures"<<finl;
+                  Cerr<<"of the fluid and solid near the wall"<<finl;
+                  Cerr<<"Tp("<<fac_front<<") = "<<tab(fac_front,0)<<" is too low"<<finl;
+                  Cerr<<"by DT = "<<Scal_moy_autre_pb(fac_front)-tab(fac_front,0)<<" K"<<finl;
                 }
             }
         }
@@ -453,17 +453,17 @@ void Champ_front_contact_VEF::verifier_scalaire_bord(double temps)
             {
               if (tab(fac_front,0)<Scal_moy(fac_front))
                 {
-                  Cerr<<"Attention, Tp n'est pas compris entre les temperatures"<<finl;
-                  Cerr<<"fluide et solide au voisinage de la paroi"<<finl;
-                  Cerr<<"Tp("<<fac_front<<") = "<<tab(fac_front,0)<<" est trop basse"<<finl;
-                  Cerr<<"de DT = "<<Scal_moy(fac_front)-tab(fac_front,0)<<" K"<<finl;
+                  Cerr<<"Warning, Tp is not between the temperatures"<<finl;
+                  Cerr<<"of the fluid and solid near the wall"<<finl;
+                  Cerr<<"Tp("<<fac_front<<") = "<<tab(fac_front,0)<<" is too low"<<finl;
+                  Cerr<<"by DT = "<<Scal_moy(fac_front)-tab(fac_front,0)<<" K"<<finl;
                 }
               else
                 {
-                  Cerr<<"Attention, Tp n'est pas compris entre les temperatures"<<finl;
-                  Cerr<<"fluide et solide au voisinage de la paroi"<<finl;
-                  Cerr<<"Tp("<<fac_front<<") = "<<tab(fac_front,0)<<" est trop elevee"<<finl;
-                  Cerr<<"de DT = "<<tab(fac_front,0)-Scal_moy_autre_pb(fac_front)<<" K"<<finl;
+                  Cerr<<"Warning, Tp is not between the temperatures"<<finl;
+                  Cerr<<"of the fluid and solid near the wall"<<finl;
+                  Cerr<<"Tp("<<fac_front<<") = "<<tab(fac_front,0)<<" is too high"<<finl;
+                  Cerr<<"by DT = "<<tab(fac_front,0)-Scal_moy_autre_pb(fac_front)<<" K"<<finl;
                 }
             }
         }
@@ -584,13 +584,12 @@ void Champ_front_contact_VEF::associer_front_vf_et_ch_front_autre_pb()
           if (sub_type(Champ_front_contact_VEF,la_cl.champ_front()))
             {
               ch_fr_autre_pb = ref_cast(Champ_front_contact_VEF,la_cl.champ_front());
-              // Test de securite pour verifier que l'on a bien saisit le champ
-              // front_contact_VEF.
+              // Safety check to verify that the Champ_front_contact_VEF has been correctly read.
               if (ch_fr_autre_pb->nom_pb1 == nom_pb1)
                 if (!(sub_type(Champ_front_contact_fictif_VEF,(*this))))
                   {
-                    Cerr<<"Attention, erreur lors de la lecture du Champ_Front_Contact_VEF"<<finl;
-                    Cerr<<"La syntaxe a utiliser est : nom_pb_local nom_bord_local nom_pb_distant nom_bord_distant"<<finl;
+                    Cerr<<"Warning, error when reading Champ_Front_Contact_VEF"<<finl;
+                    Cerr<<"The syntax to use is: local_pb_name local_boundary_name remote_pb_name remote_boundary_name"<<finl;
                     exit();
                   }
               fr_vf_autre_pb=ref_cast(Front_VF, la_cl.frontiere_dis());
@@ -781,7 +780,7 @@ void Champ_front_contact_VEF::remplir_connect_bords()
                   Cout << "err i j " << std::fabs(xv1(ndeb1+i,0) - xv2(ndeb2+j,0)) << finl;
                   Cout << "err i j " << std::fabs(xv1(ndeb1+i,1) - xv2(ndeb2+j,1)) << finl;
                   Cout << "err i j " << std::fabs(xv1(ndeb1+i,2) - xv2(ndeb2+j,2)) << finl;
-                  Cout << "erreur " << erreur << finl;
+                  Cout << "error " << erreur << finl;
                   }*/
               connect_bords(i)=j;
               temoin=1;
@@ -807,7 +806,7 @@ void Champ_front_contact_VEF::remplir_connect_bords()
                      Cout << "err i j " << std::fabs(xv1(ndeb1+i,0) - xv2(ndeb2+j,0)) << finl;
                      Cout << "err i j " << std::fabs(xv1(ndeb1+i,1) - xv2(ndeb2+j,1)) << finl;
                      Cout << "err i j " << std::fabs(xv1(ndeb1+i,2) - xv2(ndeb2+j,2)) << finl;
-                     Cout << "erreur " << erreur << finl;
+                     Cout << "error " << erreur << finl;
                      }*/
                 connect_bords(i)=j;
                 temoin=1;
@@ -840,9 +839,9 @@ void Champ_front_contact_VEF::remplir_connect_bords()
     }
   if (min_array(inv_connect_bords) < 0)
     {
-      Cerr<<"Pb a la creation de connect_bord, ce n'est pas une bijection"<<finl;
-      Cerr<<"tableau inverse "<<inv_connect_bords<<finl;
-      Cerr<<"tableau connect "<<connect_bords<<finl;
+      Cerr<<"Problem creating connect_bord: the mapping is not a bijection"<<finl;
+      Cerr<<"inverse array "<<inv_connect_bords<<finl;
+      Cerr<<"connect array "<<connect_bords<<finl;
       exit();
     }
 }
@@ -960,7 +959,7 @@ void Champ_front_contact_VEF::test_faces_coin()
               if (faces_coin_fr(i)!=0)
                 {
                   erreur =1;
-                  Cerr<<"La face suivante du bord "<<nom_bord_fr<<" est une face de coin pour le domaine "<<nom_dom<<finl;
+                  Cerr<<"The following face of boundary "<<nom_bord_fr<<" is a corner face for domain "<<nom_dom<<finl;
                   for (int k=0; k<dimension; k++)
                     Cerr<<"x_"<<k<<" "<<xv1(ndeb_fr+i,k)<<finl;
                 }
@@ -969,9 +968,9 @@ void Champ_front_contact_VEF::test_faces_coin()
     }
   if (erreur)
     {
-      Cerr<<"Le codage de Champ_front_contact_VEF n est pas disponible pour cette situation"<<finl;
-      Cerr<<"Decouper la (ou les) maille concernee en utilisant l interprete VerifierCoin"<<finl;
-      Cerr<<"ou en utilisant Trianguler_H en 2D ou Tetraedriser_homogene en 3D"<<finl;
+      Cerr<<"The Champ_front_contact_VEF implementation is not available for this situation"<<finl;
+      Cerr<<"Split the affected mesh cell(s) using the VerifierCoin interpreter"<<finl;
+      Cerr<<"or using Trianguler_H in 2D or Tetraedriser_homogene in 3D"<<finl;
       //exit();
     }
 }
@@ -1014,7 +1013,7 @@ void Champ_front_contact_VEF::connectivity_failed(const Domaine_VEF& zvef1, int&
 
       if(elem2==-1)
         {
-          Cerr << "Probleme dans la recherche de l'element associe !" << finl;
+          Cerr << "Problem searching for the associated element!" << finl;
           exit();
         }
 
@@ -1047,7 +1046,7 @@ void Champ_front_contact_VEF::connectivity_failed(const Domaine_VEF& zvef1, int&
 
       if(trouve==0)
         {
-          Cerr << "Probleme dans la recherche de l'indice local !" << finl;
+          Cerr << "Problem searching for the local index!" << finl;
           exit();
         }
 

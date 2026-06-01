@@ -40,8 +40,8 @@ Entree& Loi_Etat_Mono_GP_base::readOn(Entree& is)
   else if (gamma_!=-1) R_ = Cp_ *(1.-1./gamma_);
   else
     {
-      Cerr<<"ERREUR : on attendait la definition du Cv (constante en gaz parfaits)"<<finl;
-      Cerr<<"ou de la constante gamma (constante en gaz parfaits)"<<finl;
+      Cerr<<"ERROR: expected the definition of Cv (perfect gas constant)"<<finl;
+      Cerr<<"or the gamma constant (perfect gas constant)"<<finl;
       abort();
     }
   return is;

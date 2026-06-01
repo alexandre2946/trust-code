@@ -66,7 +66,7 @@ int Source_Neutronique::lire_motcle_non_standard(const Motcle& mot, Entree& is)
     {
       if (N<1)
         {
-          Cerr << "Il faut rentrer le nb de groupes N avant lambda dans  " << que_suis_je() << finl;
+          Cerr << "The number of groups N must be specified before lambda in  " << que_suis_je() << finl;
           exit();
         }
       lambda.resize(N);
@@ -76,7 +76,7 @@ int Source_Neutronique::lire_motcle_non_standard(const Motcle& mot, Entree& is)
     {
       if (N<1)
         {
-          Cerr << "Il faut rentrer le nb de groupes N avant beta dans  " << que_suis_je() << finl;
+          Cerr << "The number of groups N must be specified before beta in  " << que_suis_je() << finl;
           exit();
 
         }
@@ -102,7 +102,7 @@ int Source_Neutronique::lire_motcle_non_standard(const Motcle& mot, Entree& is)
         }
       else
         {
-          Cerr << "On ne comprend le mot : " << mot << "dans " << que_suis_je() << finl;
+          Cerr << "The keyword " << mot << " is not understood in " << que_suis_je() << finl;
           exit();
         }
     }
@@ -110,7 +110,7 @@ int Source_Neutronique::lire_motcle_non_standard(const Motcle& mot, Entree& is)
     {
       Nom tmp;
       is >> tmp;
-      Cerr << "Lecture de la reactivite " << tmp << finl;
+      Cerr << "Reading reactivity " << tmp << finl;
       fct_tT.setNbVar(2);
       fct_tT.setString(tmp);
       fct_tT.addVar("t");
@@ -126,7 +126,7 @@ int Source_Neutronique::lire_motcle_non_standard(const Motcle& mot, Entree& is)
     {
       if (N<1)
         {
-          Cerr << "Il faut rentrer le nb de groupes N avant les Ci initiaux dans  " << que_suis_je() << finl;
+          Cerr << "The number of groups N must be specified before the initial Ci values in  " << que_suis_je() << finl;
           exit();
         }
       Ci0_ok = 1;
@@ -305,9 +305,9 @@ void Source_Neutronique::imprimer(double temps) const
     }
   fic << finl;
 
-  /*Cout << "Impression du pas de temps pour l'equation de la cinetique point " << finl;
-    Cout << ">>>> Pas de temps utilise dt = " << dt << finl;
-    Cout << ">>>> Pas de temps de stabilite dt_stab = " << dt_stab << finl;
+  /*Cout << "Printing time step for the point kinetics equation" << finl;
+    Cout << ">>>> Time step used dt = " << dt << finl;
+    Cout << ">>>> Stability time step dt_stab = " << dt_stab << finl;
   */
 }
 

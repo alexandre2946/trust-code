@@ -53,9 +53,9 @@ Entree& Echange_global_impose_rayo_semi_transp::readOn(Entree& is)
           }
         default:
           {
-            Cerr << "Erreur a la lecture de la condition aux limites de type " << finl;
+            Cerr << "Error reading the boundary condition of type " << finl;
             Cerr << "Echange_global_impose_rayo_semi_transp " << finl;
-            Cerr << "On attendait " << les_motcles << "a la place de " << motlu << finl;
+            Cerr << "Expected " << les_motcles << " instead of " << motlu << finl;
             Process::exit();
           }
         }

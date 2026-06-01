@@ -237,10 +237,10 @@ void Op_Conv_VEF_base::associer(const Domaine_dis_base& domaine_dis,
   le_dom_vef = zvef;
   la_zcl_vef = zclvef;
   //******************************************************************************
-  // Initialisation des jetons pour l'alternance (kamoulox !)
+  // Initialization of tokens for alternation (kamoulox!)
 
   //******************************************************************************
-  Cerr << "Initialisation de la roue pour la permutation des schemas de convection" << finl;
+  Cerr << "Initialization of the wheel for permutation of convection schemes" << finl;
   roue= -1;
   //  roue2=-1;
 

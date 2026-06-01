@@ -63,7 +63,7 @@ DoubleTab& Solveur_Masse_EF::appliquer_impl(DoubleTab& sm) const
   int face;
   if (nfa != sm.dimension(0))
     {
-      Cerr << "erreur dans Solveur_Masse_EF : ";
+      Cerr << "error in Solveur_Masse_EF : ";
       Cerr << "nombre de faces :  " << nfa
            << " taille du second membre : " << sm.dimension(0) << finl;
       exit();

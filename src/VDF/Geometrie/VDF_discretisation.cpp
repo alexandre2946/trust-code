@@ -427,7 +427,7 @@ void VDF_discretisation::y_plus(const Domaine_dis_base& z, const Domaine_Cl_dis_
   const Domaine_Cl_VDF& domaine_cl_vdf = ref_cast(Domaine_Cl_VDF, zcl);
   if (domaine_cl_vdf.equation().probleme().que_suis_je().debute_par("Pb_Multiphase"))
     {
-      Cerr << "Discretisation de y plus" << finl; // Utilise comme modele distance paroi globale
+      Cerr << "Discretization of y plus" << finl; // Used as a global wall distance model
       Noms noms(1), unites(1);
       noms[0] = Nom("Y_plus");
       unites[0] = Nom("adimensionnel");
@@ -454,7 +454,7 @@ void VDF_discretisation::y_plus(const Domaine_dis_base& z, const Domaine_Cl_dis_
 
 void VDF_discretisation::t_paroi(const Domaine_dis_base& z,const Domaine_Cl_dis_base& zcl, const Champ_Inc_base& ch_temp, OWN_PTR(Champ_Fonc_base)& ch) const
 {
-  Cerr << "Discretisation de temperature_paroi" << finl;
+  Cerr << "Discretization of temperature_paroi" << finl;
   const Champ_P0_VDF& temp = ref_cast(Champ_P0_VDF, ch_temp);
   const Domaine_VDF& domaine_vdf = ref_cast(Domaine_VDF, z);
   const Domaine_Cl_VDF& domaine_cl_vdf = ref_cast(Domaine_Cl_VDF, zcl);
@@ -483,38 +483,37 @@ void VDF_discretisation::modifier_champ_tabule(const Domaine_dis_base& domaine_d
   le_champ_tabule_dis.changer_temps(ch_inc[0]->temps());
 }
 
-/*! @brief discretise en VDF le fluide incompressible, donc  K e N
+/*! @brief Discretizes the incompressible fluid in VDF, including K, e, N.
  *
- * @param (Domaine_dis_base&) domaine a discretiser
- * @param (Fluide_Ostwald&) fluide a discretiser
- * @param (Champ_Inc_base&) vitesse
- * @param (Champ_Inc_base&) temperature
+ * @param z domain to discretize
+ * @param le_fluide fluid to discretize
+ * @param eqn_hydr Navier-Stokes equation (used to access velocity)
  */
 void VDF_discretisation::proprietes_physiques_fluide_Ostwald(const Domaine_dis_base& z, Fluide_Ostwald& le_fluide, const Navier_Stokes_std& eqn_hydr, const Champ_Inc_base&) const
 {
-  Cerr << "Discretisation du fluide_Ostwald" << finl;
+  Cerr << "Discretization of fluide_Ostwald" << finl;
   const Domaine_VDF& domaine_vdf = ref_cast(Domaine_VDF, z);
   const Champ_Inc_base& ch_vitesse = eqn_hydr.inconnue();
   const Champ_Face_VDF& vit = ref_cast(Champ_Face_VDF, ch_vitesse);
 
   Champ_Don_base& mu = le_fluide.viscosite_dynamique();
-  //  mu est toujours un champ_Ostwald_VDF , il faut toujours faire ce qui suit
+  //  mu is always a champ_Ostwald_VDF, so the following must always be done
   Champ_Ostwald_VDF& ch_mu = ref_cast(Champ_Ostwald_VDF, mu);
-  Cerr << "associe domainedisbase" << finl;
+  Cerr << "associating domainedisbase" << finl;
   ch_mu.associer_domaine_dis_base(domaine_vdf);
   ch_mu.associer_fluide(le_fluide);
   ch_mu.associer_champ(vit);
-  Cerr << "associations finies" << finl;
+  Cerr << "associations done" << finl;
   ch_mu.fixer_nb_comp(1);
 
-  Cerr << "fait fixer_nb_valeurs_nodales" << finl;
+  Cerr << "calling fixer_nb_valeurs_nodales" << finl;
   Cerr << "nb_valeurs_nodales = " << domaine_vdf.nb_elem() << finl;
   ch_mu.fixer_nb_valeurs_nodales(domaine_vdf.nb_elem());
 
-  Cerr << "fait changer_temps" << finl;
+  Cerr << "calling changer_temps" << finl;
   ch_mu.changer_temps(vit.temps());
 
-  Cerr << "mu est discretise " << finl;
+  Cerr << "mu is discretized " << finl;
 }
 
 void VDF_discretisation::creer_champ_vorticite(const Schema_Temps_base& sch, const Champ_Inc_base& ch_vitesse,
@@ -577,7 +576,7 @@ void VDF_discretisation::residu(const Domaine_dis_base& z, const Champ_Inc_base&
 
 void VDF_discretisation::distance_paroi_globale(const Schema_Temps_base& sch, Domaine_dis_base& z, OWN_PTR(Champ_Fonc_base) &ch) const
 {
-  Cerr << "Discretisation de distance paroi globale" << finl;
+  Cerr << "Discretization of global wall distance" << finl;
   Noms noms(1), unites(1);
   noms[0] = Nom("distance_paroi_globale");
   unites[0] = Nom("m");

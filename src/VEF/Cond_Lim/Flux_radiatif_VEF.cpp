@@ -118,19 +118,19 @@ void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
             }
           else
             {
-              Cerr << "Coder pour les autres condition limites de l'equation de temperature 1 " << finl;
+              Cerr << "To be implemented for other boundary conditions of the temperature equation 1 " << finl;
               Process::exit();
             }
         }
     }
   if (test_nom == 0)
     {
-      Cerr << "Erreur : il n'y a pas de condition limite sur une frontiere portant le nom : " << frontiere_dis().le_nom() << finl;
+      Cerr << "Error: there is no boundary condition on a boundary with the name: " << frontiere_dis().le_nom() << finl;
       Process::exit();
     }
 
-  // Tb contient les temperatures de bord
-  // Calcul du flux radiatif
+  // Tb contains the wall temperatures
+  // Computation of the radiative flux
   DoubleTab& Flux = flux_radiatif().valeurs();
   Flux.resize(le_bord.nb_faces(), 1);
   const Eq_rayo_semi_transp& eq_rayo = ref_cast(Eq_rayo_semi_transp, domaine_Cl_dis().equation());
@@ -186,5 +186,5 @@ void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
   Debog::verifier_bord(" Flux_radiatif_VEF::calculer_flux_radiatif_Flux ", Flux, ndeb);
 
   if (eq_rayo.schema_temps().limpr())
-    Cout << "Flux radiatif sur le bord " << le_bord.le_nom() << " : " << bilan_flux << finl;
+    Cout << "Radiative flux on boundary " << le_bord.le_nom() << " : " << bilan_flux << finl;
 }

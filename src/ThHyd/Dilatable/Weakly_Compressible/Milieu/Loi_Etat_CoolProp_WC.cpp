@@ -26,7 +26,7 @@ Sortie& Loi_Etat_CoolProp_WC::printOn(Sortie& os) const { return os << que_suis_
 
 Entree& Loi_Etat_CoolProp_WC::readOn(Entree& is)
 {
-  Cerr << "Lecture de la loi d'etat CoolProp_WC ... " << finl;
+  Cerr << "Reading the equation of state CoolProp_WC ... " << finl;
   Loi_Etat_TPPI_WC_base::readOn(is);
 
   TPPI_ = std::make_shared<CoolProp_to_TRUST_generique>();

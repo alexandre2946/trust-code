@@ -45,7 +45,7 @@ Entree& Op_Conv_EF_VEF_P1NC::readOn(Entree& s )
         s >> antisym;
       else
         {
-          Cerr << motlu << "n'est pas compris par "
+          Cerr << motlu << "is not understood by "
                << que_suis_je() << finl;
           exit();
         }
@@ -53,39 +53,39 @@ Entree& Op_Conv_EF_VEF_P1NC::readOn(Entree& s )
 
   if (transportant_bar <0)
     {
-      Cerr << "il manque le mot cle transportant_bar" << finl;
+      Cerr << "missing keyword transportant_bar" << finl;
       exit();
     }
   if (transporte_bar <0)
     {
-      Cerr << "il manque le mot cle transporte_bar" << finl;
+      Cerr << "missing keyword transporte_bar" << finl;
       exit();
     }
   if (filtrer_resu <0)
     {
-      Cerr << "il manque le mot cle filtrer_resu" << finl;
+      Cerr << "missing keyword filtrer_resu" << finl;
       exit();
     }
   if (antisym <0)
     {
-      Cerr << "il manque le mot cle antisym" << finl;
+      Cerr << "missing keyword antisym" << finl;
       exit();
     }
   return s ;
 }
 
 //
-//   Fonctions de la classe Op_Conv_EF_VEF_P1NC
+//   Member functions of class Op_Conv_EF_VEF_P1NC
 //
 
-// convbis correspond au calcul de -1*terme_convection
+// convbis corresponds to the computation of -1*convection_term
 
 
 ////////////////////////////////////////////////////////////////////
 //
-//                      Implementation des fonctions
+//                      Implementation of member functions
 //
-//                   de la classe Op_Conv_EF_VEF_P1NC
+//                   of class Op_Conv_EF_VEF_P1NC
 //
 ////////////////////////////////////////////////////////////////////
 
@@ -244,7 +244,7 @@ DoubleTab& Op_Conv_EF_VEF_P1NC::ajouter(const DoubleTab& transporte_2,
 
       else if ((antisym==1) && (!sub_type(Symetrie,la_cl.valeur())) )
         {
-          //          Cerr << "Ajout des termes de bords :" << finl;
+          //          Cerr << "Adding boundary terms:" << finl;
           int num1 = le_bord.num_premiere_face();
           int nb_faces=le_bord.nb_faces();
           int num2 = num1 + nb_faces;
@@ -266,11 +266,11 @@ DoubleTab& Op_Conv_EF_VEF_P1NC::ajouter(const DoubleTab& transporte_2,
   if(filtrer_resu)
     ch.filtrer_resu(resu);
 
-  // On desactive le calcul et l'impression des energies u'......
-  // on garde le codage au cas ou..
+  // Disable the computation and printing of u' energies......
+  // keeping the code in case it is needed later..
   if (0)
     {
-      Cerr << "filtrage petites echelles : " << finl;
+      Cerr << "small-scale filtering: " << finl;
 
       DoubleTab ubar(transporte);
       ch.filtrer_L2(ubar);
@@ -406,12 +406,12 @@ DoubleTab& Op_Conv_EF_VEF_P1NC::ajouter(const DoubleTab& transporte_2,
 
 void Op_Conv_EF_VEF_P1NC::ajouter_contribution(const DoubleTab& transporte, Matrice_Morse& matrice ) const
 {
-  Cerr << "Op_Conv_EF_VEF_P1NC::ajouter_contribution non code." << finl;
+  Cerr << "Op_Conv_EF_VEF_P1NC::ajouter_contribution not implemented." << finl;
   exit();
 }
 
 void Op_Conv_EF_VEF_P1NC::contribue_au_second_membre(DoubleTab& resu ) const
 {
-  Cerr << "Op_Conv_EF_VEF_P1NC::contribue_au_second_membre non code." << finl;
+  Cerr << "Op_Conv_EF_VEF_P1NC::contribue_au_second_membre not implemented." << finl;
   exit();
 }

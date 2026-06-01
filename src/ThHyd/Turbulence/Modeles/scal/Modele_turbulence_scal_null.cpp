@@ -50,13 +50,13 @@ Entree& Modele_turbulence_scal_null::readOn(Entree& is)
   else if (discr == "EF") loipar_.typer("negligeable_scalaire_EF");
   else
     {
-      Cerr << "Erreur dans Modele_turbulence_scal_null::readOn : la discretisation " << discr << " n'est pas prise en charge" << finl;
+      Cerr << "Error in Modele_turbulence_scal_null::readOn: the discretization " << discr << " is not supported" << finl;
       Process::exit();
     }
   loipar_->associer_modele(*this);
   loipar_->associer(le_pb.equation(0).domaine_dis(), le_pb.equation(0).domaine_Cl_dis());
 
-  // Pas envie de debugger XDATA ... je penalise tt le monde alors
+  // Not willing to debug XDATA ... penalizing everyone instead
   Param param(que_suis_je());
   param.lire_avec_accolades_depuis(is);
   return is;

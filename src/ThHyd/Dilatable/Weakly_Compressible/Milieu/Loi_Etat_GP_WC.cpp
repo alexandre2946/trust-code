@@ -33,7 +33,7 @@ Sortie& Loi_Etat_GP_WC::printOn(Sortie& os) const
 
 Entree& Loi_Etat_GP_WC::readOn(Entree& is)
 {
-  Cerr << "Lecture de la loi d'etat gaz parfait pour le WC ... " << finl;
+  Cerr << "Reading the perfect gas equation of state for WC ... " << finl;
   Loi_Etat_Mono_GP_base::readOn(is);
 
   if(rho_constant_pour_debug_)

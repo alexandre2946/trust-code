@@ -132,7 +132,7 @@ void Source_Fluide_Dilatable_VEF_Proto::ajouter_impl(const Equation_base& eqn,co
     }
   else
     {
-      Cerr<<"La discretisation "<<eqn.discretisation().que_suis_je()<<" n'est pas reconnue dans Source_Fluide_Dilatable_VEF_Proto"<<finl;
+      Cerr<<"Discretization "<<eqn.discretisation().que_suis_je()<<" is not recognized in Source_Fluide_Dilatable_VEF_Proto"<<finl;
       Process::exit();
     }
 }

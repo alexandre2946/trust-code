@@ -250,7 +250,7 @@ void PolyMAC_CDO_discretisation::discretiser_champ_fonc_don(const Motcle& direct
 
 void PolyMAC_CDO_discretisation::distance_paroi(const Schema_Temps_base& sch, Domaine_dis_base& z, OWN_PTR(Champ_Fonc_base)& ch) const
 {
-  Cerr << "Discretisation de la distance paroi" << finl;
+  Cerr << "Discretization of the wall distance" << finl;
   Domaine_PolyMAC_CDO& domaine_PolyMAC_CDO = ref_cast(Domaine_PolyMAC_CDO, z);
   ch.typer("Champ_Fonc_Elem_PolyMAC_CDO");
   Champ_Fonc_Elem_PolyMAC_CDO& ch_dist_paroi = ref_cast(Champ_Fonc_Elem_PolyMAC_CDO, ch.valeur());
@@ -399,7 +399,7 @@ Nom PolyMAC_CDO_discretisation::get_name_of_type_for(const Nom& class_operateur,
 
 void PolyMAC_CDO_discretisation::distance_paroi_globale(const Schema_Temps_base& sch, Domaine_dis_base& z, OWN_PTR(Champ_Fonc_base)& ch) const
 {
-  Cerr << "Discretisation de distance paroi globale" << finl;
+  Cerr << "Discretization of global wall distance" << finl;
   Noms noms(1), unites(1);
   noms[0] = Nom("distance_paroi_globale");
   unites[0] = Nom("m");

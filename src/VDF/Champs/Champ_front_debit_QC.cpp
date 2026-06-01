@@ -72,8 +72,8 @@ Entree& Champ_front_debit_QC::readOn(Entree& is)
   is >> motlu;
   if (motlu != les_mots[0])
     {
-      Cerr << "Erreur a la lecture d'un Champ_front_debit_QC" << finl;
-      Cerr << "On attendait { a la place de " << motlu << finl;
+      Cerr << "Error reading a Champ_front_debit_QC" << finl;
+      Cerr << "Expected { instead of " << motlu << finl;
       exit();
     }
   fixer_nb_comp(dim);
@@ -83,8 +83,8 @@ Entree& Champ_front_debit_QC::readOn(Entree& is)
   is >> motlu;
   if (motlu != les_mots[1])
     {
-      Cerr << "Erreur a la lecture d'un Champ_front_debit_QC" << finl;
-      Cerr << "On attendait } a la place de " << finl;
+      Cerr << "Error reading a Champ_front_debit_QC" << finl;
+      Cerr << "Expected } instead of " << finl;
       exit();
     }
   Nom nom_pb;

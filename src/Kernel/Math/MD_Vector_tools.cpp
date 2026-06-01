@@ -311,7 +311,7 @@ void MD_Vector_tools::creer_md_vect_renum(const IntVect& renum, MD_Vector& md_ve
   const MD_Vector& src_md = renum.get_md_vector();
   if (!src_md)
     {
-      Cerr << "Internal error in MD_Vector_tools::creer_md_vect_renum: descripteur nul !" << finl;
+      Cerr << "Internal error in MD_Vector_tools::creer_md_vect_renum: null descriptor!" << finl;
       Process::exit();
     }
   if (renum.line_size() != 1)

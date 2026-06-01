@@ -45,12 +45,12 @@ Entree& Perte_Charge_VEF::readOn(Entree& is )
   lambda.setNbVar(4+dimension);
   set_param(param);
   param.lire_avec_accolades_depuis(is);
-  Cerr << "Interpretation de la fonction " << lambda.getString() << " ... ";
+  Cerr << "Parsing function " << lambda.getString() << " ... ";
   lambda.parseString();
   Cerr << " Ok" << finl;
   if (diam_hydr->nb_comp()!=1)
     {
-      Cerr << "Il faut definir le champ diam_hydr a une composante" << finl;
+      Cerr << "The diam_hydr field must be defined with one component" << finl;
       exit();
     }
   return is;
@@ -86,9 +86,9 @@ int Perte_Charge_VEF::lire_motcle_non_standard(const Motcle& mot, Entree& is)
       sous_domaine=true;
       return 1;
     }
-  else // non compris
+  else // not recognized
     {
-      Cerr << "Mot cle \"" << mot << "\" non compris lors de la lecture d'un "
+      Cerr << "Keyword \"" << mot << "\" not understood when reading a "
            << que_suis_je() << finl;
       exit();
     }
@@ -314,7 +314,7 @@ void Perte_Charge_VEF::completer()
 
       if(!sous_domaine)
         {
-          Cerr << "On ne trouve pas le sous_domaine discretise associe a " << nom_sous_domaine << finl;
+          Cerr << "Cannot find the discretized sub-domain associated with " << nom_sous_domaine << finl;
           exit();
         }
     }

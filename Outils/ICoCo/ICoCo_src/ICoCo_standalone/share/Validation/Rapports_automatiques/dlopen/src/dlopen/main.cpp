@@ -186,7 +186,7 @@ int main(int argc, char** argv) {
   }                                   // End loop on timesteps
   
   T->terminate();
-  cerr<<"Arret des processes."<<endl;
+  cerr<<"Stopping processes."<<endl;
   delete T;
   }
   MPI_Barrier(MPI_COMM_WORLD);

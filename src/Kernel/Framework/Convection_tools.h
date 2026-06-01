@@ -46,7 +46,7 @@ KOKKOS_INLINE_FUNCTION double vanalbada(double grad1, double grad2)
 KOKKOS_INLINE_FUNCTION double chakravarthy(double grad1, double grad2)
 {
   /*
-    Cerr << " limiteur chakavarthy non preconise (non symetrique) " << finl;
+    Cerr << " chakravarthy limiter not recommended (non-symmetric) " << finl;
     exit();
     return 0;
   */
@@ -63,7 +63,7 @@ KOKKOS_INLINE_FUNCTION double chakravarthy(double grad1, double grad2)
 KOKKOS_INLINE_FUNCTION double superbee(double grad1, double grad2)
 {
   /*
-    Cerr << " limiteur superbee non preconise (source d'instabilites) " << finl;
+    Cerr << " superbee limiter not recommended (source of instabilities) " << finl;
     exit();
     return 0;
   */

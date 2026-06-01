@@ -1346,14 +1346,14 @@ then
                    echo $ECHO_OPTS "Caution  ! No result file created !"
                    [ $PB = 0 ] && PB='255'
                 # Est ce que le calcul s'est arrete ?
-                #elif [ "`tail -1 $NOM2.err`" != "Arret des processes." ]
+                #elif [ "`tail -1 $NOM2.err`" != "Stopping processes." ]
                 # message dans le .err normalement, mais sur rhodia 8 avec openmpi 5.x + ctest => Cerr parfois ecrit dans le .out
-                elif [ "`grep 'Arret des processes.' $NOM2.err`" = "" ] && [ "`grep 'Arret des processes.' $NOM2.out`" = "" ]
+                elif [ "`grep 'Stopping processes.' $NOM2.err`" = "" ] && [ "`grep 'Stopping processes.' $NOM2.out`" = "" ]
                 then
                    [ $PB = 0 ] && PB='255'
                 else
                    # message dans le .err normalement, mais sur rhodia 8 avec openmpi 5.x + ctest => Cerr parfois ecrit dans le .out
-                   PB=0 && [ "`grep 'Arret ' $NOM2.err`" = "" ] && [ "`grep 'Arret ' $NOM2.out`" = "" ] && PB=255
+                   PB=0 && [ "`grep 'Stopping processes.' $NOM2.err`" = "" ] && [ "`grep 'Stopping processes.' $NOM2.out`" = "" ] && PB=255
                    # Verification eventuelle
                    if [ -f verifie ] && [ "$VALGRIND" != 1 ]
                    then

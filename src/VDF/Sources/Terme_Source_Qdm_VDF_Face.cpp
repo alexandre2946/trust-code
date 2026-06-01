@@ -37,8 +37,8 @@ Entree& Terme_Source_Qdm_VDF_Face::readOn(Entree& s)
   s >> la_source;
   if (la_source->nb_comp() != equation().inconnue().nb_comp())
     {
-      Cerr << "Erreur a la lecture du terme source de type " << que_suis_je() << finl;
-      Cerr << "le champ source doit avoir " << equation().inconnue().nb_comp() << " composantes" << finl;
+      Cerr << "Error reading the source term of type " << que_suis_je() << finl;
+      Cerr << "the source field must have " << equation().inconnue().nb_comp() << " components" << finl;
       exit();
     }
   return s;

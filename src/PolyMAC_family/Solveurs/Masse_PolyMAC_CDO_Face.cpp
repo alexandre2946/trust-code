@@ -33,24 +33,24 @@ Entree& Masse_PolyMAC_CDO_Face::readOn(Entree& s) { return s; }
 
 DoubleTab& Masse_PolyMAC_CDO_Face::appliquer_impl(DoubleTab& sm) const
 {
-  //hors faces de bord, on ne fait rien et on passe secmem a corriger_derivee_* (car PolyMAC_CDO a une matrice de masse)
+  //outside boundary faces, we do nothing and pass secmem to corriger_derivee_* (because PolyMAC_CDO has a mass matrix)
   assert(le_dom_PolyMAC_CDO);
   assert(le_dom_Cl_PolyMAC_CDO);
   const Domaine_PolyMAC_CDO& domaine_PolyMAC_CDO = le_dom_PolyMAC_CDO.valeur();
   const Champ_Face_PolyMAC_CDO& ch = ref_cast(Champ_Face_PolyMAC_CDO, equation().inconnue());
   ch.fcl();
 
-  assert(sm.nb_dim() <= 2); // sinon on ne fait pas ce qu'il faut
+  assert(sm.nb_dim() <= 2); // otherwise we would not do the right thing
   int nb_faces_tot = domaine_PolyMAC_CDO.nb_faces_tot();
   int nb_aretes_tot = (dimension < 3 ? domaine_PolyMAC_CDO.nb_som_tot() : domaine_PolyMAC_CDO.domaine().nb_aretes_tot()), nc = sm.line_size();
 
   if (sm.dimension_tot(0) != nb_faces_tot && sm.dimension_tot(0) != nb_faces_tot + nb_aretes_tot)
     {
-      Cerr << "Masse_PolyMAC_CDO_Face::appliquer :  erreur dans la taille de sm" << finl;
+      Cerr << "Masse_PolyMAC_CDO_Face::appliquer :  error in the size of sm" << finl;
       Process::exit();
     }
 
-  //mise a zero de la partie vitesse de sm sur les faces a vitesse imposee
+  //zero out the velocity part of sm on faces with imposed velocity
   for (int f = 0; f < domaine_PolyMAC_CDO.nb_faces(); f++)
     if (ch.fcl()(f, 0) > 1)
       for (int k = 0; k < nc; k++)

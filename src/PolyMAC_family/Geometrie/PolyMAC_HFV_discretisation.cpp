@@ -238,7 +238,7 @@ void PolyMAC_HFV_discretisation::discretiser_champ_fonc_don(const Motcle& direct
 
 void PolyMAC_HFV_discretisation::y_plus(const Domaine_dis_base& z, const Domaine_Cl_dis_base& zcl, const Champ_Inc_base& ch_vitesse, OWN_PTR(Champ_Fonc_base) &ch) const
 {
-  Cerr << "Discretisation de y plus" << finl; // Utilise comme modele distance paroi globale
+  Cerr << "Discretization of y plus" << finl; // Used as a global wall-distance model
   Noms noms(1), unites(1);
   noms[0] = Nom("y_plus");
   unites[0] = Nom("adimensionnel");

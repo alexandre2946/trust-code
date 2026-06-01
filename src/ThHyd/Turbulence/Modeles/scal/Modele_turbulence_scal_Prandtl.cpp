@@ -54,9 +54,9 @@ Entree& Modele_turbulence_scal_Prandtl::readOn(Entree& is)
       fonction1_.parseString();
     }
   else
-    Cerr << "La valeur par defaut du nombre de Prandtl turbulent est " << LePrdt_ << finl;
+    Cerr << "The default value of the turbulent Prandtl number is " << LePrdt_ << finl;
 
-  Cerr << "L'expression du nombre de Prandtl turbulent est " << LePrdt_fct_ << finl;
+  Cerr << "The expression for the turbulent Prandtl number is " << LePrdt_fct_ << finl;
   return is;
 }
 
@@ -125,24 +125,24 @@ Champ_Fonc_base& Modele_turbulence_scal_Prandtl::calculer_diffusivite_turbulente
   int n = tab_alpha_t.size();
   if (tab_nu_t.size() != n)
     {
-      Cerr << "Les DoubleTab des champs diffusivite_turbulente et viscosite_turbulente" << finl;
-      Cerr << "doivent avoir le meme nombre de valeurs nodales" << finl;
+      Cerr << "The DoubleTab arrays of diffusivite_turbulente and viscosite_turbulente fields" << finl;
+      Cerr << "must have the same number of nodal values" << finl;
       exit();
     }
 
   if (definition_fonction_ != Nom())
     {
-      // modif VB pour utiliser l'equation qui approche Yakhot : LePrdt = 0.7/Pe-t + 0.85
-      // Pe-t est un nombre de Peclet turbulent defini par Pr*(nut/nu)
-      // On a alors alpha_t = nut * nut / ( 0.7 alpha + 0.85 nut )
+      // modif VB to use the equation approaching Yakhot: LePrdt = 0.7/Pe-t + 0.85
+      // Pe-t is a turbulent Peclet number defined by Pr*(nut/nu)
+      // giving alpha_t = nut * nut / ( 0.7 alpha + 0.85 nut )
 
       const Milieu_base& milieu = mon_equation_->milieu();
       const Champ_Don_base& alpha = milieu.diffusivite();
       if (!milieu.has_diffusivite())
         {
-          // GF si cette condition est bloquante, on peut ameliorer en
-          // tentant de creer un parser sans la variable alpha, si ok on peut dire que alpha existe , est constant et vaut 1.
-          Cerr << "Erreur dans Modele_turbulence_scal_prandt, l'option Prandt_turbulent_fonction_nu_t_alpha n'est disponible que pour des milieux ayant defini la diffusivite" << finl;
+          // GF if this condition is blocking, we could improve by
+          // attempting to create a parser without the variable alpha; if successful, alpha exists, is constant, and equals 1.
+          Cerr << "Error in Modele_turbulence_scal_prandtl, the Prandt_turbulent_fonction_nu_t_alpha option is only available for media with a defined diffusivity" << finl;
           exit();
         }
       double d_alpha = 0.;

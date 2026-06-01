@@ -42,14 +42,14 @@ Entree& Modele_turbulence_scal_base::readOn(Entree& is)
   set_param(param);
   param.lire_avec_accolades_depuis(is);
   const Probleme_base& le_pb = mon_equation_->probleme();
-  // lp loi de paroi du modele de turbulence de l'hydraulique
+  // lp wall law of the hydraulic turbulence model
   const RefObjU& modele_turbulence = le_pb.equation(0).get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base, modele_turbulence.valeur());
   if (!loipar_ && mod_turb_hydr.has_loi_paroi_hyd())
     {
       Cerr << finl;
-      Cerr << "Mot cle " << mot << "non trouve !" << finl;
-      Cerr << "On doit lire une loi de paroi dans le modele de turbulence pour un scalaire." << finl;
+      Cerr << "Keyword " << mot << " not found!" << finl;
+      Cerr << "A wall law must be read in the turbulence model for a scalar." << finl;
       Cerr << finl;
       exit();
     }

@@ -27,8 +27,8 @@ Entree& Champ_Ostwald::readOn(Entree& is) { return is; }
 
 void Champ_Ostwald::mettre_a_jour(double)
 {
-  Cerr << "Champ_Ostwald::mettre_a_jour() ne fait rien" << finl;
-  Cerr << que_suis_je() << "doit la surcharger !" << finl;
+  Cerr << "Champ_Ostwald::mettre_a_jour() does nothing" << finl;
+  Cerr << que_suis_je() << " must override it!" << finl;
   Process::exit();
 }
 
@@ -42,20 +42,20 @@ int Champ_Ostwald::initialiser(const double un_temps)
 
 void Champ_Ostwald::me_calculer(double tps)
 {
-  Cerr << "Champ_Ostwald::me_calculer() ne fait rien" << finl;
-  Cerr << que_suis_je() << "doit la surcharger !" << finl;
+  Cerr << "Champ_Ostwald::me_calculer() does nothing" << finl;
+  Cerr << que_suis_je() << " must override it!" << finl;
   Process::exit();
 }
 
-/*! @brief Fixe le nombre de degres de liberte par composante
+/*! @brief Sets the number of degrees of freedom per component.
  *
- * @param (int nb_noeuds) le nombre de degre de liberte par composante
- * @return (int) le nombre de degres de liberte par composante
+ * @param (int nb_noeuds) the number of degrees of freedom per component
+ * @return (int) the number of degrees of freedom per component
  */
 int Champ_Ostwald::fixer_nb_valeurs_nodales(int nb_noeuds)
 {
-  // Note B.M.: encore un heritage a la noix qui m'empeche de factoriser
-  // en utilisant creer_tableau_distribue:
+  // Note B.M.: another awkward inheritance that prevents factorization
+  // using creer_tableau_distribue:
   const Champ_Don_base& cdb = *this;
   const Domaine& domaine = cdb.domaine_dis_base().domaine();
 

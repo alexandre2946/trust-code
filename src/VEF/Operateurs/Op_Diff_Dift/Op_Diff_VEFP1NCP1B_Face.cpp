@@ -83,20 +83,20 @@ Entree& Op_Diff_VEFP1NCP1B_Face::readOn(Entree& s )
     les_mots[5] = "epsilon";
   }
 
-  //Verification de la syntaxe
+  //Syntax check
   s >> motlu;
   if (motlu!=accouverte)
     {
-      Cerr << "Erreur Op_Diff_VEFP1NCP1B_Face::readOn()" << finl;
-      Cerr << "Depuis la 1.5.5, la syntaxe du mot cle P1NCP1B a change." << finl;
-      Cerr << "Il faut commencer par une accolade ouvrante {" << finl;
-      Cerr << "et les options eventuelles sont entre les accolades :" << finl;
+      Cerr << "Error in Op_Diff_VEFP1NCP1B_Face::readOn()" << finl;
+      Cerr << "Since version 1.5.5, the syntax of keyword P1NCP1B has changed." << finl;
+      Cerr << "An opening brace { is required first." << finl;
+      Cerr << "Optional settings go between the braces:" << finl;
       Cerr << "Diffusion { P1NCP1B } -> Diffusion { P1NCB { } }" << finl;
       exit();
     }
 
 
-  //Lecture des parametres
+  //Read parameters
   s >> motlu;
   while(motlu!=accfermee)
     {
@@ -120,9 +120,9 @@ Entree& Op_Diff_VEFP1NCP1B_Face::readOn(Entree& s )
             s >> alphaA;
           else
             {
-              Cerr << "Erreur Op_Diff_VEFP1NCP1B_Face::readOn()" << finl;
-              Cerr << "L'option alphaA ne peut etre activee qu'en " << "dimension 3" << finl;
-              Cerr << "Sortie du programme" << finl;
+              Cerr << "Error in Op_Diff_VEFP1NCP1B_Face::readOn()" << finl;
+              Cerr << "The alphaA option can only be enabled in dimension 3" << finl;
+              Cerr << "Exiting program" << finl;
               exit();
             }
           break;
@@ -144,17 +144,17 @@ Entree& Op_Diff_VEFP1NCP1B_Face::readOn(Entree& s )
 
         default :
 
-          Cerr << "Erreur Op_Diff_VEFP1NCP1B_Face::readOn()" << finl;
-          Cerr << "Mot clef " << motlu << " non reconnu" << finl;
-          Cerr << "Les mots clef reconnus sont : " << les_mots << finl;
-          Cerr << "Sortie du programme" << finl;
+          Cerr << "Error in Op_Diff_VEFP1NCP1B_Face::readOn()" << finl;
+          Cerr << "Keyword " << motlu << " not recognised" << finl;
+          Cerr << "Recognised keywords are: " << les_mots << finl;
+          Cerr << "Exiting program" << finl;
           exit();
           break;
-        }//fin du switch
+        }//end switch
 
-      //Suite de la lecture
+      //Continue reading
       s >> motlu;
-    }//fin du while
+    }//end while
 
   if (alphaE && !alphaS) convexite_=1.;
   else if (alphaS && !alphaE) convexite_=0.;
@@ -3090,28 +3090,28 @@ void Op_Diff_VEFP1NCP1B_Face::dimensionner(Matrice_Morse& matrice) const
                     debut+=nb_comp-1;
                   }
 
-              }//fin du for sur "comp"
+              }//end loop over "comp"
 
-          }//fin du for sur "face"
+          }//end loop over "face"
 
-    }//fin du if sur "alphaS"
+    }//end if on "alphaS"
 
   if (alphaA)
     {
-      Cerr << "Erreur Op_Dift_VEFP1NCP1B_Face::dimensionner(Matrice_Morse&)" << finl;
-      Cerr << "Le dimensionnement de la matrice implicite avec l'option alphaA"
-           << " n'est pas encore codee" << finl;
-      Cerr << "Sortie du programme" << finl;
+      Cerr << "Error in Op_Dift_VEFP1NCP1B_Face::dimensionner(Matrice_Morse&)" << finl;
+      Cerr << "Sizing of the implicit matrix with the alphaA option"
+           << " is not yet implemented" << finl;
+      Cerr << "Exiting program" << finl;
       exit();
     }
 }
 
-//Fonction qui initialise le tableau is_symetry passe en argument :
-//-si une face "f" est une face de symetrie alors is_symetry(f)=1
-//-si une face "f" n'est pas une face de symetrie alors is_symetry(f)=0
-//La fonction renvoie egalement le nombre total de faces de symetrie (argument nnz)
-//REMARQUE : le tableau "is_symetry" doit etre dimensionne a nb_faces_tot
-//AVANT d'utiliser cette fonction
+//Function that initialises the is_symetry array passed as argument:
+//-if a face "f" is a symmetry face then is_symetry(f)=1
+//-if a face "f" is not a symmetry face then is_symetry(f)=0
+//The function also returns the total number of symmetry faces (argument nnz).
+//NOTE: the array "is_symetry" must be dimensioned to nb_faces_tot
+//BEFORE calling this function.
 void Op_Diff_VEFP1NCP1B_Face::isFaceOfSymetry(ArrOfBit& is_symetry,int& nnz) const
 {
   const Domaine_VEF& domaine_VEF=domaine_vef();

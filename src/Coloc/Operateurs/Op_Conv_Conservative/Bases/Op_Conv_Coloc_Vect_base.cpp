@@ -167,7 +167,7 @@ void Op_Conv_Coloc_Vect_base::Riemann_solver(DoubleTab& num_flux) const
           }
         else
           {
-            Cerr << " La CL de type " << fcl(f, 0) << " pour l'equation " << eq.que_suis_je() << " n est pas diponible .....\n";
+            Cerr << " The BC of type " << fcl(f, 0) << " for the equation " << eq.que_suis_je() << " is not available .....\n";
             Process::exit();
           }
 

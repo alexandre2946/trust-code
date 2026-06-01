@@ -275,25 +275,25 @@ double Loi_Etat_base::calculer_H(double Pth_, double T_) const
 
 double Loi_Etat_base::Drho_DP(double,double) const
 {
-  Cerr<<"Drho_DP doit etre code dans la classe fille "<<que_suis_je()<<" pour etre utilisee"<<finl;
+  Cerr<<"Drho_DP must be implemented in the derived class "<<que_suis_je()<<" to be used"<<finl;
   abort();
   return 0;
 }
 double Loi_Etat_base::Drho_DT(double,double) const
 {
-  Cerr<<"Drho_DT doit etre code dans la classe fille "<<que_suis_je()<<" pour etre utilisee"<<finl;
+  Cerr<<"Drho_DT must be implemented in the derived class "<<que_suis_je()<<" to be used"<<finl;
   abort();
   return 0;
 }
 double Loi_Etat_base::De_DP(double,double) const
 {
-  Cerr<<"De_DP doit etre code dans la classe fille "<<que_suis_je()<<" pour etre utilisee"<<finl;
+  Cerr<<"De_DP must be implemented in the derived class "<<que_suis_je()<<" to be used"<<finl;
   abort();
   return 0;
 }
 double Loi_Etat_base::De_DT(double,double) const
 {
-  Cerr<<"De_DT doit etre code dans la classe fille "<<que_suis_je()<<" pour etre utilisee"<<finl;
+  Cerr<<"De_DT must be implemented in the derived class "<<que_suis_je()<<" to be used"<<finl;
   abort();
   return 0;
 }

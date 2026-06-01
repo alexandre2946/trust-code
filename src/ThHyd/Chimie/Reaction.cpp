@@ -103,14 +103,14 @@ void Reaction::completer(const Motcles& list_var,const ArrOfDouble& masse_molair
     }
   if (!est_egal(mreactif,mproduit))
     {
-      Cerr<<" erreur dans la chimie de "<<(*this)<<finl;
+      Cerr<<" error in the chemistry of "<<(*this)<<finl;
       Cerr<<" mreactif "<< mreactif<<finl;
       Cerr<<" mproduit "<< mproduit<<finl;
       exit();
     }
   //coeff_Y_/=mreactif;
   save_alias_=list_var;
-  Cerr<<" Extraction des activites "<<finl;
+  Cerr<<" Extracting activities "<<finl;
   extract_coef_local(coeff_activite_,activite_,list_var);
 }
 
@@ -147,13 +147,13 @@ int Reaction::lire_motcle_non_standard(const Motcle& motlu, Entree& is)
       is >> motlubis;
       if (motlubis!="{")
         {
-          Cerr<<"On attendait { et non " <<motlubis<<" dans lire_motcle_non_standard de "<<que_suis_je()<<finl;
+          Cerr<<"Expected { and not " <<motlubis<<" in lire_motcle_non_standard of "<<que_suis_je()<<finl;
           exit();
         }
       is>>motlubis;
       while (motlubis!="}")
         {
-          // on lit deux mots et on fait +mot1*mot2
+          // read two words and form +word1*word2
           activite_+="+";
           activite_+=motlubis;
           activite_+="*";
@@ -164,7 +164,7 @@ int Reaction::lire_motcle_non_standard(const Motcle& motlu, Entree& is)
     }
   else
     {
-      Cerr<<"On attendait coefficients_activites et non " <<motlu<<" dans lire_motcle_non_standard de "<<que_suis_je()<<finl;
+      Cerr<<"Expected coefficients_activites and not " <<motlu<<" in lire_motcle_non_standard of "<<que_suis_je()<<finl;
       exit();
     }
   return 1;
@@ -191,7 +191,7 @@ void Reaction::reagir(VECT(OBS_PTR(Champ_Inc_base))& liste_C,double deltat) cons
   int nb_case= liste_C[0]->valeurs().size();
   if ((beta_!=0)||(Ea_!=0)||((c_r_Ea_!=0)&&(contre_reaction_>0)))
     {
-      Cerr<<"Reaction :  Donnees incompatibles avec le fait que l on n a pas de temperature"<<finl;
+      Cerr<<"Reaction:  Data incompatible with the fact that there is no temperature"<<finl;
       Cerr<<*this<<finl;
       exit();
     }
@@ -211,7 +211,7 @@ void Reaction::reagir(VECT(OBS_PTR(Champ_Inc_base))& liste_C,double deltat) cons
 
                   if (C[i]<-1e-5)
                     {
-                      Cerr<<" on rabote C_"<<i<<" dans la maille "<<elem<<" dans la chimie !!!!!! "<<C[i]<<finl;
+                      Cerr<<" clipping C_"<<i<<" in cell "<<elem<<" in the chemistry !!!!!! "<<C[i]<<finl;
 
                       exit();
                     }
@@ -299,22 +299,22 @@ double Reaction::calcul_proportion_implicite(ArrOfDouble& C_temp,const ArrOfDoub
       //      proportion*=produit_activite;
       if (1)
         {
-          // conditionnement en temps pour ne pas consommer plus que ce qui est present
+          // time conditioning to avoid consuming more than what is available
           if (proportion>0)
             for (int i=0; i<nbc; i++)
               {
-                if (coeff_Y_[i]>0.) // c'est un reactif
+                if (coeff_Y_[i]>0.) // it is a reactant
                   {
-                    if (proportion > C[i]/coeff_stoechio_[i]*securite) Cerr<<" on limite" <<finl;
+                    if (proportion > C[i]/coeff_stoechio_[i]*securite) Cerr<<" clipping" <<finl;
                     proportion=std::min(proportion,C[i]/coeff_stoechio_[i]*securite);
                   }
               }
           else
             for (int i=0; i<nbc; i++)
               {
-                if (coeff_Y_[i]<0.) // c'est un reactif car on est dans le cas contre treaction
+                if (coeff_Y_[i]<0.) // it is a reactant since we are in the reverse reaction case
                   {
-                    // on prend le max car proportion et Y_i(elem)/coeff_Y_[i] sont negatifs
+                    // take the max because proportion and Y_i(elem)/coeff_Y_[i] are negative
                     proportion=std::max(proportion,C[i]/coeff_stoechio_[i]*securite);
                   }
               }

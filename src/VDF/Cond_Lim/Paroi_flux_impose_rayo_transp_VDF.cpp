@@ -129,15 +129,15 @@ void Paroi_flux_impose_rayo_transp_VDF::calculer_Teta_i()
         teta_i_(numfa) = omega * ((le_champ_front->valeurs()(numfa, 0) - flux_radia) / (d_Lambda / e) + T_f(elem)) + (1 - omega) * teta_i_(numfa);
       else
         {
-          Cerr << "Paroi_flux_impose_rayo_transp::calculer_Teta_i() erreur" << finl;
+          Cerr << "Paroi_flux_impose_rayo_transp::calculer_Teta_i() error" << finl;
           Process::exit();
         }
     }
 
-  // Impression:
+  // Printing:
   if (zvdf.domaine().bords_a_imprimer().contient(la_frontiere_VF.le_nom()) && sch.limpr())
     {
-      Cout << "Impression des temperatures de paroi sur la frontiere " << la_frontiere_VF.le_nom() << " :" << finl;
+      Cout << "Printing wall temperatures on boundary " << la_frontiere_VF.le_nom() << " :" << finl;
       Cout << "---------------------------------------------------------------------" << finl;
       for (int numfa = 0; numfa < nb_faces_bord; numfa++)
         Cout << "T(" << numfa << ") : " << teta_i_(numfa) << " K." << finl;

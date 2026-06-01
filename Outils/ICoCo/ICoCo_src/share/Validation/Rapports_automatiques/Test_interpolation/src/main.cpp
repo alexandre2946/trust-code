@@ -311,6 +311,6 @@ int main(int argc,char **argv) {
   main2(argc,argv);
   MPI_Barrier(MPI_COMM_WORLD);
   MPI_Finalize();
-  cerr<<"Arret des processes."<<endl;
+  cerr<<"Stopping processes."<<endl;
   return 0;
 }

@@ -332,7 +332,7 @@ void Convection_Diffusion_Fluide_Dilatable_Proto::assembler_impl
         }
       eqn.solv_masse().appliquer(diff);
       double err=mp_max_abs_vect(diff);
-      Cerr << eqn.que_suis_je() <<" : Erreur assemblage = " << err << finl;;
+      Cerr << eqn.que_suis_je() <<" : Assembly error = " << err << finl;
 
       if (err > 1.e-5)
         {
@@ -343,7 +343,7 @@ void Convection_Diffusion_Fluide_Dilatable_Proto::assembler_impl
 
           if (test_op==1)
             {
-              Cerr<<" pb max case "<<imin_array(diff)<<" ou " <<imax_array(diff)<<finl;
+              Cerr<<" problem max cell "<<imin_array(diff)<<" or " <<imax_array(diff)<<finl;
               Process::exit();
             }
         }

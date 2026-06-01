@@ -138,7 +138,7 @@ void Domaine_Cl_PolyMAC_family::imposer_cond_lim(Champ_Inc_base& ch, double temp
     }
   else
     {
-      Cerr << "Le type de OWN_PTR(Champ_Inc_base) " << ch.que_suis_je() << " n'est pas prevu en PolyMAC_CDO family " << finl;
+      Cerr << "The type of OWN_PTR(Champ_Inc_base) " << ch.que_suis_je() << " is not supported in the PolyMAC_CDO family " << finl;
       Process::exit();
     }
   ch_tab.echange_espace_virtuel();
@@ -168,7 +168,7 @@ int Domaine_Cl_PolyMAC_family::initialiser(double temps)
 
   if (nb_bord_periodicite() > 0)
     {
-      Cerr << " La periodicite n'est pas codee !!!" << finl;
+      Cerr << " Periodicity is not implemented !!!" << finl;
       Process::exit();
     }
   return 1;

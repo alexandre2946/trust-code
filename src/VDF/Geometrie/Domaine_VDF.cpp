@@ -155,8 +155,8 @@ void Domaine_VDF::discretiser()
     {
       if (!sub_type(Rectangle,elem_geom))
         {
-          Cerr << " Le type de l'element geometrique " << elem_geom.que_suis_je() << " est incorrect" << finl;
-          Cerr << " Seul le type Rectangle et Rectangle_Axi sont compatibles avec la discretisation VDF en dimension 2" << finl;
+          Cerr << " The geometric element type " << elem_geom.que_suis_je() << " is incorrect" << finl;
+          Cerr << " Only the Rectangle and Rectangle_Axi types are compatible with VDF discretization in dimension 2" << finl;
           exit();
         }
     }
@@ -164,22 +164,22 @@ void Domaine_VDF::discretiser()
     {
       if (!sub_type(Hexaedre,elem_geom))
         {
-          Cerr << " Le type de l'element geometrique " << elem_geom.que_suis_je() << " est incorrect" << finl;
-          Cerr << " Seul le type Hexaedre ou Hexadre_Axi sont compatibles avec la discretisation VDF en dimension 3" << finl;
+          Cerr << " The geometric element type " << elem_geom.que_suis_je() << " is incorrect" << finl;
+          Cerr << " Only the Hexaedre and Hexaedre_Axi types are compatible with VDF discretization in dimension 3" << finl;
           exit();
         }
     }
-  // Calcul de l'orientation des faces virtuelles
-  // Note BM: pour compatibilite avec la version 1.5, orientation_
-  //  n'a pas d'espace virtuel.
+  // Compute the orientation of virtual faces
+  // Note BM: for compatibility with version 1.5, orientation_
+  //  has no virtual space.
   MD_Vector md_nul;
   creer_tableau_faces(orientation_);
   orientation_.echange_espace_virtuel();
-  orientation_.set_md_vector(md_nul); // Detache la structure parallele
+  orientation_.set_md_vector(md_nul); // Detach the parallel structure
 
-  // Application de la convention VDF sur face_voisin:
-  // L'element face_voisin(i,0) doit avoir une coordonnee "ori" plus petite que la face
-  // et l'element face_voisin(i,1) doit avoir une coordonnee plus grande.
+  // Apply the VDF convention on face_voisin:
+  // The element face_voisin(i,0) must have an "ori" coordinate smaller than the face
+  // and the element face_voisin(i,1) must have a larger coordinate.
   {
     const int nbr_faces_tot = face_voisins_.dimension_tot(0);
     for (int i_face = 0; i_face < nbr_faces_tot; i_face++)
@@ -213,16 +213,16 @@ void Domaine_VDF::discretiser()
   genere_aretes();
   calcul_h();
   remplir_face_normales();
-  Cerr << "L'objet de type Domaine_VDF a ete rempli avec succes " << finl;
+  Cerr << "The Domaine_VDF object has been filled successfully " << finl;
 
 }
 
 void Domaine_VDF::remplir_face_normales()
 {
-  // On remplit le tableau face_normales_;
-  //  Attention : le tableau face_voisins n'est pas exactement un tableau distribue. Une face n'a pas ses deux voisins dans le
-  //  meme ordre sur tous les processeurs qui possedent la face.
-  //  Donc la normale a la face peut changer de direction d'un processeur a l'autre, y compris pour les faces de joint.
+  // Fill the face_normales_ array;
+  //  Note: the face_voisins array is not exactly a distributed array. A face does not have its two neighbors in the
+  //  same order on all processors that own the face.
+  //  Therefore the face normal can change direction from one processor to another, including for joint faces.
   face_normales_ = xv_; // already has // structure
   face_normales_ = 0.;
 
@@ -233,12 +233,12 @@ void Domaine_VDF::remplir_face_normales()
     }
 }
 
-/*! @brief remplissage des volumes entrelaces
+/*! @brief Fills the staggered volumes (volumes entrelaces).
  *
  */
 void Domaine_VDF::calculer_volumes_entrelaces()
 {
-  Cerr << "On calcule les volumes entrelaces" << finl;
+  Cerr << "Computing staggered volumes" << finl;
   creer_tableau_faces(volumes_entrelaces_);
   volumes_entrelaces_dir_.resize(nb_faces(), 2);
   creer_tableau_faces(volumes_entrelaces_dir_);
@@ -283,27 +283,27 @@ static inline int face_vois(const Domaine_VDF& zvdf, const Domaine& domaine, int
   return elem;
 }
 
-/*! @brief generation des aretes
+/*! @brief Generates the edge connectivity arrays.
  *
  */
 void Domaine_VDF::genere_aretes()
 {
-  Cerr << "On genere les aretes" << finl;
+  Cerr << "Generating edges" << finl;
 
   Domaine& mon_dom=domaine();
   //  int nb_poly = le_dom.nb_elem();
   int nb_poly_tot = mon_dom.nb_elem_tot();
-  // Estimation avec majoration du nombre d'aretes : nb_aretes_plus
+  // Estimate with upper bound on the number of edges: nb_aretes_plus
   nb_aretes_=-1; // cf Aretes::affecter
   int nb_aretes_plus=-1;
   if (dimension == 2)
     nb_aretes_plus = mon_dom.nb_som();
   else if (dimension == 3)
     nb_aretes_plus = mon_dom.nb_som()*3;
-  Cerr << "Creation des aretes " << finl;
+  Cerr << "Creating edges " << finl;
   Aretes les_aretes(nb_aretes_plus);
 
-  // On balaie les elements :
+  // Loop over all elements:
   int el1, el2, el3, el4;
   int face12, face13, face34, face24;
 
@@ -607,9 +607,9 @@ void Domaine_VDF::modifier_pour_Cl(const Conds_lim& conds_lim)
                     }
                 }
             }
-          // prise  en compte des aretes coin
+          // handle corner edges
           int ndeb_arete_coin = premiere_arete_coin();
-          Cerr << "Modifications de Qdm pour les aretes coins  num_cond_lim=" << num_cond_lim <<  finl;
+          Cerr << "Modifying Qdm for corner edges  num_cond_lim=" << num_cond_lim <<  finl;
           int fac4;
 
           for (int n_arete=ndeb_arete_coin; n_arete<ndeb_arete_coin+nb_aretes_coin(); n_arete++)
@@ -746,23 +746,23 @@ void Domaine_VDF::modifier_pour_Cl(const Conds_lim& conds_lim)
 
                   else
                     {
-                      Cerr << "Attention : les cas concernant d autres types d aretes coin "  << finl;
-                      Cerr << "que perio-perio ou perio-paroi ne sont pas traites!!" << finl;
+                      Cerr << "Warning: cases involving other corner edge types "  << finl;
+                      Cerr << "than perio-perio or perio-wall are not handled!!" << finl;
                     }
                 }
             }
         }
 
-      // Modif OC 01/2005 pour traiter les coins de type paroi/fluide
+      // Modif OC 01/2005 to handle wall/fluid corner types
       else if (sub_type(Dirichlet_entree_fluide, cl) || sub_type(Neumann_sortie_libre, cl) )
         {
-          // if cl de type paroi
+          // if cl of wall type
 
           const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,cl.domaine_Cl_dis());
 
           int fac1,fac2,n_type;
           int ndeb_arete_coin = premiere_arete_coin();
-          Cerr << "Modifications de Qdm pour les aretes coins touchant une paroi num_cond_lim=" << num_cond_lim <<  finl;
+          Cerr << "Modifying Qdm for corner edges touching a wall num_cond_lim=" << num_cond_lim <<  finl;
           int fac4;
 
           for (int n_arete=ndeb_arete_coin; n_arete<ndeb_arete_coin+nb_aretes_coin(); n_arete++)
@@ -851,24 +851,25 @@ void Domaine_VDF::modifier_pour_Cl(const Conds_lim& conds_lim)
       //   Cerr << "Qdm : " << Qdm_ << finl;
       //   Cerr << "aretes_coin_traitees : " << aretes_coin_traitees << finl;
     }
-  //Journal() << "le_dom apres modif pour Cl : " << *this << finl;
+  //Journal() << "domain after modification for Cl : " << *this << finl;
 
 
-  // PQ : 10/10/05 : les faces periodiques etant a double contribution
-  //                      l'appel a marquer_faces_double_contrib s'effectue dans cette methode
-  //                      afin de pouvoir beneficier de conds_lim.
+  // PQ : 10/10/05 : periodic faces have a double contribution;
+  //                      the call to marquer_faces_double_contrib is done in this method
+  //                      in order to have access to conds_lim.
 
 
   Domaine_VF::marquer_faces_double_contrib(conds_lim);
 }
 
-/*! @brief remplit le tableau face_voisins_fictifs_ ne CREE PAS d elts fictifs!!!
+/*! @brief Fills the face_voisins_fictifs_ array. Does NOT create fictitious elements.
  *
+ * @param zcldisbase The discretized boundary condition domain.
  */
 
 void Domaine_VDF::creer_elements_fictifs(const Domaine_Cl_dis_base& zcldisbase)
 {
-  Cerr << "Domaine_VDF::creer_elements_fictifs()" << finl;
+  Cerr << "Domaine_VDF::creer_elements_fictifs() called" << finl;
   const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF,zcldisbase);
   if (face_voisins_fictifs_.size() == 0)
     {
@@ -894,12 +895,12 @@ void Domaine_VDF::creer_elements_fictifs(const Domaine_Cl_dis_base& zcldisbase)
             }
         }
     }
-  Cerr << "taille "<<face_voisins_fictifs_.size()-nb_elem()<<finl;
+  Cerr << "size "<<face_voisins_fictifs_.size()-nb_elem()<<finl;
 }
 
-// Remplit le tableau dist avec les valeurs des distances normales
-// au bord des faces du bord de nom nom_bord
-// Le tableau dist est dimensionne par la methode
+// Fills the dist array with the normal distances to the boundary
+// for the boundary faces of name nom_bord.
+// The dist array is resized by this method.
 DoubleVect& Domaine_VDF::dist_norm_bord(DoubleVect& dist, const Nom& nom_bord) const
 {
   if (axi)

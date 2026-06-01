@@ -76,20 +76,19 @@ double Sortie_libre_pression_imposee_QC::flux_impose(int i) const
   else if (le_champ_front->valeurs().dimension(1) == 1)
     return (le_champ_front->valeurs()(i, 0) - Pthn) / rho_;
   else
-    Cerr << "Neumann::flux_impose erreur" << finl;
+    Cerr << "Neumann::flux_impose error" << finl;
 
   Process::exit();
   return 0.;
 }
 
-/*! @brief Renvoie la valeur du flux impose sur la (i,j)-eme composante du champ representant le flux a la frontiere.
+/*! @brief Returns the imposed flux value for the (i,j)-th component of the field representing the flux at the boundary.
  *
- *     Le champ a la frontiere n'est PAS constant sur tous les elements
- *     la frontiere.
+ * The boundary field is NOT constant over all elements of the boundary.
  *
- * @param (int i) indice suivant la premiere dimension du champ
- * @param (int j) indice suivant la deuxieme dimension du champ
- * @return (double) la valeur imposee sur la composante du champ specifiee
+ * @param i Index along the first dimension of the field.
+ * @param j Index along the second dimension of the field.
+ * @return Imposed value for the specified field component.
  */
 double Sortie_libre_pression_imposee_QC::flux_impose(int i, int j) const
 {

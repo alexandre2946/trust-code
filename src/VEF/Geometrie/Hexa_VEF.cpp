@@ -649,11 +649,11 @@ void Hexa_VEF::modif_volumes_entrelaces(int j,int elem,
                                         DoubleVect& volumes_entrelaces_Cl,
                                         int type_cl) const
 {
-  Cerr << "Hexa_VEF::modif_volumes_entrelaces() ne fait rien pour le moment " << finl;
+  Cerr << "Hexa_VEF::modif_volumes_entrelaces() does nothing for now" << finl;
 
 }
 
-/*! @brief modifie les volumes entrelaces pour la face joint j d'un elem non standard
+/*! @brief Modifies the interlaced volumes for the joint face j of a non-standard element.
  *
  */
 void Hexa_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,

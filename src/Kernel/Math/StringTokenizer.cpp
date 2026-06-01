@@ -219,12 +219,12 @@ int StringTokenizer::nextToken()
                 }
               else if (type == NUMBER)
                 {
-                  // GF suivant les versions on a soit
+                  // GF: depending on the version, the exponent is either parsed as below
                   nval_tmp*=pow(10.,nval);
-                  // soit
+                  // or as:
                   //nval_tmp = nval;
-                  // J'interdis pour l'instant
-                  //Cerr << "Possible Erreur en interpretant la chaine " << str << finl;
+                  // Disallowed for now:
+                  //Cerr << "Possible error while interpreting the string " << str << finl;
                   //Process::exit();
                 }
               else

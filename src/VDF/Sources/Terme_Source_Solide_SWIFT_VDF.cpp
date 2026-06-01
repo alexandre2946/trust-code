@@ -207,8 +207,8 @@ void Terme_Source_Solide_SWIFT_VDF::correspondance_SWIFT_coarse()
         }
       if (burk)
         {
-          Cerr << "## ACHTUNG !!! On n'a pas trouve l'equivalence entre" << finl;
-          Cerr << "## les deux domaines au niveau des Y !" << finl;
+          Cerr << "## ACHTUNG !!! The equivalence between" << finl;
+          Cerr << "## the two domains at the Y level was not found!" << finl;
         }
     }
 }

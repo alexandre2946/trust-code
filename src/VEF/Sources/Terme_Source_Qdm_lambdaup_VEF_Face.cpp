@@ -41,13 +41,13 @@ Entree& Terme_Source_Qdm_lambdaup_VEF_Face::readOn(Entree& is )
   if(motlu!=accouverte)
     {
       Cerr << motlu << " --> " << finl;
-      Cerr << "{ attendue a la lecture du terme source lambda uprime " << finl;
-      Cerr << "La syntaxe du mot cle Source_Qdm_lambdaup a change, voir le" << finl;
-      Cerr << "manuel utilisateur de la version 1.5.5 ou plus recent." << finl;
-      Cerr << "La valeur de lambda, qui peut etre desormais variable" << finl;
-      Cerr << "doit etre precedee d'un mot cle:" << finl;
-      Cerr << "Ainsi, Source_Qdm_lambdaup valeur devient:" <<finl;
-      Cerr << "Source_Qdm_lambdaup { lambda valeur }" <<finl;
+      Cerr << "{ expected when reading lambda uprime source term " << finl;
+      Cerr << "The syntax of keyword Source_Qdm_lambdaup has changed, see the" << finl;
+      Cerr << "user manual of version 1.5.5 or later." << finl;
+      Cerr << "The value of lambda, which can now be variable," << finl;
+      Cerr << "must be preceded by a keyword:" << finl;
+      Cerr << "Thus, Source_Qdm_lambdaup value becomes:" <<finl;
+      Cerr << "Source_Qdm_lambdaup { lambda value }" <<finl;
       Process::exit();
     }
   Motcles les_mots(4);
@@ -103,11 +103,11 @@ Entree& Terme_Source_Qdm_lambdaup_VEF_Face::readOn(Entree& is )
     lambda=lambda_min;
   if (lambda < 0.)
     {
-      Cerr << "Erreur a la lecture de lambda dans " << que_suis_je() << finl;
-      Cerr << " lambda doit etre defini et superieur a 0 " << finl;
+      Cerr << "Error reading lambda in " << que_suis_je() << finl;
+      Cerr << " lambda must be defined and greater than 0 " << finl;
       exit();
     }
-  Cerr << "Sortie du readOn " << finl;
+  Cerr << "Exiting readOn " << finl;
   return is ;
 }
 
@@ -131,8 +131,8 @@ void Terme_Source_Qdm_lambdaup_VEF_Face::associer_pb(const Probleme_base& pb)
 
   if (!ok)
     {
-      Cerr << "Erreur TRUST dans " << que_suis_je()  << finl;
-      Cerr << "On ne trouve pas d'equation d'hydraulique dans le probleme" << finl;
+      Cerr << "TRUST error in " << que_suis_je()  << finl;
+      Cerr << "No hydraulic equation found in the problem" << finl;
       exit();
     }
 }

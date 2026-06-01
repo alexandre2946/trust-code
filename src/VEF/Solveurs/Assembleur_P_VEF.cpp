@@ -541,14 +541,14 @@ int Assembleur_P_VEF::remplir(Matrice& la_matrice, const DoubleTab& inverse_quan
   return 1;
 }
 
-/*! @brief Assemble la matrice de pression pour un fluide quasi compressible laplacein(P) est remplace par div(grad(P)/rho).
+/*! @brief Assembles the pressure matrix for a quasi-compressible fluid: laplacian(P) is replaced by div(grad(P)/rho).
  *
- * @param (DoubleTab& tab_rho) mass volumique
- * @return (int) renvoie toujours 1
+ * @param tab_rho Mass density array.
+ * @return Always returns 1.
  */
 int Assembleur_P_VEF::assembler_QC(const DoubleTab& tab_rho, Matrice& matrice)
 {
-  Cerr << "Assemblage de la matrice de pression pour Quasi Compressible en cours..." << finl;
+  Cerr << "Assembling pressure matrix for Quasi-Compressible in progress..." << finl;
   int stat=assembler(matrice);
   set_resoudre_en_u(0);
   return stat;
@@ -592,7 +592,7 @@ int Assembleur_P_VEF::modifier_secmem(DoubleTab& secmem)
             {
               Pstar_OSWR = la_cl_robin.increment_pression_bord(num_face);
               coef = les_coeff_pression[num_face]*Pstar_OSWR+100;
-              Cerr << "PASSAGE PAR GET RESOUDRE INCR PRESSION" <<finl;
+              Cerr << "PASSING THROUGH GET RESOUDRE INCR PRESSION" <<finl;
               secmem[face_voisins(num_face,0)] += coef;
             }
         }*/
@@ -671,7 +671,7 @@ int Assembleur_P_VEF::modifier_matrice(Matrice& matrice)
               element_referent=i;
             }
         }
-      Cerr << "On modifie la ligne (element) " << element_referent << finl;
+      Cerr << "Modifying the row (element) " << element_referent << finl;
       A00RR(element_referent,element_referent)*=2;
       matrice_modifiee=1;
     }

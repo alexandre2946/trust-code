@@ -73,7 +73,7 @@ mon_main::mon_main(int verbose_level, bool journal_master, Nom log_directory, bo
   journal_master_ = journal_master;
   log_directory_ = log_directory;
   LecFicDiffuse_JDD::apply_verif = apply_verification;
-  // Creation d'un journal temporaire qui ecrit dans Cerr
+  // Create a temporary journal that writes to Cerr
   init_journal_file(verbose_level, 0 /* filename = 0 => Cerr */, 0 /* append */);
   trio_began_mpi_=false;
   disable_stop_=disable_stop;
@@ -409,13 +409,13 @@ void mon_main::dowork(const Nom& nom_du_cas)
     }
 
   //---------------------------------------------//
-  // Chargement des modules : //
-  // on ne les charges que pour le cas nul, pour verifier avec valgrind
+  // Module loading:
+  // only loaded for the "nul" case, for valgrind verification
   if (Objet_U::nom_du_cas()=="nul")
     {
-      Cerr<<"Chargement des modules:"<<finl;
+      Cerr<<"Loading modules:"<<finl;
 #include <instancie_appel_c.h>
-      Cerr<<"Fin chargement des modules "<<finl;
+      Cerr<<"Finished loading modules "<<finl;
     }
 
   // initializing communicators on node
@@ -452,12 +452,12 @@ void mon_main::dowork(const Nom& nom_du_cas)
 
   info_atelier(Cout);
   Cout<<" " << finl;
-  Cout<<"  Vous traitez le cas " << Objet_U::nom_du_cas() << "\n";
+  Cout<<"  Processing case: " << Objet_U::nom_du_cas() << "\n";
   Cout<<" " << finl;
 
-  // GF on ecrit la hierarchie que si on a un erreur
+  // GF: the class hierarchy is written only on error
   //---------------------------------------------//
-  Cerr<<"Debut de l'execution " << finl;
+  Cerr<<"Beginning execution" << finl;
   {
     Nom nomentree = nom_du_cas;
     nomentree+=".data";

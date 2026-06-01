@@ -44,7 +44,7 @@ Entree& Perte_Charge_Circulaire_VEF_P1NC::readOn(Entree& s )
   Perte_Charge_VEF::readOn(s);
   if (v->nb_comp()!=dimension)
     {
-      Cerr << "Il faut definir le champ direction a " << dimension << " composantes" << finl;
+      Cerr << "The direction field must be defined with " << dimension << " components" << finl;
       exit();
     }
   return s;
@@ -74,7 +74,7 @@ int Perte_Charge_Circulaire_VEF_P1NC::lire_motcle_non_standard(const Motcle& mot
     {
       Nom tmp;
       is >> tmp;
-      Cerr << "Lecture et interpretation de la fonction " << tmp << " ... ";
+      Cerr << "Reading and interpreting the function " << tmp << " ... ";
       lambda_ortho.setNbVar(3+dimension);
       lambda_ortho.setString(tmp);
       lambda_ortho.addVar("Re_tot");

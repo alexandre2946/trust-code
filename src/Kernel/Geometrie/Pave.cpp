@@ -1586,7 +1586,7 @@ void Pave_32_64<_SIZE_>::lire_front(Entree& is, Frontiere_t& front)
               for(; coord_noeud(0,jmax,1)+this->epsilon_<xmax; jmax++) {};
               //            if(jmax-jmin==0)
               //            {
-              //               Cerr << "le bord de nom " << nom_front << "est vide !" << finl;
+              //               Cerr << "boundary named " << nom_front << " is empty!" << finl;
               //               Process::exit();
               //            }
             }
@@ -1633,7 +1633,7 @@ void Pave_32_64<_SIZE_>::lire_front(Entree& is, Frontiere_t& front)
               for(; coord_noeud(imax,0,0)+this->epsilon_<xmax; imax++) {};
               //            if(imax-imin==0)
               //            {
-              //               Cerr << "le bord de nom " << nom_front << "est vide !" << finl;
+              //               Cerr << "boundary named " << nom_front << " is empty!" << finl;
               //               Process::exit();
               //            }
             }
@@ -1780,7 +1780,7 @@ void Pave_32_64<_SIZE_>::lire_front(Entree& is, Frontiere_t& front)
           for(; coord_noeud(0,0,(kmax),2)+this->epsilon_<ymax; kmax++) {};
           //         if((jmax-jmin)*(kmax-kmin)==0)
           //         {
-          //            Cerr << "le bord de nom " << nom_front << "est vide !" << finl;
+          //            Cerr << "boundary named " << nom_front << " is empty!" << finl;
           //            Process::exit();
           //         }
           som.resize((jmax-jmin)*(kmax-kmin),4);
@@ -1828,7 +1828,7 @@ void Pave_32_64<_SIZE_>::lire_front(Entree& is, Frontiere_t& front)
           for(; coord_noeud(0,0,(kmax),2)+this->epsilon_<ymax; kmax++) {};
           //         if((imax-imin)*(kmax-kmin)==0)
           //         {
-          //            Cerr << "le bord de nom " << nom_front << "est vide !" << finl;
+          //            Cerr << "boundary named " << nom_front << " is empty!" << finl;
           //            Process::exit();
           //         }
           som.resize((imax-imin)*(kmax-kmin),4);
@@ -1876,7 +1876,7 @@ void Pave_32_64<_SIZE_>::lire_front(Entree& is, Frontiere_t& front)
             for(; coord_noeud(0,jmax,0,1)+this->epsilon_<ymax; jmax++) {};
           //         if((imax-imin)*(jmax-jmin)==0)
           //         {
-          //            Cerr << "le bord de nom " << nom_front << "est vide !" << finl;
+          //            Cerr << "boundary named " << nom_front << " is empty!" << finl;
           //            Process::exit();
           //         }
           som.resize((imax-imin)*(jmax-jmin),4);

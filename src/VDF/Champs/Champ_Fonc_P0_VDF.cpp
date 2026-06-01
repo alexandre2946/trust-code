@@ -144,7 +144,7 @@ int Champ_Fonc_P0_VDF::imprime(Sortie& os, int ncomp) const
     }
   else
     {
-      Cerr << "Champ_P0_implementation::imprime_P0_VDF avec nb_compo_>1 non code." << finl;
+      Cerr << "Champ_P0_implementation::imprime_P0_VDF with nb_compo_>1 not implemented." << finl;
       exit();
     }
   return 1;

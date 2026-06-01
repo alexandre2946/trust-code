@@ -59,13 +59,13 @@ Entree& IJK_Lata_Swap_JK::interpreter(Entree& is)
   IJK_Field_vector3_double velocity_;
   IJK_Field_vector3_double velocity_dest_;
   IJK_Field_double rho, dest_rho;
-  // Recuperation des donnees de maillage
+  // Retrieve mesh data
   splitting_ = ref_cast(Domaine_IJK, Interprete_bloc::objet_global(ijk_splitting_name));
 
   allocate_velocity(velocity_, splitting_, 1);
-  Cerr << "lecture de la vitesse" << finl;
+  Cerr << "reading velocity" << finl;
   lire_dans_lata(fichier_reprise_vitesse_, timestep_reprise_vitesse_, "DOM", "VELOCITY",
-                 velocity_[0], velocity_[1], velocity_[2]); // fonction qui lit un champ a partir d'un lata .
+                 velocity_[0], velocity_[1], velocity_[2]); // function that reads a field from a lata file
   Cerr << "swap jk" << finl;
 
   splitting_dest_ = ref_cast(Domaine_IJK, Interprete_bloc::objet_global(ijk_splitting_name_dest));
@@ -106,9 +106,9 @@ Entree& IJK_Lata_Swap_JK::interpreter(Entree& is)
 
   rho.allocate(splitting_, Domaine_IJK::ELEM, 0);
   dest_rho.allocate(splitting_dest_, Domaine_IJK::ELEM, 0);
-  Cerr << "lecture de rho" << finl;
+  Cerr << "reading rho" << finl;
   lire_dans_lata(fichier_reprise_vitesse_, timestep_reprise_vitesse_, "DOM", "RHO",
-                 rho); // fonction qui lit un champ a partir d'un lata .
+                 rho); // function that reads a field from a lata file
   Cerr << "swap jk" << finl;
 
   {

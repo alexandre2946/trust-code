@@ -292,22 +292,22 @@ const DoubleTab& Terme_Source_Acceleration_VDF_Face::calculer_vitesse_faces(
   return v_faces_stockage;
 }
 
-/*! @brief Associe le champ de masse volumique=> Le terme source calcule sera alors homogene a d/dt(integrale(rho*v)).
+/*! @brief Associates the density field. The computed source term will then be homogeneous to d/dt(integral(rho*v)).
  *
- * @param (champ_rho) un champ de type Champ_Fonc_P0_VDF qui sera utilise lors des appels a "ajouter()" pour evaluer la masse volumique.
+ * @param champ_rho a field of type Champ_Fonc_P0_VDF that will be used during calls to "ajouter()" to evaluate the density.
  */
 
 void Terme_Source_Acceleration_VDF_Face::associer_champ_rho(const Champ_base& champ_rho)
 {
-  // Il faut que le champ soit discretise aux elements: possibilite
-  // d'autoriser d'autres types si besoin (Champ_Don, Champ_Inc, etc.)
-  // du moment que c'est des champs P0.
+  // The field must be discretized at elements: possibility
+  // to allow other types if needed (Champ_Don, Champ_Inc, etc.)
+  // as long as they are P0 fields.
   if (!sub_type(Champ_Fonc_P0_VDF, champ_rho))
     {
-      Cerr << "Erreur dans Terme_Source_Acceleration_VDF_Face::associer_champ_rho" << finl;
-      Cerr << " Le champ de masse volumique doit etre de type Champ_Fonc_P0_VDF" << finl;
-      Cerr << " Type du champ associe : " << champ_rho.que_suis_je() << finl;
-      Cerr << " Nom du champ associe :  " << champ_rho.le_nom() << finl;
+      Cerr << "Error in Terme_Source_Acceleration_VDF_Face::associer_champ_rho" << finl;
+      Cerr << " The density field must be of type Champ_Fonc_P0_VDF" << finl;
+      Cerr << " Type of the associated field: " << champ_rho.que_suis_je() << finl;
+      Cerr << " Name of the associated field: " << champ_rho.le_nom() << finl;
       assert(0);
       exit();
     }

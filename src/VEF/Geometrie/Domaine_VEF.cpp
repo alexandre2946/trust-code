@@ -102,7 +102,7 @@ Entree& Domaine_VEF::readOn(Entree& is)
       type_elem_ = Hexa_VEF();
     else
       {
-        Cerr << type << " n'est pas un Elem_VEF !" << finl;
+        Cerr << type << " is not an Elem_VEF!" << finl;
         Process::exit();
       }
   }
@@ -193,17 +193,17 @@ void Domaine_VEF::discretiser()
       }
   }
 
-  // Verification de la coherence entre l'element geometrique et
-  //l'elemnt de discretisation
+  // Check coherence between the geometric element and
+  //the discretisation element
 
   if (sub_type(Tri_VEF, type_elem_.valeur()))
     {
       if (!sub_type(Triangle, elem_geom))
         {
-          Cerr << " Le type de l'element geometrique " << elem_geom.que_suis_je() << " est incorrect" << finl;
-          Cerr << " Seul le type Triangle est compatible avec la discretisation VEF en dimension 2" << finl;
-          Cerr << " Il faut trianguler le domaine lorsqu'on utilise le mailleur interne";
-          Cerr << " en utilisant l'instruction: Trianguler nom_dom" << finl;
+          Cerr << " The geometric element type " << elem_geom.que_suis_je() << " is incorrect" << finl;
+          Cerr << " Only the Triangle type is compatible with VEF discretization in 2D" << finl;
+          Cerr << " The domain must be triangulated when using the internal mesher";
+          Cerr << " using the instruction: Trianguler nom_dom" << finl;
           exit();
         }
     }
@@ -211,10 +211,10 @@ void Domaine_VEF::discretiser()
     {
       if (!sub_type(Tetraedre, elem_geom))
         {
-          Cerr << " Le type de l'element geometrique " << elem_geom.que_suis_je() << " est incorrect" << finl;
-          Cerr << " Seul le type Tetraedre est compatible avec la discretisation VEF en dimension 3" << finl;
-          Cerr << " Il faut tetraedriser le domaine lorsqu'on utilise le mailleur interne";
-          Cerr << " en utilisant l'instruction: Tetraedriser nom_dom" << finl;
+          Cerr << " The geometric element type " << elem_geom.que_suis_je() << " is incorrect" << finl;
+          Cerr << " Only the Tetraedre type is compatible with VEF discretization in 3D" << finl;
+          Cerr << " The domain must be tetrahedralized when using the internal mesher";
+          Cerr << " using the instruction: Tetraedriser nom_dom" << finl;
           exit();
         }
     }
@@ -224,7 +224,7 @@ void Domaine_VEF::discretiser()
 
       if (!sub_type(Quadrangle_VEF, elem_geom))
         {
-          Cerr << " Le type de l'element geometrique " << elem_geom.que_suis_je() << " est incorrect" << finl;
+          Cerr << " The geometric element type " << elem_geom.que_suis_je() << " is incorrect" << finl;
           exit();
         }
     }
@@ -233,17 +233,17 @@ void Domaine_VEF::discretiser()
 
       if (!sub_type(Hexaedre_VEF, elem_geom))
         {
-          Cerr << " Le type de l'element geometrique " << elem_geom.que_suis_je() << " est incorrect" << finl;
+          Cerr << " The geometric element type " << elem_geom.que_suis_je() << " is incorrect" << finl;
           exit();
         }
     }
 
-  // On remplit le tableau face_normales_;
-  //  Attention : le tableau face_voisins n'est pas exactement un
-  //  tableau distribue. Une face n'a pas ses deux voisins dans le
-  //  meme ordre sur tous les processeurs qui possedent la face.
-  //  Donc la normale a la face peut changer de direction d'un
-  //  processeur a l'autre, y compris pour les faces de joint.
+  // Fill the face_normales_ array;
+  //  Note: the face_voisins array is not exactly a distributed array.
+  //  A face does not have its two neighbors in the same order on all
+  //  processors that own the face.
+  //  Therefore the face normal can change direction from one processor
+  //  to another, including for joint faces.
   {
     const int n = nb_faces();
     face_normales_.resize(n, dimension);
@@ -326,7 +326,7 @@ void Domaine_VEF::discretiser_suite(const VEF_discretisation& discr)
       }
     md_vector_p1b_.copy(md_p1b);
   }
-  Cerr << "le Domaine_VEF a ete rempli avec succes" << finl;
+  Cerr << "the Domaine_VEF has been filled successfully" << finl;
 }
 
 /*
@@ -789,19 +789,19 @@ void Domaine_VEF::verifie_ok_arete(int nombre_aretes_superflues_prevues_sur_le_d
 
   if (nb_som_reel > 0 && min_array(sommet_relie_arete_superflue)==0)
     {
-      Cerr << finl << "[" << Process::me() << "] Il y'a au moins un sommet qui n'est pas relie a une arete superflue :" << finl;
+      Cerr << finl << "[" << Process::me() << "] There is at least one vertex not linked to a redundant edge:" << finl;
       for (int i=0; i<sommet_relie_arete_superflue.size_array(); i++)
-        if (sommet_relie_arete_superflue[i]==0) Cerr << "Sommet " << i << finl;
+        if (sommet_relie_arete_superflue[i]==0) Cerr << "Vertex " << i << finl;
       Process::exit();
     }
-  Cerr << "[" << Process::me() << "] Verification que chaque sommet non periodique est bien relie a au moins une arete superflue: OK!" << finl;
-  // On compte le nombre total de sommets en tenant compte de la periodicite et des sommets communs
+  Cerr << "[" << Process::me() << "] Verification that each non-periodic vertex is linked to at least one redundant edge: OK!" << finl;
+  // Count the total number of vertices accounting for periodicity and shared vertices
   double nb_sommets_non_periodiques=0;
   for (int i=0; i<nb_som_reel; i++)
-    if (dom.get_renum_som_perio(i)==i) // Sommet non periodique
+    if (dom.get_renum_som_perio(i)==i) // Non-periodic vertex
       {
         int sommets_communs=1;
-        // On tient compte des sommets communs
+        // Account for shared vertices
         for (int j=0; j<dom.faces_joint().size(); j++)
           for (int k=0; k<dom.faces_joint()(j).joint_item(JOINT_ITEM::SOMMET).items_communs().size_array(); k++)
             if (dom.faces_joint()(j).joint_item(JOINT_ITEM::SOMMET).items_communs()[k]==i) sommets_communs++;
@@ -825,36 +825,36 @@ void Domaine_VEF::verifie_ok_arete(int nombre_aretes_superflues_prevues_sur_le_d
           //if (!ok_arete(i)) nb_aretes_perio_superflues++;
         }
     }
-  // Cerr << "Nombre d'aretes non periodiques             = " << nb_aretes_tot-nb_aretes_periodiques << finl;
-  // Cerr << "Nombre d'aretes periodiques                 =  " << nb_aretes_periodiques << finl;
+  // Cerr << "Number of non-periodic edges             = " << nb_aretes_tot-nb_aretes_periodiques << finl;
+  // Cerr << "Number of periodic edges                 =  " << nb_aretes_periodiques << finl;
 
-  // Cerr << "Nombre d'aretes superflues                  =  " << total_nombre_aretes_superflues << finl;
-  // Cerr << "Nombre d'aretes superflues periodiques      =  " << nb_aretes_perio_superflues << finl;
-  // Cerr << "Nombre d'aretes non superflues periodiques  =  " << nb_aretes_periodiques-nb_aretes_perio_superflues << finl;
+  // Cerr << "Number of redundant edges                =  " << total_nombre_aretes_superflues << finl;
+  // Cerr << "Number of periodic redundant edges       =  " << nb_aretes_perio_superflues << finl;
+  // Cerr << "Number of non-redundant periodic edges   =  " << nb_aretes_periodiques-nb_aretes_perio_superflues << finl;
 
-  if (Process::is_sequential()) // On se limite au sequentiel car il y'a un soucis pour le calcul de total_nombre_aretes_superflues (les items communs pour les aretes n'est pas construit!)
+  if (Process::is_sequential()) // Limited to sequential because there is an issue with computing total_nombre_aretes_superflues (common items for edges are not yet built!)
     if (!est_egal(somme_nombre_aretes_superflues_prevues_par_domaine,total_nombre_aretes_superflues) && je_suis_maitre())
       {
-        Cerr << "La somme des aretes superflues prevues par domaine n'est pas egale au nombre d'aretes superflues trouvees sur le domaine." << finl;
+        Cerr << "The sum of redundant edges predicted per domain is not equal to the number of redundant edges found on the domain." << finl;
         Cerr << somme_nombre_aretes_superflues_prevues_par_domaine << " != " << total_nombre_aretes_superflues << finl;
         Process::exit();
       }
-  Cerr << "Nombre total d'aretes superflues: " << somme_nombre_aretes_superflues_prevues_par_domaine << finl;
-  Cerr << "Nombre total de sommets non periodiques = " << total_nb_sommets_non_periodiques << finl;
-  Cerr << "Verification de l'egalite du nombre total d'aretes superflues et du nombre total de sommets: ";
-  // Verification que le nombre d'aretes superflues et egal au nombre de sommets
+  Cerr << "Total number of redundant edges: " << somme_nombre_aretes_superflues_prevues_par_domaine << finl;
+  Cerr << "Total number of non-periodic vertices = " << total_nb_sommets_non_periodiques << finl;
+  Cerr << "Verifying equality between total number of redundant edges and total number of vertices: ";
+  // Verify that the number of redundant edges equals the number of vertices
   if (!est_egal(somme_nombre_aretes_superflues_prevues_par_domaine,total_nb_sommets_non_periodiques) && je_suis_maitre())
     {
-      Cerr << "Non correspondance. Echec de l'algorithme de recherche des aretes superflues." << finl;
+      Cerr << "Mismatch. Failure of the redundant edge search algorithm." << finl;
       Process::exit();
     }
-  Cerr << "OK!" << finl << "Verification correcte des aretes superflues." << finl;
+  Cerr << "OK!" << finl << "Redundant edge verification correct." << finl;
 }
 
-// Valeur de retour:
+// Return value:
 //  1: ok
-//  0: fichier inexistant
-//  -1: fichier existe mais pas le bon nombre d'aretes
+//  0: file does not exist
+//  -1: file exists but wrong number of edges
 int Domaine_VEF::lecture_ok_arete()
 {
   Nom fichier(nom_du_cas());
@@ -978,11 +978,11 @@ void Domaine_VEF::calculer_h_carre()
 
 void Domaine_VEF::calculer_volumes_entrelaces()
 {
-  //  Cerr << "les normales aux faces " << face_normales() << finl;
-  // On calcule les volumes entrelaces;
+  //  Cerr << "face normals " << face_normales() << finl;
+  // Compute interlaced volumes;
 
-  // Si domaine dynamique, le tableau peut eventuellement deja avoir la bonne structure, ou pas.
-  // S'il n'est pas deformable, on n'est pas cense passer ici deux fois.
+  // For a dynamic domain, the array may or may not already have the correct structure.
+  // If not deformable, this function should not be called twice.
   assert(domaine().deformable() || !(volumes_entrelaces_.get_md_vector()));
   if (!(volumes_entrelaces_.get_md_vector() == md_vector_faces()))
     {
@@ -1147,7 +1147,7 @@ void Domaine_VEF::typer_elem(Domaine& domaine_geom)
         type = "Hexa_VEF";
       else
         {
-          Cerr << "probleme de typage dans Elem_VEF::typer" << finl;
+          Cerr << "typing problem in Elem_VEF::typer" << finl;
           Process::exit();
         }
       type_elem_.typer(type);

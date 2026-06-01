@@ -166,7 +166,7 @@ protected:
           }
         if (L2 > 1.0e-12) err_L2 = sqrt(err_L2 / L2);
 
-        Cerr<<"    composant # "<<k<<" => "<<err_L2<<" "<<err_max;
+        Cerr<<"    component # "<<k<<" => "<<err_L2<<" "<<err_max;
       }
     Cerr<<finl;
   }

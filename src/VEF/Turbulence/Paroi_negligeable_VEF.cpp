@@ -88,14 +88,14 @@ int Paroi_negligeable_VEF::init_lois_paroi()
                     }
                   if (verif == 0)
                     {
-                      Cerr << "Il y a un gros pbl dans la detremination de elem_paroi_double" << finl;
+                      Cerr << "There is a serious problem in the determination of elem_paroi_double" << finl;
                     }
                 }
             }
         }
     }
-  elem_paroi.resize(compteur_elem_paroi);  // On a tous les elts qui touchent la paroi par une face
-  // PBL : est ce qu on a plusieurs fois le meme???? -> Non car Verif_elem_double!!
+  elem_paroi.resize(compteur_elem_paroi);  // We have all elements touching the wall by one face
+  // PBL: do we have duplicates???? -> No, because of Verif_elem_double!!
   return 1;
 }
 

@@ -58,35 +58,35 @@ void Save_Restart::assoscier_pb_base(const Probleme_base& pb)
 
 void Save_Restart::allocation() const
 {
-  if(pb_base_->schema_temps().file_allocation() && EcritureLectureSpecial::Active)        // Permet de tester l'allocation d'espace disque
+  if(pb_base_->schema_temps().file_allocation() && EcritureLectureSpecial::Active)        // Allows testing disk space allocation
     {
-      if (Bad_allocate_==1)                                        // Si l'allocation n'a pas eut lieu
-        if (Process::je_suis_maitre())                                // Qu'avec le proc maitre
+      if (Bad_allocate_==1)                                        // If allocation did not take place
+        if (Process::je_suis_maitre())                                // Only with the master process
           {
-            if (Num_pb_==1)                                                // Si le probleme est le premier
-              if (!allocate_file_size(File_size_))                        // je tente une allocation d'espace disque de taille 2*file_size
-                Bad_allocate_=0;                                        // Si cela echoue, j'indique au code que l'allocation a deja eut lieu et n'a pas fonctionner
+            if (Num_pb_==1)                                                // If the problem is the first
+              if (!allocate_file_size(File_size_))                        // I attempt a disk space allocation of size 2*file_size
+                Bad_allocate_=0;                                        // If this fails, I indicate to the code that the allocation already took place and did not work
               else
-                Num_pb_=Nb_pb_total_;                                        // Si OK, je modifie num_pb pour que les autres pb ne tentent pas d'allocation
+                Num_pb_=Nb_pb_total_;                                        // If OK, I modify num_pb so that other problems do not attempt allocation
             else
-              Num_pb_-=1;                                                // Si le probleme n'est pas le premier, je decremente le numero de probleme
+              Num_pb_-=1;                                                // If the problem is not the first, I decrement the problem number
           }
       const int canal = 2007;
-      if (Process::je_suis_maitre())                                // le processeur maitre envoi bad_allocate a tout le monde
+      if (Process::je_suis_maitre())                                // the master processor sends bad_allocate to everyone
         for (int p=1; p<Process::nproc(); p++)
           envoyer(Bad_allocate_,p,canal);
       else
         recevoir(Bad_allocate_,0,canal);
 
-      if (Bad_allocate_==0)                                        // Si l'allocation a echoue
+      if (Bad_allocate_==0)                                        // If allocation failed
         {
           sauver_xyz(1);
-          if (Num_pb_==Nb_pb_total_)                                        // Si le numero de probleme correspond au nombre total de probleme
+          if (Num_pb_==Nb_pb_total_)                                        // If the problem number corresponds to the total number of problems
             {
               if (Process::je_suis_maitre())
                 {
-                  Cerr << finl;                                                // j'arrete le code de facon claire
-                  Cerr << "***Error*** " << error_ << finl;                // et je sort l'erreur du code
+                  Cerr << finl;                                                // I stop the code clearly
+                  Cerr << "***Error*** " << error_ << finl;                // and I output the error from the code
                   Cerr << "A xyz backup was made because you do not have enough disk space" << finl;
                   Cerr << "to continue the current calculation. Free up disk space and" << finl;
                   Cerr << "restart the calculation thanks to the backup just made." << finl;

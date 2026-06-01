@@ -99,7 +99,7 @@ void Champ_Inc_P0_base::init_fcl() const
         idx = 3;
       if (!idx)
         {
-          Cerr << "Champ_Inc_P0_base : CL non codee rencontree! " << cls[n]->que_suis_je() << finl;
+          Cerr << "Champ_Inc_P0_base : unhandled boundary condition encountered! " << cls[n]->que_suis_je() << finl;
           Process::exit();
         }
       for (i = 0; i < fvf.nb_faces_tot(); i++)

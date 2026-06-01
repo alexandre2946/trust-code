@@ -66,25 +66,25 @@ void Champ_Ostwald_VDF::calculer_mu(DoubleTab& mu_tab)
     }
 }
 
-/*! @brief Calcul le champ Ostwald : calcul de D::D
+/*! @brief Computes the Ostwald field: computes D::D then computes mu.
  *
- *         puis calcul de mu
- *
- * @param (double) temps ou le calcul est effectue
+ * @param tps Time at which the computation is performed.
  */
 
 void Champ_Ostwald_VDF::me_calculer(double tps)
 {
   if (temps_ != tps)
     {
-      // Cerr<< "Calcul de Mu Ostwald"<<finl;
+      // Cerr<< "Compute Mu Ostwald"<<finl;
       mon_champ_->calculer_dscald_centre_element(valeurs());
       calculer_mu(valeurs());
     }
 }
 
-/*! @brief Initialise le champs
+/*! @brief Initializes the field.
  *
+ * @param un_temps Initial time.
+ * @return 1 on success.
  */
 int Champ_Ostwald_VDF::initialiser(const double un_temps)
 {

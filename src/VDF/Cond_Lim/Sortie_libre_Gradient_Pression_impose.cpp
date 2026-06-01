@@ -93,7 +93,7 @@ double Sortie_libre_Gradient_Pression_impose::flux_impose(int face) const
   else if (le_champ_front->valeurs().line_size() == 1)
     return (trace_pression_int[face] + coeff[face] * le_champ_front->valeurs()(face, 0));
   else
-    Cerr << "Sortie_libre_Gradient_Pression_impose::flux_impose erreur" << finl;
+    Cerr << "Sortie_libre_Gradient_Pression_impose::flux_impose error" << finl;
   exit();
   return 0.;
 }
@@ -103,7 +103,7 @@ double Sortie_libre_Gradient_Pression_impose::flux_impose(int face, int ncomp) c
   if (ncomp == 0) return flux_impose(face);
 
   Cerr << "Sortie_libre_Gradient_Pression_impose::flux_impose(int  , int )" << finl;
-  Cerr << "On ne sait imposer que la composante normale du gradient" << finl;
+  Cerr << "Only the normal component of the gradient can be imposed" << finl;
   Process::exit();
   return 0.;
 }
@@ -120,11 +120,11 @@ double Sortie_libre_Gradient_Pression_impose::grad_P_imp(int face) const
       else if (le_champ_front->valeurs().line_size() == 1)
         return le_champ_front->valeurs()(face, 0) / d_rho;
       else
-        Cerr << "Sortie_libre_Gradient_Pression_impose::grad_P_imp() erreur" << finl;
+        Cerr << "Sortie_libre_Gradient_Pression_impose::grad_P_imp() error" << finl;
     }
   else
     {
-      //quasi compressible
+      //quasi-compressible
       const DoubleTab& tab_rho = mil.masse_volumique().valeurs();
       int elem = le_dom_VDF->face_voisins(face, 0);
       if (elem == -1)
@@ -135,7 +135,7 @@ double Sortie_libre_Gradient_Pression_impose::grad_P_imp(int face) const
       else if (le_champ_front->valeurs().line_size() == 1)
         return le_champ_front->valeurs()(face, 0) / d_rho;
       else
-        Cerr << "Sortie_libre_Gradient_Pression_impose::grad_P_imp() erreur" << finl;
+        Cerr << "Sortie_libre_Gradient_Pression_impose::grad_P_imp() error" << finl;
     }
   exit();
   return 0.;

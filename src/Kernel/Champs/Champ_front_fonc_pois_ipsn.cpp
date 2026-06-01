@@ -61,7 +61,7 @@ Entree& Champ_front_fonc_pois_ipsn::readOn(Entree& is )
     }
 
 
-  //Cerr << "Champ_front_fonc_pois_ipsn lu U_moy = "<< U_moy << finl ;
+  //Cerr << "Champ_front_fonc_pois_ipsn read U_moy = "<< U_moy << finl ;
   return is ;
 }
 

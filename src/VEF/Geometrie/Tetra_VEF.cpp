@@ -237,14 +237,14 @@ void Tetra_VEF::modif_volumes_entrelaces(int j,int elem,
   switch(type_cl)
     {
 
-      // pas de Face de Dirichlet : impossible
+      // no Dirichlet face: impossible
     case 0:
       {
-        Cerr << "Tetra_VEF::modif_volumes_entrelaces() type 0 impossible!\n";
+        Cerr << "Tetra_VEF::modif_volumes_entrelaces() type 0 not possible!\n";
         break;
       }
 
-    case 1: // une Face de Dirichlet : Face 3
+    case 1: // one Dirichlet face: Face 3
       {
         vol_mod = volumes_entrelaces[j]/3 ;
         volumes_entrelaces_Cl[elem_faces(elem,0)]  += vol_mod;
@@ -374,11 +374,11 @@ void Tetra_VEF::modif_volumes_entrelaces(int j,int elem,
       }
     default :
       {
-        Cerr << "\n  type inconnu Tetra_VEF::modif_volumes_entrelaces: " << type_cl;
+        Cerr << "\n  unknown type in Tetra_VEF::modif_volumes_entrelaces: " << type_cl;
         exit();
       }
 
-    } // fin du switch
+    } // end of switch
 }
 
 void Tetra_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
@@ -395,14 +395,14 @@ void Tetra_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
   switch(type_cl)
     {
 
-      // pas de Face de Dirichlet : impossible
+      // no Dirichlet face: impossible
     case 0:
       {
-        Cerr << "Tetra_VEF::modif_volumes_entrelaces() type 0 impossible!\n";
+        Cerr << "Tetra_VEF::modif_volumes_entrelaces() type 0 not possible!\n";
         break;
       }
 
-    case 1: // une Face de Dirichlet : Face 3
+    case 1: // one Dirichlet face: Face 3
       {
         vol_mod = volumes_entrelaces[j]/3 ;
         face=elem_faces(elem,0);
@@ -588,11 +588,11 @@ void Tetra_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
       }
     default :
       {
-        Cerr << "\n  type inconnu Tetra_VEF::modif_volumes_entrelaces: " << type_cl;
+        Cerr << "\n  unknown type in Tetra_VEF::modif_volumes_entrelaces: " << type_cl;
         exit();
       }
 
-    } // fin du switch
+    } // end of switch
 }
 
 void Tetra_VEF::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
